@@ -24,7 +24,7 @@ export const defaultConfig: Config = {
 
 export const defaultEngineConfig: Partial<ConfigParams> = {
   useStats: true,
-  licenseKey: 'agpl-v3'
+  licenseKey: 'gpl-v3'
 }
 
 export interface ExpectedValue {

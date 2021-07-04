@@ -179,8 +179,7 @@ export interface ConfigParams {
   leapYear1900: boolean,
   /**
    * A license key of HyperFormula accepts the following values:
-   * * `agpl-v3` string if you want to use the software on AGPL v3 license terms,
-   * * `non-commercial-and-evaluation` string if you want to use our limited versions,
+   * * `gpl-v3` string if you want to use the software on GPL v3 license terms,
    * * a valid license key string, if you bought the commercial license.
    *
    * For more details visit [this guide](/guide/license-key.html)
