@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | matrixMapping      | arrrayMapping     |
 | isCellPartOfMatrix | isCellPartOfArray |
 
-- Changed Exceptions (#747):
+- **Breaking change**: Changed Exceptions (#747):
 
 | before                       | after                       |
 |------------------------------|-----------------------------|
