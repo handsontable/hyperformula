@@ -54,7 +54,7 @@ To constrain the size of the output array, use the `ARRAY_CONSTRAIN` function:
 
 | Syntax | Example |
 | :--- | :--- |
-| `ARRAY_CONSTRAIN(your_array,your_height,your_width)` | `=ARRAY_CONSTRAIN(ARRAYFORMULA(A2:A5*10),2,1)` |
+| `ARRAY_CONSTRAIN(your_array,your_height,your_width)` | `=ARRAY_CONSTRAIN(A2:E5,2,2)` |
 
 If your specified output array size is smaller than the input array size, only the corresponding top-left cells of the input array are taken into account.
 
