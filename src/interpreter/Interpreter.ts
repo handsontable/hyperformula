@@ -8,7 +8,7 @@ import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../Absol
 import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
-import {DependencyGraph} from '../DependencyGraph'
+import {CellVertex, DependencyGraph, Vertex} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
@@ -40,6 +40,7 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
+import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
   private gpu?: GPU
@@ -74,7 +75,7 @@ export class Interpreter {
     if(val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
       [[val]] = val.data
     }
-    return wrapperForAddress(val, state.formulaAddress)
+    return wrapperForRootVertex(val, state.formulaVertex)
   }
 
   /**
@@ -177,7 +178,7 @@ export class Interpreter {
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if(pluginFunction!==undefined) {
-          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)))
+          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex))
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
@@ -482,9 +483,9 @@ function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) =
   }
 }
 
-function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): InterpreterValue {
-  if (val instanceof CellError) {
-    return val.attachAddress(adr)
+function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): InterpreterValue {
+  if (val instanceof CellError && vertex !== undefined) {
+    return val.attachRootVertex(vertex)
   }
   return val
 }
