@@ -15,6 +15,7 @@ const dictionary: RawTranslationPackage = {
     NAME: '#NÉV?',
     NUM: '#SZÁM!',
     REF: '#HIV!',
+    SPILL: '#KIBONTÁS!',
     VALUE: '#ÉRTÉK!',
   },
   functions: {

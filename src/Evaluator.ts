@@ -82,7 +82,7 @@ export class Evaluator {
           } else if (vertex instanceof FormulaVertex) {
             const address = vertex.getAddress(this.lazilyTransformingAstService)
             this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
-            const error = new CellError(ErrorType.CYCLE, undefined, address)
+            const error = new CellError(ErrorType.CYCLE, undefined, vertex)
             vertex.setCellValue(error)
             changes.addChange(error, address)
           }
@@ -123,7 +123,7 @@ export class Evaluator {
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex.getAddress(this.lazilyTransformingAstService)))
+        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex))
       }
     })
     sorted.forEach((vertex: Vertex) => {
@@ -143,7 +143,7 @@ export class Evaluator {
       return vertex.setNoSpace()
     } else {
       const formula = vertex.getFormula(this.lazilyTransformingAstService)
-      const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic))
+      const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic, vertex))
       return vertex.setCellValue(newCellValue)
     }
   }

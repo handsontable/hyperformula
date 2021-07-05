@@ -59,7 +59,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added pretty print for detailedCellError. (#712)
 - Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. (#720)
 - Added `CellError` to exports. (#736)
+<<<<<<< HEAD
 - Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. (#747)
+=======
+- Added `#SPILL!` error type. (#708)
+>>>>>>> jk/matrices-take-2-cruds-part-2
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

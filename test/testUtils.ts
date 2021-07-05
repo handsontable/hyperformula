@@ -155,7 +155,7 @@ export function detailedError(errorType: ErrorType, message?: string, config?: C
 }
 
 export function noSpace(): DetailedCellError {
-  return detailedError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult)
+  return detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
 }
 
 export function detailedErrorWithOrigin(errorType: ErrorType, address: string, message?: string, config?: Config): DetailedCellError {

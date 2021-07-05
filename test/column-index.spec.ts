@@ -15,6 +15,11 @@ import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
 import {adr, expectColumnIndexToMatchSheet} from './testUtils'
+<<<<<<< HEAD
+=======
+import {HyperFormula} from '../src'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
+>>>>>>> jk/matrices-take-2-cruds-part-2
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
