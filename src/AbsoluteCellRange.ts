@@ -15,7 +15,7 @@ import {
 import {DependencyGraph} from './DependencyGraph'
 import {SheetsNotEqual} from './errors'
 import {Maybe} from './Maybe'
-import {AstNodeType, CellAddress, CellRangeAst} from './parser'
+import {AstNodeType, CellRangeAst} from './parser'
 import {ColumnRangeAst, RowRangeAst} from './parser/Ast'
 import {RowsSpan, Span} from './Span'
 
