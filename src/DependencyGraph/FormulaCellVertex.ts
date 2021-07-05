@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {addressesEqual, CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
@@ -207,7 +207,7 @@ export class MatrixVertex extends FormulaVertex {
   ensureRecentData(_updatingService: LazilyTransformingAstService) {}
 
   isLeftCorner(address: SimpleCellAddress): boolean {
-    return addressesEqual(this.cellAddress, address)
+    return equalSimpleCellAddress(this.cellAddress, address)
   }
 
   private setErrorValue(error: CellError) {

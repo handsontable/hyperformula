@@ -16,6 +16,7 @@ import {
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 /**
  * Possible errors returned by our interpreter.
@@ -143,13 +144,13 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
-    public readonly address?: SimpleCellAddress
+    public readonly root?: FormulaVertex
   ) {
   }
 
-  public attachAddress(address: SimpleCellAddress): CellError {
-    if (this.address === undefined) {
-      return new CellError(this.type, this.message, address)
+  public attachRootVertex(vertex: FormulaVertex): CellError {
+    if(this.root === undefined) {
+      return new CellError(this.type, this.message, vertex)
     } else {
       return this
     }
@@ -189,9 +190,7 @@ export const invalidSimpleCellAddress = (address: SimpleCellAddress): boolean =>
 export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: number, toRight: number, toBottom: number): SimpleCellAddress => {
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
-export const addressesEqual = (left: SimpleCellAddress, right: SimpleCellAddress) => {
-  return left.sheet === right.sheet && left.row === right.row && left.col === right.col
-}
+
 export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
 export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
@@ -205,6 +204,7 @@ export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
 export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
   return address.sheet ?? baseAddress.sheet
 }
+
 export const equalSimpleCellAddress = (left: SimpleCellAddress, right: SimpleCellAddress) => {
   return left.sheet === right.sheet && left.col === right.col && left.row === right.row
 }
