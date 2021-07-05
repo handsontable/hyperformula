@@ -74,5 +74,5 @@ When passing arrays to functions that expect scalars, the following rules apply:
 
 * Array dimensions need to be consistent (e.g. every row needs to be of the same length).
 * If an input array value is missing (due to a difference in dimensions), the corresponding output array value is `#N/A`.
-* If a cell evaluates to an array, the array values are spilled into neighboring cells.<br>This behavior doesn't apply to ranges, which return a `#VALUE!` error in this case.
+* If a cell evaluates to an array, the array values are spilled into neighboring cells (unless the neighboring cells are already filled).<br>This behavior doesn't apply to ranges, which return a `#VALUE!` error in this case.
 * If one or both of input array dimensions is `1` (`1`x`1` or `1`x`n` or `n`x`1`), the array is repeated, to match the output array dimensions.
