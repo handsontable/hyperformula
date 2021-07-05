@@ -66,13 +66,13 @@ To filter an array based on boolean arrays, use the `FILTER` function:
 
 | Syntax | Example |
 | :--- | :--- |
-| `FILTER(your_array,BoolArray1[; BoolArray2[; ...]]` | `=FILTER(A2:A5*10),BoolArray1)` |
+| `FILTER(your_array, BoolArray1[; BoolArray2[; ...]]` | `=FILTER(ARRAYFORMULA(A2:A5*10), {1,0,0,1})` |
 
 ## Array rules
 
-When operating on arrays, or passing arrays as function arguments, the following rules apply:
+When passing arrays to functions that expect scalars, the following rules apply:
 
 * Array dimensions need to be consistent (e.g. every row needs to be of the same length).
 * If an input array value is missing (due to a difference in dimensions), the corresponding output array value is `#N/A`.
 * If a cell evaluates to an array, the array values are spilled into neighboring cells.<br>This behavior doesn't apply to ranges, which return a `#VALUE!` error in this case.
-* If one or both of input array dimensions is `1` (`1`x`1` or `1`x`n` or `n`x`1`), the array is repeated, to match the output array dimensions (in Google Sheets and Microsoft Excel, this behavior is different: `1`x`1` arrays are treated as [scalars](#about-arrays-in-hyperformula)).
+* If one or both of input array dimensions is `1` (`1`x`1` or `1`x`n` or `n`x`1`), the array is repeated, to match the output array dimensions.
