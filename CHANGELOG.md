@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Changed behaviour of `addColumns/removeColumns` so that it is possible to add/remove columns across spilled array without changing array size. (#732)
 - Changed SWITCH function, so it takes array as its first argument.
 - Changed TRANSPOSE function, so it works with data of any type. (#670)
-- Changed config options (#747):
+- **Breaking change**: Changed config options (#747):
 
 | before                | after                |
 |-----------------------|----------------------|
