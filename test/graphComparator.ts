@@ -6,6 +6,7 @@ import {
   EmptyCellVertex,
   FormulaCellVertex,
   MatrixVertex,
+  ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
   Vertex,
@@ -48,6 +49,8 @@ export class EngineComparator {
     const actualWidth = this.actual.addressMapping.getWidth(sheet)
     const actualHeight = this.actual.addressMapping.getHeight(sheet)
 
+    this.compareMatrixMappings()
+
     for (let x = 0; x < Math.max(expectedWidth, actualWidth); ++x) {
       for (let y = 0; y < Math.max(expectedHeight, actualHeight); ++y) {
         const address = simpleCellAddress(sheet, x, y)
@@ -55,7 +58,10 @@ export class EngineComparator {
         const actualVertex = this.actual.addressMapping.getCell(address)
         if (expectedVertex === undefined && actualVertex === undefined) {
           continue
-        } else if (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) {
+        } else if (
+          (expectedVertex instanceof FormulaCellVertex  && actualVertex instanceof FormulaCellVertex) ||
+          (expectedVertex instanceof MatrixVertex  && actualVertex instanceof MatrixVertex)
+        ) {
           const actualVertexAddress = actualVertex.getAddress(this.actual.dependencyGraph.lazilyTransformingAstService)
           const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)
           deepStrictEqual(actualVertexAddress, expectedVertexAddress, `Different addresses in formulas. expected: ${actualVertexAddress}, actual: ${expectedVertexAddress}`)
@@ -65,8 +71,8 @@ export class EngineComparator {
           deepStrictEqual(actualVertex.getCellValue(), expectedVertex.getCellValue(), `Different values. expected: ${expectedVertex.getCellValue().toString()}, actual: ${actualVertex.getCellValue().toString()}`)
         } else if (expectedVertex instanceof EmptyCellVertex && actualVertex instanceof EmptyCellVertex) {
           continue
-        } else if (expectedVertex instanceof MatrixVertex && actualVertex instanceof MatrixVertex) {
-          throw Error('Not implemented yet.')
+        } else if (expectedVertex instanceof ParsingErrorVertex && actualVertex instanceof ParsingErrorVertex) {
+          deepStrictEqual(expectedVertex.rawInput, actualVertex.rawInput, `Different raw input. expected: ${expectedVertex.rawInput}, actual: ${actualVertex.rawInput}`)
         } else {
           throw Error('Different vertex types')
         }
@@ -95,6 +101,20 @@ export class EngineComparator {
       }
     }
     return value
+  }
+
+  private compareMatrixMappings() {
+    const actual = this.actual.matrixMapping.matrixMapping
+    const expected = this.expected.matrixMapping.matrixMapping
+
+    expect(actual.size).toEqual(expected.size)
+
+    for (const [key, value] of expected.entries()) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const actualEntry = actual.get(key)!
+      expect(actualEntry).toBeDefined()
+      expect(actualEntry.matrix.size.isRef).toBe(value.matrix.size.isRef)
+    }
   }
 
   private getAddressOfVertex(engine: HyperFormula, vertex: Vertex): SimpleCellAddress | AbsoluteCellRange {

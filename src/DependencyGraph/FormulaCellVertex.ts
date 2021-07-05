@@ -4,8 +4,9 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
+import {ErrorMessage} from '../error-message'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ErroredMatrix, IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
@@ -83,7 +84,11 @@ export class MatrixVertex extends FormulaVertex {
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, size: MatrixSize, version: number = 0) {
     super(formula, cellAddress, version)
-    this.matrix = new NotComputedMatrix(size)
+    if (size.isRef) {
+      this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
+    } else {
+      this.matrix = new NotComputedMatrix(size)
+    }
   }
 
   get width(): number {
@@ -96,6 +101,10 @@ export class MatrixVertex extends FormulaVertex {
 
   get sheet(): number {
     return this.cellAddress.sheet
+  }
+
+  get leftCorner(): SimpleCellAddress {
+    return this.cellAddress
   }
 
   setCellValue(value: InterpreterValue): InterpreterValue {
@@ -151,6 +160,11 @@ export class MatrixVertex extends FormulaVertex {
     }
   }
 
+  setNoSpace(): InterpreterValue {
+    this.matrix = new ErroredMatrix(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
+    return this.getCellValue()
+  }
+
   getRange(): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(this.cellAddress, this.width, this.height)
   }
@@ -175,33 +189,6 @@ export class MatrixVertex extends FormulaVertex {
       (col < this.cellAddress.col + this.width)
   }
 
-  /* TODO cruds should ensure is recent data */
-  addRows(sheet: number, row: number, numberOfRows: number): void {
-    if (this.matrix instanceof Matrix) {
-      this.matrix.addRows(row - this.cellAddress.row, numberOfRows)
-    }
-  }
-
-  addColumns(sheet: number, column: number, numberOfColumns: number): void {
-    if (this.matrix instanceof Matrix) {
-      this.matrix.addColumns(column - this.cellAddress.col, numberOfColumns)
-    }
-  }
-
-  removeRows(removedRows: RowsSpan): void {
-    if (this.matrix instanceof Matrix) {
-      const removedRowsFromMatrix = this.rowsFromMatrix().intersect(removedRows)!
-      this.matrix.removeRows(removedRowsFromMatrix.rowStart - this.cellAddress.row, removedRowsFromMatrix.rowEnd - this.cellAddress.row)
-    }
-  }
-
-  removeColumns(removedColumns: ColumnsSpan): void {
-    if (this.matrix instanceof Matrix) {
-      const removedColumnsFromMatrix = this.columnsFromMatrix().intersect(removedColumns)!
-      this.matrix.removeColumns(removedColumnsFromMatrix.columnStart - this.cellAddress.col, removedColumnsFromMatrix.columnEnd - this.cellAddress.col)
-    }
-  }
-
   isComputed() {
     return (!(this.matrix instanceof NotComputedMatrix))
   }
@@ -218,6 +205,10 @@ export class MatrixVertex extends FormulaVertex {
    * No-op as matrix vertices are transformed eagerly.
    * */
   ensureRecentData(_updatingService: LazilyTransformingAstService) {}
+
+  isLeftCorner(address: SimpleCellAddress): boolean {
+    return equalSimpleCellAddress(this.cellAddress, address)
+  }
 
   private setErrorValue(error: CellError) {
     this.matrix = new ErroredMatrix(error, this.matrix.size)

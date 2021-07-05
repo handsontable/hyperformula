@@ -11,9 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
 - **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
 - **Breaking change**: Changed API of the following methods to take `SimpleCellRange` type argument: `copy`,  `cut`, `getCellDependents`, `getCellPrecedents`, `getFillRangeData`, `getRangeFormulas`,  `getRangeSerialized`, `getRangeValues`, `isItPossibleToMoveCells`, `isItPossibleToSetCellContents`, `moveCells`. (#687)
-- Changed SWITCH function so it takes array as its first argument.
 - **Breaking change**: Changed the AGPLv3 license to GPLv3.
 - **Breaking change**: Removed the free non-commercial license.
+- **Breaking change**: Changed behaviour of `setCellContents` so that it is possible to override space occupied by spilled array. (#708)
+- **Breaking change**: Changed behaviour of `addRows/removeRows` so that it is possible to add/remove rows across spilled array without changing array size. (#708)
+- Changed SWITCH function, so it takes array as its first argument.
+- Changed TRANSPOSE function, so it works with data of any type. (#708)
 
 ### Added
 - Added support for array arithmetic. (#628)
@@ -34,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added pretty print for detailedCellError. (#712)
 - Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. (#720)
 - Added `CellError` to exports. (#736)
+- Added `#SPILL!` error type. (#708)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

@@ -1,6 +1,6 @@
-import {CellValue, DetailedCellError, HyperFormula} from '../src'
+import {CellValue, DetailedCellError, ErrorType, HyperFormula, Sheet, SheetDimensions} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {CellError, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
 import {FormulaCellVertex, MatrixVertex, RangeVertex} from '../src/DependencyGraph'
@@ -17,6 +17,8 @@ import {
 } from '../src/parser'
 import {ColumnRangeAst, RowRangeAst} from '../src/parser/Ast'
 import {EngineComparator} from './graphComparator'
+import {ErrorMessage} from '../src/error-message'
+import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
   return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
@@ -152,6 +154,10 @@ export function detailedError(errorType: ErrorType, message?: string, config?: C
   return new DetailedCellError(error, config.translationPackage.getErrorTranslation(errorType))
 }
 
+export function noSpace(): DetailedCellError {
+  return detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
+}
+
 export function detailedErrorWithOrigin(errorType: ErrorType, address: string, message?: string, config?: Config): DetailedCellError {
   config = new Config(config)
   const error = new CellError(errorType, message)
@@ -186,3 +192,54 @@ export function unregisterAllLanguages() {
     HyperFormula.unregisterLanguage(langCode)
   }
 }
+
+export function expectVerticesOfTypes(engine: HyperFormula, types: any[][], sheet: number = 0) {
+  for (let row=0; row<types.length; ++row) {
+    for (let col=0; col<types[row].length; ++col) {
+      const expectedType = types[row][col]
+      const cell = engine.dependencyGraph.getCell(simpleCellAddress(sheet, col, row))
+      if (expectedType === undefined) {
+        expect(cell === undefined).toBe(true)
+      } else {
+        expect(cell instanceof types[row][col]).toBe(true)
+      }
+    }
+  }
+}
+
+export function columnIndexToSheet(columnIndex: ColumnIndex, width: number, height: number, sheet: number = 0): any[][] {
+  const result: any[][] = []
+  for (let col=0; col<width; ++col) {
+    const columnMap = columnIndex.getColumnMap(sheet, col)
+    for (const [value, { index }] of columnMap.entries()) {
+      columnIndex.ensureRecentData(sheet, col, value)
+      for (const row of index) {
+        result[row] = result[row] ?? []
+        if (result[row][col] !== undefined) {
+          throw new Error('ColumnIndex ambiguity.')
+        }
+        result[row][col] = value
+      }
+    }
+  }
+  return normalizeSheet(result, { width, height })
+}
+
+function normalizeSheet(sheet: any[][], dimensions: SheetDimensions): any[][]  {
+  return Array.from(sheet, row => {
+    if (row) {
+      row.length = dimensions.width
+      return Array.from(row, v => v || null)
+    }
+    return Array(dimensions.width).fill(null)
+  })
+}
+
+export function expectColumnIndexToMatchSheet(expected: Sheet, engine: HyperFormula, sheetId: number = 0) {
+  const columnIndex = engine.columnSearch as ColumnIndex
+  expect(columnIndex).toBeInstanceOf(ColumnIndex)
+  const exportedColumnIndex = columnIndexToSheet(columnIndex, engine.getSheetDimensions(sheetId).width, sheetId)
+  const dimensions = engine.getSheetDimensions(0)
+  expectArrayWithSameContent(normalizeSheet(expected, dimensions), normalizeSheet(exportedColumnIndex, dimensions))
+}
+

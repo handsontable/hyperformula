@@ -12,6 +12,7 @@ import {ColumnsSpan} from '../Span'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
+import {CellValueChange} from '../ContentChanges'
 
 export interface SearchStrategy {
   find(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean): number,
@@ -25,6 +26,8 @@ export interface ColumnSearchStrategy extends SearchStrategy {
   remove(value: RawInterpreterValue | undefined, address: SimpleCellAddress): void,
 
   change(oldValue: RawInterpreterValue | undefined, newValue: RawInterpreterValue, address: SimpleCellAddress): void,
+
+  applyChanges(contentChanges: CellValueChange[]): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 

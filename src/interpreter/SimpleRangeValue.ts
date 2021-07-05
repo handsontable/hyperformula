@@ -96,6 +96,15 @@ export class SimpleRangeValue {
     return ret
   }
 
+  public* effectiveAddressesFromData(leftCorner: SimpleCellAddress): IterableIterator<SimpleCellAddress> {
+    for (let row = 0; row < this.data.length; ++row) {
+      const rowData = this.data[row]
+      for (let col = 0; col < rowData.length; ++col) {
+        yield simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)
+      }
+    }
+  }
+
   public* entriesFromTopLeftCorner(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     this.ensureThatComputed()
     for (let row = 0; row < this.size.height; ++row) {
@@ -134,6 +143,7 @@ export class SimpleRangeValue {
   }
 
   public rawData(): InternalScalarValue[][] {
+    this.ensureThatComputed()
     return this._data ?? []
   }
 

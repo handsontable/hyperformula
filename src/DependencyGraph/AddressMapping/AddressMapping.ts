@@ -99,6 +99,25 @@ export class AddressMapping {
     sheetMapping.setCell(address, newVertex)
   }
 
+  public moveCell(source: SimpleCellAddress, destination: SimpleCellAddress) {
+    const sheetMapping = this.mapping.get(source.sheet)
+    if (!sheetMapping) {
+      throw Error('Sheet not initialized.')
+    }
+    if (source.sheet !== destination.sheet) {
+      throw Error('Cannot move cells between sheets.')
+    }
+    if (sheetMapping.has(destination)) {
+      throw new Error('Cannot move cell. Destination already occupied.')
+    }
+    const vertex = sheetMapping.getCell(source)
+    if (vertex === undefined) {
+      throw new Error('Cannot move cell. No cell with such address.')
+    }
+    this.setCell(destination, vertex)
+    this.removeCell(source)
+  }
+
   public removeCell(address: SimpleCellAddress) {
     const sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
@@ -186,7 +205,7 @@ export class AddressMapping {
     yield* this.mapping.get(columnsSpan.sheet)!.entriesFromColumnsSpan(columnsSpan)
   }
 
-  public* entries(): IterableIterator<[SimpleCellAddress, CellVertex | null]> {
+  public* entries(): IterableIterator<[SimpleCellAddress, Maybe<CellVertex>]> {
     for (const [sheet, mapping] of this.mapping.entries()) {
       yield* mapping.getEntries(sheet)
     }

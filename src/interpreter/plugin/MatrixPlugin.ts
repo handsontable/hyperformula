@@ -9,7 +9,7 @@ import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from
 import {ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -188,12 +188,9 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
 
   public transpose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
-      if (!matrix.hasOnlyNumbers()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
-      }
-      const input = matrix.rawNumbers()
+      const input = matrix.rawData()
       const inputSize = matrix.size
-      const result: number[][] = []
+      const result: InternalScalarValue[][] = []
       for (let i = 0; i < inputSize.width; ++i) {
         result[i] = []
         for (let j = 0; j < inputSize.height; ++j) {
@@ -201,7 +198,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         }
       }
 
-      return SimpleRangeValue.onlyNumbers(result)
+      return SimpleRangeValue.onlyValues(result)
     })
   }
 

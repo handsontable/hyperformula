@@ -27,14 +27,14 @@ export class MatrixSize {
   constructor(
     public width: number,
     public height: number,
-    public isRef?: boolean,
+    public isRef: boolean = false,
   ) {
     if (width <= 0 || height <= 0) {
       throw Error('Incorrect matrix size')
     }
   }
 
-  isScalar() {
+  isScalar(): boolean {
     return (this.width<=1 && this.height<=1) || this.isRef
   }
 }

@@ -203,7 +203,8 @@ describe('Adding column - FormulaCellVertex#address update', () => {
   })
 })
 
-describe('Adding column - MatrixVertex', () => {
+/* TODO size of matrix can be dependent on structural changes */
+xdescribe('Adding column - MatrixVertex', () => {
   it('MatrixVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=TRANSPOSE(A1:B2)'],

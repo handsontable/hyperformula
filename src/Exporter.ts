@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {CellValue, DetailedCellError} from './CellValue'
 import {Config} from './Config'
 import {CellValueChange, ChangeExporter} from './ContentChanges'
@@ -63,10 +63,10 @@ export class Exporter implements ChangeExporter<ExportedChange> {
 
   public exportChange(change: CellValueChange): ExportedChange | ExportedChange[] {
     const value = change.value
-    const address = simpleCellAddress(change.sheet, change.col, change.row)
+    const address = change.address
 
-    if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
-      const namedExpression = this.namedExpressions.namedExpressionInAddress(change.row)
+    if (address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      const namedExpression = this.namedExpressions.namedExpressionInAddress(address.row)
       if (!namedExpression) {
         throw new Error('Missing named expression')
       }

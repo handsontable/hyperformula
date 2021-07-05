@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
-import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {equalSimpleCellAddress, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
 import {Config} from './Config'
@@ -51,9 +51,11 @@ import {
 } from './NamedExpressions'
 import {NamedExpressionDependency, ParserWithCaching, RelativeDependency} from './parser'
 import {ParsingError} from './parser/Ast'
+import {ParsingResult} from './parser/ParserWithCaching'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 export class RemoveRowsCommand {
   constructor(
@@ -318,8 +320,8 @@ export class Operations {
   public setRowOrder(sheetId: number, rowMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][] {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
     let oldContent: [SimpleCellAddress, ClipboardCell][] = []
-    for(const [source, target] of rowMapping ) {
-      if(source!==target) {
+    for (const [source, target] of rowMapping) {
+      if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
         const row = this.getRangeClipboardCells(rowRange)
         oldContent = oldContent.concat(row)
@@ -336,11 +338,11 @@ export class Operations {
     return oldContent
   }
 
-  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][]  {
+  public setColumnOrder(sheetId: number, columnMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][] {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
     let oldContent: [SimpleCellAddress, ClipboardCell][] = []
-    for(const [source, target] of columnMapping ) {
-      if(source!==target) {
+    for (const [source, target] of columnMapping) {
+      if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
         const column = this.getRangeClipboardCells(rowRange)
         oldContent = oldContent.concat(column)
@@ -481,7 +483,9 @@ export class Operations {
       removedCells.push({address, cellType: this.getClipboardCell(address)})
     }
 
-    this.dependencyGraph.removeRows(rowsToRemove)
+    const {affectedArrays, contentChanges} = this.dependencyGraph.removeRows(rowsToRemove)
+
+    this.columnSearch.applyChanges(contentChanges.getChanges())
 
     let version: number
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
@@ -489,6 +493,9 @@ export class Operations {
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
+
+    this.rewriteAffectedMatrices(affectedArrays)
+
     return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
   }
 
@@ -519,6 +526,7 @@ export class Operations {
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
+
     return {
       version: version!,
       removedCells,
@@ -540,13 +548,27 @@ export class Operations {
       return
     }
 
-    this.dependencyGraph.addRows(addedRows)
+    const {affectedArrays} = this.dependencyGraph.addRows(addedRows)
 
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new AddRowsTransformer(addedRows)
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
+
+    this.rewriteAffectedMatrices(affectedArrays)
+  }
+
+  private rewriteAffectedMatrices(affectedMatrices: Set<MatrixVertex>) {
+    for (const matrixVertex of affectedMatrices.values()) {
+      if (matrixVertex.matrix.size.isRef) {
+        continue
+      }
+      const ast = matrixVertex.getFormula(this.lazilyTransformingAstService)
+      const address = matrixVertex.getAddress(this.lazilyTransformingAstService)
+      const hash = this.parser.computeHashFromAst(ast)
+      this.setFormulaToCellFromCache(hash, address)
+    }
   }
 
   /**
@@ -572,6 +594,25 @@ export class Operations {
     })
   }
 
+  public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (vertex === undefined || vertex instanceof EmptyCellVertex) {
+      return [address, {type: ClipboardCellType.EMPTY}]
+    } else if (vertex instanceof ValueCellVertex) {
+      return [address, {type: ClipboardCellType.VALUE, ...vertex.getValues()}]
+    } else if (vertex instanceof FormulaVertex) {
+      return [vertex.getAddress(this.lazilyTransformingAstService), {
+        type: ClipboardCellType.FORMULA,
+        hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService))
+      }]
+    } else if (vertex instanceof ParsingErrorVertex) {
+      return [address, {type: ClipboardCellType.PARSING_ERROR, rawInput: vertex.rawInput, errors: vertex.errors}]
+    }
+
+    throw Error('Trying to copy unsupported type')
+  }
+
   public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
 
@@ -581,7 +622,7 @@ export class Operations {
       return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
     } else if (vertex instanceof MatrixVertex) {
       const val = vertex.getMatrixCellValue(address)
-      if(val === EmptyValue) {
+      if (val === EmptyValue) {
         return {type: ClipboardCellType.EMPTY}
       }
       return {type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getMatrixCellRawValue(address)}
@@ -621,28 +662,26 @@ export class Operations {
     return result
   }
 
-  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): void {
+  public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): [SimpleCellAddress, ClipboardCell] {
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
+    const oldContent = this.getOldContent(address)
 
-    const vertex = this.dependencyGraph.getCell(address)
-
-    if (!(vertex instanceof MatrixVertex)) {
-      if (parsedCellContent instanceof CellContent.Formula) {
-        const {ast, errors, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.parse(parsedCellContent.formula, address)
-        if (errors.length > 0) {
-          this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, parsedCellContent.formula))
-        } else {
-          const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
-          this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
-        }
-      } else if (parsedCellContent instanceof CellContent.Empty) {
-        this.setCellEmpty(address)
+    if (parsedCellContent instanceof CellContent.Formula) {
+      const parserResult = this.parser.parse(parsedCellContent.formula, address)
+      const {ast, errors} = parserResult
+      if (errors.length > 0) {
+        this.setParsingErrorToCell(parsedCellContent.formula, errors, address)
       } else {
-        this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
+        const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+        this.setFormulaToCell(address, size, parserResult)
       }
+    } else if (parsedCellContent instanceof CellContent.Empty) {
+      this.setCellEmpty(address)
     } else {
-      throw new Error('Illegal operation')
+      this.setValueToCell({parsedValue: parsedCellContent.value, rawValue: newCellContent}, address)
     }
+
+    return oldContent
   }
 
   public setSheetContent(sheetId: number, newSheetContent: RawCellContent[][]) {
@@ -655,31 +694,63 @@ export class Operations {
     }
   }
 
+  public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    const vertex = new ParsingErrorVertex(errors, rawInput)
+    const arrayChanges = this.dependencyGraph.setParsingErrorToCell(address, vertex)
+    this.columnSearch.remove(getRawValue(oldValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges())
+    this.changes.addAll(arrayChanges)
+    this.changes.addChange(vertex.getCellValue(), address)
+  }
+
+  public setFormulaToCell(address: SimpleCellAddress, size: MatrixSize, {
+    ast,
+    hasVolatileFunction,
+    hasStructuralChangeFunction,
+    dependencies
+  }: ParsingResult) {
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
+    this.columnSearch.remove(getRawValue(oldValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges())
+    this.changes.addAll(arrayChanges)
+  }
+
   public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {
     const oldValue = this.dependencyGraph.getCellValue(address)
-    this.dependencyGraph.setValueToCell(address, value)
+    const arrayChanges = this.dependencyGraph.setValueToCell(address, value)
     this.columnSearch.change(getRawValue(oldValue), getRawValue(value.parsedValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges().filter(change => !equalSimpleCellAddress(change.address, address)))
+    this.changes.addAll(arrayChanges)
     this.changes.addChange(value.parsedValue, address)
   }
 
   public setCellEmpty(address: SimpleCellAddress) {
+    if (this.dependencyGraph.isArrayInternalCell(address)) {
+      return
+    }
     const oldValue = this.dependencyGraph.getCellValue(address)
+    const arrayChanges = this.dependencyGraph.setCellEmpty(address)
     this.columnSearch.remove(getRawValue(oldValue), address)
+    this.columnSearch.applyChanges(arrayChanges.getChanges())
+    this.changes.addAll(arrayChanges)
     this.changes.addChange(EmptyValue, address)
-    this.dependencyGraph.setCellEmpty(address)
   }
 
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
-    const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = this.parser.fetchCachedResult(formulaHash)
+    const {
+      ast,
+      hasVolatileFunction,
+      hasStructuralChangeFunction,
+      dependencies
+    } = this.parser.fetchCachedResult(formulaHash)
     const absoluteDependencies = absolutizeDependencies(dependencies, address)
     const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
     this.parser.rememberNewAst(cleanedAst)
     const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
-    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
-  }
-
-  public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
-    this.dependencyGraph.setParsingErrorToCell(address, new ParsingErrorVertex(errors, rawInput))
+    const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction)
   }
 
   /**
@@ -838,7 +909,7 @@ export function normalizeRemovedIndexes(indexes: ColumnRowIndex[]): ColumnRowInd
     return indexes
   }
 
-  const sorted = [...indexes].sort(([a], [b]) => a-b)
+  const sorted = [...indexes].sort(([a], [b]) => a - b)
 
   /* merge overlapping and adjacent indexes */
   const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {
@@ -869,7 +940,7 @@ export function normalizeAddedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex
     return indexes
   }
 
-  const sorted = [...indexes].sort(([a], [b]) => a-b)
+  const sorted = [...indexes].sort(([a], [b]) => a - b)
 
   /* merge indexes with same start */
   const merged = sorted.reduce((acc: ColumnRowIndex[], [startIndex, amount]: ColumnRowIndex) => {
