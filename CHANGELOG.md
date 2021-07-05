@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added pretty print for detailedCellError. (#712)
 - Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. (#720)
 - Added `CellError` to exports. (#736)
+- Added `#SPILL!` error type. (#708)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
