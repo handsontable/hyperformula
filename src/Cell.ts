@@ -36,6 +36,9 @@ export enum ErrorType {
   /** Wrong address reference. */
   REF = 'REF',
 
+  /** Array spill error. */
+  SPILL = 'SPILL',
+
   /** Invalid/missing licence error. */
   LIC = 'LIC',
 

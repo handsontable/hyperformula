@@ -15,6 +15,7 @@ const dictionary: RawTranslationPackage = {
     NAME: '#NOME?',
     NUM: '#NÚM!',
     REF: '#REF!',
+    SPILL: '#TRANSPOSIÇÃO!',
     VALUE: '#VALOR!',
   },
   functions: {
