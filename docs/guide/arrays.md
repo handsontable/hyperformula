@@ -42,7 +42,7 @@ To pass an array as an argument, enable the array arithmetic with the [`ARRAYFOR
 
 | Syntax | Example |
 | :--- | :--- |
-| `YOUR_FUNCTION(ARRAYFORMULA(your_formula))` | `=ISEVEN(ARRAYFORMULA(A2:A5*10))` |
+| `ARRAYFORMULA(YOUR_FUNCTION(your_formula))` | `=ARRAYFORMULA(ISEVEN(A2:A5*10))` |
 
 If you don't use the `ARRAYFORMULA` function, HyperFormula treats [ad-hoc arrays](#about-arrays-in-hyperformula) as [scalars](#about-arrays-in-hyperformula), taking only your ad-hoc array's top-left value.
 
