@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | matrixRowSeparator    | arrayRowSeparator    |
 
 - **Breaking change**: Changed CellType.MATRIX to CellType.ARRAY (#747)
-- Changed API methods (#747):
+- **Breaking change**: Changed API methods (#747):
 
 | before             | after             |
 |--------------------|-------------------|
