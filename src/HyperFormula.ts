@@ -1113,7 +1113,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
    *
-   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
@@ -1831,7 +1830,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} source - range for a moved block
    * @param {SimpleCellAddress} destinationLeftCorner - upper left address of the target cell block
    *
-   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if destinationLeftCorner, source, or any of basic type arguments are of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    *
@@ -2414,7 +2412,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Ranges
    */
-
   public getFillRangeData(source: SimpleCellRange, target: SimpleCellRange): RawCellContent[][] {
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
@@ -2843,7 +2840,6 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if address is not [[SimpleCellAddress]] or [[SimpleCellRange]]
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
-   *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    *
    * @example
@@ -3496,8 +3492,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
    * @example
    * ```js
@@ -3713,9 +3707,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
-   *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
    * @example
    * ```js
@@ -3797,8 +3788,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} expressionName - an expression name, case insensitive.
    * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
    * @example
