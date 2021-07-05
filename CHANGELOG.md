@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Changed behaviour of `addRows/removeRows` so that it is possible to add/remove rows across spilled array without changing array size. (#708)
 - **Breaking change**: Changed behaviour of `addColumns/removeColumns` so that it is possible to add/remove columns across spilled array without changing array size. (#732)
 - Changed SWITCH function, so it takes array as its first argument.
-- Changed TRANSPOSE function, so it works with data of any type. (#670)
+- Changed TRANSPOSE function, so it works with data of any type. (#708)
 
 ### Added
 - Added support for array arithmetic. (#628)
@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added pretty print for detailedCellError. (#712)
 - Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. (#720)
 - Added `CellError` to exports. (#736)
+- Added `#SPILL!` error type. (#708)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

@@ -12,6 +12,7 @@ import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber} from './int
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 
@@ -55,6 +56,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     private readonly config: Config,
     private readonly namedExpressions: NamedExpressions,
     private readonly sheetIndexMapping: SheetIndexMappingFn,
+    private readonly lazilyTransformingService: LazilyTransformingAstService,
   ) {
   }
 
@@ -113,7 +115,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
 
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
-    const originAddress = error.address
+    const originAddress = error.root?.getAddress(this.lazilyTransformingService)
     if (originAddress !== undefined) {
       if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
         address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName

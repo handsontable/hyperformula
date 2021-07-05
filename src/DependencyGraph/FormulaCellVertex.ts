@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {addressesEqual, CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
@@ -161,7 +161,7 @@ export class MatrixVertex extends FormulaVertex {
   }
 
   setNoSpace(): InterpreterValue {
-    this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
+    this.matrix = new ErroredMatrix(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
     return this.getCellValue()
   }
 
@@ -207,7 +207,7 @@ export class MatrixVertex extends FormulaVertex {
   ensureRecentData(_updatingService: LazilyTransformingAstService) {}
 
   isLeftCorner(address: SimpleCellAddress): boolean {
-    return addressesEqual(this.cellAddress, address)
+    return equalSimpleCellAddress(this.cellAddress, address)
   }
 
   private setErrorValue(error: CellError) {

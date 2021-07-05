@@ -1109,7 +1109,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns information whether it is possible to change the content in a rectangular area bounded by the box.
    * If returns `true`, doing [[setCellContents]] operation won't throw any errors.
-   * Returns `false` if the operation might be disrupted and causes side-effects by the fact that there is a matrix inside selected cells, the address is invalid or the sheet does not exist.
+   * Returns `false` if the address is invalid or the sheet does not exist.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - single cell or block of cells to check
    *
