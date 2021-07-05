@@ -4,13 +4,13 @@ Use arrays to perform an operation (or call a function) on multiple cells at a t
 
 ## About arrays
 
-In HyperFormula, an array is inherently a two-dimensional object.
-
-An array can be:
+In HyperFormula, an array can be:
 * A range of cell addresses (e.g. `A1:A10`)
 * An **ad-hoc array**: an input array with no ground-truth range that defines the values (e.g. `{1,3,5}`)
 * A result of an arithmetic operation (e.g. `5*A1:B5`)
 * A result of a function (e.g. `=ARRAY_CONSTRAIN(A2:E5,2,2)`)
+
+An array is inherently a two-dimensional object.
 
 `1`x`1` arrays are treated as single, zero-dimensional values (**scalars**).
 
@@ -33,7 +33,9 @@ To enable the array arithmetic mode once, within a particular function or formul
 
 ### Enabling the array arithmetic mode globally
 
-To enable the array arithmetic mode by default, everywhere in your HyperFormula instance, set the `useArrayArithmetic` option to `true` in your HyperFormula [configuration](../api/interfaces/configparams.html#usearrayarithmetic).
+To enable the array arithmetic mode by default, everywhere in your HyperFormula instance:
+
+* In your HyperFormula [configuration](../api/interfaces/configparams.html#usearrayarithmetic), set the `useArrayArithmetic` option to `true`.
 
 ## Array features
 
