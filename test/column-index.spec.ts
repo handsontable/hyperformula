@@ -12,7 +12,7 @@ import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
-import {adr, columnIndexToSheet, expectColumnIndexToMatchSheet} from './testUtils'
+import {adr, expectColumnIndexToMatchSheet} from './testUtils'
 import {HyperFormula} from '../src'
 import {EmptyValue} from '../src/interpreter/InterpreterValue'
 

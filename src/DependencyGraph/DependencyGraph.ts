@@ -408,7 +408,7 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return {affectedArrays}
+    return { affectedArrays }
   }
 
   public addColumns(addedColumns: ColumnsSpan): EagerChangesGraphChangeResult {
