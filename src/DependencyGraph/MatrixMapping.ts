@@ -48,6 +48,14 @@ export class MatrixMapping {
     }
   }
 
+  public* matricesInCols(col: ColumnsSpan): IterableIterator<[string, MatrixVertex]> {
+    for (const [mtxKey, mtx] of this.matrixMapping.entries()) {
+      if (mtx.spansThroughSheetColumn(col.sheet, col.columnStart, col.columnEnd)) {
+        yield [mtxKey, mtx]
+      }
+    }
+  }
+
   public isFormulaMatrixInRow(sheet: number, row: number): boolean {
     for (const mtx of this.matrixMapping.values()) {
       if (mtx.spansThroughSheetRows(sheet, row)) {
@@ -57,7 +65,7 @@ export class MatrixMapping {
     return false
   }
 
-  public isFormulaMatrixInAllRows(span: RowsSpan) {
+  public isFormulaMatrixInAllRows(span: RowsSpan): boolean {
     let result = true
     for (const row of span.rows()) {
       if (!this.isFormulaMatrixInRow(span.sheet, row)) {
@@ -76,13 +84,14 @@ export class MatrixMapping {
     return false
   }
 
-  public isFormulaMatrixInColumns(span: ColumnsSpan) {
+  public isFormulaMatrixInAllColumns(span: ColumnsSpan): boolean {
+    let result = true
     for (const col of span.columns()) {
-      if (this.isFormulaMatrixInColumn(span.sheet, col)) {
-        return true
+      if (!this.isFormulaMatrixInColumn(span.sheet, col)) {
+        result = false
       }
     }
-    return false
+    return result
   }
 
   public isFormulaMatrixInRange(range: AbsoluteCellRange) {
@@ -111,6 +120,13 @@ export class MatrixMapping {
     this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: MatrixVertex) => {
       const range = vertex.getRange()
       return row <= range.start.row ? [range.shifted(0, numberOfRows), vertex] : undefined
+    })
+  }
+
+  public moveMatrixVerticesAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
+    this.updateMatrixVerticesInSheet(sheet, (key: string, vertex: MatrixVertex) => {
+      const range = vertex.getRange()
+      return column <= range.start.col ? [range.shifted(numberOfColumns, 0), vertex] : undefined
     })
   }
 

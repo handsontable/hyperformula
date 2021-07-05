@@ -474,7 +474,6 @@ export class CrudOperations {
       if (rowEnd < rowStart) {
         throw new InvalidArgumentsError('starting row to be smaller than the ending row.')
       }
-
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
@@ -496,13 +495,6 @@ export class CrudOperations {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.')
       }
-
-      if (isPositiveInteger(column)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column - 1)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column)
-      ) {
-        throw new TargetLocationHasMatrixError()
-      }
     }
   }
 
@@ -516,14 +508,8 @@ export class CrudOperations {
       if (columnEnd < columnStart) {
         throw new InvalidArgumentsError('starting column to be smaller than the ending column.')
       }
-      const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-        throw new SourceLocationHasMatrixError()
       }
     }
   }
@@ -576,6 +562,9 @@ export class CrudOperations {
 
     if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
       throw new SourceLocationHasMatrixError()
+    }
+    if (targetColumn > 0 && this.dependencyGraph.matrixMapping.isFormulaMatrixInAllColumns(ColumnsSpan.fromNumberOfColumns(sheet, targetColumn - 1, 2))) {
+      throw new TargetLocationHasMatrixError()
     }
   }
 
