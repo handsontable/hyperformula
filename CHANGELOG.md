@@ -16,8 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Changed behaviour of `setCellContents` so that it is possible to override space occupied by spilled array. (#708)
 - **Breaking change**: Changed behaviour of `addRows/removeRows` so that it is possible to add/remove rows across spilled array without changing array size. (#708)
 - **Breaking change**: Changed behaviour of `addColumns/removeColumns` so that it is possible to add/remove columns across spilled array without changing array size. (#732)
-- Changed SWITCH function, so it takes array as its first argument.
-- Changed TRANSPOSE function, so it works with data of any type. (#670)
 - **Breaking change**: Changed config options (#747):
 
 | before                | after                |
@@ -39,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 |------------------------------|-----------------------------|
 | SourceLocationHasMatrixError | SourceLocationHasArrayError |
 | TargetLocationHasMatrixError | TargetLocationHasArrayError |
+
+- Changed SWITCH function, so it takes array as its first argument.
+- Changed TRANSPOSE function, so it works with data of any type. (#670)
 
 ### Added
 - Added support for array arithmetic. (#628)
