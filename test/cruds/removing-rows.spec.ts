@@ -12,6 +12,7 @@ import {
   extractMatrixRange,
   extractRange,
   extractReference,
+  noSpace,
   verifyRangesInSheet,
   verifyValues,
 } from '../testUtils'
@@ -58,18 +59,17 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(-Infinity, [0, 1])).toEqual(false)
   })
 
-  it('no if theres a formula matrix in place where we remove', () => {
+  it('yes if theres an array in place where we remove', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=TRANSPOSE(A1:B2)'],
-      ['13'],
     ])
 
     expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveRows(0, [1, 2])).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, [2, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveRows(0, [3, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveRows(0, [1, 2])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [2, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveRows(0, [3, 1])).toEqual(true)
     expect(engine.isItPossibleToRemoveRows(0, [4, 1])).toEqual(true)
   })
 
@@ -547,17 +547,7 @@ describe('Removing rows - reevaluation', () => {
   })
 })
 
-describe('Removing rows - matrices', () => {
-  it('should not remove row with formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['=MMULT(A1:B2, A1:B2)'],
-    ])
-
-    expect(() => engine.removeRows(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
-  })
-
+describe('Removing rows - arrays', () => {
   it('MatrixVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '4'],
@@ -600,6 +590,140 @@ describe('Removing rows - matrices', () => {
     engine.removeRows(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
+  })
+
+  it('should be possible to remove row above array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [],
+      ['=-C2:D4'],
+      [],
+      [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    engine.removeRows(0, [0, 1])
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-C1:D3'],
+      [],
+      [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('removing row across array should not change array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2], [3, 4], [5, 6],
+      ['=-A1:B3'],
+      [], [], [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    engine.removeRows(0, [4, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2], [3, 4], [5, 6],
+      ['=-A1:B3'],
+      [], [],
+      ['foo']
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('removing row should shrink dependent array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [],
+      [3, 4],
+      ['=TRANSPOSE(A1:B3)']
+    ], {useArrayArithmetic: true})
+
+    engine.removeRows(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)']
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('it should be REF if no space after removing row', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-B3:B4'],
+      [],
+      [1, 1],
+      [null, 2],
+    ], {useArrayArithmetic: true})
+
+    engine.removeRows(0, [1, 1])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [noSpace()],
+      [1, 1],
+      [null, 2],
+    ])
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-B2:B3'],
+      [1, 1],
+      [null, 2]
+    ], {useArrayArithmetic: true})
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('it should be REF, not CYCLE, after removing rows', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-A3:A4'],
+      [],
+      [1],
+      [2]
+    ], {useArrayArithmetic: true})
+
+    engine.removeRows(0, [1, 1])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [noSpace()],
+      [1],
+      [2]
+    ])
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-A2:A3'],
+      [1],
+      [2]
+    ], {useArrayArithmetic: true})
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('it should remove array when removing row with left corner', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=MMULT(A1:B2, A1:B2)'],
+    ])
+
+    engine.removeRows(0, [2, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4]
+    ]))
+  })
+
+  it('it should remove array when removing rows with whole matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=MMULT(A1:B2, A1:B2)'],
+    ])
+
+    engine.removeRows(0, [2, 2])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4]
+    ]))
   })
 })
 
@@ -762,14 +886,16 @@ describe('Removing rows - row range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
-      ['1', '2', '=SUM(1:3)']
+      ['1', '2'],
+      ['=SUM(1:3)']
     ])
 
     engine.removeRows(0, [0, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2'],
-      ['1', '2', '=SUM(1:2)']
+      ['1', '2'],
+      ['=SUM(1:2)']
     ]))
   })
 
@@ -777,29 +903,33 @@ describe('Removing rows - row range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
-      ['1', '2', '=SUM(1:3)']
+      ['1', '2'],
+      ['=SUM(1:3)']
     ])
 
     engine.removeRows(0, [1, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2'],
-      ['1', '2', '=SUM(1:2)']
+      ['1', '2'],
+      ['=SUM(1:2)']
     ]))
   })
 
   it('removing rows - end of row range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '=SUM(1:3)'],
       ['1', '2'],
-      ['1', '2']
+      ['1', '2'],
+      ['1', '2'],
+      ['=SUM(1:3)']
     ])
 
     engine.removeRows(0, [2, 1])
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
-      ['1', '2', '=SUM(1:2)'],
-      ['1', '2']
+      ['1', '2'],
+      ['1', '2'],
+      ['=SUM(1:2)']
     ]))
   })
 })

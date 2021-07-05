@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, SimpleCellAddress, simpleCellAddress} from './Cell'
+import {CellError} from './Cell'
 import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {MatrixSize} from './MatrixSize'
@@ -127,14 +127,6 @@ export class Matrix implements IMatrix {
 
   public raw(): InternalScalarValue[][] {
     return this.matrix
-  }
-
-  public* generateValues(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
-    for (let row = 0; row < this.size.height; ++row) {
-      for (let col = 0; col < this.size.width; ++col) {
-        yield [this.matrix[row][col], simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)]
-      }
-    }
   }
 
   public resize(newSize: MatrixSize) {

@@ -4,7 +4,9 @@
  */
 
 import {
-  CellRange, isSimpleCellAddress,
+  CellRange,
+  equalSimpleCellAddress,
+  isSimpleCellAddress,
   simpleCellAddress,
   SimpleCellAddress,
   SimpleColumnAddress,
@@ -13,7 +15,7 @@ import {
 import {DependencyGraph} from './DependencyGraph'
 import {SheetsNotEqual} from './errors'
 import {Maybe} from './Maybe'
-import {AstNodeType, CellAddress, CellRangeAst} from './parser'
+import {AstNodeType, CellRangeAst} from './parser'
 import {ColumnRangeAst, RowRangeAst} from './parser/Ast'
 import {RowsSpan, Span} from './Span'
 
@@ -94,11 +96,6 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return new AbsoluteCellRange(simpleCellAddress(sheet, x1, y1), simpleCellAddress(sheet, x2, y2))
   }
 
-  public static singleRangeFromCellAddress(cellAddress: CellAddress, baseAddress: SimpleCellAddress): AbsoluteCellRange {
-    const simpleCellAddress = cellAddress.toSimpleCellAddress(baseAddress)
-    return new AbsoluteCellRange(simpleCellAddress, simpleCellAddress)
-  }
-
   constructor(
     start: SimpleCellAddress,
     end: SimpleCellAddress,
@@ -132,12 +129,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
       return false
     }
 
-    if (this.start.row <= address.row && this.end.row >= address.row
-        && this.start.col <= address.col && this.end.col >= address.col) {
-      return true
-    }
-
-    return false
+    return this.start.row <= address.row
+      && this.end.row >= address.row
+      && this.start.col <= address.col
+      && this.end.col >= address.col
   }
 
   public columnInRange(address: SimpleColumnAddress): boolean {
@@ -301,6 +296,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return this.width() === other.width() && this.height() === other.height()
   }
 
+  public sameAs(other: AbsoluteCellRange) {
+    return equalSimpleCellAddress(this.start, other.start) && equalSimpleCellAddress(this.end, other.end)
+  }
+
   public addressesArrayMap<T>(dependencyGraph: DependencyGraph, op: (arg: SimpleCellAddress) => T): T[][] {
     const ret = []
     let currentRow = this.start.row
@@ -417,7 +416,6 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   public shouldBeRemoved() {
     return this.width() <= 0
   }
-
 
   public shiftByRows(_numberOfRows: number) {
     return

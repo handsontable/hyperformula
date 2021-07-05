@@ -4,7 +4,7 @@
  */
 
 import {absolutizeDependencies} from './absolutizeDependencies'
-import {simpleCellAddress} from './Cell'
+import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {Config} from './Config'
@@ -51,6 +51,7 @@ export class GraphBuilder {
    */
   public buildGraph(sheets: Sheets) {
     const dependencies = this.buildStrategy.run(sheets)
+    this.dependencyGraph.getAndClearContentChanges()
     this.processDependencies(dependencies)
   }
 
@@ -93,11 +94,13 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           if (parsedCellContent instanceof CellContent.Formula) {
             const parseResult = this.stats.measure(StatType.PARSER, () => this.parser.parse(parsedCellContent.formula, address))
             if (parseResult.errors.length > 0) {
+              this.shrinkMatrixIfNeeded(address)
               const vertex = new ParsingErrorVertex(parseResult.errors, parsedCellContent.formula)
               this.dependencyGraph.addVertex(address, vertex)
             } else {
+              this.shrinkMatrixIfNeeded(address)
               const size = this.matrixSizePredictor.checkMatrixSize(parseResult.ast, address)
-              if(size === undefined || (size.width<=1 && size.height<=1) || size.isRef) {
+              if (size.isScalar()) {
                 const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addVertex(address, vertex)
@@ -116,6 +119,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
           } else if (parsedCellContent instanceof CellContent.Empty) {
             /* we don't care about empty cells here */
           } else {
+            this.shrinkMatrixIfNeeded(address)
             const vertex = new ValueCellVertex(parsedCellContent.value, cellContent)
             this.columnIndex.add(getRawValue(parsedCellContent.value), address)
             this.dependencyGraph.addVertex(address, vertex)
@@ -125,5 +129,12 @@ export class SimpleStrategy implements GraphBuilderStrategy {
     }
 
     return dependencies
+  }
+
+  private shrinkMatrixIfNeeded(address: SimpleCellAddress) {
+    const vertex = this.dependencyGraph.getCell(address)
+    if (vertex instanceof MatrixVertex) {
+      this.dependencyGraph.shrinkMatrixToCorner(vertex)
+    }
   }
 }
