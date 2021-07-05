@@ -161,7 +161,7 @@ export class MatrixVertex extends FormulaVertex {
   }
 
   setNoSpace(): InterpreterValue {
-    this.matrix = new ErroredMatrix(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
+    this.matrix = new ErroredMatrix(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult), MatrixSize.error())
     return this.getCellValue()
   }
 
