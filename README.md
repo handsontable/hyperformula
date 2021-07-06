@@ -119,7 +119,7 @@ Your help is much appreciated in any of the following topics:
 HyperFormula is a double-licensed software. In all your non-commercial projects, you can use it under the
 open source [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt). Additionally, there is also a [commercial license](https://handsontable.github.io/hyperformula/guide/contact.html), and support services available.
 
-## Acknowledgements
+## Acknowledgments
 
 You should know that this project wouldn’t exist without co-financing from European Union funds under the European Regional Development Funds as a part of the Smart Growth Operational Programme. Project implemented as a part of the Polish National Centre for Research and Development: “Fast Track”.
 
