@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Changed SWITCH function, so it takes array as its first argument.
 - Changed TRANSPOSE function, so it works with data of any type. (#708)
+- Removed gpu.js from dependencies. (#753)
 
 ### Added
 - Added support for array arithmetic. (#628)
