@@ -179,9 +179,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
 - Simplified adding new function modules, reworked (simplified) implementations of existing modules. (#480)
 
-### Changed
-- Operation `moveCells` creating cyclic dependencies does not cause losing original formula. (#479)
-
 ### Fixed
 - Fixed hardcoding of languages in i18n tests. (#471)
 - Fixed many compilation warnings based on LGTM analysis. (#473)
