@@ -202,7 +202,7 @@ describe('large psuedo-random test', () => {
     let sideX = 3
     const n = 4
     let sideY = 3
-    for(let rep=0;rep<5;rep++) {
+    for(let rep=0;rep<3;rep++) {
       randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
       verifyValues(engine)
       for (let i = 0; i < n; i++) {
