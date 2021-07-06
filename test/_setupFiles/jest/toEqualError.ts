@@ -15,8 +15,8 @@ export const toEqualError: ExpectExtendMap = {
 
     if (typeof received === 'object' && typeof expected === 'object') {
       result = this.equals(
-        {...received, address: undefined},
-        {...expected, address: undefined}
+        {...received, root: undefined, address: undefined},
+        {...expected, root: undefined, address: undefined}
       )
     } else {
       result = this.equals(received, expected)

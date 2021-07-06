@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {rangeLowerBound} from '../interpreter/binarySearch'
@@ -28,6 +29,8 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   public remove(value: RawScalarValue | undefined, address: SimpleCellAddress): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public change(oldValue: RawScalarValue | undefined, newValue: RawScalarValue, address: SimpleCellAddress): void {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public applyChanges(contentChanges: CellValueChange[]): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public addColumns(columnsSpan: ColumnsSpan): void {}
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

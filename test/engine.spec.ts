@@ -556,8 +556,8 @@ describe('#getCellType', () => {
   it('formula matrix', () => {
     const engine = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
 
-    expect(engine.getCellType(adr('A1'))).toBe(CellType.MATRIX)
-    expect(engine.getCellType(adr('B1'))).toBe(CellType.MATRIX)
+    expect(engine.getCellType(adr('A1'))).toBe(CellType.ARRAY)
+    expect(engine.getCellType(adr('B1'))).toBe(CellType.ARRAY)
   })
 
   it('parsing error is a formula cell', () => {
@@ -734,18 +734,18 @@ describe('#isCellEmpty', () => {
   })
 })
 
-describe('#isCellPartOfMatrix', () => {
+describe('#isCellPartOfArray', () => {
   it('true', () => {
     const engine = HyperFormula.buildFromArray([['=TRANSPOSE(B1:C1)']])
-    expect(engine.isCellPartOfMatrix(adr('A1'))).toEqual(true)
+    expect(engine.isCellPartOfArray(adr('A1'))).toEqual(true)
   })
 
   it('false', () => {
     const engine = HyperFormula.buildFromArray([['1', '', '=SUM(1, 2)', 'foo']])
-    expect(engine.isCellPartOfMatrix(adr('A1'))).toEqual(false)
-    expect(engine.isCellPartOfMatrix(adr('B1'))).toEqual(false)
-    expect(engine.isCellPartOfMatrix(adr('C1'))).toEqual(false)
-    expect(engine.isCellPartOfMatrix(adr('D1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('A1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('B1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('C1'))).toEqual(false)
+    expect(engine.isCellPartOfArray(adr('D1'))).toEqual(false)
   })
 })
 

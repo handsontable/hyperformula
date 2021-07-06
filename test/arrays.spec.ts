@@ -1,6 +1,8 @@
 import {ErrorType, HyperFormula} from '../src'
+import {ArraySize} from '../src/ArraySize'
+import {ArrayVertex, ValueCellVertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
-import {adr, detailedError, detailedErrorWithOrigin} from './testUtils'
+import {adr, detailedError, detailedErrorWithOrigin, expectVerticesOfTypes, noSpace} from './testUtils'
 
 describe('without arrayformula, with useArrayArithmetic flag', () => {
   it('unary op, scalar ret', () => {
@@ -319,5 +321,123 @@ describe('vectorization', () => {
       ['=SWITCH({1,2,3},1,2,3,4,5)']
     ], {useArrayArithmetic: true})
     expect(engine.getSheetValues(0)).toEqual([[2, 5, 4]])
+  })
+})
+
+describe('build from array', () => {
+  it('should create engine with array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, '=-A1:B2'],
+      [3, 4],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 2, -1, -2],
+      [3, 4, -3, -4],
+    ])
+  })
+
+  it('should be enough to specify only corner of an array', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TRANSPOSE(D1:E2)'],
+    ], {useArrayArithmetic: true})
+
+    expectVerticesOfTypes(engine, [
+      [ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex],
+    ])
+  })
+
+  it('should be separate arrays', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TRANSPOSE(D1:E2)', '=TRANSPOSE(D1:E2)'],
+      ['=TRANSPOSE(D1:E2)', '=TRANSPOSE(D1:E2)'],
+    ], {useArrayArithmetic: true})
+
+    expectVerticesOfTypes(engine, [
+      [ArrayVertex, ArrayVertex, undefined],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [undefined, ArrayVertex, ArrayVertex],
+    ])
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
+    expect(engine.getSheetValues(0))
+  })
+
+  it('should REF last array', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TRANSPOSE(D1:E2)', '=TRANSPOSE(D1:E2)', null, 1, 2],
+      ['=TRANSPOSE(D1:E2)', null, null, 1, 2],
+    ], {useArrayArithmetic: true})
+
+    expectVerticesOfTypes(engine, [
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [undefined, undefined],
+    ])
+    expect(engine.getSheetValues(0)).toEqual([
+      [noSpace(), 1, 1, 1, 2],
+      [noSpace(), 2, 2, 1, 2],
+    ])
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
+    expect(engine.getSheetValues(0))
+  })
+
+  it('array should work with different types of data', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 'foo', '=TRANSPOSE(A1:B2)'],
+      [true, '=SUM(A1)'],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [1, 'foo', 1, true],
+      [true, 1, 'foo', 1],
+    ])
+  })
+
+  it('should make REF array if no space', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C1:D2', 2],
+      [3, 4],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [noSpace(), 2],
+      [3, 4],
+    ])
+  })
+
+  it('should not shrink array if empty vertex', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C1:D2', null],
+      [null, null]
+    ], {useArrayArithmetic: true})
+
+    expectVerticesOfTypes(engine, [
+      [ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex],
+    ])
+
+  })
+
+  it('should shrink to one vertex if there is more content colliding with array', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C1:D2', null],
+      [1, null]
+    ], {useArrayArithmetic: true})
+
+    expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
+    expectVerticesOfTypes(engine, [
+      [ArrayVertex, undefined],
+      [ValueCellVertex, undefined],
+    ])
+  })
+
+  it('DependencyGraph changes should be empty after building fresh engine', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C1:D2', null],
+      [1, null]
+    ], {useArrayArithmetic: true})
+
+    expect(engine.dependencyGraph.getAndClearContentChanges().isEmpty()).toEqual(true)
   })
 })

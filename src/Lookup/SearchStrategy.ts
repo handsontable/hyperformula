@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
@@ -25,6 +26,8 @@ export interface ColumnSearchStrategy extends SearchStrategy {
   remove(value: RawInterpreterValue | undefined, address: SimpleCellAddress): void,
 
   change(oldValue: RawInterpreterValue | undefined, newValue: RawInterpreterValue, address: SimpleCellAddress): void,
+
+  applyChanges(contentChanges: CellValueChange[]): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 

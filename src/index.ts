@@ -10,6 +10,11 @@ import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex} from './CrudOperations'
 import {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold
+} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
   EvaluationSuspendedError,
@@ -34,8 +39,8 @@ import {
   ProtectedFunctionTranslationError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError,
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError,
   UnableToParseError
 } from './errors'
 import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from './Exporter'
@@ -84,8 +89,8 @@ class HyperFormulaNS extends HyperFormula {
   public static ProtectedFunctionTranslationError = ProtectedFunctionTranslationError
   public static SheetNameAlreadyTakenError = SheetNameAlreadyTakenError
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
-  public static SourceLocationHasMatrixError = SourceLocationHasMatrixError
-  public static TargetLocationHasMatrixError = TargetLocationHasMatrixError
+  public static SourceLocationHasArrayError = SourceLocationHasArrayError
+  public static TargetLocationHasArrayError = TargetLocationHasArrayError
   public static UnableToParseError = UnableToParseError
 }
 
@@ -105,6 +110,9 @@ for (const pluginName of Object.getOwnPropertyNames(plugins)) {
 export default HyperFormulaNS
 
 export {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold,
   CellValue,
   NoErrorCellValue,
   ConfigParams,
@@ -156,8 +164,8 @@ export {
   ProtectedFunctionTranslationError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError,
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError,
   UnableToParseError,
   SerializedNamedExpression,
 }

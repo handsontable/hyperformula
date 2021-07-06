@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {equalSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {ClipboardCell} from './ClipboardOperations'
 import {Config} from './Config'
@@ -20,11 +20,13 @@ import {
 
 export interface UndoEntry {
   doUndo(undoRedo: UndoRedo): void,
+
   doRedo(undoRedo: UndoRedo): void,
 }
 
 export abstract class BaseUndoEntry implements UndoEntry {
   abstract doUndo(undoRedo: UndoRedo): void
+
   abstract doRedo(undoRedo: UndoRedo): void
 }
 
@@ -296,7 +298,7 @@ export class SetCellContentsUndoEntry extends BaseUndoEntry {
     public readonly cellContents: {
       address: SimpleCellAddress,
       newContent: RawCellContent,
-      oldContent: ClipboardCell,
+      oldContent: [SimpleCellAddress, ClipboardCell],
     }[],
   ) {
     super()
@@ -544,7 +546,12 @@ export class UndoRedo {
 
   public undoSetCellContents(operation: SetCellContentsUndoEntry) {
     for (const cellContentData of operation.cellContents) {
-      this.operations.restoreCell(cellContentData.address, cellContentData.oldContent)
+      const address = cellContentData.address
+      const [oldContentAddress, oldContent] = cellContentData.oldContent
+      if (!equalSimpleCellAddress(address, oldContentAddress)) {
+        this.operations.setCellEmpty(address)
+      }
+      this.operations.restoreCell(oldContentAddress, oldContent)
     }
   }
 
@@ -597,7 +604,7 @@ export class UndoRedo {
       }
     }
 
-    for(const [namedexpression, content] of operation.scopedNamedExpressions) {
+    for (const [namedexpression, content] of operation.scopedNamedExpressions) {
       this.operations.restoreNamedExpression(namedexpression, content, sheetId)
     }
 

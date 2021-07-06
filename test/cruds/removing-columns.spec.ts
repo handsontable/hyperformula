@@ -1,6 +1,6 @@
 import {ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {MatrixVertex, RangeVertex} from '../../src/DependencyGraph'
+import {ArrayVertex, RangeVertex} from '../../src/DependencyGraph'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../src/parser'
 import {
@@ -12,6 +12,7 @@ import {
   extractMatrixRange,
   extractRange,
   extractReference,
+  noSpace,
   verifyRangesInSheet,
   verifyValues,
 } from '../testUtils'
@@ -58,16 +59,16 @@ describe('Removing columns - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveColumns(-Infinity, [0, 1])).toEqual(false)
   })
 
-  it('no if theres a formula matrix in place where we remove', () => {
+  it('yes if theres an array in place where we remove', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '=TRANSPOSE(A1:B2)', undefined, '13'],
+      ['1', '2', '=TRANSPOSE(A1:B2)'],
       ['3', '4'],
     ])
 
     expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [2, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [3, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [2, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [3, 1])).toEqual(true)
     expect(engine.isItPossibleToRemoveColumns(0, [4, 1])).toEqual(true)
   })
 
@@ -490,17 +491,8 @@ describe('Removing columns - reevaluation', () => {
   })
 })
 
-describe('Removing columns - matrices', () => {
-  it('should not remove column within formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '=MMULT(A1:B2, A1:B2)'],
-      ['3', '4'],
-    ])
-
-    expect(() => engine.removeColumns(0, [2, 1])).toThrowError('Cannot perform this operation, source location has a matrix inside.')
-  })
-
-  it('MatrixVertex#formula should be updated', () => {
+describe('Removing rows - arrays', () => {
+  it('ArrayVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
       ['4', '5', '6'],
@@ -511,7 +503,7 @@ describe('Removing columns - matrices', () => {
     expect(extractMatrixRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 
-  it('MatrixVertex#address should be updated', () => {
+  it('ArrayVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
       ['4', '5', '6'],
@@ -519,11 +511,11 @@ describe('Removing columns - matrices', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.fetchCell(adr('C1')) as MatrixVertex
+    const matrixVertex = engine.addressMapping.fetchCell(adr('C1')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 
-  it('MatrixVertex#formula should be updated when different sheets', () => {
+  it('ArrayVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2', '3'],
@@ -537,6 +529,114 @@ describe('Removing columns - matrices', () => {
     engine.removeColumns(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
+  })
+
+  it('should be possible to remove column before array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, '=-B3:D4', null, null, 'foo'],
+    ], {useArrayArithmetic: true})
+
+    engine.removeColumns(0, [0, 1])
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-A3:C4', null, null, 'foo'],
+    ], {useArrayArithmetic: true})
+
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('removing column across array should not change array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C2', null, null, null, 'foo'],
+      [4, 5, 6]
+    ], {useArrayArithmetic: true})
+
+    engine.removeColumns(0, [4, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2, 3, '=-A1:C2', null, null, 'foo'],
+      [4, 5, 6]
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('removing column should shrink dependent array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, null, 3, '=TRANSPOSE(A1:C2)'],
+      [2, null, 4],
+    ], {useArrayArithmetic: true})
+
+    engine.removeColumns(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 3, '=TRANSPOSE(A1:B2)'],
+      [2, 4],
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('it should be REF if no space after removing column', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C2:D2', null, 1],
+      [null, null, 1, 2]
+    ], {useArrayArithmetic: true})
+
+    engine.removeColumns(0, [1, 1])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [noSpace(), 1],
+      [null, 1, 2],
+    ])
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-B2:C2', 1],
+      [null, 1, 2]
+    ], {useArrayArithmetic: true})
+
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('it should be REF, not CYCLE, after removing columns', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C1:D1', null, 1, 2]
+    ], {useArrayArithmetic: true})
+
+    engine.removeColumns(0, [1, 1])
+
+    expect(engine.getSheetValues(0)).toEqual([
+      [noSpace(), 1, 2],
+    ])
+
+    const expected = HyperFormula.buildFromArray([
+      ['=-B1:C1', 1, 2],
+    ], {useArrayArithmetic: true})
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('it should remove array when removing column with left corner', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=MMULT(A1:B2, A1:B2)'],
+      ['3', '4'],
+    ])
+
+    engine.removeColumns(0, [2, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4]
+    ]))
+  })
+
+  it('it should remove array when removing columns with whole matrix', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '=MMULT(A1:B2, A1:B2)'],
+      ['3', '4'],
+    ])
+
+    engine.removeColumns(0, [2, 2])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4]
+    ]))
   })
 })
 
@@ -679,7 +779,7 @@ describe('Removing columns - sheet dimensions', () => {
 })
 
 describe('Removing columns - column index', () => {
-  it('should update column index when adding row', () => {
+  it('should update column index when adding column', () => {
     const engine = HyperFormula.buildFromArray([
       ['', '1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
     ], { useColumnIndex: true })
