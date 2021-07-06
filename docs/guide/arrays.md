@@ -8,7 +8,7 @@ In HyperFormula, an array can be:
 * A range of cell addresses (e.g. `A1:A10`)
 * An **ad-hoc array**: an input array with no ground-truth range that defines the values (e.g. `{1,3,5}`)
 * A result of an arithmetic operation (e.g. `5*A1:B5`)
-* A result of a function (e.g. `=ARRAY_CONSTRAIN(A2:E5,2,2)`)
+* A result of a function (e.g. `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5,2,2))`)
 
 An array is inherently a two-dimensional object.
 
