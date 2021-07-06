@@ -36,8 +36,33 @@ The keys are canonical function IDs which are also used to find
 corresponding translations in translation packages. Inside of them,
 there is also an object which contains the corresponding method.
 
-Optionally, you can specify if your function is volatile or not
-(`false` as a default means that it is not defined).
+```javascript
+// import FunctionPlugin
+import { FunctionPlugin } from 'hyperformula';
+
+// start creating a class
+class CountHF extends FunctionPlugin {
+
+// define functions inside this plugin
+  public static implementedFunctions = {
+    'HYPER': {
+    // this method's functionality will be defined below
+      method: 'hyper',
+    }
+  };
+}
+```
+
+### Optional parameters
+
+Using optional parameters, you can set your function to:
+* Use the [array arithmetic mode](arrays.md)
+* Treat reference or range arguments as arguments that don't create dependency
+* Inline range arguments to scalar arguments
+* Get recalculated with each sheet shape change
+* Be a [volatile](volatile-functions.md) function
+* Repeat indefinitely a specified number of last arguments
+* Never get vectorized
 
 ```javascript
 // import FunctionPlugin
@@ -49,22 +74,68 @@ class CountHF extends FunctionPlugin {
 // define functions inside this plugin
   public static implementedFunctions = {
     'HYPER': {
-    // this method's functionality will be defined in the next step
+    // this method's functionality will be defined below
       method: 'hyper',
-    // optionally, mark your function as volatile
+    // set your optional parameters below
+      arrayFunction: false,
+      doesNotNeedArgumentsToBeComputed: false,
+      expandRanges: false,
+      isDependentOnSheetStructureChange: false,
       isVolatile: true,
+      repeatLastArgs: 4,
+      vectorizationForbidden: false,
     }
   };
 }
 ```
 
-Similarly, there are other useful properties. 
-`isDependentOnSheetStructureChange` marks functions that need to be recalculated with 
-each change of the shape of the engine sheets. 
-`doesNotNeedArgumentsToBeComputed` marks functions that treat references or ranges in their arguments
-as arguments that do not create dependency. Other arguments are properly evaluated.
-`arrayFunction` denotes functions that enable array arithmetic in its arguments and nested expressions.
-`vectorizationForbidden` when set prevents function from ever being vectorized (however, it is up to implementation of a function to properly handle vectorization).
+You can set the following optional parameters:
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `arrayFunction` | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions. |
+| `doesNotNeedArgumentsToBeComputed` | Boolean | If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.<br><br>Other arguments are properly evaluated. |
+| `expandRanges` | Boolean | If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments. |
+| `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change. |
+| `isVolatile` | Boolean | If set to `true`, the function is [volatile](volatile-functions.md). |
+| `repeatLastArgs` | Number | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely. |
+| `vectorizationForbidden` | Boolean | If set to `true`, prevents the function from ever being vectorized (but it's up to your function implementation to properly handle vectorization). |
+
+### Argument validation options
+
+In an optional `parameters` array, you can set rules for your function's argument validation.
+
+```javascript
+// import FunctionPlugin
+import { FunctionPlugin } from 'hyperformula';
+
+// start creating a class
+class CountHF extends FunctionPlugin {
+
+// define functions inside this plugin
+  public static implementedFunctions = {
+    'HYPER': {
+    // this method's functionality will be defined below
+      method: 'hyper',
+    // set your argument validation options below
+      parameters: [passSubtype: false, defaultValue: 10, optionalArg: false, minValue: 5, maxValue: 15, lessThan: 15, greaterThan: 5],
+    }
+  };
+}
+```
+
+You can set the following argument validation options:
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `passSubtype` | Boolean | If set to `true`, arguments need to be passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`) |
+| `defaultValue` | `InternalScalarValue` \| `RawScalarValue` | If an argument is missing, its value defaults to `defaultValue`. |
+| `optionalArg` | Boolean | If set to `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>This is logically equivalent to setting `defaultValue` to `undefined`. |
+| `minValue` | Number | If set, numerical arguments need to be greater than or equal to `minValue`. |
+| `maxValue` | Number | If set, numerical arguments need to be less than or equal to `maxValue`. |
+| `lessThan` | Number | If set, numerical argument need to be less than `lessThan`. |
+| `greaterThan` | Number | If set, numerical argument need to be greater than `greaterThan`. |
+
 ## Aliases
 
 Aliases are available since the <Badge text="v0.4.0"  vertical="middle"/> version.
@@ -84,7 +155,7 @@ class CountHF extends FunctionPlugin {
 // define functions inside this plugin
   public static implementedFunctions = {
     'HYPER': {
-    // this method's functionality will be defined in the next step
+    // this method's functionality will be defined below
       method: 'hyper',
     }
   };
@@ -94,6 +165,7 @@ class CountHF extends FunctionPlugin {
   };
 }
 ```
+
 ## Translations
 
 There are **two ways** of adding a translation of the custom function.
