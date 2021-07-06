@@ -118,7 +118,15 @@ class CountHF extends FunctionPlugin {
     // this method's functionality will be defined below
       method: 'hyper',
     // set your argument validation options below
-      parameters: [passSubtype: false, defaultValue: 10, optionalArg: false, minValue: 5, maxValue: 15, lessThan: 15, greaterThan: 5],
+      parameters: [
+                    passSubtype: false,
+                    defaultValue: 10,
+                    optionalArg: false,
+                    minValue: 5,
+                    maxValue: 15,
+                    lessThan: 15,
+                    greaterThan: 5
+      ],
     }
   };
 }
@@ -215,6 +223,19 @@ public hyper(ast, state) {
   };
 ```
 
+### `runFunction()`
+
+At the end of your custom function definition, run the built-in `runFunction()` callback method.
+
+The `runFunction()` method:
+- Validates arguments passed to your function, taking your [argument validation options](#argument-validation-options) into account
+- Validates your function's optional parameters
+- Checks if values returned by your function are in the right format
+
+```javascript
+this.runFunction();
+```
+
 ## A complete example of the class definition
 
 To sum up, here is a complete example of a custom `CountHF` class:
@@ -234,6 +255,8 @@ export class CountHF extends FunctionPlugin {
   public hyper(ast, state) {
     return 'Hyperformula'.length
     }
+    
+  this.runFunction();
   };
 ```
 
