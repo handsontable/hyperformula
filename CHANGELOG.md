@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | TargetLocationHasMatrixError | TargetLocationHasArrayError |
 
 - Changed SWITCH function, so it takes array as its first argument.
-- Changed TRANSPOSE function, so it works with data of any type. (#670)
+- Changed TRANSPOSE function, so it works with data of any type. (#708)
 
 ### Added
 - Added support for array arithmetic. (#628)
