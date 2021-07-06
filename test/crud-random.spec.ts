@@ -1,4 +1,5 @@
 import {HyperFormula} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {verifyValues} from './testUtils'
 
 
@@ -122,7 +123,7 @@ function rectangleFromCorner(pts: Pts, sideX: number, sideY: number): Rectangle 
 }
 
 /**
- * all adresses from a rectangle
+ * all addresses from a rectangle
  *
  * @param rect
  */
@@ -159,19 +160,19 @@ function shuffleArray<T>(array: T[]): T[] {
  */
 function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: number, sideY: number) {
   if(outputLog) {
-    console.log(`engine.moveCells( {sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}, {sheet: 0, col: 1000, row: 1000})`)
+    console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}), {sheet: 0, col: 1000, row: 1000})`)
   }
-  engine.moveCells( {sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY, {sheet: 0, col: 1000, row: 1000})
+  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY), {sheet: 0, col: 1000, row: 1000})
   undoRedo(engine)
   if(outputLog) {
-    console.log(`engine.moveCells( {sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}, {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
+    console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
   }
-  engine.moveCells( {sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY, {sheet: 0, col: pts1.x, row: pts1.y})
+  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY), {sheet: 0, col: pts1.x, row: pts1.y})
   undoRedo(engine)
   if(outputLog) {
-    console.log(`engine.moveCells( {sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}, {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
+    console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
   }
-  engine.moveCells( {sheet: 0, col: 1000, row: 1000}, sideX, sideY, {sheet: 0, col: pts2.x, row: pts2.y})
+  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, sideX, sideY), {sheet: 0, col: pts2.x, row: pts2.y})
   undoRedo(engine)
 }
 
@@ -195,8 +196,8 @@ function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   )
 }
 
-describe('large random integration test', () => {
-  it('growing rectangle + addRows + addColumns + removeRows + removeColumns', () => {
+describe('large psuedo-random test', () => {
+  it('growing rectangle + addRows + addColumns + removeRows + removeColumns should produce the same sheet as static sheet', () => {
     const engine = HyperFormula.buildFromArray([])
     let sideX = 3
     const n = 4
