@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies, filterDependenciesOutOfScope} from './absolutizeDependencies'
+import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {equalSimpleCellAddress, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardCellType} from './ClipboardOperations'
@@ -13,16 +14,17 @@ import {ContentChanges} from './ContentChanges'
 import {ColumnRowIndex} from './CrudOperations'
 import {
   AddressMapping,
+  ArrayVertex,
   CellVertex,
   DependencyGraph,
   EmptyCellVertex,
   FormulaCellVertex,
-  MatrixVertex,
   ParsingErrorVertex,
   SheetMapping,
   SparseStrategy,
   ValueCellVertex
 } from './DependencyGraph'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {RawAndParsedValue} from './DependencyGraph/ValueCellVertex'
 import {AddColumnsTransformer} from './dependencyTransformers/AddColumnsTransformer'
 import {AddRowsTransformer} from './dependencyTransformers/AddRowsTransformer'
@@ -36,13 +38,12 @@ import {
   NamedExpressionDoesNotExistError,
   NoRelativeAddressesAllowedError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError
 } from './errors'
 import {EmptyValue, getRawValue} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {MatrixSize, MatrixSizePredictor} from './MatrixSize'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
@@ -55,7 +56,6 @@ import {ParsingResult} from './parser/ParserWithCaching'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
 import {Statistics, StatType} from './statistics'
-import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 export class RemoveRowsCommand {
   constructor(
@@ -166,7 +166,7 @@ export class Operations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly namedExpressions: NamedExpressions,
     private readonly config: Config,
-    private readonly matrixSizePredictor: MatrixSizePredictor,
+    private readonly arraySizePredictor: ArraySizePredictor,
   ) {
     this.allocateNamedExpressionAddressSpace()
   }
@@ -423,12 +423,12 @@ export class Operations {
       throw new SheetSizeLimitExceededError()
     }
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new SourceLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(sourceRange)) {
+      throw new SourceLocationHasArrayError()
     }
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
-      throw new TargetLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(targetRange)) {
+      throw new TargetLocationHasArrayError()
     }
   }
 
@@ -494,7 +494,7 @@ export class Operations {
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
 
     return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
   }
@@ -528,7 +528,7 @@ export class Operations {
       version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
 
     return {
       version: version!,
@@ -559,16 +559,16 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
   }
 
-  private rewriteAffectedMatrices(affectedMatrices: Set<MatrixVertex>) {
-    for (const matrixVertex of affectedMatrices.values()) {
-      if (matrixVertex.matrix.size.isRef) {
+  private rewriteAffectedArrays(affectedArrays: Set<ArrayVertex>) {
+    for (const arrayVertex of affectedArrays.values()) {
+      if (arrayVertex.array.size.isRef) {
         continue
       }
-      const ast = matrixVertex.getFormula(this.lazilyTransformingAstService)
-      const address = matrixVertex.getAddress(this.lazilyTransformingAstService)
+      const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
+      const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
       const hash = this.parser.computeHashFromAst(ast)
       this.setFormulaToCellFromCache(hash, address)
     }
@@ -597,7 +597,7 @@ export class Operations {
       this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    this.rewriteAffectedMatrices(affectedArrays)
+    this.rewriteAffectedArrays(affectedArrays)
   }
 
   public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {
@@ -626,12 +626,12 @@ export class Operations {
       return {type: ClipboardCellType.EMPTY}
     } else if (vertex instanceof ValueCellVertex) {
       return {type: ClipboardCellType.VALUE, ...vertex.getValues()}
-    } else if (vertex instanceof MatrixVertex) {
-      const val = vertex.getMatrixCellValue(address)
+    } else if (vertex instanceof ArrayVertex) {
+      const val = vertex.getArrayCellValue(address)
       if (val === EmptyValue) {
         return {type: ClipboardCellType.EMPTY}
       }
-      return {type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getMatrixCellRawValue(address)}
+      return {type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getArrayCellRawValue(address)}
     } else if (vertex instanceof FormulaCellVertex) {
       return {
         type: ClipboardCellType.FORMULA,
@@ -678,7 +678,7 @@ export class Operations {
       if (errors.length > 0) {
         this.setParsingErrorToCell(parsedCellContent.formula, errors, address)
       } else {
-        const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+        const size = this.arraySizePredictor.checkArraySize(ast, address)
         this.setFormulaToCell(address, size, parserResult)
       }
     } else if (parsedCellContent instanceof CellContent.Empty) {
@@ -710,7 +710,7 @@ export class Operations {
     this.changes.addChange(vertex.getCellValue(), address)
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, size: MatrixSize, {
+  public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
     ast,
     hasVolatileFunction,
     hasStructuralChangeFunction,
@@ -755,7 +755,7 @@ export class Operations {
     const [cleanedAst] = new CleanOutOfScopeDependenciesTransformer(address.sheet).transformSingleAst(ast, address)
     this.parser.rememberNewAst(cleanedAst)
     const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
-    const size = this.matrixSizePredictor.checkMatrixSize(ast, address)
+    const size = this.arraySizePredictor.checkArraySize(ast, address)
     this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction)
   }
 
@@ -825,7 +825,7 @@ export class Operations {
         throw new NoRelativeAddressesAllowedError()
       }
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.setCellEmpty(address)
     } else {
@@ -895,7 +895,7 @@ export class Operations {
       if (sourceVertex instanceof FormulaCellVertex) {
         const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
         const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), MatrixSize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
+        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
       } else if (sourceVertex instanceof EmptyCellVertex) {
         this.setCellEmpty(expression.address)
       } else if (sourceVertex instanceof ValueCellVertex) {

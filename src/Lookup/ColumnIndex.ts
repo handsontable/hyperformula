@@ -5,6 +5,7 @@
 
 import {CellError, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
@@ -23,7 +24,6 @@ import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnSearchStrategy} from './SearchStrategy'
-import {CellValueChange} from '../ContentChanges'
 
 type ColumnMap = Map<RawInterpreterValue, ValueIndex>
 
@@ -53,8 +53,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     if (value === EmptyValue || value instanceof CellError) {
       return
     } else if (value instanceof SimpleRangeValue) {
-      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
-        this.addSingleCellValue(getRawValue(matrixValue), cellAddress)
+      for (const [arrayValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
+        this.addSingleCellValue(getRawValue(arrayValue), cellAddress)
       }
     } else {
       this.addSingleCellValue(value, address)
@@ -67,8 +67,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
 
     if (value instanceof SimpleRangeValue) {
-      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
-        this.removeSingleValue(getRawValue(matrixValue), cellAddress)
+      for (const [arrayValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
+        this.removeSingleValue(getRawValue(arrayValue), cellAddress)
       }
     } else {
       this.removeSingleValue(value, address)

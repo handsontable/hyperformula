@@ -340,7 +340,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2))
       engine.paste(adr('C1'))
-    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
+    }).toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should not be possible to move cells to area with matrix', () => {
@@ -352,7 +352,7 @@ describe('moving ranges', () => {
     expect(() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
       engine.paste(adr('A2'))
-    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
+    }).toThrowError('Cannot perform this operation, target location has an array inside.')
   })
 
   it('should adjust edges when moving part of range', () => {
@@ -707,7 +707,7 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('MatrixVertex#formula should be updated', () => {
+  it('ArrayVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -720,7 +720,7 @@ describe('overlapping areas', () => {
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
 
-  it('MatrixVertex#formula should be updated when different sheets', () => {
+  it('ArrayVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
@@ -823,7 +823,7 @@ describe('move cells with matrices', () => {
     expect(() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1))
       engine.paste(adr('A3'))
-    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
+    }).toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should not be possible to move formula matrix at all', function() {
@@ -835,7 +835,7 @@ describe('move cells with matrices', () => {
     expect(() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1))
       engine.paste(adr('A3'))
-    }).toThrowError('Cannot perform this operation, source location has a matrix inside.')
+    }).toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 })
 

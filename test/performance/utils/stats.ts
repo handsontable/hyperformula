@@ -46,7 +46,6 @@ export function statsTreePrint(stats: Stats): void {
 |    |    |GRAPH_BUILD:                     ${stats.get(EnrichedStatType.GRAPH_BUILD) || 0}
 |    |    |    |INIT_DATASTRUCTURES:        ${stats.get(EnrichedStatType.INIT_DATASTRUCTURES) || 0}
 |    |    |    |    |BUILD_COLUMN_INDEX:    ${stats.get(EnrichedStatType.BUILD_COLUMN_INDEX) || 0}
-|    |    |    |    |MATRIX_DETECTION:      ${stats.get(EnrichedStatType.MATRIX_DETECTION) || 0}
 |    |    |    |PARSER:                     ${stats.get(EnrichedStatType.PARSER) || 0}
 |    |    |TOP_SORT:                        ${stats.get(EnrichedStatType.TOP_SORT) || 0}
 |    |EVALUATION:                           ${stats.get(EnrichedStatType.EVALUATION) || 0}
@@ -61,7 +60,7 @@ export function statsTreePrintCruds(stats: Stats): void {
 |   |TRANSFORM_ASTS:                        ${stats.get(EnrichedStatType.TRANSFORM_ASTS) || 0}
 |   |TRANSFORM_ASTS_POSTPONED:              ${stats.get(EnrichedStatType.TRANSFORM_ASTS_POSTPONED) || 0}
 |   |ADJUSTING_ADDRESS_MAPPING:             ${stats.get(EnrichedStatType.ADJUSTING_ADDRESS_MAPPING) || 0}
-|   |ADJUSTING_MATRIX_MAPPING:              ${stats.get(EnrichedStatType.ADJUSTING_MATRIX_MAPPING) || 0}
+|   |ADJUSTING_MATRIX_MAPPING:              ${stats.get(EnrichedStatType.ADJUSTING_ARRAY_MAPPING) || 0}
 |   |ADJUSTING_RANGES:                      ${stats.get(EnrichedStatType.ADJUSTING_RANGES) || 0}
 |   |ADJUSTING_GRAPH:                       ${stats.get(EnrichedStatType.ADJUSTING_GRAPH) || 0}
 |   |EVALUATION:                            ${stats.get(EnrichedStatType.EVALUATION) || 0}

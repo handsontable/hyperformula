@@ -1,7 +1,7 @@
 import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {Config} from '../../src/Config'
-import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {ArrayVertex, FormulaCellVertex} from '../../src/DependencyGraph'
 import {AlwaysDense} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {adr, expectArrayWithSameContent, expectEngineToBeTheSameAs, extractMatrixRange} from '../testUtils'
@@ -381,7 +381,7 @@ describe('Adding row - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('MatrixVertex#formula should be updated', () => {
+  it('ArrayVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -393,7 +393,7 @@ describe('Adding row - arrays', () => {
     expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
   })
 
-  it('MatrixVertex#formula should be updated when different sheets', () => {
+  it('ArrayVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
@@ -409,7 +409,7 @@ describe('Adding row - arrays', () => {
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
   })
 
-  it('MatrixVertex#address should be updated', () => {
+  it('ArrayVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -418,7 +418,7 @@ describe('Adding row - arrays', () => {
 
     engine.addRows(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.fetchCell(adr('A4')) as MatrixVertex
+    const matrixVertex = engine.addressMapping.fetchCell(adr('A4')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A4'))
   })
 })

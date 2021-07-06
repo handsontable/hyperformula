@@ -1,9 +1,9 @@
 import {DetailedCellError} from '../src'
+import {ArraySize} from '../src/ArraySize'
 import {CellError, ErrorType} from '../src/Cell'
 import {adr} from './testUtils'
 import {FormulaVertex} from '../src/DependencyGraph/FormulaCellVertex'
 import {buildNumberAst} from '../src/parser/Ast'
-import {MatrixSize} from '../src/MatrixSize'
 
 describe('Matchers', () => {
   it('should compare two simple values', () => {
@@ -14,7 +14,7 @@ describe('Matchers', () => {
 
   it('should compare two cell errors ignoring vertices', () => {
     function dummyFormulaVertex(): FormulaVertex {
-      return FormulaVertex.fromAst(buildNumberAst(1), adr('A1'), MatrixSize.scalar(), 0)
+      return FormulaVertex.fromAst(buildNumberAst(1), adr('A1'), ArraySize.scalar(), 0)
     }
 
     expect(

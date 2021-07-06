@@ -7,7 +7,7 @@ import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
 import {Config} from './Config'
-import {DependencyGraph, FormulaCellVertex, MatrixVertex, ParsingErrorVertex} from './DependencyGraph'
+import {ArrayVertex, DependencyGraph, FormulaCellVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
@@ -35,9 +35,9 @@ export class Serialization {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
       targetAddress = targetAddress ?? address
       return this.unparser.unparse(formula, targetAddress)
-    } else if (formulaVertex instanceof MatrixVertex) {
-      const matrixVertexAddress = formulaVertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-      if(matrixVertexAddress.row !== address.row || matrixVertexAddress.col !== address.col || matrixVertexAddress.sheet !== address.sheet) {
+    } else if (formulaVertex instanceof ArrayVertex) {
+      const arrayVertexAddress = formulaVertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+      if(arrayVertexAddress.row !== address.row || arrayVertexAddress.col !== address.col || arrayVertexAddress.sheet !== address.sheet) {
         return undefined
       }
       targetAddress = targetAddress ?? address

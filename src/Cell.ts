@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {ArrayVertex, CellVertex, FormulaCellVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,
@@ -52,7 +52,7 @@ export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 export enum CellType {
   FORMULA = 'FORMULA',
   VALUE = 'VALUE',
-  MATRIX = 'MATRIX',
+  ARRAY = 'ARRAY',
   EMPTY = 'EMPTY',
 }
 
@@ -63,8 +63,8 @@ export const getCellType = (vertex?: CellVertex): CellType => {
   if (vertex instanceof ValueCellVertex) {
     return CellType.VALUE
   }
-  if (vertex instanceof MatrixVertex) {
-    return CellType.MATRIX
+  if (vertex instanceof ArrayVertex) {
+    return CellType.ARRAY
   }
 
   return CellType.EMPTY

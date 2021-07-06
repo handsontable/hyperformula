@@ -41,8 +41,8 @@ describe('Matrix plugin', () => {
         ['=mmult(A1:B3,A4:C6)'],
       ], config)
 
-      expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
-      expect(engine.getCellValue(adr('B7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
+      expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ArrayDimensions))
+      expect(engine.getCellValue(adr('B7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ArrayDimensions))
     })
 
     it('matrix multiplication with string in data', () => {
