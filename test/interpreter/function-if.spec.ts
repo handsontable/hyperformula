@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -51,6 +51,16 @@ describe('Function IF', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
+  it('passes subtypes of second arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(TRUE(),B1,C1)', '1%', '1']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
+  })
+
+  it('passes subtypes of third arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(FALSE(),B1,C1)', '1', '1%']])
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
+  })
+
   it('passes correct value when other arg is an error', () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(), 4/0, "no")']])
 
@@ -81,15 +91,16 @@ describe('Function IF', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
   })
 
-  // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
     const engine = HyperFormula.buildFromArray([
-      ['0', '=IF(A1:A3,"yes","no")'],
-      ['1', '=IF(A1:A3,"yes","no")'],
+      ['0'],
+      ['1'],
       ['3'],
+      ['=IF(A1:A3,"yes","no")'],
+      ['=IF(A1:A3,"yes","no")'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

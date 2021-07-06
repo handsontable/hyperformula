@@ -1,5 +1,5 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src'
+import {ErrorType, HyperFormula} from '../../src'
+import {CellError} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {ErrorMessage} from '../../src/error-message'
@@ -9,9 +9,9 @@ import {
   coerceScalarToBoolean,
   coerceScalarToString
 } from '../../src/interpreter/ArithmeticHelper'
-import {adr, detailedError} from '../testUtils'
+import {DateNumber, EmptyValue, TimeNumber} from '../../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
-import {CellError, EmptyValue} from '../../src/Cell'
+import {adr, detailedError} from '../testUtils'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
   const config = new Config()
@@ -29,6 +29,38 @@ describe('#coerceNonDateScalarToMaybeNumber', () => {
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(true)).toBe(1)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(false)).toBe(0)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('')).toBe(0)
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' ')).toEqual(undefined)
+  })
+})
+
+describe('#coerceScalarToComplex', () => {
+  const config = new Config()
+  const dateTimeHelper = new DateTimeHelper(config)
+  const numberLiteralsHelper = new NumberLiteralHelper(config)
+  const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+  it('works', () => {
+    expect(arithmeticHelper.coerceScalarToComplex(42)).toEqual([42, 0])
+    expect(arithmeticHelper.coerceScalarToComplex(true)).toEqual(new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected))
+    expect(arithmeticHelper.coerceScalarToComplex(EmptyValue)).toEqual([0, 0])
+    expect(arithmeticHelper.coerceScalarToComplex('')).toEqual(new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected))
+    expect(arithmeticHelper.coerceScalarToComplex('1')).toEqual([1, 0])
+    expect(arithmeticHelper.coerceScalarToComplex('-1.1')).toEqual([-1.1, 0])
+    expect(arithmeticHelper.coerceScalarToComplex('+.1')).toEqual([0.1, 0])
+    expect(arithmeticHelper.coerceScalarToComplex('1e1')).toEqual([10, 0])
+    expect(arithmeticHelper.coerceScalarToComplex('1 i')).toEqual([0, 1])
+    expect(arithmeticHelper.coerceScalarToComplex('-1.1j')).toEqual([0, -1.1])
+    expect(arithmeticHelper.coerceScalarToComplex('+.1 i')).toEqual([0, 0.1])
+    expect(arithmeticHelper.coerceScalarToComplex('1e1j')).toEqual([0, 10])
+    expect(arithmeticHelper.coerceScalarToComplex('i')).toEqual([0, 1])
+    expect(arithmeticHelper.coerceScalarToComplex('-i')).toEqual([0, -1])
+    expect(arithmeticHelper.coerceScalarToComplex('+i')).toEqual([0, 1])
+    expect(arithmeticHelper.coerceScalarToComplex('i1')).toEqual(new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected))
+    expect(arithmeticHelper.coerceScalarToComplex('--1')).toEqual(new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected))
+    expect(arithmeticHelper.coerceScalarToComplex('i+1')).toEqual(new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected))
+    expect(arithmeticHelper.coerceScalarToComplex('1+-i')).toEqual([1, -1])
+    expect(arithmeticHelper.coerceScalarToComplex('0.1+.1 i')).toEqual([0.1, 0.1])
+    expect(arithmeticHelper.coerceScalarToComplex(' - 1.0e+1 - - 1.0e+1j')).toEqual([-10, 10])
   })
 })
 
@@ -84,8 +116,8 @@ describe('#coerceScalarToNumberOrError', () => {
 
     expect(arithmeticHelper.coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(1)
-    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(0)
+    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(new DateNumber(1, 'DD/MM/YYYY'))
+    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(new TimeNumber(0, 'hh:mm:ss.sss'))
     expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion))

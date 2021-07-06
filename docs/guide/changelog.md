@@ -1,5 +1,78 @@
 # Changelog
 
+## 0.6.2
+**Release date: May 26, 2021**
+
+### Changed
+- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. [#681](https://github.com/handsontable/hyperformula/issues/681)
+
+## 0.6.1
+**Release date: May 24, 2021**
+
+### Changed
+- Remove redundant `'assert'` dependency from the code. [#672](https://github.com/handsontable/hyperformula/issues/672)
+
+### Fixed
+- Fixed library support for IE11. The `unorm` package is added to the dependencies. [#675](https://github.com/handsontable/hyperformula/issues/675)
+
+## 0.6.0
+**Release date: April 27, 2021**
+
+### Changed
+- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. [#642](https://github.com/handsontable/hyperformula/issues/642)
+
+### Added
+- Added two new fired events, for suspending and resuming execution. [#637](https://github.com/handsontable/hyperformula/issues/637)
+- Added listing in scopes to `listNamedExpressions` method. [#638](https://github.com/handsontable/hyperformula/issues/638)
+
+### Fixed
+- Fixed issues with scoped named expression. [#646](https://github.com/handsontable/hyperformula/issues/646), [#641](https://github.com/handsontable/hyperformula/issues/641)
+- Fixed an issue with losing formating info about DateTime numbers. [#626](https://github.com/handsontable/hyperformula/issues/626)
+
+## 0.5.0
+**Release date: April 15, 2021**
+
+### Changed
+- **Breaking change**: A change to the type of value returned via serialization methods. [#617](https://github.com/handsontable/hyperformula/issues/617)
+- An input value should be preserved through serialization more precisely. [#617](https://github.com/handsontable/hyperformula/issues/617)
+- GPU.js constructor needs to be provided directly to engine configuration. [#355](https://github.com/handsontable/hyperformula/issues/355)
+- A deprecated config option vlookupThreshold has been removed. [#620](https://github.com/handsontable/hyperformula/issues/620)
+
+### Added
+- Added support for row and column reordering. [#343](https://github.com/handsontable/hyperformula/issues/343)
+- Added type inferrence for subtypes for number. [#313](https://github.com/handsontable/hyperformula/issues/313)
+- Added parsing of number literals containing '%' or currency symbol (default '$'). [#590](https://github.com/handsontable/hyperformula/issues/590)
+- Added ability to fallback to plain CPU implementation for functions that uses GPU.js [#355](https://github.com/handsontable/hyperformula/issues/355)
+
+### Fixed
+- Fixed minor issue. [#631](https://github.com/handsontable/hyperformula/issues/631)
+- Fixed a bug with serialization of some addresses after CRUDs. [#587](https://github.com/handsontable/hyperformula/issues/587)
+- Fixed a bug with MEDIAN function implementation. [#601](https://github.com/handsontable/hyperformula/issues/601)
+- Fixed a bug with copy-paste operation that could cause out of scope references [#591](https://github.com/handsontable/hyperformula/issues/591)
+- Fixed a bug with date parsing. [#614](https://github.com/handsontable/hyperformula/issues/614)
+- Fixed a bug where accent/case sensitivity was ignored for LOOKUPs. [#621](https://github.com/handsontable/hyperformula/issues/621)
+- Fixed a bug with handling of no time format/no date format scenarios. [#616](https://github.com/handsontable/hyperformula/issues/616)
+
+## 0.4.0
+**Release date: December 17, 2020**
+
+### Changed
+- A **breaking change**: CEILING function implementation to be consistent with existing implementations. [#582](https://github.com/handsontable/hyperformula/issues/582)
+
+### Added
+- Added 50 mathematical functions: ROMAN, ARABIC, FACT, FACTDOUBLE, COMBIN, COMBINA, GCD, LCM, MROUND, MULTINOMIAL, QUOTIENT, RANDBETWEEN, SERIESSUM, SIGN, SQRTPI, SUMX2MY2, SUMX2PY2, SUMXMY2, CEILING.MATH, FLOOR.MATH, FLOOR, CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING, COMPLEX, IMABS, IMAGINARY, IMARGUMENT, IMCONJUGATE, IMCOS, IMCOSH, IMCOT, IMCSC, IMCSCH, IMDIV, IMEXP, IMLN, IMLOG10, IMLOG2, IMPOWER, IMPRODUCT, IMREAL, IMSEC, IMSECH, IMSIN, IMSINH, IMSQRT, IMSUB,  IMSUM, IMTAN. [#537](https://github.com/handsontable/hyperformula/issues/537), [#582](https://github.com/handsontable/hyperformula/issues/582), [#281](https://github.com/handsontable/hyperformula/issues/281), [#581](https://github.com/handsontable/hyperformula/issues/581)
+- Added 106 statistical functions: EXPON.DIST, EXPONDIST, FISHER, FISHERINV, GAMMA, GAMMA.DIST, GAMMADIST, GAMMALN, GAMMALN.PRECISE, GAMMA.INV, GAMMAINV, GAUSS, BETA.DIST, BETADIST, BETA.INV, BETAINV, BINOM.DIST, BINOMDIST, BINOM.INV, BESSELI, BESSELJ, BESSELK, BESSELY, CHISQ.DIST, CHISQ.DIST.RT, CHISQ.INV, CHISQ.INV.RT, CHIDIST, CHIINV, F.DIST, F.DIST.RT, F.INV, F.INV.RT, FDIST, FINV, WEIBULL, WEIBULL.DIST, HYPGEOMDIST, HYPGEOM.DIST, T.DIST, T.DIST.2T, T.DIST.RT, T.INV, T.INV.2T, TDIST, TINV, LOGNORM.DIST, LOGNORMDIST, LOGNORM.INV, LOGINV, NORM.DIST, NORMDIST, NORM.S.DIST, NORMSDIST, NORM.INV, NORMINV, NORM.S.INV, NORMSINV, PHI, NEGBINOM.DIST, NEGBINOMDIST, POISSON, POISSON.DIST, LARGE, SMALL, AVEDEV, CONFIDENCE, CONFIDENCE.NORM, CONFIDENCE.T, DEVSQ, GEOMEAN, HARMEAN, CRITBINOM, COVAR, COVARIANCE.P, COVARIANCE.S, PEARSON, RSQ, STANDARDIZE, Z.TEST, ZTEST, F.TEST, FTEST, STEYX, SLOPE, CHITEST, CHISQ.TEST, T.TEST, TTEST, SKEW.P, SKEW, WEIBULLDIST, VARS, TINV2T, TDISTRT, TDIST2T, STDEVS, FINVRT, FDISTRT, CHIDISTRT, CHIINVRT, COVARIANCEP, COVARIANCES, LOGNORMINV, POISSONDIST, SKEWP. [#152](https://github.com/handsontable/hyperformula/issues/152), [#154](https://github.com/handsontable/hyperformula/issues/154), [#160](https://github.com/handsontable/hyperformula/issues/160)
+- Added function aliases mechanism. [#569](https://github.com/handsontable/hyperformula/pull/569)
+- Added support for scientific notation. [#579](https://github.com/handsontable/hyperformula/issues/579)
+- Added support for complex numbers. [#281](https://github.com/handsontable/hyperformula/issues/281)
+
+### Fixed
+- Fixed a problem with dependencies not collected for specific functions. [#550](https://github.com/handsontable/hyperformula/issues/550), [#549](https://github.com/handsontable/hyperformula/issues/549)
+- Fixed a minor problem with dependencies under nested parenthesis. [#549](https://github.com/handsontable/hyperformula/issues/549), [#558](https://github.com/handsontable/hyperformula/issues/558)
+- Fixed a problem with HLOOKUP/VLOOKUP getting stuck in binary search. [#559](https://github.com/handsontable/hyperformula/issues/559), [#562](https://github.com/handsontable/hyperformula/issues/562)
+- Fixed a problem with the logic of dependency resolving. [#561](https://github.com/handsontable/hyperformula/issues/561), [#563](https://github.com/handsontable/hyperformula/pull/563)
+- Fixed a minor bug with ATAN2 function. [#581](https://github.com/handsontable/hyperformula/issues/581)
+
 ## 0.3.0
 **Release date: October 22, 2020**
 

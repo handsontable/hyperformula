@@ -1,21 +1,22 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {simpleCellRange, SimpleCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
-import {sheetNameRegexp, simpleSheetName} from './LexerConfig'
+import {ABSOLUTE_OPERATOR, RANGE_OPERATOR, sheetNameRegexp, simpleSheetName} from './LexerConfig'
 import {RowAddress} from './RowAddress'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
-const addressRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([A-Za-z]+)(\\$?)([0-9]+)$`)
-const columnRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([A-Za-z]+)$`)
-const rowRegex = new RegExp(`^(${sheetNameRegexp})?(\\$?)([0-9]+)$`)
+const addressRegex = new RegExp(`^(${sheetNameRegexp})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
+const columnRegex = new RegExp(`^(${sheetNameRegexp})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)$`)
+const rowRegex = new RegExp(`^(${sheetNameRegexp})?(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
 const simpleSheetNameRegex = new RegExp(`^${simpleSheetName}$`)
 
 /**
@@ -31,54 +32,66 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   const col = columnLabelToIndex(result[6])
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
   }
 
+  if(sheet === null) {
+    sheet = undefined
+  }
+
   const row = Number(result[8]) - 1
-  if (result[5] === '$' && result[7] === '$') {
-    return CellAddress.absolute(sheet, col, row)
-  } else if (result[5] === '$') {
-    return CellAddress.absoluteCol(sheet, col, row - baseAddress.row)
-  } else if (result[7] === '$') {
-    return CellAddress.absoluteRow(sheet, col - baseAddress.col, row)
+  if (result[5] === ABSOLUTE_OPERATOR && result[7] === ABSOLUTE_OPERATOR) {
+    return CellAddress.absolute(col, row, sheet)
+  } else if (result[5] === ABSOLUTE_OPERATOR) {
+    return CellAddress.absoluteCol( col, row - baseAddress.row, sheet)
+  } else if (result[7] === ABSOLUTE_OPERATOR) {
+    return CellAddress.absoluteRow(col - baseAddress.col, row, sheet)
   } else {
-    return CellAddress.relative(sheet, col - baseAddress.col, row - baseAddress.row)
+    return CellAddress.relative(row - baseAddress.row, col - baseAddress.col, sheet)
   }
 }
 
 export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<ColumnAddress> => {
   const result = columnRegex.exec(stringAddress)!
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
   }
 
+  if(sheet === null) {
+    sheet = undefined
+  }
+
   const col = columnLabelToIndex(result[6])
 
-  if (result[5] === '$') {
-    return ColumnAddress.absolute(sheet, col)
+  if (result[5] === ABSOLUTE_OPERATOR) {
+    return ColumnAddress.absolute(col, sheet)
   } else {
-    return ColumnAddress.relative(sheet, col - baseAddress.col)
+    return ColumnAddress.relative(col - baseAddress.col, sheet)
   }
 }
 
 export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<RowAddress> => {
   const result = rowRegex.exec(stringAddress)!
 
-  const sheet = extractSheetNumber(result, sheetMapping)
+  let sheet = extractSheetNumber(result, sheetMapping)
   if (sheet === undefined) {
     return undefined
   }
 
+  if(sheet === null) {
+    sheet = undefined
+  }
+
   const row = Number(result[6]) - 1
 
-  if (result[5] === '$') {
-    return RowAddress.absolute(sheet, row)
+  if (result[5] === ABSOLUTE_OPERATOR) {
+    return RowAddress.absolute(row, sheet)
   } else {
-    return RowAddress.relative(sheet, row - baseAddress.row)
+    return RowAddress.relative(row - baseAddress.row, sheet)
   }
 }
 
@@ -110,6 +123,26 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
   return simpleCellAddress(sheet, col, row)
 }
 
+export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): Maybe<SimpleCellRange> => {
+  const split = stringAddress.split(RANGE_OPERATOR)
+  if(split.length !== 2) {
+    return undefined
+  }
+  const [startString, endString] = split
+  const start = simpleCellAddressFromString(sheetMapping, startString, sheetContext)
+  if(start === undefined) {
+    return undefined
+  }
+  const end = simpleCellAddressFromString(sheetMapping, endString, start.sheet)
+  if(end === undefined) {
+    return undefined
+  }
+  if(start.sheet !== end.sheet) {
+    return undefined
+  }
+  return simpleCellRange(start, end)
+}
+
 /**
  * Returns string representation of absolute address
  * If sheet index is not present in sheet mapping, returns undefined
@@ -130,6 +163,16 @@ export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn
     return `${sheetName}!${column}${address.row + 1}`
   } else {
     return `${column}${address.row + 1}`
+  }
+}
+
+export const simpleCellRangeToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellRange, sheetIndex: number): Maybe<string> => {
+  const startString = simpleCellAddressToString(sheetIndexMapping, address.start, sheetIndex)
+  const endString = simpleCellAddressToString(sheetIndexMapping, address.end, address.start.sheet)
+  if(startString === undefined || endString === undefined) {
+    return undefined
+  } else {
+    return `${startString}${RANGE_OPERATOR}${endString}`
   }
 }
 
@@ -166,7 +209,7 @@ export function columnIndexToLabel(column: number) {
   return result.toUpperCase()
 }
 
-export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): string | undefined {
+export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): Maybe<string> {
   let sheetName = sheetMappingFn(sheetId)
   if (sheetName === undefined) {
     return undefined
@@ -183,15 +226,10 @@ export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMa
 function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
   let maybeSheetName = regexResult[3] ?? regexResult[2]
 
-  let sheet = null
-
   if (maybeSheetName) {
     maybeSheetName = maybeSheetName.replace(/''/g, "'")
-    sheet = sheetMapping(maybeSheetName)
-    if (sheet === undefined) {
-      return undefined
-    }
+    return sheetMapping(maybeSheetName)
+  } else {
+    return null
   }
-
-  return sheet
 }

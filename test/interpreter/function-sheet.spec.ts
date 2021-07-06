@@ -79,4 +79,10 @@ describe('Function SHEET', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
+
+  it('should make cycle for non-refs', () => {
+    const engine = HyperFormula.buildFromArray([['=SHEET(1+A1)']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.CYCLE))
+  })
 })

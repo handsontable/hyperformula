@@ -1,31 +1,33 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {InternalNoErrorScalarValue, InternalScalarValue, SimpleCellAddress} from '../Cell'
+import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
-import {InterpreterValue} from '../interpreter/InterpreterValue'
-import {Matrix} from '../Matrix'
+import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
+import {ColumnsSpan} from '../Span'
 import {Statistics} from '../statistics/Statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
-import {ColumnsSpan} from '../Span'
 
 export interface SearchStrategy {
-  find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number,
+  find(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean): number,
 
-  advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number,
+  advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number,
 }
 
 export interface ColumnSearchStrategy extends SearchStrategy {
-  add(value: InterpreterValue | Matrix, address: SimpleCellAddress): void,
+  add(value: RawInterpreterValue, address: SimpleCellAddress): void,
 
-  remove(value: InterpreterValue | Matrix | null, address: SimpleCellAddress): void,
+  remove(value: RawInterpreterValue | undefined, address: SimpleCellAddress): void,
 
-  change(oldValue: InterpreterValue | Matrix | null, newValue: InterpreterValue | Matrix, address: SimpleCellAddress): void,
+  change(oldValue: RawInterpreterValue | undefined, newValue: RawInterpreterValue, address: SimpleCellAddress): void,
+
+  applyChanges(contentChanges: CellValueChange[]): void,
 
   addColumns(columnsSpan: ColumnsSpan): void,
 
@@ -33,9 +35,9 @@ export interface ColumnSearchStrategy extends SearchStrategy {
 
   removeSheet(sheetId: number): void,
 
-  moveValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
+  moveValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
 
-  removeValues(range: IterableIterator<[InternalScalarValue, SimpleCellAddress]>): void,
+  removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void,
 
   destroy(): void,
 }

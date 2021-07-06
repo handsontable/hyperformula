@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType, SimpleCellAddress} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType, SimpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
@@ -31,6 +31,7 @@ describe('Function EOMONTH', () => {
     ])
 
     expectToHaveDate(engine, adr('A2'), '31/03/2019')
+    expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 
   it('works for exact end of month', () => {
@@ -145,29 +146,5 @@ describe('Function EOMONTH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
-  })
-
-  // Inconsistency with Product 1
-  it('range value in 1st argument results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=DATE(2019, 3, 31)', '=EOMONTH(A1:A3, 1)'],
-      ['=DATE(2018, 3, 31)', '=EOMONTH(A1:A3, 1)'],
-      ['=DATE(2018, 3, 31)'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-  })
-
-  // Inconsistency with Product 1
-  it('range value in 2nd argument results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '=EOMONTH(DATE(2019, 3, 31), A1:A3)'],
-      ['2', '=EOMONTH(DATE(2019, 3, 31), A1:A3)'],
-      ['3'],
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

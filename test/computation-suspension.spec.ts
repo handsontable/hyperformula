@@ -1,5 +1,6 @@
-import {HyperFormula, EvaluationSuspendedError, ExportedCellChange} from '../src'
-import { CellType } from '../src/Cell'
+import {EvaluationSuspendedError, ExportedCellChange, HyperFormula} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {CellType} from '../src/Cell'
 import {adr} from './testUtils'
 
 describe('Evaluation suspension', () => {
@@ -30,7 +31,7 @@ describe('Evaluation suspension', () => {
       engine.getAllSheetsValues()
     }).toThrow(new EvaluationSuspendedError())
     expect(() => {
-      engine.getRangeValues(adr('A1'), 1, 2)
+      engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     }).toThrow(new EvaluationSuspendedError())
     expect(() => {
       engine.getNamedExpressionValue('FOO')
@@ -54,7 +55,7 @@ describe('Evaluation suspension', () => {
       engine.getAllSheetsSerialized()
     }).toThrow(new EvaluationSuspendedError())
     expect(() => {
-      engine.getRangeSerialized(adr('A1'), 1, 2)
+      engine.getRangeSerialized(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     }).toThrow(new EvaluationSuspendedError())
   })
 
@@ -82,7 +83,7 @@ describe('Evaluation suspension', () => {
     expect(engine.doesCellHaveSimpleValue(adr('C1'))).toBe(false)
     expect(engine.doesCellHaveFormula(adr('C1'))).toBe(true)
     expect(engine.isCellEmpty(adr('C1'))).toBe(false)
-    expect(engine.isCellPartOfMatrix(adr('C1'))).toBe(false)
+    expect(engine.isCellPartOfArray(adr('C1'))).toBe(false)
   })
 
   it('when evaluation is stopped, getting cell formulas is possible', () => {
@@ -95,7 +96,7 @@ describe('Evaluation suspension', () => {
     expect(engine.getCellFormula(adr('C1'))).toEqual('=A1+78')
     expect(engine.getSheetFormulas(0)).toEqual([[undefined, undefined, '=A1+78']])
     expect(engine.getAllSheetsFormulas()).toEqual({ Sheet1: [[undefined, undefined, '=A1+78']] })
-    expect(engine.getRangeFormulas(adr('A1'), 3, 1)).toEqual([[undefined, undefined, '=A1+78']])
+    expect(engine.getRangeFormulas(AbsoluteCellRange.spanFrom(adr('A1'), 3, 1))).toEqual([[undefined, undefined, '=A1+78']])
   })
 
   it('formulas are rebuild even if evaluation is suspended', () => {
@@ -148,7 +149,7 @@ describe('Evaluation suspension', () => {
       engine.suspendEvaluation()
 
       expect(() => {
-        engine.copy(adr('A1'), 2, 2)
+        engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
       }).toThrow(new EvaluationSuspendedError())
     })
 
@@ -159,7 +160,7 @@ describe('Evaluation suspension', () => {
       engine.suspendEvaluation()
 
       expect(() => {
-        engine.cut(adr('A1'), 2, 2)
+        engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
       }).toThrow(new EvaluationSuspendedError())
     })
 
@@ -167,7 +168,7 @@ describe('Evaluation suspension', () => {
       const engine = HyperFormula.buildFromArray([
         ['1', '2', '=A1'],
       ])
-      engine.copy(adr('A1'), 2, 2)
+      engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
       engine.suspendEvaluation()
 
       expect(() => {

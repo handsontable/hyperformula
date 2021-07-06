@@ -1,13 +1,13 @@
-import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
+import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 
 describe('ParserWithCaching - caching', () => {
   it('it use cache for similar formulas', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast1 = parser.parse('=A1', simpleCellAddress(0, 0, 0)).ast
-    const ast2 = parser.parse('=A2', simpleCellAddress(0, 0, 1)).ast
+    const ast1 = parser.parse('=A1', adr('A1')).ast
+    const ast2 = parser.parse('=A2', adr('A2')).ast
 
     expect(ast1).toEqual(ast2)
     expect(parser.statsCacheUsed).toBe(1)
@@ -17,9 +17,9 @@ describe('ParserWithCaching - caching', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     // eslint-disable-next-line
-    const bast1 = parser.parse('=A1', simpleCellAddress(0, 0, 0)).ast
+    const bast1 = parser.parse('=A1', adr('A1')).ast
     // eslint-disable-next-line
-    const bast2 = parser.parse('=A2+A3', simpleCellAddress(0, 0, 0)).ast
+    const bast2 = parser.parse('=A2+A3', adr('A1')).ast
 
     expect(parser.statsCacheUsed).toBe(0)
   })

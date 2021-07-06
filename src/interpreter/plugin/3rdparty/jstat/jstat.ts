@@ -850,3 +850,101 @@ export const negbin = {
     return sum;
   }
 }
+
+function sum(arr: number[]): number {
+  var sum = 0;
+  var i = arr.length;
+  while (--i >= 0)
+    sum += arr[i];
+  return sum;
+};
+
+export function mean(arr: number[]): number {
+  return sum(arr) / arr.length;
+};
+
+export function sumsqerr(arr: number[]): number {
+  var meanv = mean(arr);
+  var sum = 0;
+  var i = arr.length;
+  var tmp;
+  while (--i >= 0) {
+    tmp = arr[i] - meanv;
+    sum += tmp * tmp;
+  }
+  return sum;
+};
+
+export function variance(arr: number[], flag: any) {
+  return sumsqerr(arr) / (arr.length - (flag ? 1 : 0));
+}
+
+export function stdev(arr: number[], flag: any) {
+  return Math.sqrt(variance(arr, flag));
+}
+
+// 2 different parameter setups
+// (value, alpha, sd, n)
+// (value, alpha, array)
+export function normalci() {
+  var args = [].slice.call(arguments),
+    ans = new Array(2),
+    change;
+  if (args.length === 4) {
+    change = Math.abs(normal.inv(args[1] / 2, 0, 1) *
+      args[2] / Math.sqrt(args[3]));
+  } else {
+    // @ts-ignore
+    change = Math.abs(normal.inv(args[1] / 2, 0, 1) * stdev(args[2]) / Math.sqrt(args[2].length));
+  }
+  ans[0] = args[0] - change;
+  ans[1] = args[0] + change;
+  return ans;
+}
+
+export function tci() {
+  var args = [].slice.call(arguments),
+    ans = new Array(2),
+    change;
+  if (args.length === 4) {
+    change = Math.abs(studentt.inv(args[1] / 2, args[3] - 1) *
+      args[2] / Math.sqrt(args[3]));
+  } else {
+    // @ts-ignore
+    change = Math.abs(studentt.inv(args[1] / 2, args[2].length - 1) * stdev(args[2], true) / Math.sqrt(args[2].length));
+  }
+  ans[0] = args[0] - change;
+  ans[1] = args[0] + change;
+  return ans;
+}
+
+function product(arr: number[]): number {
+  var prod = 1;
+  var i = arr.length;
+  while (--i >= 0)
+    prod *= arr[i];
+  return prod;
+}
+
+export function geomean(arr: number[]): number {
+  return Math.pow(product(arr), 1 / arr.length);
+}
+
+export function covariance(arr1: number[], arr2: number[]): number {
+  var u = mean(arr1);
+  var v = mean(arr2);
+  var arr1Len = arr1.length;
+  var sq_dev = new Array(arr1Len);
+  var i;
+
+  for (i = 0; i < arr1Len; i++)
+    sq_dev[i] = (arr1[i] - u) * (arr2[i] - v);
+
+  return sum(sq_dev) / (arr1Len - 1);
+}
+
+export function corrcoeff(arr1: number[], arr2: number[]): number {
+  return covariance(arr1, arr2) /
+    stdev(arr1, 1) /
+    stdev(arr2, 1);
+}

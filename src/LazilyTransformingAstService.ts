@@ -1,15 +1,15 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellAddress} from './Cell'
+import {CombinedTransformer} from './dependencyTransformers/CombinedTransformer'
+import {FormulaTransformer} from './dependencyTransformers/Transformer'
 import {Ast, ParserWithCaching} from './parser'
+import {StatType} from './statistics'
 import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
-import {FormulaTransformer} from './dependencyTransformers/Transformer'
-import {StatType} from './statistics'
-import {CombinedTransformer} from './dependencyTransformers/CombinedTransformer'
 
 export class LazilyTransformingAstService {
 

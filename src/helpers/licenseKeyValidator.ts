@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
@@ -54,7 +54,7 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
     vars: {},
   }
 
-  if (licenseKey === 'non-commercial-and-evaluation' || licenseKey === 'agpl-v3' || licenseKey === 'internal-use-in-handsontable') {
+  if (licenseKey === 'gpl-v3' || licenseKey === 'internal-use-in-handsontable') {
     messageDescriptor.template = LicenseKeyValidityState.VALID
 
   } else if (typeof licenseKey === 'string' && checkKeySchema(licenseKey)) {

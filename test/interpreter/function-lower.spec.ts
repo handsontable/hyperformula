@@ -1,6 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {adr, detailedError} from '../testUtils'
 import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function LOWER', () => {
   it('should take one argument', () => {
@@ -37,13 +37,5 @@ describe('Function LOWER', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual('true')
     expect(engine.getCellValue(adr('A2'))).toEqual('0')
-  })
-
-  it('should return error for range', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=LOWER(B1:B2)'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })

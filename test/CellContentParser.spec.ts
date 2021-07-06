@@ -2,20 +2,19 @@ import {ErrorType} from '../src/Cell'
 import {CellContent, CellContentParser} from '../src/CellContentParser'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
+import {ErrorMessage} from '../src/error-message'
+import {
+  CurrencyNumber,
+  DateNumber,
+  DateTimeNumber,
+  PercentNumber,
+  TimeNumber
+} from '../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
 
 describe('CellContentParser', () => {
   const config = new Config()
   const cellContentParser = new CellContentParser(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
-
-  it('a matrix', () => {
-    expect(cellContentParser.parse('{=FOO()}')).toEqual(new CellContent.MatrixFormula('=FOO()'))
-  })
-
-  it('not a matrix', () => {
-    expect(cellContentParser.parse('{=FOO()')).not.toBeInstanceOf(CellContent.MatrixFormula)
-    expect(cellContentParser.parse('=FOO()}')).not.toEqual(CellContent.MatrixFormula)
-  })
 
   it('a formula', () => {
     expect(cellContentParser.parse('=FOO()')).toEqual(new CellContent.Formula('=FOO()'))
@@ -83,9 +82,9 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse(null)).toEqual(new CellContent.Empty())
     expect(cellContentParser.parse(undefined)).toEqual(new CellContent.Empty())
     expect(cellContentParser.parse(-0)).toEqual(new CellContent.Number(0))
-    expect(cellContentParser.parse(Infinity)).toEqual(new CellContent.Error(ErrorType.NUM))
-    expect(cellContentParser.parse(-Infinity)).toEqual(new CellContent.Error(ErrorType.NUM))
-    expect(cellContentParser.parse(NaN)).toEqual(new CellContent.Error(ErrorType.NUM))
+    expect(cellContentParser.parse(Infinity)).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(cellContentParser.parse(-Infinity)).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge))
+    expect(cellContentParser.parse(NaN)).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
   it('string', () => {
@@ -115,12 +114,15 @@ describe('CellContentParser', () => {
   })
 
   it('date parsing', () => {
-    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(43863))
-    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(43863))
+    expect(cellContentParser.parse('02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863, 'DD/MM/YYYY')))
+    expect(cellContentParser.parse('  02-02-2020')).toEqual(new CellContent.Number(new DateNumber(43863, 'DD/MM/YYYY')))
   })
 
   it('JS Date parsing', () => {
-    expect(cellContentParser.parse(new Date(1995, 11, 17))).toEqual(new CellContent.Number(35050))
+    expect(cellContentParser.parse(new Date(1995, 11, 17))).toEqual(new CellContent.Number(new DateNumber(35050, 'Date()')))
+    expect(cellContentParser.parse(new Date(1995, 11, 17, 12, 0, 0))).toEqual(new CellContent.Number(new DateTimeNumber(35050.5, 'Date()')))
+    expect(cellContentParser.parse(new Date(1899, 11, 30, 6, 0, 0))).toEqual(new CellContent.Number(new TimeNumber(0.25, 'Date()')))
+    expect(cellContentParser.parse(new Date(1899, 11, 29))).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.DateBounds))
   })
 
   it( 'starts with \'', () => {
@@ -130,5 +132,30 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('\' 1')).toEqual(new CellContent.String(' 1'))
     expect(cellContentParser.parse(' \'1')).toEqual(new CellContent.String(' \'1'))
     expect(cellContentParser.parse('\'02-02-2020')).toEqual(new CellContent.String('02-02-2020'))
+  })
+
+  it('currency parsing', () => {
+    expect(cellContentParser.parse('1$')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
+    expect(cellContentParser.parse('$1')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
+    expect(cellContentParser.parse('-1.1e1$')).toEqual(new CellContent.Number(new CurrencyNumber(-11, '$')))
+    expect(cellContentParser.parse('$-1.1e1')).toEqual(new CellContent.Number(new CurrencyNumber(-11, '$')))
+    expect(cellContentParser.parse(' 1$ ')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
+    expect(cellContentParser.parse(' $1 ')).toEqual(new CellContent.Number(new CurrencyNumber(1, '$')))
+    expect(cellContentParser.parse('1 $')).toEqual(new CellContent.String('1 $'))
+    expect(cellContentParser.parse('$ 1')).toEqual(new CellContent.String('$ 1'))
+  })
+
+  it('other currency parsing', () => {
+    expect(cellContentParser.parse('1PLN')).toEqual(new CellContent.String('1PLN'))
+    const configPLN = new Config({currencySymbol: ['PLN']})
+    const cellContentParserPLN = new CellContentParser(configPLN, new DateTimeHelper(configPLN), new NumberLiteralHelper(configPLN))
+    expect(cellContentParserPLN.parse('1PLN')).toEqual(new CellContent.Number(new CurrencyNumber(1, 'PLN')))
+  })
+
+  it('percentage parsing', () => {
+    expect(cellContentParser.parse('100%')).toEqual(new CellContent.Number(new PercentNumber(1)))
+    expect(cellContentParser.parse('-1.1e3%')).toEqual(new CellContent.Number(new PercentNumber(-11)))
+    expect(cellContentParser.parse(' 100% ')).toEqual(new CellContent.Number(new PercentNumber(1)))
+    expect(cellContentParser.parse('100 %')).toEqual(new CellContent.String('100 %'))
   })
 })

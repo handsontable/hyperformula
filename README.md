@@ -37,8 +37,8 @@ and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-
 - Demos
   - [JavaScript](https://handsontable.github.io/hyperformula/guide/demo.html)
   - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
-  - [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
-  - [Angular.js](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
+  - [Vue](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
+  - [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
 - [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
 - [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
 - [API Reference](https://handsontable.github.io/hyperformula/api/)
@@ -62,7 +62,7 @@ import { HyperFormula } from 'hyperformula';
 
 // define the options
 const options = {
-  licenseKey: 'agpl-v3',
+  licenseKey: 'gpl-v3',
 };
 
 // define the data
@@ -116,16 +116,26 @@ Your help is much appreciated in any of the following topics:
 
 ## License
 
-HyperFormula is a triple-licensed software. You can use it under the
-open source [AGPLv3 license](https://github.com/handsontable/hyperformula/blob/master/agpl-3.0.txt),
-or a [free license](https://github.com/handsontable/hyperformula/blob/master/non-commercial-license.pdf)
-in all your non-commercial projects. There is also a
-[commercial license](https://handsontable.github.io/hyperformula/guide/contact.html),
-and support services available.
+HyperFormula is a double-licensed software. In all your non-commercial projects, you can use it under the
+open source [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt). Additionally, there is also a [commercial license](https://handsontable.github.io/hyperformula/guide/contact.html), and support services available.
+
+## Acknowledgements
+
+You should know that this project wouldn’t exist without co-financing from European Union funds under the European Regional Development Funds as a part of the Smart Growth Operational Programme. Project implemented as a part of the Polish National Centre for Research and Development: “Fast Track”.
+
+- Name of the programme: Smart Growth Operational Programme 2014-2020
+- Project name: “Development of the high-performance calculation engine for processing tabular data of the significant size on mobile devices and workstations using parallel computing and GPU.”
+- Project number: POIR.01.01.01-00-0223/18-00
+- Beneficiary: Handsoncode sp. z o.o.
+- Total budget: PLN 1 117 275.87 (USD ~295 000)
+- Amount of grant: PLN 771 807.73 (USD ~204 000)
+- Duration: 2018-2019
+
+![eu-funds](docs/.vuepress/public/eu-logos.png)
 
 ## Authors
 
 Created by [Handsontable](https://handsontable.com), [NavAlgo](https://www.navalgo.com/en/),
 and [Contributors](https://github.com/handsontable/hyperformula/graphs/contributors).
 
-© 2020 Handsoncode
+© 2021 Handsoncode

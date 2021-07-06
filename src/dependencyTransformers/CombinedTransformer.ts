@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {FormulaTransformer} from './Transformer'
 import {SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {Ast, ParserWithCaching} from '../parser'
+import {FormulaTransformer} from './Transformer'
 
 export class CombinedTransformer implements FormulaTransformer {
   private readonly transformations: FormulaTransformer[] = []

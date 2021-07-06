@@ -1,15 +1,16 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SearchStrategy} from './SearchStrategy'
-import {InternalNoErrorScalarValue} from '../Cell'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {rangeLowerBound} from '../interpreter/binarySearch'
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
+import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
+import {rangeLowerBound} from '../interpreter/binarySearch'
+import {getRawValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {AdvancedFind} from './AdvancedFind'
+import {SearchStrategy} from './SearchStrategy'
 
 export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
   constructor(
@@ -19,11 +20,19 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
     super(dependencyGraph)
   }
 
-  public find(key: InternalNoErrorScalarValue, range: AbsoluteCellRange, sorted: boolean): number {
-    if (range.width() < this.config.binarySearchThreshold || !sorted) {
-      const values = this.dependencyGraph.computeListOfValuesInRange(range)
-      const index =  values.indexOf(key)
-      return index < 0 ? index : index + range.start.col
+  public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
+    if(typeof key === 'string') {
+      key = forceNormalizeString(key)
+    }
+    const range = rangeValue.range
+    if(range === undefined) {
+      return rangeValue.valuesFromTopLeftCorner().map(getRawValue).indexOf(key)
+    } else if (range.width() < this.config.binarySearchThreshold || !sorted) {
+      return this.dependencyGraph.computeListOfValuesInRange(range).findIndex(arg => {
+          arg = getRawValue(arg)
+          arg = (typeof arg === 'string') ? forceNormalizeString(arg) : arg
+          return arg === key
+        })
     } else {
       return rangeLowerBound(range, key, this.dependencyGraph, 'col')
     }

@@ -1,15 +1,17 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {SimpleRangeValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {getRawValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class SumprodPlugin extends FunctionPlugin {
+export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumprodPlugin>{
   public static implementedFunctions = {
     'SUMPRODUCT': {
       method: 'sumproduct',
@@ -20,8 +22,8 @@ export class SumprodPlugin extends FunctionPlugin {
     },
   }
 
-  public sumproduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMPRODUCT'), (left: SimpleRangeValue, right: SimpleRangeValue) => {
+  public sumproduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SUMPRODUCT'), (left: SimpleRangeValue, right: SimpleRangeValue) => {
       if (left.numberOfElements() !== right.numberOfElements()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
       }
@@ -40,8 +42,8 @@ export class SumprodPlugin extends FunctionPlugin {
         } else {
           const lval = this.coerceScalarToNumberOrError(l.value)
           const rval = this.coerceScalarToNumberOrError(r.value)
-          if (typeof lval === 'number' && typeof rval === 'number') {
-            result += lval * rval
+          if (isExtendedNumber(lval) && isExtendedNumber(rval)) {
+            result += getRawValue(lval) * getRawValue(rval)
           }
         }
       }

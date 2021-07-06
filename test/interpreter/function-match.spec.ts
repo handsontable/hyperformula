@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {DependencyGraph} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
-import {DependencyGraph} from '../../src/DependencyGraph'
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {
@@ -16,18 +16,18 @@ describe('Function MATCH', () => {
 
   it('validates that 1st argument is number, string or boolean', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(C1:C2, B1:B1)'],
+      ['=MATCH(C2:C3, B1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('validates that 2nd argument is range', () => {
+  it('2nd argument can be a scalar', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(1, 42)'],
+      ['=MATCH(42, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
   it('validates that 3rd argument is number', () => {
@@ -271,5 +271,25 @@ describe('Function MATCH', () => {
     ], {useColumnIndex: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
+  })
+
+  it('works for strings, is not case sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH("A", A2:A5, 0)'],
+      ['a'],
+      ['A'],
+    ], {caseSensitive: false})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+
+  it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH("A", A2:A5, 0)'],
+      ['a'],
+      ['A'],
+    ], {caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 })

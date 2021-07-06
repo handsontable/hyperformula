@@ -58,6 +58,42 @@ class CountHF extends FunctionPlugin {
 }
 ```
 
+Similarly, there are other useful properties. 
+`isDependentOnSheetStructureChange` marks functions that need to be recalculated with 
+each change of the shape of the engine sheets. 
+`doesNotNeedArgumentsToBeComputed` marks functions that treat references or ranges in their arguments
+as arguments that do not create dependency. Other arguments are properly evaluated.
+`arrayFunction` denotes functions that enable array arithmetic in its arguments and nested expressions.
+`vectorizationForbidden` when set prevents function from ever being vectorized (however, it is up to implementation of a function to properly handle vectorization).
+## Aliases
+
+Aliases are available since the <Badge text="v0.4.0"  vertical="middle"/> version.
+
+If you want to include aliases (multiple names to a single implemented function) inside the plugin,
+you can do this with the static `aliases` property.
+
+The property is keyed with aliases IDs, and with values being aliased functions IDs.
+
+```javascript
+// import FunctionPlugin
+import { FunctionPlugin } from 'hyperformula';
+
+// start creating a class
+class CountHF extends FunctionPlugin {
+
+// define functions inside this plugin
+  public static implementedFunctions = {
+    'HYPER': {
+    // this method's functionality will be defined in the next step
+      method: 'hyper',
+    }
+  };
+  public static aliases = {
+    'HYPER.ALIAS': 'HYPER'
+  //HYPER.ALIAS is now an alias to HYPER
+  };
+}
+```
 ## Translations
 
 There are **two ways** of adding a translation of the custom function.
@@ -97,12 +133,12 @@ export const myTranslations = {
 For the simplicity of a basic example, you will not pass any
 arguments. However, this method imposes a particular structure to
 be used; there are two optional arguments, `ast` and
-`formulaAddress`, and the function must return the results of
+`state`, and the function must return the results of
 the calculations.
 
 ```javascript
 // arguments here are displayed just to show the structure
-public hyper(ast, formulaAddress) {
+public hyper(ast, state) {
     return 'Hyperformula'.length;
   }
 };
@@ -124,7 +160,7 @@ export class CountHF extends FunctionPlugin {
     }
   };
 
-  public hyper(ast, formulaAddress) {
+  public hyper(ast, state) {
     return 'Hyperformula'.length
     }
   };
@@ -171,7 +207,7 @@ console.log(A1Value);
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.3.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.6.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: custom-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

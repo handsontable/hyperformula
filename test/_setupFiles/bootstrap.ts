@@ -6,17 +6,16 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB} from '../../src/i18n/languages'
+import * as plugins from '../../src/interpreter/plugin'
 import {unregisterAllLanguages} from './../testUtils'
 import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from './matchers'
-import * as plugins from '../../src/interpreter/plugin'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
   functionPlugins: [],
   gpuMode: 'cpu',
-  matrixDetection: false,
   useStats: true,
-  licenseKey: 'agpl-v3',
+  licenseKey: 'gpl-v3',
 })
 
 const jestPresent = (() => {

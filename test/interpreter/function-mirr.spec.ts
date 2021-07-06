@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -22,6 +23,7 @@ describe('Function MIRR', () => {
       ['=MIRR(B5:D5, -2, 1)', 3, 4, -3]
     ])
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.257018945686308, 6)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.161201673643132, 6)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.261451054124004, 6) // different value without 0

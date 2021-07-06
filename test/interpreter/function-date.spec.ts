@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
@@ -11,6 +11,7 @@ describe('Function DATE', () => {
       ['=DATE(1900, 1, 1)', '=DATE(1900, 1, 2)', '=DATE(1915, 10, 24)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATE)
     expect(dateNumberToString(engine.getCellValue(adr('A1')), config)).toEqual('01/01/1900')
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
     expect(dateNumberToString(engine.getCellValue(adr('B1')), config)).toEqual('02/01/1900')
@@ -98,19 +99,6 @@ describe('Function DATE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
-  })
-
-  // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const config = new Config()
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2000'],
-      ['2', '2001', '=DATE(B1:B3, 1, 1)', '=DATE(1950, A1:A3, 1)', '=DATE(1950, 1, A1:A3)'],
-      ['3', '2002'],
-    ], config)
-    expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('D2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('E2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 })
 

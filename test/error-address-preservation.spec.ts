@@ -1,5 +1,7 @@
 import {ErrorType, HyperFormula} from '../src'
 import {adr, detailedErrorWithOrigin} from './testUtils'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
+import {simpleCellRange} from '../src/AbsoluteCellRange'
 
 describe('Address preservation.', () => {
   it('Should work in the basic case.', () => {
@@ -66,5 +68,20 @@ describe('Address preservation.', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!B1'))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'))
     expect(engine.getCellValue(adr('A3'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'))
+  })
+
+  it('Should work after simple cruds', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NA()', '=A1']
+    ])
+
+    engine.addColumns(0, [0, 1])
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!B1'))
+
+    engine.setCellContents(adr('B1'), '=1/0')
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!B1'))
+
+    engine.moveCells(simpleCellRange(adr('B1'), adr('B1')), adr('C5'))
+    expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!C5'))
   })
 })

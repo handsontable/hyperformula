@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {Transformer} from './Transformer'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {CellAddress, ParserWithCaching} from '../parser'
 import {ColumnAddress} from '../parser/ColumnAddress'
 import {RowAddress} from '../parser/RowAddress'
+import {Transformer} from './Transformer'
 
 export class RemoveSheetTransformer extends Transformer {
   constructor(
@@ -22,8 +22,8 @@ export class RemoveSheetTransformer extends Transformer {
   }
 
   public performEagerTransformations(graph: DependencyGraph, _parser: ParserWithCaching): void {
-    for (const node of graph.matrixFormulaNodes()) {
-      const [newAst] = this.transformSingleAst(node.getFormula()!, node.getAddress())
+    for (const node of graph.arrayFormulaNodes()) {
+      const [newAst] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
       node.setFormula(newAst)
     }
   }

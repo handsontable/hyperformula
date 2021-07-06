@@ -5,15 +5,140 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
+- **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
+- **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
+- **Breaking change**: Removed numeric matrix detection along with matrixDetection and matrixDetectionThreshold config options. (#669)
+- **Breaking change**: Changed API of the following methods to take `SimpleCellRange` type argument: `copy`,  `cut`, `getCellDependents`, `getCellPrecedents`, `getFillRangeData`, `getRangeFormulas`,  `getRangeSerialized`, `getRangeValues`, `isItPossibleToMoveCells`, `isItPossibleToSetCellContents`, `moveCells`. (#687)
+- **Breaking change**: Changed the AGPLv3 license to GPLv3.
+- **Breaking change**: Removed the free non-commercial license.
+- **Breaking change**: Changed behaviour of `setCellContents` so that it is possible to override space occupied by spilled array. (#708)
+- **Breaking change**: Changed behaviour of `addRows/removeRows` so that it is possible to add/remove rows across spilled array without changing array size. (#708)
+- **Breaking change**: Changed behaviour of `addColumns/removeColumns` so that it is possible to add/remove columns across spilled array without changing array size. (#732)
+- **Breaking change**: Changed config options (#747):
+
+| before                | after                |
+|-----------------------|----------------------|
+| matrixColumnSeparator | arrayColumnSeparator |
+| matrixRowSeparator    | arrayRowSeparator    |
+
+- **Breaking change**: Changed CellType.MATRIX to CellType.ARRAY (#747)
+- **Breaking change**: Changed API methods (#747):
+
+| before             | after             |
+|--------------------|-------------------|
+| matrixMapping      | arrrayMapping     |
+| isCellPartOfMatrix | isCellPartOfArray |
+
+- **Breaking change**: Changed Exceptions (#747):
+
+| before                       | after                       |
+|------------------------------|-----------------------------|
+| SourceLocationHasMatrixError | SourceLocationHasArrayError |
+| TargetLocationHasMatrixError | TargetLocationHasArrayError |
+
+- Changed SWITCH function, so it takes array as its first argument.
+- Changed TRANSPOSE function, so it works with data of any type. (#708)
+
 ### Added
-- Added 18 mathematical functions ROMAN, ARABIC, FACT, FACTDOUBLE, COMBIN, COMBINA, GCD, LCM, MROUND, MULTINOMIAL, QUOTIENT, RANDBETWEEN, SERIESSUM, SIGN, SQRTPI, SUMX2MY2, SUMX2PY2, SUMXMY2.
-- Added 63 statistical functions EXPON.DIST, EXPONDIST, FISHER, FISHERINV, GAMMA, GAMMA.DIST, GAMMADIST, GAMMALN, GAMMALN.PRECISE, GAMMA.INV, GAMMAINV, GAUSS, BETA.DIST, BETADIST, BETA.INV, BETAINV, BINOM.DIST, BINOMDIST, BINOM.INV, BESSELI, BESSELJ, BESSELK, BESSELY, CHISQ.DIST, CHISQ.DIST.RT, CHISQ.INV, CHISQ.INV.RT, CHIDIST, CHIINV, F.DIST, F.DIST.RT, F.INV, F.INV.RT, FDIST, FINV, WEIBULL, WEIBULL.DIST, HYPGEOMDIST, HYPGEOM.DIST, T.DIST, T.DIST.2T, T.DIST.RT, T.INV, T.INV.2T, TDIST, TINV, LOGNORM.DIST, LOGNORMDIST, LOGNORM.INV, LOGINV, NORM.DIST, NORMDIST, NORM.S.DIST, NORMSDIST, NORM.INV, NORMINV, NORM.S.INV, NORMSINV, PHI, NEGBINOM.DIST, NEGBINOMDIST, POISSON, POISSON.DIST.
+- Added support for array arithmetic. (#628)
+- Added performance improvements for array handling. (#629)
+- Added ARRAYFORMULA function. (#630)
+- Added FILTER function. (#668)
+- Added ARRAY_CONSTRAIN function. (#661)
+- Added casting to scalars from non-range arrays. (#663)
+- Added support for range interpolation. (#665)
+- Added parsing of arrays in formulas (together with respective config options for separators). (#671)
+- Added support for vectorization of scalar functions. (#673)
+- Added support for time in JS `Date()` objects on the input. (#648)
+- Added validation of API argument types for simple types. (#654)
+- Added named expression handling to engine factories. (#680)
+- Added `getAllNamedExpressionsSerialized` method. (#680)
+- Added parsing of arrays in formulas (together with respective config options for separators). (#671)
+- Added utility function for filling ranges with source from other range. (#678)
+- Added pretty print for detailedCellError. (#712)
+- Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. (#720)
+- Added `CellError` to exports. (#736)
+- Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. (#747)
+- Added `#SPILL!` error type. (#708)
+
+### Fixed
+- Fixed an issue with arrays and cruds. (#651)
+- Fixed handling of arrays for ROWS/COLUMNS functions. (#677)
+- Fixed an issue with nested namedexpressions. (#679)
+- Fixed an issue with matrixDetection + number parsing. (#686)
+- Fixed an issue with NOW and TODAY functions. (#709)
+- Fixed an issue with MIN/MAX function caches. (#711)
+- Fixed an issue with caching and order of evaluation. (#735)
+
+## [0.6.2] - 2021-05-26
+
+### Changed
+- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. (#681)
+
+## [0.6.1] - 2021-05-24
+
+### Changed
+- Remove redundant `'assert'` dependency from the code. (#672)
+
+### Fixed
+- Fixed library support for IE11. The `unorm` package is added to the dependencies. (#675)
+
+## [0.6.0] - 2021-04-27
+
+### Changed
+- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. (#642)
+
+### Added
+- Added two new fired events, for suspending and resuming execution. (#637)
+- Added listing in scopes to `listNamedExpressions` method. (#638)
+
+### Fixed
+- Fixed issues with scoped named expression. (#646, #641)
+- Fixed an issue with losing formating info about DateTime numbers. (#626)
+
+## [0.5.0] - 2021-04-15
+
+### Changed
+- **Breaking change**: A change to the type of value returned via serialization methods. (#617)
+- An input value should be preserved through serialization more precisely. (#617)
+- GPU.js constructor needs to be provided directly to engine configuration. (#355)
+- A deprecated config option vlookupThreshold has been removed. (#620)
+
+### Added
+- Added support for row and column reordering. (#343)
+- Added type inferrence for subtypes for number. (#313)
+- Added parsing of number literals containing '%' or currency symbol (default '$'). (#590)
+- Added ability to fallback to plain CPU implementation for functions that uses GPU.js (#355)
+
+### Fixed
+- Fixed minor issue. (#631)
+- Fixed a bug with serialization of some addresses after CRUDs. (#587)
+- Fixed a bug with MEDIAN function implementation. (#601)
+- Fixed a bug with copy-paste operation that could cause out of scope references (#591)
+- Fixed a bug with date parsing. (#614)
+- Fixed a bug where accent/case sensitivity was ignored for LOOKUPs. (#621)
+- Fixed a bug with handling of no time format/no date format scenarios. (#616)
+
+## [0.4.0] - 2020-12-17
+
+### Changed
+- A **breaking change**: CEILING function implementation to be consistent with existing implementations. (#582)
+
+### Added
+- Added 50 mathematical functions: ROMAN, ARABIC, FACT, FACTDOUBLE, COMBIN, COMBINA, GCD, LCM, MROUND, MULTINOMIAL, QUOTIENT, RANDBETWEEN, SERIESSUM, SIGN, SQRTPI, SUMX2MY2, SUMX2PY2, SUMXMY2, CEILING.MATH, FLOOR.MATH, FLOOR, CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING, COMPLEX, IMABS, IMAGINARY, IMARGUMENT, IMCONJUGATE, IMCOS, IMCOSH, IMCOT, IMCSC, IMCSCH, IMDIV, IMEXP, IMLN, IMLOG10, IMLOG2, IMPOWER, IMPRODUCT, IMREAL, IMSEC, IMSECH, IMSIN, IMSINH, IMSQRT, IMSUB,  IMSUM, IMTAN. (#537, #582, #281, #581)
+- Added 106 statistical functions: EXPON.DIST, EXPONDIST, FISHER, FISHERINV, GAMMA, GAMMA.DIST, GAMMADIST, GAMMALN, GAMMALN.PRECISE, GAMMA.INV, GAMMAINV, GAUSS, BETA.DIST, BETADIST, BETA.INV, BETAINV, BINOM.DIST, BINOMDIST, BINOM.INV, BESSELI, BESSELJ, BESSELK, BESSELY, CHISQ.DIST, CHISQ.DIST.RT, CHISQ.INV, CHISQ.INV.RT, CHIDIST, CHIINV, F.DIST, F.DIST.RT, F.INV, F.INV.RT, FDIST, FINV, WEIBULL, WEIBULL.DIST, HYPGEOMDIST, HYPGEOM.DIST, T.DIST, T.DIST.2T, T.DIST.RT, T.INV, T.INV.2T, TDIST, TINV, LOGNORM.DIST, LOGNORMDIST, LOGNORM.INV, LOGINV, NORM.DIST, NORMDIST, NORM.S.DIST, NORMSDIST, NORM.INV, NORMINV, NORM.S.INV, NORMSINV, PHI, NEGBINOM.DIST, NEGBINOMDIST, POISSON, POISSON.DIST, LARGE, SMALL, AVEDEV, CONFIDENCE, CONFIDENCE.NORM, CONFIDENCE.T, DEVSQ, GEOMEAN, HARMEAN, CRITBINOM, COVAR, COVARIANCE.P, COVARIANCE.S, PEARSON, RSQ, STANDARDIZE, Z.TEST, ZTEST, F.TEST, FTEST, STEYX, SLOPE, CHITEST, CHISQ.TEST, T.TEST, TTEST, SKEW.P, SKEW, WEIBULLDIST, VARS, TINV2T, TDISTRT, TDIST2T, STDEVS, FINVRT, FDISTRT, CHIDISTRT, CHIINVRT, COVARIANCEP, COVARIANCES, LOGNORMINV, POISSONDIST, SKEWP. (#152, #154, #160)
+- Added function aliases mechanism. (PR #569)
+- Added support for scientific notation. (#579)
+- Added support for complex numbers. (#281)
 
 ### Fixed
 - Fixed a problem with dependencies not collected for specific functions. (#550, #549)
 - Fixed a minor problem with dependencies under nested parenthesis. (#549, #558)
 - Fixed a problem with HLOOKUP/VLOOKUP getting stuck in binary search. (#559, #562)
-- Fixed a problem with logic of dependency resolving. (#561, #563)
+- Fixed a problem with the logic of dependency resolving. (#561, #563)
+- Fixed a minor bug with ATAN2 function. (#581)
 
 ## [0.3.0] - 2020-10-22
 

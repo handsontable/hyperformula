@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -24,6 +25,7 @@ describe('Function DDB', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(900)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1600)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(1056)
     expect(engine.getCellValue(adr('D1'))).toBeCloseTo(1875)

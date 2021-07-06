@@ -6,7 +6,7 @@ import {adr, detailedError} from '../testUtils'
 describe('CORREL', () => {
   it('validates number of arguments',  () => {
     const engine =  HyperFormula.buildFromArray([
-      ['=CORREL()'],
+      ['=CORREL(B1:B5)'],
       ['=CORREL(B1:B5, C1:C5, D1:D5)'],
     ])
 
@@ -76,7 +76,7 @@ describe('CORREL', () => {
       ['=CORREL(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.999248091927219)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.999248091927219, 6)
   })
 
   it('propagates errors', () => {

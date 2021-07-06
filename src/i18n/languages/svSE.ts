@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -15,9 +15,13 @@ const dictionary: RawTranslationPackage = {
     NAME: '#NAMN?',
     NUM: '#OGILTIGT!',
     REF: '#REFERENS!',
+    SPILL: '#SPILL!',
     VALUE: '#VÄRDEFEL!',
   },
   functions: {
+    FILTER: 'FILTER',
+    'ARRAY_CONSTRAIN' : 'ARRAY_CONSTRAIN',
+    ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
@@ -328,6 +332,81 @@ const dictionary: RawTranslationPackage = {
     PHI: 'PHI',
     'NEGBINOM.DIST': 'NEGBINOM.FÖRD',
     NEGBINOMDIST: 'NEGBINOMFÖRD',
+    COMPLEX: 'KOMPLEX',
+    IMABS: 'IMABS',
+    IMAGINARY: 'IMAGINÄR',
+    IMARGUMENT: 'IMARGUMENT',
+    IMCONJUGATE: 'IMKONJUGAT',
+    IMCOS: 'IMCOS',
+    IMCOSH: 'IMCOSH',
+    IMCOT: 'IMCOT',
+    IMCSC: 'IMCSC',
+    IMCSCH: 'IMCSCH',
+    IMDIV: 'IMDIV',
+    IMEXP: 'IMEUPPHÖJT',
+    IMLN: 'IMLN',
+    IMLOG10: 'IMLOG10',
+    IMLOG2: 'IMLOG2',
+    IMPOWER: 'IMUPPHÖJT',
+    IMPRODUCT: 'IMPRODUKT',
+    IMREAL: 'IMREAL',
+    IMSEC: 'IMSEC',
+    IMSECH: 'IMSECH',
+    IMSIN: 'IMSIN',
+    IMSINH: 'IMSINH',
+    IMSQRT: 'IMROT',
+    IMSUB: 'IMDIFF',
+    IMSUM: 'IMSUM',
+    IMTAN: 'IMTAN',
+    LARGE: 'STÖRSTA',
+    SMALL: 'MINSTA',
+    AVEDEV: 'MEDELAVV',
+    CONFIDENCE: 'KONFIDENS',
+    'CONFIDENCE.NORM': 'KONFIDENS.NORM',
+    'CONFIDENCE.T': 'KONFIDENS.T',
+    DEVSQ: 'KVADAVV',
+    GEOMEAN: 'GEOMEDEL',
+    HARMEAN: 'HARMMEDEL',
+    CRITBINOM: 'KRITBINOM',
+    PEARSON: 'PEARSON',
+    RSQ: 'RKV',
+    STANDARDIZE: 'STANDARDISERA',
+    'Z.TEST': 'Z.TEST',
+    ZTEST: 'ZTEST',
+    'F.TEST': 'F.TEST',
+    FTEST: 'FTEST',
+    STEYX: 'STDFELYX',
+    SLOPE: 'LUTNING',
+    COVAR: 'KOVAR',
+    'COVARIANCE.P': 'KOVARIANS.P',
+    'COVARIANCE.S': 'KOVARIANS.S',
+    'CHISQ.TEST': 'CHI2.TEST',
+    CHITEST: 'CHI2TEST',
+    'T.TEST': 'T.TEST',
+    TTEST: 'TTEST',
+    SKEW: 'SNEDHET',
+    'SKEW.P': 'SKEW.P',
+    WEIBULLDIST: 'WEIBULLDIST', //FIXME
+    VARS: 'VARS', //FIXME
+    TINV2T: 'TINV2T', //FIXME
+    TDISTRT: 'TDISTRT', //FIXME
+    TDIST2T: 'TDIST2T', //FIXME
+    STDEVS: 'STDEVS', //FIXME
+    FINVRT: 'FINVRT', //FIXME
+    FDISTRT: 'FDISTRT', //FIXME
+    CHIDISTRT: 'CHIDISTRT', //FIXME
+    CHIINVRT: 'CHIINVRT', //FIXME
+    COVARIANCEP: 'COVARIANCEP', //FIXME
+    COVARIANCES: 'COVARIANCES', //FIXME
+    LOGNORMINV: 'LOGNORMINV', //FIXME
+    POISSONDIST: 'POISSONDIST', //FIXME
+    SKEWP: 'SKEWP', //FIXME
+    'CEILING.MATH': 'CEILING.MATH',
+    FLOOR: 'RUNDA.NER',
+    'FLOOR.MATH': 'FLOOR.MATH',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'svSE',
   ui: {

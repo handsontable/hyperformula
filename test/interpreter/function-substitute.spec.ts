@@ -1,6 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {adr, detailedError} from '../testUtils'
 import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function SUBSTITUTE', () => {
   it('should take three or four parameters', () => {
@@ -63,9 +63,9 @@ describe('Function SUBSTITUTE', () => {
   it('should return value when arguments of wrong type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBSTITUTE("foobar", "o", "f", "bar")'],
-      ['=SUBSTITUTE(B1:B2, "o", "f", 3)'],
-      ['=SUBSTITUTE("foobar", B1:B2, "f", 3)'],
-      ['=SUBSTITUTE("foobar", "o", B1:B2, 3)'],
+      ['=SUBSTITUTE(B1:C1, "o", "f", 3)'],
+      ['=SUBSTITUTE("foobar", B1:C1, "f", 3)'],
+      ['=SUBSTITUTE("foobar", "o", B1:C1, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))

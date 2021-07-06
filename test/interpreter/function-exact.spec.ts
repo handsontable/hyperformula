@@ -1,6 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {adr, detailedError} from '../testUtils'
 import {ErrorMessage} from '../../src/error-message'
+import {adr, detailedError} from '../testUtils'
 
 describe('Function EXACT', () => {
   it('should take two arguments', () => {
@@ -27,6 +27,16 @@ describe('Function EXACT', () => {
     expect(engine.getCellValue(adr('A4'))).toBe(false)
   })
 
+  it('should be case/accent sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=EXACT(B1, C1)', 'foo', 'FOO'],
+      ['=EXACT(B2, C2)', 'foo', 'fóó'],
+    ], {caseSensitive: false})
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('A2'))).toBe(false)
+  })
+
   it('should be case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['=EXACT(B1, C1)', 'foo', 'Foo'],
@@ -51,8 +61,8 @@ describe('Function EXACT', () => {
 
   it('should return error for range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=EXACT("foo",B1:B2)'],
-      ['=EXACT(B1:B2,"foo")'],
+      ['=EXACT("foo",B1:C1)'],
+      ['=EXACT(B1:C1,"foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))

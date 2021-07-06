@@ -112,7 +112,7 @@ recognizes them as proper dates:
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.3.x/date-time?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.6.x/date-time?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: date-time"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -137,7 +137,9 @@ different countries.
 | Belgium | Dutch | d/MM/yyyy |
 | Bulgaria | Bulgarian | yyyy-M-d |
 | Bahrain | Arabic | dd/MM/yyyy |
-| Bosnia and Herzegovina | Serbian | yyyy-MM-dd |
+| Bosnia and Herzegovina | Bosnian | dd.MM.yyyy. |
+| Bosnia and Herzegovina | Serbian | dd.MM.yyyy. |
+| Bosnia and Herzegovina | Croatian | dd.MM.yyyy. |
 | Belarus | Belarusian | d.M.yyyy |
 | Bolivia | Spanish | dd-MM-yyyy |
 | Brazil | Portuguese | dd/MM/yyyy |

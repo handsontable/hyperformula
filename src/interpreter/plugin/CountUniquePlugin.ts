@@ -1,16 +1,18 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, EmptyValueType, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {EmptyValueType, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function
  */
-export class CountUniquePlugin extends FunctionPlugin {
+export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountUniquePlugin>{
   public static implementedFunctions = {
     'COUNTUNIQUE': {
       method: 'countunique',
@@ -28,10 +30,10 @@ export class CountUniquePlugin extends FunctionPlugin {
    * Returns number of unique numbers from arguments
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public countunique(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTUNIQUE'), (...args: InternalScalarValue[]) => {
+  public countunique(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('COUNTUNIQUE'), (...args: RawScalarValue[]) => {
       const valuesSet = new Set<number | string | boolean | EmptyValueType>()
       const errorsSet = new Set<ErrorType>()
 

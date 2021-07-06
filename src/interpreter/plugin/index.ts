@@ -1,15 +1,15 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+export {ArrayPlugin} from './ArrayPlugin'
 export {AbsPlugin} from './AbsPlugin'
 export {BitShiftPlugin} from './BitShiftPlugin'
 export {BitwiseLogicOperationsPlugin} from './BitwiseLogicOperationsPlugin'
 export {BooleanPlugin} from './BooleanPlugin'
 export {CharPlugin} from './CharPlugin'
 export {CodePlugin} from './CodePlugin'
-export {CorrelPlugin} from './CorrelPlugin'
 export {CountBlankPlugin} from './CountBlankPlugin'
 export {CountUniquePlugin} from './CountUniquePlugin'
 export {DateTimePlugin} from './DateTimePlugin'
@@ -42,3 +42,5 @@ export {RomanPlugin} from './RomanPlugin'
 export {SimpleArithmerticPlugin} from './SimpleArithmertic'
 export {StatisticalPlugin} from './StatisticalPlugin'
 export {MathPlugin} from './MathPlugin'
+export {ComplexPlugin} from './ComplexPlugin'
+export {StatisticalAggregationPlugin} from './StatisticalAggregationPlugin'

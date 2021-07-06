@@ -1,8 +1,8 @@
 import {ErrorType, HyperFormula} from '../../src'
 import {ConfigParams} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
-import {adr, detailedError} from '../testUtils'
 import {Sheet} from '../../src/Sheet'
+import {adr, detailedError} from '../testUtils'
 
 const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
   describe('VLOOKUP - args validation', () => {
@@ -24,7 +24,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
     it('wrong type of first argument', () => {
       const engine = builder([
-        ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
+        ['=VLOOKUP(D1:E1, A2:B3, 2, TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
@@ -246,23 +246,12 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(3)
     })
 
-    it('should work for detected matrices', () => {
-      const engine = builder([
-        ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
-        ['1'],
-        ['2'],
-        ['3'],
-      ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-      expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    })
-
     it('should work for standard matrices', () => {
       const engine = builder([
         ['=VLOOKUP(3, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
-        ['{=TRANSPOSE(A2:C3)}'],
+        ['=TRANSPOSE(A2:C3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
@@ -273,7 +262,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(4, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
-        ['{=TRANSPOSE(A2:C3)}'],
+        ['=TRANSPOSE(A2:C3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
@@ -375,10 +364,48 @@ describe('BinarySearchStrategy', () => {
 
   it('should work on column ranges', () => {
     const engine = HyperFormula.buildFromArray([
-      [ '=VLOOKUP(2,B:C,2)', 1, 'a'],
+      ['=VLOOKUP(2,B:C,2)', 1, 'a'],
       [null, 2, 'b'],
       [null, 3, 'c'],
     ], {binarySearchThreshold: 1})
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
+  })
+
+  it('works for strings, is not case sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', '1'],
+      ['b', '2'],
+      ['c', '3'],
+      ['A', '4'],
+      ['B', '5'],
+      ['=VLOOKUP("A", A1:B5, 2, FALSE())']
+    ], {caseSensitive: false})
+
+    expect(engine.getCellValue(adr('A6'))).toEqual(1)
+  })
+
+  it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', '1'],
+      ['b', '2'],
+      ['c', '3'],
+      ['A', '4'],
+      ['B', '5'],
+      ['=VLOOKUP("A", A1:B5, 2, FALSE())']
+    ], {caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A6'))).toEqual(1)
+  })
+
+  it('should find value in sorted range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', '1'],
+      ['B', '2'],
+      ['c', '3'],
+      ['d', '4'],
+      ['e', '5'],
+      ['=VLOOKUP("b", A1:B5, 2)'],
+    ], {binarySearchThreshold: 1, caseSensitive: false})
+    expect(engine.getCellValue(adr('A6'))).toEqual(2)
   })
 })

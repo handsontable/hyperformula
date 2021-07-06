@@ -136,11 +136,12 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
 
   it('works for matrices', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1'],
-      ['2'],
-      ['=AVERAGEIF(A1:A2, ">0", A1:A2)'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
+      ['1', '2'],
+      ['=TRANSPOSE(A1:B1)'],
+      [],
+      ['=AVERAGEIF(A2:A3, ">0", A2:A3)'],
+    ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(1.5)
+    expect(engine.getCellValue(adr('A4'))).toEqual(1.5)
   })
 })

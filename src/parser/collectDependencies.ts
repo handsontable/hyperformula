@@ -1,8 +1,9 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
   AddressDependency,
   Ast,
@@ -13,8 +14,6 @@ import {
   RelativeDependency,
   RowRangeDependency
 } from './'
-import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-
 
 const collectDependenciesFn = (ast: Ast, functionRegistry: FunctionRegistry, dependenciesSet: RelativeDependency[], needArgument: boolean) => {
   switch (ast.type) {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType} from './Cell'
@@ -18,5 +18,13 @@ export class DetailedCellError {
   ) {
     this.type = error.type
     this.message = error.message ?? ''
+  }
+
+  public toString(): string {
+    return this.value
+  }
+
+  public valueOf(): string {
+    return this.value
   }
 }

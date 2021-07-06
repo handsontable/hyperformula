@@ -1,4 +1,5 @@
 import {HyperFormula} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {adr, colEnd, colStart, extractColumnRange} from './testUtils'
 
 describe('Column ranges', () => {
@@ -73,7 +74,7 @@ describe('Column ranges', () => {
     ])
     expect(engine.getCellValue(adr('E1'))).toEqual(3)
 
-    engine.moveCells(adr('A1'), 2, 1, adr('C1'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('C1'))
 
     expect(engine.getCellValue(adr('E1'))).toEqual(0)
     const range = extractColumnRange(engine, adr('E1'))

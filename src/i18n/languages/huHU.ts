@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -15,9 +15,13 @@ const dictionary: RawTranslationPackage = {
     NAME: '#NÉV?',
     NUM: '#SZÁM!',
     REF: '#HIV!',
+    SPILL: '#KIBONTÁS!',
     VALUE: '#ÉRTÉK!',
   },
   functions: {
+    FILTER: 'FILTER',
+    'ARRAY_CONSTRAIN' : 'ARRAY_CONSTRAIN',
+    ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'ARCCOS',
     ACOSH: 'ARCCOSH',
@@ -328,6 +332,81 @@ const dictionary: RawTranslationPackage = {
     PHI: 'FI',
     'NEGBINOM.DIST': 'NEGBINOM.ELOSZLÁS',
     NEGBINOMDIST: 'NEGBINOM.ELOSZL',
+    COMPLEX: 'KOMPLEX',
+    IMABS: 'KÉPZ.ABSZ',
+    IMAGINARY: 'KÉPZETES',
+    IMARGUMENT: 'KÉPZ.ARGUMENT',
+    IMCONJUGATE: 'KÉPZ.KONJUGÁLT',
+    IMCOS: 'KÉPZ.COS',
+    IMCOSH: 'KÉPZ.COSH',
+    IMCOT: 'KÉPZ.COT',
+    IMCSC: 'KÉPZ.CSC',
+    IMCSCH: 'KÉPZ.CSCH',
+    IMDIV: 'KÉPZ.HÁNYAD',
+    IMEXP: 'KÉPZ.EXP',
+    IMLN: 'KÉPZ.LN',
+    IMLOG10: 'KÉPZ.LOG10',
+    IMLOG2: 'KÉPZ.LOG2',
+    IMPOWER: 'KÉPZ.HATV',
+    IMPRODUCT: 'KÉPZ.SZORZAT',
+    IMREAL: 'KÉPZ.VALÓS',
+    IMSEC: 'KÉPZ.SEC',
+    IMSECH: 'KÉPZ.SECH',
+    IMSIN: 'KÉPZ.SIN',
+    IMSINH: 'KÉPZ.SINH',
+    IMSQRT: 'KÉPZ.GYÖK',
+    IMSUB: 'KÉPZ.KÜL',
+    IMSUM: 'KÉPZ.ÖSSZEG',
+    IMTAN: 'KÉPZ.TAN',
+    LARGE: 'NAGY',
+    SMALL: 'KICSI',
+    AVEDEV: 'ÁTL.ELTÉRÉS',
+    CONFIDENCE: 'MEGBÍZHATÓSÁG',
+    'CONFIDENCE.NORM': 'MEGBÍZHATÓSÁG.NORM',
+    'CONFIDENCE.T': 'MEGBÍZHATÓSÁG.T',
+    DEVSQ: 'SQ',
+    GEOMEAN: 'MÉRTANI.KÖZÉP',
+    HARMEAN: 'HARM.KÖZÉP',
+    CRITBINOM: 'KRITBINOM',
+    PEARSON: 'PEARSON',
+    RSQ: 'RNÉGYZET',
+    STANDARDIZE: 'NORMALIZÁLÁS',
+    'Z.TEST': 'Z.PRÓB',
+    ZTEST: 'Z.PRÓBA',
+    'F.TEST': 'F.PRÓB',
+    FTEST: 'F.PRÓBA',
+    STEYX: 'STHIBAYX',
+    SLOPE: 'MEREDEKSÉG',
+    COVAR: 'KOVAR',
+    'COVARIANCE.P': 'KOVARIANCIA.S',
+    'COVARIANCE.S': 'KOVARIANCIA.M',
+    'CHISQ.TEST': 'KHINÉGYZET.PRÓBA',
+    CHITEST: 'KHI.PRÓBA',
+    'T.TEST': 'T.PRÓB',
+    TTEST: 'T.PRÓBA',
+    SKEW: 'FERDESÉG',
+    'SKEW.P': 'FERDESÉG.P',
+    WEIBULLDIST: 'WEIBULLDIST', //FIXME
+    VARS: 'VARS', //FIXME
+    TINV2T: 'TINV2T', //FIXME
+    TDISTRT: 'TDISTRT', //FIXME
+    TDIST2T: 'TDIST2T', //FIXME
+    STDEVS: 'STDEVS', //FIXME
+    FINVRT: 'FINVRT', //FIXME
+    FDISTRT: 'FDISTRT', //FIXME
+    CHIDISTRT: 'CHIDISTRT', //FIXME
+    CHIINVRT: 'CHIINVRT', //FIXME
+    COVARIANCEP: 'COVARIANCEP', //FIXME
+    COVARIANCES: 'COVARIANCES', //FIXME
+    LOGNORMINV: 'LOGNORMINV', //FIXME
+    POISSONDIST: 'POISSONDIST', //FIXME
+    SKEWP: 'SKEWP', //FIXME
+    'CEILING.MATH': 'PLAFON.MAT',
+    FLOOR: 'PADLÓ',
+    'FLOOR.MATH': 'PADLÓ.MAT',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'huHU',
   ui: {

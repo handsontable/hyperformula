@@ -1,4 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
+import {CellValueDetailedType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -18,6 +19,7 @@ describe('Function IPMT', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-996.690428219826)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-995.697556685774)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-985.839165035419)
   })

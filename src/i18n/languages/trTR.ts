@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -15,9 +15,13 @@ const dictionary: RawTranslationPackage = {
     NAME: '#AD?',
     NUM: '#SAYI!',
     REF: '#BAŞV!',
+    SPILL: '#TAŞMA!',
     VALUE: '#DEĞER!',
   },
   functions: {
+    FILTER: 'FILTER',
+    'ARRAY_CONSTRAIN' : 'ARRAY_CONSTRAIN',
+    ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'MUTLAK',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',
@@ -328,6 +332,81 @@ const dictionary: RawTranslationPackage = {
     NORMSINV: 'NORMSTERS',
     'NEGBINOM.DIST': 'NEGBİNOM.DAĞ',
     NEGBINOMDIST: 'NEGBİNOMDAĞ',
+    COMPLEX: 'KARMAŞIK',
+    IMABS: 'SANMUTLAK',
+    IMAGINARY: 'SANAL',
+    IMARGUMENT: 'SANBAĞ_DEĞİŞKEN',
+    IMCONJUGATE: 'SANEŞLENEK',
+    IMCOS: 'SANCOS',
+    IMCOSH: 'SANCOSH',
+    IMCOT: 'SANCOT',
+    IMCSC: 'SANCSC',
+    IMCSCH: 'SANCSCH',
+    IMDIV: 'SANBÖL',
+    IMEXP: 'SANÜS',
+    IMLN: 'SANLN',
+    IMLOG10: 'SANLOG10',
+    IMLOG2: 'SANLOG2',
+    IMPOWER: 'SANKUVVET',
+    IMPRODUCT: 'SANÇARP',
+    IMREAL: 'SANGERÇEK',
+    IMSEC: 'SANSEC',
+    IMSECH: 'SANSECH',
+    IMSIN: 'SANSIN',
+    IMSINH: 'SANSINH',
+    IMSQRT: 'SANKAREKÖK',
+    IMSUB: 'SANTOPLA',
+    IMSUM: 'SANÇIKAR',
+    IMTAN: 'SANTAN',
+    LARGE: 'BÜYÜK',
+    SMALL: 'KÜÇÜK',
+    AVEDEV: 'ORTSAP',
+    CONFIDENCE: 'GÜVENİRLİK',
+    'CONFIDENCE.NORM': 'GÜVENİLİRLİK.NORM',
+    'CONFIDENCE.T': 'GÜVENİLİRLİK.T',
+    DEVSQ: 'SAPKARE',
+    GEOMEAN: 'GEOORT',
+    HARMEAN: 'HARORT',
+    CRITBINOM: 'KRİTİKBİNOM',
+    PEARSON: 'PEARSON',
+    RSQ: 'RKARE',
+    STANDARDIZE: 'STANDARTLAŞTIRMA',
+    'Z.TEST': 'Z.TEST',
+    ZTEST: 'ZTEST',
+    'F.TEST': 'F.TEST',
+    FTEST: 'FTEST',
+    STEYX: 'STHYX',
+    SLOPE: 'EĞİM',
+    COVAR: 'KOVARYANS',
+    'COVARIANCE.P': 'KOVARYANS.P',
+    'COVARIANCE.S': 'KOVARYANS.S',
+    'CHISQ.TEST': 'KİKARE.TEST',
+    CHITEST: 'KİKARETEST',
+    'T.TEST': 'T.TEST',
+    TTEST: 'TTEST',
+    SKEW: 'ÇARPIKLIK',
+    'SKEW.P': 'ÇARPIKLIK.P',
+    WEIBULLDIST: 'WEIBULLDIST', //FIXME
+    VARS: '_VARS', //FIXME
+    TINV2T: 'TINV2T', //FIXME
+    TDISTRT: 'TDISTRT', //FIXME
+    TDIST2T: 'TDIST2T', //FIXME
+    STDEVS: 'STDEVS', //FIXME
+    FINVRT: 'FINVRT', //FIXME
+    FDISTRT: 'FDISTRT', //FIXME
+    CHIDISTRT: 'CHIDISTRT', //FIXME
+    CHIINVRT: 'CHIINVRT', //FIXME
+    COVARIANCEP: 'COVARIANCEP', //FIXME
+    COVARIANCES: 'COVARIANCES', //FIXME
+    LOGNORMINV: 'LOGNORMINV', //FIXME
+    POISSONDIST: 'POISSONDIST', //FIXME
+    SKEWP: 'SKEWP', //FIXME
+    'CEILING.MATH': 'TAVANAYUVARLA.MATEMATİK',
+    FLOOR: 'TABANAYUVARLA',
+    'FLOOR.MATH': 'TABANAYUVARLA.MATEMATİK',
+    'CEILING.PRECISE': 'CEILING.PRECISE', //FIXME
+    'FLOOR.PRECISE': 'FLOOR.PRECISE', //FIXME
+    'ISO.CEILING': 'ISO.CEILING', //FIXME
   },
   langCode: 'trTR',
   ui: {

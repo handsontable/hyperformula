@@ -1,10 +1,11 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {IToken, tokenMatcher} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
+import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {AstNodeType, buildParsingErrorAst, RelativeDependency} from './'
 import {
   cellAddressFromString,
@@ -27,7 +28,6 @@ import {
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
-import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 
 export interface ParsingResult {
   ast: Ast,
@@ -213,6 +213,10 @@ export class ParserWithCaching {
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT: {
         return imageWithWhitespace(ast.rawInput, ast.leadingWhitespace)
+      }
+      case AstNodeType.ARRAY: {
+        const args = ast.args.map(row => row.map(val => this.computeHashOfAstNode(val)).join(',')).join(';')
+        return imageWithWhitespace('{'+args+imageWithWhitespace('}', ast.internalWhitespace), ast.leadingWhitespace)
       }
       case AstNodeType.PARENTHESIS: {
         const expression = this.computeHashOfAstNode(ast.expression)

@@ -1,14 +1,15 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {EmptyCellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex} from './'
+import {EmptyCellVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex} from './'
+import {FormulaVertex} from './FormulaCellVertex'
 
 /**
  * Represents vertex which keeps values of one or more cells
  */
-export type CellVertex = FormulaCellVertex | ValueCellVertex | EmptyCellVertex | MatrixVertex | ParsingErrorVertex
+export type CellVertex = FormulaVertex | ValueCellVertex | EmptyCellVertex | ParsingErrorVertex
 
 /**
  * Represents any vertex

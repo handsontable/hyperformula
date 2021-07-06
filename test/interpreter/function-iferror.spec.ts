@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -15,6 +15,18 @@ describe('Function IFERROR', () => {
     const engine = HyperFormula.buildFromArray([['=IFERROR("abcd", "no")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('abcd')
+  })
+
+  it('preserves types of first arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IFERROR(B1, 1)', '1%' ]])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
+  })
+
+  it('preserves types of second arg', () => {
+    const engine = HyperFormula.buildFromArray([['=IFERROR(NA(), B1)', '1%' ]])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('when left-error', () => {

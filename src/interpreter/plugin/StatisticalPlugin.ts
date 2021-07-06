@@ -1,11 +1,13 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, InternalScalarValue, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue} from '../InterpreterValue'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,
@@ -18,15 +20,19 @@ import {
   gamma,
   gammafn,
   gammaln,
-  hypgeom, lognormal, negbin,
+  hypgeom,
+  lognormal,
+  negbin,
   normal,
+  normalci,
   poisson,
   studentt,
+  tci,
   weibull
 } from './3rdparty/jstat/jstat'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class StatisticalPlugin extends  FunctionPlugin {
+export class StatisticalPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<StatisticalPlugin>{
   public static implementedFunctions = {
     'ERF': {
       method: 'erf',
@@ -42,14 +48,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
       ]
     },
     'EXPON.DIST': {
-      method: 'expondist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'EXPONDIST': {
       method: 'expondist',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -84,36 +82,13 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
-    'GAMMADIST': {
-      method: 'gammadist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
     'GAMMALN': {
       method: 'gammaln',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0}
       ]
     },
-    'GAMMALN.PRECISE': {
-      method: 'gammaln',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0}
-      ]
-    },
     'GAMMA.INV': {
-      method: 'gammainv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
-    },
-    'GAMMAINV': {
       method: 'gammainv',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
@@ -138,17 +113,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ]
     },
-    'BETADIST': {
-      method: 'betadist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-      ]
-    },
     'BETA.INV': {
       method: 'betainv',
       parameters: [
@@ -159,26 +123,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ]
     },
-    'BETAINV': {
-      method: 'betainv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-      ]
-    },
     'BINOM.DIST': {
-      method: 'binomialdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'BINOMDIST': {
       method: 'binomialdist',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -252,20 +197,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
-    'CHIDIST': {
-      method: 'chisqdistrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
-      ]
-    },
-    'CHIINV': {
-      method: 'chisqinvrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
     'F.DIST': {
       method: 'fdist',
       parameters: [
@@ -299,32 +230,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
-    'FDIST': {
-      method: 'fdistrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
-    'FINV': {
-      method: 'finvrt',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
     'WEIBULL.DIST': {
-      method: 'weibulldist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'WEIBULL': {
       method: 'weibulldist',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -341,25 +247,7 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
-    'POISSON': {
-      method: 'poissondist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
     'HYPGEOM.DIST': {
-      method: 'hypgeomdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'HYPGEOMDIST': {
       method: 'hypgeomdist',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
@@ -413,13 +301,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
       ]
     },
-    'TINV': {
-      method: 'tinv2t',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-      ]
-    },
     'LOGNORM.DIST': {
       method: 'lognormdist',
       parameters: [
@@ -430,23 +311,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
       ]
     },
     'LOGNORM.INV': {
-      method: 'lognorminv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
-    },
-    'LOGNORMDIST': {
-      method: 'lognormdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'LOGINV': {
       method: 'lognorminv',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
@@ -484,36 +348,6 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
-    'NORMDIST': {
-      method: 'normdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'NORMINV': {
-      method: 'norminv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-      ]
-    },
-    'NORMSDIST': {
-      method: 'normsdist',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
-    },
-    'NORMSINV': {
-      method: 'normsinv',
-      parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-      ]
-    },
     'PHI': {
       method: 'phi',
       parameters: [
@@ -529,19 +363,71 @@ export class StatisticalPlugin extends  FunctionPlugin {
         {argumentType: ArgumentTypes.BOOLEAN},
       ]
     },
-    'NEGBINOMDIST': {
-      method: 'negbinomdist',
+    'CONFIDENCE.NORM': {
+      method: 'confidencenorm',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
         {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
-      ]
+      ],
+    },
+    'CONFIDENCE.T': {
+      method: 'confidencet',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+      ],
+    },
+    'STANDARDIZE': {
+      method: 'standardize',
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+      ],
     },
   }
 
-  public erf(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ERF'), (lowerBound, upperBound) => {
+  public static aliases = {
+    NEGBINOMDIST : 'NEGBINOM.DIST',
+    EXPONDIST : 'EXPON.DIST',
+    BETADIST : 'BETA.DIST',
+    NORMDIST: 'NORM.DIST',
+    NORMINV: 'NORM.INV',
+    NORMSDIST: 'NORM.S.DIST',
+    NORMSINV: 'NORM.S.INV',
+    LOGNORMDIST: 'LOGNORM.DIST',
+    LOGINV: 'LOGNORM.INV',
+    TINV: 'T.INV.2T',
+    HYPGEOMDIST: 'HYPGEOM.DIST',
+    POISSON: 'POISSON.DIST',
+    WEIBULL: 'WEIBULL.DIST',
+    FINV: 'F.INV.RT',
+    FDIST: 'F.DIST.RT',
+    CHIDIST: 'CHISQ.DIST.RT',
+    CHIINV: 'CHISQ.INV.RT',
+    GAMMADIST: 'GAMMA.DIST',
+    'GAMMALN.PRECISE': 'GAMMALN',
+    GAMMAINV: 'GAMMA.INV',
+    BETAINV: 'BETA.INV',
+    BINOMDIST: 'BINOM.DIST',
+    CONFIDENCE: 'CONFIDENCE.NORM',
+    CRITBINOM: 'BINOM.INV',
+    WEIBULLDIST: 'WEIBULL.DIST',
+    TINV2T: 'T.INV.2T',
+    TDISTRT: 'T.DIST.RT',
+    TDIST2T: 'T.DIST.2T',
+    FINVRT: 'F.INV.RT',
+    FDISTRT: 'F.DIST.RT',
+    CHIDISTRT: 'CHISQ.DIST.RT',
+    CHIINVRT: 'CHISQ.INV.RT',
+    LOGNORMINV: 'LOGNORM.INV',
+    POISSONDIST: 'POISSON.DIST',
+  }
+
+  public erf(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ERF'), (lowerBound, upperBound) => {
       if (upperBound === undefined) {
         return erf(lowerBound)
       } else {
@@ -550,13 +436,13 @@ export class StatisticalPlugin extends  FunctionPlugin {
     })
   }
 
-  public erfc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ERFC'), erfc)
+  public erfc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ERFC'), erfc)
   }
 
 
-  public expondist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EXPON.DIST'),
+  public expondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EXPON.DIST'),
       (x: number, lambda: number, cumulative: boolean) => {
         if(cumulative) {
           return exponential.cdf(x, lambda)
@@ -567,24 +453,24 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public fisher(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FISHER'),
+  public fisher(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FISHER'),
       (x: number) => Math.log((1 + x) / (1 - x)) / 2
     )
   }
 
-  public fisherinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FISHERINV'),
+  public fisherinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FISHERINV'),
       (y: number) => 1 - 2 / (Math.exp(2 * y) + 1)
     )
   }
 
-  public gamma(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GAMMA'), gammafn)
+  public gamma(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('GAMMA'), gammafn)
   }
 
-  public gammadist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GAMMA.DIST'),
+  public gammadist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('GAMMA.DIST'),
       (value: number, alphaVal: number, betaVal: number, cumulative: boolean) => {
         if(cumulative) {
           return gamma.cdf(value, alphaVal, betaVal)
@@ -595,22 +481,22 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public gammaln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GAMMALN'), gammaln)
+  public gammaln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('GAMMALN'), gammaln)
   }
 
-  public gammainv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GAMMA.INV'), gamma.inv)
+  public gammainv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('GAMMA.INV'), gamma.inv)
   }
 
-  public gauss(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('GAUSS'),
+  public gauss(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('GAUSS'),
       (z: number) => normal.cdf(z, 0, 1) - 0.5
     )
   }
 
-  public betadist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BETA.DIST'),
+  public betadist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BETA.DIST'),
       (x: number, alphaVal: number, betaVal: number, cumulative: boolean, A: number, B: number) => {
         if(x<=A) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
@@ -627,8 +513,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public betainv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BETA.INV'),
+  public betainv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BETA.INV'),
       (x: number, alphaVal: number, betaVal: number, A: number, B: number) => {
         if (A >= B) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
@@ -639,8 +525,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public binomialdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BINOM.DIST'),
+  public binomialdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BINOM.DIST'),
       (succ: number, trials: number, prob: number, cumulative: boolean) => {
         if(succ>trials) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
@@ -656,8 +542,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public binomialinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BINOM.INV'),
+  public binomialinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BINOM.INV'),
       (trials: number, prob: number, alpha: number) => {
         trials = Math.trunc(trials)
         let lower = -1
@@ -675,32 +561,32 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public besselifn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELI'),
+  public besselifn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BESSELI'),
       (x: number, n: number) => besseli(x, Math.trunc(n))
     )
   }
 
-  public besseljfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELJ'),
+  public besseljfn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BESSELJ'),
       (x: number, n: number) => besselj(x, Math.trunc(n))
     )
   }
 
-  public besselkfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELK'),
+  public besselkfn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BESSELK'),
       (x: number, n: number) => besselk(x, Math.trunc(n))
     )
   }
 
-  public besselyfn(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('BESSELY'),
+  public besselyfn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('BESSELY'),
       (x: number, n: number) => bessely(x, Math.trunc(n))
     )
   }
 
-  public chisqdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.DIST'),
+  public chisqdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CHISQ.DIST'),
       (x: number, deg: number, cumulative: boolean) => {
         deg = Math.trunc(deg)
         if(cumulative) {
@@ -712,26 +598,26 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public chisqdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.DIST.RT'),
+  public chisqdistrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CHISQ.DIST.RT'),
       (x: number, deg: number) => 1 - chisquare.cdf(x, Math.trunc(deg))
     )
   }
 
-  public chisqinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.INV'),
+  public chisqinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CHISQ.INV'),
       (p: number, deg: number) => chisquare.inv(p, Math.trunc(deg))
     )
   }
 
-  public chisqinvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CHISQ.INV.RT'),
+  public chisqinvrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CHISQ.INV.RT'),
       (p: number, deg: number) => chisquare.inv(1.0 - p, Math.trunc(deg))
     )
   }
 
-  public fdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('F.DIST'),
+  public fdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('F.DIST'),
       (x: number, deg1: number, deg2: number, cumulative: boolean) => {
         deg1 = Math.trunc(deg1)
         deg2 = Math.trunc(deg2)
@@ -744,27 +630,27 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public fdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('F.DIST.RT'),
+  public fdistrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('F.DIST.RT'),
       (x: number, deg1: number, deg2: number) => 1 - centralF.cdf(x, Math.trunc(deg1), Math.trunc(deg2))
 
     )
   }
 
-  public finv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV'),
+  public finv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('F.INV'),
       (p: number, deg1: number, deg2: number) => centralF.inv(p, Math.trunc(deg1), Math.trunc(deg2))
     )
   }
 
-  public finvrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('F.INV.RT'),
+  public finvrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('F.INV.RT'),
       (p: number, deg1: number, deg2: number) => centralF.inv(1.0 - p, Math.trunc(deg1), Math.trunc(deg2))
     )
   }
 
-  public weibulldist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('WEIBULL.DIST'),
+  public weibulldist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('WEIBULL.DIST'),
       (x: number, shape: number, scale: number, cumulative: boolean) => {
         if(cumulative) {
           return weibull.cdf(x, scale, shape)
@@ -775,8 +661,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public poissondist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('POISSON.DIST'),
+  public poissondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('POISSON.DIST'),
       (x: number, mean: number, cumulative: boolean) => {
         x = Math.trunc(x)
         if(cumulative) {
@@ -788,8 +674,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public hypgeomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HYPGEOM.DIST'),
+  public hypgeomdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('HYPGEOM.DIST'),
       (s: number, numberS: number, populationS: number, numberPop: number, cumulative: boolean) => {
         if(s > numberS || s > populationS || numberS > numberPop || populationS > numberPop) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
@@ -811,8 +697,8 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public tdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST'),
+  public tdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('T.DIST'),
       (x: number, deg: number, cumulative: boolean) => {
         deg = Math.trunc(deg)
         if(cumulative) {
@@ -824,38 +710,38 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public tdist2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.2T'),
+  public tdist2t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('T.DIST.2T'),
       (x: number, deg: number) => (1 - studentt.cdf(x, Math.trunc(deg))) * 2
     )
   }
 
-  public tdistrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T.DIST.RT'),
+  public tdistrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('T.DIST.RT'),
       (x: number, deg: number) => 1 - studentt.cdf(x, Math.trunc(deg))
     )
   }
 
-  public tdistold(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TDIST'),
+  public tdistold(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TDIST'),
       (x: number, deg: number, mode: number) => mode*(1 - studentt.cdf(x, Math.trunc(deg)))
     )
   }
 
-  public tinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV'),
+  public tinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('T.INV'),
       (p: number, deg: number) => studentt.inv(p, Math.trunc(deg))
     )
   }
 
-  public tinv2t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T.INV.2T'),
+  public tinv2t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('T.INV.2T'),
       (p: number, deg: number) => studentt.inv(1-p/2, Math.trunc(deg))
     )
   }
 
-  public lognormdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LOGNORM.DIST'),
+  public lognormdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LOGNORM.DIST'),
       (x: number, mean: number, stddev: number, cumulative: boolean) => {
         if(cumulative) {
           return lognormal.cdf(x, mean, stddev)
@@ -866,14 +752,14 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public lognorminv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LOGNORM.INV'),
+  public lognorminv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LOGNORM.INV'),
       (p: number, mean: number, stddev: number) => lognormal.inv(p, mean, stddev)
     )
   }
 
-  public normdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.DIST'),
+  public normdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NORM.DIST'),
       (x: number, mean: number, stddev: number, cumulative: boolean) => {
         if(cumulative) {
           return normal.cdf(x, mean, stddev)
@@ -884,14 +770,14 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public norminv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.INV'),
+  public norminv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NORM.INV'),
       (p: number, mean: number, stddev: number) => normal.inv(p, mean, stddev)
     )
   }
 
-  public normsdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.S.DIST'),
+  public normsdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NORM.S.DIST'),
       (x: number, cumulative: boolean) => {
         if(cumulative) {
           return normal.cdf(x, 0, 1)
@@ -902,20 +788,20 @@ export class StatisticalPlugin extends  FunctionPlugin {
     )
   }
 
-  public normsinv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NORM.S.INV'),
+  public normsinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NORM.S.INV'),
       (p: number) => normal.inv(p, 0, 1)
     )
   }
 
-  public phi(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PHI'),
+  public phi(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PHI'),
       (x: number) => normal.pdf(x, 0, 1)
     )
   }
 
-  public negbinomdist(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NEGBINOM.DIST'),
+  public negbinomdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NEGBINOM.DIST'),
       (nf: number, ns: number, p: number, cumulative: boolean) => {
         nf = Math.trunc(nf)
         ns = Math.trunc(ns)
@@ -925,6 +811,34 @@ export class StatisticalPlugin extends  FunctionPlugin {
           return negbin.pdf(nf, ns, p)
         }
       }
+    )
+  }
+
+  public confidencenorm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CONFIDENCE.NORM'),
+      // eslint-disable-next-line
+      // @ts-ignore
+      (alpha: number, stddev: number, size: number) => normalci(1, alpha, stddev, Math.trunc(size))[1] - 1
+    )
+  }
+
+  public confidencet(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CONFIDENCE.T'),
+      (alpha: number, stddev: number, size: number) => {
+        size = Math.trunc(size)
+        if(size===1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+        // eslint-disable-next-line
+        // @ts-ignore
+        return tci(1, alpha, stddev, size)[1] - 1
+      }
+    )
+  }
+
+  public standardize(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('STANDARDIZE'),
+      (x: number, mean: number, stddev: number) => (x-mean)/stddev
     )
   }
 }

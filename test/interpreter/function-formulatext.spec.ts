@@ -67,14 +67,6 @@ describe('Function FORMULATEXT', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.CellRefExpected))
   })
 
-  it('should work for matrix formula', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(A2)}', '=FORMULATEXT(A1)']
-    ])
-
-    expect(engine.getCellValue(adr('B1'))).toEqual('{=TRANSPOSE(A2)}')
-  })
-
   it('should work for unparsed formula', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUM(1,', '=FORMULATEXT(A1)']

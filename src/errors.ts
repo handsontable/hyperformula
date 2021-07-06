@@ -1,10 +1,9 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellAddress} from './Cell'
-
 
 /**
  * Error thrown when the sheet of a given ID does not exist.
@@ -66,6 +65,15 @@ export class InvalidAddressError extends Error {
 export class InvalidArgumentsError extends Error {
   constructor(expectedArguments: string) {
     super(`Invalid arguments, expected ${expectedArguments}`)
+  }
+}
+
+/**
+ * Error thrown when the given sheets are not equal.
+ */
+export class SheetsNotEqual extends Error {
+  constructor(sheet1: number, sheet2: number) {
+    super(`Sheets ${sheet1} and ${sheet2} are not equal.`)
   }
 }
 
@@ -169,6 +177,22 @@ export class UnableToParseError extends Error {
 export class ExpectedValueOfTypeError extends Error {
   constructor(expectedType: string, paramName: string) {
     super(`Expected value of type: ${expectedType} for config parameter: ${paramName}`)
+  }
+}
+
+/**
+ * Error thrown when supplied config parameter value is an empty string.
+ * This error might be thrown while setting or updating the [[ConfigParams]].
+ * The following methods accept [[ConfigParams]] as a parameter:
+ *
+ * @see [[buildEmpty]]
+ * @see [[buildFromArray]]
+ * @see [[buildFromSheets]]
+ * @see [[updateConfig]]
+ */
+export class ConfigValueEmpty extends Error {
+  constructor(paramName: string) {
+    super(`Config parameter ${paramName} cannot be empty.`)
   }
 }
 
@@ -324,16 +348,16 @@ export class ProtectedFunctionError extends Error {
 
 
 /**
- * Error thrown when selected source location has a matrix.
+ * Error thrown when selected source location has an array.
  */
-export class SourceLocationHasMatrixError extends Error {
+export class SourceLocationHasArrayError extends Error {
   constructor() {
-    super('Cannot perform this operation, source location has a matrix inside.')
+    super('Cannot perform this operation, source location has an array inside.')
   }
 }
 
 /**
- * Error thrown when selected target location has a matrix.
+ * Error thrown when selected target location has an array.
  *
  * @see [[addRows]]
  * @see [[addColumns]]
@@ -342,21 +366,9 @@ export class SourceLocationHasMatrixError extends Error {
  * @see [[moveColumns]]
  * @see [[paste]]
  */
-export class TargetLocationHasMatrixError extends Error {
+export class TargetLocationHasArrayError extends Error {
   constructor() {
-    super('Cannot perform this operation, target location has a matrix inside.')
-  }
-}
-
-/**
- * Error thrown when trying to use matrix expression as named expression.
- *
- * @see [[addNamedExpression]]
- * @see [[changeNamedExpression]]
- */
-export class MatrixFormulasNotSupportedError extends Error {
-  constructor() {
-    super('Matrix formulas are not supported in named expressions.')
+    super('Cannot perform this operation, target location has an array inside.')
   }
 }
 
@@ -369,5 +381,17 @@ export class MatrixFormulasNotSupportedError extends Error {
 export class NoRelativeAddressesAllowedError extends Error {
   constructor() {
     super('Relative addresses not allowed in named expressions.')
+  }
+}
+
+/**
+ * Error thrown when alias to a function is already defined.
+ *
+ * @see [[registerFunctionPlugin]]
+ * @see [[registerFunction]]
+ */
+export class AliasAlreadyExisting extends Error {
+  constructor(name: string, pluginName: string) {
+    super(`Alias id ${name} in plugin ${pluginName} already defined as a function or alias.`)
   }
 }

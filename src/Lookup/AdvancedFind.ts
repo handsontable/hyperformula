@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright (c) 2020 Handsoncode. All rights reserved.
+ * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
 import {DependencyGraph} from '../DependencyGraph'
-import {InternalScalarValue} from '../Cell'
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {getRawValue, InternalScalarValue, RawInterpreterValue} from '../interpreter/InterpreterValue'
+import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 
 export abstract class AdvancedFind {
   protected constructor(
@@ -13,11 +13,17 @@ export abstract class AdvancedFind {
   ) {
   }
 
-  public advancedFind(keyMatcher: (arg: InternalScalarValue) => boolean, range: AbsoluteCellRange): number {
-    const values = this.dependencyGraph.computeListOfValuesInRange(range)
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue): number {
+    let values: InternalScalarValue[]
+    const range = rangeValue.range
+    if(range === undefined) {
+      values = rangeValue.valuesFromTopLeftCorner()
+    } else {
+      values = this.dependencyGraph.computeListOfValuesInRange(range)
+    }
     for (let i = 0; i < values.length; i++) {
-      if (keyMatcher(values[i])) {
-        return i + range.start.col
+      if (keyMatcher(getRawValue(values[i]))) {
+        return i
       }
     }
     return -1

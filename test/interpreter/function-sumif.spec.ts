@@ -2,8 +2,8 @@ import {HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {plPL} from '../../src/i18n/languages'
-import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 import {StatType} from '../../src/statistics'
+import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 
 describe('Function SUMIF - argument validations and combinations', () => {
   it('requires 2 or 3 arguments', () => {
@@ -164,12 +164,13 @@ describe('Function SUMIF - argument validations and combinations', () => {
 
   it('works for matrices', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1'],
-      ['2'],
-      ['=SUMIF(A1:A2, ">0", A1:A2)'],
-    ], { matrixDetection: true, matrixDetectionThreshold: 1 })
+      ['1', '2'],
+      ['=TRANSPOSE(A1:B1)'],
+      [],
+      ['=SUMIF(A2:A3, ">0", A2:A3)'],
+    ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 })
 

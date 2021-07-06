@@ -23,7 +23,7 @@ the configuration options:
 import { HyperFormula } from 'hyperformula';
 
 const options = {
-    licenseKey: 'agpl-v3'
+    licenseKey: 'gpl-v3'
 };
 ```
 
@@ -73,14 +73,18 @@ Now prepare sheets and insert the data into them:
 
 ```javascript
 // add 'TeamA' sheet
-hfInstance.addSheet('TeamA');
+const sheetNameA = hfInstance.addSheet('TeamA');
+// get the new sheet ID for further API calls
+const sheetIdA = hfInstance.getSheetId(sheetNameA);
 // insert playersA content into targeted 'TeamA' sheet
-hfInstance.setSheetContent('TeamA', playersA);
+hfInstance.setSheetContent(sheetIdA, playersA);
 
 // add 'TeamB' sheet
-hfInstance.addSheet('TeamB');
+const sheetNameB = hfInstance.addSheet('TeamB');
+// get the new sheet ID for further API calls
+const sheetIdB = hfInstance.getSheetId(sheetNameB);
 // insert playersB content into targeted 'TeamB' sheet
-hfInstance.setSheetContent('TeamB', playersB);
+hfInstance.setSheetContent(sheetIdB, playersB);
 
 // check the content in the console output
 console.log(hfInstance.getAllSheetsValues());
@@ -90,9 +94,11 @@ After setting everything up, you can add formulas:
 
 ```javascript
 // add a sheet named 'Formulas'
-hfInstance.addSheet('Formulas');
+const sheetNameC = hfInstance.addSheet('Formulas');
+// get the new sheet ID for further API calls
+const sheetIdC = hfInstance.getSheetId(sheetNameA);
 // add formulas to that sheet
-hfInstance.setSheetContent('Formulas', formulas);
+hfInstance.setSheetContent(sheetIdC, formulas);
 ```
 
 Almost done! Now, you can use the `getSheetValues` method to get all
@@ -100,11 +106,11 @@ values including the calculated ones. Alternatively, you can use
 `getCellValue`to get the value from a specific cell.
 
 ```javascript
-// get sheet values from the Sheet with an ID of 2
-const sheetValues = hfInstance.getSheetValues(2);
+// get all sheet values 
+const sheetValues = hfInstance.getSheetValues(sheetIdC);
 
 // get the simple cell address of 'A1' from that sheet
-const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 2);
+const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', sheetIdC);
 
 // check the winning team 🎉
 const winningTeam = hfInstance.getCellValue(simpleCellAddress);
@@ -116,7 +122,7 @@ console.log(winningTeam)
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.3.x/advanced-usage?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.6.x/advanced-usage?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: advanced-usage"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
