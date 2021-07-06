@@ -48,7 +48,7 @@ describe('swapping columns - checking if it is possible', () => {
     expect(engine.isItPossibleToSwapColumnIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(false)
     expect(() =>
       engine.swapColumnIndexes(0, [[0, 2], [1, 1], [2, 0]])
-    ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
+    ).toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should check for matrices only in moved columns', () => {
@@ -213,7 +213,7 @@ describe('setting column order - checking if it is possible', () => {
     expect(engine.isItPossibleToSetColumnOrder(0, [2, 1, 0])).toEqual(false)
     expect(() =>
       engine.setColumnOrder(0, [2, 1, 0])
-    ).toThrowError('Cannot perform this operation, source location has a matrix inside.')
+    ).toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should check for matrices only in moved columns', () => {

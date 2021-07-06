@@ -4,14 +4,14 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
+import {ArraySize} from '../ArraySize'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
-import {MatrixSize} from '../MatrixSize'
 import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 
 export class SimpleRangeValue {
-  public readonly size: MatrixSize
+  public readonly size: ArraySize
 
   public static fromRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
@@ -40,9 +40,9 @@ export class SimpleRangeValue {
     private _hasOnlyNumbers?: boolean,
   ) {
     if (_data === undefined) {
-      this.size = new MatrixSize(range!.width(), range!.height())
+      this.size = new ArraySize(range!.width(), range!.height())
     } else {
-      this.size = new MatrixSize(_data[0].length, _data.length)
+      this.size = new ArraySize(_data[0].length, _data.length)
     }
   }
 
@@ -96,6 +96,15 @@ export class SimpleRangeValue {
     return ret
   }
 
+  public* effectiveAddressesFromData(leftCorner: SimpleCellAddress): IterableIterator<SimpleCellAddress> {
+    for (let row = 0; row < this.data.length; ++row) {
+      const rowData = this.data[row]
+      for (let col = 0; col < rowData.length; ++col) {
+        yield simpleCellAddress(leftCorner.sheet, leftCorner.col + col, leftCorner.row + row)
+      }
+    }
+  }
+
   public* entriesFromTopLeftCorner(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     this.ensureThatComputed()
     for (let row = 0; row < this.size.height; ++row) {
@@ -134,6 +143,7 @@ export class SimpleRangeValue {
   }
 
   public rawData(): InternalScalarValue[][] {
+    this.ensureThatComputed()
     return this._data ?? []
   }
 

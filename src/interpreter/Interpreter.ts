@@ -5,14 +5,14 @@
 
 import {GPU} from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
+import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
-import {DependencyGraph} from '../DependencyGraph'
+import {CellVertex, DependencyGraph, Vertex} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
-import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -40,6 +40,7 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
+import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
   private gpu?: GPU
@@ -74,7 +75,7 @@ export class Interpreter {
     if(val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
       [[val]] = val.data
     }
-    return wrapperForAddress(val, state.formulaAddress)
+    return wrapperForRootVertex(val, state.formulaVertex)
   }
 
   /**
@@ -177,7 +178,7 @@ export class Interpreter {
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if(pluginFunction!==undefined) {
-          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName)))
+          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex))
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         }
@@ -195,17 +196,17 @@ export class Interpreter {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
-        const matrixVertex = this.dependencyGraph.getMatrix(range)
-        if (matrixVertex) {
-          const matrix = matrixVertex.matrix
-          if (matrix instanceof NotComputedMatrix) {
-            throw new Error('Matrix should be already computed')
-          } else if (matrix instanceof CellError) {
-            return matrix
-          } else if (matrix instanceof Matrix) {
-            return SimpleRangeValue.fromRange(matrix.raw(), range, this.dependencyGraph)
+        const arrayVertex = this.dependencyGraph.getArray(range)
+        if (arrayVertex) {
+          const array = arrayVertex.array
+          if (array instanceof NotComputedArray) {
+            throw new Error('Array should be already computed')
+          } else if (array instanceof CellError) {
+            return array
+          } else if (array instanceof ArrayValue) {
+            return SimpleRangeValue.fromRange(array.raw(), range, this.dependencyGraph)
           } else {
-            throw new Error('Unknown matrix')
+            throw new Error('Unknown array')
           }
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -228,7 +229,7 @@ export class Interpreter {
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, state)
       }
-      case AstNodeType.MATRIX: {
+      case AstNodeType.ARRAY: {
         let totalWidth: Maybe<number> = undefined
         const ret: InternalScalarValue[][] = []
         for(const astRow of ast.args) {
@@ -482,9 +483,9 @@ function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) =
   }
 }
 
-function wrapperForAddress(val: InterpreterValue, adr: SimpleCellAddress): InterpreterValue {
-  if (val instanceof CellError) {
-    return val.attachAddress(adr)
+function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): InterpreterValue {
+  if (val instanceof CellError && vertex !== undefined) {
+    return val.attachRootVertex(vertex)
   }
   return val
 }

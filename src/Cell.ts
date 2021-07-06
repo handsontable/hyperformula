@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellVertex, FormulaCellVertex, MatrixVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {ArrayVertex, CellVertex, FormulaCellVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,
@@ -16,6 +16,7 @@ import {
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 /**
  * Possible errors returned by our interpreter.
@@ -36,6 +37,9 @@ export enum ErrorType {
   /** Wrong address reference. */
   REF = 'REF',
 
+  /** Array spill error. */
+  SPILL = 'SPILL',
+
   /** Invalid/missing licence error. */
   LIC = 'LIC',
 
@@ -48,7 +52,7 @@ export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
 export enum CellType {
   FORMULA = 'FORMULA',
   VALUE = 'VALUE',
-  MATRIX = 'MATRIX',
+  ARRAY = 'ARRAY',
   EMPTY = 'EMPTY',
 }
 
@@ -59,8 +63,8 @@ export const getCellType = (vertex?: CellVertex): CellType => {
   if (vertex instanceof ValueCellVertex) {
     return CellType.VALUE
   }
-  if (vertex instanceof MatrixVertex) {
-    return CellType.MATRIX
+  if (vertex instanceof ArrayVertex) {
+    return CellType.ARRAY
   }
 
   return CellType.EMPTY
@@ -109,11 +113,11 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
     return CellValueType.ERROR
   }
 
-  if(typeof cellValue === 'string') {
+  if (typeof cellValue === 'string') {
     return CellValueType.STRING
-  } else if(isExtendedNumber(cellValue)) {
+  } else if (isExtendedNumber(cellValue)) {
     return CellValueType.NUMBER
-  } else if(typeof cellValue === 'boolean') {
+  } else if (typeof cellValue === 'boolean') {
     return CellValueType.BOOLEAN
   }
 
@@ -121,7 +125,7 @@ export const getCellValueType = (cellValue: InterpreterValue): CellValueType => 
 }
 
 export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValueDetailedType => {
-  if(isExtendedNumber(cellValue)) {
+  if (isExtendedNumber(cellValue)) {
     return getTypeOfExtendedNumber(cellValue)
   } else {
     return getCellValueType(cellValue) as CellValueDetailedType
@@ -129,7 +133,7 @@ export const getCellValueDetailedType = (cellValue: InterpreterValue): CellValue
 }
 
 export const getCellValueFormat = (cellValue: InterpreterValue): string | undefined => {
-  if(isExtendedNumber(cellValue)) {
+  if (isExtendedNumber(cellValue)) {
     return getFormatOfExtendedNumber(cellValue)
   } else {
     return undefined
@@ -140,13 +144,13 @@ export class CellError {
   constructor(
     public readonly type: ErrorType,
     public readonly message?: string,
-    public readonly address?: SimpleCellAddress
+    public readonly root?: FormulaVertex
   ) {
   }
 
-  public attachAddress(address: SimpleCellAddress): CellError {
-    if(this.address === undefined) {
-      return new CellError(this.type, this.message, address)
+  public attachRootVertex(vertex: FormulaVertex): CellError {
+    if(this.root === undefined) {
+      return new CellError(this.type, this.message, vertex)
     } else {
       return this
     }
@@ -187,8 +191,10 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }
 
+export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
+
 export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
-  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+  if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
   } else {
     return false
@@ -197,6 +203,10 @@ export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
 
 export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
   return address.sheet ?? baseAddress.sheet
+}
+
+export const equalSimpleCellAddress = (left: SimpleCellAddress, right: SimpleCellAddress) => {
+  return left.sheet === right.sheet && left.col === right.col && left.row === right.row
 }
 
 export interface SheetCellAddress {

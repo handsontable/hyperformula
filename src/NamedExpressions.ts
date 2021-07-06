@@ -320,7 +320,7 @@ export const doesContainRelativeReferences = (ast: Ast): boolean => {
         doesContainRelativeReferences(arg)
       )
     }
-    case AstNodeType.MATRIX: {
+    case AstNodeType.ARRAY: {
       return ast.args.some(row => row.some(arg => doesContainRelativeReferences(arg)))
     }
   }

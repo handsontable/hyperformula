@@ -214,7 +214,7 @@ export class ParserWithCaching {
       case AstNodeType.ERROR_WITH_RAW_INPUT: {
         return imageWithWhitespace(ast.rawInput, ast.leadingWhitespace)
       }
-      case AstNodeType.MATRIX: {
+      case AstNodeType.ARRAY: {
         const args = ast.args.map(row => row.map(val => this.computeHashOfAstNode(val)).join(',')).join(';')
         return imageWithWhitespace('{'+args+imageWithWhitespace('}', ast.internalWhitespace), ast.leadingWhitespace)
       }

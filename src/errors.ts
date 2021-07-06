@@ -348,16 +348,16 @@ export class ProtectedFunctionError extends Error {
 
 
 /**
- * Error thrown when selected source location has a matrix.
+ * Error thrown when selected source location has an array.
  */
-export class SourceLocationHasMatrixError extends Error {
+export class SourceLocationHasArrayError extends Error {
   constructor() {
-    super('Cannot perform this operation, source location has a matrix inside.')
+    super('Cannot perform this operation, source location has an array inside.')
   }
 }
 
 /**
- * Error thrown when selected target location has a matrix.
+ * Error thrown when selected target location has an array.
  *
  * @see [[addRows]]
  * @see [[addColumns]]
@@ -366,9 +366,9 @@ export class SourceLocationHasMatrixError extends Error {
  * @see [[moveColumns]]
  * @see [[paste]]
  */
-export class TargetLocationHasMatrixError extends Error {
+export class TargetLocationHasArrayError extends Error {
   constructor() {
-    super('Cannot perform this operation, target location has a matrix inside.')
+    super('Cannot perform this operation, target location has an array inside.')
   }
 }
 

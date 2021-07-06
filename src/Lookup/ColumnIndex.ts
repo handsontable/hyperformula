@@ -5,12 +5,19 @@
 
 import {CellError, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {getRawValue, RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
+import {
+  EmptyValue,
+  getRawValue,
+  RawInterpreterValue,
+  RawNoErrorScalarValue,
+  RawScalarValue
+} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ColumnsSpan, RowsSpan} from '../Span'
@@ -43,11 +50,13 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
   public add(value: RawInterpreterValue, address: SimpleCellAddress) {
-    if (value instanceof SimpleRangeValue) {
-      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
-        this.addSingleCellValue(getRawValue(matrixValue), cellAddress)
+    if (value === EmptyValue || value instanceof CellError) {
+      return
+    } else if (value instanceof SimpleRangeValue) {
+      for (const [arrayValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
+        this.addSingleCellValue(getRawValue(arrayValue), cellAddress)
       }
-    } else if (!(value instanceof CellError)) {
+    } else {
       this.addSingleCellValue(value, address)
     }
   }
@@ -58,8 +67,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
 
     if (value instanceof SimpleRangeValue) {
-      for (const [matrixValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
-        this.removeSingleValue(getRawValue(matrixValue), cellAddress)
+      for (const [arrayValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
+        this.removeSingleValue(getRawValue(arrayValue), cellAddress)
       }
     } else {
       this.removeSingleValue(value, address)
@@ -72,6 +81,14 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
     this.remove(oldValue, address)
     this.add(newValue, address)
+  }
+
+  public applyChanges(contentChanges: CellValueChange[]) {
+    for (const change of contentChanges) {
+      if (change.oldValue !== undefined) {
+        this.change(getRawValue(change.oldValue), getRawValue(change.value), change.address)
+      }
+    }
   }
 
   public moveValues(sourceRange: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {

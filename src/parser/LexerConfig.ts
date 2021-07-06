@@ -71,9 +71,9 @@ export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${R
 export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
-/* matrix parenthesis */
-export const MatrixLParen = createToken({name: 'MatrixLParen', pattern: /{/})
-export const MatrixRParen = createToken({name: 'MatrixRParen', pattern: /}/})
+/* array parenthesis */
+export const ArrayLParen = createToken({name: 'ArrayLParen', pattern: /{/})
+export const ArrayRParen = createToken({name: 'ArrayRParen', pattern: /}/})
 
 /* procedures */
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/})
@@ -101,8 +101,8 @@ export interface ILexerConfig {
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
   decimalSeparator: '.' | ',',
-  MatrixColSeparator: TokenType,
-  MatrixRowSeparator: TokenType,
+  ArrayColSeparator: TokenType,
+  ArrayRowSeparator: TokenType,
   maxColumns: number,
   maxRows: number,
 }
@@ -112,16 +112,16 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
 
-  const MatrixRowSeparator = createToken({name: 'MatrixRowSep', pattern: config.matrixRowSeparator})
-  const MatrixColSeparator = createToken({name: 'MatrixColSep', pattern: config.matrixColumnSeparator})
+  const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
+  const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
 
   /* configurable tokens */
   let ArgSeparator, inject: TokenType[]
-  if(config.functionArgSeparator === config.matrixColumnSeparator) {
-    ArgSeparator = MatrixColSeparator
+  if(config.functionArgSeparator === config.arrayColumnSeparator) {
+    ArgSeparator = ArrayColSeparator
     inject = []
-  } else if(config.functionArgSeparator === config.matrixRowSeparator) {
-    ArgSeparator = MatrixRowSeparator
+  } else if(config.functionArgSeparator === config.arrayRowSeparator) {
+    ArgSeparator = ArrayRowSeparator
     inject = []
   } else {
     ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
@@ -147,8 +147,8 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     LessThanOp,
     LParen,
     RParen,
-    MatrixLParen,
-    MatrixRParen,
+    ArrayLParen,
+    ArrayRParen,
     OffsetProcedureName,
     ProcedureName,
     RangeSeparator,
@@ -164,16 +164,16 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
     NamedExpression,
-    MatrixRowSeparator,
-    MatrixColSeparator,
+    ArrayRowSeparator,
+    ArrayColSeparator,
   ]
 
   return {
     ArgSeparator,
     NumberLiteral,
     OffsetProcedureName,
-    MatrixRowSeparator,
-    MatrixColSeparator,
+    ArrayRowSeparator,
+    ArrayColSeparator,
     allTokens,
     errorMapping,
     functionMapping,

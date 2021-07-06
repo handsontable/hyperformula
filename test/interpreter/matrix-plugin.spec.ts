@@ -3,7 +3,7 @@ import {ErrorType, HyperFormula} from '../../src'
 import {ConfigParams} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
-import {adr, detailedError} from '../testUtils'
+import {adr, detailedError, detailedErrorWithOrigin} from '../testUtils'
 
 describe('Matrix plugin', () => {
   beforeAll(() => {
@@ -41,8 +41,8 @@ describe('Matrix plugin', () => {
         ['=mmult(A1:B3,A4:C6)'],
       ], config)
 
-      expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
-      expect(engine.getCellValue(adr('B7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.MatrixDimensions))
+      expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ArrayDimensions))
+      expect(engine.getCellValue(adr('B7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ArrayDimensions))
     })
 
     it('matrix multiplication with string in data', () => {
@@ -78,8 +78,8 @@ describe('Matrix plugin', () => {
 
     it('mmult of other mmult', () => {
       const engine = HyperFormula.buildFromArray([
-        ['1', '2', '=MMULT(A1:B2, A1:B2)', '=MMULT(A1:B2, A1:B2)'],
-        ['3', '4', '=MMULT(A1:B2, A1:B2)', '=MMULT(A1:B2, A1:B2)'],
+        ['1', '2', '=MMULT(A1:B2, A1:B2)'],
+        ['3', '4'],
         ['=MMULT(A1:B2, C1:D2)'],
       ], config)
 
@@ -256,13 +256,6 @@ describe('Function TRANSPOSE', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
-  it('transpose returns VALUE when wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=TRANSPOSE("fdsa")'],
-    ])
-
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
-  })
 
   it('transpose without braces', () => {
     const engine = HyperFormula.buildFromArray([
@@ -275,5 +268,21 @@ describe('Function TRANSPOSE', () => {
     expect(engine.getCellValue(adr('A4'))).toBe(1)
     expect(engine.getCellValue(adr('A5'))).toBe(2)
     expect(engine.getCellValue(adr('B4'))).toBe(3)
+  })
+
+  it('transpose any values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['foo', 'bar'],
+      ['=1/0', '=TRUE()'],
+      ['=TRANSPOSE(A1:B3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1)
+    expect(engine.getCellValue(adr('B4'))).toEqual('foo')
+    expect(engine.getCellValue(adr('C4'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!A3'))
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(2)
+    expect(engine.getCellValue(adr('B5'))).toEqual('bar')
+    expect(engine.getCellValue(adr('C5'))).toEqual(true)
   })
 })

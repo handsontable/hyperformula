@@ -4,22 +4,23 @@
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {CellError, ErrorType, SimpleCellAddress} from '../Cell'
+import {ArraySize} from '../ArraySize'
+import {ArrayValue, ErroredArray, IArray, NotComputedArray} from '../ArrayValue'
+import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
+import {ErrorMessage} from '../error-message'
 import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
-import {ErroredMatrix, IMatrix, Matrix, NotComputedMatrix} from '../Matrix'
-import {MatrixSize} from '../MatrixSize'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
 export abstract class FormulaVertex {
-  static fromAst(formula: Ast, address: SimpleCellAddress, size: MatrixSize, version: number) {
+  static fromAst(formula: Ast, address: SimpleCellAddress, size: ArraySize, version: number) {
     if (size.isScalar()) {
       return new FormulaCellVertex(formula, address, version)
     } else {
-      return new MatrixVertex(formula, address, size, version)
+      return new ArrayVertex(formula, address, size, version)
     }
   }
 
@@ -78,24 +79,32 @@ export abstract class FormulaVertex {
   public abstract isComputed(): boolean
 }
 
-export class MatrixVertex extends FormulaVertex {
-  matrix: IMatrix
+export class ArrayVertex extends FormulaVertex {
+  array: IArray
 
-  constructor(formula: Ast, cellAddress: SimpleCellAddress, size: MatrixSize, version: number = 0) {
+  constructor(formula: Ast, cellAddress: SimpleCellAddress, size: ArraySize, version: number = 0) {
     super(formula, cellAddress, version)
-    this.matrix = new NotComputedMatrix(size)
+    if (size.isRef) {
+      this.array = new ErroredArray(new CellError(ErrorType.REF, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
+    } else {
+      this.array = new NotComputedArray(size)
+    }
   }
 
   get width(): number {
-    return this.matrix.width()
+    return this.array.width()
   }
 
   get height(): number {
-    return this.matrix.height()
+    return this.array.height()
   }
 
   get sheet(): number {
     return this.cellAddress.sheet
+  }
+
+  get leftCorner(): SimpleCellAddress {
+    return this.cellAddress
   }
 
   setCellValue(value: InterpreterValue): InterpreterValue {
@@ -103,39 +112,39 @@ export class MatrixVertex extends FormulaVertex {
       this.setErrorValue(value)
       return value
     }
-    const matrix = Matrix.fromInterpreterValue(value)
-    matrix.resize(this.matrix.size)
-    this.matrix = matrix
+    const array = ArrayValue.fromInterpreterValue(value)
+    array.resize(this.array.size)
+    this.array = array
     return value
   }
 
   getCellValue(): InterpreterValue {
-    if (this.matrix instanceof NotComputedMatrix) {
-      throw Error('Matrix not computed yet.')
+    if (this.array instanceof NotComputedArray) {
+      throw Error('Array not computed yet.')
     }
-    return this.matrix.simpleRangeValue()
+    return this.array.simpleRangeValue()
   }
 
   public valueOrUndef(): Maybe<InterpreterValue> {
-    if (this.matrix instanceof NotComputedMatrix) {
+    if (this.array instanceof NotComputedArray) {
       return undefined
     }
-    return this.matrix.simpleRangeValue()
+    return this.array.simpleRangeValue()
   }
 
-  getMatrixCellValue(address: SimpleCellAddress): InternalScalarValue {
+  getArrayCellValue(address: SimpleCellAddress): InternalScalarValue {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
 
     try {
-      return this.matrix.get(col, row)
+      return this.array.get(col, row)
     } catch (e) {
       return new CellError(ErrorType.REF)
     }
   }
 
-  getMatrixCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
-    const val = this.getMatrixCellValue(address)
+  getArrayCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
+    const val = this.getArrayCellValue(address)
     if (val instanceof CellError || val === EmptyValue) {
       return undefined
     } else {
@@ -143,12 +152,17 @@ export class MatrixVertex extends FormulaVertex {
     }
   }
 
-  setMatrixCellValue(address: SimpleCellAddress, value: number): void {
+  setArrayCellValue(address: SimpleCellAddress, value: number): void {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
-    if (this.matrix instanceof Matrix) {
-      this.matrix.set(col, row, value)
+    if (this.array instanceof ArrayValue) {
+      this.array.set(col, row, value)
     }
+  }
+
+  setNoSpace(): InterpreterValue {
+    this.array = new ErroredArray(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
+    return this.getCellValue()
   }
 
   getRange(): AbsoluteCellRange {
@@ -175,52 +189,29 @@ export class MatrixVertex extends FormulaVertex {
       (col < this.cellAddress.col + this.width)
   }
 
-  /* TODO cruds should ensure is recent data */
-  addRows(sheet: number, row: number, numberOfRows: number): void {
-    if (this.matrix instanceof Matrix) {
-      this.matrix.addRows(row - this.cellAddress.row, numberOfRows)
-    }
-  }
-
-  addColumns(sheet: number, column: number, numberOfColumns: number): void {
-    if (this.matrix instanceof Matrix) {
-      this.matrix.addColumns(column - this.cellAddress.col, numberOfColumns)
-    }
-  }
-
-  removeRows(removedRows: RowsSpan): void {
-    if (this.matrix instanceof Matrix) {
-      const removedRowsFromMatrix = this.rowsFromMatrix().intersect(removedRows)!
-      this.matrix.removeRows(removedRowsFromMatrix.rowStart - this.cellAddress.row, removedRowsFromMatrix.rowEnd - this.cellAddress.row)
-    }
-  }
-
-  removeColumns(removedColumns: ColumnsSpan): void {
-    if (this.matrix instanceof Matrix) {
-      const removedColumnsFromMatrix = this.columnsFromMatrix().intersect(removedColumns)!
-      this.matrix.removeColumns(removedColumnsFromMatrix.columnStart - this.cellAddress.col, removedColumnsFromMatrix.columnEnd - this.cellAddress.col)
-    }
-  }
-
   isComputed() {
-    return (!(this.matrix instanceof NotComputedMatrix))
+    return (!(this.array instanceof NotComputedArray))
   }
 
-  columnsFromMatrix() {
+  columnsFromArray() {
     return ColumnsSpan.fromNumberOfColumns(this.cellAddress.sheet, this.cellAddress.col, this.width)
   }
 
-  rowsFromMatrix() {
+  rowsFromArray() {
     return RowsSpan.fromNumberOfRows(this.cellAddress.sheet, this.cellAddress.row, this.height)
   }
 
   /**
-   * No-op as matrix vertices are transformed eagerly.
+   * No-op as array vertices are transformed eagerly.
    * */
   ensureRecentData(_updatingService: LazilyTransformingAstService) {}
 
+  isLeftCorner(address: SimpleCellAddress): boolean {
+    return equalSimpleCellAddress(this.cellAddress, address)
+  }
+
   private setErrorValue(error: CellError) {
-    this.matrix = new ErroredMatrix(error, this.matrix.size)
+    this.array = new ErroredArray(error, this.array.size)
   }
 }
 
