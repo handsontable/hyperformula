@@ -193,12 +193,12 @@ export interface FunctionArgument {
   maxValue?: number,
 
   /**
-   * If set, numerical argument need to be less than `lessThan`.
+   * If set, numerical arguments need to be less than `lessThan`.
    */
   lessThan?: number,
 
   /**
-   * If set, numerical argument need to be greater than `greaterThan`.
+   * If set, numerical arguments need to be greater than `greaterThan`.
    */
   greaterThan?: number,
 }
