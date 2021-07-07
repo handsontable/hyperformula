@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {GPU} from 'gpu.js'
 import {
   configCheckIfParametersNotInConflict,
   configValueFromParam,
@@ -162,7 +161,7 @@ export interface ConfigParams {
    *
    * @category Engine
    */
-  gpujs?: typeof GPU,
+  gpujs?: any,
   /**
    * Sets array calculations to use either GPU or CPU.
    * 
@@ -521,7 +520,7 @@ export class Config implements ConfigParams, ParserConfig {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
-  public readonly gpujs?: typeof GPU
+  public readonly gpujs?: any
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
