@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `CellError` to exports. (#736)
 - Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. (#747)
 - Added `#SPILL!` error type. (#708)
+- Added large tests for CRUD interactions. (#755)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)
