@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {GPU} from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
@@ -43,7 +42,7 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
-  private gpu?: GPU
+  private gpu?: any
   public readonly arithmeticHelper: ArithmeticHelper
   public readonly criterionBuilder: CriterionBuilder
 
@@ -268,7 +267,7 @@ export class Interpreter {
     }
   }
 
-  public getGpuInstance(): GPU {
+  public getGpuInstance(): any {
     const mode = this.config.gpuMode
     const gpujs = this.config.gpujs
 
