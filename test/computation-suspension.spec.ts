@@ -83,7 +83,7 @@ describe('Evaluation suspension', () => {
     expect(engine.doesCellHaveSimpleValue(adr('C1'))).toBe(false)
     expect(engine.doesCellHaveFormula(adr('C1'))).toBe(true)
     expect(engine.isCellEmpty(adr('C1'))).toBe(false)
-    expect(engine.isCellPartOfMatrix(adr('C1'))).toBe(false)
+    expect(engine.isCellPartOfArray(adr('C1'))).toBe(false)
   })
 
   it('when evaluation is stopped, getting cell formulas is possible', () => {

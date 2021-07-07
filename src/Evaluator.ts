@@ -9,7 +9,7 @@ import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
-import {DependencyGraph, MatrixVertex, RangeVertex, Vertex} from './DependencyGraph'
+import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
@@ -139,7 +139,7 @@ export class Evaluator {
 
   private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
-    if (vertex instanceof MatrixVertex && (vertex.matrix.size.isRef || !this.dependencyGraph.isThereSpaceForMatrix(vertex))) {
+    if (vertex instanceof ArrayVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
       return vertex.setNoSpace()
     } else {
       const formula = vertex.getFormula(this.lazilyTransformingAstService)

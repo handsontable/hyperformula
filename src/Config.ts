@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {GPU} from 'gpu.js'
 import {
   configCheckIfParametersNotInConflict,
   configValueFromParam,
@@ -162,7 +161,7 @@ export interface ConfigParams {
    *
    * @category Engine
    */
-  gpujs?: typeof GPU,
+  gpujs?: any,
   /**
    * Sets array calculations to use either GPU or CPU.
    * 
@@ -246,14 +245,14 @@ export interface ConfigParams {
    * @default ','
    * @category Formula syntax
    */
-  matrixColumnSeparator: ',' | ';',
+  arrayColumnSeparator: ',' | ';',
   /**
    * Sets a row separator symbol for array notation.
    *
    * @default ';'
    * @category Formula syntax
    */
-  matrixRowSeparator: ';' | '|',
+  arrayRowSeparator: ';' | '|',
   /**
    * Sets the maximum number of rows.
    *
@@ -467,8 +466,8 @@ export class Config implements ConfigParams, ParserConfig {
     leapYear1900: false,
     localeLang: 'en',
     matchWholeCell: true,
-    matrixColumnSeparator: ',',
-    matrixRowSeparator: ';',
+    arrayColumnSeparator: ',',
+    arrayRowSeparator: ';',
     maxRows: 40_000,
     maxColumns: 18_278,
     nullYear: 30,
@@ -506,9 +505,9 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly functionArgSeparator: string
   /** @inheritDoc */
-  public readonly matrixColumnSeparator: ',' | ';'
+  public readonly arrayColumnSeparator: ',' | ';'
   /** @inheritDoc */
-  public readonly matrixRowSeparator: ';' | '|'
+  public readonly arrayRowSeparator: ';' | '|'
   /** @inheritDoc */
   public readonly decimalSeparator: '.' | ','
   /** @inheritDoc */
@@ -521,7 +520,7 @@ export class Config implements ConfigParams, ParserConfig {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
-  public readonly gpujs?: typeof GPU
+  public readonly gpujs?: any
   /** @inheritDoc */
   public readonly gpuMode: GPUMode
   /** @inheritDoc */
@@ -609,8 +608,8 @@ export class Config implements ConfigParams, ParserConfig {
       language,
       licenseKey,
       matchWholeCell,
-      matrixColumnSeparator,
-      matrixRowSeparator,
+      arrayColumnSeparator,
+      arrayRowSeparator,
       maxRows,
       maxColumns,
       nullYear,
@@ -644,8 +643,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.language = configValueFromParam(language, 'string', 'language')
     this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
     this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
-    this.matrixColumnSeparator = configValueFromParam(matrixColumnSeparator, [',', ';'], 'matrixColumnSeparator')
-    this.matrixRowSeparator = configValueFromParam(matrixRowSeparator, [';', '|'], 'matrixRowSeparator')
+    this.arrayColumnSeparator = configValueFromParam(arrayColumnSeparator, [',', ';'], 'arrayColumnSeparator')
+    this.arrayRowSeparator = configValueFromParam(arrayRowSeparator, [';', '|'], 'arrayRowSeparator')
     this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
     this.gpujs = gpujs ?? Config.defaultConfig.gpujs
@@ -700,8 +699,8 @@ export class Config implements ConfigParams, ParserConfig {
     )
 
     configCheckIfParametersNotInConflict(
-      {value: this.matrixRowSeparator, name: 'matrixRowSeparator'},
-      {value: this.matrixColumnSeparator, name: 'matrixColumnSeparator'},
+      {value: this.arrayRowSeparator, name: 'arrayRowSeparator'},
+      {value: this.arrayColumnSeparator, name: 'arrayColumnSeparator'},
     )
   }
 

@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula} from '../src'
-import {MatrixVertex, ValueCellVertex} from '../src/DependencyGraph'
+import {ArraySize} from '../src/ArraySize'
+import {ArrayVertex, ValueCellVertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
-import {MatrixSize} from '../src/MatrixSize'
 import {adr, detailedError, detailedErrorWithOrigin, expectVerticesOfTypes, noSpace} from './testUtils'
 
 describe('without arrayformula, with useArrayArithmetic flag', () => {
@@ -343,8 +343,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex],
-      [MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex],
     ])
   })
 
@@ -355,11 +355,11 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, undefined],
-      [MatrixVertex, MatrixVertex, MatrixVertex],
-      [undefined, MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex, undefined],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [undefined, ArrayVertex, ArrayVertex],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
   })
 
@@ -370,15 +370,15 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, MatrixVertex],
-      [MatrixVertex, MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
       [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([
       [noSpace(), 1, 1, 1, 2],
       [noSpace(), 2, 2, 1, 2],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(3)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
     expect(engine.getSheetValues(0))
   })
 
@@ -413,8 +413,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex],
-      [MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex],
     ])
 
   })
@@ -425,9 +425,9 @@ describe('build from array', () => {
       [1, null]
     ], {useArrayArithmetic: true})
 
-    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())
+    expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, undefined],
+      [ArrayVertex, undefined],
       [ValueCellVertex, undefined],
     ])
   })

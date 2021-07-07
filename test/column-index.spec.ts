@@ -1,4 +1,5 @@
 import {deepStrictEqual} from 'assert'
+import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {CellError, ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
@@ -6,6 +7,7 @@ import {DependencyGraph} from '../src/DependencyGraph'
 import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {ColumnIndex} from '../src/Lookup/ColumnIndex'
@@ -13,8 +15,6 @@ import {NamedExpressions} from '../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../src/Span'
 import {Statistics} from '../src/statistics'
 import {adr, expectColumnIndexToMatchSheet} from './testUtils'
-import {HyperFormula} from '../src'
-import {EmptyValue} from '../src/interpreter/InterpreterValue'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
@@ -744,6 +744,90 @@ describe('Arrays', () => {
     expectColumnIndexToMatchSheet([
       [],
       [3, 2]
+    ], engine)
+  })
+
+  it('should move array values when adding columns before array', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C2:D2'],
+      [null, 'foo', 1, 2]
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.addColumns(0, [0, 1])
+
+    expectColumnIndexToMatchSheet([
+      [null, -1, -2],
+      [null, null, 'foo', 1, 2]
+    ], engine)
+  })
+
+  it('should not move array values when adding columns', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C2:E2', null, null, -3, -2, -1],
+      [null, 'foo', 1, 2, 3]
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.addColumns(0, [1, 1])
+
+    expectColumnIndexToMatchSheet([
+      [-1, -2, -3, null, -3, -2, -1],
+      [null, null, 'foo', 1, 2, 3]
+    ], engine)
+  })
+
+  it('should move array values when removing columns before array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, '=-C2:D2'],
+      [null, null, 1, 2]
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.removeColumns(0, [0, 1])
+
+    expectColumnIndexToMatchSheet([
+      [-1, -2],
+      [null, 1, 2]
+    ], engine)
+  })
+
+  it('should not move array values when removing columns', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-D2:E2', null, null, -2, -1],
+      [-2, 'foo', null, 1, 2]
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.removeColumns(0, [1, 1])
+
+    expectColumnIndexToMatchSheet([
+      [-1, -2, -2, -1],
+      [-2, null, 1, 2]
+    ], engine)
+  })
+
+  it('should remove array values from index when removing column with left corner', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-B2:C2'],
+      [null, 1, 2],
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.removeColumns(0, [0, 1])
+
+    expectColumnIndexToMatchSheet([
+      [],
+      [1, 2],
+    ], engine)
+  })
+
+  it('should remove array values from index when REF after removing columns', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-B2:C2', null, 1],
+      [2, null, 3]
+    ], {useArrayArithmetic: true, useColumnIndex: true})
+
+    engine.removeColumns(0, [1, 1])
+
+    expectColumnIndexToMatchSheet([
+      [null, 1],
+      [2, 3]
     ], engine)
   })
 })

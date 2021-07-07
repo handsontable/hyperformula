@@ -22,13 +22,13 @@ import {
 } from '../../src/parser'
 import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
 import {
+  ArrayAst,
   buildCellReferenceAst,
   buildColumnRangeAst,
   buildErrorWithRawInputAst,
   buildNumberAst,
   buildRowRangeAst,
   ColumnRangeAst,
-  MatrixAst,
   ParenthesisAst,
   RangeSheetReferenceType,
 } from '../../src/parser/Ast'
@@ -675,8 +675,8 @@ describe('Matrices', () => {
   it('simplest matrix', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('={1}', adr('A1')).ast as MatrixAst
-    expect(ast.type).toBe(AstNodeType.MATRIX)
+    const ast = parser.parse('={1}', adr('A1')).ast as ArrayAst
+    expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(1)
     expect(ast.args[0].length).toEqual(1)
   })
@@ -684,8 +684,8 @@ describe('Matrices', () => {
   it('row matrix', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('={1,2,3}', adr('A1')).ast as MatrixAst
-    expect(ast.type).toBe(AstNodeType.MATRIX)
+    const ast = parser.parse('={1,2,3}', adr('A1')).ast as ArrayAst
+    expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(1)
     expect(ast.args[0].length).toEqual(3)
   })
@@ -693,8 +693,8 @@ describe('Matrices', () => {
   it('column matrix', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('={1;2;3}', adr('A1')).ast as MatrixAst
-    expect(ast.type).toBe(AstNodeType.MATRIX)
+    const ast = parser.parse('={1;2;3}', adr('A1')).ast as ArrayAst
+    expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(3)
     expect(ast.args[0].length).toEqual(1)
     expect(ast.args[1].length).toEqual(1)
@@ -704,8 +704,8 @@ describe('Matrices', () => {
   it('square matrix', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('={1,2,3;4,5,6;7,8,9}', adr('A1')).ast as MatrixAst
-    expect(ast.type).toBe(AstNodeType.MATRIX)
+    const ast = parser.parse('={1,2,3;4,5,6;7,8,9}', adr('A1')).ast as ArrayAst
+    expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(3)
     expect(ast.args[0].length).toEqual(3)
     expect(ast.args[1].length).toEqual(3)
@@ -715,12 +715,12 @@ describe('Matrices', () => {
   it('longer matrix with extras', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('={SUM(1,2,3),2,{1,2,3}}', adr('A1')).ast as MatrixAst
-    expect(ast.type).toBe(AstNodeType.MATRIX)
+    const ast = parser.parse('={SUM(1,2,3),2,{1,2,3}}', adr('A1')).ast as ArrayAst
+    expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(1)
     expect(ast.args[0].length).toEqual(3)
-    const ast2 = ast.args[0][2] as MatrixAst
-    expect(ast2.type).toBe(AstNodeType.MATRIX)
+    const ast2 = ast.args[0][2] as ArrayAst
+    expect(ast2.type).toBe(AstNodeType.ARRAY)
     expect(ast2.args.length).toEqual(1)
     expect(ast2.args[0].length).toEqual(3)
   })
@@ -729,17 +729,17 @@ describe('Matrices', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=1+{1,2,3}', adr('A1')).ast as PlusOpAst
-    const ast2 = ast.right as MatrixAst
-    expect(ast2.type).toBe(AstNodeType.MATRIX)
+    const ast2 = ast.right as ArrayAst
+    expect(ast2.type).toBe(AstNodeType.ARRAY)
     expect(ast2.args.length).toEqual(1)
     expect(ast2.args[0].length).toEqual(3)
   })
 
   it('square matrix, other separators', () => {
-    const parser = buildEmptyParserWithCaching(new Config({matrixRowSeparator: '|', matrixColumnSeparator: ';'}))
+    const parser = buildEmptyParserWithCaching(new Config({arrayRowSeparator: '|', arrayColumnSeparator: ';'}))
 
-    const ast = parser.parse('={1;2;3|4;5;6|7;8;9}', adr('A1')).ast as MatrixAst
-    expect(ast.type).toBe(AstNodeType.MATRIX)
+    const ast = parser.parse('={1;2;3|4;5;6|7;8;9}', adr('A1')).ast as ArrayAst
+    expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(3)
     expect(ast.args[0].length).toEqual(3)
     expect(ast.args[1].length).toEqual(3)

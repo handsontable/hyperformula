@@ -3,8 +3,8 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {GPU} from 'gpu.js'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
+import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -12,7 +12,6 @@ import {CellVertex, DependencyGraph, Vertex} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
-import {Matrix, NotComputedMatrix} from '../Matrix'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 import {NumberLiteralHelper} from '../NumberLiteralHelper'
@@ -43,7 +42,7 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
-  private gpu?: GPU
+  private gpu?: any
   public readonly arithmeticHelper: ArithmeticHelper
   public readonly criterionBuilder: CriterionBuilder
 
@@ -196,17 +195,17 @@ export class Interpreter {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
-        const matrixVertex = this.dependencyGraph.getMatrix(range)
-        if (matrixVertex) {
-          const matrix = matrixVertex.matrix
-          if (matrix instanceof NotComputedMatrix) {
-            throw new Error('Matrix should be already computed')
-          } else if (matrix instanceof CellError) {
-            return matrix
-          } else if (matrix instanceof Matrix) {
-            return SimpleRangeValue.fromRange(matrix.raw(), range, this.dependencyGraph)
+        const arrayVertex = this.dependencyGraph.getArray(range)
+        if (arrayVertex) {
+          const array = arrayVertex.array
+          if (array instanceof NotComputedArray) {
+            throw new Error('Array should be already computed')
+          } else if (array instanceof CellError) {
+            return array
+          } else if (array instanceof ArrayValue) {
+            return SimpleRangeValue.fromRange(array.raw(), range, this.dependencyGraph)
           } else {
-            throw new Error('Unknown matrix')
+            throw new Error('Unknown array')
           }
         } else {
           return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
@@ -229,7 +228,7 @@ export class Interpreter {
       case AstNodeType.PARENTHESIS: {
         return this.evaluateAst(ast.expression, state)
       }
-      case AstNodeType.MATRIX: {
+      case AstNodeType.ARRAY: {
         let totalWidth: Maybe<number> = undefined
         const ret: InternalScalarValue[][] = []
         for(const astRow of ast.args) {
@@ -268,7 +267,7 @@ export class Interpreter {
     }
   }
 
-  public getGpuInstance(): GPU {
+  public getGpuInstance(): any {
     const mode = this.config.gpuMode
     const gpujs = this.config.gpujs
 

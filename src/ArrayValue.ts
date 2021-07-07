@@ -3,13 +3,13 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from './ArraySize'
 import {CellError} from './Cell'
 import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
-import {MatrixSize} from './MatrixSize'
 
-export interface IMatrix {
-  size: MatrixSize,
+export interface IArray {
+  size: ArraySize,
 
   width(): number,
 
@@ -20,8 +20,8 @@ export interface IMatrix {
   simpleRangeValue(): SimpleRangeValue | CellError,
 }
 
-export class NotComputedMatrix implements IMatrix {
-  constructor(public readonly size: MatrixSize) {
+export class NotComputedArray implements IArray {
+  constructor(public readonly size: ArraySize) {
   }
 
   public width(): number {
@@ -34,62 +34,62 @@ export class NotComputedMatrix implements IMatrix {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public get(col: number, row: number): number {
-    throw Error('Matrix not computed yet.')
+    throw Error('Array not computed yet.')
   }
 
   simpleRangeValue(): SimpleRangeValue {
-    throw Error('Matrix not computed yet.')
+    throw Error('Array not computed yet.')
   }
 }
 
-export class Matrix implements IMatrix {
-  public size: MatrixSize
-  private readonly matrix: InternalScalarValue[][]
+export class ArrayValue implements IArray {
+  public size: ArraySize
+  private readonly array: InternalScalarValue[][]
 
   static fromInterpreterValue(value: InterpreterValue) {
     if (value instanceof SimpleRangeValue) {
-      return new Matrix(value.data)
+      return new ArrayValue(value.data)
     } else {
-      return new Matrix([[value]])
+      return new ArrayValue([[value]])
     }
   }
 
-  constructor(matrix: InternalScalarValue[][]) {
-    this.size = new MatrixSize(matrix.length > 0 ? matrix[0].length : 0, matrix.length)
-    this.matrix = matrix
+  constructor(array: InternalScalarValue[][]) {
+    this.size = new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
+    this.array = array
   }
 
   simpleRangeValue(): SimpleRangeValue {
-    return SimpleRangeValue.onlyValues(this.matrix)
+    return SimpleRangeValue.onlyValues(this.array)
   }
 
   public addRows(aboveRow: number, numberOfRows: number) {
-    this.matrix.splice(aboveRow, 0, ...this.nullArrays(numberOfRows, this.width()))
+    this.array.splice(aboveRow, 0, ...this.nullArrays(numberOfRows, this.width()))
     this.size.height += numberOfRows
   }
 
   public addColumns(aboveColumn: number, numberOfColumns: number) {
     for (let i = 0; i < this.height(); i++) {
-      this.matrix[i].splice(aboveColumn, 0, ...new Array(numberOfColumns).fill(EmptyValue))
+      this.array[i].splice(aboveColumn, 0, ...new Array(numberOfColumns).fill(EmptyValue))
     }
     this.size.width += numberOfColumns
   }
 
   public removeRows(startRow: number, endRow: number) {
     if (this.outOfBound(0, startRow) || this.outOfBound(0, endRow)) {
-      throw Error('Matrix index out of bound')
+      throw Error('Array index out of bound')
     }
     const numberOfRows = endRow - startRow + 1
-    this.matrix.splice(startRow, numberOfRows)
+    this.array.splice(startRow, numberOfRows)
     this.size.height -= numberOfRows
   }
 
   public removeColumns(leftmostColumn: number, rightmostColumn: number) {
     if (this.outOfBound(leftmostColumn, 0) || this.outOfBound(rightmostColumn, 0)) {
-      throw Error('Matrix index out of bound')
+      throw Error('Array index out of bound')
     }
     const numberOfColumns = rightmostColumn - leftmostColumn + 1
-    for (const row of this.matrix) {
+    for (const row of this.array) {
       row.splice(leftmostColumn, numberOfColumns)
     }
     this.size.width -= numberOfColumns
@@ -105,16 +105,16 @@ export class Matrix implements IMatrix {
 
   public get(col: number, row: number): InternalScalarValue {
     if (this.outOfBound(col, row)) {
-      throw Error('Matrix index out of bound')
+      throw Error('Array index out of bound')
     }
-    return this.matrix[row][col]
+    return this.array[row][col]
   }
 
   public set(col: number, row: number, value: number): void {
     if (this.outOfBound(col, row)) {
-      throw Error('Matrix index out of bound')
+      throw Error('Array index out of bound')
     }
-    this.matrix[row][col] = value
+    this.array[row][col] = value
   }
 
   public width(): number {
@@ -126,21 +126,21 @@ export class Matrix implements IMatrix {
   }
 
   public raw(): InternalScalarValue[][] {
-    return this.matrix
+    return this.array
   }
 
-  public resize(newSize: MatrixSize) {
+  public resize(newSize: ArraySize) {
     if(this.height() < newSize.height) {
       this.addRows(this.height(), newSize.height-this.height())
     }
     if(this.height() > newSize.height) {
-      throw 'Resizing to smaller matrix'
+      throw 'Resizing to smaller array'
     }
     if(this.width() < newSize.width) {
       this.addColumns(this.width(), newSize.width-this.width())
     }
     if(this.width() > newSize.width) {
-      throw 'Resizing to smaller matrix'
+      throw 'Resizing to smaller array'
     }
   }
 
@@ -149,10 +149,10 @@ export class Matrix implements IMatrix {
   }
 }
 
-export class ErroredMatrix implements IMatrix {
+export class ErroredArray implements IArray {
   constructor(
     private readonly error: CellError,
-    public readonly size: MatrixSize,
+    public readonly size: ArraySize,
   ) {
   }
 

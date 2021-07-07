@@ -3,9 +3,9 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySize, arraySizeForMultiplication, arraySizeForPoolFunction} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {MatrixSize, matrixSizeForMultiplication, matrixSizeForPoolFunction} from '../../MatrixSize'
 import {ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
@@ -65,7 +65,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
   }
 
-  private readonly createKernel: (kernel: KernelFunction, outputSize: MatrixSize) => KernelRunShortcut
+  private readonly createKernel: (kernel: KernelFunction, outputSize: ArraySize) => KernelRunShortcut
 
   constructor(interpreter: Interpreter) {
     super(interpreter)
@@ -82,9 +82,9 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
       if( rightMatrix.height() !== leftMatrix.width()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.MatrixDimensions)
+        return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
       }
-      const outputSize = matrixSizeForMultiplication(leftMatrix.size, rightMatrix.size)
+      const outputSize = arraySizeForMultiplication(leftMatrix.size, rightMatrix.size)
 
       const result = this.createKernel(function(a: number[][], b: number[][], width: number): number {
         let sum = 0
@@ -103,7 +103,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
-      const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
+      const outputSize = arraySizeForPoolFunction(matrix.size, windowSize, stride)
 
       const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
         const leftCornerX = this.thread.x * stride
@@ -126,7 +126,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
-      const outputSize = matrixSizeForPoolFunction(matrix.size, windowSize, stride)
+      const outputSize = arraySizeForPoolFunction(matrix.size, windowSize, stride)
 
       const result = this.createKernel(function(a: number[][], windowSize: number, stride: number): number {
         const leftCornerX = this.thread.x * stride
@@ -202,7 +202,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  private createCpuKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
+  private createCpuKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {
     return function(...args: any[]) {
       const result: number[][] = []
       for (let y = 0; y < outputSize.height; ++y) {
@@ -215,7 +215,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
   }
 
-  private createGpuJsKernel = (kernel: KernelFunction, outputSize: MatrixSize): KernelRunShortcut => {
+  private createGpuJsKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {
     return this.interpreter.getGpuInstance()
       .createKernel(kernel)
       .setPrecision('unsigned')

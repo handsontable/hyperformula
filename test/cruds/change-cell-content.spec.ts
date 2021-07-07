@@ -1,12 +1,12 @@
 import {ErrorType, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {ArraySize} from '../../src/ArraySize'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {EmptyCellVertex, MatrixVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {MatrixSize} from '../../src/MatrixSize'
 import {
   adr,
   colEnd,
@@ -844,9 +844,9 @@ describe('arrays', () => {
       [1]
     ])
 
-    expect(engine.matrixMapping.getMatrixByCorner(adr('A1'))?.matrix.size).toEqual(MatrixSize.error())
+    expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, undefined],
+      [ArrayVertex, undefined],
       [ValueCellVertex, undefined],
     ])
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -864,11 +864,11 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, undefined],
-      [MatrixVertex, MatrixVertex, MatrixVertex],
-      [undefined, MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex, undefined],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [undefined, ArrayVertex, ArrayVertex],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(4)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
     expect(engine.getSheetValues(0))
   })
 
@@ -884,15 +884,15 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [MatrixVertex, MatrixVertex, MatrixVertex],
-      [MatrixVertex, MatrixVertex, MatrixVertex],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayVertex, ArrayVertex, ArrayVertex],
       [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([
       [noSpace(), 1, 1, 1, 2],
       [noSpace(), 2, 2, 1, 2],
     ])
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(3)
+    expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
     expect(engine.getSheetValues(0))
   })
 

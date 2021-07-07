@@ -110,8 +110,8 @@ describe('Config', () => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ',' })
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
     expect(() => {
-      new Config({ matrixColumnSeparator: ';', matrixRowSeparator: ';'})
-    }).toThrowError('Config initialization failed. Parameters in conflict: [matrixColumnSeparator,matrixRowSeparator]')
+      new Config({ arrayColumnSeparator: ';', arrayRowSeparator: ';'})
+    }).toThrowError('Config initialization failed. Parameters in conflict: [arrayColumnSeparator,arrayRowSeparator]')
   })
 
   it('should throw error when currency symbol is empty', () => {
@@ -148,16 +148,16 @@ describe('Config', () => {
     expect(() => {
       // eslint-disable-next-line
       // @ts-ignore
-      new Config({ matrixRowSeparator: ',' })
-    }).toThrowError('Expected one of \';\' \'|\' for config parameter: matrixRowSeparator')
+      new Config({ arrayRowSeparator: ',' })
+    }).toThrowError('Expected one of \';\' \'|\' for config parameter: arrayRowSeparator')
   })
 
   it('should throw error when matrix columns separator is not correct', () => {
     expect(() => {
       // eslint-disable-next-line
       // @ts-ignore
-      new Config({ matrixColumnSeparator: '|' })
-    }).toThrowError('Expected one of \',\' \';\' for config parameter: matrixColumnSeparator')
+      new Config({ arrayColumnSeparator: '|' })
+    }).toThrowError('Expected one of \',\' \';\' for config parameter: arrayColumnSeparator')
   })
 
   it('#undoLimit validation', () => {

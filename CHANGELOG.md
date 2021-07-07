@@ -15,8 +15,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Breaking change**: Removed the free non-commercial license.
 - **Breaking change**: Changed behaviour of `setCellContents` so that it is possible to override space occupied by spilled array. (#708)
 - **Breaking change**: Changed behaviour of `addRows/removeRows` so that it is possible to add/remove rows across spilled array without changing array size. (#708)
+- **Breaking change**: Changed behaviour of `addColumns/removeColumns` so that it is possible to add/remove columns across spilled array without changing array size. (#732)
+- **Breaking change**: Changed config options (#747):
+
+| before                | after                |
+|-----------------------|----------------------|
+| matrixColumnSeparator | arrayColumnSeparator |
+| matrixRowSeparator    | arrayRowSeparator    |
+
+- **Breaking change**: Changed CellType.MATRIX to CellType.ARRAY (#747)
+- **Breaking change**: Changed API methods (#747):
+
+| before             | after             |
+|--------------------|-------------------|
+| matrixMapping      | arrrayMapping     |
+| isCellPartOfMatrix | isCellPartOfArray |
+
+- **Breaking change**: Changed Exceptions (#747):
+
+| before                       | after                       |
+|------------------------------|-----------------------------|
+| SourceLocationHasMatrixError | SourceLocationHasArrayError |
+| TargetLocationHasMatrixError | TargetLocationHasArrayError |
+
 - Changed SWITCH function, so it takes array as its first argument.
 - Changed TRANSPOSE function, so it works with data of any type. (#708)
+- Changed the way how we include `gpu.js` making it even more optional (#753)
 
 ### Added
 - Added support for array arithmetic. (#628)
@@ -37,7 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added pretty print for detailedCellError. (#712)
 - Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. (#720)
 - Added `CellError` to exports. (#736)
+- Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. (#747)
 - Added `#SPILL!` error type. (#708)
+- Added large tests for CRUD interactions. (#755)
 
 ### Fixed
 - Fixed an issue with arrays and cruds. (#651)

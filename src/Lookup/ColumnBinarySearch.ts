@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
+import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {rangeLowerBound} from '../interpreter/binarySearch'
@@ -13,7 +14,6 @@ import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {ColumnsSpan} from '../Span'
 import {AdvancedFind} from './AdvancedFind'
 import {ColumnSearchStrategy} from './SearchStrategy'
-import {CellValueChange} from '../ContentChanges'
 
 export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStrategy {
   constructor(

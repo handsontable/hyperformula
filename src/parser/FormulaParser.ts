@@ -24,8 +24,10 @@ import {
   SheetMappingFn,
 } from './addressRepresentationConverters'
 import {
+  ArrayAst,
   Ast,
   AstNodeType,
+  buildArrayAst,
   buildCellErrorAst,
   buildCellRangeAst,
   buildCellReferenceAst,
@@ -39,7 +41,6 @@ import {
   buildGreaterThanOrEqualOpAst,
   buildLessThanOpAst,
   buildLessThanOrEqualOpAst,
-  buildMatrixAst,
   buildMinusOpAst,
   buildMinusUnaryOpAst,
   buildNamedExpressionAst,
@@ -57,7 +58,6 @@ import {
   buildTimesOpAst,
   CellReferenceAst,
   ErrorAst,
-  MatrixAst,
   parsingError,
   ParsingError,
   ParsingErrorType,
@@ -66,6 +66,8 @@ import {
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {
   AdditionOp,
+  ArrayLParen,
+  ArrayRParen,
   BooleanOp,
   CellReference,
   ColumnRange,
@@ -79,8 +81,6 @@ import {
   LessThanOp,
   LessThanOrEqualOp,
   LParen,
-  MatrixLParen,
-  MatrixRParen,
   MinusOp,
   MultiplicationOp,
   NamedExpression,
@@ -372,7 +372,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private positiveAtomicExpression: AstRule = this.RULE('positiveAtomicExpression', () => {
     return this.OR(this.atomicExpCache ?? (this.atomicExpCache = [
       {
-        ALT: () => this.SUBRULE(this.matrixExpression),
+        ALT: () => this.SUBRULE(this.arrayExpression),
       },
       {
         ALT: () => this.SUBRULE(this.cellRangeExpression),
@@ -721,14 +721,14 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
   }
 
-  private matrixExpression: AstRule = this.RULE('matrixExpression', () => {
+  private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
     return this.OR([
       {
         ALT: () => {
-          const ltoken = this.CONSUME(MatrixLParen) as IExtendedToken
-          const ret = this.SUBRULE(this.insideMatrixExpression) as MatrixAst
-          const rtoken = this.CONSUME(MatrixRParen) as IExtendedToken
-          return buildMatrixAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
+          const ltoken = this.CONSUME(ArrayLParen) as IExtendedToken
+          const ret = this.SUBRULE(this.insideArrayExpression) as ArrayAst
+          const rtoken = this.CONSUME(ArrayRParen) as IExtendedToken
+          return buildArrayAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
         }
       },
       {
@@ -737,27 +737,27 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
-  private insideMatrixExpression: AstRule = this.RULE('insideMatrixExpression', () => {
+  private insideArrayExpression: AstRule = this.RULE('insideArrayExpression', () => {
     const ret: Ast[][] = [[]]
     ret[ret.length-1].push(this.SUBRULE(this.booleanExpression))
     this.MANY( () => {
       this.OR([
         {
           ALT: () => {
-            this.CONSUME(this.lexerConfig.MatrixColSeparator)
+            this.CONSUME(this.lexerConfig.ArrayColSeparator)
             ret[ret.length-1].push(this.SUBRULE2(this.booleanExpression))
           }
         },
         {
           ALT: () => {
-            this.CONSUME(this.lexerConfig.MatrixRowSeparator)
+            this.CONSUME(this.lexerConfig.ArrayRowSeparator)
             ret.push([])
             ret[ret.length-1].push(this.SUBRULE3(this.booleanExpression))
           }
         }
       ])
     })
-    return buildMatrixAst(ret)
+    return buildArrayAst(ret)
   })
 
   /**

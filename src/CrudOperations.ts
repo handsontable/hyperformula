@@ -4,6 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {ArraySizePredictor} from './ArraySize'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
@@ -23,12 +24,11 @@ import {
   NothingToPasteError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError
 } from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {MatrixSizePredictor} from './MatrixSize'
 import {Maybe} from './Maybe'
 import {
   doesContainRelativeReferences,
@@ -89,9 +89,9 @@ export class CrudOperations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     /** Storage for named expressions */
     private readonly namedExpressions: NamedExpressions,
-    private readonly matrixSizePredictor: MatrixSizePredictor,
+    private readonly arraySizePredictor: ArraySizePredictor,
   ) {
-    this.operations = new Operations(dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, config, matrixSizePredictor)
+    this.operations = new Operations(dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, config, arraySizePredictor)
     this.clipboardOperations = new ClipboardOperations(dependencyGraph, this.operations, parser, lazilyTransformingAstService, config)
     this.undoRedo = new UndoRedo(config, this.operations)
   }
@@ -295,7 +295,7 @@ export class CrudOperations {
 
   public setRowOrder(sheetId: number, rowMapping: [number, number][]): void {
     this.validateSwapRowIndexes(sheetId, rowMapping)
-    this.testRowOrderForMatrices(sheetId, rowMapping)
+    this.testRowOrderForArrays(sheetId, rowMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const oldContent = this.operations.setRowOrder(sheetId, rowMapping)
@@ -309,12 +309,12 @@ export class CrudOperations {
     this.validateRowOrColumnMapping(sheetId, rowMapping, 'row')
   }
 
-  public testColumnOrderForMatrices(sheetId: number, columnMapping: [number, number][]): void {
+  public testColumnOrderForArrays(sheetId: number, columnMapping: [number, number][]): void {
     for (const [source, target] of columnMapping) {
       if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: source, row: 0}, 1, Infinity)
-        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          throw new SourceLocationHasMatrixError()
+        if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(rowRange)) {
+          throw new SourceLocationHasArrayError()
         }
       }
     }
@@ -323,7 +323,7 @@ export class CrudOperations {
 
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
     this.validateSwapColumnIndexes(sheetId, columnMapping)
-    this.testColumnOrderForMatrices(sheetId, columnMapping)
+    this.testColumnOrderForArrays(sheetId, columnMapping)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
     const oldContent = this.operations.setColumnOrder(sheetId, columnMapping)
@@ -337,12 +337,12 @@ export class CrudOperations {
     this.validateRowOrColumnMapping(sheetId, columnMapping, 'column')
   }
 
-  public testRowOrderForMatrices(sheetId: number, rowMapping: [number, number][]): void {
+  public testRowOrderForArrays(sheetId: number, rowMapping: [number, number][]): void {
     for (const [source, target] of rowMapping) {
       if (source !== target) {
         const rowRange = AbsoluteCellRange.spanFrom({sheet: sheetId, col: 0, row: source}, Infinity, 1)
-        if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(rowRange)) {
-          throw new SourceLocationHasMatrixError()
+        if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(rowRange)) {
+          throw new SourceLocationHasArrayError()
         }
       }
     }
@@ -474,7 +474,6 @@ export class CrudOperations {
       if (rowEnd < rowStart) {
         throw new InvalidArgumentsError('starting row to be smaller than the ending row.')
       }
-
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
       }
@@ -496,13 +495,6 @@ export class CrudOperations {
       if (!isNonnegativeInteger(column) || !isPositiveInteger(numberOfColumnsToAdd)) {
         throw new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.')
       }
-
-      if (isPositiveInteger(column)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column - 1)
-        && this.dependencyGraph.matrixMapping.isFormulaMatrixInColumn(sheet, column)
-      ) {
-        throw new TargetLocationHasMatrixError()
-      }
     }
   }
 
@@ -516,14 +508,8 @@ export class CrudOperations {
       if (columnEnd < columnStart) {
         throw new InvalidArgumentsError('starting column to be smaller than the ending column.')
       }
-      const columnsToRemove = ColumnsSpan.fromColumnStartAndEnd(sheet, columnStart, columnEnd)
-
       if (!this.sheetMapping.hasSheetWithId(sheet)) {
         throw new NoSheetWithIdError(sheet)
-      }
-
-      if (this.dependencyGraph.matrixMapping.isFormulaMatrixInColumns(columnsToRemove)) {
-        throw new SourceLocationHasMatrixError()
       }
     }
   }
@@ -547,11 +533,11 @@ export class CrudOperations {
     const width = this.dependencyGraph.getSheetWidth(sheet)
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, width, numberOfRows)
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new SourceLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(sourceRange)) {
+      throw new SourceLocationHasArrayError()
     }
-    if (targetRow > 0 && this.dependencyGraph.matrixMapping.isFormulaMatrixInAllRows(RowsSpan.fromNumberOfRows(sheet, targetRow - 1, 2))) {
-      throw new TargetLocationHasMatrixError()
+    if (targetRow > 0 && this.dependencyGraph.arrayMapping.isFormulaArrayInAllRows(RowsSpan.fromNumberOfRows(sheet, targetRow - 1, 2))) {
+      throw new TargetLocationHasArrayError()
     }
   }
 
@@ -574,8 +560,11 @@ export class CrudOperations {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sourceRange = AbsoluteCellRange.spanFrom(sourceStart, numberOfColumns, sheetHeight)
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(sourceRange)) {
-      throw new SourceLocationHasMatrixError()
+    if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(sourceRange)) {
+      throw new SourceLocationHasArrayError()
+    }
+    if (targetColumn > 0 && this.dependencyGraph.arrayMapping.isFormulaArrayInAllColumns(ColumnsSpan.fromNumberOfColumns(sheet, targetColumn - 1, 2))) {
+      throw new TargetLocationHasArrayError()
     }
   }
 
