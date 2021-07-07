@@ -43,10 +43,10 @@ import { FunctionPlugin } from 'hyperformula';
 // start creating a class
 class CountHF extends FunctionPlugin {
 
-// define functions inside this plugin
+  // define functions inside this plugin
   public static implementedFunctions = {
     'HYPER': {
-    // this method's functionality will be defined below
+      // this method's functionality will be defined below
       method: 'hyper',
     }
   };
@@ -55,7 +55,7 @@ class CountHF extends FunctionPlugin {
 
 ### Optional parameters
 
-Using optional parameters, you can set your function to:
+Using optional parameters, you can configure your function to:
 * Use the [array arithmetic mode](arrays.md)
 * Treat reference or range arguments as arguments that don't create dependency
 * Inline range arguments to scalar arguments
@@ -71,12 +71,12 @@ import { FunctionPlugin } from 'hyperformula';
 // start creating a class
 class CountHF extends FunctionPlugin {
 
-// define functions inside this plugin
+  // define functions inside this plugin
   public static implementedFunctions = {
     'HYPER': {
-    // this method's functionality will be defined below
+      // this method's functionality will be defined below
       method: 'hyper',
-    // set your optional parameters below
+      // set your optional parameters below
       arrayFunction: false,
       doesNotNeedArgumentsToBeComputed: false,
       expandRanges: false,
@@ -103,7 +103,7 @@ You can set the following optional parameters:
 
 ### Argument validation options
 
-In an optional `parameters` array, you can set rules for your function's argument validation.
+In an optional `parameters` object, you can set rules for your function's argument validation.
 
 ```javascript
 // import FunctionPlugin
@@ -115,18 +115,18 @@ class CountHF extends FunctionPlugin {
 // define functions inside this plugin
   public static implementedFunctions = {
     'HYPER': {
-    // this method's functionality will be defined below
+      // this method's functionality will be defined below
       method: 'hyper',
-    // set your argument validation options below
-      parameters: [
-                    passSubtype: false,
-                    defaultValue: 10,
-                    optionalArg: false,
-                    minValue: 5,
-                    maxValue: 15,
-                    lessThan: 15,
-                    greaterThan: 5
-      ],
+      // set your argument validation options below
+      parameters: {
+        passSubtype: false,
+        defaultValue: 10,
+        optionalArg: false,
+        minValue: 5,
+        maxValue: 15,
+        lessThan: 15,
+        greaterThan: 5
+      },
     }
   };
 }
@@ -163,13 +163,13 @@ class CountHF extends FunctionPlugin {
 // define functions inside this plugin
   public static implementedFunctions = {
     'HYPER': {
-    // this method's functionality will be defined below
+      // this method's functionality will be defined below
       method: 'hyper',
     }
   };
   public static aliases = {
     'HYPER.ALIAS': 'HYPER'
-  //HYPER.ALIAS is now an alias to HYPER
+    //HYPER.ALIAS is now an alias to HYPER
   };
 }
 ```
@@ -225,15 +225,60 @@ public hyper(ast, state) {
 
 ### `runFunction()`
 
-At the end of your custom function definition, run the built-in `runFunction()` callback method.
+To test your function's configuration, run the built-in `runFunction()` function.
 
-The `runFunction()` method:
-- Validates arguments passed to your function, taking your [argument validation options](#argument-validation-options) into account
-- Validates your function's optional parameters
+The `runFunction()` function:
+- Validates your function's [optional parameter](#optional-parameters) settings
+- Validates your [argument validation options](#argument-validation-options)
 - Checks if values returned by your function are in the right format
 
 ```javascript
-this.runFunction();
+import { FunctionPlugin } from 'hyperformula';
+
+export class CountHF extends FunctionPlugin {
+
+  public static implementedFunctions = {
+    'HYPER': {
+      method: 'hyper',
+      // set your optional parameters
+      arrayFunction: false,
+      // set your argument validation options
+      parameters: {
+        passSubtype: false
+      }
+    }
+  };
+
+  public hyper(ast, state) {
+    this.runFunction(HYPER())
+    
+    return 'Hyperformula'.length
+    }
+  };
+```
+
+### Throwing errors
+
+If you want your custom function to throw an error, check the [API reference](../api) for the HyperFormula error types.
+
+For example, if you want to throw a custom error message when the user doesn't pass enough arguments to your function, use the [`CellError` class](../api/classes/cellerror.md):
+
+```javascript
+// import `CellError` and `ErrorType`
+import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
+
+public hyper({ args }) {
+    if (!args.length) {
+      // create a `CellError` instance with an `ErrorType` of `ERROR`, and your custom error message
+      const error = new CellError(ErrorType.ERROR, 'Not enough arguments!');
+      
+      return error;
+    }
+    
+    else {
+      return 'Hyperformula'.length;
+    }
+  };
 ```
 
 ## A complete example of the class definition
@@ -241,7 +286,6 @@ this.runFunction();
 To sum up, here is a complete example of a custom `CountHF` class:
 
 ```javascript
-
 import { FunctionPlugin } from 'hyperformula';
 
 export class CountHF extends FunctionPlugin {
@@ -255,8 +299,6 @@ export class CountHF extends FunctionPlugin {
   public hyper(ast, state) {
     return 'Hyperformula'.length
     }
-    
-  this.runFunction();
   };
 ```
 
