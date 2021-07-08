@@ -14,7 +14,7 @@ Sorting data in HyperFormula works similarly to Google Sheets and Microsoft Exce
 To sort rows, use the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) and [`setRowOrder`](../api/classes/hyperformula.md#setroworder) methods.
 
 ### Step 1: Choose a new row order
-Choose your required permutation of row numbers.
+Choose your required permutation of row indexes.
 
 For example, if you want to swap the first row with the third row, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
 
@@ -107,7 +107,7 @@ if (!isRowOrderOk) {
 To sort columns, use the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitpossibletosetcolumnorder) and [`setColumnOrder`](../api/classes/hyperformula.md#setcolumnorder) methods.
 
 ### Step 1: Choose a new column order
-Choose your required permutation of column numbers.
+Choose your required permutation of column indexes.
 
 For example, if you want to swap the first column with the third column, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
 
