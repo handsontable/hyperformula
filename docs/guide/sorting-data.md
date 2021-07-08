@@ -39,7 +39,7 @@ Before you change the row order, check if your specified row number permutation 
 
 Thanks to the [`isItPossibleTo*` methods](basic-operations.md#isitpossibleto-methods), you can check if an operation is allowed, and display an error message if it's not.
 
-Ue the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) method:
+Use the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) method:
 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
@@ -56,7 +56,7 @@ const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
 
 // display an error message
 if (!isRowOrderOk) {
-  messageUsedInUI = 'Sorry, you cannot sort rows like that.'
+  messageUsedInUI = 'Sorry, you cannot sort rows in this way.'
 }
 ```
 
@@ -76,9 +76,9 @@ let messageUsedInUI;
 const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
 
 if (!isRowOrderOk) {
-  messageUsedInUI = 'Sorry, you cannot sort rows like that.'
+  messageUsedInUI = 'Sorry, you cannot sort rows in this way.'
 } else {
-  // change the row order
+  // set the new row order
   setRowOrder(0, [2, 1, 0]);
 }
 // rows 0 and 2 swap places
@@ -131,7 +131,7 @@ Before you change the column order, check if your specified column number permut
 
 Thanks to the [`isItPossibleTo*` methods](basic-operations.md#isitpossibleto-methods), you can check if an operation is allowed, and display an error message if it's not.
 
-Ue the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitpossibletosetcolumnorder) method:
+Use the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitpossibletosetcolumnorder) method:
 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
@@ -147,7 +147,7 @@ const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
 
 // display an error message
 if (!isColumnOrderOk) {
-  messageUsedInUI = 'Sorry, you cannot sort columns like that.'
+  messageUsedInUI = 'Sorry, you cannot sort columns in this way.'
 }
 ```
 
@@ -166,9 +166,9 @@ let messageUsedInUI;
 const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
 
 if (!isColumnOrderOk) {
-  messageUsedInUI = 'Sorry, you cannot sort columns like that.'
+  messageUsedInUI = 'Sorry, you cannot sort columns in this way.'
 } else {
-  // change the column order
+  // set the new column order
   setColumnOrder(0, [2, 1, 0]);
 }
 // columns 0 and 2 swap places
