@@ -253,8 +253,8 @@ export class CountHF extends FunctionPlugin {
     this.runFunction(HYPER())
     
     return 'Hyperformula'.length
-    }
-  };
+  }
+};
 ```
 
 ### Throwing errors
