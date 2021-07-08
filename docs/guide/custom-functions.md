@@ -270,9 +270,7 @@ import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
 public hyper({ args }) {
     if (!args.length) {
       // create a `CellError` instance with an `ErrorType` of `ERROR`, and your custom error message
-      const error = new CellError(ErrorType.ERROR, 'Not enough arguments!');
-      
-      return error;
+      return new CellError(ErrorType.ERROR, 'Not enough arguments!');
     }
     
     else {
