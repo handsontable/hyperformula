@@ -4,10 +4,9 @@ In HyperFormula, you can sort data by reordering rows and columns.
 
 ## Sorting data in HyperFormula
 
-Sorting data in HyperFormula works similarly to Google Sheets and Microsoft Excel:
+To sort data in HyperFormula, you reorder rows (or columns), by providing your preferred permutation of row (or column) indexes.
 
-1. First, HyperFormula sorts formulas by their results (calculated values).
-2. When the sorting is done, each formula is recalculated with regard to its new position.
+You can implement any sorting algorithm that returns an array of row or column indexes.
 
 ## Sorting rows
 
