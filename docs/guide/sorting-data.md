@@ -1,17 +1,202 @@
 # Sorting data
 
+In HyperFormula, you can sort data by reordering rows and columns.
+
+## Sorting data in HyperFormula
+
+Sorting data in HyperFormula works similarly to Google Sheets and Microsoft Excel:
+
+1. First, HyperFormula sorts formulas by their results (calculated values).
+2. When the sorting is done, each formula is recalculated with regard to its new position.
+
+## Sorting rows
+
+To sort rows, use the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) and [`setRowOrder`](../api/classes/hyperformula.md#setroworder) methods.
+
+### Step 1: Choose a new row order
+Choose your required permutation of row numbers.
+
+For example, if you want to swap the first row with the third row, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
+
+```js
+// a HyperFormula instance with example data
+const hfInstance = HyperFormula.buildFromArray([
+ [1],
+ [2],
+ [4, 5],
+]);
+
+// we'll set the row order to [2, 1, 0] in the next steps
+```
+
 ::: tip
-HyperFormula does not support sorting natively.
+The [`setRowOrder`](../api/classes/hyperformula.md#setroworder) method accepts an array of numbers, so you can implement any function that returns an array with your required row order.
 :::
 
-However, a similar result can be achieved by doing multiple **move**
-operations for columns. It works in a similar way to spreadsheet
-software like Excel or Google Sheets. That means HyperFormula first
-sorts the formulas by their results (values). Then, when the sorting
-is done, the formulas are re-calculated with regard to their new
-position.
+### Step 2: Check if the new row order can be applied
 
-## Demo
+Before you change the row order, check if your specified row number permutation can actually be applied.
+
+Thanks to the [`isItPossibleTo*` methods](basic-operations.md#isitpossibleto-methods), you can check if an operation is allowed, and display an error message if it's not.
+
+Ue the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) method:
+
+```js
+const hfInstance = HyperFormula.buildFromArray([
+ [1],
+ [2],
+ [4, 5],
+]);
+
+// a variable to carry the user message
+let messageUsedInUI;
+
+// check if your permutation can be applied
+const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
+
+// display an error message
+if (!isRowOrderOk) {
+  messageUsedInUI = 'Sorry, you cannot sort rows like that.'
+}
+```
+
+### Step 3: Set the new row order
+
+If your specified row number permutation is valid, change the row order:
+
+```js
+const hfInstance = HyperFormula.buildFromArray([
+ [1],
+ [2],
+ [4, 5],
+]);
+
+let messageUsedInUI;
+
+const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
+
+if (!isRowOrderOk) {
+  messageUsedInUI = 'Sorry, you cannot sort rows like that.'
+} else {
+  // change the row order
+  setRowOrder(0, [2, 1, 0]);
+}
+// rows 0 and 2 swap places
+
+// returns:
+// [{
+//   address: { sheet: 0, col: 0, row: 2 },
+//   newValue: 1,
+// },
+// {
+//   address: { sheet: 0, col: 1, row: 2 },
+//   newValue: null,
+// },
+// {
+//   address: { sheet: 0, col: 0, row: 0 },
+//   newValue: 4,
+// },
+// {
+//   address: { sheet: 0, col: 1, row: 0 },
+//   newValue: 5,
+// }]
+```
+
+## Sorting columns
+
+To sort columns, use the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitpossibletosetcolumnorder) and [`setColumnOrder`](../api/classes/hyperformula.md#setcolumnorder) methods.
+
+### Step 1: Choose a new column order
+Choose your required permutation of column numbers.
+
+For example, if you want to swap the first column with the third column, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
+
+```js
+// a HyperFormula instance with example data
+const hfInstance = HyperFormula.buildFromArray([
+ [1, 2, 4],
+ [5]
+]);
+
+// we'll set the column order to [2, 1, 0] in the next steps
+```
+
+::: tip
+The [`setColumnOrder`](../api/classes/hyperformula.md#setcolumnorder) method accepts an array of numbers, so you can implement any function that returns an array with your required column order.
+:::
+
+### Step 2: Check if the new column order can be applied
+
+Before you change the column order, check if your specified column number permutation can actually be applied.
+
+Thanks to the [`isItPossibleTo*` methods](basic-operations.md#isitpossibleto-methods), you can check if an operation is allowed, and display an error message if it's not.
+
+Ue the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitpossibletosetcolumnorder) method:
+
+```js
+const hfInstance = HyperFormula.buildFromArray([
+ [1, 2, 4],
+ [5]
+]);
+
+// a variable to carry the user message
+let messageUsedInUI;
+
+// check if your permutation can be applied
+const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
+
+// display an error message
+if (!isColumnOrderOk) {
+  messageUsedInUI = 'Sorry, you cannot sort columns like that.'
+}
+```
+
+### Step 3: Set the new column order
+
+If your specified column number permutation is valid, change the column order:
+
+```js
+const hfInstance = HyperFormula.buildFromArray([
+ [1, 2, 4],
+ [5]
+]);
+
+let messageUsedInUI;
+
+const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
+
+if (!isColumnOrderOk) {
+  messageUsedInUI = 'Sorry, you cannot sort columns like that.'
+} else {
+  // change the column order
+  setColumnOrder(0, [2, 1, 0]);
+}
+// columns 0 and 2 swap places
+
+//returns:
+// [{
+//   address: { sheet: 0, col: 2, row: 0 },
+//   newValue: 1,
+// },
+// {
+//   address: { sheet: 0, col: 2, row: 1 },
+//   newValue: 5,
+// },
+// {
+//   address: { sheet: 0, col: 0, row: 0 },
+//   newValue: 4,
+// },
+// {
+//   address: { sheet: 0, col: 0, row: 1 },
+//   newValue: null,
+// }]
+```
+
+## Data sorting demo
+
+The demo below shows how to sort rows in ascending and descending order, based on the results (calculated values) of the cells in the second column.
+
+To see the code, select "Open Sandbox" in the frame's bottom right corner.
 
 <iframe
      src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.6.x/sorting?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
