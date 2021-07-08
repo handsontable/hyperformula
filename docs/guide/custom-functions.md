@@ -253,15 +253,15 @@ export class CountHF extends FunctionPlugin {
     this.runFunction(HYPER())
     
     return 'Hyperformula'.length
-    }
-  };
+  }
+};
 ```
 
-### Throwing errors
+### Returning errors
 
-If you want your custom function to throw an error, check the [API reference](../api) for the HyperFormula error types.
+If you want your custom function to return an error, check the [API reference](../api) for the HyperFormula [error types](types-of-errors.md).
 
-For example, if you want to throw a custom error message when the user doesn't pass enough arguments to your function, use the [`CellError` class](../api/classes/cellerror.md):
+For example, if you want to return a `#DIV/0!` error, use the [`CellError` class](../api/classes/cellerror.md), and the [DIV_BY_ZERO](../api/enums/errortype.md#div-by-zero) error type:
 
 ```javascript
 // import `CellError` and `ErrorType`
@@ -269,10 +269,8 @@ import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
 
 public hyper({ args }) {
     if (!args.length) {
-      // create a `CellError` instance with an `ErrorType` of `ERROR`, and your custom error message
-      const error = new CellError(ErrorType.ERROR, 'Not enough arguments!');
-      
-      return error;
+      // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
+      return new CellError(ErrorType.DIV_BY_ZERO);
     }
     
     else {
@@ -280,6 +278,8 @@ public hyper({ args }) {
     }
   };
 ```
+
+The error displays as `#DIV/0`, and gets properly translated.
 
 ## A complete example of the class definition
 
