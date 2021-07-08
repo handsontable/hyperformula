@@ -261,7 +261,11 @@ export class CountHF extends FunctionPlugin {
 
 If you want your custom function to return an error, check the [API reference](../api) for the HyperFormula [error types](types-of-errors.md).
 
-For example, if you want to return a `#DIV/0!` error, use the [`CellError` class](../api/classes/cellerror.md), and the [DIV_BY_ZERO](../api/enums/errortype.md#div-by-zero) error type:
+:::tip
+All HyperFormula [error types](types-of-errors.md) support optional custom error messages. Put them to good use: let your users know what caused the error and how to avoid it in the future.
+:::
+
+For example, if you want to return a `#DIV/0!` error with your custom error message, use the [`CellError` class](../api/classes/cellerror.md), and the [DIV_BY_ZERO](../api/enums/errortype.md#div-by-zero) error type:
 
 ```javascript
 // import `CellError` and `ErrorType`
@@ -270,7 +274,8 @@ import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
 public hyper({ args }) {
     if (!args.length) {
       // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
-      return new CellError(ErrorType.DIV_BY_ZERO);
+      // with your custom error message (optional)
+      return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
     }
     
     else {
@@ -280,6 +285,12 @@ public hyper({ args }) {
 ```
 
 The error displays as `#DIV/0`, and gets properly translated.
+
+#### Error localization
+
+Errors returned by methods such as `getCellValue` are wrapped in the [`DetailedCellError` type](../api/classes/detailedcellerror.md).
+
+`DetailedCellError` localizes the error based on your [internationalization settings](localizing-functions.md).
 
 ## A complete example of the class definition
 
