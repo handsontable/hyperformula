@@ -226,7 +226,7 @@ this operation, together with their absolute addresses and new values.
 
 ```javascript
 // column 0 and column 2 swap places
-const changes = hfInstance.setRowOrder(0, [2, 1, 0]);
+const changes = hfInstance.setColumnOrder(0, [2, 1, 0]);
 ```
 
 ## Cells
