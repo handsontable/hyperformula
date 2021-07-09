@@ -99,7 +99,7 @@ You can set the following optional parameters:
 | `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change. |
 | `isVolatile` | Boolean | If set to `true`, the function is [volatile](volatile-functions.md). |
 | `repeatLastArgs` | Number | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely. |
-| `vectorizationForbidden` | Boolean | If set to `true`, prevents the function from ever being vectorized (but it's up to your function implementation to properly handle vectorization). |
+| `vectorizationForbidden` | Boolean | If set to `true`, prevents the function from ever being [vectorized](arrays.md#passing-arrays-to-scalar-functions) (but it's up to your function implementation to properly handle vectorization). |
 
 ### Argument validation options
 
