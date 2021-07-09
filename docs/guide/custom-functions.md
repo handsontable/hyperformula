@@ -91,9 +91,9 @@ class CountHF extends FunctionPlugin {
 
 You can set the following optional parameters:
 
-| Option | Type | Description | Default |
+| Option | Type | Description |
 | --- | --- | --- | --- |
-| `arrayFunction` | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions. | 
+| `arrayFunction` | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions. |
 | `doesNotNeedArgumentsToBeComputed` | Boolean | If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.<br><br>Other arguments are properly evaluated. |
 | `expandRanges` | Boolean | If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments. |
 | `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change (e.g. when adding/removing rows or columns). |
