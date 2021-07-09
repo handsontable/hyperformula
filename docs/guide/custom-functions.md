@@ -208,7 +208,7 @@ export const myTranslations = {
   }
 ```
 
-## Implementing the function
+## Implementing your custom function
 
 For the simplicity of a basic example, you will not pass any
 arguments. However, this method imposes a particular structure to
@@ -225,11 +225,11 @@ public hyper(ast, state) {
 
 ### `runFunction()`
 
-To test your function's configuration, run the built-in `runFunction()` function.
+Wrap your custom function in the built-in `runFunction()` method.
 
-The `runFunction()` function:
-- Validates your function's [optional parameter](#optional-parameters) settings
-- Validates your [argument validation options](#argument-validation-options)
+The `runFunction()` method wraps your function's calculations and:
+- Validates the [optional parameter](#optional-parameters) settings
+- Validates the arguments against your [argument validation options](#argument-validation-options)
 - Checks if values returned by your function are in the right format
 
 ```javascript
@@ -250,9 +250,7 @@ export class CountHF extends FunctionPlugin {
   };
 
   public hyper(ast, state) {
-    this.runFunction(HYPER())
-    
-    return 'Hyperformula'.length
+    return this.runFunction(() => 'Hyperformula'.length)
   }
 };
 ```
