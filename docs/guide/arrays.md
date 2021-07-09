@@ -28,14 +28,22 @@ To enable the array arithmetic mode once, within a particular function or formul
 
 | Syntax | Example |
 | :--- | :--- |
-| `ARRAYFORMULA(your_formula)` | `=ARRAYFORMULA(A2:A5*B2:B5)` |
-| `ARRAYFORMULA(YOUR_FUNCTION(your_formula))` | `=ARRAYFORMULA(ISEVEN(A2:A5*10))` |
+| `ARRAYFORMULA(your_array_formula)` | `=ARRAYFORMULA(A2:A5*B2:B5)` |
+| `ARRAYFORMULA(YOUR_FUNCTION(your_array_formula))` | `=ARRAYFORMULA(ISEVEN(A2:A5*10))` |
 
 ### Enabling the array arithmetic mode globally
 
 To enable the array arithmetic mode by default, everywhere in your HyperFormula instance:
 
 * In your HyperFormula [configuration](../api/interfaces/configparams.html#usearrayarithmetic), set the `useArrayArithmetic` option to `true`.
+
+With the array arithmetic mode enabled globally, you can operate on arrays without using the `ARRAYFORMULA` function:
+
+```
+=A2:A5*B2:B5
+
+ISEVEN(A2:A5*10)
+```
 
 ## Array features
 
@@ -52,20 +60,18 @@ You can operate on arrays just like on single values.
 
 With the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled, each output array value is the result of your operation on the corresponding input array value.
 
-| Array arithmetic mode | Example |
-| :--- | :--- |
-| [Enabled locally](#enabling-the-array-arithmetic-mode-locally) | `=ARRAYFORMULA(A2:A5*B2:B5)` |
-| [Enabled globally](#enabling-the-array-arithmetic-mode-globally) | `=A2:A5*B2:B5` |
+```
+=ARRAYFORMULA(A2:A5*B2:B5)
+```
 
 ### Passing arrays to scalar functions
 You can pass arrays to functions that would normally accept [scalars](#about-arrays) (thanks to HyperFormula's **vectorization** feature).
 
 When you pass an array to a function that accepts [scalars](#about-arrays), that function produces an array on the output as well (with the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled).
 
-| Array arithmetic mode | Example |
-| :--- | :--- |
-| [Enabled locally](#enabling-the-array-arithmetic-mode-locally) | `=ARRAYFORMULA(ISEVEN(A2:A5*10))` |
-| [Enabled globally](#enabling-the-array-arithmetic-mode-globally) | `=ISEVEN(A2:A5*10)` |
+```
+=ARRAYFORMULA(ISEVEN(A2:A5*10))
+```
 
 ### Broadcasting
 You can broadcast a smaller input array across a larger output area (thanks to HyperFormula's **broadcasting** feature).
@@ -80,11 +86,6 @@ You can filter an array based on boolean arrays, using the `FILTER` function (wi
 | :--- | :--- |
 | `FILTER(your_array, BoolArray1[; BoolArray2[; ...]]` | `=ARRAYFORMULA(FILTER(A2:A5*10), {1,0,0,1})` |
 
-| Array arithmetic mode | Example |
-| :--- | :--- |
-| [Enabled locally](#enabling-the-array-arithmetic-mode-locally) | `=ARRAYFORMULA(FILTER(A2:A5*10), {1,0,0,1})` |
-| [Enabled globally](#enabling-the-array-arithmetic-mode-globally) | `=FILTER(A2:A5*10, {1,0,0,1})` |
-
 ### Constraining an array's size
 
 You can constrain the size of the output array, using the `ARRAY_CONSTRAIN` function (with the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled):
@@ -96,11 +97,6 @@ You can constrain the size of the output array, using the `ARRAY_CONSTRAIN` func
 If your specified output array size is smaller than the input array size, only the corresponding top-left cells of the input array are taken into account.
 
 If your specified output array size is larger or equal to the input array size, no change is made.
-
-| Array arithmetic mode | Example |
-| :--- | :--- |
-| [Enabled locally](#enabling-the-array-arithmetic-mode-locally) | `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5,2,2))` |
-| [Enabled globally](#enabling-the-array-arithmetic-mode-globally) | `=ARRAY_CONSTRAIN(A2:E5,2,2)` |
 
 ## Array rules
 
