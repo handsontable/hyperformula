@@ -91,12 +91,12 @@ class CountHF extends FunctionPlugin {
 
 You can set the following optional parameters:
 
-| Option | Type | Description |
-| --- | --- | --- |
-| `arrayFunction` | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions. |
+| Option | Type | Description | Default |
+| --- | --- | --- | --- |
+| `arrayFunction` | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions. | 
 | `doesNotNeedArgumentsToBeComputed` | Boolean | If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.<br><br>Other arguments are properly evaluated. |
 | `expandRanges` | Boolean | If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments. |
-| `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change. |
+| `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change (e.g. when adding/removing rows or columns). |
 | `isVolatile` | Boolean | If set to `true`, the function is [volatile](volatile-functions.md). |
 | `repeatLastArgs` | Number | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely. |
 | `vectorizationForbidden` | Boolean | If set to `true`, prevents the function from ever being [vectorized](arrays.md#passing-arrays-to-scalar-functions) (but it's up to your function implementation to properly handle vectorization). |

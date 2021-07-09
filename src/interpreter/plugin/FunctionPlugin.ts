@@ -77,7 +77,8 @@ export interface FunctionMetadata {
   /**
    * Engine.
    * 
-   * If set to `true`, the function gets recalculated with each sheet shape change.
+   * If set to `true`, the function gets recalculated with each sheet shape change
+   * (e.g. when adding/removing rows or columns).
    */
   isDependentOnSheetStructureChange?: boolean,
   /**
