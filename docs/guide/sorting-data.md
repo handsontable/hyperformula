@@ -13,7 +13,7 @@ You can implement any sorting algorithm that returns an array of row or column i
 To sort rows, use the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) and [`setRowOrder`](../api/classes/hyperformula.md#setroworder) methods.
 
 ### Step 1: Choose a new row order
-Choose your required permutation of row indexes.
+Choose your required permutation of row indexes. 
 
 For example, if you want to swap the first row with the third row, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
 
