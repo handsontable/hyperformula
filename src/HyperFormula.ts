@@ -1299,8 +1299,9 @@ export class HyperFormula implements TypedEmitter {
    *  [2],
    *  [4, 5],
    * ]);
-   *
-   * // should set swap rows 0 and 2 in place, returns:
+   * // rows 0 and 2 swap places
+   * 
+   * // returns:
    * // [{
    * //   address: { sheet: 0, col: 0, row: 2 },
    * //   newValue: 1,
@@ -1469,8 +1470,9 @@ export class HyperFormula implements TypedEmitter {
    *  [1, 2, 4],
    *  [5]
    * ]);
-   *
-   * // should set swap columns 0 and 2 in place, returns:
+   * // columns 0 and 2 swap places
+   * 
+   * // returns:
    * // [{
    * //   address: { sheet: 0, col: 2, row: 0 },
    * //   newValue: 1,
