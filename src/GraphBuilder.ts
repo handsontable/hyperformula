@@ -49,10 +49,10 @@ export class GraphBuilder {
   /**
    * Builds graph.
    */
-  public buildGraph(sheets: Sheets) {
-    const dependencies = this.buildStrategy.run(sheets)
+  public buildGraph(sheets: Sheets, stats: Statistics) {
+    const dependencies = stats.measure(StatType.COLLECT_DEPENDENCIES, () => this.buildStrategy.run(sheets))
     this.dependencyGraph.getAndClearContentChanges()
-    this.processDependencies(dependencies)
+    stats.measure(StatType.PROCESS_DEPENDENCIES, () => this.processDependencies(dependencies))
   }
 
   private processDependencies(dependencies: Dependencies) {

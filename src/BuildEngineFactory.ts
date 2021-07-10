@@ -80,7 +80,7 @@ export class BuildEngineFactory {
     })
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, arraySizePredictor)
-      graphBuilder.buildGraph(sheets)
+      graphBuilder.buildGraph(sheets, stats)
     })
 
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
