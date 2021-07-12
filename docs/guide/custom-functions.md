@@ -136,7 +136,7 @@ You can set the following argument validation options:
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `passSubtype` | Boolean | If set to `true`, arguments need to be passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`) |
+| `passSubtype` | Boolean | If set to `true`, arguments are passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`) |
 | `defaultValue` | `InternalScalarValue` \| `RawScalarValue` | If an argument is missing, its value defaults to `defaultValue`. |
 | `optionalArg` | Boolean | If set to `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>This is logically equivalent to setting `defaultValue` to `undefined`. |
 | `minValue` | Number | If set, numerical arguments need to be greater than or equal to `minValue`. |
