@@ -39,7 +39,7 @@ To enable the array arithmetic mode by default, everywhere in your HyperFormula 
 
 With the array arithmetic mode enabled globally, you can operate on arrays without using the `ARRAYFORMULA` function:
 
-```
+```js
 =A2:A5*B2:B5
 
 ISEVEN(A2:A5*10)
@@ -47,40 +47,63 @@ ISEVEN(A2:A5*10)
 
 ## Array features
 
-HyperFormula lets you:
+Thanks to HyperFormula's built-in array features, you can:
 * [Operate on arrays](#operating-on-arrays) just like on [scalars](#about-arrays)
 * [Pass arrays to functions](#passing-arrays-to-scalar-functions) that accept [scalars](#about-arrays)
-* [Broadcast](#broadcasting) a smaller input array across a larger output area
-* [Filter an array](#filtering-an-array) based on boolean arrays
-* [Constrain](#constraining-an-array-s-size) an array's size
+* [Broadcast](#broadcasting) smaller input arrays across larger output areas
+
+You can also:
+* Use the `FILTER` function to [filter an array](#filtering-an-array), based on boolean arrays
+* Use the `ARRAY_CONSTRAIN` function to [constrain an array's size](#constraining-an-array-s-size)
 
 ### Operating on arrays
 
 You can operate on arrays just like on single values.
 
-With the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled, each output array value is the result of your operation on the corresponding input array value.
+When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, each output array value is the result of your operation on the corresponding input array value.
 
-```
+```js
 =ARRAYFORMULA(A2:A5*B2:B5)
+
+// calculates:
+// =A2*B2
+// =A3*B3
+// =A4*B4
+// =A5*B5
 ```
 
 ### Passing arrays to scalar functions
 You can pass arrays to functions that would normally accept [scalars](#about-arrays) (thanks to HyperFormula's **vectorization** feature).
 
-When you pass an array to a function that accepts [scalars](#about-arrays), that function produces an array on the output as well (with the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled).
+When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, and you pass an array to a [scalar](#about-arrays) function, that function produces an array on the output as well.
 
-```
+```js
 =ARRAYFORMULA(ISEVEN(A2:A5*10))
+
+// calculates:
+// =ISEVEN(A2*10)
+// =ISEVEN(A3*10)
+// =ISEVEN(A4*10)
+// =ISEVEN(A5*10)
 ```
 
-### Broadcasting
-You can broadcast a smaller input array across a larger output area (thanks to HyperFormula's **broadcasting** feature).
+#### Broadcasting
 
-With the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled, the smaller array is automatically “broadcast” across the larger array so that both arrays have the same dimensions.
+If an input array has a dimension of `1`, it's automatically repeated ("broadcast") on that dimension to match the size of the output.
+
+```js
+=ARRAYFORMULA(ISEVEN(A2:A5*B2))
+
+// calculates:
+// =ISEVEN(A2*B2)
+// =ISEVEN(A3*B2)
+// =ISEVEN(A4*B2)
+// =ISEVEN(A5*B2)
+```
 
 ### Filtering an array
 
-You can filter an array based on boolean arrays, using the `FILTER` function (with the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled):
+When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can filter an array, based on boolean arrays, using the `FILTER` function:
 
 | Syntax | Example |
 | :--- | :--- |
@@ -88,7 +111,7 @@ You can filter an array based on boolean arrays, using the `FILTER` function (wi
 
 ### Constraining an array's size
 
-You can constrain the size of the output array, using the `ARRAY_CONSTRAIN` function (with the [array arithmetic mode](#enabling-the-array-arithmetic-mode) enabled):
+When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can constrain the size of the output array, using the `ARRAY_CONSTRAIN` function:
 
 | Syntax | Example |
 | :--- | :--- |
