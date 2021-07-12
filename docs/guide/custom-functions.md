@@ -137,12 +137,22 @@ You can set the following argument validation options:
 | Parameter | Type | Description |
 | --- | --- | --- |
 | `passSubtype` | Boolean | If set to `true`, arguments are passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`) |
-| `defaultValue` | `InternalScalarValue` \| `RawScalarValue` | If an argument is missing, its value defaults to `defaultValue`. |
-| `optionalArg` | Boolean | If set to `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>This is logically equivalent to setting `defaultValue` to `undefined`. |
+| `defaultValue` | `InternalScalarValue` \| `RawScalarValue` | If set to any value: if an argument is missing, its value defaults to `defaultValue`. |
+| `optionalArg` | Boolean | If set to `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>This is equivalent to setting `defaultValue` to `undefined`. |
 | `minValue` | Number | If set, numerical arguments need to be greater than or equal to `minValue`. |
 | `maxValue` | Number | If set, numerical arguments need to be less than or equal to `maxValue`. |
 | `lessThan` | Number | If set, numerical argument need to be less than `lessThan`. |
 | `greaterThan` | Number | If set, numerical argument need to be greater than `greaterThan`. |
+
+#### Handling missing arguments
+
+The `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
+
+When you set `defaultValue` to any value, the `optionalArg` setting doesn't matter.
+
+But, the `defaultValue` option automatically replaces any missing arguments with `defaultValue`, so your custom function is not aware of the actual number of valid arguments passed.
+
+If you don't want to set any `defaultValue` (because, for example, your function's behavior depends on the number of valid arguments passed), you can use the `optionalArg` the setting.
 
 ## Aliases
 
