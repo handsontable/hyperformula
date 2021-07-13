@@ -397,9 +397,7 @@ Before you can use the newly created function, you need to
 register it by using `registerFunctionPlugin` like so:
 
 ```javascript
-import { myTranslations } from '/myTranslationFile';
-
-HyperFormula.registerFunctionPlugin(CountHF, myTranslations);
+HyperFormula.registerFunctionPlugin(CountHF);
 ```
 
 ## Using a custom function
@@ -410,13 +408,12 @@ along with translations.
 ```javascript
 import Hyperformula, { plPL } from 'hyperformula';
 import { CountHF } from './file_with_your_custom_function';
-import { myTranslations } from '/myTranslationFile';
 
 // register the language
 HyperFormula.registerLanguage('plPL', plPL);
 
 // register your custom plugin and the translation
-HyperFormula.registerFunctionPlugin(CountHF, myTranslations);
+HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
 
 // build HF instance where you can use the function directly
 const hfInstance = HyperFormula.buildFromArray([['=HAJPER()']]);
