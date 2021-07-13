@@ -12,7 +12,7 @@ describe('Matrix size check tests', () => {
   const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
   /* eslint-disable */
   // @ts-ignore
-  const interpreter = new Interpreter(undefined, undefined, config, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor)
+  const interpreter = new Interpreter(config, undefined, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor, undefined)
   it('check', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(A1:B3,C1:E2)', adr('A1')).ast
@@ -149,7 +149,7 @@ describe('Matrix size check tests, with different config', () => {
   const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
   /* eslint-disable */
   // @ts-ignore
-  const interpreter = new Interpreter(undefined, undefined, config, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor)
+  const interpreter = new Interpreter(config, undefined, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor, undefined)
 
   it('check binary array arithmetic', () => {
     const parser = buildEmptyParserWithCaching(config)

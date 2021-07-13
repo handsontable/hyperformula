@@ -39,7 +39,6 @@ export class GraphBuilder {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly cellContentParser: CellContentParser,
-    private readonly config: Config,
     private readonly stats: Statistics,
     private readonly arraySizePredictor: ArraySizePredictor,
   ) {

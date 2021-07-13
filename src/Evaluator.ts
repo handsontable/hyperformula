@@ -26,16 +26,15 @@ import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
-  private lazilyTransformingAstService: LazilyTransformingAstService
 
   constructor(
-    private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
     public readonly interpreter: Interpreter,
+    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly columnSearch: ColumnSearchStrategy,
   ) {
-    this.lazilyTransformingAstService = this.dependencyGraph.lazilyTransformingAstService
   }
 
   public run(): void {

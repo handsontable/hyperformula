@@ -568,8 +568,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return new CellError(ErrorType.NUM)
         }
 
-        const startDate = this.interpreter.dateHelper.numberToSimpleDate(settlement)
-        const endDate = this.interpreter.dateHelper.numberToSimpleDate(maturity)
+        const startDate = this.interpreter.dateTimeHelper.numberToSimpleDate(settlement)
+        const endDate = this.interpreter.dateTimeHelper.numberToSimpleDate(maturity)
         if(endDate.year > startDate.year+1 || (endDate.year === startDate.year+1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
           return new CellError(ErrorType.NUM)
         }
@@ -594,8 +594,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return new CellError(ErrorType.NUM)
         }
 
-        const startDate = this.interpreter.dateHelper.numberToSimpleDate(settlement)
-        const endDate = this.interpreter.dateHelper.numberToSimpleDate(maturity)
+        const startDate = this.interpreter.dateTimeHelper.numberToSimpleDate(settlement)
+        const endDate = this.interpreter.dateTimeHelper.numberToSimpleDate(maturity)
         if(endDate.year > startDate.year+1 || (endDate.year === startDate.year+1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
           return new CellError(ErrorType.NUM)
         }
@@ -620,8 +620,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return new CellError(ErrorType.NUM)
         }
 
-        const startDate = this.interpreter.dateHelper.numberToSimpleDate(settlement)
-        const endDate = this.interpreter.dateHelper.numberToSimpleDate(maturity)
+        const startDate = this.interpreter.dateTimeHelper.numberToSimpleDate(settlement)
+        const endDate = this.interpreter.dateTimeHelper.numberToSimpleDate(maturity)
         if(endDate.year > startDate.year+1 || (endDate.year === startDate.year+1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
           return new CellError(ErrorType.NUM)
         }

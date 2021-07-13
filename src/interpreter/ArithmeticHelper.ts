@@ -47,7 +47,7 @@ export class ArithmeticHelper {
   private readonly actualEps: number
   constructor(
     private readonly config: Config,
-    private readonly dateTimeHelper: DateTimeHelper,
+    public readonly dateTimeHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
     this.collator = collatorFromConfig(config)

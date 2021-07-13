@@ -44,23 +44,21 @@ import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
   private gpu?: any
-  public readonly arithmeticHelper: ArithmeticHelper
   public readonly criterionBuilder: CriterionBuilder
 
   constructor(
+    public readonly config: Config,
     public readonly dependencyGraph: DependencyGraph,
     public readonly columnSearch: ColumnSearchStrategy,
-    public readonly config: Config,
     public readonly stats: Statistics,
-    public readonly dateHelper: DateTimeHelper,
-    public readonly numberLiteralsHelper: NumberLiteralHelper,
+    public readonly arithmeticHelper: ArithmeticHelper,
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
     public readonly serialization: Serialization,
     public readonly arraySizePredictor: ArraySizePredictor,
+    public readonly dateTimeHelper: DateTimeHelper
   ) {
     this.functionRegistry.initializePlugins(this)
-    this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
     this.criterionBuilder = new CriterionBuilder(config)
   }
 
