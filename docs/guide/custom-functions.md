@@ -343,9 +343,7 @@ public hyper({ args }) {
     return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
   }
   
-  else {
-    return this.runFunction(() => 'Hyperformula'.length)
-  }
+  return this.runFunction(() => 'Hyperformula'.length)
 }
 ```
 
@@ -390,9 +388,7 @@ export class CountHF extends FunctionPlugin {
       return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
     }
     
-    else {
-      return this.runFunction(() => 'Hyperformula'.length)
-    }
+    return this.runFunction(() => 'Hyperformula'.length)
   }
 }
 ```
