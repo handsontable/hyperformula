@@ -4,6 +4,7 @@
  */
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
+import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
@@ -55,7 +56,8 @@ export class Interpreter {
     public readonly numberLiteralsHelper: NumberLiteralHelper,
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
-    public readonly serialization: Serialization
+    public readonly serialization: Serialization,
+    public readonly arraySizePredictor: ArraySizePredictor,
   ) {
     this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)

@@ -15,6 +15,7 @@ import {Exporter} from './Exporter'
 import {GraphBuilder} from './GraphBuilder'
 import {UIElement} from './i18n'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
+import {Interpreter} from './interpreter/Interpreter'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {NamedExpressions} from './NamedExpressions'
@@ -78,18 +79,20 @@ export class BuildEngineFactory {
       crudOperations.ensureItIsPossibleToAddNamedExpression(entry.name, entry.expression, entry.scope)
       crudOperations.operations.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
     })
-    stats.measure(StatType.GRAPH_BUILD, () => {
-      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, arraySizePredictor)
-      graphBuilder.buildGraph(sheets, stats)
-    })
-
     lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
     lazilyTransformingAstService.parser = parser
 
     const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName, lazilyTransformingAstService)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)
+    const interpreter = new Interpreter(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization, arraySizePredictor)
+
+    stats.measure(StatType.GRAPH_BUILD, () => {
+      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, arraySizePredictor)
+      graphBuilder.buildGraph(sheets, stats)
+    })
+
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, interpreter)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)

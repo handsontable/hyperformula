@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
@@ -63,6 +64,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
     'SWITCH': {
       method: 'switch',
+      arraySizeMethod: 'switchArraySize',
       parameters: [
           {argumentType: ArgumentTypes.NOERROR},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
@@ -194,6 +196,18 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         return new CellError(ErrorType.NA, ErrorMessage.NoDefault)
       }
     })
+  }
+
+  public switchArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length === 0) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('SWITCH')
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+
+    const [{width, height}] = subChecks
+    return new ArraySize(width, height)
   }
 
   public iferror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {

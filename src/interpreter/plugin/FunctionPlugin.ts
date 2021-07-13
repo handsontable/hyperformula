@@ -4,6 +4,7 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {ArraySize, ArraySizePredictor} from '../../ArraySize'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
 import {DependencyGraph} from '../../DependencyGraph'
@@ -65,6 +66,10 @@ export interface FunctionMetadata {
    * Engine.
    */
   method: string,
+  /**
+   * Engine.
+   */
+  arraySizeMethod?: string,
   /**
    * Engine.
    */
@@ -187,8 +192,10 @@ export interface FunctionArgument {
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
 
+export type PluginArraySizeFunctionType = (ast: ProcedureAst, state: InterpreterState) => ArraySize
+
 export type FunctionPluginTypecheck<T> = {
-  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : never
+  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : T[K] extends PluginArraySizeFunctionType ? T[K] : never
 }
 
 /**
@@ -207,6 +214,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected readonly columnSearch: SearchStrategy
   protected readonly config: Config
   protected readonly serialization: Serialization
+  protected readonly arraySizePredictor: ArraySizePredictor
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
@@ -214,10 +222,15 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
     this.serialization = interpreter.serialization
+    this.arraySizePredictor = interpreter.arraySizePredictor
   }
 
   protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
     return this.interpreter.evaluateAst(ast, state)
+  }
+
+  protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
+    return this.arraySizePredictor.checkArraySizeForAst(ast, state)
   }
 
   protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean][] {

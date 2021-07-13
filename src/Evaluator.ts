@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
+import {ArraySizePredictor} from './ArraySize'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
@@ -25,7 +26,6 @@ import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
-  private interpreter: Interpreter
   private lazilyTransformingAstService: LazilyTransformingAstService
 
   constructor(
@@ -33,13 +33,8 @@ export class Evaluator {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
-    public readonly dateHelper: DateTimeHelper,
-    private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly functionRegistry: FunctionRegistry,
-    private readonly namedExpressions: NamedExpressions,
-    private readonly serialization: Serialization,
+    public readonly interpreter: Interpreter,
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
     this.lazilyTransformingAstService = this.dependencyGraph.lazilyTransformingAstService
   }
 

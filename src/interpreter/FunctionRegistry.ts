@@ -3,13 +3,20 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySizePredictor} from '../ArraySize'
 import {Config} from '../Config'
 import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
 import {Interpreter} from './Interpreter'
-import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition, PluginFunctionType} from './plugin/FunctionPlugin'
+import {
+  FunctionMetadata,
+  FunctionPlugin,
+  FunctionPluginDefinition,
+  PluginArraySizeFunctionType,
+  PluginFunctionType
+} from './plugin/FunctionPlugin'
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
@@ -153,6 +160,7 @@ export class FunctionRegistry {
 
   private readonly instancePlugins: Map<string, FunctionPluginDefinition>
   private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
+  private readonly arraySizeFunctions: Map<string, [string, FunctionPlugin]> = new Map()
 
   private readonly volatileFunctions: Set<string> = new Set()
   private readonly arrayFunctions: Set<string> = new Set()
@@ -188,8 +196,13 @@ export class FunctionRegistry {
         foundPluginInstance = new plugin(interpreter)
         instances.push(foundPluginInstance)
       }
-      const methodName = validateAndReturnMetadataFromName(functionId, plugin).method
+      const metadata = validateAndReturnMetadataFromName(functionId, plugin)
+      const methodName = metadata.method
       this.functions.set(functionId, [methodName, foundPluginInstance])
+      const arraySizeMethodName = metadata.arraySizeMethod
+      if(arraySizeMethodName !== undefined) {
+        this.arraySizeFunctions.set(functionId, [arraySizeMethodName, foundPluginInstance])
+      }
     }
   }
 
@@ -205,6 +218,16 @@ export class FunctionRegistry {
     if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
       const [pluginFunction, pluginInstance] = pluginEntry
       return (ast, state) => (pluginInstance as any as Record<string, PluginFunctionType>)[pluginFunction](ast, state)
+    } else {
+      return undefined
+    }
+  }
+
+  public getArraySizeFunction(functionId: string): Maybe<PluginArraySizeFunctionType> {
+    const pluginEntry = this.arraySizeFunctions.get(functionId)
+    if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
+      const [pluginArraySizeFunction, pluginInstance] = pluginEntry
+      return (ast, state) => (pluginInstance as any as Record<string, PluginArraySizeFunctionType>)[pluginArraySizeFunction](ast, state)
     } else {
       return undefined
     }

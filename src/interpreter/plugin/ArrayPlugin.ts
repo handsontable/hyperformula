@@ -3,9 +3,10 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
@@ -16,6 +17,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public static implementedFunctions = {
     'ARRAYFORMULA': {
       method: 'arrayformula',
+      arraySizeMethod: 'arrayformulaArraySize',
       arrayFunction: true,
       parameters: [
         {argumentType: ArgumentTypes.ANY}
@@ -23,6 +25,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
     'ARRAY_CONSTRAIN': {
       method: 'arrayconstrain',
+      arraySizeMethod: 'arrayconstrainArraySize',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.INTEGER, minValue: 1},
@@ -32,6 +35,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
     'FILTER': {
       method: 'filter',
+      arraySizeMethod: 'filterArraySize',
       arrayFunction: true,
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
@@ -45,6 +49,17 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return this.runFunction(ast.args, state, this.metadata('ARRAYFORMULA'), (value) => value)
   }
 
+  public arrayformulaArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length !== 1) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('ARRAYFORMULA')
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+
+    return subChecks[0]
+  }
+
   public arrayconstrain(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARRAY_CONSTRAIN'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
       numRows = Math.min(numRows, range.height())
@@ -56,6 +71,27 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       }
       return SimpleRangeValue.onlyValues(ret)
     })
+  }
+
+  public arrayconstrainArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length !== 3) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('ARRAY_CONSTRAIN')
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+
+    let {height, width} = subChecks[0]
+    if (ast.args[1].type === AstNodeType.NUMBER) {
+      height = Math.min(height, ast.args[1].value)
+    }
+    if (ast.args[2].type === AstNodeType.NUMBER) {
+      width = Math.min(width, ast.args[2].value)
+    }
+    if (height < 1 || width < 1 || !Number.isInteger(height) || !Number.isInteger(width)) {
+      return ArraySize.error()
+    }
+    return new ArraySize(width, height)
   }
 
   public filter(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -95,5 +131,19 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
       }
     })
+  }
+
+  public filterArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length <= 1) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('FILTER')
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+
+    const width = Math.max(...(subChecks).map(val => val.width))
+    const height = Math.max(...(subChecks).map(val => val.height))
+    return new ArraySize(width, height)
+
   }
 }
