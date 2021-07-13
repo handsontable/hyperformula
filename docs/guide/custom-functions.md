@@ -397,7 +397,7 @@ Before you can use the newly created function, you need to
 register it by using `registerFunctionPlugin` like so:
 
 ```javascript
-HyperFormula.registerFunctionPlugin(CountHF);
+HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
 ```
 
 ## Using a custom function
