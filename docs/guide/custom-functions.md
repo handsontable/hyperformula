@@ -136,7 +136,7 @@ You can set the following argument validation options:
 
 The `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
 
-When you set `defaultValue` to any value, the `optionalArg` setting doesn't matter.
+Setting a `defaultValue` for an argument always makes that argument optional.
 
 But, the `defaultValue` option automatically replaces any missing arguments with `defaultValue`, so your custom function is not aware of the actual number of valid arguments passed.
 
