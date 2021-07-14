@@ -35,7 +35,7 @@ If you use the free non-commercial license, switch to the GPLv3 license or purch
 
 If you use a commercial license, you don't need to make any changes.
 
-## Step 2: Change sheet-related methods from `sheetName` to `sheetId`
+## Step 2: Change `sheetName` to `sheetId`
 
 Most sheet-related methods now take the `sheetID` number parameter instead of the `sheetName` string parameter.
 
@@ -102,7 +102,7 @@ Adapt to the following changes in configuration option names, API method names a
 
 Switch from the matrix formula notation to the array formula notation.
 
-For details on the array formula notation, go [here](arrays.md).
+For more information on the array formula notation, go [here](arrays.md).
 
 Before:
 ```js
@@ -165,7 +165,8 @@ const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
 ]);
 
-// should return: [ [ 2 ] ]
+// takes `simpleCellAddress`, `width`, and `height`
+// returns: [ [ 2 ] ]
 const clipboardContent = hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
 ```
 
@@ -175,7 +176,8 @@ const hfInstance = HyperFormula.buildFromArray([
  ['1', '2'],
 ]);
 
-// should return: [ [ 2 ] ]
+// takes `simpleCellRange`
+// returns: [ [ 2 ] ]
 const clipboardContent = hfInstance.copy({ start: { sheet: 0, col: 1, row: 0 }, end: { sheet: 0, col: 1, row: 0 } });
 ```
 
