@@ -186,7 +186,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         if (args[i] instanceof CellError) {
           continue
         }
-        if (this.interpreter.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
+        if (this.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
           return args[i + 1]
         }
       }
@@ -197,18 +197,6 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
       }
     })
   }
-
-  // public switchArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
-  //   if (ast.args.length === 0) {
-  //     return ArraySize.error()
-  //   }
-  //
-  //   const metadata = this.metadata('SWITCH')
-  //   const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
-  //
-  //   const [{width, height}] = subChecks
-  //   return new ArraySize(width, height)
-  // }
 
   public iferror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IFERROR'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
