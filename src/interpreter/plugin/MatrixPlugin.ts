@@ -27,10 +27,6 @@ export interface KernelFunctionThis {
   },
 }
 
-function arraySizeForTranspose(inputSize: ArraySize): ArraySize {
-  return new ArraySize(inputSize.height, inputSize.width)
-}
-
 function arraySizeForMultiplication(leftArraySize: ArraySize, rightArraySize: ArraySize): ArraySize {
   return new ArraySize(rightArraySize.width, leftArraySize.height)
 }
@@ -281,7 +277,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
 
     const [size] = subChecks
 
-    return arraySizeForTranspose(size)
+    return new ArraySize(size.height, size.width)
   }
 
   private createCpuKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {
