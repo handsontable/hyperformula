@@ -784,7 +784,7 @@ describe('Graph dependency topological ordering module', () => {
   })
 })
 
-describe('#getFillRangeData', () => {
+describe('#getFillRangeData from corner source', () => {
   it('should properly apply wrap-around #1', () => {
     const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
@@ -804,5 +804,28 @@ describe('#getFillRangeData', () => {
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('A1'), 3, 3))
     ).toEqual([['2', '=$A$1', '2'], ['=#REF!', 1, '=A1'], ['2', '=$A$1', '2'] ])
+  })
+})
+
+describe('#getFillRangeData from target source', () => {
+  it('should properly apply wrap-around #1', () => {
+    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+
+    expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('C3'), 3, 3), true)
+    ).toEqual([[1, '=B2', 1], ['=$A$1', '2', '=$A$1'], [1, '=B4', 1]])
+  })
+
+  it('should properly apply wrap-around #2', () => {
+    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+
+    expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('B2'), 3, 3), true)
+    ).toEqual([[1, '=A1', 1], ['=$A$1', '2', '=$A$1'], [1, '=A3', 1]])
+  })
+
+  it('should properly apply wrap-around #3', () => {
+    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+
+    expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('A1'), 3, 3), true)
+    ).toEqual([[1, '=#REF!', 1], ['=$A$1', '2', '=$A$1'], [1, '=#REF!', 1]])
   })
 })
