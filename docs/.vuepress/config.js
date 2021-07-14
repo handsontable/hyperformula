@@ -220,6 +220,14 @@ module.exports = {
           ]
         },
         {
+          title: 'Upgrade and migration',
+          collapsable: false,
+          children: [
+            ['/guide/release-notes', 'Release notes'],
+            ['/guide/migration-from-0.6-to-1.0', 'Migrating from 0.6 to 1.0'],
+          ]
+        },
+        {
           title: 'Miscellaneous',
           collapsable: false,
           children: [
@@ -229,7 +237,7 @@ module.exports = {
             ['/guide/acknowledgements', 'Acknowledgments'],
             ['/guide/contact', 'Contact'],
           ]
-        }
+        },
       ],
     },
   }
