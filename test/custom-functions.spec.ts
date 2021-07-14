@@ -49,11 +49,11 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
   }
 
   public arrayfoo(_ast: ProcedureAst, _state: InterpreterState): SimpleRangeValue {
-    return SimpleRangeValue.onlyValues([[1,1],[1,1]])
+    return SimpleRangeValue.onlyValues([[1, 1], [1, 1]])
   }
 
   public arraysizeFoo(_ast: ProcedureAst, _state: InterpreterState): ArraySize {
-    return new ArraySize(2,2)
+    return new ArraySize(2, 2)
   }
 }
 
@@ -187,7 +187,7 @@ describe('Register static custom plugin', () => {
       ['=ARRAYFOO()']
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[1,1],[1,1]])
+    expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
   })
 
   it('should override one formula with custom implementation', () => {
