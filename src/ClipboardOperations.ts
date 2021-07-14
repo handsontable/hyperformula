@@ -10,9 +10,7 @@ import {Config} from './Config'
 import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Operations} from './Operations'
-import {ParserWithCaching} from './parser'
 import {ParsingError} from './parser/Ast'
 
 export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty | ClipboardCellParsingError

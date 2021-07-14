@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {ArraySizePredictor} from '../ArraySize'
 import {Config} from '../Config'
 import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {HyperFormula} from '../HyperFormula'

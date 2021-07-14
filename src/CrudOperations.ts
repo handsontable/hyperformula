@@ -4,7 +4,6 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {ArraySizePredictor} from './ArraySize'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
@@ -40,7 +39,6 @@ import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, Rem
 import {ParserWithCaching} from './parser'
 import {findBoundaries, validateAsSheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
-import {Statistics} from './statistics'
 import {
   AddColumnsUndoEntry,
   AddNamedExpressionUndoEntry,

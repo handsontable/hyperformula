@@ -8,7 +8,6 @@ import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {Config} from './Config'
 import {
   ArrayVertex,
   DependencyGraph,
