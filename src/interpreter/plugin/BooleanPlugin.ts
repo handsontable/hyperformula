@@ -64,7 +64,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
     'SWITCH': {
       method: 'switch',
-      arraySizeMethod: 'switchArraySize',
+      // arraySizeMethod: 'switchArraySize',
       parameters: [
           {argumentType: ArgumentTypes.NOERROR},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
@@ -198,17 +198,17 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
-  public switchArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
-    if (ast.args.length === 0) {
-      return ArraySize.error()
-    }
-
-    const metadata = this.metadata('SWITCH')
-    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
-
-    const [{width, height}] = subChecks
-    return new ArraySize(width, height)
-  }
+  // public switchArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+  //   if (ast.args.length === 0) {
+  //     return ArraySize.error()
+  //   }
+  //
+  //   const metadata = this.metadata('SWITCH')
+  //   const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+  //
+  //   const [{width, height}] = subChecks
+  //   return new ArraySize(width, height)
+  // }
 
   public iferror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IFERROR'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
