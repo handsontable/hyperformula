@@ -64,7 +64,6 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
     'SWITCH': {
       method: 'switch',
-      // arraySizeMethod: 'switchArraySize',
       parameters: [
           {argumentType: ArgumentTypes.NOERROR},
           {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
