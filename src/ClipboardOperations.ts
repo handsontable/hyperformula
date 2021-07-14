@@ -76,7 +76,7 @@ class Clipboard {
 export class ClipboardOperations {
   public clipboard?: Clipboard
   private maxRows: number
-  private maxColumns : number
+  private maxColumns: number
 
   constructor(
     config: Config,

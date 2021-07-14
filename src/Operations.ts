@@ -157,7 +157,7 @@ export interface MoveCellsResult {
 export class Operations {
   private changes: ContentChanges = ContentChanges.empty()
   private maxRows: number
-  private maxColumns : number
+  private maxColumns: number
 
   constructor(
     config: Config,
