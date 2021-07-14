@@ -10,9 +10,7 @@ import {Config} from './Config'
 import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Operations} from './Operations'
-import {ParserWithCaching} from './parser'
 import {ParsingError} from './parser/Ast'
 
 export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty | ClipboardCellParsingError
@@ -75,14 +73,16 @@ class Clipboard {
 
 export class ClipboardOperations {
   public clipboard?: Clipboard
+  private maxRows: number
+  private maxColumns: number
 
   constructor(
+    config: Config,
     private readonly dependencyGraph: DependencyGraph,
     private readonly operations: Operations,
-    private readonly parser: ParserWithCaching,
-    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    private readonly config: Config,
   ) {
+    this.maxRows = config.maxRows
+    this.maxColumns = config.maxColumns
   }
 
   public cut(leftCorner: SimpleCellAddress, width: number, height: number): void {
@@ -125,7 +125,7 @@ export class ClipboardOperations {
     }
 
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
-    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+    if (targetRange.exceedsSheetSizeLimits(this.maxColumns, this.maxRows)) {
       throw new SheetSizeLimitExceededError()
     }
 

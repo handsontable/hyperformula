@@ -5,6 +5,7 @@
 
 import {ArraySizePredictor} from './ArraySize'
 import {CellContentParser} from './CellContentParser'
+import {ClipboardOperations} from './ClipboardOperations'
 import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {DateTimeHelper} from './DateTimeHelper'
@@ -14,15 +15,19 @@ import {Evaluator} from './Evaluator'
 import {Exporter} from './Exporter'
 import {GraphBuilder} from './GraphBuilder'
 import {UIElement} from './i18n'
+import {ArithmeticHelper} from './interpreter/ArithmeticHelper'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
+import {Interpreter} from './interpreter/Interpreter'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {buildColumnSearchStrategy, ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {NamedExpressions} from './NamedExpressions'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
+import {Operations} from './Operations'
 import {buildLexerConfig, ParserWithCaching, Unparser} from './parser'
 import {Serialization, SerializedNamedExpression} from './Serialization'
 import {findBoundaries, Sheet, Sheets, validateAsSheet} from './Sheet'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
+import {UndoRedo} from './UndoRedo'
 
 export type EngineState = {
   config: Config,
@@ -67,29 +72,35 @@ export class BuildEngineFactory {
     }
 
     const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    lazilyTransformingAstService.parser = parser
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressions)
-    const dateHelper = new DateTimeHelper(config)
+    const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
-    const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralHelper)
+    const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
 
     const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
-    const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
+    const operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
+    const undoRedo = new UndoRedo(config, operations)
+    lazilyTransformingAstService.undoRedo = undoRedo
+    const clipboardOperations = new ClipboardOperations(config, dependencyGraph, operations)
+    const crudOperations = new CrudOperations(config, operations, undoRedo, clipboardOperations, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
     inputNamedExpressions.forEach((entry: SerializedNamedExpression) => {
       crudOperations.ensureItIsPossibleToAddNamedExpression(entry.name, entry.expression, entry.scope)
       crudOperations.operations.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
     })
+
+    const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName, lazilyTransformingAstService)
+    const serialization = new Serialization(dependencyGraph, unparser, exporter)
+
+    const interpreter = new Interpreter(config, dependencyGraph, columnSearch, stats, arithmeticHelper, functionRegistry, namedExpressions, serialization, arraySizePredictor, dateTimeHelper)
+
     stats.measure(StatType.GRAPH_BUILD, () => {
-      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, config, stats, arraySizePredictor)
+      const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, stats, arraySizePredictor)
       graphBuilder.buildGraph(sheets, stats)
     })
 
-    lazilyTransformingAstService.undoRedo = crudOperations.undoRedo
-    lazilyTransformingAstService.parser = parser
-
-    const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName, lazilyTransformingAstService)
-    const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
-
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)
+    const evaluator = new Evaluator(config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)

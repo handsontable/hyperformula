@@ -8,39 +8,27 @@ import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
-import {DateTimeHelper} from './DateTimeHelper'
 import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
-import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {NamedExpressions} from './NamedExpressions'
-import {NumberLiteralHelper} from './NumberLiteralHelper'
 import {Ast, RelativeDependency} from './parser'
-import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
-  private interpreter: Interpreter
-  private lazilyTransformingAstService: LazilyTransformingAstService
 
   constructor(
-    private readonly dependencyGraph: DependencyGraph,
-    private readonly columnSearch: ColumnSearchStrategy,
     private readonly config: Config,
     private readonly stats: Statistics,
-    public readonly dateHelper: DateTimeHelper,
-    private readonly numberLiteralsHelper: NumberLiteralHelper,
-    private readonly functionRegistry: FunctionRegistry,
-    private readonly namedExpressions: NamedExpressions,
-    private readonly serialization: Serialization,
+    public readonly interpreter: Interpreter,
+    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly columnSearch: ColumnSearchStrategy,
   ) {
-    this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
-    this.lazilyTransformingAstService = this.dependencyGraph.lazilyTransformingAstService
   }
 
   public run(): void {

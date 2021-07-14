@@ -51,7 +51,7 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
   public median(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MEDIAN'),
       (...args: RawScalarValue[]) => {
-        const values = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const values = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(values instanceof CellError) {
           return values
         }
@@ -70,7 +70,7 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
   public large(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LARGE'),
       (range: SimpleRangeValue, n: number) => {
-        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if(vals instanceof CellError) {
           return vals
         }
@@ -87,7 +87,7 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
   public small(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SMALL'),
       (range: SimpleRangeValue, n: number) => {
-        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if(vals instanceof CellError) {
           return vals
         }

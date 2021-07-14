@@ -4,7 +4,6 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {ArraySizePredictor} from './ArraySize'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
@@ -40,7 +39,6 @@ import {AddColumnsCommand, AddRowsCommand, Operations, RemoveColumnsCommand, Rem
 import {ParserWithCaching} from './parser'
 import {findBoundaries, validateAsSheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
-import {Statistics} from './statistics'
 import {
   AddColumnsUndoEntry,
   AddNamedExpressionUndoEntry,
@@ -68,32 +66,24 @@ export type ColumnRowIndex = [number, number]
 
 export class CrudOperations {
 
-  private readonly clipboardOperations: ClipboardOperations
-  public readonly undoRedo: UndoRedo
-  public readonly operations: Operations
+
+  private readonly maxRows: number
+  private readonly maxColumns: number
 
   constructor(
-    /** Engine config */
-    private readonly config: Config,
-    /** Statistics module for benchmarking */
-    private readonly stats: Statistics,
-    /** Dependency graph storing sheets structure */
+    config: Config,
+    public readonly operations: Operations,
+    public readonly undoRedo: UndoRedo,
+    private readonly clipboardOperations: ClipboardOperations,
     private readonly dependencyGraph: DependencyGraph,
-    /** Column search strategy used by VLOOKUP plugin */
     private readonly columnSearch: ColumnSearchStrategy,
-    /** Parser with caching */
     private readonly parser: ParserWithCaching,
-    /** Raw cell input parser */
     private readonly cellContentParser: CellContentParser,
-    /** Service handling postponed CRUD transformations */
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    /** Storage for named expressions */
     private readonly namedExpressions: NamedExpressions,
-    private readonly arraySizePredictor: ArraySizePredictor,
   ) {
-    this.operations = new Operations(dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, config, arraySizePredictor)
-    this.clipboardOperations = new ClipboardOperations(dependencyGraph, this.operations, parser, lazilyTransformingAstService, config)
-    this.undoRedo = new UndoRedo(config, this.operations)
+    this.maxRows = config.maxRows
+    this.maxColumns = config.maxColumns
   }
 
   public addRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
@@ -454,7 +444,7 @@ export class CrudOperations {
 
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const newRowsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
-    if (sheetHeight + newRowsCount > this.config.maxRows) {
+    if (sheetHeight + newRowsCount > this.maxRows) {
       throw new SheetSizeLimitExceededError()
     }
 
@@ -487,7 +477,7 @@ export class CrudOperations {
 
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
     const newColumnsCount = indexes.map(index => index[1]).reduce((a, b) => a + b, 0)
-    if (sheetWidth + newColumnsCount > this.config.maxColumns) {
+    if (sheetWidth + newColumnsCount > this.maxColumns) {
       throw new SheetSizeLimitExceededError()
     }
 
@@ -610,7 +600,7 @@ export class CrudOperations {
   }
 
   public ensureRangeInSizeLimits(range: AbsoluteCellRange): void {
-    if (range.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+    if (range.exceedsSheetSizeLimits(this.maxColumns, this.maxRows)) {
       throw new SheetSizeLimitExceededError()
     }
   }
