@@ -120,7 +120,7 @@ HyperFormula is available under the [GPLv3 license](https://github.com/handsonta
 
 If you need a commercial license or support and maintenance services, [contact our Sales Team](https://handsontable.com/get-a-quote).
 
-
+  
 ## Acknowledgments 
 
 You should know that this project wouldn’t exist without co-financing from European Union funds under the European Regional Development Funds as a part of the Smart Growth Operational Programme. Project implemented as a part of the Polish National Centre for Research and Development: “Fast Track”.
