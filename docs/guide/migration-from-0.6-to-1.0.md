@@ -117,7 +117,7 @@ After:
 
 // when the `useArrayArithmetic` configuration option is set to `true`
 // you don't need to use the ARRAYFORMULA function
-=(ISEVEN(A2:A5*10))
+=ISEVEN(A2:A5*10)
 ```
 
 ## Step 5: Drop the `matrixDetection` and `matrixDetectionThreshold` options
