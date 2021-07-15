@@ -568,8 +568,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return new CellError(ErrorType.NUM)
         }
 
-        const startDate = this.interpreter.dateHelper.numberToSimpleDate(settlement)
-        const endDate = this.interpreter.dateHelper.numberToSimpleDate(maturity)
+        const startDate = this.dateTimeHelper.numberToSimpleDate(settlement)
+        const endDate = this.dateTimeHelper.numberToSimpleDate(maturity)
         if(endDate.year > startDate.year+1 || (endDate.year === startDate.year+1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
           return new CellError(ErrorType.NUM)
         }
@@ -594,8 +594,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return new CellError(ErrorType.NUM)
         }
 
-        const startDate = this.interpreter.dateHelper.numberToSimpleDate(settlement)
-        const endDate = this.interpreter.dateHelper.numberToSimpleDate(maturity)
+        const startDate = this.dateTimeHelper.numberToSimpleDate(settlement)
+        const endDate = this.dateTimeHelper.numberToSimpleDate(maturity)
         if(endDate.year > startDate.year+1 || (endDate.year === startDate.year+1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
           return new CellError(ErrorType.NUM)
         }
@@ -620,8 +620,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return new CellError(ErrorType.NUM)
         }
 
-        const startDate = this.interpreter.dateHelper.numberToSimpleDate(settlement)
-        const endDate = this.interpreter.dateHelper.numberToSimpleDate(maturity)
+        const startDate = this.dateTimeHelper.numberToSimpleDate(settlement)
+        const endDate = this.dateTimeHelper.numberToSimpleDate(maturity)
         if(endDate.year > startDate.year+1 || (endDate.year === startDate.year+1 && (endDate.month > startDate.month || (endDate.month === startDate.month && endDate.day > startDate.day)))) {
           return new CellError(ErrorType.NUM)
         }
@@ -653,7 +653,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public npv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NPV'),
       (rate: number, ...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }
@@ -665,7 +665,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public mirr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MIRR'),
       (range: SimpleRangeValue, frate: number, rrate: number) => {
-        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if(vals instanceof CellError) {
           return vals
         }

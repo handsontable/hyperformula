@@ -116,91 +116,91 @@ export class SimpleArithmerticPlugin extends FunctionPlugin implements FunctionP
 
   public add(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.ADD'),
-      this.interpreter.arithmeticHelper.addWithEpsilon
+      this.arithmeticHelper.addWithEpsilon
     )
   }
 
   public concat(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.CONCAT'),
-      this.interpreter.arithmeticHelper.concat
+      this.arithmeticHelper.concat
     )
   }
 
   public divide(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.DIVIDE'),
-      this.interpreter.arithmeticHelper.divide
+      this.arithmeticHelper.divide
     )
   }
 
   public eq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.EQ'),
-        this.interpreter.arithmeticHelper.eq
+        this.arithmeticHelper.eq
     )
   }
 
   public gt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.GT'),
-        this.interpreter.arithmeticHelper.gt
+        this.arithmeticHelper.gt
     )
   }
 
   public gte(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.GTE'),
-        this.interpreter.arithmeticHelper.geq
+        this.arithmeticHelper.geq
     )
   }
 
   public lt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.LT'),
-        this.interpreter.arithmeticHelper.lt
+        this.arithmeticHelper.lt
     )
   }
 
   public lte(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.LTE'),
-        this.interpreter.arithmeticHelper.leq
+        this.arithmeticHelper.leq
     )
   }
 
   public minus(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.MINUS'),
-      this.interpreter.arithmeticHelper.subtract
+      this.arithmeticHelper.subtract
     )
   }
 
   public multiply(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.MULTIPLY'),
-      this.interpreter.arithmeticHelper.multiply
+      this.arithmeticHelper.multiply
     )
   }
 
   public ne(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.NE'),
-      this.interpreter.arithmeticHelper.neq
+      this.arithmeticHelper.neq
     )
   }
 
   public pow(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.POW'),
-      this.interpreter.arithmeticHelper.pow
+      this.arithmeticHelper.pow
     )
   }
 
   public uminus(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.UMINUS'),
-      this.interpreter.arithmeticHelper.unaryMinus
+      this.arithmeticHelper.unaryMinus
     )
   }
 
   public upercent(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.UNARY_PERCENT'),
-      this.interpreter.arithmeticHelper.unaryPercent
+      this.arithmeticHelper.unaryPercent
     )
   }
 
   public uplus(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.UPLUS'),
-      this.interpreter.arithmeticHelper.unaryPlus
+      this.arithmeticHelper.unaryPlus
     )
   }
 }

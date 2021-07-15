@@ -156,8 +156,11 @@ export interface MoveCellsResult {
 
 export class Operations {
   private changes: ContentChanges = ContentChanges.empty()
+  private maxRows: number
+  private maxColumns: number
 
   constructor(
+    config: Config,
     private readonly dependencyGraph: DependencyGraph,
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly cellContentParser: CellContentParser,
@@ -165,10 +168,11 @@ export class Operations {
     private readonly stats: Statistics,
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly namedExpressions: NamedExpressions,
-    private readonly config: Config,
     private readonly arraySizePredictor: ArraySizePredictor,
   ) {
     this.allocateNamedExpressionAddressSpace()
+    this.maxColumns = config.maxColumns
+    this.maxRows = config.maxRows
   }
 
   public removeRows(cmd: RemoveRowsCommand): RowsRemoval[] {
@@ -419,7 +423,7 @@ export class Operations {
     const sourceRange = AbsoluteCellRange.spanFrom(sourceLeftCorner, width, height)
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
-    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+    if (targetRange.exceedsSheetSizeLimits(this.maxColumns, this.maxRows)) {
       throw new SheetSizeLimitExceededError()
     }
 

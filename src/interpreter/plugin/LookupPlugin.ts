@@ -181,9 +181,9 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean, searchStrategy: SearchStrategy): number {
-    if(!sorted && typeof key === 'string' && this.interpreter.arithmeticHelper.requiresRegex(key)) {
+    if(!sorted && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
-        this.interpreter.arithmeticHelper.eqMatcherFunction(key),
+        this.arithmeticHelper.eqMatcherFunction(key),
         range
       )
     } else {

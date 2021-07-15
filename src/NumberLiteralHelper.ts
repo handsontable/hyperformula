@@ -31,13 +31,6 @@ export class NumberLiteralHelper {
     return undefined
   }
 
-  public isNumber(input: string): boolean {
-    if (this.numberPattern.test(input)) {
-      return !isNaN(this.numericStringToNumber(input))
-    }
-    return false
-  }
-
   public numericStringToNumber(input: string): number {
     const normalized = input
       .replace(this.allThousandSeparatorsRegex, '')

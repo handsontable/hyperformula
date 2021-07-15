@@ -22,10 +22,9 @@ export interface SerializedNamedExpression {
 
 export class Serialization {
   constructor(
-    public readonly dependencyGraph: DependencyGraph,
-    public readonly unparser: Unparser,
-    public readonly config: Config,
-    public readonly exporter: Exporter
+    private readonly dependencyGraph: DependencyGraph,
+    private readonly unparser: Unparser,
+    private readonly exporter: Exporter
   ) {
   }
 
@@ -147,6 +146,6 @@ export class Serialization {
 
   public withNewConfig(newConfig: Config, namedExpressions: NamedExpressions): Serialization {
     const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping.fetchDisplayName, namedExpressions)
-    return new Serialization(this.dependencyGraph, newUnparser, newConfig, this.exporter)
+    return new Serialization(this.dependencyGraph, newUnparser, this.exporter)
   }
 }

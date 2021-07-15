@@ -8,7 +8,6 @@ import {ArraySize, ArraySizePredictor} from './ArraySize'
 import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
-import {Config} from './Config'
 import {
   ArrayVertex,
   DependencyGraph,
@@ -39,7 +38,6 @@ export class GraphBuilder {
     private readonly columnSearch: ColumnSearchStrategy,
     private readonly parser: ParserWithCaching,
     private readonly cellContentParser: CellContentParser,
-    private readonly config: Config,
     private readonly stats: Statistics,
     private readonly arraySizePredictor: ArraySizePredictor,
   ) {
