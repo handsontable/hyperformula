@@ -8,16 +8,16 @@ import {adr} from './testUtils'
 describe('Matrix size check tests', () => {
   const config = new Config()
   const functionRegistry = new FunctionRegistry(config)
+  /* eslint-enable */
+  const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
   /* eslint-disable */
   // @ts-ignore
-  const interpreter = new Interpreter(undefined, undefined, config, undefined, undefined, undefined, functionRegistry, undefined)
-  /* eslint-enable */
-  const matrixSizePredictor = new ArraySizePredictor(config, functionRegistry)
+  const interpreter = new Interpreter(config, undefined, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor, undefined)
   it('check', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(A1:B3,C1:E2)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(3, 3))
   })
 
@@ -25,7 +25,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(3, 3))
   })
 
@@ -33,7 +33,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E2), A1:B3)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(2, 3))
   })
 
@@ -41,7 +41,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(2, 3))
   })
 
@@ -49,7 +49,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=maxpool(A1:I9,3)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(3, 3))
   })
 
@@ -57,7 +57,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=maxpool(A1:I9,B3)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(9, 9))
   })
 
@@ -65,7 +65,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=transpose(A2)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(1, 1))
   })
 
@@ -73,7 +73,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=1234', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(1, 1, false))
   })
 
@@ -81,7 +81,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=A1', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(1, 1, true))
   })
 
@@ -89,7 +89,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=A1:D3+A1:C4', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(ArraySize.error())
   })
 
@@ -97,7 +97,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=ARRAYFORMULA(A1:D3+A1:C4)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(4, 4))
   })
 
@@ -105,7 +105,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=-A1:B3', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(ArraySize.error())
   })
 
@@ -113,7 +113,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=ARRAYFORMULA(-A1:B3)', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(2, 3))
   })
 
@@ -121,7 +121,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('={1,2,3;4,5,6}', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(3, 2))
   })
 
@@ -129,7 +129,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('={{1;2},{3;4}}', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(2, 2))
   })
 
@@ -137,7 +137,7 @@ describe('Matrix size check tests', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('={1,{2,3},4;{5;6},{7,8;9,10},{11;12};13,{14,15},16}', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(4, 4))
   })
 })
@@ -145,17 +145,17 @@ describe('Matrix size check tests', () => {
 describe('Matrix size check tests, with different config', () => {
   const config = new Config({useArrayArithmetic: true})
   const functionRegistry = new FunctionRegistry(config)
+  /* eslint-enable */
+  const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
   /* eslint-disable */
   // @ts-ignore
-  const interpreter = new Interpreter(undefined, undefined, config, undefined, undefined, undefined, functionRegistry, undefined)
-  /* eslint-enable */
-  const matrixSizePredictor = new ArraySizePredictor(config, functionRegistry)
+  const interpreter = new Interpreter(config, undefined, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor, undefined)
 
   it('check binary array arithmetic', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=A1:D3+A1:C4', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(4, 4))
   })
 
@@ -163,7 +163,7 @@ describe('Matrix size check tests, with different config', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=-A1:B3', adr('A1')).ast
 
-    const size = matrixSizePredictor.checkArraySize(ast, adr('A1'))
+    const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
     expect(size).toEqual(new ArraySize(2, 3))
   })
 })

@@ -530,7 +530,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     return this.reduce(args, state, 1, 'PRODUCT', (left, right) => left * right, getRawValue, strictlyNumbers)
   }
 
-  private addWithEpsilonRaw = (left: number, right: number) => this.interpreter.arithmeticHelper.addWithEpsilonRaw(left, right)
+  private addWithEpsilonRaw = (left: number, right: number) => this.arithmeticHelper.addWithEpsilonRaw(left, right)
 
   /**
    * Reduces procedure arguments with given reducing function

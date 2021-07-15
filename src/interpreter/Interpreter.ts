@@ -4,17 +4,17 @@
  */
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
+import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
-import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
-import {CellVertex, DependencyGraph, Vertex} from '../DependencyGraph'
+import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
-import {NumberLiteralHelper} from '../NumberLiteralHelper'
 // noinspection TypeScriptPreferShortImport
 import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
@@ -43,22 +43,21 @@ import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
   private gpu?: any
-  public readonly arithmeticHelper: ArithmeticHelper
   public readonly criterionBuilder: CriterionBuilder
 
   constructor(
+    public readonly config: Config,
     public readonly dependencyGraph: DependencyGraph,
     public readonly columnSearch: ColumnSearchStrategy,
-    public readonly config: Config,
     public readonly stats: Statistics,
-    public readonly dateHelper: DateTimeHelper,
-    public readonly numberLiteralsHelper: NumberLiteralHelper,
-    public readonly functionRegistry: FunctionRegistry,
-    public readonly namedExpressions: NamedExpressions,
-    public readonly serialization: Serialization
+    public readonly arithmeticHelper: ArithmeticHelper,
+    private readonly functionRegistry: FunctionRegistry,
+    private readonly namedExpressions: NamedExpressions,
+    public readonly serialization: Serialization,
+    public readonly arraySizePredictor: ArraySizePredictor,
+    public readonly dateTimeHelper: DateTimeHelper
   ) {
     this.functionRegistry.initializePlugins(this)
-    this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
     this.criterionBuilder = new CriterionBuilder(config)
   }
 

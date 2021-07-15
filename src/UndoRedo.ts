@@ -419,7 +419,7 @@ export class UndoRedo {
 
   constructor(
     config: Config,
-    public readonly operations: Operations,
+    private readonly operations: Operations,
   ) {
     this.undoLimit = config.undoLimit
   }

@@ -2397,6 +2397,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {SimpleCellRange} source of data
    * @param {SimpleCellRange} target range where data is intended to be put
+   * @param {boolean} offsetsFromTarget if true, offsets are computed from target corner, otherwise from source corner
    *
    * @throws [[SheetsNotEqual]] if both ranges are not from the same sheet
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
@@ -2414,7 +2415,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Ranges
    */
-  public getFillRangeData(source: SimpleCellRange, target: SimpleCellRange): RawCellContent[][] {
+  public getFillRangeData(source: SimpleCellRange, target: SimpleCellRange, offsetsFromTarget: boolean = false): RawCellContent[][] {
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2430,8 +2431,8 @@ export class HyperFormula implements TypedEmitter {
     return targetRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => {
-          const row = ((address.row - source.start.row) % sourceRange.height() + sourceRange.height()) % sourceRange.height() + source.start.row
-          const col = ((address.col - source.start.col) % sourceRange.width() + sourceRange.width()) % sourceRange.width() + source.start.col
+          const row = ((address.row - (offsetsFromTarget ? target : source).start.row) % sourceRange.height() + sourceRange.height()) % sourceRange.height() + source.start.row
+          const col = ((address.col - (offsetsFromTarget ? target : source).start.col) % sourceRange.width() + sourceRange.width()) % sourceRange.width() + source.start.col
           return this._serialization.getCellSerialized({row, col, sheet: targetRange.sheet}, address)
         }
       )
@@ -4121,7 +4122,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public numberToDateTime(inputNumber: number): DateTime {
     validateArgToType(inputNumber, 'number', 'val')
-    return this._evaluator.dateHelper.numberToSimpleDateTime(inputNumber)
+    return this._evaluator.interpreter.dateTimeHelper.numberToSimpleDateTime(inputNumber)
   }
 
   /**
@@ -4145,7 +4146,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public numberToDate(inputNumber: number): DateTime {
     validateArgToType(inputNumber, 'number', 'val')
-    return this._evaluator.dateHelper.numberToSimpleDate(inputNumber)
+    return this._evaluator.interpreter.dateTimeHelper.numberToSimpleDate(inputNumber)
   }
 
   /**

@@ -116,7 +116,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public sumif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -127,7 +127,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
           this.interpreter,
           sumifCacheKey,
           0,
-          (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
+          (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
           (arg) => getRawValue(arg),
         ).compute(valuesArg, [new Condition(conditionArg, criterion)])
       }
@@ -139,7 +139,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
         const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.arithmeticHelper)
         if (criterionPackage === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -150,7 +150,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
         this.interpreter,
         sumifCacheKey,
         0,
-        (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
+        (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
         (arg) => getRawValue(arg),
       ).compute(values, conditions)
     })
@@ -159,7 +159,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public averageif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AVERAGEIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -202,7 +202,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public countif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COUNTIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -223,7 +223,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
         const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.arithmeticHelper)
         if (criterionPackage === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }

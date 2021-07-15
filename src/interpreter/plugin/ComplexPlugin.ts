@@ -291,7 +291,7 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
   public improduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMPRODUCT'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced
         }
@@ -307,7 +307,7 @@ export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginType
   public imsum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMSUM'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced
         }
