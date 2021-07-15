@@ -57,7 +57,7 @@ const hfInstance = HyperFormula.buildFromSheets({
 });
 
 // use `sheetId` instead of `sheetName`
-const changes = hfInstance.clearSheet(0);
+const changes = hfInstance.clearSheet(1);
 ```
 
 The only methods still accepting the `sheetName` string parameter are now:
