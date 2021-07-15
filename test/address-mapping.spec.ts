@@ -31,7 +31,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it("get when there's even no column", () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(adr('A1'))).toBe(null)
+    expect(mapping.getCell(adr('A1'))).toBe(undefined)
   })
 
   it('get when there was already something in that column', () => {
@@ -39,13 +39,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(adr('A2'), new ValueCellVertex(42, 42))
 
-    expect(mapping.getCell(adr('A1'))).toBe(null)
+    expect(mapping.getCell(adr('A1'))).toBe(undefined)
   })
 
   it('get when asking for out of the row bound cell', () => {
     const mapping = builder(1, 1)
 
-    expect(mapping.getCell(adr('A2'))).toBe(null)
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
   })
 
   it("set when there's already something in that column", () => {
@@ -106,7 +106,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 0, 1)
 
-    expect(mapping.getCell(adr('A1'))).toBe(null)
+    expect(mapping.getCell(adr('A1'))).toBe(undefined)
     expect(mapping.fetchCell(adr('A2'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getHeight(0)).toEqual(2)
   })
@@ -120,7 +120,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.addRows(0, 1, 1)
 
     expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(43, 43))
     expect(mapping.getHeight(0)).toEqual(3)
   })
@@ -133,7 +133,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.addRows(0, 1, 1)
 
     expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.getHeight(0)).toEqual(2)
   })
 
@@ -146,9 +146,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.addRows(0, 1, 3)
 
     expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
-    expect(mapping.getCell(adr('A3'))).toBe(null)
-    expect(mapping.getCell(adr('A4'))).toBe(null)
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
+    expect(mapping.getCell(adr('A3'))).toBe(undefined)
+    expect(mapping.getCell(adr('A4'))).toBe(undefined)
     expect(mapping.fetchCell(adr('A5'))).toEqual(new ValueCellVertex(43, 43))
     expect(mapping.getHeight(0)).toEqual(5)
   })
@@ -165,8 +165,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(11, 11))
     expect(mapping.fetchCell(adr('B1'))).toEqual(new ValueCellVertex(12, 12))
-    expect(mapping.getCell(adr('A2'))).toBe(null)
-    expect(mapping.getCell(adr('B2'))).toBe(null)
+    expect(mapping.getCell(adr('A2'))).toBe(undefined)
+    expect(mapping.getCell(adr('B2'))).toBe(undefined)
     expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(21, 21))
     expect(mapping.fetchCell(adr('B3'))).toEqual(new ValueCellVertex(22, 22))
     expect(mapping.getHeight(0)).toEqual(3)
@@ -315,12 +315,51 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('A3'), new EmptyCellVertex({sheet: 0, row: 0, col: 0}))
     expect(mapping.getHeight(0)).toBe(3)
   })
+
+  it('should move cell from source to destination', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
+
+    mapping.moveCell(adr('A1'), adr('A2'))
+
+    expect(mapping.has(adr('A1'))).toEqual(false)
+    expect(mapping.has(adr('A2'))).toEqual(true)
+  })
+
+  it('should throw error when trying to move not existing vertex', () => {
+    const mapping = builder(1, 2)
+
+    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrowError('Cannot move cell. No cell with such address.')
+  })
+
+  it('should throw error when trying to move vertex onto occupied place', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1'), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2'), new ValueCellVertex(42, 42))
+
+    expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrowError('Cannot move cell. Destination already occupied.')
+  })
+
+  it('should throw error when trying to move vertices between sheets', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+
+    expect(() => mapping.moveCell(adr('A1', 0), adr('A2', 1))).toThrowError('Cannot move cells between sheets.')
+  })
+
+  it('should throw error when trying to move vertices in non-existing sheet', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+
+    expect(() => mapping.moveCell(adr('A1', 3), adr('A2', 3))).toThrowError('Sheet not initialized.')
+  })
 }
 
 describe('SparseStrategy', () => {
   sharedExamples((maxCol: number, maxRow: number) => {
     const mapping = new AddressMapping(new AlwaysSparse())
     mapping.addSheet(0, new SparseStrategy(maxCol, maxRow))
+    mapping.addSheet(1, new SparseStrategy(maxCol, maxRow))
     return mapping
   })
 
@@ -339,6 +378,7 @@ describe('DenseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
     const mapping = new AddressMapping(new AlwaysDense())
     mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
+    mapping.addSheet(1, new DenseStrategy(maxCol, maxRow))
     return mapping
   })
 

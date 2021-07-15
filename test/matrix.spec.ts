@@ -1,13 +1,14 @@
-import {Matrix} from '../src/Matrix'
+import {ArrayValue} from '../src/ArrayValue'
+import {EmptyValue} from '../src/interpreter/InterpreterValue'
 
 describe('Matrix', () => {
   it('fill', () => {
-    const matrix  = new Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    const matrix  = new ArrayValue([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     expect(matrix.raw()).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
   })
 
-  it('add zero rows', () => {
-    const matrix = new Matrix([
+  it('add rows', () => {
+    const matrix = new ArrayValue([
       [1, 2, 3],
       [4, 5, 6],
       [7, 8, 9],
@@ -15,9 +16,9 @@ describe('Matrix', () => {
     matrix.addRows(1, 3)
     expect(matrix.raw()).toEqual([
       [1, 2, 3],
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
+      [EmptyValue, EmptyValue, EmptyValue],
+      [EmptyValue, EmptyValue, EmptyValue],
+      [EmptyValue, EmptyValue, EmptyValue],
       [4, 5, 6],
       [7, 8, 9],
     ])
@@ -25,7 +26,7 @@ describe('Matrix', () => {
   })
 
   it('remove rows', () => {
-    const matrix = new Matrix([
+    const matrix = new ArrayValue([
       [1, 2],
       [3, 4],
       [5, 6],
@@ -40,11 +41,11 @@ describe('Matrix', () => {
   })
 
   it('remove rows out of bound', () => {
-    const matrix = new Matrix([
+    const matrix = new ArrayValue([
       [1, 2],
     ])
     expect(() => {
       matrix.removeRows(1, 1)
-    }).toThrowError('Matrix index out of bound')
+    }).toThrowError('Array index out of bound')
   })
 })

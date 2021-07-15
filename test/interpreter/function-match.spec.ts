@@ -16,18 +16,18 @@ describe('Function MATCH', () => {
 
   it('validates that 1st argument is number, string or boolean', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(C1:C2, B1:B1)'],
+      ['=MATCH(C2:C3, B1:B1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('validates that 2nd argument is range', () => {
+  it('2nd argument can be a scalar', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(1, 42)'],
+      ['=MATCH(42, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
   it('validates that 3rd argument is number', () => {

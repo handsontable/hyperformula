@@ -44,9 +44,6 @@ describe('Config', () => {
     expect( () => new Config({smartRounding: []})).toThrowError('Expected value of type: boolean for config parameter: smartRounding')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({matrixDetection: 0})).toThrowError('Expected value of type: boolean for config parameter: matrixDetection')
-    // eslint-disable-next-line
-    // @ts-ignore
     expect( () => new Config({useColumnIndex: Symbol()})).toThrowError('Expected value of type: boolean for config parameter: useColumnIndex')
     // eslint-disable-next-line
     // @ts-ignore
@@ -54,9 +51,6 @@ describe('Config', () => {
   })
 
   it( 'validation: number params', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    expect(() => new Config({matrixDetectionThreshold: 'abcd'})).toThrowError('Expected value of type: number for config parameter: matrixDetectionThreshold')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({nullYear: true})).toThrowError('Expected value of type: number for config parameter: nullYear')
@@ -115,6 +109,9 @@ describe('Config', () => {
     expect(() => {
       new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ',' })
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
+    expect(() => {
+      new Config({ arrayColumnSeparator: ';', arrayRowSeparator: ';'})
+    }).toThrowError('Config initialization failed. Parameters in conflict: [arrayColumnSeparator,arrayRowSeparator]')
   })
 
   it('should throw error when currency symbol is empty', () => {
@@ -147,6 +144,22 @@ describe('Config', () => {
     }).toThrowError('Expected one of \'\' \',\' \' \' \'.\' for config parameter: thousandSeparator')
   })
 
+  it('should throw error when matrix row separator is not correct', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ arrayRowSeparator: ',' })
+    }).toThrowError('Expected one of \';\' \'|\' for config parameter: arrayRowSeparator')
+  })
+
+  it('should throw error when matrix columns separator is not correct', () => {
+    expect(() => {
+      // eslint-disable-next-line
+      // @ts-ignore
+      new Config({ arrayColumnSeparator: '|' })
+    }).toThrowError('Expected one of \',\' \';\' for config parameter: arrayColumnSeparator')
+  })
+
   it('#undoLimit validation', () => {
     expect(() => new Config({ undoLimit: 0 })).not.toThrowError()
     expect(() => new Config({ undoLimit: 42 })).not.toThrowError()
@@ -159,13 +172,6 @@ describe('Config', () => {
     expect(() => new Config({ binarySearchThreshold: 42 })).not.toThrowError()
     expect(() => new Config({ binarySearchThreshold: Infinity })).not.toThrowError()
     expect(() => new Config({ binarySearchThreshold: 0 })).toThrowError('Config parameter binarySearchThreshold should be at least 1')
-  })
-
-  it('#matrixDetectionThreshold', () => {
-    expect(() => new Config({ matrixDetectionThreshold: 1 })).not.toThrowError()
-    expect(() => new Config({ matrixDetectionThreshold: 42 })).not.toThrowError()
-    expect(() => new Config({ matrixDetectionThreshold: Infinity })).not.toThrowError()
-    expect(() => new Config({ matrixDetectionThreshold: 0 })).toThrowError('Config parameter matrixDetectionThreshold should be at least 1')
   })
 
   it('#precisionEpsilon', () => {
@@ -202,5 +208,20 @@ describe('Config', () => {
     expect(() => new Config({ nullYear: 42 })).not.toThrowError()
     expect(() => new Config({ nullYear: 100 })).not.toThrowError()
     expect(() => new Config({ nullYear: 101 })).toThrowError('Config parameter nullYear should be at most 100')
+  })
+})
+
+describe('getConfig', () => {
+  it('should not be an instance of Config', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.getConfig()).not.toBeInstanceOf(Config)
+  })
+
+  it('should copy returned values', () => {
+    const arr = ['mm']
+    const engine = HyperFormula.buildEmpty({dateFormats: arr})
+    const arr2 = engine.getConfig().dateFormats
+    expect(arr).toEqual(arr2)
+    expect(arr).not.toBe(arr2)
   })
 })

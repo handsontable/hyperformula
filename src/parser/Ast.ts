@@ -39,6 +39,7 @@ export type Ast =
   | ErrorAst
   | ErrorWithRawInputAst
   | EmptyArgAst
+  | ArrayAst
 
 export interface ParsingError {
   type: ParsingErrorType,
@@ -97,6 +98,8 @@ export enum AstNodeType {
   ERROR = 'ERROR',
 
   ERROR_WITH_RAW_INPUT = 'ERROR_WITH_RAW_INPUT',
+
+  ARRAY = 'ARRAY',
 }
 
 export enum RangeSheetReferenceType {
@@ -393,6 +396,18 @@ export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhi
   internalWhitespace: internalWhitespace?.image,
 })
 
+export interface ArrayAst extends AstWithInternalWhitespace {
+  type: AstNodeType.ARRAY,
+  args: Ast[][],
+}
+
+export const buildArrayAst = (args: Ast[][], leadingWhitespace?: IToken, internalWhitespace?: IToken): ArrayAst => ({
+  type: AstNodeType.ARRAY,
+  args,
+  leadingWhitespace: leadingWhitespace?.image,
+  internalWhitespace: internalWhitespace?.image,
+})
+
 export interface NamedExpressionAst extends AstWithInternalWhitespace {
   type: AstNodeType.NAMED_EXPRESSION,
   expressionName: string,
@@ -446,11 +461,11 @@ export const buildParsingErrorAst = (): ErrorAst => ({
 })
 
 function assertRangeConsistency(start: AddressWithSheet, end: AddressWithSheet, sheetReferenceType: RangeSheetReferenceType) {
-  if ((start.sheet !== null && end.sheet === null) || (start.sheet === null && end.sheet !== null)) {
+  if ((start.sheet !== undefined && end.sheet === undefined) || (start.sheet === undefined && end.sheet !== undefined)) {
     throw new Error('Start address inconsistent with end address')
   }
-  if ((start.sheet === null && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
-    || (start.sheet !== null && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
+  if ((start.sheet === undefined && sheetReferenceType !== RangeSheetReferenceType.RELATIVE)
+    || (start.sheet !== undefined && sheetReferenceType === RangeSheetReferenceType.RELATIVE)) {
     throw new Error('Sheet address inconsistent with sheet reference type')
   }
 }

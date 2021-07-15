@@ -5,16 +5,19 @@
 
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
-import {DateTimeHelper} from './DateTimeHelper'
+import {DateTimeHelper, timeToNumber} from './DateTimeHelper'
+import {ErrorMessage} from './error-message'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
 import {
   cloneNumber,
   CurrencyNumber,
   DateNumber,
+  DateTimeNumber,
   ExtendedNumber,
   getRawValue,
-  PercentNumber
+  PercentNumber,
+  TimeNumber
 } from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -55,24 +58,15 @@ export namespace CellContent {
     }
   }
 
-  export class MatrixFormula {
-    constructor(public readonly formula: string) {
-    }
-
-    public formulaWithBraces(): string {
-      return '{' + this.formula + '}'
-    }
-  }
-
   export class Error {
     public readonly value: CellError
 
-    constructor(errorType: ErrorType) {
-      this.value = new CellError(errorType)
+    constructor(errorType: ErrorType, message?: string) {
+      this.value = new CellError(errorType, message)
     }
   }
 
-  export type Type = Number | String | Boolean | Empty | Formula | MatrixFormula | Error
+  export type Type = Number | String | Boolean | Empty | Formula | Error
 }
 
 /**
@@ -87,13 +81,6 @@ export function isFormula(text: string): boolean {
 export function isBoolean(text: string): boolean {
   const tl = text.toLowerCase()
   return tl === 'true' || tl === 'false'
-}
-
-export function isMatrix(text: RawCellContent): boolean {
-  if (typeof text !== 'string') {
-    return false
-  }
-  return (text.length > 1) && (text.startsWith('{')) && (text.endsWith('}'))
 }
 
 export function isError(text: string, errorMapping: Record<string, ErrorType>): boolean {
@@ -127,23 +114,33 @@ export class CellContentParser {
       return CellContent.Empty.getSingletonInstance()
     } else if (typeof content === 'number') {
       if (isNumberOverflow(content)) {
-        return new CellContent.Error(ErrorType.NUM)
+        return new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge)
       } else {
         return new CellContent.Number(content)
       }
     } else if (typeof content === 'boolean') {
       return new CellContent.Boolean(content)
     } else if (content instanceof Date) {
-      return new CellContent.Number(new DateNumber(this.dateHelper.dateToNumber({
+      const dateVal = this.dateHelper.dateToNumber({
         day: content.getDate(),
         month: content.getMonth() + 1,
         year: content.getFullYear()
-      }), 'Date()'))
+      })
+      const timeVal = timeToNumber({hours: content.getHours(), minutes: content.getMinutes(), seconds: content.getSeconds() + content.getMilliseconds()/1000})
+      const val = dateVal+timeVal
+      if(val<0) {
+        return new CellContent.Error(ErrorType.NUM, ErrorMessage.DateBounds)
+      }
+      if(val%1 === 0) {
+        return new CellContent.Number(new DateNumber(val, 'Date()'))
+      } else if(val<1) {
+        return new CellContent.Number(new TimeNumber(val, 'Date()'))
+      } else {
+        return new CellContent.Number(new DateTimeNumber(val, 'Date()'))
+      }
     } else if (typeof content === 'string') {
       if (isBoolean(content)) {
         return new CellContent.Boolean(content.toLowerCase() === 'true')
-      } else if (isMatrix(content)) {
-        return new CellContent.MatrixFormula(content.substr(1, content.length - 2))
       } else if (isFormula(content)) {
         return new CellContent.Formula(content)
       } else if (isError(content, this.config.errorMapping)) {
@@ -162,7 +159,6 @@ export class CellContentParser {
             [currency, trimmedContent] = res
           }
         }
-
 
         const val = this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
         if(val !== undefined) {

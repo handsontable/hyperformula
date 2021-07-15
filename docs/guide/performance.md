@@ -40,19 +40,6 @@ cells filled, but located very far from each other.
 the fill ratio of the sheet. Let the engine choose the best strategy
 for you.
 
-## Numeric matrix detection
-
-HyperFormula is able to optimize underlying data structures when it
-detects consistent areas of numerical data. It is especially useful
-when dealing with calculations on huge numerical data sets. You may
-consider disabling this option completely by setting `matrixDetection`
-to false or adjusting the `matrixDetectionThreshold` option to customize
-the size of the numerical areas to better fit your use case.
-
-It is worth mentioning that some of the CRUD operations, like
-inserting non-numerical data, may lead to disabling optimization
-for affected areas.
-
 ## Suspending automatic recalculations
 
 By default, HyperFormula recalculates formulas after every change.
@@ -80,7 +67,7 @@ performance.
 
 ## GPU acceleration
 
-Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, benefit from
+Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, or TRANSPOSE, benefit from
 GPU acceleration. Thanks to the cores running thousands of threads
 at once, they calculate the input data sets up to 9x faster than
 when using the CPU. According to our observations the bigger the data set is,

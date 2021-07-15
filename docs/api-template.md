@@ -1,4 +1,4 @@
-Welcome to HyperFormula `v{{ $page.version }}` API!
+Welcome to the HyperFormula `v{{ $page.version }}` API!
 
 The API reference documentation provides detailed information for methods, error types, event types, and all the configuration options available in HyperFormula.
 
@@ -28,7 +28,7 @@ This section contains information about options that allow you to configure the 
 An example set of options:
 ```javascript
 const options = {
-  licenseKey: 'agpl-v3',
+  licenseKey: 'gpl-v3',
   precisionRounding: 10,
   nullDate: { year: 1900, month: 1, day: 1 },
   functionArgSeparator: '.'

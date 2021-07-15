@@ -3,16 +3,17 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing text-specific functions
  */
-export class TextPlugin extends FunctionPlugin {
+export class TextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<TextPlugin>{
   public static implementedFunctions = {
     'CONCATENATE': {
       method: 'concatenate',
@@ -148,11 +149,11 @@ export class TextPlugin extends FunctionPlugin {
    *
    * Concatenates provided arguments to one string.
    *
-   * @param args
-   * @param formulaAddress
+   * @param ast
+   * @param state
    */
-  public concatenate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CONCATENATE'), (...args) => {
+  public concatenate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CONCATENATE'), (...args) => {
       return ''.concat(...args)
     })
   }
@@ -163,10 +164,10 @@ export class TextPlugin extends FunctionPlugin {
    * Splits provided string using space separator and returns chunk at zero-based position specified by second argument
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public split(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SPLIT'), (stringToSplit: string, indexToUse: number) => {
+  public split(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SPLIT'), (stringToSplit: string, indexToUse: number) => {
       const splittedString = stringToSplit.split(' ')
 
       if (indexToUse >= splittedString.length || indexToUse < 0) {
@@ -177,45 +178,45 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public len(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LEN'), (arg: string) => {
+  public len(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LEN'), (arg: string) => {
       return arg.length
     })
   }
 
-  public lower(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LOWER'), (arg: string) => {
+  public lower(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LOWER'), (arg: string) => {
       return arg.toLowerCase()
     })
   }
 
-  public trim(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TRIM'), (arg: string) => {
+  public trim(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TRIM'), (arg: string) => {
       return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
     })
   }
 
-  public proper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('PROPER'), (arg: string) => {
+  public proper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('PROPER'), (arg: string) => {
       return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
     })
   }
 
-  public clean(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('CLEAN'), (arg: string) => {
+  public clean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('CLEAN'), (arg: string) => {
       // eslint-disable-next-line no-control-regex
       return arg.replace(/[\u0000-\u001F]/g, '')
     })
   }
 
-  public exact(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EXACT'), (left: string, right: string) => {
+  public exact(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EXACT'), (left: string, right: string) => {
       return left === right
     })
   }
 
-  public rept(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('REPT'), (text: string, count: number) => {
+  public rept(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('REPT'), (text: string, count: number) => {
       if (count < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeCount)
       }
@@ -223,8 +224,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public right(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RIGHT'), (text: string, length: number) => {
+  public right(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('RIGHT'), (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeLength)
       } else if (length === 0) {
@@ -234,8 +235,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public left(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('LEFT'), (text: string, length: number) => {
+  public left(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('LEFT'), (text: string, length: number) => {
       if (length < 0) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NegativeLength)
       }
@@ -243,8 +244,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public mid(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MID'), (text: string, startPosition: number, numberOfChars: number) => {
+  public mid(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MID'), (text: string, startPosition: number, numberOfChars: number) => {
       if (startPosition < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
@@ -255,8 +256,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public replace(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('REPLACE'), (text: string, startPosition: number, numberOfChars: number, newText: string) => {
+  public replace(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('REPLACE'), (text: string, startPosition: number, numberOfChars: number, newText: string) => {
       if (startPosition < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
@@ -267,8 +268,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public search(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SEARCH'), (pattern, text: string, startIndex: number) => {
+  public search(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SEARCH'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LengthBounds)
       }
@@ -276,8 +277,8 @@ export class TextPlugin extends FunctionPlugin {
       const normalizedText = text.substring(startIndex - 1).toLowerCase()
 
       let index: number
-      if (this.interpreter.arithmeticHelper.requiresRegex(pattern)) {
-        index = this.interpreter.arithmeticHelper.searchString(pattern, normalizedText)
+      if (this.arithmeticHelper.requiresRegex(pattern)) {
+        index = this.arithmeticHelper.searchString(pattern, normalizedText)
       } else {
         index = normalizedText.indexOf(pattern.toLowerCase())
       }
@@ -287,8 +288,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public substitute(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUBSTITUTE'), (text: string, oldText: string, newText: string, occurrence: number | undefined) => {
+  public substitute(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SUBSTITUTE'), (text: string, oldText: string, newText: string, occurrence: number | undefined) => {
       const oldTextRegexp = new RegExp(oldText, 'g')
 
       if (occurrence === undefined) {
@@ -311,8 +312,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public find(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('FIND'), (pattern, text: string, startIndex: number) => {
+  public find(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('FIND'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE, ErrorMessage.IndexBounds)
       }
@@ -324,8 +325,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public t(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('T'), (arg: RawScalarValue) => {
+  public t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('T'), (arg: RawScalarValue) => {
       if (arg instanceof CellError) {
         return arg
       }
@@ -333,8 +334,8 @@ export class TextPlugin extends FunctionPlugin {
     })
   }
 
-  public upper(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('UPPER'), (arg: string) => {
+  public upper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('UPPER'), (arg: string) => {
       return arg.toUpperCase()
     })
   }

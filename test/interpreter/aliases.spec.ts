@@ -203,4 +203,8 @@ describe('Function aliases', () => {
   it('ISO.CEILING should be an alias of CEILING.PRECISE', () => {
     expect(engine.getFunctionPlugin('ISO.CEILING')!.aliases!['ISO.CEILING']).toEqual('CEILING.PRECISE')
   })
+
+  it('TRUNC should be an alias of ROUNDDOWN', () => {
+    expect(engine.getFunctionPlugin('TRUNC')!.aliases!['TRUNC']).toEqual('ROUNDDOWN')
+  })
 })

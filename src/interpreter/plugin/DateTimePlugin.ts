@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {
   instanceOfSimpleDate,
   instanceOfSimpleTime,
@@ -19,23 +19,24 @@ import {ErrorMessage} from '../../error-message'
 import {format} from '../../format/format'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
+import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
   getRawValue,
   InternalNoErrorScalarValue,
-  InternalScalarValue,
+  InterpreterValue,
   isExtendedNumber,
   NumberType,
   RawNoErrorScalarValue,
   RawScalarValue,
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions
  */
-export class DateTimePlugin extends FunctionPlugin {
+export class DateTimePlugin extends FunctionPlugin implements FunctionPluginTypecheck<DateTimePlugin>{
   public static implementedFunctions = {
     'DATE': {
       method: 'date',
@@ -239,24 +240,24 @@ export class DateTimePlugin extends FunctionPlugin {
    * Converts a provided year, month and day into date
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public date(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DATE'), (year, month, day) => {
+  public date(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DATE'), (year, month, day) => {
       const d = Math.trunc(day)
       let m = Math.trunc(month)
       let y = Math.trunc(year)
-      if (y < this.interpreter.dateHelper.getEpochYearZero()) {
-        y += this.interpreter.dateHelper.getEpochYearZero()
+      if (y < this.dateTimeHelper.getEpochYearZero()) {
+        y += this.dateTimeHelper.getEpochYearZero()
       }
       const delta = Math.floor((m - 1) / 12)
       y += delta
       m -= delta * 12
 
       const date = {year: y, month: m, day: 1}
-      if (this.interpreter.dateHelper.isValidDate(date)) {
-        let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
-        ret = this.interpreter.dateHelper.getWithinBounds(ret)
+      if (this.dateTimeHelper.isValidDate(date)) {
+        let ret: Maybe<number> = this.dateTimeHelper.dateToNumber(date) + (d - 1)
+        ret = this.dateTimeHelper.getWithinBounds(ret)
         if(ret === undefined) {
           return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
         }
@@ -266,8 +267,8 @@ export class DateTimePlugin extends FunctionPlugin {
     })
   }
 
-  public time(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TIME'),
+  public time(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TIME'),
       (h, m, s) => {
         const ret = timeToNumber({hours: Math.trunc(h), minutes: Math.trunc(m), seconds: Math.trunc(s)})
         if(ret<0) {
@@ -278,11 +279,11 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public eomonth(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
-      const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
-      let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
-      ret = this.interpreter.dateHelper.getWithinBounds(ret)
+  public eomonth(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
+      const date = this.dateTimeHelper.numberToSimpleDate(dateNumber)
+      let ret: Maybe<number> = this.dateTimeHelper.dateToNumber(this.dateTimeHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+      ret = this.dateTimeHelper.getWithinBounds(ret)
       if(ret === undefined) {
         return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
       }
@@ -290,14 +291,14 @@ export class DateTimePlugin extends FunctionPlugin {
     })
   }
 
-  public day(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DAY'),
-      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
+  public day(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DAY'),
+      (dateNumber) => this.dateTimeHelper.numberToSimpleDate(dateNumber).day
     )
   }
 
-  public days(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS'), (endDate, startDate) => Math.trunc(endDate) - Math.trunc(startDate))
+  public days(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DAYS'), (endDate, startDate) => Math.trunc(endDate) - Math.trunc(startDate))
   }
 
   /**
@@ -306,11 +307,11 @@ export class DateTimePlugin extends FunctionPlugin {
    * Returns the month of the year specified by a given date
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public month(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MONTH'),
-      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
+  public month(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MONTH'),
+      (dateNumber) => this.dateTimeHelper.numberToSimpleDate(dateNumber).month
     )
   }
 
@@ -320,28 +321,28 @@ export class DateTimePlugin extends FunctionPlugin {
    * Returns the year specified by a given date
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public year(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('YEAR'),
-      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
+  public year(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('YEAR'),
+      (dateNumber) => this.dateTimeHelper.numberToSimpleDate(dateNumber).year
     )
   }
 
-  public hour(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('HOUR'),
+  public hour(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('HOUR'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).hours
     )
   }
 
-  public minute(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('MINUTE'),
+  public minute(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('MINUTE'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).minutes
     )
   }
 
-  public second(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SECOND'),
+  public second(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SECOND'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber)%1).seconds
     )
   }
@@ -352,18 +353,18 @@ export class DateTimePlugin extends FunctionPlugin {
    * Tries to convert number to specified date format.
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public text(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TEXT'),
-      (numberRepresentation, formatArg) => format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
+  public text(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TEXT'),
+      (numberRepresentation, formatArg) => format(numberRepresentation, formatArg, this.config, this.dateTimeHelper)
     )
   }
 
-  public weekday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('WEEKDAY'),
+  public weekday(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('WEEKDAY'),
       (day: number, type: number) => {
-        const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
+        const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
         if(type===3) {
           return (absoluteDay-1)%7
         }
@@ -376,13 +377,13 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public weeknum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('WEEKNUM'),
+  public weeknum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('WEEKNUM'),
       (day: number, type: number) => {
-        const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
-        const date = this.interpreter.dateHelper.numberToSimpleDate(day)
-        const yearStart = this.interpreter.dateHelper.dateToNumber({year: date.year, month: 1, day: 1})
-        const yearStartAbsolute = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(yearStart)
+        const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
+        const date = this.dateTimeHelper.numberToSimpleDate(day)
+        const yearStart = this.dateTimeHelper.dateToNumber({year: date.year, month: 1, day: 1})
+        const yearStartAbsolute = this.dateTimeHelper.relativeNumberToAbsoluteNumber(yearStart)
         if(type === 21) {
           return this.isoweeknumCore(day)
         }
@@ -395,15 +396,15 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public isoweeknum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ISOWEEKNUM'), this.isoweeknumCore)
+  public isoweeknum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ISOWEEKNUM'), this.isoweeknumCore)
   }
 
   private isoweeknumCore = (day: number): number => {
-    const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
-    const date = this.interpreter.dateHelper.numberToSimpleDate(day)
-    const yearStart = this.interpreter.dateHelper.dateToNumber({year: date.year, month: 1, day: 1})
-    const yearStartAbsolute = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(yearStart)
+    const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
+    const date = this.dateTimeHelper.numberToSimpleDate(day)
+    const yearStart = this.dateTimeHelper.dateToNumber({year: date.year, month: 1, day: 1})
+    const yearStartAbsolute = this.dateTimeHelper.relativeNumberToAbsoluteNumber(yearStart)
     const firstThursdayAbs = yearStartAbsolute + ((4-yearStartAbsolute)%7+7)%7
     const ret = Math.floor((absoluteDay-1)/7) - Math.floor((firstThursdayAbs-1)/7)+1
     if(ret===0) {
@@ -412,10 +413,10 @@ export class DateTimePlugin extends FunctionPlugin {
     return ret
   }
 
-  public datevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DATEVALUE'),
+  public datevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DATEVALUE'),
       (date: string) => {
-        const {dateTime} = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
+        const {dateTime} = this.dateTimeHelper.parseDateTimeFromConfigFormats(date)
         if(dateTime === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
@@ -423,15 +424,15 @@ export class DateTimePlugin extends FunctionPlugin {
           return 0
         }
         return (instanceOfSimpleTime(dateTime) ? Math.trunc(timeToNumber(dateTime)) : 0) +
-          this.interpreter.dateHelper.dateToNumber(dateTime)
+          this.dateTimeHelper.dateToNumber(dateTime)
       }
     )
   }
 
-  public timevalue(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TIMEVALUE'),
+  public timevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TIMEVALUE'),
       (date: string) => {
-        const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
+        const dateNumber = this.dateTimeHelper.dateStringToDateNumber(date)
         if(dateNumber===undefined){
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
@@ -440,32 +441,32 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public now(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NOW'),
+  public now(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NOW'),
       () => {
-        const now = new Date()
+        const now = new Date(Date.now())
         return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
-          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+          this.dateTimeHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
       }
     )
   }
 
-  public today(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('TODAY'),
+  public today(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TODAY'),
       () => {
-        const now = new Date()
-        return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDay()})
+        const now = new Date(Date.now())
+        return this.dateTimeHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
       }
     )
   }
 
-  public edate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('EDATE'),
+  public edate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('EDATE'),
       (dateNumber: number, delta: number) => {
-        const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
+        const date = this.dateTimeHelper.numberToSimpleDate(dateNumber)
         const newDate = truncateDayInMonth(offsetMonth(date, delta))
-        let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(newDate)
-        ret = this.interpreter.dateHelper.getWithinBounds(ret)
+        let ret: Maybe<number> = this.dateTimeHelper.dateToNumber(newDate)
+        ret = this.dateTimeHelper.getWithinBounds(ret)
         if(ret === undefined) {
           return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
         }
@@ -474,8 +475,8 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public datedif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DATEDIF'),
+  public datedif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DATEDIF'),
       (startDate: number, endDate: number, unit: string) => {
         if(startDate > endDate) {
           return new CellError(ErrorType.NUM, ErrorMessage.StartEndDate)
@@ -483,8 +484,8 @@ export class DateTimePlugin extends FunctionPlugin {
         if(unit === 'D') {
           return Math.floor(endDate) - Math.floor(startDate)
         }
-        const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
-        const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
+        const start = this.dateTimeHelper.numberToSimpleDate(startDate)
+        const end = this.dateTimeHelper.numberToSimpleDate(endDate)
         switch(unit) {
           case 'M':
             return (end.year - start.year)*12 + (end.month-start.month) - (end.day < start.day?1:0)
@@ -502,17 +503,17 @@ export class DateTimePlugin extends FunctionPlugin {
             } else {
               const m = end.month === 1 ? 12 : end.month-1
               const y = end.month === 1 ? end.year-1 : end.year
-              return this.interpreter.dateHelper.daysInMonth(y, m)+end.day-start.day
+              return this.dateTimeHelper.daysInMonth(y, m)+end.day-start.day
             }
           case 'YD':
             if(end.month > start.month || (end.month === start.month && end.day >= start.day)) {
-              return Math.floor(endDate) - this.interpreter.dateHelper.dateToNumber({year: end.year, month: start.month, day: start.day})
+              return Math.floor(endDate) - this.dateTimeHelper.dateToNumber({year: end.year, month: start.month, day: start.day})
             } else {
               return Math.floor(endDate)
                 - Math.floor(startDate)
                 - 365*(end.year-start.year-1)
-                - this.interpreter.dateHelper.leapYearsCount(end.year-1)
-                + this.interpreter.dateHelper.leapYearsCount(start.year)
+                - this.dateTimeHelper.leapYearsCount(end.year-1)
+                + this.dateTimeHelper.leapYearsCount(start.year)
             }
           default:
             return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
@@ -521,25 +522,25 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public days360(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('DAYS360'), this.days360Core)
+  public days360(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DAYS360'), this.days360Core)
   }
 
   private days360Core = (startDate: number, endDate: number, mode: boolean): number => {
-    const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
-    const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
+    const start = this.dateTimeHelper.numberToSimpleDate(startDate)
+    const end = this.dateTimeHelper.numberToSimpleDate(endDate)
     let nStart, nEnd: SimpleDate
     if(mode) {
       nStart = toBasisEU(start)
       nEnd = toBasisEU(end)
     } else {
-      [nStart, nEnd] = this.interpreter.dateHelper.toBasisUS(start, end)
+      [nStart, nEnd] = this.dateTimeHelper.toBasisUS(start, end)
     }
     return 360 * (nEnd.year - nStart.year) + 30*(nEnd.month-nStart.month) + nEnd.day-nStart.day
   }
 
-  public yearfrac(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('YEARFRAC'),
+  public yearfrac(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('YEARFRAC'),
       (startDate: number, endDate: number, mode: number) => {
         startDate = Math.trunc(startDate)
         endDate = Math.trunc(endDate)
@@ -550,9 +551,9 @@ export class DateTimePlugin extends FunctionPlugin {
           case 0:
             return this.days360Core(startDate, endDate, false) / 360
           case 1:
-            return (endDate-startDate) / this.interpreter.dateHelper.yearLengthForBasis(
-              this.interpreter.dateHelper.numberToSimpleDate(startDate),
-              this.interpreter.dateHelper.numberToSimpleDate(endDate)
+            return (endDate-startDate) / this.dateTimeHelper.yearLengthForBasis(
+              this.dateTimeHelper.numberToSimpleDate(startDate),
+              this.dateTimeHelper.numberToSimpleDate(endDate)
             )
           case 2:
             return (endDate-startDate)/360
@@ -566,8 +567,8 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public interval(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('INTERVAL'),
+  public interval(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('INTERVAL'),
       (arg: number) => {
         arg = Math.trunc(arg)
         const second = arg%60
@@ -592,26 +593,26 @@ export class DateTimePlugin extends FunctionPlugin {
     )
   }
 
-  public networkdays(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NETWORKDAYS'),
+  public networkdays(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NETWORKDAYS'),
       (start, end, holidays) => this.networkdayscore(start, end, 1, holidays)
       )
   }
 
-  public networkdaysintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('NETWORKDAYS.INTL'),
+  public networkdaysintl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('NETWORKDAYS.INTL'),
       (start, end, weekend, holidays) => this.networkdayscore(start, end, weekend, holidays)
       )
   }
 
-  public workday(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY'),
+  public workday(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('WORKDAY'),
       (start, end, holidays) => this.workdaycore(start, end, 1, holidays)
     )
   }
 
-  public workdayintl(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('WORKDAY.INTL'),
+  public workdayintl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('WORKDAY.INTL'),
       (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
     )
   }
@@ -630,7 +631,7 @@ export class DateTimePlugin extends FunctionPlugin {
       return weekendPattern
     }
 
-    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(weekendPattern, holidays)
     if(filteredHolidays instanceof CellError) {
       return filteredHolidays
     }
@@ -646,7 +647,7 @@ export class DateTimePlugin extends FunctionPlugin {
       return weekendPattern
     }
 
-    const filteredHolidays = this.simpleRangeToFilteredHolidays(holidays, weekendPattern)
+    const filteredHolidays = this.simpleRangeToFilteredHolidays(weekendPattern, holidays)
     if(filteredHolidays instanceof CellError) {
       return filteredHolidays
     }
@@ -688,8 +689,8 @@ export class DateTimePlugin extends FunctionPlugin {
   }
 
   private countWorkdays(start: number, end: number, weekendPattern: string, sortedHolidays: number[]): number {
-    const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
-    const absoluteStart = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(start))
+    const absoluteEnd = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(end))
+    const absoluteStart = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(start))
     let ans = 0
     for(let i=0;i<7;i++) {
       if(weekendPattern.charAt(i) === '0') {
@@ -703,7 +704,7 @@ export class DateTimePlugin extends FunctionPlugin {
     return ans
   }
 
-  private simpleRangeToFilteredHolidays(holidays: Maybe<SimpleRangeValue>, weekendPattern: string): number[] | CellError {
+  private simpleRangeToFilteredHolidays(weekendPattern: string, holidays?: SimpleRangeValue): number[] | CellError {
     const holidaysArr = holidays?.valuesFromTopLeftCorner() ?? []
     for(const val of holidaysArr) {
       if(val instanceof CellError) {
@@ -723,7 +724,7 @@ export class DateTimePlugin extends FunctionPlugin {
     }
     return [...new Set(processedHolidays)].sort((a, b) => a-b)
       .filter((arg) => {
-      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
+      const val = this.dateTimeHelper.relativeNumberToAbsoluteNumber(arg)
       const i = (val-1)%7
       return (weekendPattern.charAt(i) === '0')
     })

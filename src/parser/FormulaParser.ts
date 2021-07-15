@@ -24,8 +24,10 @@ import {
   SheetMappingFn,
 } from './addressRepresentationConverters'
 import {
+  ArrayAst,
   Ast,
   AstNodeType,
+  buildArrayAst,
   buildCellErrorAst,
   buildCellRangeAst,
   buildCellReferenceAst,
@@ -64,6 +66,8 @@ import {
 import {CellAddress, CellReferenceType} from './CellAddress'
 import {
   AdditionOp,
+  ArrayLParen,
+  ArrayRParen,
   BooleanOp,
   CellReference,
   ColumnRange,
@@ -237,6 +241,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
+
   /**
    * Rule for concatenation operator expression (e.g. "=" & A1)
    */
@@ -365,9 +370,9 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for positive atomic expressions
    */
   private positiveAtomicExpression: AstRule = this.RULE('positiveAtomicExpression', () => {
-    return this.OR(this.atomicExpCache || (this.atomicExpCache = [
+    return this.OR(this.atomicExpCache ?? (this.atomicExpCache = [
       {
-        ALT: () => this.SUBRULE(this.parenthesisExpression),
+        ALT: () => this.SUBRULE(this.arrayExpression),
       },
       {
         ALT: () => this.SUBRULE(this.cellRangeExpression),
@@ -505,9 +510,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
   })
 
-  /*
-  * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
-  * */
+  /**
+   * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
+   */
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
     const range = this.CONSUME(ColumnRange) as IExtendedToken
     const [startImage, endImage] = range.image.split(':')
@@ -525,22 +530,22 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || end.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
-    if (start.sheet === null && end.sheet !== null) {
+    if (start.sheet === undefined && end.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
     const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
 
-    if (start.sheet !== null && end.sheet === null) {
+    if (start.sheet !== undefined && end.sheet === undefined) {
       end = end.withAbsoluteSheet(start.sheet)
     }
 
     return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
   })
 
-  /*
-* Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
-* */
+  /**
+   * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
+   */
   private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
     const range = this.CONSUME(RowRange) as IExtendedToken
     const [startImage, endImage] = range.image.split(':')
@@ -558,13 +563,13 @@ export class FormulaParser extends EmbeddedActionsParser {
     if (start.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || end.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
-    if (start.sheet === null && end.sheet !== null) {
+    if (start.sheet === undefined && end.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
     const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
 
-    if (start.sheet !== null && end.sheet === null) {
+    if (start.sheet !== undefined && end.sheet === undefined) {
       end = end.withAbsoluteSheet(start.sheet)
     }
 
@@ -612,7 +617,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
             let end = offsetProcedure.reference
             let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (startAddress.sheet !== null) {
+            if (startAddress.sheet !== undefined) {
               sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
               end = end.withAbsoluteSheet(startAddress.sheet)
             }
@@ -643,7 +648,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
             let end = offsetProcedure.reference
             let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (start.reference.sheet !== null) {
+            if (start.reference.sheet !== undefined) {
               sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
               end = end.withAbsoluteSheet(start.reference.sheet)
             }
@@ -703,18 +708,57 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   private buildCellRange(startAddress: CellAddress, endAddress: CellAddress, leadingWhitespace?: string): Ast {
-    if (startAddress.sheet === null && endAddress.sheet !== null) {
+    if (startAddress.sheet === undefined && endAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
     const sheetReferenceType = this.rangeSheetReferenceType(startAddress.sheet, endAddress.sheet)
 
-    if (startAddress.sheet !== null && endAddress.sheet === null) {
+    if (startAddress.sheet !== undefined && endAddress.sheet === undefined) {
       endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
     }
 
     return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
   }
+
+  private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
+    return this.OR([
+      {
+        ALT: () => {
+          const ltoken = this.CONSUME(ArrayLParen) as IExtendedToken
+          const ret = this.SUBRULE(this.insideArrayExpression) as ArrayAst
+          const rtoken = this.CONSUME(ArrayRParen) as IExtendedToken
+          return buildArrayAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
+        }
+      },
+      {
+        ALT: () => this.SUBRULE(this.parenthesisExpression)
+      }
+    ])
+  })
+
+  private insideArrayExpression: AstRule = this.RULE('insideArrayExpression', () => {
+    const ret: Ast[][] = [[]]
+    ret[ret.length-1].push(this.SUBRULE(this.booleanExpression))
+    this.MANY( () => {
+      this.OR([
+        {
+          ALT: () => {
+            this.CONSUME(this.lexerConfig.ArrayColSeparator)
+            ret[ret.length-1].push(this.SUBRULE2(this.booleanExpression))
+          }
+        },
+        {
+          ALT: () => {
+            this.CONSUME(this.lexerConfig.ArrayRowSeparator)
+            ret.push([])
+            ret[ret.length-1].push(this.SUBRULE3(this.booleanExpression))
+          }
+        }
+      ])
+    })
+    return buildArrayAst(ret)
+  })
 
   /**
    * Rule for parenthesis expression
@@ -725,6 +769,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
+
+
+
 
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments
@@ -788,7 +835,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const topLeftCorner = new CellAddress(
-      null,
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
       cellArg.reference.type,
@@ -814,7 +860,6 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(topLeftCorner)
     } else {
       const bottomRightCorner = new CellAddress(
-        null,
         topLeftCorner.col + width - 1,
         topLeftCorner.row + height - 1,
         topLeftCorner.type,
@@ -828,10 +873,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildParsingErrorAst()
   }
 
-  private rangeSheetReferenceType(start: number | null, end: number | null): RangeSheetReferenceType {
-    if (start === null) {
+  private rangeSheetReferenceType(start?: number, end?: number): RangeSheetReferenceType {
+    if (start === undefined) {
       return RangeSheetReferenceType.RELATIVE
-    } else if (end === null) {
+    } else if (end === undefined) {
       return RangeSheetReferenceType.START_ABSOLUTE
     } else {
       return RangeSheetReferenceType.BOTH_ABSOLUTE

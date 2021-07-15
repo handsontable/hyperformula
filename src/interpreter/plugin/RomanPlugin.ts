@@ -3,13 +3,14 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
-import {getRawValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {getRawValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class RomanPlugin extends FunctionPlugin {
+export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RomanPlugin>{
   public static implementedFunctions = {
     'ROMAN': {
       method: 'roman',
@@ -26,8 +27,8 @@ export class RomanPlugin extends FunctionPlugin {
     },
   }
 
-  public roman(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ROMAN'),
+  public roman(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ROMAN'),
       (val: number, mode: RawScalarValue) => {
         val = Math.trunc(val)
         if(mode === false) {
@@ -51,8 +52,8 @@ export class RomanPlugin extends FunctionPlugin {
     )
   }
 
-  public arabic(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('ARABIC'),
+  public arabic(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('ARABIC'),
       (inputString: string) => {
         inputString = inputString.trim().toUpperCase()
         let minusSign = false

@@ -59,7 +59,7 @@ export class Unparser {
       }
       case AstNodeType.CELL_REFERENCE: {
         let image
-        if (ast.reference.sheet !== null) {
+        if (ast.reference.sheet !== undefined) {
           image = this.unparseSheetName(ast.reference.sheet) + '!'
         } else {
           image = ''
@@ -97,6 +97,10 @@ export class Unparser {
         const rightPart = '(' + expression + imageWithWhitespace(')', ast.internalWhitespace)
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
+      case AstNodeType.ARRAY: {
+        const ret = '{'+ast.args.map(row => row.map(val => this.unparseAst(val, address)).join(this.config.arrayColumnSeparator)).join(this.config.arrayRowSeparator) + imageWithWhitespace('}', ast.internalWhitespace)
+        return imageWithWhitespace(ret, ast.leadingWhitespace)
+      }
       default: {
         const left = this.unparseAst(ast.left, address)
         const right = this.unparseAst(ast.right, address)
@@ -117,11 +121,11 @@ export class Unparser {
     let startSheeet = ''
     let endSheet = ''
 
-    if (ast.start.sheet !== null && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
+    if (ast.start.sheet !== undefined && (ast.sheetReferenceType !== RangeSheetReferenceType.RELATIVE)) {
       startSheeet = this.unparseSheetName(ast.start.sheet) + '!'
     }
 
-    if (ast.end.sheet !== null && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
+    if (ast.end.sheet !== undefined && ast.sheetReferenceType === RangeSheetReferenceType.BOTH_ABSOLUTE) {
       endSheet = this.unparseSheetName(ast.end.sheet) + '!'
     }
 

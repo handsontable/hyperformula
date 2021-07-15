@@ -62,7 +62,7 @@ import { HyperFormula } from 'hyperformula';
 
 // define the options
 const options = {
-  licenseKey: 'agpl-v3',
+  licenseKey: 'gpl-v3',
 };
 
 // define the data
@@ -116,14 +116,10 @@ Your help is much appreciated in any of the following topics:
 
 ## License
 
-HyperFormula is a triple-licensed software. You can use it under the
-open source [AGPLv3 license](https://github.com/handsontable/hyperformula/blob/master/agpl-3.0.txt),
-or a [free license](https://github.com/handsontable/hyperformula/blob/master/non-commercial-license.pdf)
-in all your non-commercial projects. There is also a
-[commercial license](https://handsontable.github.io/hyperformula/guide/contact.html),
-and support services available.
+HyperFormula is a double-licensed software. In all your non-commercial projects, you can use it under the
+open source [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt). Additionally, there is also a [commercial license](https://handsontable.github.io/hyperformula/guide/contact.html), and support services available.
 
-## Acknowledgements
+## Acknowledgments 
 
 You should know that this project wouldn’t exist without co-financing from European Union funds under the European Regional Development Funds as a part of the Smart Growth Operational Programme. Project implemented as a part of the Polish National Centre for Research and Development: “Fast Track”.
 
@@ -131,8 +127,8 @@ You should know that this project wouldn’t exist without co-financing from Eur
 - Project name: “Development of the high-performance calculation engine for processing tabular data of the significant size on mobile devices and workstations using parallel computing and GPU.”
 - Project number: POIR.01.01.01-00-0223/18-00
 - Beneficiary: Handsoncode sp. z o.o.
-- Total budget: PLN 1 121 375.00 (USD ~295 000)
-- Amount of grant: PLN 774 742.00 (USD ~204 000)
+- Total budget: PLN 1 117 275.87 (USD ~295 000)
+- Amount of grant: PLN 771 807.73 (USD ~204 000)
 - Duration: 2018-2019
 
 ![eu-funds](docs/.vuepress/public/eu-logos.png)

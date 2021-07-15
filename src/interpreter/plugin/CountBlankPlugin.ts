@@ -3,15 +3,15 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {EmptyValue, InternalScalarValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {EmptyValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
  */
-export class CountBlankPlugin extends FunctionPlugin {
+export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountBlankPlugin>{
 
   public static implementedFunctions = {
     'COUNTBLANK': {
@@ -24,8 +24,8 @@ export class CountBlankPlugin extends FunctionPlugin {
     },
   }
 
-  public countblank(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
+  public countblank(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
       let counter = 0
       args.forEach((arg) => {
         if(arg === EmptyValue) {

@@ -142,12 +142,26 @@ to pass the following parameters:
 * Target row
 
 This method returns a list of cells whose values were affected by
-this operation together with their absolute addresses and new values.
+this operation, together with their absolute addresses and new values.
 
 ```javascript
 // track the changes triggered by moving
 // the first row in the first sheet into row 2
 const changes = hfInstance.moveRows(0, 0, 1, 2);
+```
+
+### Reordering rows
+
+You can change the order of rows by using the `setRowOrder` method. You need to pass the following parameters:
+* Sheet ID
+* New row order
+
+This method returns a list of cells whose values were affected by
+this operation, together with their absolute addresses and new values.
+
+```javascript
+// row 0 and row 2 swap places
+const changes = hfInstance.setRowOrder(0, [2, 1, 0]);
 ```
 
 ## Columns
@@ -199,6 +213,20 @@ this operation together with their absolute addresses and new values.
 // track the changes triggered by moving
 // the first column in the first sheet into column 2 
 const changes = hfInstance.moveColumns(0, 0, 1, 2);
+```
+
+### Reordering columns
+
+You can change the order of columns by using the `setColumnOrder` method. You need to pass the following parameters:
+* Sheet ID
+* New column order
+
+This method returns a list of cells whose values were affected by
+this operation, together with their absolute addresses and new values.
+
+```javascript
+// column 0 and column 2 swap places
+const changes = hfInstance.setColumnOrder(0, [2, 1, 0]);
 ```
 
 ## Cells
@@ -363,7 +391,7 @@ This demo presents several basic operations integrated with a
 sample UI.
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.6.x/basic-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/1.0.x/basic-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: basic-operations"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

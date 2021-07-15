@@ -7,6 +7,9 @@ import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
 
+export const RANGE_OPERATOR = ':'
+export const ABSOLUTE_OPERATOR = '$'
+
 /* arithmetic */
 // abstract for + -
 export const AdditionOp = createToken({
@@ -48,27 +51,31 @@ export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
 
 export const CellReference = createToken({
   name: 'CellReference',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[A-Za-z]+\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
 export const ColumnRange = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[A-Za-z]+:\(${sheetNameRegexp}\)?\\$?[A-Za-z]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
 })
 
 export const RowRange = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\$?[0-9]+:\(${sheetNameRegexp}\)?\\$?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
 
-export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: /:/})
+export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${RANGE_OPERATOR}`})
 
 /* parenthesis */
 export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
 
-/* prcoedures */
+/* array parenthesis */
+export const ArrayLParen = createToken({name: 'ArrayLParen', pattern: /{/})
+export const ArrayRParen = createToken({name: 'ArrayRParen', pattern: /}/})
+
+/* procedures */
 export const ProcedureName = createToken({name: 'ProcedureName', pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/})
 
 /* named expressions */
@@ -94,6 +101,8 @@ export interface ILexerConfig {
   errorMapping: Record<string, ErrorType>,
   functionMapping: Record<string, string>,
   decimalSeparator: '.' | ',',
+  ArrayColSeparator: TokenType,
+  ArrayRowSeparator: TokenType,
   maxColumns: number,
   maxRows: number,
 }
@@ -103,8 +112,21 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
 
+  const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
+  const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
+
   /* configurable tokens */
-  const ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+  let ArgSeparator, inject: TokenType[]
+  if(config.functionArgSeparator === config.arrayColumnSeparator) {
+    ArgSeparator = ArrayColSeparator
+    inject = []
+  } else if(config.functionArgSeparator === config.arrayRowSeparator) {
+    ArgSeparator = ArrayRowSeparator
+    inject = []
+  } else {
+    ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
+    inject = [ArgSeparator]
+  }
   const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)})
   const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
 
@@ -125,10 +147,12 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     LessThanOp,
     LParen,
     RParen,
+    ArrayLParen,
+    ArrayRParen,
     OffsetProcedureName,
     ProcedureName,
     RangeSeparator,
-    ArgSeparator,
+      ...inject,
     ColumnRange,
     RowRange,
     NumberLiteral,
@@ -140,12 +164,16 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     MultiplicationOp,
     CellReference,
     NamedExpression,
+    ArrayRowSeparator,
+    ArrayColSeparator,
   ]
 
   return {
     ArgSeparator,
     NumberLiteral,
     OffsetProcedureName,
+    ArrayRowSeparator,
+    ArrayColSeparator,
     allTokens,
     errorMapping,
     functionMapping,

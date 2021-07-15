@@ -3,15 +3,16 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress, simpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError, } from './CellValue'
+import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {CellValue, DetailedCellError} from './CellValue'
 import {Config} from './Config'
-import {CellValueChange} from './ContentChanges'
+import {CellValueChange, ChangeExporter} from './ContentChanges'
 import {ErrorMessage} from './error-message'
-import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber, } from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 
@@ -45,33 +46,47 @@ export class ExportedCellChange {
 export class ExportedNamedExpressionChange {
   constructor(
     public readonly name: string,
-    public readonly newValue: CellValue,
+    public readonly newValue: CellValue | CellValue[][],
   ) {
   }
 }
 
-export class Exporter {
+export class Exporter implements ChangeExporter<ExportedChange> {
   constructor(
     private readonly config: Config,
     private readonly namedExpressions: NamedExpressions,
     private readonly sheetIndexMapping: SheetIndexMappingFn,
+    private readonly lazilyTransformingService: LazilyTransformingAstService,
   ) {
   }
 
-  public exportChange(change: CellValueChange): ExportedChange {
-    if (change.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
-      const namedExpression = this.namedExpressions.namedExpressionInAddress(change.row)
+
+  public exportChange(change: CellValueChange): ExportedChange | ExportedChange[] {
+    const value = change.value
+    const address = change.address
+
+    if (address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
+      const namedExpression = this.namedExpressions.namedExpressionInAddress(address.row)
       if (!namedExpression) {
-        throw 'Missing named expression'
+        throw new Error('Missing named expression')
       }
       return new ExportedNamedExpressionChange(
         namedExpression.displayName,
-        this.exportValue(change.value),
+        this.exportScalarOrRange(value),
       )
+    } else if (value instanceof SimpleRangeValue) {
+      const result: ExportedChange[] = []
+      for (const [cellValue, cellAddress] of value.entriesFromTopLeftCorner(address)) {
+        result.push(new ExportedCellChange(
+          cellAddress,
+          this.exportValue(cellValue)
+        ))
+      }
+      return result
     } else {
       return new ExportedCellChange(
-        simpleCellAddress(change.sheet, change.col, change.row),
-        this.exportValue(change.value),
+        address,
+        this.exportValue(value),
       )
     }
   }
@@ -90,10 +105,18 @@ export class Exporter {
     }
   }
 
+  private exportScalarOrRange(value: InterpreterValue): CellValue | CellValue[][] {
+    if (value instanceof SimpleRangeValue) {
+      return value.rawData().map(row => row.map(v => this.exportValue(v)))
+    } else {
+      return this.exportValue(value)
+    }
+  }
+
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
-    const originAddress = error.address
-    if(originAddress !== undefined) {
+    const originAddress = error.root?.getAddress(this.lazilyTransformingService)
+    if (originAddress !== undefined) {
       if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
         address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName
       } else {

@@ -15,9 +15,13 @@ const dictionary: RawTranslationPackage = {
     NAME: '#NOME?',
     NUM: '#NÚM!',
     REF: '#REF!',
+    SPILL: '#TRANSPOSIÇÃO!',
     VALUE: '#VALOR!',
   },
   functions: {
+    FILTER: 'FILTER',
+    'ARRAY_CONSTRAIN' : 'ARRAY_CONSTRAIN',
+    ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
     ACOS: 'ACOS',
     ACOSH: 'ACOSH',

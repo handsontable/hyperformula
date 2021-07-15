@@ -25,7 +25,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRemoved, handler)
-    engine.removeSheet('Sheet2')
+    engine.removeSheet(1)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])
@@ -39,7 +39,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRemoved, handler)
-    engine.removeSheet('sheet2')
+    engine.removeSheet(1)
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])

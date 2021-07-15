@@ -6,14 +6,12 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
-import {Operations} from './Operations'
+import {Config} from './Config'
 import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
 import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ParserWithCaching} from './parser'
+import {Operations} from './Operations'
 import {ParsingError} from './parser/Ast'
-import {Config} from './Config'
 
 export type ClipboardCell = ClipboardCellValue | ClipboardCellFormula | ClipboardCellEmpty | ClipboardCellParsingError
 
@@ -75,14 +73,16 @@ class Clipboard {
 
 export class ClipboardOperations {
   public clipboard?: Clipboard
+  private maxRows: number
+  private maxColumns: number
 
   constructor(
+    config: Config,
     private readonly dependencyGraph: DependencyGraph,
     private readonly operations: Operations,
-    private readonly parser: ParserWithCaching,
-    private readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    private readonly config: Config,
   ) {
+    this.maxRows = config.maxRows
+    this.maxColumns = config.maxColumns
   }
 
   public cut(leftCorner: SimpleCellAddress, width: number, height: number): void {
@@ -125,12 +125,12 @@ export class ClipboardOperations {
     }
 
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, this.clipboard.width, this.clipboard.height)
-    if (targetRange.exceedsSheetSizeLimits(this.config.maxColumns, this.config.maxRows)) {
+    if (targetRange.exceedsSheetSizeLimits(this.maxColumns, this.maxRows)) {
       throw new SheetSizeLimitExceededError()
     }
 
-    if (this.dependencyGraph.matrixMapping.isFormulaMatrixInRange(targetRange)) {
-      throw new Error('It is not possible to paste onto matrix')
+    if (this.dependencyGraph.arrayMapping.isFormulaArrayInRange(targetRange)) {
+      throw new Error('It is not possible to paste onto an array')
     }
   }
 

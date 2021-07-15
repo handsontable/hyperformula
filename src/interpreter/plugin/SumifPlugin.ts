@@ -3,14 +3,15 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
-import {getRawValue, InternalScalarValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
+import {InterpreterState} from '../InterpreterState'
+import {getRawValue, InterpreterValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 class AverageResult {
 
@@ -42,23 +43,23 @@ class AverageResult {
 /** Computes key for criterion function cache */
 function sumifCacheKey(conditions: Condition[]): string {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
+  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
   return ['SUMIF', ...conditionsStrings].join(',')
 }
 
 function averageifCacheKey(conditions: Condition[]): string {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
+  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
   return ['AVERAGEIF', ...conditionsStrings].join(',')
 }
 
 function countifsCacheKey(conditions: Condition[]): string {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range()!.sheet},${c.conditionRange.range()!.start.col},${c.conditionRange.range()!.start.row}`)
+  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
   return ['COUNTIFS', ...conditionsStrings].join(',')
 }
 
-export class SumifPlugin extends FunctionPlugin {
+export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumifPlugin>{
   public static implementedFunctions = {
     'SUMIF': {
       method: 'sumif',
@@ -110,12 +111,12 @@ export class SumifPlugin extends FunctionPlugin {
    * SumRange is the range on which adding will be performed.
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public sumif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMIF'),
+  public sumif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SUMIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -126,19 +127,19 @@ export class SumifPlugin extends FunctionPlugin {
           this.interpreter,
           sumifCacheKey,
           0,
-          (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
+          (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
           (arg) => getRawValue(arg),
         ).compute(valuesArg, [new Condition(conditionArg, criterion)])
       }
     )
   }
 
-  public sumifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('SUMIFS'), (values: SimpleRangeValue, ...args) => {
+  public sumifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('SUMIFS'), (values: SimpleRangeValue, ...args) => {
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
         const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.arithmeticHelper)
         if (criterionPackage === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -149,16 +150,16 @@ export class SumifPlugin extends FunctionPlugin {
         this.interpreter,
         sumifCacheKey,
         0,
-        (left, right) => this.interpreter.arithmeticHelper.nonstrictadd(left, right),
+        (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
         (arg) => getRawValue(arg),
       ).compute(values, conditions)
     })
   }
 
-  public averageif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('AVERAGEIF'),
+  public averageif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('AVERAGEIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -196,12 +197,12 @@ export class SumifPlugin extends FunctionPlugin {
    * Returns number of cells on which criteria evaluates to true.
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
-  public countif(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTIF'),
+  public countif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('COUNTIF'),
       (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.interpreter.arithmeticHelper)
+        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
         if (criterion === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -217,12 +218,12 @@ export class SumifPlugin extends FunctionPlugin {
     )
   }
 
-  public countifs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COUNTIFS'), (...args) => {
+  public countifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('COUNTIFS'), (...args) => {
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
         const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.interpreter.arithmeticHelper)
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.arithmeticHelper)
         if (criterionPackage === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }

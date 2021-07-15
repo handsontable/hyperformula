@@ -3,11 +3,17 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress, CellValueJustNumber, CellValueNoNumber} from './Cell'
+import {SimpleCellRange} from './AbsoluteCellRange'
+import {CellError, CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
 import {Config, ConfigParams} from './Config'
 import {ColumnRowIndex} from './CrudOperations'
+import {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold
+} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
@@ -19,7 +25,6 @@ import {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
@@ -34,8 +39,8 @@ import {
   ProtectedFunctionTranslationError,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError,
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError,
   UnableToParseError
 } from './errors'
 import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from './Exporter'
@@ -43,10 +48,12 @@ import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
-import * as plugins from './interpreter/plugin'
-import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
-import {Sheet, SheetDimensions, Sheets} from './Sheet'
 import {FormatInfo} from './interpreter/InterpreterValue'
+import * as plugins from './interpreter/plugin'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
+import {SerializedNamedExpression} from './Serialization'
+import {Sheet, SheetDimensions, Sheets} from './Sheet'
 
 /** @internal */
 class HyperFormulaNS extends HyperFormula {
@@ -69,7 +76,6 @@ class HyperFormulaNS extends HyperFormula {
   public static InvalidArgumentsError = InvalidArgumentsError
   public static LanguageNotRegisteredError = LanguageNotRegisteredError
   public static LanguageAlreadyRegisteredError = LanguageAlreadyRegisteredError
-  public static MatrixFormulasNotSupportedError = MatrixFormulasNotSupportedError
   public static MissingTranslationError = MissingTranslationError
   public static NamedExpressionDoesNotExistError = NamedExpressionDoesNotExistError
   public static NamedExpressionNameIsAlreadyTakenError = NamedExpressionNameIsAlreadyTakenError
@@ -84,8 +90,8 @@ class HyperFormulaNS extends HyperFormula {
   public static ProtectedFunctionTranslationError = ProtectedFunctionTranslationError
   public static SheetNameAlreadyTakenError = SheetNameAlreadyTakenError
   public static SheetSizeLimitExceededError = SheetSizeLimitExceededError
-  public static SourceLocationHasMatrixError = SourceLocationHasMatrixError
-  public static TargetLocationHasMatrixError = TargetLocationHasMatrixError
+  public static SourceLocationHasArrayError = SourceLocationHasArrayError
+  public static TargetLocationHasArrayError = TargetLocationHasArrayError
   public static UnableToParseError = UnableToParseError
 }
 
@@ -105,6 +111,9 @@ for (const pluginName of Object.getOwnPropertyNames(plugins)) {
 export default HyperFormulaNS
 
 export {
+  AlwaysDense,
+  AlwaysSparse,
+  DenseSparseChooseBasedOnThreshold,
   CellValue,
   NoErrorCellValue,
   ConfigParams,
@@ -115,6 +124,7 @@ export {
   Sheets,
   SheetDimensions,
   SimpleCellAddress,
+  SimpleCellRange,
   ColumnRowIndex,
   RawTranslationPackage,
   FunctionPluginDefinition,
@@ -129,6 +139,7 @@ export {
   ExportedCellChange,
   ExportedNamedExpressionChange,
   DetailedCellError,
+  CellError,
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
   EvaluationSuspendedError,
@@ -140,7 +151,6 @@ export {
   InvalidArgumentsError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
-  MatrixFormulasNotSupportedError,
   MissingTranslationError,
   NamedExpressionDoesNotExistError,
   NamedExpressionNameIsAlreadyTakenError,
@@ -153,9 +163,11 @@ export {
   NotAFormulaError,
   NothingToPasteError,
   ProtectedFunctionTranslationError,
+  SimpleRangeValue,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
-  SourceLocationHasMatrixError,
-  TargetLocationHasMatrixError,
+  SourceLocationHasArrayError,
+  TargetLocationHasArrayError,
   UnableToParseError,
+  SerializedNamedExpression,
 }

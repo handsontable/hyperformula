@@ -3,12 +3,12 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
 import {ProcedureAst} from '../../parser'
-import {InternalScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class RadiansPlugin extends FunctionPlugin {
+export class RadiansPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadiansPlugin>{
   public static implementedFunctions = {
     'RADIANS': {
       method: 'radians',
@@ -18,8 +18,8 @@ export class RadiansPlugin extends FunctionPlugin {
     },
   }
 
-  public radians(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('RADIANS'),
+  public radians(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('RADIANS'),
       (arg) => arg * (Math.PI / 180)
     )
   }

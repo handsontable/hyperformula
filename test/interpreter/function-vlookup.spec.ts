@@ -24,7 +24,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
     it('wrong type of first argument', () => {
       const engine = builder([
-        ['=VLOOKUP(D1:D2, A2:B3, 2, TRUE())'],
+        ['=VLOOKUP(D1:E1, A2:B3, 2, TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
@@ -246,23 +246,12 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(3)
     })
 
-    it('should work for detected matrices', () => {
-      const engine = builder([
-        ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
-        ['1'],
-        ['2'],
-        ['3'],
-      ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-      expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    })
-
     it('should work for standard matrices', () => {
       const engine = builder([
         ['=VLOOKUP(3, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
-        ['{=TRANSPOSE(A2:C3)}'],
+        ['=TRANSPOSE(A2:C3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
@@ -273,7 +262,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=VLOOKUP(4, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
-        ['{=TRANSPOSE(A2:C3)}'],
+        ['=TRANSPOSE(A2:C3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))

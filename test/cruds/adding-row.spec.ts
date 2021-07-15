@@ -1,10 +1,10 @@
 import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
-import {FormulaCellVertex, MatrixVertex} from '../../src/DependencyGraph'
+import {ArrayVertex, FormulaCellVertex} from '../../src/DependencyGraph'
+import {AlwaysDense} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {adr, expectArrayWithSameContent, extractMatrixRange} from '../testUtils'
+import {adr, expectArrayWithSameContent, expectEngineToBeTheSameAs, extractMatrixRange} from '../testUtils'
 
 describe('Adding row - checking if its possible', () => {
   it('no if starting row is negative', () => {
@@ -58,21 +58,6 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(-Infinity, [0, 1])).toEqual(false)
   })
 
-  it('no if theres a formula matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['13'],
-    ])
-
-    expect(engine.isItPossibleToAddRows(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, [2, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, [3, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddRows(0, [4, 1])).toEqual(true)
-  })
-
   it('no if adding row would exceed sheet size limit', () => {
     const engine = HyperFormula.buildFromArray(
       Array(Config.defaultConfig.maxRows - 1).fill([''])
@@ -82,17 +67,6 @@ describe('Adding row - checking if its possible', () => {
     expect(engine.isItPossibleToAddRows(0, [0, 1], [5, 1])).toEqual(false)
   })
 
-  it('yes if theres a numeric matrix in place where we add', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-    expect(engine.matrixMapping.matrixMapping.size).toEqual(1)
-
-    expect(engine.isItPossibleToAddRows(0, [0, 1])).toEqual(true)
-    expect(engine.isItPossibleToAddRows(0, [1, 1])).toEqual(true)
-  })
-
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
@@ -100,25 +74,51 @@ describe('Adding row - checking if its possible', () => {
   })
 })
 
-describe('Adding row - matrix check', () => {
-  it('raise error if trying to add a row in a row with matrix', () => {
+describe('Adding row - matrix', () => {
+  it('should be possible to add row crossing matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['13'],
-    ])
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      ['bar'],
+    ], {chooseAddressMappingPolicy: new AlwaysDense()})
 
-    expect(() => {
-      engine.addRows(0, [3, 1])
-    }).toThrowError('Cannot perform this operation, target location has a matrix inside.')
+    engine.addRows(0, [3, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      [null],
+      ['bar'],
+    ]))
+  })
+
+  it('should adjust matrix address mapping when adding multiple rows', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      ['bar'],
+    ], {chooseAddressMappingPolicy: new AlwaysDense()})
+
+    engine.addRows(0, [3, 3])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      ['1', '2', '3'],
+      ['4', '5', '6'],
+      ['foo', '=TRANSPOSE(A1:C2)'],
+      [null],
+      [null],
+      [null],
+      ['bar'],
+    ]))
   })
 
   it('should be possible to add row right above matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['=TRANSPOSE(A3:B4)'],
+      [],
       ['1', '2'],
       ['3', '4'],
     ])
@@ -133,8 +133,8 @@ describe('Adding row - matrix check', () => {
 
   it('should be possible to add row right after matrix', () => {
     const engine = HyperFormula.buildFromArray([
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
-      ['{=TRANSPOSE(A3:B4)}', '{=TRANSPOSE(A3:B4)}'],
+      ['=TRANSPOSE(A3:B4)'],
+      [],
       ['1', '2'],
       ['3', '4'],
     ])
@@ -204,53 +204,7 @@ describe('Adding row - reevaluation', () => {
     const changes = engine.addRows(0, [1, 1])
 
     expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(simpleCellAddress(0, 1, 2), 1))
-  })
-})
-
-describe('Adding row - MatrixVertex', () => {
-  it('MatrixVertex#formula should be updated', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-    ])
-
-    engine.addRows(0, [1, 1])
-
-    expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
-  })
-
-  it('MatrixVertex#formula should be updated when different sheets', () => {
-    const engine = HyperFormula.buildFromSheets({
-      Sheet1: [
-        ['1', '2'],
-        ['3', '4'],
-      ],
-      Sheet2: [
-        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
-        ['{=TRANSPOSE(Sheet1!A1:B2)}', '{=TRANSPOSE(Sheet1!A1:B2)}'],
-      ],
-    })
-
-    engine.addRows(0, [1, 1])
-
-    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
-  })
-
-  it('MatrixVertex#address should be updated', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-      ['{=TRANSPOSE(A1:B2)}', '{=TRANSPOSE(A1:B2)}'],
-    ])
-
-    engine.addRows(0, [1, 1])
-
-    const matrixVertex = engine.addressMapping.fetchCell(adr('A4')) as MatrixVertex
-    expect(matrixVertex.cellAddress).toEqual(adr('A4'))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B3'), 1))
   })
 })
 
@@ -283,26 +237,9 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
-    expect(formulaVertex.address).toEqual(simpleCellAddress(1, 0, 0))
-  })
-})
-
-describe('Adding row - matrices adjustments', () => {
-  it('add row inside numeric matrix, expand matrix', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-    ], {matrixDetection: true, matrixDetectionThreshold: 1})
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-
-    engine.addRows(0, [1, 2])
-
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
   })
 })
 
@@ -367,5 +304,121 @@ describe('Adding row - column index', () => {
     const index = (engine.columnSearch as ColumnIndex)
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
     expectArrayWithSameContent([2], index.getValueIndex(0, 0, 2).index)
+  })
+})
+
+describe('Adding row - arrays', () => {
+  it('should be possible to add row above array', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=-C1:D3'],
+      [],
+      [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    engine.addRows(0, [0, 1])
+
+    const expected = HyperFormula.buildFromArray([
+      [],
+      ['=-C2:D4'],
+      [],
+      [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    expectEngineToBeTheSameAs(engine, expected)
+  })
+
+  it('adding row across array should not change array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [], [], [],
+      ['=-A1:B3'],
+      [], [],
+      ['foo']
+    ], {useArrayArithmetic: true})
+
+    engine.addRows(0, [4, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [], [], [],
+      ['=-A1:B3'],
+      [], [], [],
+      ['foo']
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('adding row should expand dependent array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)']
+    ], {useArrayArithmetic: true})
+
+    engine.addRows(0, [1, 1])
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [],
+      [3, 4],
+      ['=TRANSPOSE(A1:B3)']
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('undo add row with dependent array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)']
+    ], {useArrayArithmetic: true})
+
+    engine.addRows(0, [1, 1])
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)']
+    ], {useArrayArithmetic: true}))
+  })
+
+  it('ArrayVertex#formula should be updated', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=TRANSPOSE(A1:B2)'],
+    ])
+
+    engine.addRows(0, [1, 1])
+
+    expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
+  })
+
+  it('ArrayVertex#formula should be updated when different sheets', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['1', '2'],
+        ['3', '4'],
+      ],
+      Sheet2: [
+        ['=TRANSPOSE(Sheet1!A1:B2)'],
+      ],
+    })
+
+    engine.addRows(0, [1, 1])
+
+    expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
+  })
+
+  it('ArrayVertex#address should be updated', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2'],
+      ['3', '4'],
+      ['=TRANSPOSE(A1:B2)'],
+    ])
+
+    engine.addRows(0, [1, 1])
+
+    const matrixVertex = engine.addressMapping.fetchCell(adr('A4')) as ArrayVertex
+    expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A4'))
   })
 })

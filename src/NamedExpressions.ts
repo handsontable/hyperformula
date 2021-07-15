@@ -9,7 +9,7 @@ import {Ast, AstNodeType} from './parser'
 
 export interface NamedExpression {
   name: string,
-  scope?: string,
+  scope?: number,
   expression?: string,
   options?: NamedExpressionOptions,
 }
@@ -171,7 +171,7 @@ export class NamedExpressions {
   public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {
     const store = sheetId === undefined ? this.workbookStore : this.worksheetStoreOrCreate(sheetId)
     let namedExpression = store.get(expressionName)
-    if (namedExpression) {
+    if (namedExpression !== undefined) {
       namedExpression.added = true
       namedExpression.displayName = expressionName
       namedExpression.options = options
@@ -276,16 +276,6 @@ export class NamedExpressions {
   private nextAddress() {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow++)
   }
-
-  public lookupNextAddress(expressionName: string, sheetId?: number): SimpleCellAddress {
-    if (sheetId === undefined) {
-      const namedExpression = this.workbookStore.get(expressionName)
-      if (namedExpression) {
-        return namedExpression.address
-      }
-    }
-    return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow)
-  }
 }
 
 
@@ -329,6 +319,9 @@ export const doesContainRelativeReferences = (ast: Ast): boolean => {
       return ast.args.some((arg) =>
         doesContainRelativeReferences(arg)
       )
+    }
+    case AstNodeType.ARRAY: {
+      return ast.args.some(row => row.some(arg => doesContainRelativeReferences(arg)))
     }
   }
 }

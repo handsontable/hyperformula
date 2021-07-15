@@ -9,7 +9,13 @@ import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
 import {Interpreter} from './Interpreter'
-import {FunctionMetadata, FunctionPlugin, FunctionPluginDefinition} from './plugin/FunctionPlugin'
+import {
+  FunctionMetadata,
+  FunctionPlugin,
+  FunctionPluginDefinition,
+  PluginArraySizeFunctionType,
+  PluginFunctionType
+} from './plugin/FunctionPlugin'
 import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
@@ -153,10 +159,13 @@ export class FunctionRegistry {
 
   private readonly instancePlugins: Map<string, FunctionPluginDefinition>
   private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
+  private readonly arraySizeFunctions: Map<string, [string, FunctionPlugin]> = new Map()
 
   private readonly volatileFunctions: Set<string> = new Set()
+  private readonly arrayFunctions: Set<string> = new Set()
   private readonly structuralChangeFunctions: Set<string> = new Set()
   private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string> = new Set()
+  private readonly functionsMetadata: Map<string, FunctionMetadata> = new Map()
 
   constructor(private config: Config) {
     if (config.functionPlugins.length > 0) {
@@ -186,8 +195,13 @@ export class FunctionRegistry {
         foundPluginInstance = new plugin(interpreter)
         instances.push(foundPluginInstance)
       }
-      const methodName = validateAndReturnMetadataFromName(functionId, plugin).method
+      const metadata = validateAndReturnMetadataFromName(functionId, plugin)
+      const methodName = metadata.method
       this.functions.set(functionId, [methodName, foundPluginInstance])
+      const arraySizeMethodName = metadata.arraySizeMethod
+      if(arraySizeMethodName !== undefined) {
+        this.arraySizeFunctions.set(functionId, [arraySizeMethodName, foundPluginInstance])
+      }
     }
   }
 
@@ -198,8 +212,28 @@ export class FunctionRegistry {
     return this.instancePlugins.get(functionId)
   }
 
-  public getFunction(functionId: string): Maybe<[string, FunctionPlugin]> {
-    return this.functions.get(functionId)
+  public getFunction(functionId: string): Maybe<PluginFunctionType> {
+    const pluginEntry = this.functions.get(functionId)
+    if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
+      const [pluginFunction, pluginInstance] = pluginEntry
+      return (ast, state) => (pluginInstance as any as Record<string, PluginFunctionType>)[pluginFunction](ast, state)
+    } else {
+      return undefined
+    }
+  }
+
+  public getArraySizeFunction(functionId: string): Maybe<PluginArraySizeFunctionType> {
+    const pluginEntry = this.arraySizeFunctions.get(functionId)
+    if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
+      const [pluginArraySizeFunction, pluginInstance] = pluginEntry
+      return (ast, state) => (pluginInstance as any as Record<string, PluginArraySizeFunctionType>)[pluginArraySizeFunction](ast, state)
+    } else {
+      return undefined
+    }
+  }
+
+  public getMetadata(functionId: string): Maybe<FunctionMetadata> {
+    return this.functionsMetadata.get(functionId)
   }
 
   public getPlugins(): FunctionPluginDefinition[] {
@@ -216,21 +250,20 @@ export class FunctionRegistry {
     return Array.from(this.functions.keys())
   }
 
-  public doesFunctionNeedArgumentToBeComputed = (functionId: string): boolean => {
-    return this.functionsWhichDoesNotNeedArgumentsToBeComputed.has(functionId)
-  }
+  public doesFunctionNeedArgumentToBeComputed = (functionId: string): boolean => this.functionsWhichDoesNotNeedArgumentsToBeComputed.has(functionId)
 
-  public isFunctionVolatile = (functionId: string): boolean => {
-    return this.volatileFunctions.has(functionId)
-  }
+  public isFunctionVolatile = (functionId: string): boolean => this.volatileFunctions.has(functionId)
 
-  public isFunctionDependentOnSheetStructureChange = (functionId: string): boolean => {
-    return this.structuralChangeFunctions.has(functionId)
-  }
+  public isArrayFunction = (functionId: string): boolean => this.arrayFunctions.has(functionId)
+
+  public isFunctionDependentOnSheetStructureChange = (functionId: string): boolean => this.structuralChangeFunctions.has(functionId)
 
   private categorizeFunction(functionId: string, functionMetadata: FunctionMetadata): void {
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)
+    }
+    if (functionMetadata.arrayFunction) {
+      this.arrayFunctions.add(functionId)
     }
     if (functionMetadata.doesNotNeedArgumentsToBeComputed) {
       this.functionsWhichDoesNotNeedArgumentsToBeComputed.add(functionId)
@@ -238,5 +271,6 @@ export class FunctionRegistry {
     if (functionMetadata.isDependentOnSheetStructureChange) {
       this.structuralChangeFunctions.add(functionId)
     }
+    this.functionsMetadata.set(functionId, functionMetadata)
   }
 }

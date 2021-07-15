@@ -1,4 +1,5 @@
 import {HyperFormula} from '../src'
+import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {adr} from './testUtils'
 
 describe('vertex counting', () => {
@@ -8,7 +9,7 @@ describe('vertex counting', () => {
       ['3', '4']
     ])
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
-    engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')
+    engine.calculateFormula('=SUM(A1:B2)', 0)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
   })
 
@@ -32,7 +33,7 @@ describe('range mapping', () => {
       ['3', '4']
     ])
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-    engine.calculateFormula('=SUM(A1:B2)', 'Sheet1')
+    engine.calculateFormula('=SUM(A1:B2)', 0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -320,7 +321,7 @@ describe('cruds', () => {
     ['=SUM(A1:A3)'],
     ['=SUM(A1:A4)'],
     ])
-    engine.moveCells(adr('A1'), 1, 3, adr('B1'))
+    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3), adr('B1'))
     engine.setCellContents(adr('B1'), null)
     engine.setCellContents(adr('B2'), null)
     engine.setCellContents(adr('B3'), null)

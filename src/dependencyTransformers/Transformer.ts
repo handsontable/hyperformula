@@ -29,8 +29,8 @@ export abstract class Transformer implements FormulaTransformer {
   public abstract get sheet(): number
 
   public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
-    for (const node of graph.matrixFormulaNodes()) {
-      const [newAst, newAddress] = this.transformSingleAst(node.getFormula()!, node.getAddress())
+    for (const node of graph.arrayFormulaNodes()) {
+      const [newAst, newAddress] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
       node.setAddress(newAddress)
@@ -70,14 +70,12 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.PLUS_UNARY_OP: {
         return {
           ...ast,
-          type: ast.type,
           value: this.transformAst(ast.value, address),
         }
       }
       case AstNodeType.FUNCTION_CALL: {
         return {
           ...ast,
-          type: ast.type,
           procedureName: ast.procedureName,
           args: ast.args.map((arg) => this.transformAst(arg, address)),
         }
@@ -85,14 +83,18 @@ export abstract class Transformer implements FormulaTransformer {
       case AstNodeType.PARENTHESIS: {
         return {
           ...ast,
-          type: ast.type,
           expression: this.transformAst(ast.expression, address),
+        }
+      }
+      case AstNodeType.ARRAY: {
+        return {
+          ...ast,
+          args: ast.args.map((row) => row.map(val => this.transformAst(val, address)))
         }
       }
       default: {
         return {
           ...ast,
-          type: ast.type,
           left: this.transformAst(ast.left, address),
           right: this.transformAst(ast.right, address),
         } as Ast

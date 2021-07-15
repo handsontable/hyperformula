@@ -3,14 +3,15 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
-import {InternalScalarValue, RawInterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin} from './FunctionPlugin'
+import {InterpreterState} from '../InterpreterState'
+import {InterpreterValue, RawInterpreterValue} from '../InterpreterValue'
+import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class ComplexPlugin extends  FunctionPlugin {
+export class ComplexPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<ComplexPlugin>{
   public static implementedFunctions = {
     'COMPLEX': {
       method: 'complex',
@@ -177,8 +178,8 @@ export class ComplexPlugin extends  FunctionPlugin {
     },
   }
 
-  public complex(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('COMPLEX'),
+  public complex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('COMPLEX'),
       (re: number, im: number, unit: string) => {
         if(unit !== 'i' && unit !== 'j') {
           return new CellError(ErrorType.VALUE, ErrorMessage.ShouldBeIorJ)
@@ -188,24 +189,24 @@ export class ComplexPlugin extends  FunctionPlugin {
     )
   }
 
-  public imabs(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMABS'), abs)
+  public imabs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMABS'), abs)
   }
 
-  public imaginary(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMAGINARY'),
+  public imaginary(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMAGINARY'),
       ([re, im]: complex) => im
     )
   }
 
-  public imreal(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMREAL'),
+  public imreal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMREAL'),
       ([re, im]: complex) => re
     )
   }
 
-  public imargument(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMARGUMENT'),
+  public imargument(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMARGUMENT'),
       ([re, im]: complex) => {
         if(re===0 && im===0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
@@ -215,82 +216,82 @@ export class ComplexPlugin extends  FunctionPlugin {
     )
   }
 
-  public imconjugate(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMCONJUGATE'),
+  public imconjugate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMCONJUGATE'),
       ([re, im]: complex) => coerceComplexToString([re, -im])
     )
   }
 
-  public imcos(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMCOS'),
+  public imcos(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMCOS'),
       (arg: complex) => coerceComplexToString(cos(arg))
     )
   }
 
-  public imcosh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMCOSH'),
+  public imcosh(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMCOSH'),
       (arg: complex) => coerceComplexToString(cosh(arg))
     )
   }
 
-  public imcot(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMCOT'),
+  public imcot(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMCOT'),
       (arg: complex) => coerceComplexToString(div(cos(arg), sin(arg)))
     )
   }
 
-  public imcsc(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMCSC'),
+  public imcsc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMCSC'),
       (arg: complex) => coerceComplexToString(div([1, 0], sin(arg)))
     )
   }
 
-  public imcsch(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMCSCH'),
+  public imcsch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMCSCH'),
       (arg: complex) => coerceComplexToString(div([1, 0], sinh(arg)))
     )
   }
 
-  public imsec(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSEC'),
+  public imsec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMSEC'),
       (arg: complex) => coerceComplexToString(div([1, 0], cos(arg)))
     )
   }
 
-  public imsech(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSECH'),
+  public imsech(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMSECH'),
       (arg: complex) => coerceComplexToString(div([1, 0], cosh(arg)))
     )
   }
 
-  public imsin(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSIN'),
+  public imsin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMSIN'),
       (arg: complex) => coerceComplexToString(sin(arg))
     )
   }
 
-  public imsinh(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSINH'),
+  public imsinh(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMSINH'),
       (arg: complex) => coerceComplexToString(sinh(arg))
     )
   }
 
-  public imtan(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMTAN'),
+  public imtan(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMTAN'),
       (arg: complex) => coerceComplexToString(div(sin(arg), cos(arg)))
     )
   }
 
-  public imdiv(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMDIV'),
+  public imdiv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMDIV'),
       (arg1: complex, arg2: complex) => coerceComplexToString(div(arg1, arg2))
     )
   }
 
-  public improduct(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMPRODUCT'),
+  public improduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMPRODUCT'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced
         }
@@ -303,10 +304,10 @@ export class ComplexPlugin extends  FunctionPlugin {
     )
   }
 
-  public imsum(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSUM'),
+  public imsum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMSUM'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceComplexExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceComplexExactRanges(args)
         if (coerced instanceof CellError) {
           return coerced
         }
@@ -319,26 +320,26 @@ export class ComplexPlugin extends  FunctionPlugin {
     )
   }
 
-  public imsub(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSUB'),
+  public imsub(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMSUB'),
       (arg1: complex, arg2: complex) => coerceComplexToString(sub(arg1, arg2))
     )
   }
 
-  public imexp(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMEXP'),
+  public imexp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMEXP'),
       (arg: complex) => coerceComplexToString(exp(arg))
     )
   }
 
-  public imln(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMLN'),
+  public imln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMLN'),
       (arg: complex) => coerceComplexToString(ln(arg))
     )
   }
 
-  public imlog10(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMLOG10'),
+  public imlog10(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMLOG10'),
       (arg: complex) => {
         const [re, im] = ln(arg)
         const c = Math.log(10)
@@ -347,8 +348,8 @@ export class ComplexPlugin extends  FunctionPlugin {
     )
   }
 
-  public imlog2(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMLOG2'),
+  public imlog2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMLOG2'),
       (arg: complex) => {
         const [re, im] = ln(arg)
         const c = Math.log(2)
@@ -357,14 +358,14 @@ export class ComplexPlugin extends  FunctionPlugin {
     )
   }
 
-  public impower(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMPOWER'),
+  public impower(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMPOWER'),
       (arg: complex, n: number) => coerceComplexToString(power(arg, n))
     )
   }
 
-  public imsqrt(ast: ProcedureAst, formulaAddress: SimpleCellAddress): InternalScalarValue {
-    return this.runFunction(ast.args, formulaAddress, this.metadata('IMSQRT'),
+  public imsqrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IMSQRT'),
       (arg: complex) => coerceComplexToString(power(arg, 0.5))
     )
   }
