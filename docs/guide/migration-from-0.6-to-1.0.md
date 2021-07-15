@@ -4,9 +4,9 @@ To upgrade your HyperFormula version from 0.6.x to 1.0.x, follow this guide.
 
 ## Step 1: Change your license key
 
-Change your HyperFormula license key.
+If use the AGPLv3 license, or the free non-commercial license, you need to change your license key.
 
-For more details on HyperFormula license keys, go [here](license-key.md).
+If you use a commercial license, you don't need to make any changes.
 
 ### Open-source license
 
@@ -31,9 +31,7 @@ const options = {
 
 If you use the free non-commercial license, switch to the GPLv3 license or purchase a commercial license.
 
-### Commercial license
-
-If you use a commercial license, you don't need to make any changes.
+For more details on HyperFormula license keys, go [here](license-key.md).
 
 ## Step 2: Change `sheetName` to `sheetId`
 
@@ -63,14 +61,14 @@ const changes = hfInstance.clearSheet(0);
 ```
 
 The only methods still accepting the `sheetName` string parameter are now:
-- `addSheet()`
-- `isItPossibleToAddSheet()`
-- `doesSheetExist()`
-- `getSheetId()`
+- `addSheet()`: needs `sheetName` to give a name to  the new sheet. Generates the new sheet's `sheetId`
+- `isItPossibleToAddSheet()`: needs `sheetName` to check if it's possible to add a new sheet with that name
+- `doesSheetExist()`: needs `sheetName` to check if a sheet with that name exists
+- `getSheetId()`: needs `sheetName` to get the sheet's `sheetId`
 
 Also, these methods still accept the `newName` string parameter:
-- `renameSheet()`
-- `isItPossibleToRenameSheet()`
+- `renameSheet()`: needs `newName` to give a new name to an existing sheet
+- `isItPossibleToRenameSheet()`: needs `newName` to check if it's possible to give that new name to an existing sheet
 
 ## Step 3: Adapt to the `matrix`->`array` name changes
 
@@ -109,15 +107,14 @@ Before:
 ={ISEVEN(A2:A5*10)}
 ```
 
-After:
+Now, if the `useArrayArithmetic` configuration option is set to `false`, use the `ARRAYFORMULA` function to [enable the array arithmetic mode locally]((arrays.md#enabling-the-array-arithmetic-mode-locally)):
 ```js
-// when the `useArrayArithmetic` configuration option is set to `false`
-// use the ARRAYFORMULA function
 =ARRAYFORMULA(ISEVEN(A2:A5*10))
+```
 
-// when the `useArrayArithmetic` configuration option is set to `true`
-// you don't need to use the ARRAYFORMULA function
-=(ISEVEN(A2:A5*10))
+But when the `useArrayArithmetic` configuration option is set to `true`, you don't need to use the `ARRAYFORMULA` function, as the array arithmetic mode is [enabled globally](arrays.md#enabling-the-array-arithmetic-mode-globally):
+```js
+=ISEVEN(A2:A5*10)
 ```
 
 ## Step 5: Drop the `matrixDetection` and `matrixDetectionThreshold` options
