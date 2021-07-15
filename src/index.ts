@@ -50,6 +50,7 @@ import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
@@ -162,6 +163,7 @@ export {
   NotAFormulaError,
   NothingToPasteError,
   ProtectedFunctionTranslationError,
+  SimpleRangeValue,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
   SourceLocationHasArrayError,

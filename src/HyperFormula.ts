@@ -4122,7 +4122,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public numberToDateTime(inputNumber: number): DateTime {
     validateArgToType(inputNumber, 'number', 'val')
-    return this._evaluator.dateHelper.numberToSimpleDateTime(inputNumber)
+    return this._evaluator.interpreter.dateTimeHelper.numberToSimpleDateTime(inputNumber)
   }
 
   /**
@@ -4146,7 +4146,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public numberToDate(inputNumber: number): DateTime {
     validateArgToType(inputNumber, 'number', 'val')
-    return this._evaluator.dateHelper.numberToSimpleDate(inputNumber)
+    return this._evaluator.interpreter.dateTimeHelper.numberToSimpleDate(inputNumber)
   }
 
   /**

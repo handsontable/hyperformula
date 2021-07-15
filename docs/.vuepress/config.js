@@ -215,6 +215,7 @@ module.exports = {
             ['/guide/building', 'Building'],
             ['/guide/testing', 'Testing'],
             ['/guide/custom-functions', 'Custom functions'],
+            ['/guide/arrays', 'Arrays'],
             ['/guide/performance', 'Performance'],
           ]
         },
