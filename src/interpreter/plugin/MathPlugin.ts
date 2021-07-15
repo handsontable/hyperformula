@@ -170,7 +170,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
   public gcd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GCD'),
       (...args: RawInterpreterValue[]) => {
-        const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
+        const processedArgs = this.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
           return processedArgs
         }
@@ -193,7 +193,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
   public lcm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LCM'),
       (...args: RawInterpreterValue[]) => {
-        const processedArgs = this.interpreter.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
+        const processedArgs = this.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
         if(processedArgs instanceof CellError) {
           return processedArgs
         }
@@ -261,7 +261,7 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
   public seriessum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SERIESSUM'),
       (x: number, n: number, m: number, range: SimpleRangeValue) => {
-        const coefs = this.interpreter.arithmeticHelper.manyToOnlyNumbersDropNulls(range.valuesFromTopLeftCorner())
+        const coefs = this.arithmeticHelper.manyToOnlyNumbersDropNulls(range.valuesFromTopLeftCorner())
         if(coefs instanceof CellError) {
           return coefs
         }

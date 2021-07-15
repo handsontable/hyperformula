@@ -1,4 +1,5 @@
-import {FunctionPluginValidationError, HyperFormula} from '../src'
+import {FunctionPluginValidationError, HyperFormula, SimpleRangeValue} from '../src'
+import {ArraySize} from '../src/ArraySize'
 import {ErrorType} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
@@ -18,18 +19,24 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
       method: 'foo',
     },
     'BAR': {
-      method: 'bar'
-    }
+      method: 'bar',
+    },
+    'ARRAYFOO': {
+      method: 'arrayfoo',
+      arraySizeMethod: 'arraysizeFoo',
+    },
   }
 
   public static translations = {
     'enGB': {
       'FOO': 'FOO',
-      'BAR': 'BAR'
+      'BAR': 'BAR',
+      'ARRAYFOO': 'ARRAYFOO',
     },
     'plPL': {
       'FOO': 'FU',
-      'BAR': 'BAR'
+      'BAR': 'BAR',
+      'ARRAYFOO': 'ARRAYFOO',
     }
   }
 
@@ -39,6 +46,14 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
 
   public bar(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'bar'
+  }
+
+  public arrayfoo(_ast: ProcedureAst, _state: InterpreterState): SimpleRangeValue {
+    return SimpleRangeValue.onlyValues([[1, 1], [1, 1]])
+  }
+
+  public arraysizeFoo(_ast: ProcedureAst, _state: InterpreterState): ArraySize {
+    return new ArraySize(2, 2)
   }
 }
 
@@ -138,7 +153,7 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FU', 'BAR', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
+    expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
   })
 
   it('should register all formulas from plugin', () => {
@@ -164,6 +179,15 @@ describe('Register static custom plugin', () => {
     expect(HyperFormula.getRegisteredFunctionNames('enGB')).toContain('BAR')
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
+  })
+
+  it('should register single array functions', () => {
+    HyperFormula.registerFunction('ARRAYFOO', FooPlugin, FooPlugin.translations)
+    const engine = HyperFormula.buildFromArray([
+      ['=ARRAYFOO()']
+    ])
+
+    expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
   })
 
   it('should override one formula with custom implementation', () => {

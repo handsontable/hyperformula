@@ -277,8 +277,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       const normalizedText = text.substring(startIndex - 1).toLowerCase()
 
       let index: number
-      if (this.interpreter.arithmeticHelper.requiresRegex(pattern)) {
-        index = this.interpreter.arithmeticHelper.searchString(pattern, normalizedText)
+      if (this.arithmeticHelper.requiresRegex(pattern)) {
+        index = this.arithmeticHelper.searchString(pattern, normalizedText)
       } else {
         index = normalizedText.indexOf(pattern.toLowerCase())
       }

@@ -4,8 +4,10 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {ArraySize, ArraySizePredictor} from '../../ArraySize'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
+import {DateTimeHelper} from '../../DateTimeHelper'
 import {DependencyGraph} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {SearchStrategy} from '../../Lookup/SearchStrategy'
@@ -13,6 +15,7 @@ import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
 import {
+  ArithmeticHelper,
   coerceRangeToScalar,
   coerceScalarToBoolean,
   coerceScalarToString,
@@ -72,6 +75,10 @@ export interface FunctionMetadata {
    * Engine.
    * 
    * If set to `true`, the function is volatile.
+   */
+  arraySizeMethod?: string,
+  /**
+   * Engine.
    */
   isVolatile?: boolean,
   /**
@@ -206,8 +213,10 @@ export interface FunctionArgument {
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
 
+export type PluginArraySizeFunctionType = (ast: ProcedureAst, state: InterpreterState) => ArraySize
+
 export type FunctionPluginTypecheck<T> = {
-  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : never
+  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : T[K] extends PluginArraySizeFunctionType ? T[K] : never
 }
 
 /**
@@ -226,6 +235,9 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected readonly columnSearch: SearchStrategy
   protected readonly config: Config
   protected readonly serialization: Serialization
+  protected readonly arraySizePredictor: ArraySizePredictor
+  protected readonly dateTimeHelper: DateTimeHelper
+  protected readonly arithmeticHelper: ArithmeticHelper
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
@@ -233,10 +245,17 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
     this.serialization = interpreter.serialization
+    this.arraySizePredictor = interpreter.arraySizePredictor
+    this.dateTimeHelper = interpreter.dateTimeHelper
+    this.arithmeticHelper = interpreter.arithmeticHelper
   }
 
   protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
     return this.interpreter.evaluateAst(ast, state)
+  }
+
+  protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
+    return this.arraySizePredictor.checkArraySizeForAst(ast, state)
   }
 
   protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean][] {
@@ -254,7 +273,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return ret
   }
 
-  protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
+  protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
   protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument, state: InterpreterState): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
     let ret
@@ -320,7 +339,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           ret = coerceToRange(arg)
           break
         case ArgumentTypes.COMPLEX:
-          return this.interpreter.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
+          return this.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
       }
     }
     if(coercedType.passSubtype || ret === undefined) {
@@ -474,7 +493,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
   private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
     if(type !== undefined && isExtendedNumber(val)) {
-      return this.interpreter.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
+      return this.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
     } else {
       return val
     }
