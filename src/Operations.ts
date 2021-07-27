@@ -33,6 +33,7 @@ import {MoveCellsTransformer} from './dependencyTransformers/MoveCellsTransforme
 import {RemoveColumnsTransformer} from './dependencyTransformers/RemoveColumnsTransformer'
 import {RemoveRowsTransformer} from './dependencyTransformers/RemoveRowsTransformer'
 import {RemoveSheetTransformer} from './dependencyTransformers/RemoveSheetTransformer'
+import {Destructable} from './Destructable'
 import {
   InvalidArgumentsError,
   NamedExpressionDoesNotExistError,
@@ -154,7 +155,7 @@ export interface MoveCellsResult {
   addedGlobalNamedExpressions: string[],
 }
 
-export class Operations {
+export class Operations extends Destructable {
   private changes: ContentChanges = ContentChanges.empty()
 
   constructor(
@@ -168,6 +169,7 @@ export class Operations {
     private readonly config: Config,
     private readonly arraySizePredictor: ArraySizePredictor,
   ) {
+    super()
     this.allocateNamedExpressionAddressSpace()
   }
 

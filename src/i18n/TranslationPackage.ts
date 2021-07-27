@@ -4,6 +4,7 @@
  */
 
 import {ErrorType, TranslatableErrorType} from '../Cell'
+import {Destructable} from '../Destructable'
 import {MissingTranslationError, ProtectedFunctionTranslationError} from '../errors'
 import {Maybe} from '../Maybe'
 import {ErrorTranslationSet, TranslationSet, UIElement, UITranslationSet} from './index'
@@ -15,7 +16,7 @@ export interface RawTranslationPackage {
   ui: UITranslationSet,
 }
 
-export class TranslationPackage {
+export class TranslationPackage extends Destructable {
   private readonly _protectedTranslations: TranslationSet = {
     'VERSION': 'VERSION'
   }
@@ -25,6 +26,7 @@ export class TranslationPackage {
     private errors: ErrorTranslationSet,
     private ui: UITranslationSet,
   ) {
+    super()
     this.checkUI()
     this.checkErrors()
     this.checkFunctionTranslations(this.functions)

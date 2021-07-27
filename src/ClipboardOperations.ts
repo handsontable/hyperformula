@@ -9,6 +9,7 @@ import {RawCellContent} from './CellContentParser'
 import {Config} from './Config'
 import {DependencyGraph} from './DependencyGraph'
 import {ValueCellVertexValue} from './DependencyGraph/ValueCellVertex'
+import {Destructable} from './Destructable'
 import {InvalidArgumentsError, SheetSizeLimitExceededError} from './errors'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {Operations} from './Operations'
@@ -73,7 +74,7 @@ class Clipboard {
   }
 }
 
-export class ClipboardOperations {
+export class ClipboardOperations extends Destructable {
   public clipboard?: Clipboard
 
   constructor(
@@ -83,6 +84,7 @@ export class ClipboardOperations {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly config: Config,
   ) {
+    super()
   }
 
   public cut(leftCorner: SimpleCellAddress, width: number, height: number): void {

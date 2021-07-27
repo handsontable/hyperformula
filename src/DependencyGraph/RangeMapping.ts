@@ -5,6 +5,7 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {Destructable} from '../Destructable'
 import {Maybe} from '../Maybe'
 import {Span} from '../Span'
 import {RangeVertex} from './'
@@ -22,7 +23,7 @@ export interface TruncateRangesResult extends AdjustRangesResult {
 /**
  * Mapping from address ranges to range vertices
  */
-export class RangeMapping {
+export class RangeMapping extends Destructable {
   /** Map in which actual data is stored. */
   private rangeMapping: Map<number, Map<string, RangeVertex>> = new Map()
 
@@ -223,10 +224,6 @@ export class RangeMapping {
     return {
       restRange: range,
     }
-  }
-
-  public destroy(): void {
-    this.rangeMapping.clear()
   }
 
   private* entriesFromSheet(sheet: number): IterableIterator<[string, RangeVertex]> {

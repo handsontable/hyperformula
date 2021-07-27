@@ -6,6 +6,7 @@
 import {CellError, ErrorType} from './Cell'
 import {Config} from './Config'
 import {DateTimeHelper, timeToNumber} from './DateTimeHelper'
+import {Destructable} from './Destructable'
 import {ErrorMessage} from './error-message'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
@@ -89,12 +90,12 @@ export function isError(text: string, errorMapping: Record<string, ErrorType>): 
   return errorRegex.test(upperCased) && Object.prototype.hasOwnProperty.call(errorMapping, upperCased)
 }
 
-export class CellContentParser {
+export class CellContentParser extends Destructable {
   constructor(
     private readonly config: Config,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper) {
-
+    super()
   }
 
   private currencyMatcher(token: string): Maybe<[string, string]> {

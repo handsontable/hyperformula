@@ -4,6 +4,7 @@
  */
 
 import {Config} from './Config'
+import {Destructable} from './Destructable'
 import {DateNumber, DateTimeNumber, ExtendedNumber, TimeNumber} from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 
@@ -44,13 +45,14 @@ export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
 
 export const maxDate: SimpleDate = {year: 9999, month: 12, day: 31}
 
-export class DateTimeHelper {
+export class DateTimeHelper extends Destructable {
   private readonly minDateAboluteValue: number
   private readonly maxDateValue: number
   private readonly epochYearZero: number
   private readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   private readonly leapYear1900: boolean
   constructor(private readonly config: Config) {
+    super()
     this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
     this.leapYear1900 = config.leapYear1900

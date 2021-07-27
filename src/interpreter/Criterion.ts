@@ -4,6 +4,7 @@
  */
 
 import {Config} from '../Config'
+import {Destructable} from '../Destructable'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
 import {EmptyValue, getRawValue, RawScalarValue} from './InterpreterValue'
@@ -22,10 +23,11 @@ export interface Criterion {
 }
 export const buildCriterion = (operator: CriterionType, value: number | string | boolean | null ) => ({ operator, value })
 
-export class CriterionBuilder {
+export class CriterionBuilder extends Destructable {
   private trueString: string
   private falseString: string
   constructor(config: Config) {
+    super()
     this.trueString = config.translationPackage.getMaybeFunctionTranslation('TRUE')?.toLowerCase() ?? 'true'
     this.falseString = config.translationPackage.getMaybeFunctionTranslation('FALSE')?.toLowerCase() ?? 'false'
   }

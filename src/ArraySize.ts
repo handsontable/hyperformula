@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
+import {Destructable} from './Destructable'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {ArgumentTypes} from './interpreter/plugin/FunctionPlugin'
@@ -62,11 +63,12 @@ function arraySizeForUnaryOp(arraySize: ArraySize): ArraySize {
   return new ArraySize(arraySize.width, arraySize.height)
 }
 
-export class ArraySizePredictor {
+export class ArraySizePredictor extends Destructable {
   constructor(
     private config: Config,
     private functionRegistry: FunctionRegistry,
   ) {
+    super()
   }
 
   public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {

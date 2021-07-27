@@ -9,6 +9,7 @@ import {CellError, ErrorType, invalidSimpleCellAddress, SimpleCellAddress} from 
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {CellVertex, DependencyGraph, Vertex} from '../DependencyGraph'
+import {Destructable} from '../Destructable'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
@@ -41,7 +42,7 @@ import {
 import {SimpleRangeValue} from './SimpleRangeValue'
 import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
-export class Interpreter {
+export class Interpreter extends Destructable {
   private gpu?: any
   public readonly arithmeticHelper: ArithmeticHelper
   public readonly criterionBuilder: CriterionBuilder
@@ -57,6 +58,7 @@ export class Interpreter {
     public readonly namedExpressions: NamedExpressions,
     public readonly serialization: Serialization
   ) {
+    super()
     this.functionRegistry.initializePlugins(this)
     this.arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
     this.criterionBuilder = new CriterionBuilder(config)
@@ -283,9 +285,8 @@ export class Interpreter {
   }
 
   public destroy() {
-    if (this.gpu) {
-      this.gpu.destroy()
-    }
+    this.gpu?.destroy?.()
+    super.destroy()
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {

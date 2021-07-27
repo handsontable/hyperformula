@@ -4,6 +4,7 @@
  */
 
 import {Config} from '../Config'
+import {Destructable} from '../Destructable'
 import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
@@ -29,7 +30,7 @@ function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionP
   return entry
 }
 
-export class FunctionRegistry {
+export class FunctionRegistry extends Destructable {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
 
   private static readonly _protectedPlugins: Map<string, FunctionPluginDefinition | undefined> = new Map([
@@ -161,6 +162,7 @@ export class FunctionRegistry {
   private readonly functionsMetadata: Map<string, FunctionMetadata> = new Map()
 
   constructor(private config: Config) {
+    super()
     if (config.functionPlugins.length > 0) {
       this.instancePlugins = new Map()
       for (const plugin of config.functionPlugins) {

@@ -2,6 +2,7 @@
  * @license
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
+import {Destructable} from '../Destructable'
 
 export type DependencyQuery<T> = (vertex: T) => T[]
 
@@ -23,7 +24,7 @@ enum NodeVisitStatus {
  * - this.specialNodes* are always subset of this.nodes
  * - this.edges(node) is subset of this.nodes (i.e. it does not contain nodes not present in graph) -- this invariant DOES NOT HOLD right now
  */
-export class Graph<T> {
+export class Graph<T> extends Destructable {
   /** Set with nodes in graph. */
   public nodes: Set<T> = new Set()
 
@@ -38,6 +39,7 @@ export class Graph<T> {
   constructor(
     private readonly dependencyQuery: DependencyQuery<T>
   ) {
+    super()
   }
 
   /**
@@ -306,14 +308,6 @@ export class Graph<T> {
       }
     })
     return result
-  }
-
-  public destroy(): void {
-    this.edges.clear()
-    this.nodes.clear()
-    this.specialNodes.clear()
-    this.specialNodesStructuralChanges.clear()
-    this.clearSpecialNodesRecentlyChanged()
   }
 
   private removeDependencies(node: T): T[] {

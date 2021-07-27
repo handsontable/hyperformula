@@ -7,6 +7,7 @@ import {equalSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Ce
 import {RawCellContent} from './CellContentParser'
 import {ClipboardCell} from './ClipboardOperations'
 import {Config} from './Config'
+import {Destructable} from './Destructable'
 import {InternalNamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {
   AddColumnsCommand,
@@ -411,7 +412,7 @@ export class BatchUndoEntry extends BaseUndoEntry {
   }
 }
 
-export class UndoRedo {
+export class UndoRedo extends Destructable {
   private undoStack: UndoEntry[] = []
   private redoStack: UndoEntry[] = []
   private readonly undoLimit: number
@@ -421,6 +422,7 @@ export class UndoRedo {
     config: Config,
     public readonly operations: Operations,
   ) {
+    super()
     this.undoLimit = config.undoLimit
   }
 

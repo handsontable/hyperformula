@@ -8,6 +8,7 @@ import {RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
 import {Config} from './Config'
 import {ArrayVertex, DependencyGraph, FormulaCellVertex, ParsingErrorVertex} from './DependencyGraph'
+import {Destructable} from './Destructable'
 import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
@@ -20,13 +21,14 @@ export interface SerializedNamedExpression {
   options?: NamedExpressionOptions,
 }
 
-export class Serialization {
+export class Serialization extends Destructable {
   constructor(
     public readonly dependencyGraph: DependencyGraph,
     public readonly unparser: Unparser,
     public readonly config: Config,
     public readonly exporter: Exporter
   ) {
+    super()
   }
 
   public getCellFormula(address: SimpleCellAddress, targetAddress?: SimpleCellAddress): Maybe<string> {

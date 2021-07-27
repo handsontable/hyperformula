@@ -31,6 +31,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
+import {Destructable} from './Destructable'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {
   EvaluationSuspendedError,
@@ -83,7 +84,7 @@ import {Statistics, StatType} from './statistics'
  * corresponding lifecycle events. The events are marked accordingly, as well as thrown
  * errors so they can be correctly handled.
  */
-export class HyperFormula implements TypedEmitter {
+export class HyperFormula extends Destructable implements TypedEmitter {
 
   /**
    * Version of the HyperFormula.
@@ -595,6 +596,7 @@ export class HyperFormula implements TypedEmitter {
     private _serialization: Serialization,
     private _functionRegistry: FunctionRegistry,
   ) {
+    super()
   }
 
   /**
@@ -4285,13 +4287,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public destroy(): void {
-    this.dependencyGraph.destroy()
-    this.columnSearch.destroy()
-    this.evaluator.destroy()
-    this._parser.destroy()
-    this._lazilyTransformingAstService.destroy()
-    this._stats.destroy()
-    this._crudOperations.clearClipboard()
+    super.destroy()
   }
 
   /**

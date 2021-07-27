@@ -11,6 +11,7 @@ import {ContentChanges} from './ContentChanges'
 import {DateTimeHelper} from './DateTimeHelper'
 import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
+import {Destructable} from './Destructable'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
@@ -24,7 +25,7 @@ import {Ast, RelativeDependency} from './parser'
 import {Serialization} from './Serialization'
 import {Statistics, StatType} from './statistics'
 
-export class Evaluator {
+export class Evaluator extends Destructable {
   private interpreter: Interpreter
   private lazilyTransformingAstService: LazilyTransformingAstService
 
@@ -39,6 +40,7 @@ export class Evaluator {
     private readonly namedExpressions: NamedExpressions,
     private readonly serialization: Serialization,
   ) {
+    super()
     this.interpreter = new Interpreter(this.dependencyGraph, this.columnSearch, this.config, this.stats, this.dateHelper, this.numberLiteralsHelper, this.functionRegistry, this.namedExpressions, this.serialization)
     this.lazilyTransformingAstService = this.dependencyGraph.lazilyTransformingAstService
   }
@@ -90,10 +92,6 @@ export class Evaluator {
       )
     })
     return changes
-  }
-
-  public destroy(): void {
-    this.interpreter.destroy()
   }
 
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {

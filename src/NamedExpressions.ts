@@ -4,6 +4,7 @@
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
+import {Destructable} from './Destructable'
 import {Maybe} from './Maybe'
 import {Ast, AstNodeType} from './parser'
 
@@ -34,7 +35,7 @@ export class InternalNamedExpression {
   }
 }
 
-class WorkbookStore {
+class WorkbookStore extends Destructable {
   private readonly mapping = new Map<string, InternalNamedExpression>()
 
   public has(expressionName: string): boolean {
@@ -81,7 +82,7 @@ class WorkbookStore {
   }
 }
 
-class WorksheetStore {
+class WorksheetStore extends Destructable {
   public readonly mapping = new Map<string, InternalNamedExpression>()
 
   public add(namedExpression: InternalNamedExpression): void {
@@ -118,15 +119,12 @@ class WorksheetStore {
   }
 }
 
-export class NamedExpressions {
+export class NamedExpressions extends Destructable {
   public static SHEET_FOR_WORKBOOK_EXPRESSIONS = -1
   private nextNamedExpressionRow: number = 0
   private readonly workbookStore: WorkbookStore = new WorkbookStore()
   private readonly worksheetStores: Map<number, WorksheetStore> = new Map()
   private readonly addressCache: Map<number, InternalNamedExpression> = new Map()
-
-  constructor() {
-  }
 
   public isNameAvailable(expressionName: string, sheetId?: number): boolean {
     if (sheetId === undefined) {

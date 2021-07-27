@@ -42,8 +42,6 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {}
 
-  public destroy(): void {}
-
   public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
     if(typeof key === 'string') {
       key = forceNormalizeString(key)

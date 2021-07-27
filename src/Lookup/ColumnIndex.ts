@@ -10,6 +10,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {AddRowsTransformer} from '../dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../dependencyTransformers/RemoveRowsTransformer'
 import {FormulaTransformer} from '../dependencyTransformers/Transformer'
+import {Destructable} from '../Destructable'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {
   EmptyValue,
@@ -34,7 +35,7 @@ interface ValueIndex {
 
 type SheetIndex = ColumnMap[]
 
-export class ColumnIndex implements ColumnSearchStrategy {
+export class ColumnIndex extends Destructable implements ColumnSearchStrategy {
 
   private readonly index: Map<number, SheetIndex> = new Map()
   private readonly transformingService: LazilyTransformingAstService
@@ -45,6 +46,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     private readonly config: Config,
     private readonly stats: Statistics,
   ) {
+    super()
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
   }
@@ -202,10 +204,6 @@ export class ColumnIndex implements ColumnSearchStrategy {
       }
     }
     valueIndex.version = actualVersion
-  }
-
-  public destroy() {
-    this.index.clear()
   }
 
   private addSingleCellValue(value: RawInterpreterValue, address: SimpleCellAddress) {

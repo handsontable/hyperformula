@@ -6,12 +6,13 @@
 import {SimpleCellAddress} from './Cell'
 import {CombinedTransformer} from './dependencyTransformers/CombinedTransformer'
 import {FormulaTransformer} from './dependencyTransformers/Transformer'
+import {Destructable} from './Destructable'
 import {Ast, ParserWithCaching} from './parser'
 import {StatType} from './statistics'
 import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
-export class LazilyTransformingAstService {
+export class LazilyTransformingAstService extends Destructable {
 
   public parser?: ParserWithCaching
   public undoRedo?: UndoRedo
@@ -22,6 +23,7 @@ export class LazilyTransformingAstService {
   constructor(
     private readonly stats: Statistics,
   ) {
+    super()
   }
 
   public version(): number {
@@ -77,10 +79,5 @@ export class LazilyTransformingAstService {
         yield transformation
       }
     }
-  }
-
-  public destroy() {
-    this.parser = undefined
-    this.transformations = []
   }
 }

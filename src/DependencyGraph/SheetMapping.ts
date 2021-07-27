@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {Destructable} from '../Destructable'
 import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} from '../errors'
 import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
@@ -23,13 +24,14 @@ class Sheet {
   }
 }
 
-export class SheetMapping {
+export class SheetMapping extends Destructable {
   private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
   private readonly mappingFromId: Map<number, Sheet> = new Map()
   private readonly sheetNamePrefix: string
   private lastSheetId = -1
 
   constructor(private languages: TranslationPackage) {
+    super()
     this.sheetNamePrefix = languages.getUITranslation(UIElement.NEW_SHEET_PREFIX)
   }
 
@@ -111,11 +113,6 @@ export class SheetMapping {
     sheet.displayName = newDisplayName
     this.store(sheet)
     return currentDisplayName
-  }
-
-  public destroy(): void {
-    this.mappingFromCanonicalName.clear()
-    this.mappingFromId.clear()
   }
 
   public sheetNames(): string[] {

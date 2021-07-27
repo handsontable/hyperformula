@@ -4,15 +4,17 @@
  */
 
 import {Config} from './Config'
+import {Destructable} from './Destructable'
 import {Maybe} from './Maybe'
 
-export class NumberLiteralHelper {
+export class NumberLiteralHelper extends Destructable {
   private readonly numberPattern: RegExp
   private readonly allThousandSeparatorsRegex: RegExp
 
   constructor(
     private readonly config: Config
   ) {
+    super()
     const thousandSeparator = this.config.thousandSeparator === '.' ? `\\${this.config.thousandSeparator}` : this.config.thousandSeparator
     const decimalSeparator = this.config.decimalSeparator === '.' ? `\\${this.config.decimalSeparator}` : this.config.decimalSeparator
 

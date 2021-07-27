@@ -5,15 +5,17 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {Destructable} from '../Destructable'
 import {Ast, ParserWithCaching} from '../parser'
 import {FormulaTransformer} from './Transformer'
 
-export class CombinedTransformer implements FormulaTransformer {
+export class CombinedTransformer extends Destructable implements FormulaTransformer {
   private readonly transformations: FormulaTransformer[] = []
 
   constructor(
     public readonly sheet: number
   ) {
+    super()
   }
 
   public add(transformation: FormulaTransformer): void {

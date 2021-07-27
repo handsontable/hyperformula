@@ -68,9 +68,9 @@ export class BuildEngineFactory {
 
     const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressions)
-    const dateHelper = new DateTimeHelper(config)
+    const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
-    const cellContentParser = new CellContentParser(config, dateHelper, numberLiteralHelper)
+    const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
 
     const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
     const crudOperations = new CrudOperations(config, stats, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
@@ -89,7 +89,7 @@ export class BuildEngineFactory {
     const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName, lazilyTransformingAstService)
     const serialization = new Serialization(dependencyGraph, unparser, config, exporter)
 
-    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)
+    const evaluator = new Evaluator(dependencyGraph, columnSearch, config, stats, dateTimeHelper, numberLiteralHelper, functionRegistry, namedExpressions, serialization)
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)

@@ -4,13 +4,15 @@
  */
 
 import {DependencyGraph} from '../DependencyGraph'
+import {Destructable} from '../Destructable'
 import {getRawValue, InternalScalarValue, RawInterpreterValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 
-export abstract class AdvancedFind {
+export abstract class AdvancedFind extends Destructable {
   protected constructor(
     protected dependencyGraph: DependencyGraph
   ) {
+    super()
   }
 
   public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue): number {

@@ -3,12 +3,13 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {Destructable} from '../Destructable'
 import {StatType} from './StatType'
 
 /**
  * Provides tracking performance statistics to the engine
  */
-export class Statistics {
+export class Statistics extends Destructable  {
   protected readonly stats: Map<StatType, number> = new Map<StatType, number>([
     [StatType.CRITERION_FUNCTION_FULL_CACHE_USED, 0],
     [StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED, 0],
@@ -89,10 +90,5 @@ export class Statistics {
    */
   public snapshot(): Map<StatType, number> {
     return new Map(this.stats)
-  }
-
-  public destroy() {
-    this.stats.clear()
-    this.startTimes.clear()
   }
 }

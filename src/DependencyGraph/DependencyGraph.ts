@@ -11,6 +11,7 @@ import {RawCellContent} from '../CellContentParser'
 import {CellDependency} from '../CellDependency'
 import {Config} from '../Config'
 import {ContentChanges} from '../ContentChanges'
+import {Destructable} from '../Destructable'
 import {ErrorMessage} from '../error-message'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
@@ -46,18 +47,16 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
 
-export class DependencyGraph {
+export class DependencyGraph extends Destructable {
   /**
    * Invariants:
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
    */
 
   public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, functionRegistry: FunctionRegistry, namedExpressions: NamedExpressions, stats: Statistics) {
-    const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
-    const rangeMapping = new RangeMapping()
     return new DependencyGraph(
-      addressMapping,
-      rangeMapping,
+      new AddressMapping(config.chooseAddressMappingPolicy),
+      new RangeMapping(),
       new SheetMapping(config.translationPackage),
       new ArrayMapping(),
       stats,
@@ -81,6 +80,7 @@ export class DependencyGraph {
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
   ) {
+    super()
     this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
   }
 
@@ -634,14 +634,6 @@ export class DependencyGraph {
 
   public volatileVertices() {
     return this.graph.specialNodes
-  }
-
-  public destroy(): void {
-    this.graph.destroy()
-    this.addressMapping.destroy()
-    this.rangeMapping.destroy()
-    this.sheetMapping.destroy()
-    this.arrayMapping.destroy()
   }
 
   public getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayVertex> {

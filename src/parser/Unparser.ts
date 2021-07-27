@@ -4,6 +4,7 @@
  */
 
 import {ErrorType, SimpleCellAddress} from '../Cell'
+import {Destructable} from '../Destructable'
 import {NoSheetWithIdError} from '../index'
 import {NamedExpressions} from '../NamedExpressions'
 import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
@@ -20,13 +21,14 @@ import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {ILexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
-export class Unparser {
+export class Unparser extends Destructable {
   constructor(
     private readonly config: ParserConfig,
     private readonly lexerConfig: ILexerConfig,
     private readonly sheetMappingFn: SheetIndexMappingFn,
     private readonly namedExpressions: NamedExpressions,
   ) {
+    super()
   }
 
   public unparse(ast: Ast, address: SimpleCellAddress): string {

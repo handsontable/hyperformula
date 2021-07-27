@@ -3,7 +3,9 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {Destructable} from '../Destructable'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
+import {Maybe} from '../Maybe'
 import {AstNodeType, collectDependencies, RelativeDependency} from './'
 import {Ast} from './Ast'
 
@@ -15,12 +17,13 @@ export interface CacheEntry {
 }
 const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) => ({ ast, relativeDependencies, hasVolatileFunction, hasStructuralChangeFunction })
 
-export class Cache {
+export class Cache extends Destructable {
   private cache: Map<string, CacheEntry> = new Map()
 
   constructor(
     private readonly functionRegistry: FunctionRegistry,
   ) {
+    super()
   }
 
   public set(hash: string, ast: Ast): CacheEntry {
@@ -30,8 +33,8 @@ export class Cache {
     return cacheEntry
   }
 
-  public get(hash: string): CacheEntry | null {
-    return this.cache.get(hash) || null
+  public get(hash: string): Maybe<CacheEntry> {
+    return this.cache.get(hash)
   }
 
   public maybeSetAndThenGet(hash: string, ast: Ast): Ast {
@@ -42,10 +45,6 @@ export class Cache {
       this.set(hash, ast)
       return ast
     }
-  }
-
-  public destroy() {
-    this.cache.clear()
   }
 }
 

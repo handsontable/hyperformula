@@ -5,6 +5,7 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
+import {Destructable} from '../../Destructable'
 import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {Maybe} from '../../Maybe'
@@ -15,12 +16,13 @@ import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {IAddressMappingStrategy} from './IAddressMappingStrategy'
 
-export class AddressMapping {
+export class AddressMapping extends Destructable {
   private mapping: Map<number, IAddressMappingStrategy> = new Map()
 
   constructor(
     private readonly policy: ChooseAddressMapping
   ) {
+    super()
   }
 
   /** @inheritDoc */
@@ -218,9 +220,5 @@ export class AddressMapping {
     } else {
       throw new NoSheetWithIdError(sheet)
     }
-  }
-
-  public destroy(): void {
-    this.mapping.clear()
   }
 }

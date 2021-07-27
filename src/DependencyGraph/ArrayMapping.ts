@@ -5,11 +5,12 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {addressKey, SimpleCellAddress} from '../Cell'
+import {Destructable} from '../Destructable'
 import {Maybe} from '../Maybe'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {ArrayVertex} from './'
 
-export class ArrayMapping {
+export class ArrayMapping extends Destructable {
   public readonly arrayMapping: Map<string, ArrayVertex> = new Map()
 
   public getArray(range: AbsoluteCellRange): Maybe<ArrayVertex> {
@@ -110,10 +111,6 @@ export class ArrayMapping {
       }
     }
     return false
-  }
-
-  public destroy(): void {
-    this.arrayMapping.clear()
   }
 
   public moveArrayVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {

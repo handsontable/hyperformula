@@ -15,6 +15,7 @@ import {
 } from 'chevrotain'
 
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {Destructable} from '../Destructable'
 import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
 import {
@@ -896,10 +897,11 @@ export interface IExtendedToken extends IToken {
   leadingWhitespace?: IToken,
 }
 
-export class FormulaLexer {
+export class FormulaLexer extends Destructable {
   private readonly lexer: Lexer
 
   constructor(private lexerConfig: ILexerConfig) {
+    super()
     this.lexer = new Lexer(lexerConfig.allTokens, {ensureOptimizations: true})
   }
 

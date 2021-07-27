@@ -4,6 +4,7 @@
  */
 
 import {addressKey, SimpleCellAddress} from './Cell'
+import {Destructable} from './Destructable'
 import {InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 
@@ -19,12 +20,10 @@ export interface ChangeExporter<T> {
 
 export type ChangeList = CellValueChange[]
 
-export class ContentChanges {
+export class ContentChanges extends Destructable {
   public static empty() {
     return new ContentChanges()
   }
-
-  private constructor() {}
 
   private changes: Map<string, CellValueChange> = new Map()
 

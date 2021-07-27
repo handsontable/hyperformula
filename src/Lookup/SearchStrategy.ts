@@ -38,8 +38,6 @@ export interface ColumnSearchStrategy extends SearchStrategy {
   moveValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
 
   removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void,
-
-  destroy(): void,
 }
 
 export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): ColumnSearchStrategy {

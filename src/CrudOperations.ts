@@ -11,6 +11,7 @@ import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {DependencyGraph, SheetMapping} from './DependencyGraph'
+import {Destructable} from './Destructable'
 import {
   InvalidAddressError,
   InvalidArgumentsError,
@@ -66,7 +67,7 @@ import {
 
 export type ColumnRowIndex = [number, number]
 
-export class CrudOperations {
+export class CrudOperations extends Destructable {
 
   private readonly clipboardOperations: ClipboardOperations
   public readonly undoRedo: UndoRedo
@@ -91,6 +92,7 @@ export class CrudOperations {
     private readonly namedExpressions: NamedExpressions,
     private readonly arraySizePredictor: ArraySizePredictor,
   ) {
+    super()
     this.operations = new Operations(dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, config, arraySizePredictor)
     this.clipboardOperations = new ClipboardOperations(dependencyGraph, this.operations, parser, lazilyTransformingAstService, config)
     this.undoRedo = new UndoRedo(config, this.operations)

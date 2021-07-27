@@ -14,6 +14,7 @@ import {TranslatableErrorType} from './Cell'
 import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {Destructable} from './Destructable'
 import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
 import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
@@ -444,7 +445,7 @@ export interface ConfigParams {
 
 export type ConfigParamsList = keyof ConfigParams
 
-export class Config implements ConfigParams, ParserConfig {
+export class Config extends Destructable implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     accentSensitive: false,
@@ -630,6 +631,7 @@ export class Config implements ConfigParams, ParserConfig {
       useWildcards,
     }: Partial<ConfigParams> = {},
   ) {
+    super()
     this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
     this.accentSensitive = configValueFromParam(accentSensitive, 'boolean', 'accentSensitive')
     this.caseSensitive = configValueFromParam(caseSensitive, 'boolean', 'caseSensitive')
