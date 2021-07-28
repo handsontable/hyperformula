@@ -4,6 +4,7 @@
  */
 
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {Destructable} from '../../Destructable'
 import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
@@ -14,7 +15,7 @@ import {IAddressMappingStrategy} from './IAddressMappingStrategy'
  *
  * Uses Map to store addresses, having minimal memory usage for sparse sheets but not necessarily constant set/lookup.
  */
-export class SparseStrategy implements IAddressMappingStrategy {
+export class SparseStrategy extends Destructable implements IAddressMappingStrategy {
   /**
    * Map of Maps in which actual data is stored.
    *
@@ -24,6 +25,7 @@ export class SparseStrategy implements IAddressMappingStrategy {
   private mapping: Map<number, Map<number, CellVertex>> = new Map()
 
   constructor(private width: number, private height: number) {
+    super()
   }
 
   /** @inheritDoc */

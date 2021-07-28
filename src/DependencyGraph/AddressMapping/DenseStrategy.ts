@@ -4,6 +4,7 @@
  */
 
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
+import {Destructable} from '../../Destructable'
 import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
@@ -14,7 +15,7 @@ import {IAddressMappingStrategy} from './IAddressMappingStrategy'
  *
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
  */
-export class DenseStrategy implements IAddressMappingStrategy {
+export class DenseStrategy extends Destructable implements IAddressMappingStrategy {
   /**
    * Array in which actual data is stored.
    *
@@ -27,6 +28,7 @@ export class DenseStrategy implements IAddressMappingStrategy {
    * @param height - height of the stored sheet
    */
   constructor(private width: number, private height: number) {
+    super()
     this.mapping = new Array(height)
     for (let i = 0; i < height; i++) {
       this.mapping[i] = new Array(width)

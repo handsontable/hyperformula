@@ -283,11 +283,6 @@ export class Interpreter extends Destructable {
     return this.gpu
   }
 
-  public destroy() {
-    this.gpu?.destroy?.()
-    super.destroy()
-  }
-
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
     return ast.start.sheet === ast.end.sheet
   }

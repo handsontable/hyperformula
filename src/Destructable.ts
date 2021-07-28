@@ -5,24 +5,36 @@
 
 export class Destructable {
   public destroy() {
-    const name = this.constructor.name
-    console.log('ENTERING', name)
     for(const [key, property] of Object.entries(this)) {
-      console.log(`${name}.${key}`)
       delete (this as Record<string,any>)[key]
-      property?.destroy?.()
-      if(Array.isArray(property)) {
-
-      }
-      if(property instanceof Set) {
-
-      }
-      if(property instanceof Map) {
-
-      }
-      //TODO MIXINS FOR OTHER TYPES
+      recursiveDestroy(property)
     }
-    console.log('LEAVING', name)
     Object.setPrototypeOf(this, null)
+  }
+}
+
+function recursiveDestroy(object: any) {
+  if(object?.destroy !== undefined) {
+    object.destroy()
+  } else if(Array.isArray(object)) {
+    for(const element of object) {
+      recursiveDestroy(element)
+    }
+    object.length = 0
+  } else if(object instanceof Set) {
+    for(const element of object) {
+      recursiveDestroy(element)
+    }
+    object.clear()
+  }
+  else if(object instanceof Map) {
+    for(const element of object.values()) {
+      recursiveDestroy(element)
+    }
+    object.clear()
+  } else if(object !== null && typeof object === 'object'){
+    for(const element of Object.values(object)) {
+      (element as any)?.destroy?.()
+    }
   }
 }
