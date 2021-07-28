@@ -6,7 +6,7 @@
 export class Destructable {
   public destroy() {
     for(const [key, property] of Object.entries(this)) {
-      delete (this as Record<string,any>)[key]
+      delete (this as Record<string, any>)[key]
       recursiveDestroy(property)
     }
     Object.setPrototypeOf(this, null)
@@ -26,8 +26,7 @@ function recursiveDestroy(object: any) {
       recursiveDestroy(element)
     }
     object.clear()
-  }
-  else if(object instanceof Map) {
+  } else if(object instanceof Map) {
     for(const element of object.values()) {
       recursiveDestroy(element)
     }

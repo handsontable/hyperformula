@@ -2,6 +2,7 @@
  * @license
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
+
 import {Destructable} from '../Destructable'
 
 export type DependencyQuery<T> = (vertex: T) => T[]
