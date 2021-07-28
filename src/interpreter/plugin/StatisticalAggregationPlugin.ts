@@ -163,7 +163,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public avedev(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AVEDEV'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }
@@ -178,7 +178,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public devsq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEVSQ'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }
@@ -192,7 +192,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public geomean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GEOMEAN'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }
@@ -211,7 +211,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public harmean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HARMEAN'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }
@@ -308,7 +308,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public ztest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('Z.TEST'),
       (range: SimpleRangeValue, x: number, sigma?: number) => {
-        const vals = this.interpreter.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if(vals instanceof CellError) {
           return vals
         }
@@ -333,8 +333,8 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public ftest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('F.TEST'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
-        const arrX = this.interpreter.arithmeticHelper.manyToExactNumbers(dataX.valuesFromTopLeftCorner())
-        const arrY = this.interpreter.arithmeticHelper.manyToExactNumbers(dataY.valuesFromTopLeftCorner())
+        const arrX = this.arithmeticHelper.manyToExactNumbers(dataX.valuesFromTopLeftCorner())
+        const arrY = this.arithmeticHelper.manyToExactNumbers(dataY.valuesFromTopLeftCorner())
         if(arrX instanceof CellError) {
           return arrX
         }
@@ -426,8 +426,8 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public ttest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.TEST'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue, tails: number, type: number) => {
-        const arrX = this.interpreter.arithmeticHelper.manyToExactNumbers(dataX.valuesFromTopLeftCorner())
-        const arrY = this.interpreter.arithmeticHelper.manyToExactNumbers(dataY.valuesFromTopLeftCorner())
+        const arrX = this.arithmeticHelper.manyToExactNumbers(dataX.valuesFromTopLeftCorner())
+        const arrY = this.arithmeticHelper.manyToExactNumbers(dataY.valuesFromTopLeftCorner())
         if(arrX instanceof CellError) {
           return arrX
         }
@@ -482,7 +482,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public skew(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SKEW'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }
@@ -502,7 +502,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
   public skewp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SKEW.P'),
       (...args: RawInterpreterValue[]) => {
-        const coerced = this.interpreter.arithmeticHelper.coerceNumbersExactRanges(args)
+        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
         if(coerced instanceof CellError) {
           return coerced
         }

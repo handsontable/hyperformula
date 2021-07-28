@@ -4,8 +4,10 @@
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
+import {ArraySize, ArraySizePredictor} from '../../ArraySize'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {Config} from '../../Config'
+import {DateTimeHelper} from '../../DateTimeHelper'
 import {DependencyGraph} from '../../DependencyGraph'
 import {ErrorMessage} from '../../error-message'
 import {SearchStrategy} from '../../Lookup/SearchStrategy'
@@ -13,6 +15,7 @@ import {Maybe} from '../../Maybe'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {Serialization} from '../../Serialization'
 import {
+  ArithmeticHelper,
   coerceRangeToScalar,
   coerceScalarToBoolean,
   coerceScalarToString,
@@ -46,18 +49,21 @@ export interface FunctionMetadata {
 
   /**
    * Internal.
-   * Used for functions with variable number of arguments -- tells how many last arguments can be repeated indefinitely.
+   * 
+   * For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.
    */
   repeatLastArgs?: number,
 
   /**
    * Internal.
-   * Ranges in arguments are inlined to (possibly multiple) scalar arguments.
+   * 
+   * If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.
    */
   expandRanges?: boolean,
 
   /**
    * Internal.
+   * 
    * Return number value is packed into this subtype.
    */
   returnNumberType?: NumberType,
@@ -67,24 +73,42 @@ export interface FunctionMetadata {
   method: string,
   /**
    * Engine.
+   * 
+   * If set to `true`, the function is volatile.
+   */
+  arraySizeMethod?: string,
+  /**
+   * Engine.
    */
   isVolatile?: boolean,
   /**
    * Engine.
+   * 
+   * If set to `true`, the function gets recalculated with each sheet shape change
+   * (e.g. when adding/removing rows or columns).
    */
   isDependentOnSheetStructureChange?: boolean,
   /**
    * Engine.
+   * 
+   * If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.
+   * 
+   * Other arguments are properly evaluated.
    */
   doesNotNeedArgumentsToBeComputed?: boolean,
   /**
    * Engine.
+   * 
+   * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
    */
   arrayFunction?: boolean,
 
   /**
    * Internal.
-   * Some function do not allow vectorization: array-output, and special functions.
+   * 
+   * If set to `true`, prevents the function from ever being vectorized.
+   * 
+   * Some functions do not allow vectorization: array-output, and special functions.
    */
   vectorizationForbidden?: boolean,
 }
@@ -148,47 +172,51 @@ export interface FunctionArgument {
   argumentType: ArgumentTypes,
 
   /**
-   * Argument should be passed with full type information.
-   * (e.g. Date/DateTime/Time/Currency/Percentage for numbers)
+   * If set to `true`, arguments need to be passed with full type information.
+   * (e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`)
    */
   passSubtype?: boolean,
 
   /**
-   * If argument is missing, its value defaults to this.
+   * If an argument is missing, its value defaults to `defaultValue`.
    */
   defaultValue?: InternalScalarValue | RawScalarValue,
 
   /**
-   * If argument is missing, and no defaultValue provided, undefined is supplied as a value, instead of throwing an error.
-   * Logically equivalent to setting defaultValue = undefined.
+   * If set to `true`:
+   * if an argument is missing, and no `defaultValue` is set, the argument is `undefined` (instead of throwing an error).
+   * 
+   * This is logically equivalent to setting `defaultValue` to `undefined`.
    */
   optionalArg?: boolean,
 
   /**
-   * Numeric argument needs to be greater-equal than this.
+   * If set, numerical arguments need to be greater than or equal to `minValue`.
    */
   minValue?: number,
 
   /**
-   * Numeric argument needs to be less-equal than this.
+   * If set, numerical arguments need to be less than or equal to `maxValue`.
    */
   maxValue?: number,
 
   /**
-   * Numeric argument needs to be less than this.
+   * If set, numerical arguments need to be less than `lessThan`.
    */
   lessThan?: number,
 
   /**
-   * Numeric argument needs to be greater than this.
+   * If set, numerical arguments need to be greater than `greaterThan`.
    */
   greaterThan?: number,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
 
+export type PluginArraySizeFunctionType = (ast: ProcedureAst, state: InterpreterState) => ArraySize
+
 export type FunctionPluginTypecheck<T> = {
-  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : never
+  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : T[K] extends PluginArraySizeFunctionType ? T[K] : never
 }
 
 /**
@@ -207,6 +235,9 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected readonly columnSearch: SearchStrategy
   protected readonly config: Config
   protected readonly serialization: Serialization
+  protected readonly arraySizePredictor: ArraySizePredictor
+  protected readonly dateTimeHelper: DateTimeHelper
+  protected readonly arithmeticHelper: ArithmeticHelper
 
   constructor(interpreter: Interpreter) {
     this.interpreter = interpreter
@@ -214,10 +245,17 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
     this.serialization = interpreter.serialization
+    this.arraySizePredictor = interpreter.arraySizePredictor
+    this.dateTimeHelper = interpreter.dateTimeHelper
+    this.arithmeticHelper = interpreter.arithmeticHelper
   }
 
   protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
     return this.interpreter.evaluateAst(ast, state)
+  }
+
+  protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
+    return this.arraySizePredictor.checkArraySizeForAst(ast, state)
   }
 
   protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean][] {
@@ -235,7 +273,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return ret
   }
 
-  protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.interpreter.arithmeticHelper.coerceScalarToNumberOrError(arg)
+  protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
   protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument, state: InterpreterState): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
     let ret
@@ -301,7 +339,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           ret = coerceToRange(arg)
           break
         case ArgumentTypes.COMPLEX:
-          return this.interpreter.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
+          return this.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
       }
     }
     if(coercedType.passSubtype || ret === undefined) {
@@ -455,7 +493,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
   private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
     if(type !== undefined && isExtendedNumber(val)) {
-      return this.interpreter.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
+      return this.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
     } else {
       return val
     }

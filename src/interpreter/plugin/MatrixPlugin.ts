@@ -3,10 +3,10 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {ArraySize, arraySizeForMultiplication, arraySizeForPoolFunction} from '../../ArraySize'
+import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import {ProcedureAst} from '../../parser'
+import {AstNodeType, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
@@ -27,11 +27,22 @@ export interface KernelFunctionThis {
   },
 }
 
+function arraySizeForMultiplication(leftArraySize: ArraySize, rightArraySize: ArraySize): ArraySize {
+  return new ArraySize(rightArraySize.width, leftArraySize.height)
+}
+
+function arraySizeForPoolFunction(inputArray: ArraySize, windowSize: number, stride: number): ArraySize {
+  return new ArraySize(
+    1 + (inputArray.width - windowSize) / stride,
+    1 + (inputArray.height - windowSize) / stride,
+  )
+}
 
 export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin>{
   public static implementedFunctions = {
     'MMULT': {
       method: 'mmult',
+      arraySizeMethod: 'mmultArraySize',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.RANGE},
@@ -40,6 +51,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'TRANSPOSE': {
       method: 'transpose',
+      arraySizeMethod: 'transposeArraySize',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
       ],
@@ -47,6 +59,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'MAXPOOL': {
       method: 'maxpool',
+      arraySizeMethod: 'maxpoolArraySize',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.NUMBER},
@@ -56,6 +69,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'MEDIANPOOL': {
       method: 'medianpool',
+      arraySizeMethod: 'medianpoolArraySize',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.NUMBER},
@@ -96,6 +110,16 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       return SimpleRangeValue.onlyNumbers(result)
     })
+  }
+
+  public mmultArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length !== 2) {
+      return ArraySize.error()
+    }
+    const metadata = this.metadata('MMULT')
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const [left, right] = subChecks
+    return arraySizeForMultiplication(left, right)
   }
 
   public maxpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -186,6 +210,48 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
+  public maxpoolArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('MAXPOOL')
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+
+    const array = subChecks[0]
+    const windowArg = ast.args[1]
+    let window
+
+    if (windowArg.type === AstNodeType.NUMBER) {
+      window = windowArg.value
+    } else {
+      window = 1
+    }
+
+    let stride = window
+
+    if (ast.args.length === 3) {
+      const strideArg = ast.args[2]
+      if (strideArg.type === AstNodeType.NUMBER) {
+        stride = strideArg.value
+      } else {
+        stride = 1
+      }
+    }
+
+    if (window > array.width || window > array.height
+      || stride > window
+      || (array.width - window) % stride !== 0 || (array.height - window) % stride !== 0) {
+      return ArraySize.error()
+    }
+
+    return arraySizeForPoolFunction(array, window, stride)
+  }
+
+  public medianpoolArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    return this.maxpoolArraySize(ast, state)
+  }
+
   public transpose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
       const input = matrix.rawData()
@@ -200,6 +266,18 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       return SimpleRangeValue.onlyValues(result)
     })
+  }
+
+  public transposeArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length !== 1) {
+      return ArraySize.error()
+    }
+    const metadata = this.metadata('MMULT')
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+
+    const [size] = subChecks
+
+    return new ArraySize(size.height, size.width)
   }
 
   private createCpuKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {

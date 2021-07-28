@@ -116,8 +116,9 @@ Your help is much appreciated in any of the following topics:
 
 ## License
 
-HyperFormula is a double-licensed software. In all your non-commercial projects, you can use it under the
-open source [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt). Additionally, there is also a [commercial license](https://handsontable.github.io/hyperformula/guide/contact.html), and support services available.
+HyperFormula is available under the [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt).
+
+If you need a commercial license or support and maintenance services, [contact our Sales Team](https://handsontable.com/get-a-quote).
 
 ## Acknowledgments 
 

@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
@@ -184,7 +185,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         if (args[i] instanceof CellError) {
           continue
         }
-        if (this.interpreter.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
+        if (this.arithmeticHelper.eq(selector, args[i] as InternalNoErrorScalarValue)) {
           return args[i + 1]
         }
       }

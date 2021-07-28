@@ -247,17 +247,17 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
       const d = Math.trunc(day)
       let m = Math.trunc(month)
       let y = Math.trunc(year)
-      if (y < this.interpreter.dateHelper.getEpochYearZero()) {
-        y += this.interpreter.dateHelper.getEpochYearZero()
+      if (y < this.dateTimeHelper.getEpochYearZero()) {
+        y += this.dateTimeHelper.getEpochYearZero()
       }
       const delta = Math.floor((m - 1) / 12)
       y += delta
       m -= delta * 12
 
       const date = {year: y, month: m, day: 1}
-      if (this.interpreter.dateHelper.isValidDate(date)) {
-        let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(date) + (d - 1)
-        ret = this.interpreter.dateHelper.getWithinBounds(ret)
+      if (this.dateTimeHelper.isValidDate(date)) {
+        let ret: Maybe<number> = this.dateTimeHelper.dateToNumber(date) + (d - 1)
+        ret = this.dateTimeHelper.getWithinBounds(ret)
         if(ret === undefined) {
           return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
         }
@@ -281,9 +281,9 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
 
   public eomonth(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
-      const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
-      let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(this.interpreter.dateHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
-      ret = this.interpreter.dateHelper.getWithinBounds(ret)
+      const date = this.dateTimeHelper.numberToSimpleDate(dateNumber)
+      let ret: Maybe<number> = this.dateTimeHelper.dateToNumber(this.dateTimeHelper.endOfMonth(offsetMonth(date, numberOfMonthsToShift)))
+      ret = this.dateTimeHelper.getWithinBounds(ret)
       if(ret === undefined) {
         return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
       }
@@ -293,7 +293,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
 
   public day(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DAY'),
-      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).day
+      (dateNumber) => this.dateTimeHelper.numberToSimpleDate(dateNumber).day
     )
   }
 
@@ -311,7 +311,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
    */
   public month(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MONTH'),
-      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).month
+      (dateNumber) => this.dateTimeHelper.numberToSimpleDate(dateNumber).month
     )
   }
 
@@ -325,7 +325,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
    */
   public year(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('YEAR'),
-      (dateNumber) => this.interpreter.dateHelper.numberToSimpleDate(dateNumber).year
+      (dateNumber) => this.dateTimeHelper.numberToSimpleDate(dateNumber).year
     )
   }
 
@@ -357,14 +357,14 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
    */
   public text(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TEXT'),
-      (numberRepresentation, formatArg) => format(numberRepresentation, formatArg, this.config, this.interpreter.dateHelper)
+      (numberRepresentation, formatArg) => format(numberRepresentation, formatArg, this.config, this.dateTimeHelper)
     )
   }
 
   public weekday(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEEKDAY'),
       (day: number, type: number) => {
-        const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
+        const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
         if(type===3) {
           return (absoluteDay-1)%7
         }
@@ -380,10 +380,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   public weeknum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEEKNUM'),
       (day: number, type: number) => {
-        const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
-        const date = this.interpreter.dateHelper.numberToSimpleDate(day)
-        const yearStart = this.interpreter.dateHelper.dateToNumber({year: date.year, month: 1, day: 1})
-        const yearStartAbsolute = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(yearStart)
+        const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
+        const date = this.dateTimeHelper.numberToSimpleDate(day)
+        const yearStart = this.dateTimeHelper.dateToNumber({year: date.year, month: 1, day: 1})
+        const yearStartAbsolute = this.dateTimeHelper.relativeNumberToAbsoluteNumber(yearStart)
         if(type === 21) {
           return this.isoweeknumCore(day)
         }
@@ -401,10 +401,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   }
 
   private isoweeknumCore = (day: number): number => {
-    const absoluteDay = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(day))
-    const date = this.interpreter.dateHelper.numberToSimpleDate(day)
-    const yearStart = this.interpreter.dateHelper.dateToNumber({year: date.year, month: 1, day: 1})
-    const yearStartAbsolute = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(yearStart)
+    const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
+    const date = this.dateTimeHelper.numberToSimpleDate(day)
+    const yearStart = this.dateTimeHelper.dateToNumber({year: date.year, month: 1, day: 1})
+    const yearStartAbsolute = this.dateTimeHelper.relativeNumberToAbsoluteNumber(yearStart)
     const firstThursdayAbs = yearStartAbsolute + ((4-yearStartAbsolute)%7+7)%7
     const ret = Math.floor((absoluteDay-1)/7) - Math.floor((firstThursdayAbs-1)/7)+1
     if(ret===0) {
@@ -416,7 +416,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   public datevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DATEVALUE'),
       (date: string) => {
-        const {dateTime} = this.interpreter.dateHelper.parseDateTimeFromConfigFormats(date)
+        const {dateTime} = this.dateTimeHelper.parseDateTimeFromConfigFormats(date)
         if(dateTime === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
@@ -424,7 +424,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
           return 0
         }
         return (instanceOfSimpleTime(dateTime) ? Math.trunc(timeToNumber(dateTime)) : 0) +
-          this.interpreter.dateHelper.dateToNumber(dateTime)
+          this.dateTimeHelper.dateToNumber(dateTime)
       }
     )
   }
@@ -432,7 +432,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   public timevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TIMEVALUE'),
       (date: string) => {
-        const dateNumber = this.interpreter.dateHelper.dateStringToDateNumber(date)
+        const dateNumber = this.dateTimeHelper.dateStringToDateNumber(date)
         if(dateNumber===undefined){
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
@@ -446,7 +446,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
       () => {
         const now = new Date(Date.now())
         return timeToNumber({hours: now.getHours(), minutes: now.getMinutes(), seconds: now.getSeconds()})+
-          this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
+          this.dateTimeHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
       }
     )
   }
@@ -455,7 +455,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return this.runFunction(ast.args, state, this.metadata('TODAY'),
       () => {
         const now = new Date(Date.now())
-        return this.interpreter.dateHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
+        return this.dateTimeHelper.dateToNumber({year: now.getFullYear(), month: now.getMonth()+1, day: now.getDate()})
       }
     )
   }
@@ -463,10 +463,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   public edate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EDATE'),
       (dateNumber: number, delta: number) => {
-        const date = this.interpreter.dateHelper.numberToSimpleDate(dateNumber)
+        const date = this.dateTimeHelper.numberToSimpleDate(dateNumber)
         const newDate = truncateDayInMonth(offsetMonth(date, delta))
-        let ret: Maybe<number> = this.interpreter.dateHelper.dateToNumber(newDate)
-        ret = this.interpreter.dateHelper.getWithinBounds(ret)
+        let ret: Maybe<number> = this.dateTimeHelper.dateToNumber(newDate)
+        ret = this.dateTimeHelper.getWithinBounds(ret)
         if(ret === undefined) {
           return new CellError(ErrorType.NUM, ErrorMessage.DateBounds)
         }
@@ -484,8 +484,8 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         if(unit === 'D') {
           return Math.floor(endDate) - Math.floor(startDate)
         }
-        const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
-        const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
+        const start = this.dateTimeHelper.numberToSimpleDate(startDate)
+        const end = this.dateTimeHelper.numberToSimpleDate(endDate)
         switch(unit) {
           case 'M':
             return (end.year - start.year)*12 + (end.month-start.month) - (end.day < start.day?1:0)
@@ -503,17 +503,17 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
             } else {
               const m = end.month === 1 ? 12 : end.month-1
               const y = end.month === 1 ? end.year-1 : end.year
-              return this.interpreter.dateHelper.daysInMonth(y, m)+end.day-start.day
+              return this.dateTimeHelper.daysInMonth(y, m)+end.day-start.day
             }
           case 'YD':
             if(end.month > start.month || (end.month === start.month && end.day >= start.day)) {
-              return Math.floor(endDate) - this.interpreter.dateHelper.dateToNumber({year: end.year, month: start.month, day: start.day})
+              return Math.floor(endDate) - this.dateTimeHelper.dateToNumber({year: end.year, month: start.month, day: start.day})
             } else {
               return Math.floor(endDate)
                 - Math.floor(startDate)
                 - 365*(end.year-start.year-1)
-                - this.interpreter.dateHelper.leapYearsCount(end.year-1)
-                + this.interpreter.dateHelper.leapYearsCount(start.year)
+                - this.dateTimeHelper.leapYearsCount(end.year-1)
+                + this.dateTimeHelper.leapYearsCount(start.year)
             }
           default:
             return new CellError(ErrorType.NUM, ErrorMessage.BadMode)
@@ -527,14 +527,14 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   }
 
   private days360Core = (startDate: number, endDate: number, mode: boolean): number => {
-    const start = this.interpreter.dateHelper.numberToSimpleDate(startDate)
-    const end = this.interpreter.dateHelper.numberToSimpleDate(endDate)
+    const start = this.dateTimeHelper.numberToSimpleDate(startDate)
+    const end = this.dateTimeHelper.numberToSimpleDate(endDate)
     let nStart, nEnd: SimpleDate
     if(mode) {
       nStart = toBasisEU(start)
       nEnd = toBasisEU(end)
     } else {
-      [nStart, nEnd] = this.interpreter.dateHelper.toBasisUS(start, end)
+      [nStart, nEnd] = this.dateTimeHelper.toBasisUS(start, end)
     }
     return 360 * (nEnd.year - nStart.year) + 30*(nEnd.month-nStart.month) + nEnd.day-nStart.day
   }
@@ -551,9 +551,9 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
           case 0:
             return this.days360Core(startDate, endDate, false) / 360
           case 1:
-            return (endDate-startDate) / this.interpreter.dateHelper.yearLengthForBasis(
-              this.interpreter.dateHelper.numberToSimpleDate(startDate),
-              this.interpreter.dateHelper.numberToSimpleDate(endDate)
+            return (endDate-startDate) / this.dateTimeHelper.yearLengthForBasis(
+              this.dateTimeHelper.numberToSimpleDate(startDate),
+              this.dateTimeHelper.numberToSimpleDate(endDate)
             )
           case 2:
             return (endDate-startDate)/360
@@ -689,8 +689,8 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
   }
 
   private countWorkdays(start: number, end: number, weekendPattern: string, sortedHolidays: number[]): number {
-    const absoluteEnd = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(end))
-    const absoluteStart = Math.floor(this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(start))
+    const absoluteEnd = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(end))
+    const absoluteStart = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(start))
     let ans = 0
     for(let i=0;i<7;i++) {
       if(weekendPattern.charAt(i) === '0') {
@@ -724,7 +724,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     }
     return [...new Set(processedHolidays)].sort((a, b) => a-b)
       .filter((arg) => {
-      const val = this.interpreter.dateHelper.relativeNumberToAbsoluteNumber(arg)
+      const val = this.dateTimeHelper.relativeNumberToAbsoluteNumber(arg)
       const i = (val-1)%7
       return (weekendPattern.charAt(i) === '0')
     })

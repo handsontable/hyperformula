@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2021-07-15
+
 ### Changed
 - **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. (#645)
 - **Breaking change**: Removed support for matrix formulas (`{=FORMULA}`) notation. Engine now supports formulas returning array of values (instead of only scalars). (#652)
@@ -64,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. (#747)
 - Added `#SPILL!` error type. (#708)
 - Added large tests for CRUD interactions. (#755)
+- Added support for array arithmetic in plugins. (#766)
 - Added a flag to `getFillRangeData` to support different types of offsetting. (#767)
 
 ### Fixed

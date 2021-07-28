@@ -420,7 +420,7 @@ export class UndoRedo extends Destructable {
 
   constructor(
     config: Config,
-    public readonly operations: Operations,
+    private readonly operations: Operations,
   ) {
     super()
     this.undoLimit = config.undoLimit

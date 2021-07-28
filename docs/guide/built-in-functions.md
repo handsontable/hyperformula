@@ -10,19 +10,20 @@ because a spreadsheet is probably the most universal software
 ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
-The latest version of HyperFormula has an extensive collection of **{{ $page.functionsCount }}** functions grouped into 11 categories:
+The latest version of HyperFormula has an extensive collection of **{{ $page.functionsCount }}** functions grouped into categories:
 
-* [Date and time](#date-and-time)
-* [Engineering](#engineering)
-* [Information](#information)
-* [Financial](#financial)
-* [Logical](#logical)
-* [Lookup and reference](#lookup-and-reference)
-* [Math and trigonometry](#math-and-trigonometry)
-* [Matrix functions](#matrix-functions)
-* [Operator](#operator)
-* [Statistical](#statistical)
-* [Text](#text)
+- [Array manipulation](#array-manipulation)
+- [Date and time](#date-and-time)
+- [Engineering](#engineering)
+- [Information](#information)
+- [Financial](#financial)
+- [Logical](#logical)
+- [Lookup and reference](#lookup-and-reference)
+- [Math and trigonometry](#math-and-trigonometry)
+- [Matrix functions](#matrix-functions)
+- [Operator](#operator)
+- [Statistical](#statistical)
+- [Text](#text)
 
 _Some categories such as compatibility, cube, and database
 are yet to be supported._
@@ -50,7 +51,7 @@ lets you design your own [custom functions](custom-functions).
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/0.6.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/1.0.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: built-in-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -68,8 +69,8 @@ Total number of functions: **{{ $page.functionsCount }}**
 | Function ID | Description | Syntax |
 | :--- | :--- | :--- |
 | ARRAYFORMULA | Enables array arithmetic inside. | ARRAYFORMULA(Formula) |
-| FILTER | Filter input array based on boolean arrays. | FILTER(Array; BoolArray1[; BoolArray2[; ...]])
-| ARRAY_CONSTRAINT | Truncates array to given dimensions. | ARRAYFORMULA(Array; Height; Width) |
+| FILTER | Filters the array based on boolean arrays. | FILTER(Array; BoolArray1[; BoolArray2[; ...]])
+| ARRAY_CONSTRAIN | Truncates the array to given dimensions. | ARRAY_CONSTRAIN(Array; Height; Width) |
 
 ### Date and time
 
