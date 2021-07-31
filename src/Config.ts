@@ -636,8 +636,8 @@ export class Config implements ConfigParams, ParserConfig {
     this.caseFirst = configValueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
     this.ignorePunctuation = configValueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
     this.chooseAddressMappingPolicy = chooseAddressMappingPolicy ?? Config.defaultConfig.chooseAddressMappingPolicy
-    this.dateFormats = configValueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')
-    this.timeFormats = configValueFromParamCheck(timeFormats, Array.isArray, 'array', 'timeFormats')
+    this.dateFormats = [...configValueFromParamCheck(dateFormats, Array.isArray, 'array', 'dateFormats')]
+    this.timeFormats = [...configValueFromParamCheck(timeFormats, Array.isArray, 'array', 'timeFormats')]
     this.functionArgSeparator = configValueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = configValueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = configValueFromParam(language, 'string', 'language')
@@ -646,7 +646,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.arrayColumnSeparator = configValueFromParam(arrayColumnSeparator, [',', ';'], 'arrayColumnSeparator')
     this.arrayRowSeparator = configValueFromParam(arrayRowSeparator, [';', '|'], 'arrayRowSeparator')
     this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
-    this.functionPlugins = functionPlugins ?? Config.defaultConfig.functionPlugins
+    this.functionPlugins = [...(functionPlugins ?? Config.defaultConfig.functionPlugins)]
     this.gpujs = gpujs ?? Config.defaultConfig.gpujs
     this.gpuMode = configValueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = configValueFromParam(smartRounding, 'boolean', 'smartRounding')
@@ -677,7 +677,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
     validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
-    this.currencySymbol = configValueFromParamCheck(currencySymbol, Array.isArray, 'array',  'currencySymbol')
+    this.currencySymbol = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array',  'currencySymbol')]
     this.currencySymbol.forEach((val) => {
       if(typeof val !== 'string') {
         throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')

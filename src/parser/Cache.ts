@@ -4,6 +4,7 @@
  */
 
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
+import {Maybe} from '../Maybe'
 import {AstNodeType, collectDependencies, RelativeDependency} from './'
 import {Ast} from './Ast'
 
@@ -30,8 +31,8 @@ export class Cache {
     return cacheEntry
   }
 
-  public get(hash: string): CacheEntry | null {
-    return this.cache.get(hash) || null
+  public get(hash: string): Maybe<CacheEntry> {
+    return this.cache.get(hash)
   }
 
   public maybeSetAndThenGet(hash: string, ast: Ast): Ast {
@@ -42,10 +43,6 @@ export class Cache {
       this.set(hash, ast)
       return ast
     }
-  }
-
-  public destroy() {
-    this.cache.clear()
   }
 }
 

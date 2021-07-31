@@ -80,7 +80,7 @@ export class ParserWithCaching {
     const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
 
     let cacheResult = this.cache.get(hash)
-    if (cacheResult) {
+    if (cacheResult !== undefined) {
       ++this.statsCacheUsed
     } else {
       const processedTokens = bindWhitespacesToTokens(lexerResult.tokens)
@@ -104,7 +104,7 @@ export class ParserWithCaching {
 
   public fetchCachedResult(hash: string): ParsingResult {
     const cacheResult = this.cache.get(hash)
-    if (cacheResult === null) {
+    if (cacheResult === undefined) {
       throw new Error('There is no AST with such key in the cache')
     } else {
       const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
@@ -161,10 +161,6 @@ export class ParserWithCaching {
 
   public computeHashFromAst(ast: Ast): string {
     return '=' + this.computeHashOfAstNode(ast)
-  }
-
-  public destroy(): void {
-    this.cache.destroy()
   }
 
   private computeHashOfAstNode(ast: Ast): string {

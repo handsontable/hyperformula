@@ -53,11 +53,9 @@ export class DependencyGraph {
    */
 
   public static buildEmpty(lazilyTransformingAstService: LazilyTransformingAstService, config: Config, functionRegistry: FunctionRegistry, namedExpressions: NamedExpressions, stats: Statistics) {
-    const addressMapping = new AddressMapping(config.chooseAddressMappingPolicy)
-    const rangeMapping = new RangeMapping()
     return new DependencyGraph(
-      addressMapping,
-      rangeMapping,
+      new AddressMapping(config.chooseAddressMappingPolicy),
+      new RangeMapping(),
       new SheetMapping(config.translationPackage),
       new ArrayMapping(),
       stats,
@@ -634,14 +632,6 @@ export class DependencyGraph {
 
   public volatileVertices() {
     return this.graph.specialNodes
-  }
-
-  public destroy(): void {
-    this.graph.destroy()
-    this.addressMapping.destroy()
-    this.rangeMapping.destroy()
-    this.sheetMapping.destroy()
-    this.arrayMapping.destroy()
   }
 
   public getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayVertex> {

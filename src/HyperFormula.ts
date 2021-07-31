@@ -4285,13 +4285,10 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public destroy(): void {
-    this.dependencyGraph.destroy()
-    this.columnSearch.destroy()
-    this.evaluator.destroy()
-    this._parser.destroy()
-    this._lazilyTransformingAstService.destroy()
-    this._stats.destroy()
-    this._crudOperations.clearClipboard()
+    for(const key of Object.keys(this)) {
+      delete (this as Record<string, any>)[key]
+    }
+    Object.setPrototypeOf(this, null)
   }
 
   /**
