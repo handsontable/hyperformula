@@ -3029,7 +3029,7 @@ export class HyperFormula implements TypedEmitter {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     const vertex = this.dependencyGraph.getCell(cellAddress)
-    return getCellType(vertex)
+    return getCellType(vertex, cellAddress)
   }
 
   /**
@@ -3091,7 +3091,8 @@ export class HyperFormula implements TypedEmitter {
     if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
-    return this.getCellType(cellAddress) === CellType.FORMULA
+    const cellType = this.getCellType(cellAddress)
+    return cellType === CellType.FORMULA || cellType === CellType.ARRAYFORMULA
   }
 
   /**
@@ -3150,7 +3151,8 @@ export class HyperFormula implements TypedEmitter {
     if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
-    return this.getCellType(cellAddress) === CellType.ARRAY
+    const cellType = this.getCellType(cellAddress)
+    return cellType === CellType.ARRAY || cellType === CellType.ARRAYFORMULA
   }
 
   /**

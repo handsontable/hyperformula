@@ -556,7 +556,7 @@ describe('#getCellType', () => {
   it('formula matrix', () => {
     const engine = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
 
-    expect(engine.getCellType(adr('A1'))).toBe(CellType.ARRAY)
+    expect(engine.getCellType(adr('A1'))).toBe(CellType.ARRAYFORMULA)
     expect(engine.getCellType(adr('B1'))).toBe(CellType.ARRAY)
   })
 
@@ -714,6 +714,11 @@ describe('#doesCellHaveFormula', () => {
     expect(engine.doesCellHaveFormula(adr('C1'))).toEqual(false)
     expect(engine.doesCellHaveFormula(adr('D1'))).toEqual(false)
     expect(engine.doesCellHaveFormula(adr('E1'))).toEqual(false)
+  })
+
+  it('arrayformula', () => {
+    const engine = HyperFormula.buildFromArray([['=ARRAYFORMULA(ISEVEN(B1:B2*2))']])
+    expect(engine.doesCellHaveFormula(adr('A1'))).toEqual(true)
   })
 })
 
