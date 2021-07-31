@@ -123,12 +123,12 @@ describe('Temporary formulas - calculation', () => {
 
     const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 0)
 
-    expect(result).toEqual([[1,1],[2,2]])
+    expect(result).toEqual([[1, 1], [2, 2]])
   })
 
   it('more non-scalars', () => {
     const engine = HyperFormula.buildFromArray([[0, 1]])
-    expect(engine.calculateFormula("=ARRAYFORMULA(ISEVEN(A1:B2*3))", 0)).toEqual([[true,false], [true,true]])
+    expect(engine.calculateFormula('=ARRAYFORMULA(ISEVEN(A1:B2*3))', 0)).toEqual([[true, false], [true, true]])
   })
 
   it('passing something which is not a formula doesnt work', () => {
