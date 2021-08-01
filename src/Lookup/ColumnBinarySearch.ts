@@ -53,7 +53,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
       return rangeValue.valuesFromTopLeftCorner().map(getRawValue).map(arg =>
         (typeof arg === 'string') ? forceNormalizeString(arg) : arg
       ).indexOf(key)
-    } else if (range.height() < this.config.binarySearchThreshold || !sorted) {
+    } else if (!sorted) {
       return this.dependencyGraph.computeListOfValuesInRange(range).findIndex(arg => {
         arg = getRawValue(arg)
         arg = (typeof arg === 'string') ? forceNormalizeString(arg) : arg

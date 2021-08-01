@@ -665,7 +665,7 @@ describe('updating column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
-    ], {binarySearchThreshold: 1, useColumnIndex: true})
+    ], {useColumnIndex: true})
 
     engine.setCellContents(adr('B2'), '8')
 
@@ -676,7 +676,7 @@ describe('updating column index', () => {
   it('should update column index when clearing cell content', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-    ], {binarySearchThreshold: 1, useColumnIndex: true})
+    ], {useColumnIndex: true})
 
     engine.setCellContents(adr('B1'), null)
 
@@ -686,7 +686,7 @@ describe('updating column index', () => {
   it('should update column index when changing to ParsingError', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-    ], {binarySearchThreshold: 1, useColumnIndex: true})
+    ], {useColumnIndex: true})
 
     engine.setCellContents(adr('B1'), '=SUM(')
 
@@ -696,7 +696,7 @@ describe('updating column index', () => {
   it('should update column index when changing to formula', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
-    ], {binarySearchThreshold: 1, useColumnIndex: true})
+    ], {useColumnIndex: true})
 
     engine.setCellContents(adr('B1'), '=SUM(A1)')
 
