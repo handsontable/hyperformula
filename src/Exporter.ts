@@ -107,7 +107,7 @@ export class Exporter extends Destructable implements ChangeExporter<ExportedCha
     }
   }
 
-  private exportScalarOrRange(value: InterpreterValue): CellValue | CellValue[][] {
+  public exportScalarOrRange(value: InterpreterValue): CellValue | CellValue[][] {
     if (value instanceof SimpleRangeValue) {
       return value.rawData().map(row => row.map(v => this.exportValue(v)))
     } else {
