@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Removed `binarySearchThreshold` option. Now every search of sorted data uses binary search.
+
+### Fixed
+- Fixed issue with searching sorted data (#787).
+
 ## [1.0.0] - 2021-07-15
 
 ### Changed
