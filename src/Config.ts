@@ -40,6 +40,18 @@ export interface ConfigParams {
    */
   accentSensitive: boolean,
   /**
+   * Sets a minimum number of elements that a range must have to use binary search.
+   * 
+   * Shorter ranges are searched naively.
+   * 
+   * Used by the VLOOKUP, HLOOKUP and MATCH functions.
+   *
+   * @default 20
+   *
+   * @category Engine
+   */
+  binarySearchThreshold: number,
+  /**
    * When set to `true`, makes string comparison case-sensitive.
    * 
    * Applies to comparison operators only.
@@ -436,6 +448,7 @@ export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     accentSensitive: false,
+    binarySearchThreshold: 20,
     currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
@@ -537,6 +550,8 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly useStats: boolean
   /** @inheritDoc */
+  public readonly binarySearchThreshold: number
+  /** @inheritDoc */
   public readonly nullDate: SimpleDate
   /** @inheritDoc */
   public readonly currencySymbol: string[]
@@ -575,6 +590,7 @@ export class Config implements ConfigParams, ParserConfig {
   constructor(
     {
       accentSensitive,
+      binarySearchThreshold,
       caseSensitive,
       caseFirst,
       chooseAddressMappingPolicy,
@@ -644,6 +660,8 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
+    this.binarySearchThreshold = configValueFromParam(binarySearchThreshold, 'number', 'binarySearchThreshold')
+    validateNumberToBeAtLeast(this.binarySearchThreshold, 'binarySearchThreshold', 1)
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
@@ -669,6 +687,7 @@ export class Config implements ConfigParams, ParserConfig {
       }
     })
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+    this.warnDeprecatedIfUsed(binarySearchThreshold, 'binarySearchThreshold','1.1')
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
@@ -706,9 +725,13 @@ export class Config implements ConfigParams, ParserConfig {
     return new Config(mergedConfig)
   }
 
-  private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName: string) {
+  private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
     if (inputValue !== undefined) {
-      console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
+      if(replacementName === undefined) {
+        console.warn(`${paramName} option is deprecated since ${fromVersion}`)
+      } else {
+        console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
+      }
     }
   }
 }
