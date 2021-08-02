@@ -687,7 +687,7 @@ export class Config implements ConfigParams, ParserConfig {
       }
     })
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
-    this.warnDeprecatedIfUsed(binarySearchThreshold, 'binarySearchThreshold','1.1')
+    this.warnDeprecatedIfUsed(binarySearchThreshold, 'binarySearchThreshold', '1.1')
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
