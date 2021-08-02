@@ -105,7 +105,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     }
   }
 
-  private exportScalarOrRange(value: InterpreterValue): CellValue | CellValue[][] {
+  public exportScalarOrRange(value: InterpreterValue): CellValue | CellValue[][] {
     if (value instanceof SimpleRangeValue) {
       return value.rawData().map(row => row.map(v => this.exportValue(v)))
     } else {

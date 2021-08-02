@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed issue with searching sorted data (#787).
 
+### Added
+- Added support for array arithmetic in temporary formulas. (#782)
+
 ## [1.0.0] - 2021-07-15
 
 ### Changed
