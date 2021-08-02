@@ -47,6 +47,7 @@ import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from
 import {FunctionPluginDefinition} from './interpreter'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
@@ -3997,7 +3998,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public calculateFormula(formulaString: string, sheetId: number): CellValue {
+  public calculateFormula(formulaString: string, sheetId: number): CellValue | CellValue[][] {
     validateArgToType(formulaString, 'string', 'formulaString')
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.ensureScopeIdIsValid(sheetId)
@@ -4006,7 +4007,7 @@ export class HyperFormula implements TypedEmitter {
       throw new NotAFormulaError()
     }
     const internalCellValue = this.evaluator.runAndForget(ast, address, dependencies)
-    return this._exporter.exportValue(internalCellValue)
+    return this._exporter.exportScalarOrRange(internalCellValue)
   }
 
   /**
