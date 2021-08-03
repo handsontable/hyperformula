@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed issue with searching sorted data (#787).
+- Added new CellType returned by `getCellType`, CellType.ARRAYFORMULA, assigned to top-left corner of arrays. Recognized by `isCellPartOfArray` and `doesCellHaveFormula`. (#781)
 
 ### Added
 - Added support for array arithmetic in temporary formulas. (#782)
