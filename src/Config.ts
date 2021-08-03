@@ -44,11 +44,9 @@ export interface ConfigParams {
    * 
    * Shorter ranges are searched naively.
    * 
-   * Used by the VLOOKUP, HLOOKUP and MATCH functions.
-   *
    * @default 20
    *
-   * @category Engine
+   * @category Engine, Deprecated
    */
   binarySearchThreshold: number,
   /**
