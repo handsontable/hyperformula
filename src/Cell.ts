@@ -14,6 +14,7 @@ import {
   NumberType,
 } from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {Maybe} from './Maybe'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
@@ -54,17 +55,22 @@ export enum CellType {
   VALUE = 'VALUE',
   ARRAY = 'ARRAY',
   EMPTY = 'EMPTY',
+  ARRAYFORMULA = 'ARRAYFORMULA',
 }
 
-export const getCellType = (vertex?: CellVertex): CellType => {
+export const getCellType = (vertex: Maybe<CellVertex>, address: SimpleCellAddress): CellType => {
+  if (vertex instanceof ArrayVertex) {
+    if(vertex.isLeftCorner(address)) {
+      return CellType.ARRAYFORMULA
+    } else {
+      return CellType.ARRAY
+    }
+  }
   if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
   if (vertex instanceof ValueCellVertex) {
     return CellType.VALUE
-  }
-  if (vertex instanceof ArrayVertex) {
-    return CellType.ARRAY
   }
 
   return CellType.EMPTY
