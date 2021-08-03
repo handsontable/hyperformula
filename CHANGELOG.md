@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- `binarySearchThreshold` option is now deprecated, as every search of sorted data always uses binary search.
+
 ### Fixed
+- Fixed issue with searching sorted data (#787).
 - Added new CellType returned by `getCellType`, CellType.ARRAYFORMULA, assigned to top-left corner of arrays. Recognized by `isCellPartOfArray` and `doesCellHaveFormula`. (#781)
 
 ### Added

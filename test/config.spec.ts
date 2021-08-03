@@ -167,13 +167,6 @@ describe('Config', () => {
     expect(() => new Config({ undoLimit: -1 })).toThrowError('Config parameter undoLimit should be at least 0')
   })
 
-  it('#binarySearchThreshold', () => {
-    expect(() => new Config({ binarySearchThreshold: 1 })).not.toThrowError()
-    expect(() => new Config({ binarySearchThreshold: 42 })).not.toThrowError()
-    expect(() => new Config({ binarySearchThreshold: Infinity })).not.toThrowError()
-    expect(() => new Config({ binarySearchThreshold: 0 })).toThrowError('Config parameter binarySearchThreshold should be at least 1')
-  })
-
   it('#precisionEpsilon', () => {
     expect(() => new Config({ precisionEpsilon: 0 })).not.toThrowError()
     expect(() => new Config({ precisionEpsilon: 42 })).not.toThrowError()
