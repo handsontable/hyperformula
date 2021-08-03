@@ -24,7 +24,7 @@ Cells have types that can be retrieved by using the `getCellType`
 method. Cell content is not calculated and the method returns only
 the type, so, for example, you can check if there is a formula inside
 a cell. Here is the list of possible cell types: `'FORMULA'`, `'VALUE'`,
-`'ARRAY'`, `'EMPTY`.
+`'ARRAY'`, `'EMPTY`, `ARRAYFORMULA`.
 
 ## Getting cell value type
 
