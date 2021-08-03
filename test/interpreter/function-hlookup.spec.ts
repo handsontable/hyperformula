@@ -90,7 +90,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3', '4', '5'],
         ['a', 'b', 'c', 'd', 'e'],
         ['=HLOOKUP(2, A1:E2, 2)']
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A3'))).toEqual('b')
     })
@@ -140,7 +140,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3', '=TRUE()', 'foo'],
         ['a', 'b', 'c', 'd', 'e'],
         ['=HLOOKUP(TRUE(), A1:E2, 2, FALSE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A3'))).toEqual('d')
     })
@@ -160,7 +160,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(4, A1:C2, 2, TRUE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A3'))).toEqual('c')
     })
@@ -170,7 +170,7 @@ describe('Function HLOOKUP', () => {
         ['1', '2', '3'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(0, A1:C2, 2, TRUE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
@@ -190,7 +190,7 @@ describe('Function HLOOKUP', () => {
         ['=B1', '1', '2'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(1, A1:C2, 2, TRUE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A3'))).toEqual('a')
     })
@@ -206,7 +206,7 @@ describe('Function HLOOKUP', () => {
     it('should calculate indexes properly when using binary search', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(4, E1:J1, 1, TRUE())', null, null, null, '1', '2', '3', '4', '5']
-      ], {useColumnIndex: false, binarySearchThreshold: 1})
+      ], {useColumnIndex: false})
 
       expect(engine.getCellValue(adr('A1'))).toEqual(4)
     })
@@ -240,6 +240,24 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
+    it('should properly report no match', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=HLOOKUP("0", A2:D2, 1)'],
+        [1, 2, 3, '\'1'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
+
+    it('should properly report approximate matching', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=HLOOKUP("2", A2:D2, 1)'],
+        [1, 2, 3, '\'1'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('1')
+    })
+
     it('should coerce null to zero when using naive approach', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(, A2:C2, 1, FALSE())'],
@@ -255,7 +273,7 @@ describe('Function HLOOKUP', () => {
       [ '=HLOOKUP(2,2:3,2)'],
       [ 1, 2, 3],
       [ 'a', 'b', 'c'],
-    ], {binarySearchThreshold: 1})
+    ])
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
   })
 
@@ -284,7 +302,7 @@ describe('Function HLOOKUP', () => {
       ['a', 'B', 'c', 'd', 'e'],
       [1, 2, 3, 4, 5],
       ['=HLOOKUP("b", A1:E2, 2)'],
-    ], {binarySearchThreshold: 1, caseSensitive: false})
+    ], {caseSensitive: false})
     expect(engine.getCellValue(adr('A3'))).toEqual(2)
   })
 })

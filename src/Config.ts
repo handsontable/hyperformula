@@ -41,10 +41,8 @@ export interface ConfigParams {
   accentSensitive: boolean,
   /**
    * Sets a minimum number of elements that a range must have to use binary search.
-   * 
-   * Shorter ranges are searched naively.
-   * 
-   * Used by the VLOOKUP, HLOOKUP and MATCH functions.
+   *
+   * @deprecated Every search of sorted data always uses binary search.
    *
    * @default 20
    *
@@ -687,6 +685,7 @@ export class Config implements ConfigParams, ParserConfig {
       }
     })
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+    this.warnDeprecatedIfUsed(binarySearchThreshold, 'binarySearchThreshold', '1.1')
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
@@ -724,9 +723,13 @@ export class Config implements ConfigParams, ParserConfig {
     return new Config(mergedConfig)
   }
 
-  private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName: string) {
+  private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
     if (inputValue !== undefined) {
-      console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
+      if(replacementName === undefined) {
+        console.warn(`${paramName} option is deprecated since ${fromVersion}`)
+      } else {
+        console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
+      }
     }
   }
 }
