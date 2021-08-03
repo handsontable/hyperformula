@@ -41,12 +41,12 @@ export interface ConfigParams {
   accentSensitive: boolean,
   /**
    * Sets a minimum number of elements that a range must have to use binary search.
-   * 
-   * Shorter ranges are searched naively.
-   * 
+   *
+   * @deprecated Every search of sorted data always uses binary search.
+   *
    * @default 20
    *
-   * @category Engine, Deprecated
+   * @category Engine
    */
   binarySearchThreshold: number,
   /**
