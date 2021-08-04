@@ -281,6 +281,10 @@ export class Interpreter {
     return this.gpu
   }
 
+  public destroyGpu() {
+    this.gpu?.destroy()
+  }
+
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
     return ast.start.sheet === ast.end.sheet
   }
