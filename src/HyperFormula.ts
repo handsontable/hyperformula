@@ -31,6 +31,7 @@ import {
   SheetMapping,
   Vertex,
 } from './DependencyGraph'
+import {objectDestroy} from './Destroy'
 import {Emitter, Events, Listeners, TypedEmitter} from './Emitter'
 import {
   EvaluationSuspendedError,
@@ -47,7 +48,6 @@ import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from
 import {FunctionPluginDefinition} from './interpreter'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
@@ -4288,13 +4288,8 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public destroy(): void {
-    this.dependencyGraph.destroy()
-    this.columnSearch.destroy()
-    this.evaluator.destroy()
-    this._parser.destroy()
-    this._lazilyTransformingAstService.destroy()
-    this._stats.destroy()
-    this._crudOperations.clearClipboard()
+    this._evaluator.interpreter.destroyGpu()
+    objectDestroy(this)
   }
 
   /**

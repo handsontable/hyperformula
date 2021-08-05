@@ -24,8 +24,6 @@ export class ContentChanges {
     return new ContentChanges()
   }
 
-  private constructor() {}
-
   private changes: Map<string, CellValueChange> = new Map()
 
   public addAll(other: ContentChanges): ContentChanges {

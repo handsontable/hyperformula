@@ -90,9 +90,4 @@ export class Statistics {
   public snapshot(): Map<StatType, number> {
     return new Map(this.stats)
   }
-
-  public destroy() {
-    this.stats.clear()
-    this.startTimes.clear()
-  }
 }

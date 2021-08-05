@@ -94,7 +94,6 @@ export class CellContentParser {
     private readonly config: Config,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper) {
-
   }
 
   private currencyMatcher(token: string): Maybe<[string, string]> {

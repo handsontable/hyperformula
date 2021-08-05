@@ -112,10 +112,6 @@ export class ArrayMapping {
     return false
   }
 
-  public destroy(): void {
-    this.arrayMapping.clear()
-  }
-
   public moveArrayVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
     this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
       const range = vertex.getRange()
