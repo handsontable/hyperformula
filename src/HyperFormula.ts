@@ -3978,22 +3978,26 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Calculates fire-and-forget formula, returns the calculated value.
    *
-   * @param {string} formulaString -  a formula in a proper format - it must start with "="
-   * @param {number} sheetId - an ID of the sheet in context of which we evaluate formula.
+   * @param {string} formulaString - A formula in a proper format, starting with `=`.
+   * @param {number} sheetId - The ID of a sheet in context of which the formula gets evaluated.
    *
-   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e does not start with "="
-   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exists
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e. doesn't start with `=`).
+   * @throws [[NoSheetWithIdError]] when the provided `sheetID` doesn't exist.
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
-   *  Sheet1: [['22']],
-   *  Sheet2: [['58']],
+   *  Sheet1: [['58']],
+   *  Sheet2: [['1', '2', '3'], ['4', '5', '6']]
    * });
    *
-   * // returns the value of calculated formula, '32' for this example
+   * // returns the calculated formula's value
+   * // for this example, returns `68`
    * const calculatedFormula = hfInstance.calculateFormula('=A1+10', 0);
+   *
+   * // for this example, returns [['11', '12', '13'], ['14', '15', '16']]
+   * const calculatedFormula = hfInstance.calculateFormula('=A1:B3+10', 1);
    * ```
    *
    * @category Helpers
