@@ -1,35 +1,34 @@
 # Licensing
 
-The source code is available under three licenses in order to make it a
-better fit for different types of projects.
-
-You are required to specify the license under which you use the
-software. This can be done by entering the corresponding keyword or
-a generated commercial license key in the
-[Configuration Object](configuration-options.md).
+To make HyperFormula a better fit for different types of projects, the source code is available under different licenses.
 
 ## Available licenses
 
+HyperFormula is available under the following licenses:
+
 | Name | Type |
 | :--- | :--- |
-| [GPL v3](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) | Open-source |
-| Commercial License Agreement | Proprietary |
+| [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) | Open source |
+| Commercial license | Proprietary |
 
-## Open source and non-commercial use
+## Non-commercial and open-source use
 
-If you want to use HyperFormula in a non-commercial or an open-source
-project, then head to the [license key](license-key.md) page to learn
-about the corresponding license key.
+To use HyperFormula in a non-commercial or open-source
+project, use the [GNU General Public License v3.0](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) (GPLv3).
 
-## Commercial license key
+To learn how to use the GPLv3 license, see the [License key](license-key.md#gplv3-license) page.
 
-If you are interested in obtaining a commercial license key, you should
-contact our sales team directly through the
-[contact form](https://handsontable.com/contact?category=request_for_quotation)
-or by email at [sales@handsontable.com](mailto:sales@handsontable.com).
+## Commercial use
 
-## How to enter the license key
+To use HyperFormula in a commercial project, you need to purchase a commercial license.
 
-You can find the details about adding the license key on
-[this page](license-key.md).
+Contact our Sales Team:
 
+* Through the [contact form](https://handsontable.com/contact?category=request_for_quotation) on the Handsontable website
+* By email at [sales@handsontable.com](mailto:sales@handsontable.com)
+
+## Entering a license key
+
+To use HyperFormula, you need to specify which license type you use, by entering a license key.
+
+To find out how to enter a license key, see the [License key](license-key.md) page.
