@@ -1,6 +1,6 @@
 # License key
 
-To use HyperFormula, you need to specify which [license type](licensing.md) you use, by entering a license key in your [configuration options](configuration-options.md).
+To use HyperFormula, you need to specify which [license type](licensing.md#available-licenses) you use, by entering a license key in your [configuration options](configuration-options.md).
 
 ## GPLv3 license
 
@@ -45,9 +45,9 @@ two dates:
 
 This process doesn't require any connection to the server.
 
-### License key notifications
+## License key notifications
 
-If your license key is missing, invalid, or expired, you will see a
+If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
 
 ## License key support
