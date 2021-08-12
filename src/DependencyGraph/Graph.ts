@@ -308,14 +308,6 @@ export class Graph<T> {
     return result
   }
 
-  public destroy(): void {
-    this.edges.clear()
-    this.nodes.clear()
-    this.specialNodes.clear()
-    this.specialNodesStructuralChanges.clear()
-    this.clearSpecialNodesRecentlyChanged()
-  }
-
   private removeDependencies(node: T): T[] {
     const dependencies = this.dependencyQuery(node)
     for (const dependency of dependencies) {

@@ -281,10 +281,8 @@ export class Interpreter {
     return this.gpu
   }
 
-  public destroy() {
-    if (this.gpu) {
-      this.gpu.destroy()
-    }
+  public destroyGpu() {
+    this.gpu?.destroy()
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {

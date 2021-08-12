@@ -80,10 +80,6 @@ export class Evaluator {
     return changes
   }
 
-  public destroy(): void {
-    this.interpreter.destroy()
-  }
-
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {

@@ -125,9 +125,6 @@ export class NamedExpressions {
   private readonly worksheetStores: Map<number, WorksheetStore> = new Map()
   private readonly addressCache: Map<number, InternalNamedExpression> = new Map()
 
-  constructor() {
-  }
-
   public isNameAvailable(expressionName: string, sheetId?: number): boolean {
     if (sheetId === undefined) {
       return this.workbookStore.isNameAvailable(expressionName)

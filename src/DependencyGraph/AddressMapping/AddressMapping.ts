@@ -219,8 +219,4 @@ export class AddressMapping {
       throw new NoSheetWithIdError(sheet)
     }
   }
-
-  public destroy(): void {
-    this.mapping.clear()
-  }
 }

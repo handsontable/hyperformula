@@ -94,7 +94,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['4', 'd'],
         ['5', 'e'],
         ['=VLOOKUP(2, A1:B5, 2)'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A6'))).toEqual('b')
     })
@@ -172,7 +172,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=TRUE()', 'd'],
         ['foo', 'e'],
         ['=VLOOKUP(TRUE(), A1:B5, 2, FALSE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
@@ -196,7 +196,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['2', 'b'],
         ['3', 'c'],
         ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A4'))).toEqual('c')
     })
@@ -207,7 +207,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['2', 'b'],
         ['3', 'c'],
         ['=VLOOKUP(0, A1:B3, 2, TRUE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
@@ -229,7 +229,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['1', 'b'],
         ['2', 'c'],
         ['=VLOOKUP(1, A1:B3, 2, TRUE())'],
-      ], {binarySearchThreshold: 1})
+      ])
 
       expect(engine.getCellValue(adr('A4'))).toEqual('a')
     })
@@ -265,11 +265,11 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
         ['=TRANSPOSE(A2:C3)'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
-
-      engine.setCellContents(adr('C2'), '4')
-
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
+
+      engine.setCellContents(adr('C2'), '5')
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(5)
     })
 
     it('should coerce empty arg to 0', () => {
@@ -285,17 +285,6 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
       expect(engine.getCellValue(adr('A6'))).toEqual('a')
       expect(engine.getCellValue(adr('A7'))).toEqual('a')
-    })
-
-    it('should not coerce', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=VLOOKUP("1", A2:A4, 1)'],
-        [1],
-        [2],
-        [3],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
   })
 }
@@ -330,7 +319,7 @@ describe('BinarySearchStrategy', () => {
       ['3'],
       ['4'],
       ['5'],
-    ], {useColumnIndex: false, binarySearchThreshold: 1})
+    ], {useColumnIndex: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
@@ -367,7 +356,7 @@ describe('BinarySearchStrategy', () => {
       ['=VLOOKUP(2,B:C,2)', 1, 'a'],
       [null, 2, 'b'],
       [null, 3, 'c'],
-    ], {binarySearchThreshold: 1})
+    ])
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
   })
 
@@ -405,7 +394,31 @@ describe('BinarySearchStrategy', () => {
       ['d', '4'],
       ['e', '5'],
       ['=VLOOKUP("b", A1:B5, 2)'],
-    ], {binarySearchThreshold: 1, caseSensitive: false})
+    ], {caseSensitive: false})
     expect(engine.getCellValue(adr('A6'))).toEqual(2)
+  })
+
+  it('should properly report no match', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VLOOKUP("0", A2:A5, 1)'],
+      [1],
+      [2],
+      [3],
+      ['\'1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+  })
+
+  it('should properly report approximate matching', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=VLOOKUP("2", A2:A5, 1)'],
+      [1],
+      [2],
+      [3],
+      ['\'1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('1')
   })
 })

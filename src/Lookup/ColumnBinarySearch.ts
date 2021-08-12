@@ -42,8 +42,6 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {}
 
-  public destroy(): void {}
-
   public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
     if(typeof key === 'string') {
       key = forceNormalizeString(key)
@@ -53,7 +51,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
       return rangeValue.valuesFromTopLeftCorner().map(getRawValue).map(arg =>
         (typeof arg === 'string') ? forceNormalizeString(arg) : arg
       ).indexOf(key)
-    } else if (range.height() < this.config.binarySearchThreshold || !sorted) {
+    } else if (!sorted) {
       return this.dependencyGraph.computeListOfValuesInRange(range).findIndex(arg => {
         arg = getRawValue(arg)
         arg = (typeof arg === 'string') ? forceNormalizeString(arg) : arg

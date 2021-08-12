@@ -4,6 +4,20 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.0
+**Release date: August 12, 2021**
+
+### Changed
+- Deprecated the `binarySearchThreshold` configuration option, as every search of sorted data always uses binary search. [#791](https://github.com/handsontable/hyperformula/pull/791)
+
+### Added
+- Added support for the array arithmetic mode in the `calculateFormula()` method. [#782](https://github.com/handsontable/hyperformula/issues/782)
+- Added a new `CellType` returned by `getCellType`: `CellType.ARRAYFORMULA`. It's assigned to the top-left corner of an array, and is recognized by the `isCellPartOfArray()` and `doesCellHaveFormula()` methods. [#781](https://github.com/handsontable/hyperformula/issues/781)
+
+### Fixed
+- Fixed an issue with searching sorted data. [#787](https://github.com/handsontable/hyperformula/issues/787)
+- Fixed the `destroy` method to properly destroy HyperFormula instances. [#788](https://github.com/handsontable/hyperformula/pull/788)
+
 ## 1.0.0
 **Release date: July 15, 2021**
 
@@ -75,21 +89,6 @@ HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Fixed an issue with NOW and TODAY functions. [#709](https://github.com/handsontable/hyperformula/issues/709)
 - Fixed an issue with MIN/MAX function caches. [#711](https://github.com/handsontable/hyperformula/issues/711)
 - Fixed an issue with caching and order of evaluation. [#735](https://github.com/handsontable/hyperformula/issues/735)
-
-## 0.6.2
-**Release date: May 26, 2021**
-
-### Changed
-- Modified a private field in one of the classes to ensure broader compatibility with older TypeScript versions. [#681](https://github.com/handsontable/hyperformula/issues/681)
-
-## 0.6.1
-**Release date: May 24, 2021**
-
-### Changed
-- Remove redundant `'assert'` dependency from the code. [#672](https://github.com/handsontable/hyperformula/issues/672)
-
-### Fixed
-- Fixed library support for IE11. The `unorm` package is added to the dependencies. [#675](https://github.com/handsontable/hyperformula/issues/675)
 
 ## 0.6.2
 **Release date: May 26, 2021**

@@ -190,7 +190,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { binarySearchThreshold: 1 })
+    ])
 
     expect(spy).not.toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -207,7 +207,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { binarySearchThreshold: 1 })
+    ])
 
     expect(spy).toHaveBeenCalled()
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
@@ -221,7 +221,7 @@ describe('Function MATCH', () => {
       ['300'],
       ['400'],
       ['500'],
-    ], { binarySearchThreshold: 1 })
+    ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
@@ -251,15 +251,28 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA))
   })
 
-  it('should not coerce', () => {
+  it('should properly report no match', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH("1", A2:A4)'],
+      ['=MATCH("0", A2:A5)'],
       [1],
       [2],
       [3],
+      ['\'1'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+  })
+
+  it('should properly report approximate match', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH("2", A2:A5)'],
+      [1],
+      [2],
+      [3],
+      ['\'1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
   it('should coerce null to zero when using naive approach', () => {

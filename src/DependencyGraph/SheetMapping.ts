@@ -113,11 +113,6 @@ export class SheetMapping {
     return currentDisplayName
   }
 
-  public destroy(): void {
-    this.mappingFromCanonicalName.clear()
-    this.mappingFromId.clear()
-  }
-
   public sheetNames(): string[] {
     return Array.from(this.mappingFromId.values()).map((s) => s.displayName)
   }
