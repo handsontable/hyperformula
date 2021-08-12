@@ -6,16 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- `binarySearchThreshold` option is now deprecated, as every search of sorted data always uses binary search.
+## [1.1.0] - 2021-08-12
 
-### Fixed
-- Fixed issue with searching sorted data (#787).
-- Added new CellType returned by `getCellType`, CellType.ARRAYFORMULA, assigned to top-left corner of arrays. Recognized by `isCellPartOfArray` and `doesCellHaveFormula`. (#781)
-- Fixed `destroy` method to properly destroy HyperFormula instances. (#788)
+### Changed
+- Deprecated the `binarySearchThreshold` configuration option, as every search of sorted data always uses binary search. (#791)
 
 ### Added
-- Added support for array arithmetic in temporary formulas. (#782)
+- Added support for the array arithmetic mode in the `calculateFormula()` method. (#782)
+- Added a new `CellType` returned by `getCellType`: `CellType.ARRAYFORMULA`. It's assigned to the top-left corner of an array, and is recognized by the `isCellPartOfArray()` and `doesCellHaveFormula()` methods. (#781)
+
+### Fixed
+- Fixed an issue with searching sorted data. (#787)
+- Fixed the `destroy` method to properly destroy HyperFormula instances. (#788)
+
 
 ## [1.0.0] - 2021-07-15
 
