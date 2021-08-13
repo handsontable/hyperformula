@@ -135,16 +135,9 @@ When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you pass an array to a [scalar](#about-arrays) function, the array is reduced to 1 element (usually the array's top-left value).
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of width `1`, the behavior depends on your formula's location:
+When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of width/height equal to `1`, the behavior depends on your formula's location:
 
 | Your formula's location | Behavior |
 | :--- | :--- |
 | In the same row as as one of the range's elements | Only that particular element is taken. |
-| Any other cell | `#VALUE!` error |
-
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of height `1`, the behavior depends on your formula's location:
-
-| Your formula's location | Behavior |
-| :--- | :--- |
-| In the same column as as one of the range's elements | Only that particular element is taken. |
 | Any other cell | `#VALUE!` error |
