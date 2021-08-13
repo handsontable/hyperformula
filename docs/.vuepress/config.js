@@ -174,7 +174,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Data Operations',
+          title: 'Data operations',
           collapsable: false,
           children: [
             ['/guide/basic-operations', 'Basic operations'],
@@ -185,7 +185,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Formula Reference',
+          title: 'Formulas',
           collapsable: false,
           children: [
             ['/guide/specifications-and-limits', 'Specifications and limits'],
@@ -197,6 +197,7 @@ module.exports = {
             ['/guide/built-in-functions', 'Built-in functions'],
             ['/guide/volatile-functions', 'Volatile functions'],
             ['/guide/named-ranges', 'Named ranges'],
+            ['/guide/arrays', 'Array formulas'],
           ]
         },
         {
@@ -215,7 +216,6 @@ module.exports = {
             ['/guide/building', 'Building'],
             ['/guide/testing', 'Testing'],
             ['/guide/custom-functions', 'Custom functions'],
-            ['/guide/arrays', 'Arrays'],
             ['/guide/performance', 'Performance'],
           ]
         },
