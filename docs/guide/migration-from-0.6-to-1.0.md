@@ -4,7 +4,7 @@ To upgrade your HyperFormula version from 0.6.x to 1.0.x, follow this guide.
 
 ## Step 1: Change your license key
 
-If use the AGPLv3 license, or the free non-commercial license, you need to change your license key.
+If you use the AGPLv3 license, or the free non-commercial license, you need to change your license key.
 
 If you use a commercial license, you don't need to make any changes.
 
@@ -107,7 +107,7 @@ Before:
 ={ISEVEN(A2:A5*10)}
 ```
 
-Now, if the `useArrayArithmetic` configuration option is set to `false`, use the `ARRAYFORMULA` function to [enable the array arithmetic mode locally]((arrays.md#enabling-the-array-arithmetic-mode-locally)):
+Now, if the `useArrayArithmetic` configuration option is set to `false`, use the `ARRAYFORMULA` function to [enable the array arithmetic mode locally](arrays.md#enabling-the-array-arithmetic-mode-locally):
 ```js
 =ARRAYFORMULA(ISEVEN(A2:A5*10))
 ```
