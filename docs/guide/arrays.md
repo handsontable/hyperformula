@@ -1,6 +1,6 @@
-# Arrays
+# Array formulas
 
-Use arrays to perform an operation (or call a function) on multiple cells at a time.
+Use array formulas to perform an operation (or call a function) on multiple cells at a time.
 
 ## About arrays
 
@@ -14,9 +14,9 @@ An array is inherently a two-dimensional object.
 
 `1`x`1` arrays are treated as single, zero-dimensional values (**scalars**).
 
-## Enabling the array arithmetic mode
+## Array arithmetic mode
 
-To use arrays in HyperFormula, you need to enable the **array arithmetic mode**.
+To use array formulas in HyperFormula, you need to enable the **array arithmetic mode**.
 
 You can enable the array arithmetic mode:
 * [Locally](#enabling-the-array-arithmetic-mode-locally) (for an individual function or operation)
@@ -135,16 +135,9 @@ When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you pass an array to a [scalar](#about-arrays) function, the array is reduced to 1 element (usually the array's top-left value).
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of width `1`, the behavior depends on your formula's location:
+When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of width/height equal to `1`, the behavior depends on your array formula's location:
 
-| Your formula's location | Behavior |
+| Your array formula's location | Behavior |
 | :--- | :--- |
 | In the same row as as one of the range's elements | Only that particular element is taken. |
-| Any other cell | `#VALUE!` error |
-
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of height `1`, the behavior depends on your formula's location:
-
-| Your formula's location | Behavior |
-| :--- | :--- |
-| In the same column as as one of the range's elements | Only that particular element is taken. |
 | Any other cell | `#VALUE!` error |
