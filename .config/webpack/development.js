@@ -29,12 +29,6 @@ module.exports.create = function create() {
         commonjs: 'chevrotain',
         amd: 'chevrotain',
       },
-      'gpu.js': {
-        root: 'GPU',
-        commonjs2: 'gpu.js',
-        commonjs: 'gpu.js',
-        amd: 'gpu.js',
-      },
     };
     c.plugins.push(new WebpackBar({ name: ` ${PACKAGE_FILENAME}.js` }));
   });
