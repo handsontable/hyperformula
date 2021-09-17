@@ -5,13 +5,6 @@ of every modern browser, on both mobile and desktop. In addition to
 running unit tests, we focus on two factors that are crucial for all
 users: performance and accuracy of calculations.
 
-## Testing compatibility
-
-Tests are run in BrowserStack as well as on a limited number of
-physical devices. Access to physical machines gives us an opportunity
-to measure GPU acceleration, which can't be done in a cloud testing
-platform that is based on virtual machines.
-
 ## List of supported browsers
 
 | Desktop Browsers | Mobile Browsers |
@@ -24,7 +17,7 @@ platform that is based on virtual machines.
 | UC Browser | UC Browser * |
 | QQ browser | Opera |
 
-## * Full ICU support
+## Full ICU support
 
 Browsers that do not support full-icu (e.g. UC Browser mobile) will
 not handle the comparison of accented strings properly. In

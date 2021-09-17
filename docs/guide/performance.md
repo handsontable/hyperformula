@@ -65,27 +65,13 @@ recalculation but only change the shape of the worksheet, like
 recalculation, as this may have a slightly negative impact on
 performance.
 
-## GPU acceleration
-
-Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, or TRANSPOSE, benefit from
-GPU acceleration. Thanks to the cores running thousands of threads
-at once, they calculate the input data sets up to 9x faster than
-when using the CPU. According to our observations the bigger the data set is,
-the bigger the performance gain.
-
-**For small data sets, the difference between the CPU and GPU is
-non-significant.**
-
-[See how to enable GPU acceleration &#8594;](enabling-gpu-acceleration.md)
-
 ## Benchmarks
 
 HyperFormula's performance has been tested on different devices,
-operating systems, and browsers. The table below presents the result
-of tests in which the engine multiplies two matrices of
-2000 cells, each using the MMULT formula. The main objective of this
-benchmark is to show a significant difference in performance between the
-CPU and GPU.
+operating systems, and browsers.
+
+The table below presents the result of tests in which the engine multiplies two matrices of
+2000 cells, each using the MMULT formula.
 
 The tests were run on three different physical machines with the
 following specifications:
@@ -100,21 +86,25 @@ Android Pie (9), Chrome.
 
 The resulting times are returned in seconds.
 
-|   | **GPU** | **CPU** |
-| :--- | :--- | :--- |
-| Number of rows | 2000 |  2000 |
-| Number of columns | 2000 | 2000  |
-| Number of cells | 4 million |  4 million |
-| Number of repeats | 100 |  100 |
-|   |   |   |
-| **MacBook Pro** |   |   |
-| Average total time | 2.921 | 18.570 |
-| Standard deviation | 0.117 | 1.981 |
-|   |   |   |
-| **Lenovo ThinkBook** |   |   |
-| Average total time | 3.041 | 10.543 |
-| Standard deviation | 0.138 | 0.045 |
-|   |   |   |
-| **Huawei Mate 20** |   |   |
-| Average total time | 6.611 | 40.166 |
-| Standard deviation | 0.394 | 0.594 |
+::: tip
+In HyperFormula 2.0.0, we removed the gpu.js dependency. 
+:::
+
+|                      | **GPU**   | **CPU**   |
+| :------------------- | :-------- | :-------- |
+| Number of rows       | 2000      | 2000      |
+| Number of columns    | 2000      | 2000      |
+| Number of cells      | 4 million | 4 million |
+| Number of repeats    | 100       | 100       |
+|                      |           |           |
+| **MacBook Pro**      |           |           |
+| Average total time   | 2.921     | 18.570    |
+| Standard deviation   | 0.117     | 1.981     |
+|                      |           |           |
+| **Lenovo ThinkBook** |           |           |
+| Average total time   | 3.041     | 10.543    |
+| Standard deviation   | 0.138     | 0.045     |
+|                      |           |           |
+| **Huawei Mate 20**   |           |           |
+| Average total time   | 6.611     | 40.166    |
+| Standard deviation   | 0.394     | 0.594     |
