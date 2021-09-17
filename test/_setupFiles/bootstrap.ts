@@ -13,7 +13,6 @@ import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from '
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   chooseAddressMappingPolicy: new AlwaysSparse(),
   functionPlugins: [],
-  gpuMode: 'cpu',
   useStats: true,
   licenseKey: 'gpl-v3',
 })

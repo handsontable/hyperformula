@@ -42,7 +42,6 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
-  private gpu?: any
   public readonly criterionBuilder: CriterionBuilder
 
   constructor(
@@ -264,25 +263,6 @@ export class Interpreter {
         return ast.error
       }
     }
-  }
-
-  public getGpuInstance(): any {
-    const mode = this.config.gpuMode
-    const gpujs = this.config.gpujs
-
-    if (gpujs === undefined) {
-      throw Error('Cannot instantiate GPU.js. Constructor not provided.')
-    }
-
-    if (!this.gpu) {
-      this.gpu = new gpujs({mode})
-    }
-
-    return this.gpu
-  }
-
-  public destroyGpu() {
-    this.gpu?.destroy()
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {

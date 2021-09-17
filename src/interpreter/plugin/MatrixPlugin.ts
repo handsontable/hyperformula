@@ -7,7 +7,6 @@ import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
-import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
@@ -77,17 +76,6 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       ],
       vectorizationForbidden: true,
     },
-  }
-
-  private readonly createKernel: (kernel: KernelFunction, outputSize: ArraySize) => KernelRunShortcut
-
-  constructor(interpreter: Interpreter) {
-    super(interpreter)
-    if (this.config.gpujs === undefined) {
-      this.createKernel = this.createCpuKernel
-    } else {
-      this.createKernel = this.createGpuJsKernel
-    }
   }
 
   public mmult(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -280,7 +268,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     return new ArraySize(size.height, size.width)
   }
 
-  private createCpuKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {
+  private createKernel(kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut {
     return function(...args: any[]) {
       const result: number[][] = []
       for (let y = 0; y < outputSize.height; ++y) {
@@ -291,12 +279,5 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       }
       return result
     }
-  }
-
-  private createGpuJsKernel = (kernel: KernelFunction, outputSize: ArraySize): KernelRunShortcut => {
-    return this.interpreter.getGpuInstance()
-      .createKernel(kernel)
-      .setPrecision('unsigned')
-      .setOutput([outputSize.width, outputSize.height]) as KernelRunShortcut
   }
 }

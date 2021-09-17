@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Removed `gpu.js` dependency and its use. (#812)
+
 ## [1.1.0] - 2021-08-12
 
 ### Changed

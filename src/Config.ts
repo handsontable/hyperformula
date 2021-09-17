@@ -23,9 +23,6 @@ import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 
-type GPUMode = 'gpu' | 'cpu' | 'dev'
-
-const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 const privatePool: WeakMap<Config, {licenseKeyValidityState: LicenseKeyValidityState}> = new WeakMap()
 
 export interface ConfigParams {
@@ -150,32 +147,6 @@ export interface ConfigParams {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
-  /**
-   * A GPU.js constructor used by array functions.
-   * 
-   * When not provided, the plain CPU implementation is used.
-   *
-   * @default undefined
-   *
-   * @category Engine
-   */
-  gpujs?: any,
-  /**
-   * Sets array calculations to use either GPU or CPU.
-   * 
-   * When set to `gpu`, tries to use GPU for array calculations.
-   * 
-   * When set to `cpu`, enforces CPU usage.
-   * 
-   * Use other values only for debugging purposes.
-   * 
-   * For more information, see the [GPU.js documentation](https://github.com/gpujs/gpu.js/#readme).
-   *
-   * @default 'gpu'
-   *
-   * @category Engine
-   */
-  gpuMode: GPUMode,
   /**
    * When set to `true`, string comparison ignores punctuation.
    *
@@ -456,8 +427,6 @@ export class Config implements ConfigParams, ParserConfig {
     evaluateNullToZero: false,
     functionArgSeparator: ',',
     functionPlugins: [],
-    gpujs: undefined,
-    gpuMode: 'gpu',
     ignorePunctuation: false,
     language: 'enGB',
     licenseKey: '',
@@ -517,10 +486,6 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
-  /** @inheritDoc */
-  public readonly gpujs?: any
-  /** @inheritDoc */
-  public readonly gpuMode: GPUMode
   /** @inheritDoc */
   public readonly leapYear1900: boolean
   /** @inheritDoc */
@@ -598,8 +563,6 @@ export class Config implements ConfigParams, ParserConfig {
       evaluateNullToZero,
       functionArgSeparator,
       functionPlugins,
-      gpujs,
-      gpuMode,
       ignorePunctuation,
       leapYear1900,
       localeLang,
@@ -645,8 +608,6 @@ export class Config implements ConfigParams, ParserConfig {
     this.arrayRowSeparator = configValueFromParam(arrayRowSeparator, [';', '|'], 'arrayRowSeparator')
     this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = [...(functionPlugins ?? Config.defaultConfig.functionPlugins)]
-    this.gpujs = gpujs ?? Config.defaultConfig.gpujs
-    this.gpuMode = configValueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = configValueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.evaluateNullToZero = configValueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = configValueFromParam(nullYear, 'number', 'nullYear')
