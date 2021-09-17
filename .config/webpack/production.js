@@ -18,7 +18,12 @@ module.exports.create = function create() {
     c.optimization = {
       minimize: true,
       minimizer: [
-        new TerserPlugin()
+        new TerserPlugin({
+          terserOptions: {
+            mangle: false,    // This option has to be disabled, otherwise GPU function doesn't work for min files.
+            compress: false,  // This option has to be disabled, otherwise GPU function doesn't work for min files.
+          }
+        })
       ]
     };
 
