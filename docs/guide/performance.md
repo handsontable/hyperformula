@@ -71,9 +71,7 @@ HyperFormula's performance has been tested on different devices,
 operating systems, and browsers.
 
 The table below presents the result of tests in which the engine multiplies two matrices of
-2000 cells, each using the MMULT formula.
-
-The tests were run on three different physical machines with the
+2000 cells, each using the MMULT formula. The tests were run on three different physical machines with the
 following specifications:
 
 * **MacBook Pro (2015)** - 2.7 GHz Intel Core i5, 16 GB 1867 MHz DDR3,
@@ -84,10 +82,12 @@ Intel Iris Graphics 6100 1536 MB, macOS Mojave, Chrome.
 & 4x1.8 GHz Cortex-A55), 4 GB RAM HiSilicon Kirin 980, Mali-G76 MP10,
 Android Pie (9), Chrome.
 
-The resulting times are returned in seconds.
+The resulting times are listed in seconds.
 
 ::: tip
-In HyperFormula 2.0.0, we removed the gpu.js dependency. 
+In [HyperFormula 2.0.0](https://github.com/handsontable/hyperformula/releases/tag/2.0.0), we removed the [gpu.js](https://gpu.rocks/#/) dependency.
+
+To use the GPU acceleration feature, use [HyperFormula 1.1.0](https://github.com/handsontable/hyperformula/releases/tag/1.1.0).
 :::
 
 |                      | **GPU**   | **CPU**   |
