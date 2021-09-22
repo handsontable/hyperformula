@@ -4,6 +4,12 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.2.0
+**Release date: September 23, 2021**
+
+### Changed
+- Removed `gpu.js` from optional dependencies and marked config options `gpujs` and `gpuMode` as deprecated.
+
 ## 1.1.0
 **Release date: August 12, 2021**
 
