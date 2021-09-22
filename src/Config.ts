@@ -155,6 +155,8 @@ export interface ConfigParams {
    * 
    * When not provided, the plain CPU implementation is used.
    *
+   * @deprecated since version 1.2.
+   * 
    * @default undefined
    *
    * @category Engine
@@ -171,6 +173,8 @@ export interface ConfigParams {
    * 
    * For more information, see the [GPU.js documentation](https://github.com/gpujs/gpu.js/#readme).
    *
+   * @deprecated since version 1.2 
+   * 
    * @default 'gpu'
    *
    * @category Engine
@@ -686,6 +690,10 @@ export class Config implements ConfigParams, ParserConfig {
     })
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.warnDeprecatedIfUsed(binarySearchThreshold, 'binarySearchThreshold', '1.1')
+    this.warnDeprecatedIfUsed(gpujs, 'gpujs', '1.2')
+    if (gpuMode !== Config.defaultConfig.gpuMode) {
+      this.warnDeprecatedIfUsed(gpuMode, 'gpuMode', '1.2')
+    }
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
@@ -725,7 +733,7 @@ export class Config implements ConfigParams, ParserConfig {
 
   private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
     if (inputValue !== undefined) {
-      if(replacementName === undefined) {
+      if (replacementName === undefined) {
         console.warn(`${paramName} option is deprecated since ${fromVersion}`)
       } else {
         console.warn(`${paramName} option is deprecated since ${fromVersion}, please use ${replacementName}`)
