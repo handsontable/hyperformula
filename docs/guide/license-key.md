@@ -1,54 +1,55 @@
 # License key
 
+To use HyperFormula, you need to specify which [license type](licensing.md#available-licenses) you use, by entering a license key in your [configuration options](configuration-options.md).
+
+## GPLv3 license
+
+To use HyperFormula in a non-commercial or open-source
+project, use the [GNU General Public License v3.0](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) (GPLv3):
+
+* In your [configuration options](configuration-options.md), assign the mandatory `licenseKey` property to a string, `gpl-v3`:
+  ```js
+  const options = {
+    licenseKey: 'gpl-v3',
+    //... other options
+  }
+  ```
+
+## Commercial license
+
+To use HyperFormula in a commercial project, you need to purchase a commercial license:
+
+1. Contact our [Sales Team](licensing.md#commercial-use) to purchase a commercial license.
+2. Our Sales Team sends you your commercial license key.
+3. In your [configuration options](configuration-options.md), assign the mandatory `licenseKey` property to your commercial license key:
+    ```js
+    const options = {
+      // replace xxxx-xxxx-xxxx-xxxx-xxxx with your commercial license key:
+      licenseKey: 'xxxx-xxxx-xxxx-xxxx-xxxx',
+      //... other options
+    }
+    ```
+
+### Commercial license key validation
+
 ::: tip
-HyperFormula doesn't use an internet connection to validate the
+HyperFormula doesn't use an internet connection to validate your commercial
 license key.
 :::
 
-As this library is available under multiple licenses, we require you
-to specify which terms exactly apply to your case. You can do that by
-passing a license key in the `options` object alongside other
-settings you want to apply.
-
-## GNU General Public License (GPL) v3.0
-
-If you use the open-source version of HyperFormula, simply pass the
-string `gpl-v3`.
-
-```javascript
-const options = {
-  licenseKey: 'gpl-v3',
-  //... other options
-}
-```
-
-## Commercial License Agreement
-
-After you purchase a commercial license, our sales team will deliver
-you a license key that needs to be passed in order to activate the
-software.
-
-```javascript
-const options = {
-  licenseKey: '00000-00000-00000-00000-00000' //replace with the actual commercial key
-  //... other options
-}
-```
-
-## The validation process
-
 To determine whether a user is still entitled to use a particular
-version of the software, HyperFormula simply compares the time between
-two dates. These dates come from two sources of information. One is
-the library build date, and the other one is the date taken from the license key.
-This process does not require any connections to the server.
+version of the software, HyperFormula compares the time between
+two dates:
+* The HyperFormula build date
+* The date in your commercial license key
 
-## Notifications
+This process doesn't require any connection to the server.
 
-If your license key is missing, invalid, or expired, you will see the
+## License key notifications
+
+If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
 
-## Getting help
+## License key support
 
-If you stumble across any issues while passing the license key,
-[contact](contact.md) our team.
+If you have any issues with your license key, [contact our team](contact.md).
