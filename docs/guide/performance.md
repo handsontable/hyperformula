@@ -67,10 +67,6 @@ performance.
 
 ## GPU acceleration
 
-::: tip
-GPU acceleration is deprecated since [HyperFormula 1.2.0](../guide/release-notes.md#_1-2-0).
-:::
-
 Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, or TRANSPOSE, benefit from
 GPU acceleration. Thanks to the cores running thousands of threads
 at once, they calculate the input data sets up to 9x faster than

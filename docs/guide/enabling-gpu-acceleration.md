@@ -1,24 +1,20 @@
 # Enabling GPU acceleration.
 
-::: tip
-GPU acceleration is deprecated since [HyperFormula 1.2.0](../guide/release-notes.md#_1-2-0).
-:::
-
 To enable GPU acceleration, follow the steps below.
 
-## Step 1: Use HyperFormula 1.1.0
+## Step 1: Install GPU.js
 
-As `gpu.js` was removed from optional dependencies in [HyperFormula 1.2.0](../guide/release-notes.md#_1-2-0), you can only use GPU acceleration in HyperFormula 1.1.0 (or lower).
+As GPU.js was removed from optional dependencies in [HyperFormula 1.2.0](../guide/release-notes.md#_1-2-0), you need to install GPU.js on your own.
 
-::: tip
-HyperFormula 1.1.0 supports GPU.js 2.3.0.
-:::
+HyperFormula supports GPU.js 2.3.0.
 
+```js
+// install GPU.js 2.3.0
+npm install gpu.js@2.3.0
+```
 ## Step 2: Import GPU
 
-GPU.js uses ES6 features and doesn't provide a proper ES5 package. To let HyperFormula run on browsers like Internet Explorer, GPU.js is not bundled with the HyperFormula package.
-
-When configuring your HyperFormula 1.1.0 instance, import the GPU module:
+When configuring your HyperFormula instance, import the GPU module:
 ```js
 // import the GPU module
 import GPU from 'gpu.js'
