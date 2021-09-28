@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added support for more args to SUMPRODUCT function. (#810)
+
 ## [1.2.0] - 2021-09-23
 
 ### Changed
