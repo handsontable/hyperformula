@@ -19,7 +19,7 @@ import {
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
-import {Config, ConfigParams} from './Config'
+import {Config, ConfigParams, getDefaultConfig} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {
@@ -303,6 +303,21 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput, namedExpressions))
+  }
+
+  /**
+   * Returns default configuration of the engines.
+   *
+   * @example
+   * ```js
+   * // should return all default config metadata
+   * const defaultConfig = HyperFormula.getDefaultConfig();
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getDefaultConfig(): ConfigParams {
+    return getDefaultConfig()
   }
 
   private static registeredLanguages: Map<string, TranslationPackage> = new Map()
