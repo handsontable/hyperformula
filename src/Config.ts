@@ -444,7 +444,7 @@ export interface ConfigParams {
   useWildcards: boolean,
 }
 
-export interface ConfigParamsNoDeprecated extends Omit<ConfigParams, 'binarySearchThreshold'> {}
+export type ConfigParamsNoDeprecated = Omit<ConfigParams, 'binarySearchThreshold'>
 
 export type ConfigParamsList = keyof ConfigParamsNoDeprecated
 
