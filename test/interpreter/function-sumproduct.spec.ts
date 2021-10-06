@@ -1,19 +1,14 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType, HyperFormula} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SUMPRODUCT', () => {
   it('wrong number of arguments', () => {
     const engine =  HyperFormula.buildFromArray([
-      ['1', '1'],
-      ['2', '2'],
-      ['3', '3'],
-      ['=SUMPRODUCT(A1:A3)', '=SUMPRODUCT(A1:A3,B1:B3,A1:A2)'],
+      ['=SUMPRODUCT()'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
-    expect(engine.getCellValue(adr('B4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works',  () => {
@@ -25,6 +20,28 @@ describe('Function SUMPRODUCT', () => {
     ])
 
     expect(engine.getCellValue(adr('A4'))).toEqual(14)
+  })
+
+  it('works for more args',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['2', '2'],
+      ['3', '3'],
+      ['=SUMPRODUCT(A1:A3, B1:B3, A1:A3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(36)
+  })
+
+  it('works for less args',  () => {
+    const engine =  HyperFormula.buildFromArray([
+      ['1', '1'],
+      ['2', '2'],
+      ['3', '3'],
+      ['=SUMPRODUCT(A1:A3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
   it('works with wider ranges',  () => {
@@ -165,7 +182,7 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
   })
 
-  it('works if same number of elements in ranges',  () => {
+  it('error if mismatched range shape',  () => {
     const engine =  HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['2'],
@@ -173,7 +190,7 @@ describe('Function SUMPRODUCT', () => {
       ['=SUMPRODUCT(A1:C1,A1:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(14)
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.EqualLength))
   })
 
   // Inconsistency with Product 1

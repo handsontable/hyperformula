@@ -17,38 +17,41 @@ export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypec
       method: 'sumproduct',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
       ],
+      repeatLastArgs: 1,
     },
   }
 
   public sumproduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SUMPRODUCT'), (left: SimpleRangeValue, right: SimpleRangeValue) => {
-      if (left.numberOfElements() !== right.numberOfElements()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
-      }
-
-      let result = 0
-
-      const lit = left.iterateValuesFromTopLeftCorner()
-      const rit = right.iterateValuesFromTopLeftCorner()
-      let l, r
-
-      while (l = lit.next(), r = rit.next(), !l.done && !r.done) {
-        if (l.value instanceof CellError) {
-          return l.value
-        } else if (r.value instanceof CellError) {
-          return r.value
-        } else {
-          const lval = this.coerceScalarToNumberOrError(l.value)
-          const rval = this.coerceScalarToNumberOrError(r.value)
-          if (isExtendedNumber(lval) && isExtendedNumber(rval)) {
-            result += getRawValue(lval) * getRawValue(rval)
-          }
+    return this.runFunction(ast.args, state, this.metadata('SUMPRODUCT'), (...args: SimpleRangeValue[]) => {
+      const width = args[0].width()
+      const height = args[0].height()
+      for(const arg of args) {
+        if(arg.width() !== width || arg.height() !== height) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
         }
       }
 
-      return result
+      let ret = 0
+      const iterators = args.map(arg => arg.iterateValuesFromTopLeftCorner())
+      for(let i=0;i<width*height;i++) {
+        let acc = 1
+        for(const it of iterators) {
+          const val = it.next().value
+          if(val instanceof CellError) {
+            return val
+          }
+          const coercedVal = this.coerceScalarToNumberOrError(val)
+          if(isExtendedNumber(coercedVal)) {
+            acc *= getRawValue(coercedVal)
+          } else {
+            acc = 0
+          }
+        }
+        ret += acc
+      }
+
+      return ret
     })
   }
 }
