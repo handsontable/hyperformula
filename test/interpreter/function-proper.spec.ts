@@ -27,6 +27,24 @@ describe('Function PROPER', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual('Foo Bar')
   })
 
+  it('should work with punctuation marks and numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=PROPER("123aa123bb.cc.dd")']
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('123Aa123Bb.Cc.Dd')
+  })
+
+  it('should work with accents', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=PROPER("MAI ANH ĐỨC")'],
+      ['=PROPER("MAI CHÍ THỌ")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('Mai Anh Đức')
+    expect(engine.getCellValue(adr('A2'))).toEqual('Mai Chí Thọ')
+  })
+
   it('should coerce other types to string', () => {
     const engine = HyperFormula.buildFromArray([
       ['=PROPER(1)'],
