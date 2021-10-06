@@ -316,7 +316,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Static Properties
    */
-  public static getDefaultConfig(): ConfigParams {
+  public static get defaultConfig(): ConfigParams {
     return getDefaultConfig()
   }
 
