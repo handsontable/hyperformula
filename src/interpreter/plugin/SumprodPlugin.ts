@@ -27,7 +27,7 @@ export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypec
       const width = args[0].width()
       const height = args[0].height()
       for(const arg of args) {
-        if(arg.width() != args[0].width() || arg.height() != args[0].height()) {
+        if(arg.width() !== width || arg.height() !== height) {
           return new CellError(ErrorType.VALUE, ErrorMessage.EqualLength)
         }
       }
