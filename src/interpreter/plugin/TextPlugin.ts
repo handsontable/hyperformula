@@ -198,7 +198,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
   public proper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PROPER'), (arg: string) => {
-      return arg.replace(/\w\S*/g, word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
+      return arg.replace(/\p{L}+/gu, word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
     })
   }
 
