@@ -27,7 +27,7 @@ describe('Function SUMPRODUCT', () => {
       ['1', '1'],
       ['2', '2'],
       ['3', '3'],
-      ['=SUMPRODUCT(A1:A3,B1:B3, A1:A3)'],
+      ['=SUMPRODUCT(A1:A3, B1:B3, A1:A3)'],
     ])
 
     expect(engine.getCellValue(adr('A4'))).toEqual(36)
