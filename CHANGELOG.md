@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added static property `defaultConfig`. (#822)
+
 ### Fixed
 - Fixed handling of unicode characters and non-letter characters in PROPER function. (#811)
 - Fixed unncessary warnings of deprecated config options. (#830)

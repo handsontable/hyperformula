@@ -104,7 +104,7 @@ export interface ConfigParams {
    * 
    * Any order of `YY`, `MM`, and `DD` is accepted as a date.
    *
-   * @default ['MM/DD/YYYY', 'MM/DD/YY']
+   * @default ['DD/MM/YYYY', 'DD/MM/YY']
    *
    * @category Date and Time
    */
@@ -713,18 +713,8 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   public getConfig(): ConfigParams {
-    const ret: { [key: string]: any } = {}
-    for (const key in Config.defaultConfig) {
-      const val = this[key as ConfigParamsList]
-      if (Array.isArray(val)) {
-        ret[key] = [...val]
-      } else {
-        ret[key] = val
-      }
-    }
-    return ret as ConfigParams
+    return getFullConfigFromPartial(this)
   }
-
 
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
@@ -742,3 +732,21 @@ export class Config implements ConfigParams, ParserConfig {
     }
   }
 }
+
+function getFullConfigFromPartial(partialConfig: Partial<ConfigParams>): ConfigParams {
+  const ret: { [key: string]: any } = {}
+  for (const key in Config.defaultConfig) {
+    const val = partialConfig[key as ConfigParamsList] ?? Config.defaultConfig[key as ConfigParamsList]
+    if (Array.isArray(val)) {
+      ret[key] = [...val]
+    } else {
+      ret[key] = val
+    }
+  }
+  return ret as ConfigParams
+}
+
+export function getDefaultConfig(): ConfigParams {
+  return getFullConfigFromPartial({})
+}
+
