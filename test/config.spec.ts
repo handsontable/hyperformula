@@ -218,3 +218,16 @@ describe('getConfig', () => {
     expect(arr).not.toBe(arr2)
   })
 })
+
+describe('getDefaultConfig', () => {
+  it('should not be an instance of Config', () => {
+    expect(HyperFormula.defaultConfig).not.toBeInstanceOf(Config)
+  })
+
+  it('should copy returned values', () => {
+    const defaultConfig = HyperFormula.defaultConfig
+    defaultConfig.dateFormats.push('mm')
+    const defaultDateFormats = HyperFormula.defaultConfig.dateFormats
+    expect(defaultDateFormats).toEqual(['DD/MM/YYYY', 'DD/MM/YY'])
+  })
+})
