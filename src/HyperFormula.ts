@@ -311,7 +311,7 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // should return all default config metadata
-   * const defaultConfig = HyperFormula.getDefaultConfig();
+   * const defaultConfig = HyperFormula.defaultConfig;
    * ```
    *
    * @category Static Properties
