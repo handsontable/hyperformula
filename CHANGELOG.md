@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed handling of unicode characters and non-letter characters in PROPER function. (#811)
 - Fixed SUMPRODUCT function. (#810)
 
+### Added
+- Support for `getFillRangeData` using different sheets as source and target. (#836)
+
 ## [1.2.0] - 2021-09-23
 
 ### Changed
