@@ -2400,7 +2400,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} target range where data is intended to be put
    * @param {boolean} offsetsFromTarget if true, offsets are computed from target corner, otherwise from source corner
    *
-   * @throws [[SheetsNotEqual]] if both ranges are not from the same sheet
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[ExpectedValueOfTypeError]] if source or target are of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
