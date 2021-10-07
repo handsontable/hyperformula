@@ -971,7 +971,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Instance
    */
-  public getConfig(): ConfigParams {
+  public getConfig(): Partial<ConfigParams> {
     return this._config.getConfig()
   }
 
