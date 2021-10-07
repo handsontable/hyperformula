@@ -444,14 +444,13 @@ export interface ConfigParams {
   useWildcards: boolean,
 }
 
-type ConfigParamsNoDeprecated = Omit<ConfigParams, 'binarySearchThreshold'>
+export type ConfigParamsList = keyof ConfigParams
 
-export type ConfigParamsList = keyof ConfigParamsNoDeprecated
+export class Config implements ConfigParams, ParserConfig {
 
-export class Config implements ConfigParamsNoDeprecated, ParserConfig {
-
-  public static defaultConfig: ConfigParamsNoDeprecated = {
+  public static defaultConfig: ConfigParams = {
     accentSensitive: false,
+    binarySearchThreshold: 20,
     currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
@@ -552,6 +551,8 @@ export class Config implements ConfigParamsNoDeprecated, ParserConfig {
   public readonly useColumnIndex: boolean
   /** @inheritDoc */
   public readonly useStats: boolean
+  /** @inheritDoc */
+  public readonly binarySearchThreshold: number
   /** @inheritDoc */
   public readonly nullDate: SimpleDate
   /** @inheritDoc */
@@ -661,6 +662,9 @@ export class Config implements ConfigParamsNoDeprecated, ParserConfig {
     validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    this.binarySearchThreshold = undefined
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
@@ -708,7 +712,7 @@ export class Config implements ConfigParamsNoDeprecated, ParserConfig {
     )
   }
 
-  public getConfig(): ConfigParamsNoDeprecated {
+  public getConfig(): ConfigParams {
     const ret: { [key: string]: any } = {}
     for (const key in Config.defaultConfig) {
       const val = this[key as ConfigParamsList]
@@ -718,12 +722,12 @@ export class Config implements ConfigParamsNoDeprecated, ParserConfig {
         ret[key] = val
       }
     }
-    return ret as ConfigParamsNoDeprecated
+    return ret as ConfigParams
   }
 
 
   public mergeConfig(init: Partial<ConfigParams>): Config {
-    const mergedConfig: ConfigParamsNoDeprecated = Object.assign({}, this.getConfig(), init)
+    const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     return new Config(mergedConfig)
   }
