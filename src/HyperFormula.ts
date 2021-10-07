@@ -2425,16 +2425,13 @@ export class HyperFormula implements TypedEmitter {
     }
     const sourceRange = new AbsoluteCellRange(source.start, source.end)
     const targetRange = new AbsoluteCellRange(target.start, target.end)
-    if (sourceRange.sheet !== targetRange.sheet) {
-      throw new SheetsNotEqual(sourceRange.sheet, targetRange.sheet)
-    }
     this.ensureEvaluationIsNotSuspended()
     return targetRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => {
           const row = ((address.row - (offsetsFromTarget ? target : source).start.row) % sourceRange.height() + sourceRange.height()) % sourceRange.height() + source.start.row
           const col = ((address.col - (offsetsFromTarget ? target : source).start.col) % sourceRange.width() + sourceRange.width()) % sourceRange.width() + source.start.col
-          return this._serialization.getCellSerialized({row, col, sheet: targetRange.sheet}, address)
+          return this._serialization.getCellSerialized({row, col, sheet: sourceRange.sheet}, address)
         }
       )
     )
