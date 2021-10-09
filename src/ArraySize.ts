@@ -104,7 +104,7 @@ export class ArraySizePredictor {
         if (range === undefined) {
           return ArraySize.error()
         } else {
-          return new ArraySize(range.width(),range.height())
+          return new ArraySize(range.width(),range.height(), true)
         }
       }
       case AstNodeType.ARRAY: {
