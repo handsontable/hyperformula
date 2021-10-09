@@ -443,12 +443,48 @@ describe('build from array', () => {
 })
 
 describe('column ranges', () => {
-  it('arithmetic should work', () => {
+  it('arithmetic should work for column range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=2*B:B', 1],
+      ['=2*(B:B)', 1],
       [null, 2],
     ], {useArrayArithmetic: true})
 
     expect(engine.getSheetValues(0)).toEqual([[2,1],[4,2]])
+  })
+
+  it('arithmetic should work for row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=2*(2:2)', null],
+      [1, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([[2,4],[1,2]])
+  })
+
+  it('arithmetic for shifted column range -- error', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, 1],
+      ['=2*(B:B)', 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
+  })
+
+  it('arithmetic should work for row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=2*(2:2)', null],
+      [1, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([[2,4],[1,2]])
+  })
+
+  it('arithmetic for shifted row range -- error', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, '=2*(2:2)'],
+      [1, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
   })
 })

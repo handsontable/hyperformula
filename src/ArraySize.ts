@@ -154,6 +154,9 @@ export class ArraySizePredictor {
         }
         return arraySizeForUnaryOp(val)
       }
+      case AstNodeType.PARENTHESIS: {
+        return this.checkArraySizeForAst(ast.expression, state)
+      }
       case AstNodeType.EMPTY:
         return ArraySize.error()
       default:
