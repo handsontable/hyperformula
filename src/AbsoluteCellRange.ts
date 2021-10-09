@@ -54,22 +54,19 @@ export class AbsoluteCellRange implements SimpleCellRange {
     }
   }
 
+  public static fromAstOrUndef(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): Maybe<AbsoluteCellRange> {
+    try {
+      return AbsoluteCellRange.fromAst(ast, baseAddress)
+    } catch (_e) {
+      return undefined
+    }
+  }
+
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
       x.start.toSimpleCellAddress(baseAddress),
       x.end.toSimpleCellAddress(baseAddress),
     )
-  }
-
-  public static fromCellRangeOrUndef(x: CellRange, baseAddress: SimpleCellAddress): Maybe<AbsoluteCellRange> {
-    try {
-      return new AbsoluteCellRange(
-        x.start.toSimpleCellAddress(baseAddress),
-        x.end.toSimpleCellAddress(baseAddress),
-      )
-    } catch (e) {
-      return undefined
-    }
   }
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
@@ -398,6 +395,14 @@ export class AbsoluteCellRange implements SimpleCellRange {
   public effectiveEndRow(_dependencyGraph: DependencyGraph): number {
     return this.end.row
   }
+
+  public effectiveWidth(_dependencyGraph: DependencyGraph): number {
+    return this.width()
+  }
+
+  public effectiveHeight(_dependencyGraph: DependencyGraph): number {
+    return this.height()
+  }
 }
 
 export class AbsoluteColumnRange extends AbsoluteCellRange {
@@ -448,6 +453,10 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   public effectiveEndRow(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetHeight(this.sheet) - 1
   }
+
+  public effectiveHeight(dependencyGraph: DependencyGraph): number {
+    return this.effectiveEndRow(dependencyGraph)+1
+  }
 }
 
 export class AbsoluteRowRange extends AbsoluteCellRange {
@@ -497,5 +506,9 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
 
   public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetWidth(this.sheet) - 1
+  }
+
+  public effectiveHeight(dependencyGraph: DependencyGraph): number {
+    return this.effectiveEndColumn(dependencyGraph)+1
   }
 }

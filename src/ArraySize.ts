@@ -97,12 +97,14 @@ export class ArraySizePredictor {
       case AstNodeType.FUNCTION_CALL: {
         return this.checkArraySizeForFunction(ast, state)
       }
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
       case AstNodeType.CELL_RANGE: {
-        const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, state.formulaAddress)
+        const range = AbsoluteCellRange.fromAst(ast, state.formulaAddress)
         if (range === undefined) {
           return ArraySize.error()
         } else {
-          return new ArraySize(range.width(), range.height(), true)
+          return new ArraySize(range.width(),range.height())
         }
       }
       case AstNodeType.ARRAY: {

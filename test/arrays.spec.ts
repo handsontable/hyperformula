@@ -441,3 +441,14 @@ describe('build from array', () => {
     expect(engine.dependencyGraph.getAndClearContentChanges().isEmpty()).toEqual(true)
   })
 })
+
+describe('column ranges', () => {
+  it('arithmetic should work', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=2*B:B', 1],
+      [null, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([[2,1],[4,2]])
+  })
+})
