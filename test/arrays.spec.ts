@@ -449,7 +449,7 @@ describe('column ranges', () => {
       [null, 2],
     ], {useArrayArithmetic: true})
 
-    expect(engine.getSheetValues(0)).toEqual([[2,1],[4,2]])
+    expect(engine.getSheetValues(0)).toEqual([[2, 1], [4, 2]])
   })
 
   it('arithmetic should work for row range', () => {
@@ -458,7 +458,7 @@ describe('column ranges', () => {
       [1, 2],
     ], {useArrayArithmetic: true})
 
-    expect(engine.getSheetValues(0)).toEqual([[2,4],[1,2]])
+    expect(engine.getSheetValues(0)).toEqual([[2, 4], [1, 2]])
   })
 
   it('arithmetic for shifted column range -- error', () => {
@@ -476,7 +476,7 @@ describe('column ranges', () => {
       [1, 2],
     ], {useArrayArithmetic: true})
 
-    expect(engine.getSheetValues(0)).toEqual([[2,4],[1,2]])
+    expect(engine.getSheetValues(0)).toEqual([[2, 4], [1, 2]])
   })
 
   it('arithmetic for shifted row range -- error', () => {
