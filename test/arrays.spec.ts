@@ -487,4 +487,16 @@ describe('column ranges', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
   })
+
+  it('sumproduct test', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1,1,3,'=SUMPRODUCT((A:A=1)*(B:B=1), C:C)'],
+      [1,2,3],
+      [3,1,3],
+      ], {useArrayArithmetic: true}
+    )
+
+    expect(engine.getCellValue(adr('D1'))).toEqual(3)
+  })
+
 })
