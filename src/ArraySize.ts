@@ -100,7 +100,7 @@ export class ArraySizePredictor {
       case AstNodeType.COLUMN_RANGE:
       case AstNodeType.ROW_RANGE:
       case AstNodeType.CELL_RANGE: {
-        const range = AbsoluteCellRange.fromAst(ast, state.formulaAddress)
+        const range = AbsoluteCellRange.fromAstOrUndef(ast, state.formulaAddress)
         if (range === undefined) {
           return ArraySize.error()
         } else {
