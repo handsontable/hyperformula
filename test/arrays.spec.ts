@@ -441,3 +441,62 @@ describe('build from array', () => {
     expect(engine.dependencyGraph.getAndClearContentChanges().isEmpty()).toEqual(true)
   })
 })
+
+describe('column ranges', () => {
+  it('arithmetic should work for column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=2*(B:B)', 1],
+      [null, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([[2, 1], [4, 2]])
+  })
+
+  it('arithmetic should work for row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=2*(2:2)', null],
+      [1, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([[2, 4], [1, 2]])
+  })
+
+  it('arithmetic for shifted column range -- error', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, 1],
+      ['=2*(B:B)', 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
+  })
+
+  it('arithmetic should work for row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=2*(2:2)', null],
+      [1, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getSheetValues(0)).toEqual([[2, 4], [1, 2]])
+  })
+
+  it('arithmetic for shifted row range -- error', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, '=2*(2:2)'],
+      [1, 2],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
+  })
+
+  it('sumproduct test', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 1, 3, '=SUMPRODUCT((A:A=1)*(B:B=1), C:C)'],
+      [1, 2, 3],
+      [3, 1, 3],
+      ], {useArrayArithmetic: true}
+    )
+
+    expect(engine.getCellValue(adr('D1'))).toEqual(3)
+  })
+
+})

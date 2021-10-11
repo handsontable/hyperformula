@@ -54,6 +54,14 @@ export class AbsoluteCellRange implements SimpleCellRange {
     }
   }
 
+  public static fromAstOrUndef(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): Maybe<AbsoluteCellRange> {
+    try {
+      return AbsoluteCellRange.fromAst(ast, baseAddress)
+    } catch (_e) {
+      return undefined
+    }
+  }
+
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
       x.start.toSimpleCellAddress(baseAddress),
@@ -61,26 +69,23 @@ export class AbsoluteCellRange implements SimpleCellRange {
     )
   }
 
-  public static fromCellRangeOrUndef(x: CellRange, baseAddress: SimpleCellAddress): Maybe<AbsoluteCellRange> {
-    try {
-      return new AbsoluteCellRange(
-        x.start.toSimpleCellAddress(baseAddress),
-        x.end.toSimpleCellAddress(baseAddress),
-      )
-    } catch (e) {
-      return undefined
+  public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
+    const ret = AbsoluteCellRange.spanFromOrUndef(topLeftCorner, width, height)
+    if(ret === undefined) {
+      throw new Error(WRONG_RANGE_SIZE)
     }
+    return ret
   }
 
-  public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
+  public static spanFromOrUndef(topLeftCorner: SimpleCellAddress, width: number, height: number): Maybe<AbsoluteCellRange> {
     if (!Number.isFinite(width) && Number.isFinite(height)) {
       if(topLeftCorner.col !== 0) {
-        throw new Error(WRONG_RANGE_SIZE)
+        return undefined
       }
       return new AbsoluteRowRange(topLeftCorner.sheet, topLeftCorner.row, topLeftCorner.row + height - 1)
     } else if (!Number.isFinite(height) && Number.isFinite(width)) {
       if(topLeftCorner.row !== 0) {
-        throw new Error(WRONG_RANGE_SIZE)
+        return undefined
       }
       return new AbsoluteColumnRange(topLeftCorner.sheet, topLeftCorner.col, topLeftCorner.col + width - 1)
     } else if (Number.isFinite(height) && Number.isFinite(width)) {
@@ -89,7 +94,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
         simpleCellAddress(topLeftCorner.sheet, topLeftCorner.col + width - 1, topLeftCorner.row + height - 1),
       )
     }
-    throw new Error(WRONG_RANGE_SIZE)
+    return undefined
   }
 
   public static fromCoordinates(sheet: number, x1: number, y1: number, x2: number, y2: number): AbsoluteCellRange {
@@ -398,6 +403,14 @@ export class AbsoluteCellRange implements SimpleCellRange {
   public effectiveEndRow(_dependencyGraph: DependencyGraph): number {
     return this.end.row
   }
+
+  public effectiveWidth(_dependencyGraph: DependencyGraph): number {
+    return this.width()
+  }
+
+  public effectiveHeight(_dependencyGraph: DependencyGraph): number {
+    return this.height()
+  }
 }
 
 export class AbsoluteColumnRange extends AbsoluteCellRange {
@@ -446,7 +459,11 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   }
 
   public effectiveEndRow(dependencyGraph: DependencyGraph): number {
-    return dependencyGraph.getSheetHeight(this.sheet) - 1
+    return this.effectiveHeight(dependencyGraph) - 1
+  }
+
+  public effectiveHeight(dependencyGraph: DependencyGraph): number {
+    return dependencyGraph.getSheetHeight(this.sheet)
   }
 }
 
@@ -496,6 +513,10 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
   }
 
   public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
-    return dependencyGraph.getSheetWidth(this.sheet) - 1
+    return this.effectiveWidth(dependencyGraph)-1
+  }
+
+  public effectiveWidth(dependencyGraph: DependencyGraph): number {
+    return dependencyGraph.getSheetWidth(this.sheet)
   }
 }
