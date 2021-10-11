@@ -169,6 +169,10 @@ export class ArrayVertex extends FormulaVertex {
     return AbsoluteCellRange.spanFrom(this.cellAddress, this.width, this.height)
   }
 
+  getRangeOrUndef(): Maybe<AbsoluteCellRange> {
+    return AbsoluteCellRange.spanFromOrUndef(this.cellAddress, this.width, this.height)
+  }
+
   setAddress(address: SimpleCellAddress) {
     this.cellAddress = address
   }

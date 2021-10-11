@@ -97,8 +97,10 @@ export class ArraySizePredictor {
       case AstNodeType.FUNCTION_CALL: {
         return this.checkArraySizeForFunction(ast, state)
       }
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE:
       case AstNodeType.CELL_RANGE: {
-        const range = AbsoluteCellRange.fromCellRangeOrUndef(ast, state.formulaAddress)
+        const range = AbsoluteCellRange.fromAstOrUndef(ast, state.formulaAddress)
         if (range === undefined) {
           return ArraySize.error()
         } else {
@@ -151,6 +153,9 @@ export class ArraySizePredictor {
           return ArraySize.error()
         }
         return arraySizeForUnaryOp(val)
+      }
+      case AstNodeType.PARENTHESIS: {
+        return this.checkArraySizeForAst(ast.expression, state)
       }
       case AstNodeType.EMPTY:
         return ArraySize.error()
