@@ -662,8 +662,9 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
-    this.binarySearchThreshold = configValueFromParam(binarySearchThreshold, 'number', 'binarySearchThreshold')
-    validateNumberToBeAtLeast(this.binarySearchThreshold, 'binarySearchThreshold', 1)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
+    this.binarySearchThreshold = undefined
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
