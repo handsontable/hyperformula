@@ -487,15 +487,15 @@ export var besselk: (x: number, n: number) => number = (function() {
   }
 
   var b1_a = [1.0, 0.15443144, -0.67278579, -0.18156897, -0.1919402e-1, -0.110404e-2, -0.4686e-4].reverse()
-  var b1_b = [1.25331414, 0.23498619, -0.3655620e-1, 0.1504268e-1, -0.780353e-2, 0.325614e-2, -0.68245e-3].reverse();
+  var b1_b = [1.25331414, 0.23498619, -0.3655620e-1, 0.1504268e-1, -0.780353e-2, 0.325614e-2, -0.68245e-3].reverse()
 
 // @ts-ignore
   function bessel1(x) {
     if (x <= 2) {
-      return M.log(x / 2) * besseli(x, 1) + (1 / x) * _horner(b1_a, x * x / 4);
+      return M.log(x / 2) * besseli(x, 1) + (1 / x) * _horner(b1_a, x * x / 4)
     }
-    return M.exp(-x) / M.sqrt(x) * _horner(b1_b, 2 / x);
+    return M.exp(-x) / M.sqrt(x) * _horner(b1_b, 2 / x)
   }
 
-  return _bessel_wrap(bessel0, bessel1, 'BESSELK', 2, 1);
-})();
+  return _bessel_wrap(bessel0, bessel1, 'BESSELK', 2, 1)
+})()

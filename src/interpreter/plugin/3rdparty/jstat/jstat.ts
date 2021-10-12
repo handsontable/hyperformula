@@ -973,31 +973,31 @@ function product(arr: number[]): number {
   var prod = 1
   var i = arr.length
   while (--i >= 0) {
-    prod *= arr[i];
+    prod *= arr[i]
   }
-  return prod;
+  return prod
 }
 
 export function geomean(arr: number[]): number {
-  return Math.pow(product(arr), 1 / arr.length);
+  return Math.pow(product(arr), 1 / arr.length)
 }
 
 export function covariance(arr1: number[], arr2: number[]): number {
-  var u = mean(arr1);
-  var v = mean(arr2);
-  var arr1Len = arr1.length;
-  var sq_dev = new Array(arr1Len);
-  var i;
+  var u = mean(arr1)
+  var v = mean(arr2)
+  var arr1Len = arr1.length
+  var sq_dev = new Array(arr1Len)
+  var i
 
   for (i = 0; i < arr1Len; i++) {
-    sq_dev[i] = (arr1[i] - u) * (arr2[i] - v);
+    sq_dev[i] = (arr1[i] - u) * (arr2[i] - v)
   }
 
-  return sum(sq_dev) / (arr1Len - 1);
+  return sum(sq_dev) / (arr1Len - 1)
 }
 
 export function corrcoeff(arr1: number[], arr2: number[]): number {
   return covariance(arr1, arr2) /
     stdev(arr1, 1) /
-    stdev(arr2, 1);
+    stdev(arr2, 1)
 }
