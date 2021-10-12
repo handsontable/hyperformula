@@ -306,11 +306,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns default configuration of the engines.
+   * Returns all of HyperFormula's default [configuration options](../../guide/configuration-options.md).
    *
    * @example
    * ```js
-   * // should return all default config metadata
+   * // returns all default configuration options
    * const defaultConfig = HyperFormula.defaultConfig;
    * ```
    *
