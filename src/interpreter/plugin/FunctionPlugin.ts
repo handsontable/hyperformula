@@ -216,7 +216,7 @@ export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) =>
 export type PluginArraySizeFunctionType = (ast: ProcedureAst, state: InterpreterState) => ArraySize
 
 export type FunctionPluginTypecheck<T> = {
-  [K in keyof T]: T[K] extends PluginFunctionType ? T[K] : T[K] extends PluginArraySizeFunctionType ? T[K] : never
+  [K in keyof T]: T[K] extends PluginFunctionType | PluginArraySizeFunctionType ? T[K] : never
 }
 
 /**
