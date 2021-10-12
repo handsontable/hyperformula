@@ -31,10 +31,12 @@ describe('unsupported types should result in error', () => {
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
   it('should give parsing error #4', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
     expect(() => HyperFormula.buildFromSheets({
+      // eslint-disable-next-line
+      // @ts-ignore
       Sheet1: [[() => {
+        // eslint-disable-next-line
+        // @ts-ignore
       }]], Sheet2: [[() => {
       }]]
     }))

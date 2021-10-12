@@ -81,9 +81,9 @@ describe('Config', () => {
   })
 
   it('validation: other params', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
     expect(() => new Config({
+      // eslint-disable-next-line
+      // @ts-ignore
       nullDate: {year: 123, month: 123, day: true}
     })).toThrowError('Expected value of type: IDate for config parameter: nullDate')
     // eslint-disable-next-line
