@@ -80,7 +80,7 @@ describe('function HEX2OCT', () => {
   it('result cannot be longer than 10 digits', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HEX2OCT("FFDFFFFFFF")'],
-      ['=HEX2OCT("3FFFFFFF")'],])
+      ['=HEX2OCT("3FFFFFFF")'], ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))

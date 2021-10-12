@@ -307,11 +307,9 @@ export class ArithmeticHelper {
     for (const arg of args) {
       if (arg instanceof CellError) {
         return arg
-      } else if (arg === EmptyValue) {
-
       } else if (isExtendedNumber(arg)) {
         ret.push(getRawValue(arg))
-      } else {
+      } else if (arg !== EmptyValue) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
       }
     }

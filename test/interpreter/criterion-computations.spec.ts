@@ -226,7 +226,7 @@ describe('big test', () => {
       [],
       ['1', null, null, null, '1', null, null, 'TRUE', null, null, 'TRUE', '\'1', 'Jesper'],
       ['2', '8', null, null, '2', '1', null, 'FALSE', '8', null, '\'TRUE', '1', 'apples'],
-      ['3', '9', null, null, '3', 'TRUE', null, '\'1.0', '9', null, null, '\'1.0',],
+      ['3', '9', null, null, '3', 'TRUE', null, '\'1.0', '9', null, null, '\'1.0', ],
       [],
       ['=SUMIF($B$6:$B$8, "=", $A$6:$A$8)', '1', '=A10=B10'],
       ['=SUMIF($B$6:$B$8, ">=", $A$6:$A$8)', '0', '=A11=B11'],
