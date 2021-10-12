@@ -4,6 +4,7 @@
  */
 
 import {ArrayVertex, CellVertex, FormulaCellVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,
@@ -17,7 +18,6 @@ import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {Maybe} from './Maybe'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
-import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 /**
  * Possible errors returned by our interpreter.

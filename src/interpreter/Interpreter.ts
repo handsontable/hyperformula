@@ -10,6 +10,7 @@ import {CellError, ErrorType, invalidSimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
+import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
@@ -39,7 +40,6 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
-import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
   private gpu?: any

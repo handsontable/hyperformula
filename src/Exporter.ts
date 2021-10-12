@@ -10,9 +10,9 @@ import {CellValueChange, ChangeExporter} from './ContentChanges'
 import {ErrorMessage} from './error-message'
 import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {NamedExpressions} from './NamedExpressions'
 import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 

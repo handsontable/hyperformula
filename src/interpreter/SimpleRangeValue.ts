@@ -6,7 +6,6 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {ArraySize} from '../ArraySize'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
-import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'

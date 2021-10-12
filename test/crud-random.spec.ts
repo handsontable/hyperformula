@@ -2,7 +2,6 @@ import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {verifyValues} from './testUtils'
 
-
 /**
  * random int from global variable 'state'
  */

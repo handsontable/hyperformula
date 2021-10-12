@@ -1,7 +1,4 @@
 import {HyperFormula} from '../src'
-import {ErrorType} from '../src/Cell'
-import {ErrorMessage} from '../src/error-message'
-import {detailedError} from './testUtils'
 
 describe('Temporary formulas - normalization', () => {
   it('works', () => {

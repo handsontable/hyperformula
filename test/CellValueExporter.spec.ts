@@ -5,11 +5,11 @@ import {ErrorMessage} from '../src/error-message'
 import {Exporter} from '../src/Exporter'
 import {plPL} from '../src/i18n/languages'
 import {EmptyValue} from '../src/interpreter/InterpreterValue'
+import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {SheetIndexMappingFn} from '../src/parser/addressRepresentationConverters'
-import {detailedError} from './testUtils'
-import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {EmptyStatistics} from '../src/statistics'
+import {detailedError} from './testUtils'
 
 const namedExpressionsMock = {} as NamedExpressions
 const sheetIndexMock = {} as SheetIndexMappingFn

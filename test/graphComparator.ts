@@ -11,8 +11,8 @@ import {
   ValueCellVertex,
   Vertex,
 } from '../src/DependencyGraph'
-import {simpleCellAddressToString} from '../src/parser'
 import {InterpreterValue} from '../src/interpreter/InterpreterValue'
+import {simpleCellAddressToString} from '../src/parser'
 
 export class EngineComparator {
 
