@@ -4,6 +4,18 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.3.0
+**Release date: October 14, 2021**
+
+### Added
+- Added a new static property: [`defaultConfig`](../api/classes/hyperformula.md#defaultconfig). [#822](https://github.com/handsontable/hyperformula/issues/822)
+- The [`getFillRangeData`](../api/classes/hyperformula.md#getfillrangedata) method can now use one sheet for its source and another sheet for its target. [#836](https://github.com/handsontable/hyperformula/issues/836)
+
+### Fixed
+- Fixed the handling of Unicode characters and non-letter characters in the [PROPER](built-in-functions.md#text) function. [#811](https://github.com/handsontable/hyperformula/issues/811)
+- Fixed unnecessary warnings caused by deprecated configuration options. [#830](https://github.com/handsontable/hyperformula/issues/830)
+- Fixed the [SUMPRODUCT](built-in-functions.md#math-and-trigonometry) function. [#810](https://github.com/handsontable/hyperformula/issues/810)
+
 ## 1.2.0
 **Release date: September 23, 2021**
 
