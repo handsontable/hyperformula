@@ -360,7 +360,7 @@ export class Operations {
         oldContent = oldContent.concat(column)
         buffer.push(
           column.map(
-            ([{sheet, col, row}, cell]) => [{sheet, col: target, row}, cell]
+            ([{sheet, col: _col, row}, cell]) => [{sheet, col: target, row}, cell]
           )
         )
       }
