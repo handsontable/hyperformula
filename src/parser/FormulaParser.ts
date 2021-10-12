@@ -241,7 +241,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
-
   /**
    * Rule for concatenation operator expression (e.g. "=" & A1)
    */
@@ -679,7 +678,7 @@ export class FormulaParser extends EmbeddedActionsParser {
         return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
       })
     } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
-              || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+      || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
       return this.ACTION(() => {
         return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
       })
@@ -739,20 +738,20 @@ export class FormulaParser extends EmbeddedActionsParser {
 
   private insideArrayExpression: AstRule = this.RULE('insideArrayExpression', () => {
     const ret: Ast[][] = [[]]
-    ret[ret.length-1].push(this.SUBRULE(this.booleanExpression))
-    this.MANY( () => {
+    ret[ret.length - 1].push(this.SUBRULE(this.booleanExpression))
+    this.MANY(() => {
       this.OR([
         {
           ALT: () => {
             this.CONSUME(this.lexerConfig.ArrayColSeparator)
-            ret[ret.length-1].push(this.SUBRULE2(this.booleanExpression))
+            ret[ret.length - 1].push(this.SUBRULE2(this.booleanExpression))
           }
         },
         {
           ALT: () => {
             this.CONSUME(this.lexerConfig.ArrayRowSeparator)
             ret.push([])
-            ret[ret.length-1].push(this.SUBRULE3(this.booleanExpression))
+            ret[ret.length - 1].push(this.SUBRULE3(this.booleanExpression))
           }
         }
       ])
@@ -769,9 +768,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
-
-
-
 
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments

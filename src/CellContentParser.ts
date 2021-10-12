@@ -97,11 +97,11 @@ export class CellContentParser {
   }
 
   private currencyMatcher(token: string): Maybe<[string, string]> {
-    for(const currency of this.config.currencySymbol) {
-      if(token.startsWith(currency)) {
+    for (const currency of this.config.currencySymbol) {
+      if (token.startsWith(currency)) {
         return [currency, token.slice(currency.length)]
       }
-      if(token.endsWith(currency)) {
+      if (token.endsWith(currency)) {
         return [currency, token.slice(0, token.length - currency.length)]
       }
     }
@@ -125,14 +125,18 @@ export class CellContentParser {
         month: content.getMonth() + 1,
         year: content.getFullYear()
       })
-      const timeVal = timeToNumber({hours: content.getHours(), minutes: content.getMinutes(), seconds: content.getSeconds() + content.getMilliseconds()/1000})
-      const val = dateVal+timeVal
-      if(val<0) {
+      const timeVal = timeToNumber({
+        hours: content.getHours(),
+        minutes: content.getMinutes(),
+        seconds: content.getSeconds() + content.getMilliseconds() / 1000
+      })
+      const val = dateVal + timeVal
+      if (val < 0) {
         return new CellContent.Error(ErrorType.NUM, ErrorMessage.DateBounds)
       }
-      if(val%1 === 0) {
+      if (val % 1 === 0) {
         return new CellContent.Number(new DateNumber(val, 'Date()'))
-      } else if(val<1) {
+      } else if (val < 1) {
         return new CellContent.Number(new TimeNumber(val, 'Date()'))
       } else {
         return new CellContent.Number(new DateTimeNumber(val, 'Date()'))
@@ -148,23 +152,23 @@ export class CellContentParser {
         let trimmedContent = content.trim()
         let mode = 0
         let currency
-        if(trimmedContent.endsWith('%')) {
+        if (trimmedContent.endsWith('%')) {
           mode = 1
-          trimmedContent = trimmedContent.slice(0, trimmedContent.length-1)
+          trimmedContent = trimmedContent.slice(0, trimmedContent.length - 1)
         } else {
           const res = this.currencyMatcher(trimmedContent)
-          if(res !== undefined) {
+          if (res !== undefined) {
             mode = 2;
             [currency, trimmedContent] = res
           }
         }
 
         const val = this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
-        if(val !== undefined) {
+        if (val !== undefined) {
           let parseAsNum
-          if(mode === 1) {
-            parseAsNum = new PercentNumber(val/100)
-          } else if(mode === 2) {
+          if (mode === 1) {
+            parseAsNum = new PercentNumber(val / 100)
+          } else if (mode === 2) {
             parseAsNum = new CurrencyNumber(val, currency as string)
           } else {
             parseAsNum = val
@@ -175,7 +179,7 @@ export class CellContentParser {
         if (parsedDateNumber !== undefined) {
           return new CellContent.Number(parsedDateNumber)
         } else {
-          return new CellContent.String(content.startsWith('\'') ? content.slice(1) : content )
+          return new CellContent.String(content.startsWith('\'') ? content.slice(1) : content)
         }
       }
     } else {

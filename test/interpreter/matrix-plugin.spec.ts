@@ -21,7 +21,6 @@ describe('Matrix plugin', () => {
         ['=MMULT(A1:B3,A4:B5)'],
       ], config)
 
-
       expect(engine.getCellValue(adr('A6'))).toBeCloseTo(7)
       expect(engine.getCellValue(adr('B6'))).toBeCloseTo(10)
       expect(engine.getCellValue(adr('A7'))).toBeCloseTo(15)

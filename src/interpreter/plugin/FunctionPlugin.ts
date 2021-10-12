@@ -49,21 +49,21 @@ export interface FunctionMetadata {
 
   /**
    * Internal.
-   * 
+   *
    * For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.
    */
   repeatLastArgs?: number,
 
   /**
    * Internal.
-   * 
+   *
    * If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.
    */
   expandRanges?: boolean,
 
   /**
    * Internal.
-   * 
+   *
    * Return number value is packed into this subtype.
    */
   returnNumberType?: NumberType,
@@ -73,7 +73,7 @@ export interface FunctionMetadata {
   method: string,
   /**
    * Engine.
-   * 
+   *
    * If set to `true`, the function is volatile.
    */
   arraySizeMethod?: string,
@@ -83,31 +83,31 @@ export interface FunctionMetadata {
   isVolatile?: boolean,
   /**
    * Engine.
-   * 
+   *
    * If set to `true`, the function gets recalculated with each sheet shape change
    * (e.g. when adding/removing rows or columns).
    */
   isDependentOnSheetStructureChange?: boolean,
   /**
    * Engine.
-   * 
+   *
    * If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.
-   * 
+   *
    * Other arguments are properly evaluated.
    */
   doesNotNeedArgumentsToBeComputed?: boolean,
   /**
    * Engine.
-   * 
+   *
    * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
    */
   arrayFunction?: boolean,
 
   /**
    * Internal.
-   * 
+   *
    * If set to `true`, prevents the function from ever being vectorized.
-   * 
+   *
    * Some functions do not allow vectorization: array-output, and special functions.
    */
   vectorizationForbidden?: boolean,
@@ -117,7 +117,7 @@ export interface FunctionPluginDefinition {
   new(interpreter: Interpreter): FunctionPlugin,
 
   implementedFunctions: ImplementedFunctions,
-  aliases?: {[formulaId: string]: string},
+  aliases?: { [formulaId: string]: string },
 }
 
 export enum ArgumentTypes {
@@ -185,7 +185,7 @@ export interface FunctionArgument {
   /**
    * If set to `true`:
    * if an argument is missing, and no `defaultValue` is set, the argument is `undefined` (instead of throwing an error).
-   * 
+   *
    * This is logically equivalent to setting `defaultValue` to `undefined`.
    */
   optionalArg?: boolean,
@@ -229,7 +229,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
    * Dictionary containing functions implemented by specific plugin, along with function name translations.
    */
   public static implementedFunctions: ImplementedFunctions
-  public static aliases?: {[formulaId: string]: string}
+  public static aliases?: { [formulaId: string]: string }
   protected readonly interpreter: Interpreter
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: SearchStrategy
@@ -278,21 +278,21 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument, state: InterpreterState): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
     let ret
     if (arg instanceof SimpleRangeValue) {
-      switch(coercedType.argumentType) {
+      switch (coercedType.argumentType) {
         case ArgumentTypes.RANGE:
         case ArgumentTypes.ANY:
           ret = arg
           break
         default: {
           const coerce = coerceRangeToScalar(arg, state)
-          if(coerce === undefined) {
+          if (coerce === undefined) {
             return undefined
           }
           arg = coerce
         }
       }
     }
-    if(!(arg instanceof SimpleRangeValue)) {
+    if (!(arg instanceof SimpleRangeValue)) {
       switch (coercedType.argumentType) {
         case ArgumentTypes.INTEGER:
         case ArgumentTypes.NUMBER:
@@ -342,7 +342,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           return this.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
       }
     }
-    if(coercedType.passSubtype || ret === undefined) {
+    if (coercedType.passSubtype || ret === undefined) {
       return ret
     } else {
       return getRawValue(ret)
@@ -364,7 +364,6 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
     }
 
-
     if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -373,16 +372,16 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
     argumentDefinitions = [...argumentDefinitions]
-    while(argumentDefinitions.length < argValues.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length-metadata.repeatLastArgs!))
+    while (argumentDefinitions.length < argValues.length) {
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
     }
 
     let maxWidth = 1
     let maxHeight = 1
-    if(!metadata.vectorizationForbidden && state.arraysFlag) {
-      for(let i=0;i<argValues.length;i++) {
-      const [val] = argValues[i]
-      if(val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+    if (!metadata.vectorizationForbidden && state.arraysFlag) {
+      for (let i = 0; i < argValues.length; i++) {
+        const [val] = argValues[i]
+        if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
           maxHeight = Math.max(maxHeight, val.height())
           maxWidth = Math.max(maxWidth, val.width())
         }
@@ -399,17 +398,17 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
 
     const retArr: InternalScalarValue[][] = []
-    for(let row = 0; row<maxHeight; row++) {
+    for (let row = 0; row < maxHeight; row++) {
       const rowArr: InternalScalarValue[] = []
-      for(let col = 0; col<maxWidth; col++) {
+      for (let col = 0; col < maxWidth; col++) {
         let argCoerceFailure: Maybe<CellError> = undefined
         const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
         for (let i = 0; i < argumentDefinitions.length; i++) {
           // eslint-disable-next-line prefer-const
           let [val, ignorable] = argValues[i] ?? [undefined, undefined]
-          if(val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
-            if(!metadata.vectorizationForbidden && state.arraysFlag) {
-              val = val.data[val.height()!==1 ? row : 0]?.[val.width()!==1 ? col : 0]
+          if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+            if (!metadata.vectorizationForbidden && state.arraysFlag) {
+              val = val.data[val.height() !== 1 ? row : 0]?.[val.width() !== 1 ? col : 0]
             }
           }
           const arg = val ?? argumentDefinitions[i]?.defaultValue
@@ -432,10 +431,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         }
 
         const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata.returnNumberType)
-        if(maxHeight === 1 && maxWidth === 1) {
+        if (maxHeight === 1 && maxWidth === 1) {
           return ret
         }
-        if(ret instanceof SimpleRangeValue) {
+        if (ret instanceof SimpleRangeValue) {
           throw 'Function returning array cannot be vectorized.'
         }
         rowArr.push(ret)
@@ -460,7 +459,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
     let arg = args[0]
 
-    while(arg.type === AstNodeType.PARENTHESIS) {
+    while (arg.type === AstNodeType.PARENTHESIS) {
       arg = arg.expression
     }
 
@@ -492,7 +491,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   }
 
   private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
-    if(type !== undefined && isExtendedNumber(val)) {
+    if (type !== undefined && isExtendedNumber(val)) {
       return this.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
     } else {
       return val

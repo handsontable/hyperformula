@@ -51,7 +51,6 @@ describe('Function NPV', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-
   /**
    * Inconsistency with products #1 and #2.
    */

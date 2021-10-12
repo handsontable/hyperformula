@@ -265,7 +265,7 @@ describe('remove sheet - adjust column index', () => {
   it('should remove sheet from index', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
     const index = engine.columnSearch as ColumnIndex
     const removeSheetSpy = spyOn(index, 'removeSheet')
 

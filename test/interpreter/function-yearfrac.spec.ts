@@ -24,7 +24,6 @@ describe('Function YEARFRAC', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-
   it('US mode', () => {
     const engine = HyperFormula.buildFromArray([
       ['=YEARFRAC("30/03/2020", "31/03/2020")'],
@@ -38,13 +37,13 @@ describe('Function YEARFRAC', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1/360, 9)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1 / 360, 9)
     expect(engine.getCellValue(adr('A5'))).toEqual(0)
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(1/360, 9)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(1 / 360, 9)
   })
 
   it('actual/actual mode', () => {
@@ -61,16 +60,16 @@ describe('Function YEARFRAC', () => {
       ['=YEARFRAC("01/01/2020", "01/01/2024", 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1/366, 9)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1/365, 9)
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2/366, 9)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1/365, 9)
-    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(61/366, 9)
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(60/366, 9)
-    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(59/365, 9)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1 / 366, 9)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1 / 365, 9)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2 / 366, 9)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1 / 365, 9)
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(61 / 366, 9)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(60 / 366, 9)
+    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(59 / 365, 9)
     expect(engine.getCellValue(adr('A8'))).toBeCloseTo(1, 9)
-    expect(engine.getCellValue(adr('A9'))).toBeCloseTo(367/365.5, 9)
-    expect(engine.getCellValue(adr('A10'))).toBeCloseTo((366+365+365+365)/((366+365+365+365+366)/5), 9)
+    expect(engine.getCellValue(adr('A9'))).toBeCloseTo(367 / 365.5, 9)
+    expect(engine.getCellValue(adr('A10'))).toBeCloseTo((366 + 365 + 365 + 365) / ((366 + 365 + 365 + 365 + 366) / 5), 9)
   })
 
   it('actual/360 mode', () => {
@@ -83,14 +82,13 @@ describe('Function YEARFRAC', () => {
       ['=YEARFRAC("01/03/2021", "28/02/2020", 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(364/360, 9)
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(367/360, 9)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(364 / 360, 9)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(367 / 360, 9)
   })
-
 
   it('actual/365 mode', () => {
     const engine = HyperFormula.buildFromArray([
@@ -102,12 +100,12 @@ describe('Function YEARFRAC', () => {
       ['=YEARFRAC("01/03/2021", "28/02/2020", 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1/365, 9)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1/365, 9)
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1/365, 9)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1/365, 9)
-    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(364/365, 9)
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(367/365, 9)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1 / 365, 9)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1 / 365, 9)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1 / 365, 9)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1 / 365, 9)
+    expect(engine.getCellValue(adr('A5'))).toBeCloseTo(364 / 365, 9)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(367 / 365, 9)
   })
 
   it('EU mode', () => {
@@ -123,12 +121,12 @@ describe('Function YEARFRAC', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2/360, 9)
-    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(3/360, 9)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2 / 360, 9)
+    expect(engine.getCellValue(adr('A4'))).toBeCloseTo(3 / 360, 9)
     expect(engine.getCellValue(adr('A5'))).toEqual(0)
-    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(1/360, 9)
-    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(2/360, 9)
-    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(3/360, 9)
+    expect(engine.getCellValue(adr('A6'))).toBeCloseTo(1 / 360, 9)
+    expect(engine.getCellValue(adr('A7'))).toBeCloseTo(2 / 360, 9)
+    expect(engine.getCellValue(adr('A8'))).toBeCloseTo(3 / 360, 9)
   })
 })

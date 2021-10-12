@@ -14,7 +14,7 @@ import {Interpreter} from './Interpreter'
 import {getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
-const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): {smallerRangeVertex?: RangeVertex, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange} => {
+const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange } => {
   if (valuesRange.end.row > valuesRange.start.row) {
     const valuesRangeEndRowLess = simpleCellAddress(valuesRange.end.sheet, valuesRange.end.col, valuesRange.end.row - 1)
     const rowLessVertex = dependencyGraph.getRange(valuesRange.start, valuesRangeEndRowLess)
@@ -145,7 +145,7 @@ export class Condition {
   }
 }
 
-function * getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<RawScalarValue> {
+function* getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<RawScalarValue> {
   for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
     yield getRawValue(dependencyGraph.getScalarValue(cellFromRange))
   }

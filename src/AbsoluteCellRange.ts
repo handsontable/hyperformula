@@ -27,7 +27,7 @@ export interface SimpleCellRange {
 }
 
 export function isSimpleCellRange(obj: any): obj is SimpleCellRange {
-  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+  if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'start' in obj && isSimpleCellAddress(obj.start) && 'end' in obj && isSimpleCellAddress(obj.end)
   } else {
     return false
@@ -71,7 +71,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
     const ret = AbsoluteCellRange.spanFromOrUndef(topLeftCorner, width, height)
-    if(ret === undefined) {
+    if (ret === undefined) {
       throw new Error(WRONG_RANGE_SIZE)
     }
     return ret
@@ -79,12 +79,12 @@ export class AbsoluteCellRange implements SimpleCellRange {
 
   public static spanFromOrUndef(topLeftCorner: SimpleCellAddress, width: number, height: number): Maybe<AbsoluteCellRange> {
     if (!Number.isFinite(width) && Number.isFinite(height)) {
-      if(topLeftCorner.col !== 0) {
+      if (topLeftCorner.col !== 0) {
         return undefined
       }
       return new AbsoluteRowRange(topLeftCorner.sheet, topLeftCorner.row, topLeftCorner.row + height - 1)
     } else if (!Number.isFinite(height) && Number.isFinite(width)) {
-      if(topLeftCorner.row !== 0) {
+      if (topLeftCorner.row !== 0) {
         return undefined
       }
       return new AbsoluteColumnRange(topLeftCorner.sheet, topLeftCorner.col, topLeftCorner.col + width - 1)
@@ -513,7 +513,7 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
   }
 
   public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
-    return this.effectiveWidth(dependencyGraph)-1
+    return this.effectiveWidth(dependencyGraph) - 1
   }
 
   public effectiveWidth(dependencyGraph: DependencyGraph): number {

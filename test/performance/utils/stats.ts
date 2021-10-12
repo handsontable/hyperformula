@@ -12,7 +12,6 @@ export enum ExtStatType {
 export const EnrichedStatType = {...StatType, ...ExtStatType}
 export type EnrichedStatType = StatType | ExtStatType
 
-
 export function enrichStatistics(stats: Stats): Stats {
   const initDatastructures = (stats.get(EnrichedStatType.GRAPH_BUILD) || 0) - (stats.get(EnrichedStatType.PARSER) || 0)
   const preprocessing = (stats.get(EnrichedStatType.GRAPH_BUILD) || 0) + (stats.get(EnrichedStatType.TOP_SORT) || 0)
@@ -88,7 +87,7 @@ export function average(values: number[]): number {
 }
 
 export function median(values: number[]): number {
-  return values.sort((a, b) => a-b)[Math.trunc(values.length / 2)]
+  return values.sort((a, b) => a - b)[Math.trunc(values.length / 2)]
 }
 
 export function stdDev(values: number[]): number {

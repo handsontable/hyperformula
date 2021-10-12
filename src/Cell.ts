@@ -60,7 +60,7 @@ export enum CellType {
 
 export const getCellType = (vertex: Maybe<CellVertex>, address: SimpleCellAddress): CellType => {
   if (vertex instanceof ArrayVertex) {
-    if(vertex.isLeftCorner(address)) {
+    if (vertex.isLeftCorner(address)) {
       return CellType.ARRAYFORMULA
     } else {
       return CellType.ARRAY
@@ -155,7 +155,7 @@ export class CellError {
   }
 
   public attachRootVertex(vertex: FormulaVertex): CellError {
-    if(this.root === undefined) {
+    if (this.root === undefined) {
       return new CellError(this.type, this.message, vertex)
     } else {
       return this

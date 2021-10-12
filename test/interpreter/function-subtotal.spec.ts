@@ -29,7 +29,6 @@ describe('Function SUBTOTAL', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
   })
 
-
   it('should calculate COUNTA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBTOTAL(3, A2:A4, A5)', '=SUBTOTAL(103, A2:A4, A5)'],
@@ -130,8 +129,8 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5/3, 6)
-    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(5/3, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5 / 3, 6)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(5 / 3, 6)
   })
 
   it('should calculate VAR.P', () => {
@@ -143,8 +142,8 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(5/4)
-    expect(engine.getCellValue(adr('B1'))).toEqual(5/4)
+    expect(engine.getCellValue(adr('A1'))).toEqual(5 / 4)
+    expect(engine.getCellValue(adr('B1'))).toEqual(5 / 4)
   })
 
   it('should return correct error', () => {
@@ -163,7 +162,7 @@ describe('Function SUBTOTAL', () => {
    * Inconsistency with ODFF standard.
    */
   it('does not ignore other SUBTOTALS', () => {
-    const engine = HyperFormula.buildFromArray( [
+    const engine = HyperFormula.buildFromArray([
       ['=SUBTOTAL(9, A2:A4)'],
       ['=SUBTOTAL(9, B2:C2)', 1, 1],
       ['=SUBTOTAL(9, B3:C3)', 1, 1],

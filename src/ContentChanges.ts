@@ -43,7 +43,7 @@ export class ContentChanges {
       const change = exporter.exportChange(e)
       if (Array.isArray(change)) {
         ret = ret.concat(change)
-      } else{
+      } else {
         ret.push(change)
       }
     })

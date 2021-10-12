@@ -5,20 +5,20 @@ import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/int
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
-class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin>{
+class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin> {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
       parameters: [
-          { argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
-          { argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
-        ],
+        {argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
+        {argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
+      ],
     },
   }
 
   public foo(ast: ProcedureAst, state: InterpreterState) {
     return this.runFunction(ast.args, state, this.metadata('FOO'),
-      (arg1, arg2) => arg1+'+'+arg2
+      (arg1, arg2) => arg1 + '+' + arg2
     )
   }
 }
@@ -64,6 +64,5 @@ describe('Nonexistent metadata', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('A3'))).toEqual('abcd')
   })
-
 
 })

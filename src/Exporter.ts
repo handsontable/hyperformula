@@ -60,7 +60,6 @@ export class Exporter implements ChangeExporter<ExportedChange> {
   ) {
   }
 
-
   public exportChange(change: CellValueChange): ExportedChange | ExportedChange[] {
     const value = change.value
     const address = change.address

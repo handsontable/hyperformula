@@ -16,7 +16,7 @@ import {InternalScalarValue, InterpreterValue, RawNoErrorScalarValue} from '../I
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin>{
+export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
   private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
 
   public static implementedFunctions = {
@@ -105,7 +105,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
     const range = rangeValue.range
     let searchedRange
-    if(range === undefined) {
+    if (range === undefined) {
       searchedRange = SimpleRangeValue.onlyValues(rangeValue.data.map((arg) => [arg[0]]))
     } else {
       searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
@@ -119,7 +119,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     let value
-    if(range === undefined) {
+    if (range === undefined) {
       value = rangeValue.data[rowIndex][index]
     } else {
       const address = simpleCellAddress(range.sheet, range.start.col + index, range.start.row + rowIndex)
@@ -135,10 +135,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
     const range = rangeValue.range
     let searchedRange
-    if(range === undefined) {
+    if (range === undefined) {
       searchedRange = SimpleRangeValue.onlyValues([rangeValue.data[0]])
     } else {
-      searchedRange =  SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
+      searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
     }
     const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearch)
 
@@ -146,9 +146,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
 
-
     let value
-    if(range === undefined) {
+    if (range === undefined) {
       value = rangeValue.data[index][colIndex]
     } else {
       const address = simpleCellAddress(range.sheet, range.start.col + colIndex, range.start.row + index)
@@ -181,7 +180,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean, searchStrategy: SearchStrategy): number {
-    if(!sorted && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
+    if (!sorted && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.arithmeticHelper.eqMatcherFunction(key),
         range

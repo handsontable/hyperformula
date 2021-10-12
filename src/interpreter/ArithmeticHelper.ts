@@ -41,10 +41,10 @@ export type complex = [number, number]
 const COMPLEX_NUMBER_SYMBOL = 'i'
 const complexParsingRegexp = /^\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij]))\s*(([+-])\s*([+-]?)\s*(([\d\.,]+(e[+-]?\d+)?)\s*([ij]?)|([ij])))?$/
 
-
 export class ArithmeticHelper {
   private readonly collator: Collator
   private readonly actualEps: number
+
   constructor(
     private readonly config: Config,
     private readonly dateTimeHelper: DateTimeHelper,
@@ -73,12 +73,12 @@ export class ArithmeticHelper {
   }
 
   public requiresRegex(pattern: string): boolean {
-    if(!this.config.useRegularExpressions && !this.config.useWildcards) {
+    if (!this.config.useRegularExpressions && !this.config.useWildcards) {
       return !this.config.matchWholeCell
     }
-    for(let i=0;i<pattern.length;i++) {
+    for (let i = 0; i < pattern.length; i++) {
       const c = pattern.charAt(i)
-      if(isWildcard(c) || (this.config.useRegularExpressions && needsEscape(c))) {
+      if (isWildcard(c) || (this.config.useRegularExpressions && needsEscape(c))) {
         return true
       }
     }
@@ -90,7 +90,7 @@ export class ArithmeticHelper {
     let regexpStr
     let useWildcards = this.config.useWildcards
     let useRegularExpressions = this.config.useRegularExpressions
-    if(useRegularExpressions) {
+    if (useRegularExpressions) {
       try {
         RegExp(pattern)
       } catch (e) {
@@ -98,25 +98,25 @@ export class ArithmeticHelper {
         useWildcards = false
       }
     }
-    if(useRegularExpressions) {
+    if (useRegularExpressions) {
       regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
-    } else if(useWildcards) {
+    } else if (useWildcards) {
       regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
     } else {
       regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
     }
-    if(this.config.matchWholeCell && matchWholeCell) {
-      return RegExp('^('+ regexpStr + ')$')
+    if (this.config.matchWholeCell && matchWholeCell) {
+      return RegExp('^(' + regexpStr + ')$')
     } else {
       return RegExp(regexpStr)
     }
   }
 
   private normalizeString(str: string): string {
-    if(!this.config.caseSensitive) {
+    if (!this.config.caseSensitive) {
       str = str.toLowerCase()
     }
-    if(!this.config.accentSensitive) {
+    if (!this.config.accentSensitive) {
       str = normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
     }
     return str
@@ -155,19 +155,19 @@ export class ArithmeticHelper {
       }
     }
 
-    if(left === EmptyValue) {
+    if (left === EmptyValue) {
       left = coerceEmptyToValue(right)
-    } else if(right === EmptyValue) {
+    } else if (right === EmptyValue) {
       right = coerceEmptyToValue(left)
     }
 
-    if ( typeof left === 'string' && typeof right === 'string' ) {
+    if (typeof left === 'string' && typeof right === 'string') {
       return this.stringCmp(left, right)
-    } else if ( typeof left === 'boolean' && typeof right === 'boolean' ) {
+    } else if (typeof left === 'boolean' && typeof right === 'boolean') {
       return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
-    } else if ( isExtendedNumber(left) && isExtendedNumber(right) ) {
+    } else if (isExtendedNumber(left) && isExtendedNumber(right)) {
       return this.floatCmp(left, right)
-    } else if ( left === EmptyValue && right === EmptyValue ) {
+    } else if (left === EmptyValue && right === EmptyValue) {
       return 0
     } else {
       return numberCmp(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
@@ -216,9 +216,8 @@ export class ArithmeticHelper {
 
   public unaryPlus = (arg: InternalScalarValue): InternalScalarValue => arg
 
-
   public unaryPercent = (arg: ExtendedNumber): ExtendedNumber => {
-    return new PercentNumber(getRawValue(arg)/100)
+    return new PercentNumber(getRawValue(arg) / 100)
   }
 
   public concat = (left: string, right: string): string => {
@@ -276,7 +275,7 @@ export class ArithmeticHelper {
 
   public multiply = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
     const typeOfResult = inferExtendedNumberTypeMultiplicative(left, right)
-    return this.ExtendedNumberFactory(getRawValue(left)*getRawValue(right), typeOfResult)
+    return this.ExtendedNumberFactory(getRawValue(left) * getRawValue(right), typeOfResult)
   }
 
   public coerceScalarToNumberOrError(arg: InternalScalarValue): ExtendedNumber | CellError {
@@ -296,13 +295,13 @@ export class ArithmeticHelper {
     if (arg === EmptyValue) {
       return 0
     } else if (typeof arg === 'string') {
-      if(arg === '') {
+      if (arg === '') {
         return 0
       }
       return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
-    } else if(isExtendedNumber(arg)) {
+    } else if (isExtendedNumber(arg)) {
       return arg
-    } else if(typeof arg === 'boolean') {
+    } else if (typeof arg === 'boolean') {
       return Number(arg)
     } else {
       return undefined
@@ -311,12 +310,12 @@ export class ArithmeticHelper {
 
   public coerceComplexExactRanges(args: InterpreterValue[]): complex[] | CellError {
     const vals: (complex | SimpleRangeValue)[] = []
-    for(const arg of args) {
-      if(arg instanceof SimpleRangeValue) {
+    for (const arg of args) {
+      if (arg instanceof SimpleRangeValue) {
         vals.push(arg)
-      } else if(arg !== EmptyValue) {
+      } else if (arg !== EmptyValue) {
         const coerced = this.coerceScalarToComplex(arg)
-        if(coerced instanceof CellError) {
+        if (coerced instanceof CellError) {
           return coerced
         } else {
           vals.push(coerced)
@@ -324,10 +323,10 @@ export class ArithmeticHelper {
       }
     }
     const expandedVals: complex[] = []
-    for(const val of vals) {
-      if(val instanceof SimpleRangeValue) {
+    for (const val of vals) {
+      if (val instanceof SimpleRangeValue) {
         const arr = this.manyToExactComplex(val.valuesFromTopLeftCorner())
-        if(arr instanceof CellError) {
+        if (arr instanceof CellError) {
           return arr
         } else {
           expandedVals.push(...arr)
@@ -342,12 +341,12 @@ export class ArithmeticHelper {
 
   public manyToExactComplex = (args: InternalScalarValue[]): complex[] | CellError => {
     const ret: complex[] = []
-    for(const arg of args) {
-      if(arg instanceof CellError) {
+    for (const arg of args) {
+      if (arg instanceof CellError) {
         return arg
       } else if (isExtendedNumber(arg) || typeof arg === 'string') {
         const coerced = this.coerceScalarToComplex(arg)
-        if(!(coerced instanceof CellError)) {
+        if (!(coerced instanceof CellError)) {
           ret.push(coerced)
         }
       }
@@ -355,18 +354,18 @@ export class ArithmeticHelper {
     return ret
   }
 
-  public coerceNumbersExactRanges = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToExactNumbers)
+  public coerceNumbersExactRanges = (args: InterpreterValue[]): number[] | CellError => this.manyToNumbers(args, this.manyToExactNumbers)
 
-  public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError =>  this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
+  public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError => this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
 
   private manyToNumbers(args: InterpreterValue[], rangeFn: (args: InternalScalarValue[]) => number[] | CellError): number[] | CellError {
     const vals: (number | SimpleRangeValue)[] = []
-    for(const arg of args) {
-      if(arg instanceof SimpleRangeValue) {
+    for (const arg of args) {
+      if (arg instanceof SimpleRangeValue) {
         vals.push(arg)
       } else {
         const coerced = getRawValue(this.coerceScalarToNumberOrError(arg))
-        if(coerced instanceof CellError) {
+        if (coerced instanceof CellError) {
           return coerced
         } else {
           vals.push(coerced)
@@ -374,10 +373,10 @@ export class ArithmeticHelper {
       }
     }
     const expandedVals: number[] = []
-    for(const val of vals) {
-      if(val instanceof SimpleRangeValue) {
+    for (const val of vals) {
+      if (val instanceof SimpleRangeValue) {
         const arr = rangeFn(val.valuesFromTopLeftCorner())
-        if(arr instanceof CellError) {
+        if (arr instanceof CellError) {
           return arr
         } else {
           expandedVals.push(...arr)
@@ -391,8 +390,8 @@ export class ArithmeticHelper {
 
   public manyToExactNumbers = (args: InternalScalarValue[]): number[] | CellError => {
     const ret: number[] = []
-    for(const arg of args) {
-      if(arg instanceof CellError) {
+    for (const arg of args) {
+      if (arg instanceof CellError) {
         return arg
       } else if (isExtendedNumber(arg)) {
         ret.push(getRawValue(arg))
@@ -403,10 +402,10 @@ export class ArithmeticHelper {
 
   public manyToOnlyNumbersDropNulls = (args: InterpreterValue[]): number[] | CellError => {
     const ret: number[] = []
-    for(const arg of args) {
-      if(arg instanceof CellError) {
+    for (const arg of args) {
+      if (arg instanceof CellError) {
         return arg
-      } else if(arg === EmptyValue) {
+      } else if (arg === EmptyValue) {
         continue
       } else if (isExtendedNumber(arg)) {
         ret.push(getRawValue(arg))
@@ -419,11 +418,11 @@ export class ArithmeticHelper {
 
   public manyToCoercedNumbersDropNulls = (args: InternalScalarValue[]): number[] | CellError => {
     const ret: number[] = []
-    for(const arg of args) {
-      if(arg instanceof CellError) {
+    for (const arg of args) {
+      if (arg instanceof CellError) {
         return arg
       }
-      if(arg === EmptyValue) {
+      if (arg === EmptyValue) {
         continue
       }
       const coerced = this.coerceScalarToNumberOrError(arg)
@@ -435,13 +434,13 @@ export class ArithmeticHelper {
   }
 
   public coerceScalarToComplex(arg: InternalScalarValue): complex | CellError {
-    if(arg instanceof CellError) {
+    if (arg instanceof CellError) {
       return arg
-    } else if(arg === EmptyValue) {
+    } else if (arg === EmptyValue) {
       return [0, 0]
-    } else if(isExtendedNumber(arg)) {
+    } else if (isExtendedNumber(arg)) {
       return [getRawValue(arg), 0]
-    } else if(typeof arg === 'string') {
+    } else if (typeof arg === 'string') {
       return this.coerceStringToComplex(arg)
     } else {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
@@ -450,51 +449,51 @@ export class ArithmeticHelper {
 
   private coerceStringToComplex(arg: string): complex | CellError {
     const match = complexParsingRegexp.exec(arg)
-    if(match === null) {
+    if (match === null) {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
 
     let val1
-    if(match[6]!==undefined) {
-      val1 = (match[1]==='-'?[0, -1]:[0, 1]) as complex
+    if (match[6] !== undefined) {
+      val1 = (match[1] === '-' ? [0, -1] : [0, 1]) as complex
     } else {
       val1 = this.parseComplexToken(match[1] + match[3], match[5])
     }
 
-    if(val1 instanceof CellError) {
+    if (val1 instanceof CellError) {
       return val1
     }
 
-    if(match[8] === undefined) {
+    if (match[8] === undefined) {
       return val1
     }
 
     let val2
-    if(match[14]!==undefined) {
-      val2 = (match[9]==='-'?[0, -1]:[0, 1]) as complex
+    if (match[14] !== undefined) {
+      val2 = (match[9] === '-' ? [0, -1] : [0, 1]) as complex
     } else {
       val2 = this.parseComplexToken(match[9] + match[11], match[13])
     }
-    if(val2 instanceof CellError) {
+    if (val2 instanceof CellError) {
       return val2
     }
-    if((match[5]!=='') || (match[13]==='')) {
+    if ((match[5] !== '') || (match[13] === '')) {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
 
-    if(match[8] === '+') {
-      return [val1[0]+val2[0], val1[1]+val2[1]]
+    if (match[8] === '+') {
+      return [val1[0] + val2[0], val1[1] + val2[1]]
     } else {
-      return [val1[0]-val2[0], val1[1]-val2[1]]
+      return [val1[0] - val2[0], val1[1] - val2[1]]
     }
   }
 
   private parseComplexToken(arg: string, mod: string): complex | CellError {
     const val = getRawValue(this.coerceNonDateScalarToMaybeNumber(arg))
-    if(val === undefined) {
+    if (val === undefined) {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
-    if(mod === '') {
+    if (mod === '') {
       return [val, 0]
     } else {
       return [0, val]
@@ -522,15 +521,15 @@ export class ArithmeticHelper {
 }
 
 export function coerceComplexToString([re, im]: complex, symb?: string): string | CellError {
-  if(!isFinite(re) || !isFinite(im)) {
+  if (!isFinite(re) || !isFinite(im)) {
     return new CellError(ErrorType.NUM, ErrorMessage.NaN)
   }
   symb = symb ?? COMPLEX_NUMBER_SYMBOL
-  if(im===0) {
+  if (im === 0) {
     return `${re}`
   }
   const imStr = `${im === -1 || im === 1 ? '' : Math.abs(im)}${symb}`
-  if(re===0) {
+  if (re === 0) {
     return `${im < 0 ? '-' : ''}${imStr}`
   }
   return `${re}${im < 0 ? '-' : '+'}${imStr}`
@@ -667,7 +666,7 @@ function escapeNonWildcards(pattern: string, caseSensitive: boolean): string {
       str += '.' + c
     } else if (needsEscape(c)) {
       str += '\\' + c
-    } else if(caseSensitive) {
+    } else if (caseSensitive) {
       str += c
     } else {
       str += c.toLowerCase()
@@ -680,9 +679,9 @@ function escapeAllCharacters(pattern: string, caseSensitive: boolean): string {
   let str = ''
   for (let i = 0; i < pattern.length; i++) {
     const c = pattern.charAt(i)
-    if(isWildcard(c) || needsEscape(c)) {
+    if (isWildcard(c) || needsEscape(c)) {
       str += '\\' + c
-    } else if(caseSensitive) {
+    } else if (caseSensitive) {
       str += c
     } else {
       str += c.toLowerCase()
@@ -695,9 +694,9 @@ function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
   let str = ''
   for (let i = 0; i < pattern.length; i++) {
     const c = pattern.charAt(i)
-    if(isWildcard(c) || needsEscape(c)) {
+    if (isWildcard(c) || needsEscape(c)) {
       str += c
-    } else if(caseSensitive) {
+    } else if (caseSensitive) {
       str += c
     } else {
       str += c.toLowerCase()
@@ -709,29 +708,29 @@ function escapeNoCharacters(pattern: string, caseSensitive: boolean): string {
 function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: ExtendedNumber): NumberTypeWithFormat {
   const {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
   const {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
-  if(leftType === NumberType.NUMBER_RAW) {
+  if (leftType === NumberType.NUMBER_RAW) {
     return {type: rightType, format: rightFormat}
   }
-  if(rightType === NumberType.NUMBER_RAW) {
+  if (rightType === NumberType.NUMBER_RAW) {
     return {type: leftType, format: leftFormat}
   }
-  if((leftType === NumberType.NUMBER_DATETIME || leftType === NumberType.NUMBER_DATE)
+  if ((leftType === NumberType.NUMBER_DATETIME || leftType === NumberType.NUMBER_DATE)
     && (rightType === NumberType.NUMBER_DATETIME || rightType === NumberType.NUMBER_DATE)) {
     return {type: NumberType.NUMBER_RAW}
   }
-  if(leftType === NumberType.NUMBER_TIME) {
-    if(rightType === NumberType.NUMBER_DATE) {
+  if (leftType === NumberType.NUMBER_TIME) {
+    if (rightType === NumberType.NUMBER_DATE) {
       return {type: NumberType.NUMBER_DATETIME, format: rightFormat + ' ' + leftFormat}
     }
-    if(rightType === NumberType.NUMBER_DATETIME) {
+    if (rightType === NumberType.NUMBER_DATETIME) {
       return {type: NumberType.NUMBER_DATETIME, format: rightFormat}
     }
   }
-  if(rightType === NumberType.NUMBER_TIME) {
-    if(leftType === NumberType.NUMBER_DATE) {
+  if (rightType === NumberType.NUMBER_TIME) {
+    if (leftType === NumberType.NUMBER_DATE) {
       return {type: NumberType.NUMBER_DATETIME, format: leftFormat + ' ' + rightFormat}
     }
-    if(leftType === NumberType.NUMBER_DATETIME) {
+    if (leftType === NumberType.NUMBER_DATETIME) {
       return {type: NumberType.NUMBER_DATETIME, format: leftFormat}
     }
   }
@@ -741,18 +740,18 @@ function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: Exte
 function inferExtendedNumberTypeMultiplicative(leftArg: ExtendedNumber, rightArg: ExtendedNumber): NumberTypeWithFormat {
   let {type: leftType, format: leftFormat} = getTypeFormatOfExtendedNumber(leftArg)
   let {type: rightType, format: rightFormat} = getTypeFormatOfExtendedNumber(rightArg)
-  if(leftType === NumberType.NUMBER_PERCENT) {
+  if (leftType === NumberType.NUMBER_PERCENT) {
     leftType = NumberType.NUMBER_RAW
     leftFormat = undefined
   }
-  if(rightType === NumberType.NUMBER_PERCENT) {
+  if (rightType === NumberType.NUMBER_PERCENT) {
     rightType = NumberType.NUMBER_RAW
     rightFormat = undefined
   }
-  if(leftType === NumberType.NUMBER_RAW) {
+  if (leftType === NumberType.NUMBER_RAW) {
     return {type: rightType, format: rightFormat}
   }
-  if(rightType === NumberType.NUMBER_RAW) {
+  if (rightType === NumberType.NUMBER_RAW) {
     return {type: leftType, format: leftFormat}
   }
   return {type: NumberType.NUMBER_RAW}
@@ -762,12 +761,12 @@ export function forceNormalizeString(str: string): string {
   return normalizeString(str.toLowerCase(), 'nfd').replace(/[\u0300-\u036f]/g, '')
 }
 
-export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue>{
-  if(arg.isAdHoc()) {
+export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterState): Maybe<InternalScalarValue> {
+  if (arg.isAdHoc()) {
     return arg.data[0]?.[0]
   }
   const range = arg.range!
-  if(state.formulaAddress.sheet === range.sheet) {
+  if (state.formulaAddress.sheet === range.sheet) {
     if (range.width() === 1) {
       const offset = state.formulaAddress.row - range.start.row
       if (offset >= 0 && offset < range.height()) {

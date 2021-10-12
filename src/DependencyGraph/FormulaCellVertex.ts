@@ -208,7 +208,8 @@ export class ArrayVertex extends FormulaVertex {
   /**
    * No-op as array vertices are transformed eagerly.
    * */
-  ensureRecentData(_updatingService: LazilyTransformingAstService) {}
+  ensureRecentData(_updatingService: LazilyTransformingAstService) {
+  }
 
   isLeftCorner(address: SimpleCellAddress): boolean {
     return equalSimpleCellAddress(this.cellAddress, address)
@@ -229,10 +230,8 @@ export class FormulaCellVertex extends FormulaVertex {
   constructor(
     /** Formula in AST format */
     formula: Ast,
-
     /** Address which this vertex represents */
     address: SimpleCellAddress,
-
     version: number,
   ) {
     super(formula, address, version)

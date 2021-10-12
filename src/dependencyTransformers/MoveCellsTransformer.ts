@@ -12,6 +12,7 @@ import {Transformer} from './Transformer'
 
 export class MoveCellsTransformer extends Transformer {
   private dependentFormulaTransformer: DependentFormulaTransformer
+
   constructor(
     public readonly sourceRange: AbsoluteCellRange,
     public readonly toRight: number,
@@ -72,7 +73,7 @@ export class MoveCellsTransformer extends Transformer {
     return dependencyAddress.shiftRelativeDimensions(-this.toRight, -this.toBottom) as T
   }
 
-  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T,  end: T, formulaAddress: SimpleCellAddress): [T, T] {
+  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T, end: T, formulaAddress: SimpleCellAddress): [T, T] {
     const sourceRange = this.sourceRange
 
     if (start instanceof CellAddress && end instanceof CellAddress) {
@@ -145,7 +146,7 @@ class DependentFormulaTransformer extends Transformer {
     return this.transformRange(start, end, formulaAddress)
   }
 
-  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T,  end: T, formulaAddress: SimpleCellAddress): [T, T] | false {
+  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T, end: T, formulaAddress: SimpleCellAddress): [T, T] | false {
     const newStart = this.transformCellAddress(start, formulaAddress)
     const newEnd = this.transformCellAddress(end, formulaAddress)
 

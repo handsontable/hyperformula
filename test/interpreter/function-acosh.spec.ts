@@ -22,7 +22,6 @@ describe('Function ACOSH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
-
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=ACOSH()', '=ACOSH(1,-1)']])
 
@@ -30,8 +29,8 @@ describe('Function ACOSH', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="1"', '=ACOSH(A1)'],
       ['=TRUE()', '=ACOSH(A2)'],
     ])
@@ -41,7 +40,7 @@ describe('Function ACOSH', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=ACOSH(4/0)'],
     ])
 

@@ -5,8 +5,8 @@ import {adr, detailedError} from '../testUtils'
 describe('Function REPLACE', () => {
   it('should take 4 parameters', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=REPLACE("foobar", 1, 2)', ],
-      ['=REPLACE("foobar", 1, 2, "baz", 3)', ],
+      ['=REPLACE("foobar", 1, 2)',],
+      ['=REPLACE("foobar", 1, 2, "baz", 3)',],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -15,9 +15,9 @@ describe('Function REPLACE', () => {
 
   it('should replace characters in text based on given position and number of chars', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=REPLACE("foobar", 2, 2, "uu")', ],
-      ['=REPLACE("foobar", 2, 10, "uu")', ],
-      ['=REPLACE("foobar", 3, 2, "uuuu")', ],
+      ['=REPLACE("foobar", 2, 2, "uu")',],
+      ['=REPLACE("foobar", 2, 10, "uu")',],
+      ['=REPLACE("foobar", 3, 2, "uuuu")',],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('fuubar')
@@ -27,7 +27,7 @@ describe('Function REPLACE', () => {
 
   it('should insert text before position if number of chars is 0', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=REPLACE("foobar", 4, 0, "uu")', ],
+      ['=REPLACE("foobar", 4, 0, "uu")',],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('foouubar')
@@ -35,8 +35,8 @@ describe('Function REPLACE', () => {
 
   it('should append new text if start position is greater than text length', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=REPLACE("foobar", 7, 15, "uu")', ],
-      ['=REPLACE("foobar", 28, 0, "uu")', ],
+      ['=REPLACE("foobar", 7, 15, "uu")',],
+      ['=REPLACE("foobar", 28, 0, "uu")',],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('foobaruu')
@@ -45,8 +45,8 @@ describe('Function REPLACE', () => {
 
   it('should coerce', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=REPLACE("foobar", 1, 3, TRUE())', ],
-      ['=REPLACE(12345, 3, 2, 123)', ],
+      ['=REPLACE("foobar", 1, 3, TRUE())',],
+      ['=REPLACE(12345, 3, 2, 123)',],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('TRUEbar')
@@ -55,8 +55,8 @@ describe('Function REPLACE', () => {
 
   it('should return #VALUE! if parameters out of range', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=REPLACE("foobar", 0, 2, TRUE())', ],
-      ['=REPLACE("foobar", 1, -1, "uu")', ],
+      ['=REPLACE("foobar", 0, 2, TRUE())',],
+      ['=REPLACE("foobar", 1, -1, "uu")',],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))

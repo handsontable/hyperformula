@@ -226,14 +226,14 @@ export class NamedExpressions {
       throw 'Named expression does not exist'
     }
     store.remove(expressionName)
-    if(store instanceof WorksheetStore && store.mapping.size === 0) {
+    if (store instanceof WorksheetStore && store.mapping.size === 0) {
       this.worksheetStores.delete(sheetId!)
     }
     this.addressCache.delete(namedExpression.address.row)
   }
 
   public getAllNamedExpressionsNamesInScope(sheetId?: number): string[] {
-    return this.getAllNamedExpressions().filter(({scope}) => scope===sheetId).map((ne) => ne.expression.displayName)
+    return this.getAllNamedExpressions().filter(({scope}) => scope === sheetId).map((ne) => ne.expression.displayName)
   }
 
   public getAllNamedExpressionsNames(): string[] {
@@ -263,7 +263,7 @@ export class NamedExpressions {
   }
 
   public getAllNamedExpressionsForScope(scope?: number): InternalNamedExpression[] {
-    if(scope === undefined) {
+    if (scope === undefined) {
       return this.workbookStore.getAllNamedExpressions()
     } else {
       return this.worksheetStores.get(scope)?.getAllNamedExpressions() ?? []
@@ -274,7 +274,6 @@ export class NamedExpressions {
     return simpleCellAddress(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, 0, this.nextNamedExpressionRow++)
   }
 }
-
 
 export const doesContainRelativeReferences = (ast: Ast): boolean => {
   switch (ast.type) {

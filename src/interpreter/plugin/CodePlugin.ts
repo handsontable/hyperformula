@@ -10,7 +10,7 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class CodePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CodePlugin>{
+export class CodePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CodePlugin> {
   public static implementedFunctions = {
     'CODE': {
       method: 'code',

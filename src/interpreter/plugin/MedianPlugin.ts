@@ -14,7 +14,7 @@ import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './Function
 /**
  * Interpreter plugin containing MEDIAN function
  */
-export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MedianPlugin>{
+export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MedianPlugin> {
 
   public static implementedFunctions = {
     'MEDIAN': {
@@ -52,7 +52,7 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
     return this.runFunction(ast.args, state, this.metadata('MEDIAN'),
       (...args: RawScalarValue[]) => {
         const values = this.arithmeticHelper.coerceNumbersExactRanges(args)
-        if(values instanceof CellError) {
+        if (values instanceof CellError) {
           return values
         }
         if (values.length === 0) {
@@ -64,22 +64,22 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
         } else {
           return values[Math.floor(values.length / 2)]
         }
-    })
+      })
   }
 
   public large(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LARGE'),
       (range: SimpleRangeValue, n: number) => {
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
-        if(vals instanceof CellError) {
+        if (vals instanceof CellError) {
           return vals
         }
-        vals.sort((a, b) => a-b)
+        vals.sort((a, b) => a - b)
         n = Math.trunc(n)
-        if(n > vals.length) {
+        if (n > vals.length) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
-        return vals[vals.length-n]
+        return vals[vals.length - n]
       }
     )
   }
@@ -88,15 +88,15 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
     return this.runFunction(ast.args, state, this.metadata('SMALL'),
       (range: SimpleRangeValue, n: number) => {
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
-        if(vals instanceof CellError) {
+        if (vals instanceof CellError) {
           return vals
         }
-        vals.sort((a, b) => a-b)
+        vals.sort((a, b) => a - b)
         n = Math.trunc(n)
-        if(n > vals.length) {
+        if (n > vals.length) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
-        return vals[n-1]
+        return vals[n - 1]
       }
     )
   }

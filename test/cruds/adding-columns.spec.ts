@@ -288,7 +288,7 @@ describe('Adding column - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(1, A1:A1, 1, TRUE())'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
     const index = (engine.columnSearch as ColumnIndex)
 
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)

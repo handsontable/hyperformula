@@ -20,7 +20,6 @@ describe('Function STDEV.S', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.707106781186548, 6)
   })
 
-
   it('should coerce explicit argument to numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.S(2, 3, 4, TRUE(), FALSE(), "1",)'],

@@ -1316,7 +1316,7 @@ export class HyperFormula implements TypedEmitter {
    *  [4, 5],
    * ]);
    * // rows 0 and 2 swap places
-   * 
+   *
    * // returns:
    * // [{
    * //   address: { sheet: 0, col: 0, row: 2 },
@@ -1487,7 +1487,7 @@ export class HyperFormula implements TypedEmitter {
    *  [5]
    * ]);
    * // columns 0 and 2 swap places
-   * 
+   *
    * // returns:
    * // [{
    * //   address: { sheet: 0, col: 2, row: 0 },
@@ -2841,7 +2841,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public simpleCellRangeToString(cellRange: SimpleCellRange, sheetId: number): string | undefined {
-    if(!isSimpleCellRange(cellRange)) {
+    if (!isSimpleCellRange(cellRange)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'cellRange')
     }
     validateArgToType(sheetId, 'number', 'sheetId')

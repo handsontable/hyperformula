@@ -314,7 +314,6 @@ export class DependencyGraph {
       }
     })
 
-
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
       for (const range of rangesToRemove) {
@@ -406,7 +405,7 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return { affectedArrays }
+    return {affectedArrays}
   }
 
   public addColumns(addedColumns: ColumnsSpan): EagerChangesGraphChangeResult {
@@ -441,7 +440,7 @@ export class DependencyGraph {
 
   public isThereSpaceForArray(arrayVertex: ArrayVertex): boolean {
     const range = arrayVertex.getRangeOrUndef()
-    if(range===undefined) {
+    if (range === undefined) {
       return false
     }
     for (const address of range.addresses(this)) {
@@ -983,7 +982,7 @@ export class DependencyGraph {
     }
 
     const range = AbsoluteCellRange.spanFromOrUndef(formulaAddress, vertex.width, vertex.height)
-    if(range === undefined) {
+    if (range === undefined) {
       return
     }
     this.setArray(range, vertex)
@@ -1046,7 +1045,6 @@ export class DependencyGraph {
       }
     }
   }
-
 
   private fixArraysAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number) {
     this.arrayMapping.moveArrayVerticesAfterColumnByColumns(sheet, columnStart, numberOfColumns)

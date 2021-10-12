@@ -35,7 +35,7 @@ describe('Function COMBIN', () => {
     expect(engine.getCellValue(adr('A7'))).toBe(847660528)
     expect(engine.getCellValue(adr('A8'))).toBe(100)
     expect(engine.getCellValue(adr('A9'))).toBe(186087894300)
-    expect(engine.getCellValue(adr('A10')) as number/1.41325918108873e+308).toBeCloseTo(1, 6)
+    expect(engine.getCellValue(adr('A10')) as number / 1.41325918108873e+308).toBeCloseTo(1, 6)
   })
 
   it('truncates argument', () => {

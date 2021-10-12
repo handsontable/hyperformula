@@ -175,7 +175,7 @@ describe('swapping rows working with redo', () => {
 })
 
 function fillValues(order: number[], fill: number): number[] {
-  while(order.length < fill) {
+  while (order.length < fill) {
     const x = order.length
     order[x] = x
   }
@@ -330,7 +330,7 @@ describe('reorder working with redo', () => {
     const engine = HyperFormula.buildFromArray([['=A2', '=SUM(B2:B3)', 3], ['=A10', '=SUM(B10:B15)', 6], ['=SUM(C1:C10)', 8, 9]])
     engine.setRowOrder(0, fillValues([1, 2, 0], 15))
     engine.undo()
-    expect(engine.isItPossibleToSetRowOrder(0, fillValues( [1, 2, 0], 16))).toEqual(true)
+    expect(engine.isItPossibleToSetRowOrder(0, fillValues([1, 2, 0], 16))).toEqual(true)
     engine.redo()
     expect(engine.getSheetSerialized(0)).toEqual([['=SUM(#REF!)', 8, 9], ['=A3', '=SUM(B3:B4)', 3], ['=A11', '=SUM(B11:B16)', 6]])
   })

@@ -102,7 +102,7 @@ describe('Function DATE', () => {
   })
 })
 
-describe( 'Function DATE + leap years', () =>{
+describe('Function DATE + leap years', () => {
   it('should support nonleap year 2001 ', () => {
     const config = new Config()
     const engine = HyperFormula.buildFromArray([

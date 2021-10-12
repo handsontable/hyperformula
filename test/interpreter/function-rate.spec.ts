@@ -15,13 +15,13 @@ describe('Function RATE', () => {
 
   it('should calculate the correct value with correct arguments and defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=RATE(12, -100, 400)', ],
-      ['=RATE(12, -100, 400, 100, 1)', ],
-      ['=RATE(12, -100, 400, 1, 1)', ],
-      ['=RATE(12, -100, 400, 0, 1)', ],
-      ['=RATE(12, -100, 400, -100, 1)', ],
-      ['=RATE(12, -100, 400, 100, 1, -1)', ],
-      ['=RATE(0.9, -100, 400)', ],
+      ['=RATE(12, -100, 400)',],
+      ['=RATE(12, -100, 400, 100, 1)',],
+      ['=RATE(12, -100, 400, 1, 1)',],
+      ['=RATE(12, -100, 400, 0, 1)',],
+      ['=RATE(12, -100, 400, -100, 1)',],
+      ['=RATE(12, -100, 400, 100, 1, -1)',],
+      ['=RATE(0.9, -100, 400)',],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.228933070977096)

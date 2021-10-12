@@ -35,7 +35,7 @@ export class ArraySize {
   }
 
   isScalar(): boolean {
-    return (this.width<=1 && this.height<=1) || this.isRef
+    return (this.width <= 1 && this.height <= 1) || this.isRef
   }
 }
 
@@ -61,11 +61,11 @@ export class ArraySizePredictor {
   private checkArraySizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
     const metadata = this.functionRegistry.getMetadata(ast.procedureName)
     const pluginArraySizeFunction = this.functionRegistry.getArraySizeFunction(ast.procedureName)
-    if(pluginArraySizeFunction !== undefined) {
+    if (pluginArraySizeFunction !== undefined) {
       return pluginArraySizeFunction(ast, state)
     }
     const subChecks = ast.args.map((arg) => this.checkArraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
-    if(metadata === undefined || metadata.expandRanges || !state.arraysFlag || metadata.vectorizationForbidden || metadata.parameters === undefined) {
+    if (metadata === undefined || metadata.expandRanges || !state.arraysFlag || metadata.vectorizationForbidden || metadata.parameters === undefined) {
       return new ArraySize(1, 1)
     }
     const argumentDefinitions = [...metadata.parameters]
@@ -77,14 +77,14 @@ export class ArraySizePredictor {
       return ArraySize.error()
     }
 
-    while(argumentDefinitions.length < subChecks.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length-metadata.repeatLastArgs!))
+    while (argumentDefinitions.length < subChecks.length) {
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
     }
 
     let maxWidth = 1
     let maxHeight = 1
-    for(let i=0;i<subChecks.length;i++) {
-      if(argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+    for (let i = 0; i < subChecks.length; i++) {
+      if (argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
         maxHeight = Math.max(maxHeight, subChecks[i].height)
         maxWidth = Math.max(maxWidth, subChecks[i].width)
       }
@@ -110,14 +110,14 @@ export class ArraySizePredictor {
       case AstNodeType.ARRAY: {
         const heights = []
         const widths = []
-        for(const row of ast.args) {
+        for (const row of ast.args) {
           const sizes = row.map(ast => this.checkArraySizeForAst(ast, state))
           const h = Math.min(...sizes.map(size => size.height))
-          const w = sizes.reduce((total, size) => total+size.width, 0)
+          const w = sizes.reduce((total, size) => total + size.width, 0)
           heights.push(h)
           widths.push(w)
         }
-        const height = heights.reduce((total, h) => total+h, 0)
+        const height = heights.reduce((total, h) => total + h, 0)
         const width = Math.min(...widths)
         return new ArraySize(width, height)
       }

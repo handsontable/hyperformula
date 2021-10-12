@@ -29,8 +29,8 @@ describe('MIN', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 
-  it('doesnt do coercions',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('doesnt do coercions', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['foo'],

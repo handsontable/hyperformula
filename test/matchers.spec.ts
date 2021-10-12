@@ -11,7 +11,6 @@ describe('Matchers', () => {
     expect(1).not.toEqualError(2)
   })
 
-
   it('should compare two cell errors ignoring vertices', () => {
     function dummyFormulaVertex(): FormulaVertex {
       return FormulaVertex.fromAst(buildNumberAst(1), adr('A1'), ArraySize.scalar(), 0)

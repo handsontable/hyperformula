@@ -39,7 +39,7 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('.13')).toEqual(new CellContent.Number(0.13))
   })
 
-  it( 'boolean', () => {
+  it('boolean', () => {
     expect(cellContentParser.parse('true')).toEqual(new CellContent.Boolean(true))
     expect(cellContentParser.parse('false')).toEqual(new CellContent.Boolean(false))
     expect(cellContentParser.parse('TRUE')).toEqual(new CellContent.Boolean(true))
@@ -49,7 +49,7 @@ describe('CellContentParser', () => {
   })
 
   it('numbers with different decimal separators', () => {
-    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const config = new Config({decimalSeparator: ',', functionArgSeparator: ';'})
     const cellContentParser = new CellContentParser(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
 
     expect(cellContentParser.parse('42')).toEqual(new CellContent.Number(42))
@@ -62,7 +62,7 @@ describe('CellContentParser', () => {
   })
 
   it('numbers with thousand separators', () => {
-    const config = new Config({ thousandSeparator: ' ', functionArgSeparator: ';' })
+    const config = new Config({thousandSeparator: ' ', functionArgSeparator: ';'})
     const cellContentParser = new CellContentParser(config, new DateTimeHelper(config), new NumberLiteralHelper(config))
 
     expect(cellContentParser.parse('42')).toEqual(new CellContent.Number(42))
@@ -76,7 +76,7 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse('1 234.12.12')).toEqual(new CellContent.String('1 234.12.12'))
   })
 
-  it( 'non-string', () => {
+  it('non-string', () => {
     expect(cellContentParser.parse(42)).toEqual(new CellContent.Number(42))
     expect(cellContentParser.parse(true)).toEqual(new CellContent.Boolean(true))
     expect(cellContentParser.parse(null)).toEqual(new CellContent.Empty())
@@ -125,7 +125,7 @@ describe('CellContentParser', () => {
     expect(cellContentParser.parse(new Date(1899, 11, 29))).toEqual(new CellContent.Error(ErrorType.NUM, ErrorMessage.DateBounds))
   })
 
-  it( 'starts with \'', () => {
+  it('starts with \'', () => {
     expect(cellContentParser.parse('\'123')).toEqual(new CellContent.String('123'))
     expect(cellContentParser.parse('\'=1+1')).toEqual(new CellContent.String('=1+1'))
     expect(cellContentParser.parse('\'\'1')).toEqual(new CellContent.String('\'1'))

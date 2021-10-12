@@ -66,7 +66,6 @@ export type ColumnRowIndex = [number, number]
 
 export class CrudOperations {
 
-
   private readonly maxRows: number
   private readonly maxColumns: number
 
@@ -310,7 +309,6 @@ export class CrudOperations {
     }
   }
 
-
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
     this.validateSwapColumnIndexes(sheetId, columnMapping)
     this.testColumnOrderForArrays(sheetId, columnMapping)
@@ -337,7 +335,6 @@ export class CrudOperations {
       }
     }
   }
-
 
   public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number, number][] {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {

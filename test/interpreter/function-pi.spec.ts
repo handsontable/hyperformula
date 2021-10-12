@@ -12,7 +12,7 @@ describe('Function PI', () => {
   it('should return PI with proper precision', () => {
     const engine = HyperFormula.buildFromArray([
       ['=PI()'],
-    ], { smartRounding : false})
+    ], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3.14159265358979)
   })

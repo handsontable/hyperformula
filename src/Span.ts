@@ -66,7 +66,6 @@ export class RowsSpan {
   }
 }
 
-
 /*
  * A class representing a set of columns in specific sheet
  */

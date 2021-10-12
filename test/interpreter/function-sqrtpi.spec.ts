@@ -29,7 +29,7 @@ describe('Function SQRTPI', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SQRTPI(NA())'],
     ])
-    
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

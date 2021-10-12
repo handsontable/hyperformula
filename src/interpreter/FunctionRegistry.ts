@@ -23,13 +23,13 @@ export type FunctionTranslationsPackage = Record<string, TranslationSet>
 function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionPluginDefinition): FunctionMetadata {
   let entry = plugin.implementedFunctions[functionId]
   const key = plugin.aliases?.[functionId]
-  if(key!==undefined) {
+  if (key !== undefined) {
     if (entry !== undefined) {
       throw new AliasAlreadyExisting(functionId, plugin.name)
     }
     entry = plugin.implementedFunctions[key]
   }
-  if(entry === undefined) {
+  if (entry === undefined) {
     throw FunctionPluginValidationError.functionNotDeclaredInPlugin(functionId, plugin.name)
   }
   return entry
@@ -113,7 +113,7 @@ export class FunctionRegistry {
     Object.keys(plugin.implementedFunctions).forEach((functionName) => {
       this.loadPluginFunction(plugin, functionName, registry)
     })
-    if(plugin.aliases !== undefined) {
+    if (plugin.aliases !== undefined) {
       Object.keys(plugin.aliases).forEach((functionName) => {
         this.loadPluginFunction(plugin, functionName, registry)
       })
@@ -199,7 +199,7 @@ export class FunctionRegistry {
       const methodName = metadata.method
       this.functions.set(functionId, [methodName, foundPluginInstance])
       const arraySizeMethodName = metadata.arraySizeMethod
-      if(arraySizeMethodName !== undefined) {
+      if (arraySizeMethodName !== undefined) {
         this.arraySizeFunctions.set(functionId, [arraySizeMethodName, foundPluginInstance])
       }
     }

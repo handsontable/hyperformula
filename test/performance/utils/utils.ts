@@ -3,7 +3,7 @@ import {HyperFormula, SimpleCellAddress} from '../../../src'
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
   const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
   const row = Number(result[6]) - 1
-  return { sheet: sheet, col: colNumber(result[4]), row: row }
+  return {sheet: sheet, col: colNumber(result[4]), row: row}
 }
 
 const colNumber = (input: string): number => {

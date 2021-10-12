@@ -59,7 +59,7 @@ function countifsCacheKey(conditions: Condition[]): string {
   return ['COUNTIFS', ...conditionsStrings].join(',')
 }
 
-export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumifPlugin>{
+export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumifPlugin> {
   public static implementedFunctions = {
     'SUMIF': {
       method: 'sumif',
@@ -123,7 +123,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
         valuesArg = valuesArg ?? conditionArg
 
-        return  new CriterionFunctionCompute<RawScalarValue>(
+        return new CriterionFunctionCompute<RawScalarValue>(
           this.interpreter,
           sumifCacheKey,
           0,
@@ -139,7 +139,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
         const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.arithmeticHelper)
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i + 1], this.arithmeticHelper)
         if (criterionPackage === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }
@@ -223,7 +223,7 @@ export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypeche
       const conditions: Condition[] = []
       for (let i = 0; i < args.length; i += 2) {
         const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i+1], this.arithmeticHelper)
+        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i + 1], this.arithmeticHelper)
         if (criterionPackage === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
         }

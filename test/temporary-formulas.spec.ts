@@ -9,12 +9,12 @@ describe('Temporary formulas - normalization', () => {
     expect(normalizedFormula).toEqual('=Sheet1!A1+10')
   })
 
-  it('fail with a typo', () => { 
+  it('fail with a typo', () => {
     const engine = HyperFormula.buildFromArray([])
 
     const normalizedFormula = engine.normalizeFormula('=SHET1!A1+10')
     const normalizedFormula2 = engine.normalizeFormula('=SUM(SHET1!A1:A100)')
-   
+
     expect(normalizedFormula).toEqual('=SHET1!A1+10')
     expect(normalizedFormula2).toEqual('=SUM(SHET1!A1:A100)')
   })

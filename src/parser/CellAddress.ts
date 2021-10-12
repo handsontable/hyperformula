@@ -49,6 +49,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
   public static absoluteRow(col: number, row: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW, sheet)
   }
+
   constructor(
     public readonly col: number,
     public readonly row: number,
@@ -166,7 +167,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
 
   public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleCellAddress(baseAddress)
-    if(invalidSimpleCellAddress(simpleAddress)) {
+    if (invalidSimpleCellAddress(simpleAddress)) {
       return undefined
     }
     const column = columnIndexToLabel(simpleAddress.col)
