@@ -85,43 +85,6 @@ export class ArithmeticHelper {
     return false
   }
 
-  private buildRegex(pattern: string, matchWholeCell: boolean = true): RegExp {
-    pattern = this.normalizeString(pattern)
-    let regexpStr
-    let useWildcards = this.config.useWildcards
-    let useRegularExpressions = this.config.useRegularExpressions
-    if (useRegularExpressions) {
-      try {
-        RegExp(pattern)
-      } catch (e) {
-        useRegularExpressions = false
-        useWildcards = false
-      }
-    }
-    if (useRegularExpressions) {
-      regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
-    } else if (useWildcards) {
-      regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
-    } else {
-      regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
-    }
-    if (this.config.matchWholeCell && matchWholeCell) {
-      return RegExp('^(' + regexpStr + ')$')
-    } else {
-      return RegExp(regexpStr)
-    }
-  }
-
-  private normalizeString(str: string): string {
-    if (!this.config.caseSensitive) {
-      str = str.toLowerCase()
-    }
-    if (!this.config.accentSensitive) {
-      str = normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
-    }
-    return str
-  }
-
   public lt = (left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): boolean => {
     return this.compare(left, right) < 0
   }
@@ -146,34 +109,6 @@ export class ArithmeticHelper {
     return this.compare(left, right) !== 0
   }
 
-  private compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
-    if (typeof left === 'string' || typeof right === 'string') {
-      const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
-      const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
-      if (isExtendedNumber(leftTmp) && isExtendedNumber(rightTmp)) {
-        return this.floatCmp(leftTmp, rightTmp)
-      }
-    }
-
-    if (left === EmptyValue) {
-      left = coerceEmptyToValue(right)
-    } else if (right === EmptyValue) {
-      right = coerceEmptyToValue(left)
-    }
-
-    if (typeof left === 'string' && typeof right === 'string') {
-      return this.stringCmp(left, right)
-    } else if (typeof left === 'boolean' && typeof right === 'boolean') {
-      return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
-    } else if (isExtendedNumber(left) && isExtendedNumber(right)) {
-      return this.floatCmp(left, right)
-    } else if (left === EmptyValue && right === EmptyValue) {
-      return 0
-    } else {
-      return numberCmp(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
-    }
-  }
-
   public floatCmp(leftArg: ExtendedNumber, rightArg: ExtendedNumber): number {
     const left = getRawValue(leftArg)
     const right = getRawValue(rightArg)
@@ -189,10 +124,6 @@ export class ArithmeticHelper {
     }
   }
 
-  private stringCmp(left: string, right: string): number {
-    return this.collator.compare(left, right)
-  }
-
   public pow = (left: ExtendedNumber, right: ExtendedNumber) => {
     return Math.pow(getRawValue(left), getRawValue(right))
   }
@@ -205,6 +136,7 @@ export class ArithmeticHelper {
       return ret
     }
   }
+
   public addWithEpsilon = (left: ExtendedNumber, right: ExtendedNumber): ExtendedNumber => {
     const typeOfResult = inferExtendedNumberTypeAdditive(left, right)
     return this.ExtendedNumberFactory(this.addWithEpsilonRaw(getRawValue(left), getRawValue(right)), typeOfResult)
@@ -358,36 +290,6 @@ export class ArithmeticHelper {
 
   public coerceNumbersCoerceRangesDropNulls = (args: InterpreterValue[]): number[] | CellError => this.manyToNumbers(args, this.manyToCoercedNumbersDropNulls)
 
-  private manyToNumbers(args: InterpreterValue[], rangeFn: (args: InternalScalarValue[]) => number[] | CellError): number[] | CellError {
-    const vals: (number | SimpleRangeValue)[] = []
-    for (const arg of args) {
-      if (arg instanceof SimpleRangeValue) {
-        vals.push(arg)
-      } else {
-        const coerced = getRawValue(this.coerceScalarToNumberOrError(arg))
-        if (coerced instanceof CellError) {
-          return coerced
-        } else {
-          vals.push(coerced)
-        }
-      }
-    }
-    const expandedVals: number[] = []
-    for (const val of vals) {
-      if (val instanceof SimpleRangeValue) {
-        const arr = rangeFn(val.valuesFromTopLeftCorner())
-        if (arr instanceof CellError) {
-          return arr
-        } else {
-          expandedVals.push(...arr)
-        }
-      } else {
-        expandedVals.push(val)
-      }
-    }
-    return expandedVals
-  }
-
   public manyToExactNumbers = (args: InternalScalarValue[]): number[] | CellError => {
     const ret: number[] = []
     for (const arg of args) {
@@ -406,7 +308,7 @@ export class ArithmeticHelper {
       if (arg instanceof CellError) {
         return arg
       } else if (arg === EmptyValue) {
-        continue
+
       } else if (isExtendedNumber(arg)) {
         ret.push(getRawValue(arg))
       } else {
@@ -445,6 +347,124 @@ export class ArithmeticHelper {
     } else {
       return new CellError(ErrorType.NUM, ErrorMessage.ComplexNumberExpected)
     }
+  }
+
+  public ExtendedNumberFactory(value: number, typeFormat: NumberTypeWithFormat): ExtendedNumber {
+    const {type, format} = typeFormat
+    switch (type) {
+      case NumberType.NUMBER_RAW:
+        return value
+      case NumberType.NUMBER_CURRENCY: {
+        return new CurrencyNumber(value, format ?? this.config.currencySymbol[0])
+      }
+      case NumberType.NUMBER_DATE:
+        return new DateNumber(value, format)
+      case NumberType.NUMBER_DATETIME:
+        return new DateTimeNumber(value, format)
+      case NumberType.NUMBER_TIME:
+        return new TimeNumber(value, format)
+      case NumberType.NUMBER_PERCENT:
+        return new PercentNumber(value, format)
+    }
+  }
+
+  private buildRegex(pattern: string, matchWholeCell: boolean = true): RegExp {
+    pattern = this.normalizeString(pattern)
+    let regexpStr
+    let useWildcards = this.config.useWildcards
+    let useRegularExpressions = this.config.useRegularExpressions
+    if (useRegularExpressions) {
+      try {
+        RegExp(pattern)
+      } catch (e) {
+        useRegularExpressions = false
+        useWildcards = false
+      }
+    }
+    if (useRegularExpressions) {
+      regexpStr = escapeNoCharacters(pattern, this.config.caseSensitive)
+    } else if (useWildcards) {
+      regexpStr = escapeNonWildcards(pattern, this.config.caseSensitive)
+    } else {
+      regexpStr = escapeAllCharacters(pattern, this.config.caseSensitive)
+    }
+    if (this.config.matchWholeCell && matchWholeCell) {
+      return RegExp('^(' + regexpStr + ')$')
+    } else {
+      return RegExp(regexpStr)
+    }
+  }
+
+  private normalizeString(str: string): string {
+    if (!this.config.caseSensitive) {
+      str = str.toLowerCase()
+    }
+    if (!this.config.accentSensitive) {
+      str = normalizeString(str, 'nfd').replace(/[\u0300-\u036f]/g, '')
+    }
+    return str
+  }
+
+  private compare(left: InternalNoErrorScalarValue, right: InternalNoErrorScalarValue): number {
+    if (typeof left === 'string' || typeof right === 'string') {
+      const leftTmp = typeof left === 'string' ? this.dateTimeHelper.dateStringToDateNumber(left) : left
+      const rightTmp = typeof right === 'string' ? this.dateTimeHelper.dateStringToDateNumber(right) : right
+      if (isExtendedNumber(leftTmp) && isExtendedNumber(rightTmp)) {
+        return this.floatCmp(leftTmp, rightTmp)
+      }
+    }
+
+    if (left === EmptyValue) {
+      left = coerceEmptyToValue(right)
+    } else if (right === EmptyValue) {
+      right = coerceEmptyToValue(left)
+    }
+
+    if (typeof left === 'string' && typeof right === 'string') {
+      return this.stringCmp(left, right)
+    } else if (typeof left === 'boolean' && typeof right === 'boolean') {
+      return numberCmp(coerceBooleanToNumber(left), coerceBooleanToNumber(right))
+    } else if (isExtendedNumber(left) && isExtendedNumber(right)) {
+      return this.floatCmp(left, right)
+    } else if (left === EmptyValue && right === EmptyValue) {
+      return 0
+    } else {
+      return numberCmp(CellValueTypeOrd(getCellValueType(left)), CellValueTypeOrd(getCellValueType(right)))
+    }
+  }
+
+  private stringCmp(left: string, right: string): number {
+    return this.collator.compare(left, right)
+  }
+
+  private manyToNumbers(args: InterpreterValue[], rangeFn: (args: InternalScalarValue[]) => number[] | CellError): number[] | CellError {
+    const vals: (number | SimpleRangeValue)[] = []
+    for (const arg of args) {
+      if (arg instanceof SimpleRangeValue) {
+        vals.push(arg)
+      } else {
+        const coerced = getRawValue(this.coerceScalarToNumberOrError(arg))
+        if (coerced instanceof CellError) {
+          return coerced
+        } else {
+          vals.push(coerced)
+        }
+      }
+    }
+    const expandedVals: number[] = []
+    for (const val of vals) {
+      if (val instanceof SimpleRangeValue) {
+        const arr = rangeFn(val.valuesFromTopLeftCorner())
+        if (arr instanceof CellError) {
+          return arr
+        } else {
+          expandedVals.push(...arr)
+        }
+      } else {
+        expandedVals.push(val)
+      }
+    }
+    return expandedVals
   }
 
   private coerceStringToComplex(arg: string): complex | CellError {
@@ -497,25 +517,6 @@ export class ArithmeticHelper {
       return [val, 0]
     } else {
       return [0, val]
-    }
-  }
-
-  public ExtendedNumberFactory(value: number, typeFormat: NumberTypeWithFormat): ExtendedNumber {
-    const {type, format} = typeFormat
-    switch (type) {
-      case NumberType.NUMBER_RAW:
-        return value
-      case NumberType.NUMBER_CURRENCY: {
-        return new CurrencyNumber(value, format ?? this.config.currencySymbol[0])
-      }
-      case NumberType.NUMBER_DATE:
-        return new DateNumber(value, format)
-      case NumberType.NUMBER_DATETIME:
-        return new DateTimeNumber(value, format)
-      case NumberType.NUMBER_TIME:
-        return new TimeNumber(value, format)
-      case NumberType.NUMBER_PERCENT:
-        return new PercentNumber(value, format)
     }
   }
 }

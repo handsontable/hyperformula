@@ -20,11 +20,11 @@ export interface ChangeExporter<T> {
 export type ChangeList = CellValueChange[]
 
 export class ContentChanges {
+  private changes: Map<string, CellValueChange> = new Map()
+
   public static empty() {
     return new ContentChanges()
   }
-
-  private changes: Map<string, CellValueChange> = new Map()
 
   public addAll(other: ContentChanges): ContentChanges {
     for (const change of other.changes.values()) {

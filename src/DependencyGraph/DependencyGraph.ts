@@ -47,6 +47,22 @@ import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
 
 export class DependencyGraph {
+  public readonly graph: Graph<Vertex>
+  private changes: ContentChanges = ContentChanges.empty()
+
+  constructor(
+    public readonly addressMapping: AddressMapping,
+    public readonly rangeMapping: RangeMapping,
+    public readonly sheetMapping: SheetMapping,
+    public readonly arrayMapping: ArrayMapping,
+    public readonly stats: Statistics,
+    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly functionRegistry: FunctionRegistry,
+    public readonly namedExpressions: NamedExpressions,
+  ) {
+    this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
+  }
+
   /**
    * Invariants:
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
@@ -63,23 +79,6 @@ export class DependencyGraph {
       functionRegistry,
       namedExpressions
     )
-  }
-
-  private changes: ContentChanges = ContentChanges.empty()
-
-  public readonly graph: Graph<Vertex>
-
-  constructor(
-    public readonly addressMapping: AddressMapping,
-    public readonly rangeMapping: RangeMapping,
-    public readonly sheetMapping: SheetMapping,
-    public readonly arrayMapping: ArrayMapping,
-    public readonly stats: Statistics,
-    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    public readonly functionRegistry: FunctionRegistry,
-    public readonly namedExpressions: NamedExpressions,
-  ) {
-    this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
   }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: ArraySize, hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean): ContentChanges {

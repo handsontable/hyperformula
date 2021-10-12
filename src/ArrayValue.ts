@@ -46,17 +46,17 @@ export class ArrayValue implements IArray {
   public size: ArraySize
   private readonly array: InternalScalarValue[][]
 
+  constructor(array: InternalScalarValue[][]) {
+    this.size = new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
+    this.array = array
+  }
+
   static fromInterpreterValue(value: InterpreterValue) {
     if (value instanceof SimpleRangeValue) {
       return new ArrayValue(value.data)
     } else {
       return new ArrayValue([[value]])
     }
-  }
-
-  constructor(array: InternalScalarValue[][]) {
-    this.size = new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
-    this.array = array
   }
 
   simpleRangeValue(): SimpleRangeValue {

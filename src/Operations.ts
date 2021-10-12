@@ -175,6 +175,14 @@ export class Operations {
     this.maxRows = config.maxRows
   }
 
+  private get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
+  private get addressMapping(): AddressMapping {
+    return this.dependencyGraph.addressMapping
+  }
+
   public removeRows(cmd: RemoveRowsCommand): RowsRemoval[] {
     const rowsRemovals: RowsRemoval[] = []
     for (const rowsToRemove of cmd.rowsSpans()) {
@@ -469,141 +477,6 @@ export class Operations {
     }
   }
 
-  /**
-   * Removes multiple rows from sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
-   * */
-  private doRemoveRows(rowsToRemove: RowsSpan): RowsRemoval | undefined {
-    if (this.rowEffectivelyNotInSheet(rowsToRemove.rowStart, rowsToRemove.sheet)) {
-      return
-    }
-
-    const removedCells: ChangedCell[] = []
-    for (const [address] of this.dependencyGraph.entriesFromRowsSpan(rowsToRemove)) {
-      removedCells.push({address, cellType: this.getClipboardCell(address)})
-    }
-
-    const {affectedArrays, contentChanges} = this.dependencyGraph.removeRows(rowsToRemove)
-
-    this.columnSearch.applyChanges(contentChanges.getChanges())
-
-    let version: number
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new RemoveRowsTransformer(rowsToRemove)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      version = this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
-    this.rewriteAffectedArrays(affectedArrays)
-
-    return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
-  }
-
-  /**
-   * Removes multiple columns from sheet. </br>
-   * Does nothing if columns are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
-   */
-  private doRemoveColumns(columnsToRemove: ColumnsSpan): ColumnsRemoval | undefined {
-    if (this.columnEffectivelyNotInSheet(columnsToRemove.columnStart, columnsToRemove.sheet)) {
-      return
-    }
-
-    const removedCells: ChangedCell[] = []
-    for (const [address] of this.dependencyGraph.entriesFromColumnsSpan(columnsToRemove)) {
-      removedCells.push({address, cellType: this.getClipboardCell(address)})
-    }
-
-    const {affectedArrays, contentChanges} = this.dependencyGraph.removeColumns(columnsToRemove)
-    this.columnSearch.applyChanges(contentChanges.getChanges())
-    this.columnSearch.removeColumns(columnsToRemove)
-
-    let version: number
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new RemoveColumnsTransformer(columnsToRemove)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      version = this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
-    this.rewriteAffectedArrays(affectedArrays)
-
-    return {
-      version: version!,
-      removedCells,
-      columnFrom: columnsToRemove.columnStart,
-      columnCount: columnsToRemove.numberOfColumns
-    }
-  }
-
-  /**
-   * Add multiple rows to sheet. </br>
-   * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
-   */
-  private doAddRows(addedRows: RowsSpan) {
-    if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
-      return
-    }
-
-    const {affectedArrays} = this.dependencyGraph.addRows(addedRows)
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new AddRowsTransformer(addedRows)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
-    this.rewriteAffectedArrays(affectedArrays)
-  }
-
-  private rewriteAffectedArrays(affectedArrays: Set<ArrayVertex>) {
-    for (const arrayVertex of affectedArrays.values()) {
-      if (arrayVertex.array.size.isRef) {
-        continue
-      }
-      const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
-      const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
-      const hash = this.parser.computeHashFromAst(ast)
-      this.setFormulaToCellFromCache(hash, address)
-    }
-  }
-
-  /**
-   * Add multiple columns to sheet </br>
-   * Does nothing if columns are outside of effective sheet size
-   *
-   * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
-   */
-  private doAddColumns(addedColumns: ColumnsSpan): void {
-    if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
-      return
-    }
-
-    const {affectedArrays, contentChanges} = this.dependencyGraph.addColumns(addedColumns)
-    this.columnSearch.addColumns(addedColumns)
-    this.columnSearch.applyChanges(contentChanges.getChanges())
-
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new AddColumnsTransformer(addedColumns)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
-    this.rewriteAffectedArrays(affectedArrays)
-  }
-
   public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {
     const vertex = this.dependencyGraph.getCell(address)
 
@@ -784,8 +657,139 @@ export class Operations {
     this.dependencyGraph.forceApplyPostponedTransformations()
   }
 
-  private get sheetMapping(): SheetMapping {
-    return this.dependencyGraph.sheetMapping
+  /**
+   * Removes multiple rows from sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which rows will be removed
+   * @param rowStart - number of the first row to be deleted
+   * @param rowEnd - number of the last row to be deleted
+   * */
+  private doRemoveRows(rowsToRemove: RowsSpan): RowsRemoval | undefined {
+    if (this.rowEffectivelyNotInSheet(rowsToRemove.rowStart, rowsToRemove.sheet)) {
+      return
+    }
+
+    const removedCells: ChangedCell[] = []
+    for (const [address] of this.dependencyGraph.entriesFromRowsSpan(rowsToRemove)) {
+      removedCells.push({address, cellType: this.getClipboardCell(address)})
+    }
+
+    const {affectedArrays, contentChanges} = this.dependencyGraph.removeRows(rowsToRemove)
+
+    this.columnSearch.applyChanges(contentChanges.getChanges())
+
+    let version: number
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new RemoveRowsTransformer(rowsToRemove)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.rewriteAffectedArrays(affectedArrays)
+
+    return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
+  }
+
+  /**
+   * Removes multiple columns from sheet. </br>
+   * Does nothing if columns are outside of effective sheet size.
+   *
+   * @param sheet - sheet id from which columns will be removed
+   * @param columnStart - number of the first column to be deleted
+   * @param columnEnd - number of the last row to be deleted
+   */
+  private doRemoveColumns(columnsToRemove: ColumnsSpan): ColumnsRemoval | undefined {
+    if (this.columnEffectivelyNotInSheet(columnsToRemove.columnStart, columnsToRemove.sheet)) {
+      return
+    }
+
+    const removedCells: ChangedCell[] = []
+    for (const [address] of this.dependencyGraph.entriesFromColumnsSpan(columnsToRemove)) {
+      removedCells.push({address, cellType: this.getClipboardCell(address)})
+    }
+
+    const {affectedArrays, contentChanges} = this.dependencyGraph.removeColumns(columnsToRemove)
+    this.columnSearch.applyChanges(contentChanges.getChanges())
+    this.columnSearch.removeColumns(columnsToRemove)
+
+    let version: number
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new RemoveColumnsTransformer(columnsToRemove)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.rewriteAffectedArrays(affectedArrays)
+
+    return {
+      version: version!,
+      removedCells,
+      columnFrom: columnsToRemove.columnStart,
+      columnCount: columnsToRemove.numberOfColumns
+    }
+  }
+
+  /**
+   * Add multiple rows to sheet. </br>
+   * Does nothing if rows are outside of effective sheet size.
+   *
+   * @param sheet - sheet id in which rows will be added
+   * @param row - row number above which the rows will be added
+   * @param numberOfRowsToAdd - number of rows to add
+   */
+  private doAddRows(addedRows: RowsSpan) {
+    if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
+      return
+    }
+
+    const {affectedArrays} = this.dependencyGraph.addRows(addedRows)
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new AddRowsTransformer(addedRows)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.rewriteAffectedArrays(affectedArrays)
+  }
+
+  private rewriteAffectedArrays(affectedArrays: Set<ArrayVertex>) {
+    for (const arrayVertex of affectedArrays.values()) {
+      if (arrayVertex.array.size.isRef) {
+        continue
+      }
+      const ast = arrayVertex.getFormula(this.lazilyTransformingAstService)
+      const address = arrayVertex.getAddress(this.lazilyTransformingAstService)
+      const hash = this.parser.computeHashFromAst(ast)
+      this.setFormulaToCellFromCache(hash, address)
+    }
+  }
+
+  /**
+   * Add multiple columns to sheet </br>
+   * Does nothing if columns are outside of effective sheet size
+   *
+   * @param sheet - sheet id in which columns will be added
+   * @param column - column number above which the columns will be added
+   * @param numberOfColumns - number of columns to add
+   */
+  private doAddColumns(addedColumns: ColumnsSpan): void {
+    if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
+      return
+    }
+
+    const {affectedArrays, contentChanges} = this.dependencyGraph.addColumns(addedColumns)
+    this.columnSearch.addColumns(addedColumns)
+    this.columnSearch.applyChanges(contentChanges.getChanges())
+
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new AddColumnsTransformer(addedColumns)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+      this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    this.rewriteAffectedArrays(affectedArrays)
   }
 
   /**
@@ -907,10 +911,6 @@ export class Operations {
       }
     }
     return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address)
-  }
-
-  private get addressMapping(): AddressMapping {
-    return this.dependencyGraph.addressMapping
   }
 }
 

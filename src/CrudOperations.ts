@@ -85,6 +85,10 @@ export class CrudOperations {
     this.maxColumns = config.maxColumns
   }
 
+  private get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
+  }
+
   public addRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
     const addRowsCommand = new AddRowsCommand(sheet, indexes)
     this.ensureItIsPossibleToAddRows(sheet, ...indexes)
@@ -353,24 +357,6 @@ export class CrudOperations {
     return ret
   }
 
-  private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
-    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
-    const sources = rowMapping.map(([a, _]) => a).sort((a, b) => a - b)
-    const targets = rowMapping.map(([_, b]) => b).sort((a, b) => a - b)
-
-    for (let i = 0; i < sources.length; i++) {
-      if (!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
-        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn === 'row' ? 'height' : 'width'}.`)
-      }
-      if (sources[i] === sources[i + 1]) {
-        throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
-      }
-      if (sources[i] !== targets[i]) {
-        throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
-      }
-    }
-  }
-
   public undo() {
     if (this.undoRedo.isUndoStackEmpty()) {
       throw new NoOperationToUndoError()
@@ -620,8 +606,22 @@ export class CrudOperations {
     }
   }
 
-  private get sheetMapping(): SheetMapping {
-    return this.dependencyGraph.sheetMapping
+  private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
+    const sources = rowMapping.map(([a, _]) => a).sort((a, b) => a - b)
+    const targets = rowMapping.map(([_, b]) => b).sort((a, b) => a - b)
+
+    for (let i = 0; i < sources.length; i++) {
+      if (!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
+        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn === 'row' ? 'height' : 'width'}.`)
+      }
+      if (sources[i] === sources[i + 1]) {
+        throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
+      }
+      if (sources[i] !== targets[i]) {
+        throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
+      }
+    }
   }
 
   private ensureNamedExpressionNameIsValid(expressionName: string, sheetId?: number) {

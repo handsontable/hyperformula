@@ -16,14 +16,6 @@ import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
 export abstract class FormulaVertex {
-  static fromAst(formula: Ast, address: SimpleCellAddress, size: ArraySize, version: number) {
-    if (size.isScalar()) {
-      return new FormulaCellVertex(formula, address, version)
-    } else {
-      return new ArrayVertex(formula, address, size, version)
-    }
-  }
-
   protected constructor(
     protected formula: Ast,
     protected cellAddress: SimpleCellAddress,
@@ -37,6 +29,14 @@ export abstract class FormulaVertex {
 
   public get height(): number {
     return 1
+  }
+
+  static fromAst(formula: Ast, address: SimpleCellAddress, size: ArraySize, version: number) {
+    if (size.isScalar()) {
+      return new FormulaCellVertex(formula, address, version)
+    } else {
+      return new ArrayVertex(formula, address, size, version)
+    }
   }
 
   /**

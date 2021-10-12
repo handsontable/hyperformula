@@ -154,16 +154,16 @@ export class CellError {
   ) {
   }
 
+  public static parsingError() {
+    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
+  }
+
   public attachRootVertex(vertex: FormulaVertex): CellError {
     if (this.root === undefined) {
       return new CellError(this.type, this.message, vertex)
     } else {
       return this
     }
-  }
-
-  public static parsingError() {
-    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
   }
 }
 

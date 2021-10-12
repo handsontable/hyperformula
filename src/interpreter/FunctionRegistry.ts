@@ -42,6 +42,33 @@ export class FunctionRegistry {
     ['VERSION', VersionPlugin],
     ['OFFSET', undefined],
   ])
+  private readonly instancePlugins: Map<string, FunctionPluginDefinition>
+  private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
+  private readonly arraySizeFunctions: Map<string, [string, FunctionPlugin]> = new Map()
+  private readonly volatileFunctions: Set<string> = new Set()
+  private readonly arrayFunctions: Set<string> = new Set()
+  private readonly structuralChangeFunctions: Set<string> = new Set()
+  private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string> = new Set()
+  private readonly functionsMetadata: Map<string, FunctionMetadata> = new Map()
+
+  constructor(private config: Config) {
+    if (config.functionPlugins.length > 0) {
+      this.instancePlugins = new Map()
+      for (const plugin of config.functionPlugins) {
+        FunctionRegistry.loadPluginFunctions(plugin, this.instancePlugins)
+      }
+    } else {
+      this.instancePlugins = new Map(FunctionRegistry.plugins)
+    }
+
+    for (const [functionId, plugin] of FunctionRegistry.protectedFunctions()) {
+      FunctionRegistry.loadFunctionUnprotected(plugin, functionId, this.instancePlugins)
+    }
+
+    for (const [functionId, plugin] of this.instancePlugins.entries()) {
+      this.categorizeFunction(functionId, validateAndReturnMetadataFromName(functionId, plugin))
+    }
+  }
 
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     this.loadPluginFunctions(plugin, this.plugins)
@@ -100,6 +127,10 @@ export class FunctionRegistry {
     }
   }
 
+  public static functionIsProtected(functionId: string) {
+    return this._protectedPlugins.has(functionId)
+  }
+
   private static loadTranslations(translations: FunctionTranslationsPackage) {
     const registeredLanguages = new Set(HyperFormula.getRegisteredLanguagesCodes())
     Object.keys(translations).forEach(code => {
@@ -137,10 +168,6 @@ export class FunctionRegistry {
     }
   }
 
-  public static functionIsProtected(functionId: string) {
-    return this._protectedPlugins.has(functionId)
-  }
-
   private static* protectedFunctions(): IterableIterator<[string, FunctionPluginDefinition]> {
     for (const [functionId, plugin] of this._protectedPlugins) {
       if (plugin !== undefined) {
@@ -154,35 +181,6 @@ export class FunctionRegistry {
       if (plugin !== undefined) {
         yield plugin
       }
-    }
-  }
-
-  private readonly instancePlugins: Map<string, FunctionPluginDefinition>
-  private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
-  private readonly arraySizeFunctions: Map<string, [string, FunctionPlugin]> = new Map()
-
-  private readonly volatileFunctions: Set<string> = new Set()
-  private readonly arrayFunctions: Set<string> = new Set()
-  private readonly structuralChangeFunctions: Set<string> = new Set()
-  private readonly functionsWhichDoesNotNeedArgumentsToBeComputed: Set<string> = new Set()
-  private readonly functionsMetadata: Map<string, FunctionMetadata> = new Map()
-
-  constructor(private config: Config) {
-    if (config.functionPlugins.length > 0) {
-      this.instancePlugins = new Map()
-      for (const plugin of config.functionPlugins) {
-        FunctionRegistry.loadPluginFunctions(plugin, this.instancePlugins)
-      }
-    } else {
-      this.instancePlugins = new Map(FunctionRegistry.plugins)
-    }
-
-    for (const [functionId, plugin] of FunctionRegistry.protectedFunctions()) {
-      FunctionRegistry.loadFunctionUnprotected(plugin, functionId, this.instancePlugins)
-    }
-
-    for (const [functionId, plugin] of this.instancePlugins.entries()) {
-      this.categorizeFunction(functionId, validateAndReturnMetadataFromName(functionId, plugin))
     }
   }
 

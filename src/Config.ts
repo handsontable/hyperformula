@@ -579,16 +579,6 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
 
-  /**
-   * Proxied property to its private counterpart. This makes the property
-   * as accessible as the other Config options but without ability to change the value.
-   *
-   * @internal
-   */
-  public get licenseKeyValidityState() {
-    return privatePool.get(this)!.licenseKeyValidityState
-  }
-
   constructor(
     {
       accentSensitive,
@@ -710,6 +700,16 @@ export class Config implements ConfigParams, ParserConfig {
       {value: this.arrayRowSeparator, name: 'arrayRowSeparator'},
       {value: this.arrayColumnSeparator, name: 'arrayColumnSeparator'},
     )
+  }
+
+  /**
+   * Proxied property to its private counterpart. This makes the property
+   * as accessible as the other Config options but without ability to change the value.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState() {
+    return privatePool.get(this)!.licenseKeyValidityState
   }
 
   public getConfig(): ConfigParams {

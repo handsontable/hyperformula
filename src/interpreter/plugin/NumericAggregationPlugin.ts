@@ -34,15 +34,15 @@ class MomentsAggregate {
 
   public static empty = new MomentsAggregate(0, 0, 0)
 
-  public static single(arg: number): MomentsAggregate {
-    return new MomentsAggregate(arg * arg, arg, 1)
-  }
-
   constructor(
     public readonly sumsq: number,
     public readonly sum: number,
     public readonly count: number,
   ) {
+  }
+
+  public static single(arg: number): MomentsAggregate {
+    return new MomentsAggregate(arg * arg, arg, 1)
   }
 
   public compose(other: MomentsAggregate) {

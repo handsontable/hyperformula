@@ -34,6 +34,14 @@ export enum CellReferenceType {
 
 export class CellAddress implements AddressWithColumn, AddressWithRow {
 
+  constructor(
+    public readonly col: number,
+    public readonly row: number,
+    public readonly type: CellReferenceType,
+    public readonly sheet?: number,
+  ) {
+  }
+
   public static relative(row: number, col: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_RELATIVE, sheet)
   }
@@ -48,14 +56,6 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
 
   public static absoluteRow(col: number, row: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW, sheet)
-  }
-
-  constructor(
-    public readonly col: number,
-    public readonly row: number,
-    public readonly type: CellReferenceType,
-    public readonly sheet?: number,
-  ) {
   }
 
   /**

@@ -400,19 +400,6 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return this.runFunction(ast.args, state, this.metadata('ISOWEEKNUM'), this.isoweeknumCore)
   }
 
-  private isoweeknumCore = (day: number): number => {
-    const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
-    const date = this.dateTimeHelper.numberToSimpleDate(day)
-    const yearStart = this.dateTimeHelper.dateToNumber({year: date.year, month: 1, day: 1})
-    const yearStartAbsolute = this.dateTimeHelper.relativeNumberToAbsoluteNumber(yearStart)
-    const firstThursdayAbs = yearStartAbsolute + ((4 - yearStartAbsolute) % 7 + 7) % 7
-    const ret = Math.floor((absoluteDay - 1) / 7) - Math.floor((firstThursdayAbs - 1) / 7) + 1
-    if (ret === 0) {
-      return this.isoweeknumCore(day - 7) + 1
-    }
-    return ret
-  }
-
   public datevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DATEVALUE'),
       (date: string) => {
@@ -534,19 +521,6 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return this.runFunction(ast.args, state, this.metadata('DAYS360'), this.days360Core)
   }
 
-  private days360Core = (startDate: number, endDate: number, mode: boolean): number => {
-    const start = this.dateTimeHelper.numberToSimpleDate(startDate)
-    const end = this.dateTimeHelper.numberToSimpleDate(endDate)
-    let nStart, nEnd: SimpleDate
-    if (mode) {
-      nStart = toBasisEU(start)
-      nEnd = toBasisEU(end)
-    } else {
-      [nStart, nEnd] = this.dateTimeHelper.toBasisUS(start, end)
-    }
-    return 360 * (nEnd.year - nStart.year) + 30 * (nEnd.month - nStart.month) + nEnd.day - nStart.day
-  }
-
   public yearfrac(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('YEARFRAC'),
       (startDate: number, endDate: number, mode: number) => {
@@ -623,6 +597,32 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return this.runFunction(ast.args, state, this.metadata('WORKDAY.INTL'),
       (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
     )
+  }
+
+  private isoweeknumCore = (day: number): number => {
+    const absoluteDay = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(day))
+    const date = this.dateTimeHelper.numberToSimpleDate(day)
+    const yearStart = this.dateTimeHelper.dateToNumber({year: date.year, month: 1, day: 1})
+    const yearStartAbsolute = this.dateTimeHelper.relativeNumberToAbsoluteNumber(yearStart)
+    const firstThursdayAbs = yearStartAbsolute + ((4 - yearStartAbsolute) % 7 + 7) % 7
+    const ret = Math.floor((absoluteDay - 1) / 7) - Math.floor((firstThursdayAbs - 1) / 7) + 1
+    if (ret === 0) {
+      return this.isoweeknumCore(day - 7) + 1
+    }
+    return ret
+  }
+
+  private days360Core = (startDate: number, endDate: number, mode: boolean): number => {
+    const start = this.dateTimeHelper.numberToSimpleDate(startDate)
+    const end = this.dateTimeHelper.numberToSimpleDate(endDate)
+    let nStart, nEnd: SimpleDate
+    if (mode) {
+      nStart = toBasisEU(start)
+      nEnd = toBasisEU(end)
+    } else {
+      [nStart, nEnd] = this.dateTimeHelper.toBasisUS(start, end)
+    }
+    return 360 * (nEnd.year - nStart.year) + 30 * (nEnd.month - nStart.month) + nEnd.day - nStart.day
   }
 
   private networkdayscore(start: number, end: number, weekend: RawNoErrorScalarValue, holidays?: SimpleRangeValue): RawScalarValue {

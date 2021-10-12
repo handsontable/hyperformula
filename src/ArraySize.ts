@@ -12,6 +12,16 @@ import {ArgumentTypes} from './interpreter/plugin/FunctionPlugin'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
 export class ArraySize {
+  constructor(
+    public width: number,
+    public height: number,
+    public isRef: boolean = false,
+  ) {
+    if (width <= 0 || height <= 0) {
+      throw Error('Incorrect array size')
+    }
+  }
+
   public static fromArray<T>(array: T[][]): ArraySize {
     return new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
   }
@@ -22,16 +32,6 @@ export class ArraySize {
 
   public static scalar() {
     return new ArraySize(1, 1, false)
-  }
-
-  constructor(
-    public width: number,
-    public height: number,
-    public isRef: boolean = false,
-  ) {
-    if (width <= 0 || height <= 0) {
-      throw Error('Incorrect array size')
-    }
   }
 
   isScalar(): boolean {
@@ -56,40 +56,6 @@ export class ArraySizePredictor {
 
   public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
     return this.checkArraySizeForAst(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
-  }
-
-  private checkArraySizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
-    const metadata = this.functionRegistry.getMetadata(ast.procedureName)
-    const pluginArraySizeFunction = this.functionRegistry.getArraySizeFunction(ast.procedureName)
-    if (pluginArraySizeFunction !== undefined) {
-      return pluginArraySizeFunction(ast, state)
-    }
-    const subChecks = ast.args.map((arg) => this.checkArraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
-    if (metadata === undefined || metadata.expandRanges || !state.arraysFlag || metadata.vectorizationForbidden || metadata.parameters === undefined) {
-      return new ArraySize(1, 1)
-    }
-    const argumentDefinitions = [...metadata.parameters]
-    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < subChecks.length) {
-      return ArraySize.error()
-    }
-    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < subChecks.length &&
-      (subChecks.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
-      return ArraySize.error()
-    }
-
-    while (argumentDefinitions.length < subChecks.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
-    }
-
-    let maxWidth = 1
-    let maxHeight = 1
-    for (let i = 0; i < subChecks.length; i++) {
-      if (argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
-        maxHeight = Math.max(maxHeight, subChecks[i].height)
-        maxWidth = Math.max(maxWidth, subChecks[i].width)
-      }
-    }
-    return new ArraySize(maxWidth, maxHeight)
   }
 
   public checkArraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
@@ -162,6 +128,40 @@ export class ArraySizePredictor {
       default:
         return ArraySize.error()
     }
+  }
+
+  private checkArraySizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    const metadata = this.functionRegistry.getMetadata(ast.procedureName)
+    const pluginArraySizeFunction = this.functionRegistry.getArraySizeFunction(ast.procedureName)
+    if (pluginArraySizeFunction !== undefined) {
+      return pluginArraySizeFunction(ast, state)
+    }
+    const subChecks = ast.args.map((arg) => this.checkArraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    if (metadata === undefined || metadata.expandRanges || !state.arraysFlag || metadata.vectorizationForbidden || metadata.parameters === undefined) {
+      return new ArraySize(1, 1)
+    }
+    const argumentDefinitions = [...metadata.parameters]
+    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < subChecks.length) {
+      return ArraySize.error()
+    }
+    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < subChecks.length &&
+      (subChecks.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
+      return ArraySize.error()
+    }
+
+    while (argumentDefinitions.length < subChecks.length) {
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
+    }
+
+    let maxWidth = 1
+    let maxHeight = 1
+    for (let i = 0; i < subChecks.length; i++) {
+      if (argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+        maxHeight = Math.max(maxHeight, subChecks[i].height)
+        maxWidth = Math.max(maxWidth, subChecks[i].width)
+      }
+    }
+    return new ArraySize(maxWidth, maxHeight)
   }
 }
 

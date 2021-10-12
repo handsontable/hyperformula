@@ -92,39 +92,8 @@ export class DateTimeHelper {
     }
   }
 
-  private parseSingleFormat(dateString: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
-    const dateTime = this.parseDateTime(dateString, dateFormat, timeFormat)
-    if (instanceOfSimpleDate(dateTime)) {
-      if (dateTime.year >= 0 && dateTime.year < 100) {
-        if (dateTime.year < this.getNullYear()) {
-          dateTime.year += 2000
-        } else {
-          dateTime.year += 1900
-        }
-      }
-      if (!this.isValidDate(dateTime)) {
-        return undefined
-      }
-    }
-    return dateTime
-  }
-
   public parseDateTimeFromConfigFormats(dateTimeString: string): Partial<{ dateTime: DateTime, dateFormat: string, timeFormat: string }> {
     return this.parseDateTimeFromFormats(dateTimeString, this.config.dateFormats, this.config.timeFormats)
-  }
-
-  private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Partial<{ dateTime: DateTime, dateFormat: string, timeFormat: string }> {
-    const dateFormatsIterate = dateFormats.length === 0 ? [undefined] : dateFormats
-    const timeFormatsIterate = timeFormats.length === 0 ? [undefined] : timeFormats
-    for (const dateFormat of dateFormatsIterate) {
-      for (const timeFormat of timeFormatsIterate) {
-        const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
-        if (dateTime !== undefined) {
-          return {dateTime, timeFormat, dateFormat}
-        }
-      }
-    }
-    return {}
   }
 
   public getNullYear() {
@@ -184,30 +153,6 @@ export class DateTimeHelper {
     return Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + (this.config.leapYear1900 && year >= 1900 ? 1 : 0)
   }
 
-  private countLeapDays(date: SimpleDate): number {
-    if (date.month > 2 || (date.month === 2 && date.day >= 29)) {
-      return this.leapYearsCount(date.year)
-    } else {
-      return this.leapYearsCount(date.year - 1)
-    }
-  }
-
-  private dateToNumberFromZero(date: SimpleDate): number {
-    return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
-  }
-
-  private isLeapYear(year: number): boolean {
-    if (year % 4) {
-      return false
-    } else if (year % 100) {
-      return true
-    } else if (year % 400) {
-      return year === 1900 && this.config.leapYear1900
-    } else {
-      return true
-    }
-  }
-
   public daysInMonth(year: number, month: number): number {
     if (this.isLeapYear(year) && month === 2) {
       return 29
@@ -252,6 +197,61 @@ export class DateTimeHelper {
       return 366
     } else {
       return 365
+    }
+  }
+
+  private parseSingleFormat(dateString: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
+    const dateTime = this.parseDateTime(dateString, dateFormat, timeFormat)
+    if (instanceOfSimpleDate(dateTime)) {
+      if (dateTime.year >= 0 && dateTime.year < 100) {
+        if (dateTime.year < this.getNullYear()) {
+          dateTime.year += 2000
+        } else {
+          dateTime.year += 1900
+        }
+      }
+      if (!this.isValidDate(dateTime)) {
+        return undefined
+      }
+    }
+    return dateTime
+  }
+
+  private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Partial<{ dateTime: DateTime, dateFormat: string, timeFormat: string }> {
+    const dateFormatsIterate = dateFormats.length === 0 ? [undefined] : dateFormats
+    const timeFormatsIterate = timeFormats.length === 0 ? [undefined] : timeFormats
+    for (const dateFormat of dateFormatsIterate) {
+      for (const timeFormat of timeFormatsIterate) {
+        const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
+        if (dateTime !== undefined) {
+          return {dateTime, timeFormat, dateFormat}
+        }
+      }
+    }
+    return {}
+  }
+
+  private countLeapDays(date: SimpleDate): number {
+    if (date.month > 2 || (date.month === 2 && date.day >= 29)) {
+      return this.leapYearsCount(date.year)
+    } else {
+      return this.leapYearsCount(date.year - 1)
+    }
+  }
+
+  private dateToNumberFromZero(date: SimpleDate): number {
+    return 365 * date.year + prefSumDays[date.month - 1] + date.day - 1 + (date.month <= 2 ? this.leapYearsCount(date.year - 1) : this.leapYearsCount(date.year))
+  }
+
+  private isLeapYear(year: number): boolean {
+    if (year % 4) {
+      return false
+    } else if (year % 100) {
+      return true
+    } else if (year % 400) {
+      return year === 1900 && this.config.leapYear1900
+    } else {
+      return true
     }
   }
 }

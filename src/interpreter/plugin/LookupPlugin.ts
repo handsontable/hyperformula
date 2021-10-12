@@ -17,8 +17,6 @@ import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
-  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
-
   public static implementedFunctions = {
     'VLOOKUP': {
       method: 'vlookup',
@@ -47,6 +45,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       ]
     },
   }
+  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
 
   /**
    * Corresponds to VLOOKUP(key, range, index, [sorted])
@@ -99,6 +98,17 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
       return this.doMatch(zeroIfEmpty(key), rangeValue, sorted)
     })
+  }
+
+  protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean, searchStrategy: SearchStrategy): number {
+    if (!sorted && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
+      return searchStrategy.advancedFind(
+        this.arithmeticHelper.eqMatcherFunction(key),
+        range
+      )
+    } else {
+      return searchStrategy.find(key, range, sorted)
+    }
   }
 
   private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
@@ -176,17 +186,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
       }
       return index + 1
-    }
-  }
-
-  protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean, searchStrategy: SearchStrategy): number {
-    if (!sorted && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
-      return searchStrategy.advancedFind(
-        this.arithmeticHelper.eqMatcherFunction(key),
-        range
-      )
-    } else {
-      return searchStrategy.find(key, range, sorted)
     }
   }
 }

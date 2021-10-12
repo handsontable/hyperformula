@@ -113,6 +113,42 @@ export class HyperFormula implements TypedEmitter {
    * @category Static Properties
    */
   public static languages: Record<string, RawTranslationPackage> = {}
+  private static registeredLanguages: Map<string, TranslationPackage> = new Map()
+  private readonly _emitter: Emitter = new Emitter()
+  private _evaluationSuspended: boolean = false
+
+  protected constructor(
+    private _config: Config,
+    private _stats: Statistics,
+    private _dependencyGraph: DependencyGraph,
+    private _columnSearch: ColumnSearchStrategy,
+    private _parser: ParserWithCaching,
+    private _unparser: Unparser,
+    private _cellContentParser: CellContentParser,
+    private _evaluator: Evaluator,
+    private _lazilyTransformingAstService: LazilyTransformingAstService,
+    private _crudOperations: CrudOperations,
+    private _exporter: Exporter,
+    private _namedExpressions: NamedExpressions,
+    private _serialization: Serialization,
+    private _functionRegistry: FunctionRegistry,
+  ) {
+  }
+
+  /**
+   * Returns default configuration of the engines.
+   *
+   * @example
+   * ```js
+   * // should return all default config metadata
+   * const defaultConfig = HyperFormula.defaultConfig;
+   * ```
+   *
+   * @category Static Properties
+   */
+  public static get defaultConfig(): ConfigParams {
+    return getDefaultConfig()
+  }
 
   /**
    * Calls the `graph` method on the dependency graph.
@@ -191,25 +227,6 @@ export class HyperFormula implements TypedEmitter {
    */
   public get licenseKeyValidityState(): LicenseKeyValidityState {
     return this._config.licenseKeyValidityState
-  }
-
-  private static buildFromEngineState(engine: EngineState): HyperFormula {
-    return new HyperFormula(
-      engine.config,
-      engine.stats,
-      engine.dependencyGraph,
-      engine.columnSearch,
-      engine.parser,
-      engine.unparser,
-      engine.cellContentParser,
-      engine.evaluator,
-      engine.lazilyTransformingAstService,
-      engine.crudOperations,
-      engine.exporter,
-      engine.namedExpressions,
-      engine.serialization,
-      engine.functionRegistry,
-    )
   }
 
   /**
@@ -304,23 +321,6 @@ export class HyperFormula implements TypedEmitter {
   public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput, namedExpressions))
   }
-
-  /**
-   * Returns default configuration of the engines.
-   *
-   * @example
-   * ```js
-   * // should return all default config metadata
-   * const defaultConfig = HyperFormula.defaultConfig;
-   * ```
-   *
-   * @category Static Properties
-   */
-  public static get defaultConfig(): ConfigParams {
-    return getDefaultConfig()
-  }
-
-  private static registeredLanguages: Map<string, TranslationPackage> = new Map()
 
   /**
    * Returns registered language from its code string.
@@ -592,25 +592,23 @@ export class HyperFormula implements TypedEmitter {
     return FunctionRegistry.getPlugins()
   }
 
-  private readonly _emitter: Emitter = new Emitter()
-  private _evaluationSuspended: boolean = false
-
-  protected constructor(
-    private _config: Config,
-    private _stats: Statistics,
-    private _dependencyGraph: DependencyGraph,
-    private _columnSearch: ColumnSearchStrategy,
-    private _parser: ParserWithCaching,
-    private _unparser: Unparser,
-    private _cellContentParser: CellContentParser,
-    private _evaluator: Evaluator,
-    private _lazilyTransformingAstService: LazilyTransformingAstService,
-    private _crudOperations: CrudOperations,
-    private _exporter: Exporter,
-    private _namedExpressions: NamedExpressions,
-    private _serialization: Serialization,
-    private _functionRegistry: FunctionRegistry,
-  ) {
+  private static buildFromEngineState(engine: EngineState): HyperFormula {
+    return new HyperFormula(
+      engine.config,
+      engine.stats,
+      engine.dependencyGraph,
+      engine.columnSearch,
+      engine.parser,
+      engine.unparser,
+      engine.cellContentParser,
+      engine.evaluator,
+      engine.lazilyTransformingAstService,
+      engine.crudOperations,
+      engine.exporter,
+      engine.namedExpressions,
+      engine.serialization,
+      engine.functionRegistry,
+    )
   }
 
   /**
@@ -644,12 +642,6 @@ export class HyperFormula implements TypedEmitter {
     }
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getCellValue(cellAddress)
-  }
-
-  private ensureEvaluationIsNotSuspended() {
-    if (this._evaluationSuspended) {
-      throw new EvaluationSuspendedError()
-    }
   }
 
   /**
@@ -4190,22 +4182,6 @@ export class HyperFormula implements TypedEmitter {
     return numberToSimpleTime(inputNumber)
   }
 
-  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
-    const parsedCellContent = this._cellContentParser.parse(formulaString)
-    const address = {sheet: sheetId, col: 0, row: 0}
-    if (!(parsedCellContent instanceof CellContent.Formula)) {
-      return {address, dependencies: []}
-    }
-
-    const {ast, errors, dependencies} = this._parser.parse(parsedCellContent.formula, address)
-
-    if (errors.length > 0) {
-      return {address, dependencies: []}
-    }
-
-    return {ast, address, dependencies}
-  }
-
   /**
    * Subscribes to an event.
    * For the list of all available events, see [[Listeners]].
@@ -4305,6 +4281,28 @@ export class HyperFormula implements TypedEmitter {
   public destroy(): void {
     this._evaluator.interpreter.destroyGpu()
     objectDestroy(this)
+  }
+
+  private ensureEvaluationIsNotSuspended() {
+    if (this._evaluationSuspended) {
+      throw new EvaluationSuspendedError()
+    }
+  }
+
+  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
+    const parsedCellContent = this._cellContentParser.parse(formulaString)
+    const address = {sheet: sheetId, col: 0, row: 0}
+    if (!(parsedCellContent instanceof CellContent.Formula)) {
+      return {address, dependencies: []}
+    }
+
+    const {ast, errors, dependencies} = this._parser.parse(parsedCellContent.formula, address)
+
+    if (errors.length > 0) {
+      return {address, dependencies: []}
+    }
+
+    return {ast, address, dependencies}
   }
 
   /**

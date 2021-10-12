@@ -114,10 +114,10 @@ export interface FunctionMetadata {
 }
 
 export interface FunctionPluginDefinition {
-  new(interpreter: Interpreter): FunctionPlugin,
-
   implementedFunctions: ImplementedFunctions,
   aliases?: { [formulaId: string]: string },
+
+  new(interpreter: Interpreter): FunctionPlugin,
 }
 
 export enum ArgumentTypes {

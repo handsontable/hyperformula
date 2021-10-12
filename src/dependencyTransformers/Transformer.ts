@@ -46,6 +46,8 @@ export abstract class Transformer implements FormulaTransformer {
     return [newAst, newAddress]
   }
 
+  public abstract isIrreversible(): boolean
+
   protected transformAst(ast: Ast, address: SimpleCellAddress): Ast {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
@@ -158,6 +160,4 @@ export abstract class Transformer implements FormulaTransformer {
   protected abstract transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false
 
   protected abstract fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress
-
-  public abstract isIrreversible(): boolean
 }

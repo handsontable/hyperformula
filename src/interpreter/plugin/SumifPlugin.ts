@@ -17,14 +17,14 @@ class AverageResult {
 
   public static empty = new AverageResult(0, 0)
 
-  public static single(arg: number): AverageResult {
-    return new AverageResult(arg, 1)
-  }
-
   constructor(
     public readonly sum: number,
     public readonly count: number,
   ) {
+  }
+
+  public static single(arg: number): AverageResult {
+    return new AverageResult(arg, 1)
   }
 
   public compose(other: AverageResult) {

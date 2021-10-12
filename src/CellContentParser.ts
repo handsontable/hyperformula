@@ -43,14 +43,14 @@ export namespace CellContent {
 
   export class Empty {
 
+    private static instance: Empty
+
     public static getSingletonInstance() {
       if (!Empty.instance) {
         Empty.instance = new Empty()
       }
       return Empty.instance
     }
-
-    private static instance: Empty
   }
 
   export class Formula {
@@ -94,18 +94,6 @@ export class CellContentParser {
     private readonly config: Config,
     private readonly dateHelper: DateTimeHelper,
     private readonly numberLiteralsHelper: NumberLiteralHelper) {
-  }
-
-  private currencyMatcher(token: string): Maybe<[string, string]> {
-    for (const currency of this.config.currencySymbol) {
-      if (token.startsWith(currency)) {
-        return [currency, token.slice(currency.length)]
-      }
-      if (token.endsWith(currency)) {
-        return [currency, token.slice(0, token.length - currency.length)]
-      }
-    }
-    return undefined
   }
 
   public parse(content: RawCellContent): CellContent.Type {
@@ -185,5 +173,17 @@ export class CellContentParser {
     } else {
       throw new UnableToParseError(content)
     }
+  }
+
+  private currencyMatcher(token: string): Maybe<[string, string]> {
+    for (const currency of this.config.currencySymbol) {
+      if (token.startsWith(currency)) {
+        return [currency, token.slice(currency.length)]
+      }
+      if (token.endsWith(currency)) {
+        return [currency, token.slice(0, token.length - currency.length)]
+      }
+    }
+    return undefined
   }
 }

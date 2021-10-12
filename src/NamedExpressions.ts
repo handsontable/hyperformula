@@ -100,10 +100,6 @@ class WorksheetStore {
     return Array.from(this.mapping.values()).filter((ne: InternalNamedExpression) => ne.added)
   }
 
-  private normalizeExpressionName(expressionName: string): string {
-    return expressionName.toLowerCase()
-  }
-
   public isNameAvailable(expressionName: string): boolean {
     const normalizedExpressionName = this.normalizeExpressionName(expressionName)
     return !this.mapping.has(normalizedExpressionName)
@@ -115,6 +111,10 @@ class WorksheetStore {
     if (namedExpression) {
       this.mapping.delete(normalizedExpressionName)
     }
+  }
+
+  private normalizeExpressionName(expressionName: string): string {
+    return expressionName.toLowerCase()
   }
 }
 
@@ -188,19 +188,6 @@ export class NamedExpressions {
     return namedExpression
   }
 
-  private worksheetStoreOrCreate(sheetId: number): WorksheetStore {
-    let store = this.worksheetStores.get(sheetId)
-    if (!store) {
-      store = new WorksheetStore()
-      this.worksheetStores.set(sheetId, store)
-    }
-    return store
-  }
-
-  private worksheetStore(sheetId: number): Maybe<WorksheetStore> {
-    return this.worksheetStores.get(sheetId)
-  }
-
   public namedExpressionOrPlaceholder(expressionName: string, sheetId: number): InternalNamedExpression {
     return this.worksheetStoreOrCreate(sheetId).get(expressionName) ?? this.workbookNamedExpressionOrPlaceholder(expressionName)
   }
@@ -268,6 +255,19 @@ export class NamedExpressions {
     } else {
       return this.worksheetStores.get(scope)?.getAllNamedExpressions() ?? []
     }
+  }
+
+  private worksheetStoreOrCreate(sheetId: number): WorksheetStore {
+    let store = this.worksheetStores.get(sheetId)
+    if (!store) {
+      store = new WorksheetStore()
+      this.worksheetStores.set(sheetId, store)
+    }
+    return store
+  }
+
+  private worksheetStore(sheetId: number): Maybe<WorksheetStore> {
+    return this.worksheetStores.get(sheetId)
   }
 
   private nextAddress() {
