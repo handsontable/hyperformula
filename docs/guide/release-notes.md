@@ -8,7 +8,7 @@ HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 **Release date: October 14, 2021**
 
 ### Added
-- Added a new static property: [`defaultConfig`](../api/classes/hyperformula.md#defaultconfig). [#822](https://github.com/handsontable/hyperformula/issues/822)
+- Added a new static property: [`HyperFormula.defaultConfig`](../api/classes/hyperformula.md#defaultconfig). [#822](https://github.com/handsontable/hyperformula/issues/822)
 - The [`getFillRangeData`](../api/classes/hyperformula.md#getfillrangedata) method can now use one sheet for its source and another sheet for its target. [#836](https://github.com/handsontable/hyperformula/issues/836)
 
 ### Fixed
