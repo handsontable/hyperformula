@@ -39,7 +39,6 @@ import {
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
   NotAFormulaError,
-  SheetsNotEqual
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'

@@ -195,13 +195,13 @@ export class ComplexPlugin extends FunctionPlugin implements FunctionPluginTypec
 
   public imaginary(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMAGINARY'),
-      ([re, im]: complex) => im
+      ([_re, im]: complex) => im
     )
   }
 
   public imreal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IMREAL'),
-      ([re, im]: complex) => re
+      ([re, _im]: complex) => re
     )
   }
 

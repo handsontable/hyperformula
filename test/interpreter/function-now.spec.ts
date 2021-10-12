@@ -1,13 +1,7 @@
 import {HyperFormula} from '../../src'
-import {CellValueDetailedType, ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
-
-function sleepFor(sleepDuration: number) {
-  const now = new Date().getTime()
-  while (new Date().getTime() < now + sleepDuration) { /* do nothing */
-  }
-}
 
 describe('Interpreter - function NOW', () => {
   let originalNow: () => number
