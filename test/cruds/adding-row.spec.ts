@@ -199,7 +199,6 @@ describe('Adding row - reevaluation', () => {
       ['1'],
       ['2', '=COUNTBLANK(A1:A2)'],
     ])
-    engine.addressMapping.getCell(adr('C1'))
 
     const changes = engine.addRows(0, [1, 1])
 

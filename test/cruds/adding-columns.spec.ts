@@ -192,8 +192,6 @@ describe('Adding column - reevaluation', () => {
       ['1', '2', '=COLUMNS(A1:B1)'],
     ])
 
-    engine.addressMapping.getCell(adr('C1'))
-
     const changes = engine.addColumns(0, [1, 1])
 
     expect(changes.length).toBe(1)
