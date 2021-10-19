@@ -5,7 +5,7 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## 1.3.0
-**Release date: October 14, 2021**
+**Release date: October 20, 2021**
 
 ### Added
 - Added a new static property: [`HyperFormula.defaultConfig`](../api/classes/hyperformula.md#defaultconfig). [#822](https://github.com/handsontable/hyperformula/issues/822)
