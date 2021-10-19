@@ -183,7 +183,7 @@ describe('Move rows', () => {
 
     engine.moveRows(0, 0, 1, 2)
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absolute( 0, 0))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absolute(0, 0))
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(-1, 0))
   })
 

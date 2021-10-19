@@ -49,7 +49,6 @@ describe('Function SUBSTITUTE', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('foo5')
   })
 
-
   it('should return value when last argument is less than one', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBSTITUTE("foobar", "o", "f", 0)'],

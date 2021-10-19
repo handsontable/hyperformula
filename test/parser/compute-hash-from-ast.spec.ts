@@ -32,12 +32,12 @@ describe('Compute hash from ast', () => {
     expect(hashFromAst).toEqual(hashFromTokens)
   }
 
-  it('literals',  () => {
+  it('literals', () => {
     const formula = '=CONCATENATE("foo", 42.34)'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('function call',  () => {
+  it('function call', () => {
     const formula = '=SUM(1,2,3)'
     expectHashFromAstMatchHashFromTokens(formula)
   })
@@ -47,27 +47,27 @@ describe('Compute hash from ast', () => {
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('simple addreess',  () => {
+  it('simple addreess', () => {
     const formula = '=Sheet1!A1'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('absolute col',  () => {
+  it('absolute col', () => {
     const formula = '=Sheet1!$A1'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('absolute row addreess',  () => {
+  it('absolute row addreess', () => {
     const formula = '=Sheet1!A$1'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('absolute address',  () => {
+  it('absolute address', () => {
     const formula = '=Sheet1!$A$1'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('cell range',  () => {
+  it('cell range', () => {
     const formula = '=$A$1:B$2'
     expectHashFromAstMatchHashFromTokens(formula)
   })
@@ -82,7 +82,7 @@ describe('Compute hash from ast', () => {
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('column range',  () => {
+  it('column range', () => {
     const formula = '=$A:B'
     expectHashFromAstMatchHashFromTokens(formula)
   })
@@ -97,7 +97,7 @@ describe('Compute hash from ast', () => {
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('row range',  () => {
+  it('row range', () => {
     const formula = '=$1:2'
     expectHashFromAstMatchHashFromTokens(formula)
   })
@@ -112,17 +112,17 @@ describe('Compute hash from ast', () => {
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('ops',  () => {
+  it('ops', () => {
     const formula = '=-1+1-1*1/1^1&1=1<>1<1<=1>1<1%'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('parenthesis',  () => {
+  it('parenthesis', () => {
     const formula = '=-1*(-2)*(3+4)+5'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 
-  it('nested parenthesis',  () => {
+  it('nested parenthesis', () => {
     const formula = '=-(-(3+4))'
     expectHashFromAstMatchHashFromTokens(formula)
   })
@@ -148,7 +148,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure hash using canonical name', () => {
-    const config = new Config({ language: 'plPL' })
+    const config = new Config({language: 'plPL'})
     const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
@@ -165,7 +165,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('procedure name with missing translation', () => {
-    const config = new Config({ language: 'plPL' })
+    const config = new Config({language: 'plPL'})
     const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
@@ -203,12 +203,11 @@ describe('Compute hash from ast', () => {
   })
 
   it('should work with decimal separator', () => {
-    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const config = new Config({decimalSeparator: ',', functionArgSeparator: ';'})
     const sheetMapping = new SheetMapping(buildTranslationPackage(plPL))
     sheetMapping.addSheet('Sheet1')
     const lexer = new FormulaLexer(buildLexerConfig(config))
     const parser = buildEmptyParserWithCaching(config, sheetMapping)
-
 
     const formula = '=1+123,456'
     const address = adr('A1')

@@ -24,7 +24,7 @@ describe('Function ACOS', () => {
 
   it('for -1 (edge)', () => {
     const engine = HyperFormula.buildFromArray([['=ACOS(-1)']],
-      { smartRounding : false })
+      {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(Math.PI)
   })
@@ -48,8 +48,8 @@ describe('Function ACOS', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="-1"', '=ACOS(A1)'],
       ['=TRUE()', '=ACOS(A2)'],
     ])
@@ -59,7 +59,7 @@ describe('Function ACOS', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=ACOS(4/0)'],
     ])
 

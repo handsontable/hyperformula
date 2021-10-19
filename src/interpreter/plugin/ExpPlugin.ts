@@ -8,12 +8,12 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class ExpPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ExpPlugin>{
+export class ExpPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ExpPlugin> {
   public static implementedFunctions = {
     'EXP': {
       method: 'exp',
-      parameters:[
-        { argumentType: ArgumentTypes.NUMBER }
+      parameters: [
+        {argumentType: ArgumentTypes.NUMBER}
       ],
     },
   }

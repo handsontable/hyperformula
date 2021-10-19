@@ -35,8 +35,8 @@ describe('Function LOG10', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="10"', '=LOG10(A1)'],
       ['', '=LOG10(A2)'],
     ])
@@ -46,7 +46,7 @@ describe('Function LOG10', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=LOG10(4/0)'],
     ])
 

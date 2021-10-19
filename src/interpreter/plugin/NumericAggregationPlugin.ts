@@ -34,15 +34,15 @@ class MomentsAggregate {
 
   public static empty = new MomentsAggregate(0, 0, 0)
 
-  public static single(arg: number): MomentsAggregate {
-    return new MomentsAggregate(arg*arg, arg, 1)
-  }
-
   constructor(
     public readonly sumsq: number,
     public readonly sum: number,
     public readonly count: number,
   ) {
+  }
+
+  public static single(arg: number): MomentsAggregate {
+    return new MomentsAggregate(arg * arg, arg, 1)
   }
 
   public compose(other: MomentsAggregate) {
@@ -58,23 +58,23 @@ class MomentsAggregate {
   }
 
   public varSValue(): Maybe<number> {
-    if(this.count > 1) {
-      return (this.sumsq - (this.sum*this.sum)/this.count)/(this.count-1)
+    if (this.count > 1) {
+      return (this.sumsq - (this.sum * this.sum) / this.count) / (this.count - 1)
     } else {
       return undefined
     }
   }
 
   public varPValue(): Maybe<number> {
-    if(this.count > 0) {
-      return (this.sumsq - (this.sum*this.sum)/this.count)/this.count
+    if (this.count > 0) {
+      return (this.sumsq - (this.sum * this.sum) / this.count) / this.count
     } else {
       return undefined
     }
   }
 }
 
-export class NumericAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<NumericAggregationPlugin>{
+export class NumericAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<NumericAggregationPlugin> {
   public static implementedFunctions = {
     'SUM': {
       method: 'sum',
@@ -353,7 +353,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varSValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
     }
   }
 
@@ -364,7 +364,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varPValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
     }
   }
 
@@ -417,7 +417,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  private reduceAggregate(args: Ast[], state: InterpreterState): MomentsAggregate | CellError{
+  private reduceAggregate(args: Ast[], state: InterpreterState): MomentsAggregate | CellError {
     return this.reduce<MomentsAggregate>(args, state, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
@@ -427,7 +427,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     )
   }
 
-  private reduceAggregateA(args: Ast[], state: InterpreterState): MomentsAggregate | CellError{
+  private reduceAggregateA(args: Ast[], state: InterpreterState): MomentsAggregate | CellError {
     return this.reduce<MomentsAggregate>(args, state, MomentsAggregate.empty, '_AGGREGATE_A', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
@@ -474,7 +474,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varSValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
     }
   }
 
@@ -485,7 +485,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return result
     } else {
       const val = result.varPValue()
-      return val === undefined  ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
+      return val === undefined ? new CellError(ErrorType.DIV_BY_ZERO) : Math.sqrt(val)
     }
   }
 
@@ -553,7 +553,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       }
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
-        if(val instanceof CellError) {
+        if (val instanceof CellError) {
           return val
         }
         return reducingFunction(val, acc)

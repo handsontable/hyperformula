@@ -5,13 +5,13 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ATAN2', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ATAN2(1,2)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ATAN2(1,2)']], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.107148718, 6)
   })
 
   it('validates error', () => {
-    const engine = HyperFormula.buildFromArray([['=ATAN2(0,0)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ATAN2(0,0)']], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
@@ -29,8 +29,8 @@ describe('Function ATAN2', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="-1"', '="1"', '=ATAN2(A1,B1)'],
     ])
 
@@ -38,7 +38,7 @@ describe('Function ATAN2', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=ATAN2(4/0, 1)'],
     ])
 

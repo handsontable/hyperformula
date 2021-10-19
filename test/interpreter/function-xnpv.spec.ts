@@ -50,7 +50,7 @@ describe('Function XNPV', () => {
       ['=XNPV(1, B1:E1, F1:I1)', 1, 2, 3, 4, 1, 4, 3, 2],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo( 9.9696766801485, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(9.9696766801485, 6)
   })
 
   it('should evaluate to #NUM! if values in range are not numbers', () => {

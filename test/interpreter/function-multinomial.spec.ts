@@ -26,7 +26,7 @@ describe('Function MULTINOMIAL', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(49008960)
-    expect(engine.getCellValue(adr('B1')) as number/2.20917676017678e+38).toBeCloseTo(1, 6)
+    expect(engine.getCellValue(adr('B1')) as number / 2.20917676017678e+38).toBeCloseTo(1, 6)
   })
 
   it('accepts single arg', () => {

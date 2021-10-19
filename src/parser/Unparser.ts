@@ -45,7 +45,7 @@ export class Unparser {
         return imageWithWhitespace('"' + ast.value + '"', ast.leadingWhitespace)
       }
       case AstNodeType.FUNCTION_CALL: {
-        const args = ast.args.map((arg) => arg!==undefined?this.unparseAst(arg, address):''
+        const args = ast.args.map((arg) => arg !== undefined ? this.unparseAst(arg, address) : ''
         ).join(this.config.functionArgSeparator)
         const procedureName = this.config.translationPackage.isFunctionTranslated(ast.procedureName) ?
           this.config.translationPackage.getFunctionTranslation(ast.procedureName) :
@@ -98,7 +98,7 @@ export class Unparser {
         return imageWithWhitespace(rightPart, ast.leadingWhitespace)
       }
       case AstNodeType.ARRAY: {
-        const ret = '{'+ast.args.map(row => row.map(val => this.unparseAst(val, address)).join(this.config.arrayColumnSeparator)).join(this.config.arrayRowSeparator) + imageWithWhitespace('}', ast.internalWhitespace)
+        const ret = '{' + ast.args.map(row => row.map(val => this.unparseAst(val, address)).join(this.config.arrayColumnSeparator)).join(this.config.arrayRowSeparator) + imageWithWhitespace('}', ast.internalWhitespace)
         return imageWithWhitespace(ret, ast.leadingWhitespace)
       }
       default: {
@@ -131,7 +131,7 @@ export class Unparser {
 
     const unparsedStart = ast.start.unparse(baseAddress)
     const unparsedEnd = ast.end.unparse(baseAddress)
-    if(unparsedStart === undefined || unparsedEnd === undefined) {
+    if (unparsedStart === undefined || unparsedEnd === undefined) {
       return this.config.translationPackage.getErrorTranslation(ErrorType.REF)
     }
     return `${startSheeet}${unparsedStart}:${endSheet}${unparsedEnd}`

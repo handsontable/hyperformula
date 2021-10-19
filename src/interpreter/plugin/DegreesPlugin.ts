@@ -8,13 +8,13 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class DegreesPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DegreesPlugin>{
+export class DegreesPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DegreesPlugin> {
   public static implementedFunctions = {
     'DEGREES': {
       method: 'degrees',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER}
-        ]
+        {argumentType: ArgumentTypes.NUMBER}
+      ]
     },
   }
 

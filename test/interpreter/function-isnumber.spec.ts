@@ -16,7 +16,7 @@ describe('Function ISNUMBER', () => {
 
   it('should return false for nonnumbers', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISNUMBER(1<1)', '=ISNUMBER(A2)',  '=ISNUMBER("foo")'],
+      ['=ISNUMBER(1<1)', '=ISNUMBER(A2)', '=ISNUMBER("foo")'],
       [null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)

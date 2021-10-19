@@ -30,7 +30,7 @@ describe('Function SECOND', () => {
   })
 
   it('use datenumber coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=SECOND(TRUE())'],
     ])
 
@@ -38,7 +38,7 @@ describe('Function SECOND', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=SECOND(4/0)'],
     ])
 

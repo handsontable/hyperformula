@@ -11,7 +11,7 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FormulaTextPlugin>{
+export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FormulaTextPlugin> {
   public static implementedFunctions = {
     'FORMULATEXT': {
       method: 'formulatext',

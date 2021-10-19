@@ -89,7 +89,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [2, 1])
 
-    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol( 1, 0))
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(1, 0))
   })
 
   it('case Ab: absolute dependency after removed column should be shifted', () => {
@@ -99,7 +99,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol( 1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(1, 0))
   })
 
   it('case Ac: absolute dependency in removed column range should be replaced by #REF', () => {
@@ -282,7 +282,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
 
     engine.removeColumns(0, [0, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol( 0, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 0, 1))
   })
 
   it('case Ra: removing column before formula should shift dependency', () => {
@@ -332,7 +332,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 1))
     expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, 0, 1))
     expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(0, -1, 1))
-    expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.absoluteCol( 1, 0, 1))
+    expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.absoluteCol(1, 0, 1))
   })
 
   it('case ARb: relative/absolute dependency before removed column should not be affected', () => {
@@ -348,7 +348,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     engine.removeColumns(1, [1, 1])
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absoluteCol( 0, 0, 1))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absoluteCol(0, 0, 1))
   })
 
   it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
@@ -685,9 +685,9 @@ describe('Removing columns - dependencies', () => {
       ],
     })
 
-    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol( 0, 0, 1))
+    expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 0, 1))
     engine.removeColumns(0, [0, 2])
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol( 0, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 0, 1))
   })
 
 })
@@ -782,7 +782,7 @@ describe('Removing columns - column index', () => {
   it('should update column index when adding column', () => {
     const engine = HyperFormula.buildFromArray([
       ['', '1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
 
     engine.removeColumns(0, [0, 1])
 

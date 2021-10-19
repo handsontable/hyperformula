@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DEGREES', () => {
-  it('happy path',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('happy path', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=DEGREES(0)', '=DEGREES(3.14)'],
     ])
 
@@ -13,16 +13,16 @@ describe('Function DEGREES', () => {
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(179.9087477)
   })
 
-  it('given wrong argument type',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('given wrong argument type', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=DEGREES("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="3.14"', '=DEGREES(A1)'],
       ['=TRUE()', '=DEGREES(A2)'],
     ])
@@ -31,8 +31,8 @@ describe('Function DEGREES', () => {
     expect(engine.getCellValue(adr('B2'))).toBeCloseTo(57.29577951)
   })
 
-  it('given wrong number of arguments',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('given wrong number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=DEGREES()'],
       ['=DEGREES(1, 2)'],
     ])
@@ -42,7 +42,7 @@ describe('Function DEGREES', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=DEGREES(4/0)'],
     ])
 

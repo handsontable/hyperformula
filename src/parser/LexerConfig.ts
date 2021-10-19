@@ -56,14 +56,13 @@ export const CellReference = createToken({
 
 export const ColumnRange = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
 })
 
 export const RowRange = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}\(${sheetNameRegexp}\)?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
+  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
-
 
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${RANGE_OPERATOR}`})
 
@@ -76,10 +75,16 @@ export const ArrayLParen = createToken({name: 'ArrayLParen', pattern: /{/})
 export const ArrayRParen = createToken({name: 'ArrayRParen', pattern: /}/})
 
 /* procedures */
-export const ProcedureName = createToken({name: 'ProcedureName', pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/})
+export const ProcedureName = createToken({
+  name: 'ProcedureName',
+  pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/
+})
 
 /* named expressions */
-export const NamedExpression = createToken({name: 'NamedExpression', pattern: /[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*/})
+export const NamedExpression = createToken({
+  name: 'NamedExpression',
+  pattern: /[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*/
+})
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
@@ -117,18 +122,24 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
 
   /* configurable tokens */
   let ArgSeparator, inject: TokenType[]
-  if(config.functionArgSeparator === config.arrayColumnSeparator) {
+  if (config.functionArgSeparator === config.arrayColumnSeparator) {
     ArgSeparator = ArrayColSeparator
     inject = []
-  } else if(config.functionArgSeparator === config.arrayRowSeparator) {
+  } else if (config.functionArgSeparator === config.arrayRowSeparator) {
     ArgSeparator = ArrayRowSeparator
     inject = []
   } else {
     ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
     inject = [ArgSeparator]
   }
-  const NumberLiteral = createToken({name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)})
-  const OffsetProcedureName = createToken({name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i')})
+  const NumberLiteral = createToken({
+    name: 'NumberLiteral',
+    pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)
+  })
+  const OffsetProcedureName = createToken({
+    name: 'OffsetProcedureName',
+    pattern: new RegExp(offsetProcedureNameLiteral, 'i')
+  })
 
   /* order is important, first pattern is used */
   const allTokens = [
@@ -152,7 +163,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     OffsetProcedureName,
     ProcedureName,
     RangeSeparator,
-      ...inject,
+    ...inject,
     ColumnRange,
     RowRange,
     NumberLiteral,

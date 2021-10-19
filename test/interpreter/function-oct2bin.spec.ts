@@ -119,7 +119,6 @@ describe('function OCT2BIN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
-
   it('should allow for numbers from 1 to 10 as second argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=OCT2BIN(2, 0)'],

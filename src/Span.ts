@@ -10,18 +10,6 @@ export type Span = RowsSpan | ColumnsSpan
  */
 export class RowsSpan {
 
-  public get numberOfRows() {
-    return this.rowEnd - this.rowStart + 1
-  }
-
-  public static fromNumberOfRows(sheet: number, rowStart: number, numberOfRows: number) {
-    return new RowsSpan(sheet, rowStart, rowStart + numberOfRows - 1)
-  }
-
-  public static fromRowStartAndEnd(sheet: number, rowStart: number, rowEnd: number) {
-    return new RowsSpan(sheet, rowStart, rowEnd)
-  }
-
   constructor(
     public readonly sheet: number,
     public readonly rowStart: number,
@@ -33,6 +21,26 @@ export class RowsSpan {
     if (rowEnd < rowStart) {
       throw Error('Row span cant end before start')
     }
+  }
+
+  public get numberOfRows() {
+    return this.rowEnd - this.rowStart + 1
+  }
+
+  public get start(): number {
+    return this.rowStart
+  }
+
+  public get end(): number {
+    return this.rowEnd
+  }
+
+  public static fromNumberOfRows(sheet: number, rowStart: number, numberOfRows: number) {
+    return new RowsSpan(sheet, rowStart, rowStart + numberOfRows - 1)
+  }
+
+  public static fromRowStartAndEnd(sheet: number, rowStart: number, rowEnd: number) {
+    return new RowsSpan(sheet, rowStart, rowEnd)
   }
 
   public* rows(): IterableIterator<number> {
@@ -56,33 +64,12 @@ export class RowsSpan {
   public firstRow(): RowsSpan {
     return new RowsSpan(this.sheet, this.rowStart, this.rowStart)
   }
-
-  public get start(): number {
-    return this.rowStart
-  }
-
-  public get end(): number {
-    return this.rowEnd
-  }
 }
-
 
 /*
  * A class representing a set of columns in specific sheet
  */
 export class ColumnsSpan {
-  public get numberOfColumns() {
-    return this.columnEnd - this.columnStart + 1
-  }
-
-  public static fromNumberOfColumns(sheet: number, columnStart: number, numberOfColumns: number) {
-    return new ColumnsSpan(sheet, columnStart, columnStart + numberOfColumns - 1)
-  }
-
-  public static fromColumnStartAndEnd(sheet: number, columnStart: number, columnEnd: number) {
-    return new ColumnsSpan(sheet, columnStart, columnEnd)
-  }
-
   constructor(
     public readonly sheet: number,
     public readonly columnStart: number,
@@ -94,6 +81,26 @@ export class ColumnsSpan {
     if (columnEnd < columnStart) {
       throw Error('Column span cant end before start')
     }
+  }
+
+  public get numberOfColumns() {
+    return this.columnEnd - this.columnStart + 1
+  }
+
+  public get start(): number {
+    return this.columnStart
+  }
+
+  public get end(): number {
+    return this.columnEnd
+  }
+
+  public static fromNumberOfColumns(sheet: number, columnStart: number, numberOfColumns: number) {
+    return new ColumnsSpan(sheet, columnStart, columnStart + numberOfColumns - 1)
+  }
+
+  public static fromColumnStartAndEnd(sheet: number, columnStart: number, columnEnd: number) {
+    return new ColumnsSpan(sheet, columnStart, columnEnd)
   }
 
   public* columns(): IterableIterator<number> {
@@ -116,13 +123,5 @@ export class ColumnsSpan {
 
   public firstColumn(): ColumnsSpan {
     return new ColumnsSpan(this.sheet, this.columnStart, this.columnStart)
-  }
-
-  public get start(): number {
-    return this.columnStart
-  }
-
-  public get end(): number {
-    return this.columnEnd
   }
 }

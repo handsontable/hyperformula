@@ -412,6 +412,7 @@ export class BatchUndoEntry extends BaseUndoEntry {
 }
 
 export class UndoRedo {
+  public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
   private undoStack: UndoEntry[] = []
   private redoStack: UndoEntry[] = []
   private readonly undoLimit: number
@@ -424,8 +425,6 @@ export class UndoRedo {
     this.undoLimit = config.undoLimit
   }
 
-  public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
-
   public saveOperation(operation: UndoEntry) {
     if (this.batchUndoEntry !== undefined) {
       this.batchUndoEntry.add(operation)
@@ -436,11 +435,6 @@ export class UndoRedo {
 
   public beginBatchMode() {
     this.batchUndoEntry = new BatchUndoEntry()
-  }
-
-  private addUndoEntry(operation: UndoEntry) {
-    this.undoStack.push(operation)
-    this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
   }
 
   public commitBatchMode() {
@@ -484,10 +478,6 @@ export class UndoRedo {
     this.undoEntry(operation)
 
     this.redoStack.push(operation)
-  }
-
-  private undoEntry(operation: UndoEntry) {
-    operation.doUndo(this)
   }
 
   public undoBatch(batchOperation: BatchUndoEntry) {
@@ -660,12 +650,6 @@ export class UndoRedo {
     this.restoreOperationOldContent(operation.oldContent)
   }
 
-  private restoreOperationOldContent(oldContent: [SimpleCellAddress, ClipboardCell][]) {
-    for (const [address, clipboardCell] of oldContent) {
-      this.operations.restoreCell(address, clipboardCell)
-    }
-  }
-
   public redo() {
     const operation = this.redoStack.pop()
 
@@ -676,10 +660,6 @@ export class UndoRedo {
     this.redoEntry(operation)
 
     this.undoStack.push(operation)
-  }
-
-  private redoEntry(operation: UndoEntry) {
-    operation.doRedo(this)
   }
 
   public redoBatch(batchOperation: BatchUndoEntry) {
@@ -773,6 +753,25 @@ export class UndoRedo {
 
   public redoSetColumnOrder(operation: SetColumnOrderUndoEntry) {
     this.operations.setColumnOrder(operation.sheetId, operation.columnMapping)
+  }
+
+  private addUndoEntry(operation: UndoEntry) {
+    this.undoStack.push(operation)
+    this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
+  }
+
+  private undoEntry(operation: UndoEntry) {
+    operation.doUndo(this)
+  }
+
+  private restoreOperationOldContent(oldContent: [SimpleCellAddress, ClipboardCell][]) {
+    for (const [address, clipboardCell] of oldContent) {
+      this.operations.restoreCell(address, clipboardCell)
+    }
+  }
+
+  private redoEntry(operation: UndoEntry) {
+    operation.doRedo(this)
   }
 
   private restoreOldDataFromVersion(version: number) {

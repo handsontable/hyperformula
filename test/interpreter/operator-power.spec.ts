@@ -73,7 +73,7 @@ describe('Operator POWER', () => {
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it( 'NaN as a result', () => {
+  it('NaN as a result', () => {
 
     const engine = HyperFormula.buildFromArray([
       ['01/02/1999', '02/02/1999', '=A1^B1'],

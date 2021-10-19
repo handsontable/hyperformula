@@ -24,7 +24,8 @@ export class ColumnAddress implements AddressWithColumn {
     public readonly type: ReferenceType,
     public readonly col: number,
     public readonly sheet?: number
-  ) {}
+  ) {
+  }
 
   public static absolute(column: number, sheet?: number) {
     return new ColumnAddress(ReferenceType.ABSOLUTE, column, sheet)
@@ -96,7 +97,7 @@ export class ColumnAddress implements AddressWithColumn {
 
   public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleColumnAddress(baseAddress)
-    if(invalidSimpleColumnAddress(simpleAddress)) {
+    if (invalidSimpleColumnAddress(simpleAddress)) {
       return undefined
     }
     const column = columnIndexToLabel(simpleAddress.col)

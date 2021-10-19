@@ -26,12 +26,12 @@ import {ParserConfig} from './parser/ParserConfig'
 type GPUMode = 'gpu' | 'cpu' | 'dev'
 
 const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
-const privatePool: WeakMap<Config, {licenseKeyValidityState: LicenseKeyValidityState}> = new WeakMap()
+const privatePool: WeakMap<Config, { licenseKeyValidityState: LicenseKeyValidityState }> = new WeakMap()
 
 export interface ConfigParams {
   /**
    * When set to `true`, makes string comparison accent-sensitive.
-   * 
+   *
    * Applies only to comparison operators.
    *
    * @default false
@@ -51,7 +51,7 @@ export interface ConfigParams {
   binarySearchThreshold: number,
   /**
    * When set to `true`, makes string comparison case-sensitive.
-   * 
+   *
    * Applies to comparison operators only.
    *
    * @default false
@@ -61,9 +61,9 @@ export interface ConfigParams {
   caseSensitive: boolean,
   /**
    * When set to `upper`, upper case sorts first.
-   * 
+   *
    * When set to `lower`, lower case sorts first.
-   * 
+   *
    * When set to `false`, uses the locale's default.
    *
    * @default 'lower'
@@ -73,7 +73,7 @@ export interface ConfigParams {
   caseFirst: 'upper' | 'lower' | 'false',
   /**
    * Sets the address mapping policy to be used.
-   * 
+   *
    * Built-in implementations:
    * - `DenseSparseChooseBasedOnThreshold`: sets the address mapping policy separately for each sheet, based on fill ratio.
    * - `AlwaysDense`: uses `DenseStrategy` for all sheets.
@@ -101,7 +101,7 @@ export interface ConfigParams {
    * - `/` (slash)
    *
    * `YY` can be replaced with `YYYY`.
-   * 
+   *
    * Any order of `YY`, `MM`, and `DD` is accepted as a date.
    *
    * @default ['DD/MM/YYYY', 'DD/MM/YY']
@@ -111,7 +111,7 @@ export interface ConfigParams {
   dateFormats: string[],
   /**
    * Sets a separator character that separates procedure arguments in formulas.
-   * 
+   *
    * Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
    * @default ','
@@ -121,11 +121,11 @@ export interface ConfigParams {
   functionArgSeparator: string,
   /**
    * Sets a decimal separator used for parsing numerical literals.
-   * 
+   *
    * Can be one of the following:
    * - `.` (period)
    * - `,` (comma)
-   * 
+   *
    * Must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
    * @default '.'
@@ -152,11 +152,11 @@ export interface ConfigParams {
   functionPlugins: any[],
   /**
    * A GPU.js constructor used by array functions.
-   * 
+   *
    * When not provided, the plain CPU implementation is used.
    *
    * @deprecated since version 1.2.
-   * 
+   *
    * @default undefined
    *
    * @category Engine
@@ -164,17 +164,17 @@ export interface ConfigParams {
   gpujs?: any,
   /**
    * Sets array calculations to use either GPU or CPU.
-   * 
+   *
    * When set to `gpu`, tries to use GPU for array calculations.
-   * 
+   *
    * When set to `cpu`, enforces CPU usage.
-   * 
+   *
    * Use other values only for debugging purposes.
-   * 
+   *
    * For more information, see the [GPU.js documentation](https://github.com/gpujs/gpu.js/#readme).
    *
-   * @deprecated since version 1.2 
-   * 
+   * @deprecated since version 1.2
+   *
    * @default 'gpu'
    *
    * @category Engine
@@ -198,9 +198,9 @@ export interface ConfigParams {
   language: string,
   /**
    * Sets year 1900 as a leap year.
-   * 
+   *
    * For compatibility with Lotus 1-2-3 and Microsoft Excel, set this option to `true`.
-   * 
+   *
    * For more information, see [[nullDate]].
    *
    * @default false
@@ -210,9 +210,9 @@ export interface ConfigParams {
   leapYear1900: boolean,
   /**
    * Sets your HyperFormula license key.
-   * 
+   *
    * To use HyperFormula on the GPLv3 license terms, set this option to `gpl-v3`.
-   * 
+   *
    * To use HyperFormula with your commercial license, set this option to your valid license key string.
    *
    * For more information, go [here](/guide/license-key.html).
@@ -234,7 +234,7 @@ export interface ConfigParams {
   localeLang: string,
   /**
    * When set to `true`, function criteria require whole cells to match the pattern.
-   * 
+   *
    * When set to `false`, function criteria require just a subword to match the pattern.
    *
    * @default true
@@ -275,7 +275,7 @@ export interface ConfigParams {
    * Internally, each date is represented as a number of days that passed since `nullDate`.
    *
    * This option sets a specific date from which that number of days is counted.
-   * 
+   *
    * @default {year: 1899, month: 12, day: 30}
    *
    * @category Date and Time
@@ -283,11 +283,11 @@ export interface ConfigParams {
   nullDate: SimpleDate,
   /**
    * Sets the interpretation of two-digit year values.
-   * 
+   *
    * Two-digit year values (`xx`) can either become `19xx` or `20xx`.
-   * 
+   *
    * If `xx` is less or equal to `nullYear`, two-digit year values become `20xx`.
-   * 
+   *
    * If `xx` is more than `nullYear`, two-digit year values become `19xx`.
    *
    * @default 30
@@ -305,12 +305,12 @@ export interface ConfigParams {
   parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>,
   /**
    * Sets how far two numerical values need to be from each other to be treated as non-equal.
-   * 
+   *
    * `a` and `b` are equal if all three of the following conditions are met:
    * - Both `a` and `b` are of the same sign
    * - `abs(a)` <= `(1+precisionEpsilon) * abs(b)`
    * - `abs(b)` <= `(1+precisionEpsilon) * abs(a)`
-   * 
+   *
    * Additionally, this option controls the snap-to-zero behavior for additions and subtractions:
    * - For `c=a+b`, if `abs(c)` <= `precisionEpsilon * abs(a)`, then `c` is set to `0`
    * - For `c=a-b`, if `abs(c)` <= `precisionEpsilon * abs(a)`, then `c` is set to `0`
@@ -322,7 +322,7 @@ export interface ConfigParams {
   precisionEpsilon: number,
   /**
    * Sets calculations' precision level.
-   * 
+   *
    * Numerical outputs are rounded to the `precisionRounding` number of digits after the decimal.
    *
    * @default 14
@@ -348,7 +348,7 @@ export interface ConfigParams {
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
    * When set to `false`, no rounding happens, and numbers are equal if and only if they are of truly identical value.
-   * 
+   *
    * For more information, see [[precisionEpsilon]].
    *
    * @default true
@@ -358,12 +358,12 @@ export interface ConfigParams {
   smartRounding: boolean,
   /**
    * Sets a thousands separator symbol for parsing numerical literals.
-   * 
+   *
    * Can be one of the following:
    * - empty
    * - `,` (comma)
    * - ` ` (empty space)
-   * 
+   *
    * Must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
    * @default ''
@@ -388,11 +388,11 @@ export interface ConfigParams {
   timeFormats: string[],
   /**
    * When set to `true`, array arithmetic is enabled globally.
-   * 
+   *
    * When set to `false`, array arithmetic is enabled only inside array functions (`ARRAYFORMULA`, `FILTER`, and `ARRAY_CONSTRAIN`).
    *
    * For more information, see the [Arrays guide](/guide/arrays.html).
-   * 
+   *
    * @default false
    *
    * @category Engine
@@ -402,7 +402,7 @@ export interface ConfigParams {
    * When set to `true`, switches column search strategy from binary search to column index.
    *
    * Using column index improves efficiency of the `VLOOKUP` and `MATCH` functions, but increases memory usage.
-   * 
+   *
    * When searching with wildcards or regular expressions, column search strategy falls back to binary search (even with `useColumnIndex` set to `true`).
    *
    * @default false
@@ -412,7 +412,7 @@ export interface ConfigParams {
   useColumnIndex: boolean,
   /**
    * When set to `true`, enables gathering engine statistics and timings.
-   * 
+   *
    * Useful for testing and benchmarking.
    *
    * @default false
@@ -579,16 +579,6 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
 
-  /**
-   * Proxied property to its private counterpart. This makes the property
-   * as accessible as the other Config options but without ability to change the value.
-   *
-   * @internal
-   */
-  public get licenseKeyValidityState() {
-    return privatePool.get(this)!.licenseKeyValidityState
-  }
-
   constructor(
     {
       accentSensitive,
@@ -680,12 +670,12 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
     validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
-    this.currencySymbol = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array',  'currencySymbol')]
+    this.currencySymbol = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array', 'currencySymbol')]
     this.currencySymbol.forEach((val) => {
-      if(typeof val !== 'string') {
+      if (typeof val !== 'string') {
         throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
       }
-      if(val === '') {
+      if (val === '') {
         throw new ConfigValueEmpty('currencySymbol')
       }
     })
@@ -710,6 +700,16 @@ export class Config implements ConfigParams, ParserConfig {
       {value: this.arrayRowSeparator, name: 'arrayRowSeparator'},
       {value: this.arrayColumnSeparator, name: 'arrayColumnSeparator'},
     )
+  }
+
+  /**
+   * Proxied property to its private counterpart. This makes the property
+   * as accessible as the other Config options but without ability to change the value.
+   *
+   * @internal
+   */
+  public get licenseKeyValidityState() {
+    return privatePool.get(this)!.licenseKeyValidityState
   }
 
   public getConfig(): ConfigParams {

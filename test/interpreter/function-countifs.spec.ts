@@ -6,7 +6,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COUNTIFS', () => {
   it('validates number of arguments', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=COUNTIFS(B1:B3)'],
       ['=COUNTIFS(B1:B3, ">0", B1)'],
       ['=COUNTIFS(B1:B3, ">0", B1, ">1", 42)'],
@@ -18,7 +18,7 @@ describe('Function COUNTIFS', () => {
   })
 
   it('works', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
@@ -29,7 +29,7 @@ describe('Function COUNTIFS', () => {
   })
 
   it('works for more criteria pairs', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '20'],
       ['3', '30'],
@@ -39,8 +39,8 @@ describe('Function COUNTIFS', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
-  it('use partial cache',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use partial cache', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2', '=COUNTIFS(A1:A3, ">=1")'],
@@ -52,8 +52,8 @@ describe('Function COUNTIFS', () => {
     expect(engine.getStats().get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toEqual(1)
   })
 
-  it('use full cache',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use full cache', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0', '=COUNTIFS(A1:A3, ">=1")'],
       ['1', '=COUNTIFS(A1:A3, ">=1")'],
       ['2'],
@@ -64,8 +64,8 @@ describe('Function COUNTIFS', () => {
     expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(1)
   })
 
-  it('works for only one cell',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('works for only one cell', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', '=COUNTIFS(A1, ">=1")'],
       ['0', '=COUNTIFS(A2, ">=1")'],
     ])
@@ -74,8 +74,8 @@ describe('Function COUNTIFS', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(0)
   })
 
-  it('error when criterion unparsable',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('error when criterion unparsable', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=COUNTIFS(B1:B2, "><foo")'],
     ])
 
@@ -83,7 +83,7 @@ describe('Function COUNTIFS', () => {
   })
 
   it('scalars are treated like singular arrays', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=COUNTIFS(10, ">1")'],
       ['=COUNTIFS(0, ">1")'],
     ])
@@ -93,7 +93,7 @@ describe('Function COUNTIFS', () => {
   })
 
   it('error propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=COUNTIFS(4/0, ">1")'],
       ['=COUNTIFS(0, 4/0)'],
       ['=COUNTIFS(4/0, FOOBAR())'],
@@ -105,7 +105,7 @@ describe('Function COUNTIFS', () => {
   })
 
   it('works with range values', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['3', '5'],
       ['7', '9'],
       ['=COUNTIFS(A1:B2, ">4")'],
@@ -117,7 +117,7 @@ describe('Function COUNTIFS', () => {
   })
 
   it('works for matrices', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
       [],
@@ -128,7 +128,7 @@ describe('Function COUNTIFS', () => {
   })
 
   it('ignore errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['=4/0'],
       ['1'],

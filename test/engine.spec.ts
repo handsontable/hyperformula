@@ -289,7 +289,7 @@ describe('#getSheetDimensions', () => {
   it('should work for empty sheet', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    expect(engine.getSheetDimensions(0)).toEqual({ height: 0, width: 0})
+    expect(engine.getSheetDimensions(0)).toEqual({height: 0, width: 0})
   })
 
   it('should return sheet dimensions', () => {
@@ -298,7 +298,7 @@ describe('#getSheetDimensions', () => {
       [1, null, 1],
     ])
 
-    expect(engine.getSheetDimensions(0)).toEqual({ height: 2, width: 3})
+    expect(engine.getSheetDimensions(0)).toEqual({height: 2, width: 3})
   })
 })
 
@@ -312,10 +312,10 @@ describe('#getAllSheetsDimensions', () => {
     })
 
     expect(engine.getAllSheetsDimensions()).toEqual({
-      'Sheet1': { width: 0, height: 0},
-      'Sheet2': { width: 1, height: 1},
-      'Foo': { width: 0, height: 0},
-      'Bar': { width: 2, height: 2},
+      'Sheet1': {width: 0, height: 0},
+      'Sheet2': {width: 1, height: 1},
+      'Foo': {width: 0, height: 0},
+      'Bar': {width: 2, height: 2},
     })
   })
 })
@@ -757,7 +757,14 @@ describe('#isCellPartOfArray', () => {
 describe('dateTime', () => {
   it('dateTime', () => {
     const engine = HyperFormula.buildEmpty()
-    expect(engine.numberToDateTime(43845.1)).toEqual({'day': 15, 'hours': 2, 'minutes': 24, 'month': 1, 'seconds': 0, 'year': 2020})
+    expect(engine.numberToDateTime(43845.1)).toEqual({
+      'day': 15,
+      'hours': 2,
+      'minutes': 24,
+      'month': 1,
+      'seconds': 0,
+      'year': 2020
+    })
     expect(engine.numberToDate(43845)).toEqual({'day': 15, 'month': 1, 'year': 2020})
     expect(engine.numberToTime(1.1)).toEqual({'hours': 26, 'minutes': 24, 'seconds': 0})
   })
@@ -808,7 +815,7 @@ describe('#getFillRangeData from corner source', () => {
     const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('A1'), 3, 3))
-    ).toEqual([['2', '=$A$1', '2'], ['=#REF!', 1, '=A1'], ['2', '=$A$1', '2'] ])
+    ).toEqual([['2', '=$A$1', '2'], ['=#REF!', 1, '=A1'], ['2', '=$A$1', '2']])
   })
 })
 
@@ -838,10 +845,10 @@ describe('#getFillRangeData from target source', () => {
 describe('#getFillRangeData', () => {
   it('should move between sheets - sheet relative addresses', () => {
     const engine = HyperFormula.buildFromSheets({
-      'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
-      'Sheet2': [],
-    }
-  )
+        'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
+        'Sheet2': [],
+      }
+    )
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2', 0), 2, 2), AbsoluteCellRange.spanFrom(adr('C3', 1), 3, 3))
     ).toEqual([['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']])

@@ -18,13 +18,13 @@ describe('Function NPER', () => {
       ['=NPER(100%, -50, 100, 0, 1)', '=NPER(100%, -50, 100, -100, 1)', '=NPER(-100%, 1, 100, 1, 1)', '=NPER(-200%, 1, 100, 1, 1)'],
       ['=NPER(-20%, -50, 100, 300, 1)', ],
       ['=NPER(0%, -50, 100, 300, 1)', ],
-      ['=NPER(0%, 0, 100, 100, 1)', '=NPER(0%, 0, 100, -100, 1)' ],
-      ['=NPER(1%, 0, 100, 100, 1)', '=NPER(1%, 0, 100, -50, 1)' ],
+      ['=NPER(0%, 0, 100, 100, 1)', '=NPER(0%, 0, 100, -100, 1)'],
+      ['=NPER(1%, 0, 100, 100, 1)', '=NPER(1%, 0, 100, -50, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-70.67076731)
-    expect(engine.getCellValue(adr('B1'))).toBeCloseTo( -70.16196068)
-    expect(engine.getCellValue(adr('C1'))).toBeCloseTo( -70.16196068)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-70.16196068)
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-70.16196068)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
     expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
     expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))

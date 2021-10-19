@@ -37,7 +37,7 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
     return undefined
   }
 
-  if(sheet === null) {
+  if (sheet === null) {
     sheet = undefined
   }
 
@@ -45,7 +45,7 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
   if (result[5] === ABSOLUTE_OPERATOR && result[7] === ABSOLUTE_OPERATOR) {
     return CellAddress.absolute(col, row, sheet)
   } else if (result[5] === ABSOLUTE_OPERATOR) {
-    return CellAddress.absoluteCol( col, row - baseAddress.row, sheet)
+    return CellAddress.absoluteCol(col, row - baseAddress.row, sheet)
   } else if (result[7] === ABSOLUTE_OPERATOR) {
     return CellAddress.absoluteRow(col - baseAddress.col, row, sheet)
   } else {
@@ -61,7 +61,7 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
     return undefined
   }
 
-  if(sheet === null) {
+  if (sheet === null) {
     sheet = undefined
   }
 
@@ -82,7 +82,7 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
     return undefined
   }
 
-  if(sheet === null) {
+  if (sheet === null) {
     sheet = undefined
   }
 
@@ -125,19 +125,19 @@ export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, string
 
 export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): Maybe<SimpleCellRange> => {
   const split = stringAddress.split(RANGE_OPERATOR)
-  if(split.length !== 2) {
+  if (split.length !== 2) {
     return undefined
   }
   const [startString, endString] = split
   const start = simpleCellAddressFromString(sheetMapping, startString, sheetContext)
-  if(start === undefined) {
+  if (start === undefined) {
     return undefined
   }
   const end = simpleCellAddressFromString(sheetMapping, endString, start.sheet)
-  if(end === undefined) {
+  if (end === undefined) {
     return undefined
   }
-  if(start.sheet !== end.sheet) {
+  if (start.sheet !== end.sheet) {
     return undefined
   }
   return simpleCellRange(start, end)
@@ -169,7 +169,7 @@ export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn
 export const simpleCellRangeToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellRange, sheetIndex: number): Maybe<string> => {
   const startString = simpleCellAddressToString(sheetIndexMapping, address.start, sheetIndex)
   const endString = simpleCellAddressToString(sheetIndexMapping, address.end, address.start.sheet)
-  if(startString === undefined || endString === undefined) {
+  if (startString === undefined || endString === undefined) {
     return undefined
   } else {
     return `${startString}${RANGE_OPERATOR}${endString}`
@@ -177,11 +177,11 @@ export const simpleCellRangeToString = (sheetIndexMapping: SheetIndexMappingFn, 
 }
 
 /**
-* Convert column label to index
-*
-* @param columnStringRepresentation - column label (e.g. 'AAB')
-* @returns column index
-* */
+ * Convert column label to index
+ *
+ * @param columnStringRepresentation - column label (e.g. 'AAB')
+ * @returns column index
+ * */
 function columnLabelToIndex(columnStringRepresentation: string): number {
   if (columnStringRepresentation.length === 1) {
     return columnStringRepresentation.toUpperCase().charCodeAt(0) - 65

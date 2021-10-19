@@ -53,7 +53,6 @@ describe('Function CODE', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(209)
   })
 
-
   it('should return number', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CODE("foo")']

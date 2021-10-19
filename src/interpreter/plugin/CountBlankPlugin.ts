@@ -11,7 +11,7 @@ import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './Function
 /**
  * Interpreter plugin containing MEDIAN function
  */
-export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountBlankPlugin>{
+export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountBlankPlugin> {
 
   public static implementedFunctions = {
     'COUNTBLANK': {
@@ -28,7 +28,7 @@ export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTy
     return this.runFunction(ast.args, state, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
       let counter = 0
       args.forEach((arg) => {
-        if(arg === EmptyValue) {
+        if (arg === EmptyValue) {
           counter++
         }
       })

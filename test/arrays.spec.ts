@@ -49,9 +49,9 @@ describe('without arrayformula, with useArrayArithmetic flag', () => {
         [1, 2, 3],
         [4, 5, 6],
         [7, 8, 9],
-      [2, 4, detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!C4')],
-      [8, 10, detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!C5')],
-      [detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A6'), detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!B6'), detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!C6')]])
+        [2, 4, detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!C4')],
+        [8, 10, detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!C5')],
+        [detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A6'), detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!B6'), detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!C6')]])
   })
 
   it('match', () => {
@@ -490,9 +490,9 @@ describe('column ranges', () => {
 
   it('sumproduct test', () => {
     const engine = HyperFormula.buildFromArray([
-      [1, 1, 3, '=SUMPRODUCT((A:A=1)*(B:B=1), C:C)'],
-      [1, 2, 3],
-      [3, 1, 3],
+        [1, 1, 3, '=SUMPRODUCT((A:A=1)*(B:B=1), C:C)'],
+        [1, 2, 3],
+        [3, 1, 3],
       ], {useArrayArithmetic: true}
     )
 

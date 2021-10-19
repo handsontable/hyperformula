@@ -19,12 +19,12 @@ export class RemoveColumnsTransformer extends Transformer {
     super()
   }
 
-  public isIrreversible() {
-    return true
-  }
-
   public get sheet(): number {
     return this.columnsSpan.sheet
+  }
+
+  public isIrreversible() {
+    return true
   }
 
   protected transformRowRangeAst(ast: RowRangeAst, _formulaAddress: SimpleCellAddress): Ast {

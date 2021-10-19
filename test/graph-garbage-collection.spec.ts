@@ -56,7 +56,7 @@ function randomInteger(min: number, max: number) {
 
 describe('larger tests', () => {
 
-  it( 'large fixed', () => {
+  it('large fixed', () => {
     const arr = [
       [
         '=SUM(B2:C4)',
@@ -70,8 +70,8 @@ describe('larger tests', () => {
       ],
     ]
     const engine = HyperFormula.buildFromArray(arr)
-    for(let x=0; x<3; x++) {
-      for(let y=0; y<3; y++) {
+    for (let x = 0; x < 3; x++) {
+      for (let y = 0; y < 3; y++) {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
@@ -96,8 +96,8 @@ describe('larger tests', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it( 'large fixed #3', () => {
-    const arr =     [
+  it('large fixed #3', () => {
+    const arr = [
       [
         '=SUM(A1:B1)',
       ],
@@ -110,8 +110,8 @@ describe('larger tests', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it( 'large fixed #4', () => {
-    const arr =     [
+  it('large fixed #4', () => {
+    const arr = [
       [
         null, '=SUM(A1:A1)', '=SUM(A1:A2)', '=SUM(A1:A3)', '=SUM(A1:A4)',
       ],
@@ -129,7 +129,7 @@ describe('larger tests', () => {
 
   it('repeat the same crud', () => {
     const engine = HyperFormula.buildFromArray([])
-    for(let tmp = 0; tmp < 3; tmp++) {
+    for (let tmp = 0; tmp < 3; tmp++) {
       for (let x = 0; x < 10; x++) {
         for (let y = 0; y < 10; y++) {
           const col1 = randomInteger(2, 7)
@@ -151,8 +151,8 @@ describe('larger tests', () => {
         }
       }
     }
-    for(let x=0; x<10; x++) {
-      for(let y=0; y<10; y++) {
+    for (let x = 0; x < 10; x++) {
+      for (let y = 0; y < 10; y++) {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
@@ -314,12 +314,12 @@ describe('cruds', () => {
 
   it('movecell', () => {
     const engine = HyperFormula.buildFromArray([
-    [1],
-    [2],
-    [3],
-    [4],
-    ['=SUM(A1:A3)'],
-    ['=SUM(A1:A4)'],
+      [1],
+      [2],
+      [3],
+      [4],
+      ['=SUM(A1:A3)'],
+      ['=SUM(A1:A4)'],
     ])
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3), adr('B1'))
     engine.setCellContents(adr('B1'), null)

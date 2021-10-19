@@ -22,8 +22,8 @@ describe('Function CSCH', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="-1"', '=CSCH(A1)'],
     ])
 
@@ -31,7 +31,7 @@ describe('Function CSCH', () => {
   })
 
   it('div/zero', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       [0, '=CSCH(A1)'],
     ])
 
@@ -39,7 +39,7 @@ describe('Function CSCH', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=CSCH(4/0)'],
     ])
 

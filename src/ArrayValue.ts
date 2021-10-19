@@ -46,17 +46,17 @@ export class ArrayValue implements IArray {
   public size: ArraySize
   private readonly array: InternalScalarValue[][]
 
+  constructor(array: InternalScalarValue[][]) {
+    this.size = new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
+    this.array = array
+  }
+
   static fromInterpreterValue(value: InterpreterValue) {
     if (value instanceof SimpleRangeValue) {
       return new ArrayValue(value.data)
     } else {
       return new ArrayValue([[value]])
     }
-  }
-
-  constructor(array: InternalScalarValue[][]) {
-    this.size = new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
-    this.array = array
   }
 
   simpleRangeValue(): SimpleRangeValue {
@@ -130,16 +130,16 @@ export class ArrayValue implements IArray {
   }
 
   public resize(newSize: ArraySize) {
-    if(this.height() < newSize.height && isFinite(newSize.height)) {
-      this.addRows(this.height(), newSize.height-this.height())
+    if (this.height() < newSize.height && isFinite(newSize.height)) {
+      this.addRows(this.height(), newSize.height - this.height())
     }
-    if(this.height() > newSize.height) {
+    if (this.height() > newSize.height) {
       throw 'Resizing to smaller array'
     }
-    if(this.width() < newSize.width && isFinite(newSize.width)) {
-      this.addColumns(this.width(), newSize.width-this.width())
+    if (this.width() < newSize.width && isFinite(newSize.width)) {
+      this.addColumns(this.width(), newSize.width - this.width())
     }
-    if(this.width() > newSize.width) {
+    if (this.width() > newSize.width) {
       throw 'Resizing to smaller array'
     }
   }

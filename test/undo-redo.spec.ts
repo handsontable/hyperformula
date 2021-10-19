@@ -456,7 +456,7 @@ describe('Undo - removing sheet', () => {
 
 describe('Undo - renaming sheet', () => {
   it('undo previous operation if name not changes', () => {
-    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
     engine.setCellContents(adr('A1'), [[2]])
     engine.renameSheet(0, 'Sheet1')
 
@@ -467,7 +467,7 @@ describe('Undo - renaming sheet', () => {
   })
 
   it('undo rename sheet', () => {
-    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
     engine.renameSheet(0, 'Foo')
 
     engine.undo()
@@ -859,7 +859,7 @@ describe('Undo', () => {
   it('keeps elements within limit', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-    ], { undoLimit: 3 })
+    ], {undoLimit: 3})
     engine.setCellContents(adr('A1'), '2')
     engine.setCellContents(adr('A1'), '3')
     engine.setCellContents(adr('A1'), '4')
@@ -875,7 +875,7 @@ describe('Undo', () => {
   it('undo limit works with infinity', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
-    ], { undoLimit: Infinity })
+    ], {undoLimit: Infinity})
     engine.setCellContents(adr('A1'), '2')
     engine.setCellContents(adr('A1'), '3')
     engine.setCellContents(adr('A1'), '4')
@@ -1273,7 +1273,7 @@ describe('Redo - adding sheet', () => {
 
 describe('Redo - renaming sheet', () => {
   it('redo rename sheet', () => {
-    const engine = HyperFormula.buildFromSheets({ 'Sheet1': [[1]] })
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
     engine.renameSheet(0, 'Foo')
     engine.undo()
 

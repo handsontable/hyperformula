@@ -3,7 +3,6 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
@@ -14,7 +13,7 @@ import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './Function
 /**
  * Interpreter plugin containing boolean functions
  */
-export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BooleanPlugin>{
+export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BooleanPlugin> {
   public static implementedFunctions = {
     'TRUE': {
       method: 'literalTrue',
@@ -27,71 +26,71 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'IF': {
       method: 'conditionalIf',
       parameters: [
-          {argumentType: ArgumentTypes.BOOLEAN},
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-          {argumentType: ArgumentTypes.SCALAR, defaultValue: false, passSubtype: true},
-        ],
+        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: ArgumentTypes.SCALAR, defaultValue: false, passSubtype: true},
+      ],
     },
     'AND': {
       method: 'and',
       parameters: [
-          {argumentType: ArgumentTypes.BOOLEAN},
-        ],
-        repeatLastArgs: 1,
-        expandRanges: true,
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
     'OR': {
       method: 'or',
       parameters: [
-          {argumentType: ArgumentTypes.BOOLEAN},
-        ],
-        repeatLastArgs: 1,
-        expandRanges: true,
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
     'XOR': {
       method: 'xor',
       parameters: [
-          {argumentType: ArgumentTypes.BOOLEAN},
-        ],
-        repeatLastArgs: 1,
-        expandRanges: true,
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
     'NOT': {
       method: 'not',
-      parameters:  [
-          {argumentType: ArgumentTypes.BOOLEAN},
-        ]
+      parameters: [
+        {argumentType: ArgumentTypes.BOOLEAN},
+      ]
     },
     'SWITCH': {
       method: 'switch',
       parameters: [
-          {argumentType: ArgumentTypes.NOERROR},
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        ],
+        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+      ],
       repeatLastArgs: 1,
     },
     'IFERROR': {
       method: 'iferror',
-      parameters:  [
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        ]
+      parameters: [
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+      ]
     },
     'IFNA': {
       method: 'ifna',
       parameters: [
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        ]
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+      ]
     },
     'CHOOSE': {
       method: 'choose',
-      parameters:  [
-          {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-          {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        ],
-        repeatLastArgs: 1,
+      parameters: [
+        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
+        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+      ],
+      repeatLastArgs: 1,
     },
   }
 

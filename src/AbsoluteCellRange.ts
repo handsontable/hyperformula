@@ -27,7 +27,7 @@ export interface SimpleCellRange {
 }
 
 export function isSimpleCellRange(obj: any): obj is SimpleCellRange {
-  if( obj && (typeof obj === 'object' || typeof obj === 'function')) {
+  if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'start' in obj && isSimpleCellAddress(obj.start) && 'end' in obj && isSimpleCellAddress(obj.end)
   } else {
     return false
@@ -39,6 +39,17 @@ export const simpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress
 export class AbsoluteCellRange implements SimpleCellRange {
   public readonly start: SimpleCellAddress
   public readonly end: SimpleCellAddress
+
+  constructor(
+    start: SimpleCellAddress,
+    end: SimpleCellAddress,
+  ) {
+    if (start.sheet !== end.sheet) {
+      throw new SheetsNotEqual(start.sheet, end.sheet)
+    }
+    this.start = simpleCellAddress(start.sheet, start.col, start.row)
+    this.end = simpleCellAddress(end.sheet, end.col, end.row)
+  }
 
   public get sheet() {
     return this.start.sheet
@@ -71,7 +82,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
 
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
     const ret = AbsoluteCellRange.spanFromOrUndef(topLeftCorner, width, height)
-    if(ret === undefined) {
+    if (ret === undefined) {
       throw new Error(WRONG_RANGE_SIZE)
     }
     return ret
@@ -79,12 +90,12 @@ export class AbsoluteCellRange implements SimpleCellRange {
 
   public static spanFromOrUndef(topLeftCorner: SimpleCellAddress, width: number, height: number): Maybe<AbsoluteCellRange> {
     if (!Number.isFinite(width) && Number.isFinite(height)) {
-      if(topLeftCorner.col !== 0) {
+      if (topLeftCorner.col !== 0) {
         return undefined
       }
       return new AbsoluteRowRange(topLeftCorner.sheet, topLeftCorner.row, topLeftCorner.row + height - 1)
     } else if (!Number.isFinite(height) && Number.isFinite(width)) {
-      if(topLeftCorner.row !== 0) {
+      if (topLeftCorner.row !== 0) {
         return undefined
       }
       return new AbsoluteColumnRange(topLeftCorner.sheet, topLeftCorner.col, topLeftCorner.col + width - 1)
@@ -99,17 +110,6 @@ export class AbsoluteCellRange implements SimpleCellRange {
 
   public static fromCoordinates(sheet: number, x1: number, y1: number, x2: number, y2: number): AbsoluteCellRange {
     return new AbsoluteCellRange(simpleCellAddress(sheet, x1, y1), simpleCellAddress(sheet, x2, y2))
-  }
-
-  constructor(
-    start: SimpleCellAddress,
-    end: SimpleCellAddress,
-  ) {
-    if (start.sheet !== end.sheet) {
-      throw new SheetsNotEqual(start.sheet, end.sheet)
-    }
-    this.start = simpleCellAddress(start.sheet, start.col, start.row)
-    this.end = simpleCellAddress(end.sheet, end.col, end.row)
   }
 
   public isFinite(): boolean {
@@ -217,40 +217,6 @@ export class AbsoluteCellRange implements SimpleCellRange {
     } else {
       this.removeColumns(span.start, span.end)
     }
-  }
-
-  protected removeRows(rowStart: number, rowEnd: number) {
-    if (rowStart > this.end.row) {
-      return
-    }
-
-    if (rowEnd < this.start.row) {
-      const numberOfRows = rowEnd - rowStart + 1
-      return this.shiftByRows(-numberOfRows)
-    }
-
-    if (rowStart <= this.start.row) {
-      this.start.row = rowStart
-    }
-
-    this.end.row -= Math.min(rowEnd, this.end.row) - rowStart + 1
-  }
-
-  protected removeColumns(columnStart: number, columnEnd: number) {
-    if (columnStart > this.end.col) {
-      return
-    }
-
-    if (columnEnd < this.start.col) {
-      const numberOfColumns = columnEnd - columnStart + 1
-      return this.shiftByColumns(-numberOfColumns)
-    }
-
-    if (columnStart <= this.start.col) {
-      this.start.col = columnStart
-    }
-
-    this.end.col -= Math.min(columnEnd, this.end.col) - columnStart + 1
   }
 
   public shouldBeRemoved(): boolean {
@@ -411,9 +377,50 @@ export class AbsoluteCellRange implements SimpleCellRange {
   public effectiveHeight(_dependencyGraph: DependencyGraph): number {
     return this.height()
   }
+
+  protected removeRows(rowStart: number, rowEnd: number) {
+    if (rowStart > this.end.row) {
+      return
+    }
+
+    if (rowEnd < this.start.row) {
+      const numberOfRows = rowEnd - rowStart + 1
+      return this.shiftByRows(-numberOfRows)
+    }
+
+    if (rowStart <= this.start.row) {
+      this.start.row = rowStart
+    }
+
+    this.end.row -= Math.min(rowEnd, this.end.row) - rowStart + 1
+  }
+
+  protected removeColumns(columnStart: number, columnEnd: number) {
+    if (columnStart > this.end.col) {
+      return
+    }
+
+    if (columnEnd < this.start.col) {
+      const numberOfColumns = columnEnd - columnStart + 1
+      return this.shiftByColumns(-numberOfColumns)
+    }
+
+    if (columnStart <= this.start.col) {
+      this.start.col = columnStart
+    }
+
+    this.end.col -= Math.min(columnEnd, this.end.col) - columnStart + 1
+  }
 }
 
 export class AbsoluteColumnRange extends AbsoluteCellRange {
+  constructor(sheet: number, columnStart: number, columnEnd: number) {
+    super(
+      simpleCellAddress(sheet, columnStart, 0),
+      simpleCellAddress(sheet, columnEnd, Number.POSITIVE_INFINITY),
+    )
+  }
+
   public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
     const start = x.start.toSimpleColumnAddress(baseAddress)
     const end = x.end.toSimpleColumnAddress(baseAddress)
@@ -421,13 +428,6 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
       throw new SheetsNotEqual(start.sheet, end.sheet)
     }
     return new AbsoluteColumnRange(start.sheet, start.col, end.col)
-  }
-
-  constructor(sheet: number, columnStart: number, columnEnd: number) {
-    super(
-      simpleCellAddress(sheet, columnStart, 0),
-      simpleCellAddress(sheet, columnEnd, Number.POSITIVE_INFINITY),
-    )
   }
 
   public shouldBeRemoved() {
@@ -446,10 +446,6 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return new AbsoluteColumnRange(this.sheet, this.start.col + byCols, this.end.col + byCols)
   }
 
-  protected removeRows(_rowStart: number, _rowEnd: number) {
-    return
-  }
-
   public rangeWithSameHeight(startColumn: number, numberOfColumns: number): AbsoluteCellRange {
     return new AbsoluteColumnRange(this.sheet, startColumn, startColumn + numberOfColumns - 1)
   }
@@ -465,9 +461,20 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
   public effectiveHeight(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetHeight(this.sheet)
   }
+
+  protected removeRows(_rowStart: number, _rowEnd: number) {
+    return
+  }
 }
 
 export class AbsoluteRowRange extends AbsoluteCellRange {
+  constructor(sheet: number, rowStart: number, rowEnd: number) {
+    super(
+      simpleCellAddress(sheet, 0, rowStart),
+      simpleCellAddress(sheet, Number.POSITIVE_INFINITY, rowEnd),
+    )
+  }
+
   public static fromRowRangeAst(x: RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
     const start = x.start.toSimpleRowAddress(baseAddress)
     const end = x.end.toSimpleRowAddress(baseAddress)
@@ -475,13 +482,6 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
       throw new SheetsNotEqual(start.sheet, end.sheet)
     }
     return new AbsoluteRowRange(start.sheet, start.row, end.row)
-  }
-
-  constructor(sheet: number, rowStart: number, rowEnd: number) {
-    super(
-      simpleCellAddress(sheet, 0, rowStart),
-      simpleCellAddress(sheet, Number.POSITIVE_INFINITY, rowEnd),
-    )
   }
 
   public shouldBeRemoved() {
@@ -500,10 +500,6 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, this.start.row + byRows, this.end.row + byRows)
   }
 
-  protected removeColumns(_columnStart: number, _columnEnd: number) {
-    return
-  }
-
   public rangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, startRow, startRow + numberOfRows - 1)
   }
@@ -513,10 +509,14 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
   }
 
   public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
-    return this.effectiveWidth(dependencyGraph)-1
+    return this.effectiveWidth(dependencyGraph) - 1
   }
 
   public effectiveWidth(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetWidth(this.sheet)
+  }
+
+  protected removeColumns(_columnStart: number, _columnEnd: number) {
+    return
   }
 }

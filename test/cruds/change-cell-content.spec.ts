@@ -1050,7 +1050,7 @@ describe('arrays', () => {
   })
 
   it('should return values of a range in changes', () => {
-    const engine = HyperFormula.buildFromArray([[1, 2]], { useArrayArithmetic: true})
+    const engine = HyperFormula.buildFromArray([[1, 2]], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
 
@@ -1063,7 +1063,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
-    ], { useArrayArithmetic: true})
+    ], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('A2'), [['foo']])
 
@@ -1076,7 +1076,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
-    ], { useArrayArithmetic: true})
+    ], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('B2'), [['foo']])
 
@@ -1090,7 +1090,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
-    ], { useArrayArithmetic: true})
+    ], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('B2'), [['=SUM(']])
 
@@ -1104,7 +1104,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
-    ], { useArrayArithmetic: true})
+    ], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('A2'), null)
 
@@ -1117,7 +1117,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
-    ], { useArrayArithmetic: true})
+    ], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('B2'), null)
 
@@ -1128,7 +1128,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
-    ], { useArrayArithmetic: true})
+    ], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('A2'), [['=+A1:B1']])
 
@@ -1142,7 +1142,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
-    ], { useArrayArithmetic: true})
+    ], {useArrayArithmetic: true})
 
     const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
 
