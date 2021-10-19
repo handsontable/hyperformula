@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2021-10-20
+
 ### Added
 - Added static property `defaultConfig`. (#822)
 - Support for `getFillRangeData` using different sheets as source and target. (#836)
