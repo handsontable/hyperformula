@@ -51,7 +51,7 @@ lets you design your own [custom functions](custom-functions).
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/1.2.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/1.3.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: built-in-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -244,15 +244,15 @@ Total number of functions: **{{ $page.functionsCount }}**
 | :--- | :--- | :--- |
 | ABS | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
-| ACOSH | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
+| ACOSH | Returns the inverse hyperbolic cosine of a number. | ACOSH(Number) |
 | ACOT | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
-| ACOTH | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
+| ACOTH | Returns the inverse hyperbolic cotangent of a number. | ACOTH(Number) |
 | ARABIC | Converts number from roman form. | ARABIC(String) |
 | ASIN | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
-| ASINH | Returns the inverse harmonic sine of a number. | ASINH(Number) |
+| ASINH | Returns the inverse hyperbolic sine of a number. | ASINH(Number) |
 | ATAN | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
 | ATAN2 | Returns the inverse trigonometric tangent of the specified x and y coordinates. | ATAN2(Numberx; Numbery) |
-| ATANH | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
+| ATANH | Returns the inverse hyperbolic tangent of a number. | ATANH(Number) |
 | BASE | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance) |
 | CEILING.MATH | Rounds a number up to the nearest multiple of Significance. | CEILING.MATH(Number[; Significance[; Mode]]) |

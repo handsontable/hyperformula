@@ -130,13 +130,13 @@ export class ArrayValue implements IArray {
   }
 
   public resize(newSize: ArraySize) {
-    if(this.height() < newSize.height) {
+    if(this.height() < newSize.height && isFinite(newSize.height)) {
       this.addRows(this.height(), newSize.height-this.height())
     }
     if(this.height() > newSize.height) {
       throw 'Resizing to smaller array'
     }
-    if(this.width() < newSize.width) {
+    if(this.width() < newSize.width && isFinite(newSize.width)) {
       this.addColumns(this.width(), newSize.width-this.width())
     }
     if(this.width() > newSize.width) {

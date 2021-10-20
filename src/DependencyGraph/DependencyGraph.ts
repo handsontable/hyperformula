@@ -440,7 +440,11 @@ export class DependencyGraph {
   }
 
   public isThereSpaceForArray(arrayVertex: ArrayVertex): boolean {
-    for (const address of arrayVertex.getRange().addresses(this)) {
+    const range = arrayVertex.getRangeOrUndef()
+    if(range===undefined) {
+      return false
+    }
+    for (const address of range.addresses(this)) {
       const vertexUnderAddress = this.addressMapping.getCell(address)
       if (vertexUnderAddress !== undefined && !(vertexUnderAddress instanceof EmptyCellVertex) && vertexUnderAddress !== arrayVertex) {
         return false
@@ -978,7 +982,10 @@ export class DependencyGraph {
       return
     }
 
-    const range = AbsoluteCellRange.spanFrom(formulaAddress, vertex.width, vertex.height)
+    const range = AbsoluteCellRange.spanFromOrUndef(formulaAddress, vertex.width, vertex.height)
+    if(range === undefined) {
+      return
+    }
     this.setArray(range, vertex)
 
     if (!this.isThereSpaceForArray(vertex)) {

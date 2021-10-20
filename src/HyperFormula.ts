@@ -19,7 +19,7 @@ import {
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
-import {Config, ConfigParams} from './Config'
+import {Config, ConfigParams, getDefaultConfig} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {
@@ -303,6 +303,21 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput, namedExpressions))
+  }
+
+  /**
+   * Returns all of HyperFormula's default [configuration options](../../guide/configuration-options.md).
+   *
+   * @example
+   * ```js
+   * // returns all default configuration options
+   * const defaultConfig = HyperFormula.defaultConfig;
+   * ```
+   *
+   * @category Static Properties
+   */
+  public static get defaultConfig(): ConfigParams {
+    return getDefaultConfig()
   }
 
   private static registeredLanguages: Map<string, TranslationPackage> = new Map()
@@ -2400,7 +2415,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {SimpleCellRange} target range where data is intended to be put
    * @param {boolean} offsetsFromTarget if true, offsets are computed from target corner, otherwise from source corner
    *
-   * @throws [[SheetsNotEqual]] if both ranges are not from the same sheet
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    * @throws [[ExpectedValueOfTypeError]] if source or target are of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
@@ -2425,16 +2439,13 @@ export class HyperFormula implements TypedEmitter {
     }
     const sourceRange = new AbsoluteCellRange(source.start, source.end)
     const targetRange = new AbsoluteCellRange(target.start, target.end)
-    if (sourceRange.sheet !== targetRange.sheet) {
-      throw new SheetsNotEqual(sourceRange.sheet, targetRange.sheet)
-    }
     this.ensureEvaluationIsNotSuspended()
     return targetRange.arrayOfAddressesInRange().map(
       (subarray) => subarray.map(
         (address) => {
           const row = ((address.row - (offsetsFromTarget ? target : source).start.row) % sourceRange.height() + sourceRange.height()) % sourceRange.height() + source.start.row
           const col = ((address.col - (offsetsFromTarget ? target : source).start.col) % sourceRange.width() + sourceRange.width()) % sourceRange.width() + source.start.col
-          return this._serialization.getCellSerialized({row, col, sheet: targetRange.sheet}, address)
+          return this._serialization.getCellSerialized({row, col, sheet: sourceRange.sheet}, address)
         }
       )
     )

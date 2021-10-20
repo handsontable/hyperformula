@@ -834,3 +834,38 @@ describe('#getFillRangeData from target source', () => {
     ).toEqual([[1, '=#REF!', 1], ['=$A$1', '2', '=$A$1'], [1, '=#REF!', 1]])
   })
 })
+
+describe('#getFillRangeData', () => {
+  it('should move between sheets - sheet relative addresses', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
+      'Sheet2': [],
+    }
+  )
+
+    expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2', 0), 2, 2), AbsoluteCellRange.spanFrom(adr('C3', 1), 3, 3))
+    ).toEqual([['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']])
+  })
+
+  it('should move between sheets - sheet absolute addresses', () => {
+    const engine = HyperFormula.buildFromSheets({
+        'Sheet1': [[], [undefined, 1, '=Sheet1!A1'], [undefined, '=Sheet2!$A$1', '2']],
+        'Sheet2': [],
+      }
+    )
+
+    expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2', 0), 2, 2), AbsoluteCellRange.spanFrom(adr('C3', 1), 3, 3))
+    ).toEqual([['2', '=Sheet2!$A$1', '2'], ['=Sheet1!A3', 1, '=Sheet1!C3'], ['2', '=Sheet2!$A$1', '2']])
+  })
+
+  it('should move between sheets - no sheet of a given name', () => {
+    const engine = HyperFormula.buildFromSheets({
+        'Sheet1': [],
+      }
+    )
+
+    expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2', 0), 1, 1), AbsoluteCellRange.spanFrom(adr('C3', 1), 1, 1))
+    ).toEqual([[null]])
+  })
+
+})
