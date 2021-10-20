@@ -20,7 +20,6 @@ describe('Unparse', () => {
   const namedExpressions = new NamedExpressions()
   const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, namedExpressions)
 
-
   beforeEach(() => {
     unregisterAllLanguages()
     HyperFormula.registerLanguage(plPL.langCode, plPL)
@@ -411,7 +410,7 @@ describe('Unparse', () => {
   })
 
   it('unparsing numbers with decimal separator', () => {
-    const config = new Config({ decimalSeparator: ',', functionArgSeparator: ';' })
+    const config = new Config({decimalSeparator: ',', functionArgSeparator: ';'})
     const lexerConfig = buildLexerConfig(config)
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')

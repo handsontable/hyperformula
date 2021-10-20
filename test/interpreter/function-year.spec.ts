@@ -33,7 +33,7 @@ describe('Function YEAR', () => {
   })
 
   it('use datenumber coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=YEAR(TRUE())'],
       ['=YEAR(1)'],
     ])
@@ -43,7 +43,7 @@ describe('Function YEAR', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=YEAR(4/0)'],
     ])
 

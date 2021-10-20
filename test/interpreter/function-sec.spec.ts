@@ -24,8 +24,8 @@ describe('Function SEC', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="-1"', '=SEC(A1)'],
     ])
 
@@ -33,7 +33,7 @@ describe('Function SEC', () => {
   })
 
   it('close to div/zero', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       [1.57079632679486, '=SEC(A1)'],
     ])
 
@@ -41,7 +41,7 @@ describe('Function SEC', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=SEC(4/0)'],
     ])
 

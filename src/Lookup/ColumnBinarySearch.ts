@@ -24,30 +24,47 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars 
-  public add(value: RawScalarValue, address: SimpleCellAddress): void {}
+  public add(value: RawScalarValue, address: SimpleCellAddress): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public remove(value: RawScalarValue | undefined, address: SimpleCellAddress): void {}
+  public remove(value: RawScalarValue | undefined, address: SimpleCellAddress): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public change(oldValue: RawScalarValue | undefined, newValue: RawScalarValue, address: SimpleCellAddress): void {}
+  public change(oldValue: RawScalarValue | undefined, newValue: RawScalarValue, address: SimpleCellAddress): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public applyChanges(contentChanges: CellValueChange[]): void {}
+  public applyChanges(contentChanges: CellValueChange[]): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public addColumns(columnsSpan: ColumnsSpan): void {}
+  public addColumns(columnsSpan: ColumnsSpan): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public removeColumns(columnsSpan: ColumnsSpan): void {}
+  public removeColumns(columnsSpan: ColumnsSpan): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public removeSheet(sheetId: number): void {}
+  public removeSheet(sheetId: number): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public moveValues(sourceRange: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {}
+  public moveValues(sourceRange: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void {
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {}
+  public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {
+  }
 
   public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
-    if(typeof key === 'string') {
+    if (typeof key === 'string') {
       key = forceNormalizeString(key)
     }
     const range = rangeValue.range
-    if(range === undefined) {
+    if (range === undefined) {
       return rangeValue.valuesFromTopLeftCorner().map(getRawValue).map(arg =>
         (typeof arg === 'string') ? forceNormalizeString(arg) : arg
       ).indexOf(key)

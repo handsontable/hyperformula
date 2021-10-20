@@ -13,6 +13,24 @@ import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 export class SimpleRangeValue {
   public readonly size: ArraySize
 
+  constructor(
+    private _data?: InternalScalarValue[][],
+    public readonly range?: AbsoluteCellRange,
+    private readonly dependencyGraph?: DependencyGraph,
+    private _hasOnlyNumbers?: boolean,
+  ) {
+    if (_data === undefined) {
+      this.size = new ArraySize(range!.effectiveWidth(dependencyGraph!), range!.effectiveHeight(dependencyGraph!))
+    } else {
+      this.size = new ArraySize(_data[0].length, _data.length)
+    }
+  }
+
+  public get data(): InternalScalarValue[][] {
+    this.ensureThatComputed()
+    return this._data!
+  }
+
   public static fromRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
   }
@@ -33,19 +51,6 @@ export class SimpleRangeValue {
     return new SimpleRangeValue([[scalar]], undefined, undefined, undefined)
   }
 
-  constructor(
-    private _data?: InternalScalarValue[][],
-    public readonly range?: AbsoluteCellRange,
-    private readonly dependencyGraph?: DependencyGraph,
-    private _hasOnlyNumbers?: boolean,
-  ) {
-    if (_data === undefined) {
-      this.size = new ArraySize(range!.width(), range!.height())
-    } else {
-      this.size = new ArraySize(_data[0].length, _data.length)
-    }
-  }
-
   public isAdHoc(): boolean {
     return this.range === undefined
   }
@@ -56,31 +61,6 @@ export class SimpleRangeValue {
 
   public height(): number {
     return this.size.height //should be equal to this.data.length
-  }
-
-  public get data(): InternalScalarValue[][] {
-    this.ensureThatComputed()
-    return this._data!
-  }
-
-  private ensureThatComputed() {
-    if (this._data !== undefined) {
-      return
-    }
-    this._hasOnlyNumbers = true
-    this._data = this.range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
-      const value = this.dependencyGraph!.getCellValue(cellFromRange)
-      if (value instanceof SimpleRangeValue) {
-        this._hasOnlyNumbers = false
-        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
-      } else if (isExtendedNumber(value)) {
-        return value as InternalScalarValue
-      } else {
-        this._hasOnlyNumbers = false
-        return value as InternalScalarValue
-      }
-    })
-
   }
 
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
@@ -149,5 +129,25 @@ export class SimpleRangeValue {
 
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
     return this.width() === other.width() && this.height() === other.height()
+  }
+
+  private ensureThatComputed() {
+    if (this._data !== undefined) {
+      return
+    }
+    this._hasOnlyNumbers = true
+    this._data = this.range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
+      const value = this.dependencyGraph!.getCellValue(cellFromRange)
+      if (value instanceof SimpleRangeValue) {
+        this._hasOnlyNumbers = false
+        return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
+      } else if (isExtendedNumber(value)) {
+        return value as InternalScalarValue
+      } else {
+        this._hasOnlyNumbers = false
+        return value as InternalScalarValue
+      }
+    })
+
   }
 }

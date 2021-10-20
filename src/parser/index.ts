@@ -60,7 +60,7 @@ export {
   buildCellErrorAst,
 } from './Ast'
 
-export { Unparser } from './Unparser'
+export {Unparser} from './Unparser'
 
 export {
   RelativeDependency,

@@ -12,6 +12,7 @@ import {Transformer} from './Transformer'
 
 export class MoveCellsTransformer extends Transformer {
   private dependentFormulaTransformer: DependentFormulaTransformer
+
   constructor(
     public readonly sourceRange: AbsoluteCellRange,
     public readonly toRight: number,
@@ -22,12 +23,12 @@ export class MoveCellsTransformer extends Transformer {
     this.dependentFormulaTransformer = new DependentFormulaTransformer(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public isIrreversible() {
-    return true
-  }
-
   public get sheet(): number {
     return this.sourceRange.sheet
+  }
+
+  public isIrreversible() {
+    return true
   }
 
   public transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress] {
@@ -72,7 +73,7 @@ export class MoveCellsTransformer extends Transformer {
     return dependencyAddress.shiftRelativeDimensions(-this.toRight, -this.toBottom) as T
   }
 
-  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T,  end: T, formulaAddress: SimpleCellAddress): [T, T] {
+  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T, end: T, formulaAddress: SimpleCellAddress): [T, T] {
     const sourceRange = this.sourceRange
 
     if (start instanceof CellAddress && end instanceof CellAddress) {
@@ -123,16 +124,6 @@ class DependentFormulaTransformer extends Transformer {
     return false
   }
 
-  private shouldMove(dependencyAddress: CellAddress | RowAddress | ColumnAddress, formulaAddress: SimpleCellAddress): boolean {
-    if (dependencyAddress instanceof CellAddress) {
-      return this.sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))
-    } else if (dependencyAddress instanceof RowAddress) {
-      return this.sourceRange.rowInRange(dependencyAddress.toSimpleRowAddress(formulaAddress)) && !this.sourceRange.isFinite()
-    } else {
-      return this.sourceRange.columnInRange(dependencyAddress.toSimpleColumnAddress(formulaAddress)) && !this.sourceRange.isFinite()
-    }
-  }
-
   protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | false {
     return this.transformRange(start, end, formulaAddress)
   }
@@ -145,7 +136,17 @@ class DependentFormulaTransformer extends Transformer {
     return this.transformRange(start, end, formulaAddress)
   }
 
-  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T,  end: T, formulaAddress: SimpleCellAddress): [T, T] | false {
+  private shouldMove(dependencyAddress: CellAddress | RowAddress | ColumnAddress, formulaAddress: SimpleCellAddress): boolean {
+    if (dependencyAddress instanceof CellAddress) {
+      return this.sourceRange.addressInRange(dependencyAddress.toSimpleCellAddress(formulaAddress))
+    } else if (dependencyAddress instanceof RowAddress) {
+      return this.sourceRange.rowInRange(dependencyAddress.toSimpleRowAddress(formulaAddress)) && !this.sourceRange.isFinite()
+    } else {
+      return this.sourceRange.columnInRange(dependencyAddress.toSimpleColumnAddress(formulaAddress)) && !this.sourceRange.isFinite()
+    }
+  }
+
+  private transformRange<T extends CellAddress | RowAddress | ColumnAddress>(start: T, end: T, formulaAddress: SimpleCellAddress): [T, T] | false {
     const newStart = this.transformCellAddress(start, formulaAddress)
     const newEnd = this.transformCellAddress(end, formulaAddress)
 

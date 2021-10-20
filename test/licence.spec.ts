@@ -2,7 +2,7 @@ import {ErrorType, HyperFormula} from '../src'
 import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError} from './testUtils'
 
-describe( 'Wrong licence', () => {
+describe('Wrong licence', () => {
   it('eval', () => {
     const engine = HyperFormula.buildFromArray([['=TRUE()', null, 1, '=A(']], {licenseKey: ''})
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.LIC, ErrorMessage.LicenseKey('missing')))

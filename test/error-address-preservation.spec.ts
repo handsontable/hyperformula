@@ -1,7 +1,6 @@
 import {ErrorType, HyperFormula} from '../src'
-import {adr, detailedErrorWithOrigin} from './testUtils'
-import {EmptyValue} from '../src/interpreter/InterpreterValue'
 import {simpleCellRange} from '../src/AbsoluteCellRange'
+import {adr, detailedErrorWithOrigin} from './testUtils'
 
 describe('Address preservation.', () => {
   it('Should work in the basic case.', () => {

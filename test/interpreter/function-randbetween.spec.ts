@@ -4,9 +4,9 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - function RANDBETWEEN', () => {
-  it('works with regular input',  () => {
+  it('works with regular input', () => {
     const arr: number[] = Array(10).fill(0)
-    for(let i=0;i<100;i++) {
+    for (let i = 0; i < 100; i++) {
       const engine = HyperFormula.buildFromArray([
         ['=RANDBETWEEN(0,9)'],
       ])
@@ -16,14 +16,14 @@ describe('Interpreter - function RANDBETWEEN', () => {
       expect(val).toEqual(Math.trunc(val))
       arr[val] += 1
     }
-    for(const val of arr) {
+    for (const val of arr) {
       expect(val).toBeGreaterThan(0)
     }
   })
 
-  it('rounds arguments',  () => {
+  it('rounds arguments', () => {
     const arr: number[] = Array(10).fill(0)
-    for(let i=0;i<100;i++) {
+    for (let i = 0; i < 100; i++) {
       const engine = HyperFormula.buildFromArray([
         ['=RANDBETWEEN(-0.1,9.9)'],
       ])
@@ -33,13 +33,13 @@ describe('Interpreter - function RANDBETWEEN', () => {
       expect(val).toEqual(Math.trunc(val))
       arr[val] += 1
     }
-    for(const val of arr) {
+    for (const val of arr) {
       expect(val).toBeGreaterThan(0)
     }
   })
 
-  it('should work for short intervals',  () => {
-    for(let i=0;i<10;i++) {
+  it('should work for short intervals', () => {
+    for (let i = 0; i < 10; i++) {
       const engine = HyperFormula.buildFromArray([
         ['=RANDBETWEEN(0,0.5)'],
       ])
@@ -48,8 +48,8 @@ describe('Interpreter - function RANDBETWEEN', () => {
     }
   })
 
-  it('should work for short intervals #2',  () => {
-    for(let i=0;i<10;i++) {
+  it('should work for short intervals #2', () => {
+    for (let i = 0; i < 10; i++) {
       const engine = HyperFormula.buildFromArray([
         ['=RANDBETWEEN(0.5,1)'],
       ])
@@ -58,8 +58,8 @@ describe('Interpreter - function RANDBETWEEN', () => {
     }
   })
 
-  it('should work for short intervals #3',  () => {
-    for(let i=0;i<10;i++) {
+  it('should work for short intervals #3', () => {
+    for (let i = 0; i < 10; i++) {
       const engine = HyperFormula.buildFromArray([
         ['=RANDBETWEEN(0.5,0.6)'],
       ])

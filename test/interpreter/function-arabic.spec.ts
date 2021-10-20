@@ -88,9 +88,9 @@ function inputOutput(mode: number) {
   const arr = [mode0, mode1, mode2, mode3, mode4][mode]
   const input = []
   const output = []
-  for(let i=0;i<arr.length;i++) {
+  for (let i = 0; i < arr.length; i++) {
     input.push(`=ARABIC("${arr[i]}")`)
-    output.push(i+1)
+    output.push(i + 1)
   }
   return [input, output]
 }

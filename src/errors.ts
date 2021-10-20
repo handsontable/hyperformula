@@ -137,10 +137,10 @@ function replacer(key: any, val: any): any {
     case 'symbol':
       return val.toString()
     case 'bigint':
-      return 'BigInt('+val.toString()+')'
+      return 'BigInt(' + val.toString() + ')'
     default: {
-      if(val instanceof RegExp) {
-        return 'RegExp('+val.toString()+')'
+      if (val instanceof RegExp) {
+        return 'RegExp(' + val.toString() + ')'
       } else {
         return val
       }
@@ -345,7 +345,6 @@ export class ProtectedFunctionError extends Error {
     return new ProtectedFunctionError('Cannot unregister protected plugin')
   }
 }
-
 
 /**
  * Error thrown when selected source location has an array.

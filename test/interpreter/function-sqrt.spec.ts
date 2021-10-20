@@ -37,7 +37,7 @@ describe('Function SQRT', () => {
       ['=SQRT(0)'],
       ['=SQRT(16)'],
       ['=SQRT(2)'],
-    ], { smartRounding : false})
+    ], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toEqual(4)

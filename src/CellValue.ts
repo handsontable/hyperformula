@@ -11,6 +11,7 @@ export type CellValue = NoErrorCellValue | DetailedCellError
 export class DetailedCellError {
   public readonly type: ErrorType
   public readonly message: string
+
   constructor(
     error: CellError,
     public readonly value: string,

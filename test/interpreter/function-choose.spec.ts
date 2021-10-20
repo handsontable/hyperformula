@@ -21,13 +21,13 @@ describe('Interpreter - CHOOSE function', () => {
   })
 
   it('should preserve types', () => {
-    const engine = HyperFormula.buildFromArray([['=CHOOSE(1,B1,3)', '1%' ]])
+    const engine = HyperFormula.buildFromArray([['=CHOOSE(1,B1,3)', '1%']])
 
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('preserves types of second arg', () => {
-    const engine = HyperFormula.buildFromArray([['=IFERROR(NA(), B1)', '1%' ]])
+    const engine = HyperFormula.buildFromArray([['=IFERROR(NA(), B1)', '1%']])
 
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })

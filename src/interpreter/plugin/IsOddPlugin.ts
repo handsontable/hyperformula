@@ -8,13 +8,13 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class IsOddPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsOddPlugin>{
+export class IsOddPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsOddPlugin> {
   public static implementedFunctions = {
     'ISODD': {
       method: 'isodd',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER}
-        ]
+        {argumentType: ArgumentTypes.NUMBER}
+      ]
     },
   }
 

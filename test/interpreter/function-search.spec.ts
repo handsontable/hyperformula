@@ -72,7 +72,7 @@ describe('Function SEARCH', () => {
       ['=SEARCH("b.z", "foobarbaz")'],
       ['=SEARCH("b.b", "foobarbaz")'],
       ['=SEARCH(".b", "foobarbaz", 5)'],
-    ], { useRegularExpressions: true })
+    ], {useRegularExpressions: true})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(4)

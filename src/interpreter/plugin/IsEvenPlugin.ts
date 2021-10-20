@@ -8,12 +8,12 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class IsEvenPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsEvenPlugin>{
+export class IsEvenPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsEvenPlugin> {
   public static implementedFunctions = {
     'ISEVEN': {
       method: 'iseven',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER}
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
   }

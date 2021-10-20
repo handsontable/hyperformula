@@ -8,9 +8,15 @@
     "module": "commonjs",
     "outDir": "../test-jest",
     /* Make sure proper types are used */
-    "types": ["jest", "node"]
+    "types": [
+      "jest",
+      "node"
+    ]
   },
   "extends": "../tsconfig",
-  "include": ["../src", "../test"],
+  "include": [
+    "../src",
+    "../test"
+  ],
   "exclude": []
 }

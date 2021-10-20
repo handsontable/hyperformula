@@ -221,8 +221,8 @@ describe('Function HLOOKUP', () => {
 
     it('should coerce empty arg to 0', () => {
       const engine = HyperFormula.buildFromArray([
-        [ '0', '2', '3', '4', '5' ],
-        [ 'a', 'b', 'c', 'd', 'e' ],
+        ['0', '2', '3', '4', '5'],
+        ['a', 'b', 'c', 'd', 'e'],
         ['=HLOOKUP(F3, A1:E2, 2)'],
         ['=HLOOKUP(, A1:E2, 2)'],
       ])
@@ -270,9 +270,9 @@ describe('Function HLOOKUP', () => {
 
   it('should work on row ranges', () => {
     const engine = HyperFormula.buildFromArray([
-      [ '=HLOOKUP(2,2:3,2)'],
-      [ 1, 2, 3],
-      [ 'a', 'b', 'c'],
+      ['=HLOOKUP(2,2:3,2)'],
+      [1, 2, 3],
+      ['a', 'b', 'c'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
   })

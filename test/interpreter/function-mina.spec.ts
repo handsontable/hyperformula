@@ -22,8 +22,8 @@ describe('MINA', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
-  it('does only boolean coercions',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('does only boolean coercions', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="42"', '=MINA(A1)'],
       ['=TRUE()', '=MINA(A2)'],
       ['=FALSE()', '=MINA(A3)'],

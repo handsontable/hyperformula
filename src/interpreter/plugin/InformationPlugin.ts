@@ -339,20 +339,20 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     let argAst = ast.args[0]
-    while(argAst.type === AstNodeType.PARENTHESIS) {
+    while (argAst.type === AstNodeType.PARENTHESIS) {
       argAst = argAst.expression
     }
     if (argAst.type === AstNodeType.CELL_RANGE || argAst.type === AstNodeType.COLUMN_RANGE) {
       return argAst.end.col - argAst.start.col + 1
-    } else if(argAst.type === AstNodeType.CELL_REFERENCE) {
+    } else if (argAst.type === AstNodeType.CELL_REFERENCE) {
       return 1
-    } else if(argAst.type === AstNodeType.ROW_RANGE) {
+    } else if (argAst.type === AstNodeType.ROW_RANGE) {
       return this.config.maxColumns
     } else {
       const val = this.evaluateAst(argAst, state)
-      if(val instanceof SimpleRangeValue) {
+      if (val instanceof SimpleRangeValue) {
         return val.width()
-      } else if (val instanceof CellError){
+      } else if (val instanceof CellError) {
         return val
       } else {
         return 1
@@ -391,20 +391,20 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       return new CellError(ErrorType.NUM, ErrorMessage.EmptyArg)
     }
     let argAst = ast.args[0]
-    while(argAst.type === AstNodeType.PARENTHESIS) {
+    while (argAst.type === AstNodeType.PARENTHESIS) {
       argAst = argAst.expression
     }
     if (argAst.type === AstNodeType.CELL_RANGE || argAst.type === AstNodeType.ROW_RANGE) {
       return argAst.end.row - argAst.start.row + 1
-    } else if(argAst.type === AstNodeType.CELL_REFERENCE) {
+    } else if (argAst.type === AstNodeType.CELL_REFERENCE) {
       return 1
-    } else if(argAst.type === AstNodeType.COLUMN_RANGE) {
+    } else if (argAst.type === AstNodeType.COLUMN_RANGE) {
       return this.config.maxRows
     } else {
       const val = this.evaluateAst(argAst, state)
-      if(val instanceof SimpleRangeValue) {
+      if (val instanceof SimpleRangeValue) {
         return val.height()
-      } else if (val instanceof CellError){
+      } else if (val instanceof CellError) {
         return val
       } else {
         return 1
@@ -428,10 +428,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       if (col > rangeValue.width() || row > rangeValue.height()) {
         return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
       }
-      return rangeValue?.data?.[row-1]?.[col-1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
-
-      const address = rangeValue.range!.getAddress(col - 1, row - 1)
-      return this.dependencyGraph.getScalarValue(address)
+      return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     })
   }
 

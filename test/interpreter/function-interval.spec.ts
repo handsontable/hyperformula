@@ -30,7 +30,7 @@ describe('Function INTERVAL', () => {
   })
 
   it('use datenumber coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=INTERVAL(TRUE())'],
       ['=INTERVAL("1")'],
     ])
@@ -40,7 +40,7 @@ describe('Function INTERVAL', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=INTERVAL(NA())'],
     ])
 

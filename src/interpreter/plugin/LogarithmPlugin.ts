@@ -8,27 +8,27 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LogarithmPlugin>{
+export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LogarithmPlugin> {
 
   public static implementedFunctions = {
     'LOG10': {
       method: 'log10',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER}
-        ]
+        {argumentType: ArgumentTypes.NUMBER}
+      ]
     },
     'LOG': {
       method: 'log',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-          {argumentType: ArgumentTypes.NUMBER, defaultValue: 10, greaterThan: 0},
-        ]
+        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 10, greaterThan: 0},
+      ]
     },
     'LN': {
       method: 'ln',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER}
-        ]
+        {argumentType: ArgumentTypes.NUMBER}
+      ]
     },
   }
 

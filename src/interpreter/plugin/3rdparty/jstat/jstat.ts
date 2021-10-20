@@ -38,7 +38,7 @@ export function erf(x: number): number {
   let dd = 0
   let t, ty, tmp, res
 
-  if(x===0) {
+  if (x === 0) {
     return 0
   }
   if (x < 0) {
@@ -49,7 +49,7 @@ export function erf(x: number): number {
   t = 2 / (2 + x)
   ty = 4 * t - 2
 
-  for(; j > 0; j--) {
+  for (; j > 0; j--) {
     tmp = d
     d = ty * d - dd + cof[j]
     dd = tmp
@@ -66,10 +66,12 @@ export function erfc(x: number): number {
 function erfcinv(p: number): number {
   let j = 0
   let x, err, t, pp
-  if (p >= 2)
+  if (p >= 2) {
     return -100
-  if (p <= 0)
+  }
+  if (p <= 0) {
     return 100
+  }
   pp = (p < 1) ? p : 2 - p
   t = Math.sqrt(-2 * Math.log(pp / 2))
   x = -0.70711 * ((2.30753 + t * 0.27061) /
@@ -99,7 +101,7 @@ export function gammafn(x: number): number {
   const q = [-30.8402300119739, 315.35062697960416, -1015.1563674902192,
     -3107.771671572311, 22538.118420980151, 4755.8462775278811,
     -134659.9598649693, -115132.2596755535]
-  let fact: number | boolean  = false
+  let fact: number | boolean = false
   let n = 0
   let xden = 0
   let xnum = 0
@@ -144,16 +146,18 @@ export function gammafn(x: number): number {
 
 export const gamma = {
   pdf: function pdf(x: number, shape: number, scale: number): number {
-    if (x < 0)
+    if (x < 0) {
       return 0
+    }
     return (x === 0 && shape === 1) ? 1 / scale :
       Math.exp((shape - 1) * Math.log(x) - x / scale -
         gammaln(shape) - shape * Math.log(scale))
   },
 
   cdf: function cdf(x: number, shape: number, scale: number): number {
-    if (x < 0)
+    if (x < 0) {
       return 0
+    }
     return lowRegGamma(shape, x / scale)
   },
 
@@ -172,8 +176,9 @@ export function gammaln(x: number): number {
   let xx, y, tmp
   tmp = (y = xx = x) + 5.5
   tmp -= (xx + 0.5) * Math.log(tmp)
-  for (; j < 6; j++)
+  for (; j < 6; j++) {
     ser += cof[j] / ++y
+  }
   return Math.log(2.5066282746310005 * ser / xx) - tmp
 }
 
@@ -221,42 +226,50 @@ function gammapinv(p: number, a: number) {
   let lna1: number | undefined
   let afac: number | undefined
 
-  if (p >= 1)
+  if (p >= 1) {
     return Math.max(100, a + 100 * Math.sqrt(a))
-  if (p <= 0)
+  }
+  if (p <= 0) {
     return 0
+  }
   if (a > 1) {
     lna1 = Math.log(a1)
     afac = Math.exp(a1 * (lna1 - 1) - gln)
     pp = (p < 0.5) ? p : 1 - p
     t = Math.sqrt(-2 * Math.log(pp))
     x = (2.30753 + t * 0.27061) / (1 + t * (0.99229 + t * 0.04481)) - t
-    if (p < 0.5)
+    if (p < 0.5) {
       x = -x
+    }
     x = Math.max(1e-3,
       a * Math.pow(1 - 1 / (9 * a) - x / (3 * Math.sqrt(a)), 3))
   } else {
     t = 1 - a * (0.253 + a * 0.12)
-    if (p < t)
+    if (p < t) {
       x = Math.pow(p / t, 1 / a)
-    else
+    } else {
       x = 1 - Math.log(1 - (p - t) / (1 - t))
+    }
   }
 
-  for(; j < 12; j++) {
-    if (x <= 0)
+  for (; j < 12; j++) {
+    if (x <= 0) {
       return 0
+    }
     err = lowRegGamma(a, x) - p
-    if (a > 1)
+    if (a > 1) {
       t = afac! * Math.exp(-(x - a1) + a1 * (Math.log(x) - lna1!))
-    else
+    } else {
       t = Math.exp(-x + a1 * Math.log(x) - gln)
+    }
     u = err / t
     x -= (t = u / (1 - 0.5 * Math.min(1, u * ((a - 1) / x - 1))))
-    if (x <= 0)
+    if (x <= 0) {
       x = 0.5 * (x + t)
-    if (Math.abs(t) < EPS * x)
+    }
+    if (Math.abs(t) < EPS * x) {
       break
+    }
   }
 
   return x
@@ -280,257 +293,283 @@ export const normal = {
 export const beta = {
   pdf: function pdf(x: number, alpha: number, beta: number) {
     // PDF is zero outside the support
-    if (x > 1 || x < 0)
-      return 0;
+    if (x > 1 || x < 0) {
+      return 0
+    }
     // PDF is one for the uniform case
-    if (alpha == 1 && beta == 1)
-      return 1;
+    if (alpha == 1 && beta == 1) {
+      return 1
+    }
 
     if (alpha < 512 && beta < 512) {
       return (Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1)) /
-        betafn(alpha, beta)!;
+        betafn(alpha, beta)!
     } else {
       return Math.exp((alpha - 1) * Math.log(x) +
         (beta - 1) * Math.log(1 - x) -
-        betaln(alpha, beta));
+        betaln(alpha, beta))
     }
   },
 
   cdf: function cdf(x: number, alpha: number, beta: number) {
-    return (x > 1 || x < 0) ? +(x > 1)  : ibeta(x, alpha, beta);
+    return (x > 1 || x < 0) ? +(x > 1) : ibeta(x, alpha, beta)
   },
 
   inv: function inv(x: number, alpha: number, beta: number) {
-    return ibetainv(x, alpha, beta);
+    return ibetainv(x, alpha, beta)
   },
 }
 
 function betafn(x: number, y: number) {
   // ensure arguments are positive
-  if (x <= 0 || y <= 0)
-    return undefined;
+  if (x <= 0 || y <= 0) {
+    return undefined
+  }
   // make sure x + y doesn't exceed the upper limit of usable values
   return (x + y > 170)
     ? Math.exp(betaln(x, y))
-    : gammafn(x) * gammafn(y) / gammafn(x + y);
-};
+    : gammafn(x) * gammafn(y) / gammafn(x + y)
+}
 
 function betaln(x: number, y: number) {
-  return gammaln(x) + gammaln(y) - gammaln(x + y);
-};
+  return gammaln(x) + gammaln(y) - gammaln(x + y)
+}
 
 function ibetainv(p: number, a: number, b: number) {
-  var EPS = 1e-8;
-  var a1 = a - 1;
-  var b1 = b - 1;
-  var j = 0;
-  var lna, lnb, pp, t, u, err, x, al, h, w, afac;
-  if (p <= 0)
-    return 0;
-  if (p >= 1)
-    return 1;
+  var EPS = 1e-8
+  var a1 = a - 1
+  var b1 = b - 1
+  var j = 0
+  var lna, lnb, pp, t, u, err, x, al, h, w, afac
+  if (p <= 0) {
+    return 0
+  }
+  if (p >= 1) {
+    return 1
+  }
   if (a >= 1 && b >= 1) {
-    pp = (p < 0.5) ? p : 1 - p;
-    t = Math.sqrt(-2 * Math.log(pp));
-    x = (2.30753 + t * 0.27061) / (1 + t* (0.99229 + t * 0.04481)) - t;
-    if (p < 0.5)
-      x = -x;
-    al = (x * x - 3) / 6;
-    h = 2 / (1 / (2 * a - 1)  + 1 / (2 * b - 1));
+    pp = (p < 0.5) ? p : 1 - p
+    t = Math.sqrt(-2 * Math.log(pp))
+    x = (2.30753 + t * 0.27061) / (1 + t * (0.99229 + t * 0.04481)) - t
+    if (p < 0.5) {
+      x = -x
+    }
+    al = (x * x - 3) / 6
+    h = 2 / (1 / (2 * a - 1) + 1 / (2 * b - 1))
     w = (x * Math.sqrt(al + h) / h) - (1 / (2 * b - 1) - 1 / (2 * a - 1)) *
-      (al + 5 / 6 - 2 / (3 * h));
-    x = a / (a + b * Math.exp(2 * w));
+      (al + 5 / 6 - 2 / (3 * h))
+    x = a / (a + b * Math.exp(2 * w))
   } else {
-    lna = Math.log(a / (a + b));
-    lnb = Math.log(b / (a + b));
-    t = Math.exp(a * lna) / a;
-    u = Math.exp(b * lnb) / b;
-    w = t + u;
-    if (p < t / w)
-      x = Math.pow(a * w * p, 1 / a);
-    else
-      x = 1 - Math.pow(b * w * (1 - p), 1 / b);
+    lna = Math.log(a / (a + b))
+    lnb = Math.log(b / (a + b))
+    t = Math.exp(a * lna) / a
+    u = Math.exp(b * lnb) / b
+    w = t + u
+    if (p < t / w) {
+      x = Math.pow(a * w * p, 1 / a)
+    } else {
+      x = 1 - Math.pow(b * w * (1 - p), 1 / b)
+    }
   }
-  afac = -gammaln(a) - gammaln(b) + gammaln(a + b);
-  for(; j < 10; j++) {
-    if (x === 0 || x === 1)
-      return x;
+  afac = -gammaln(a) - gammaln(b) + gammaln(a + b)
+  for (; j < 10; j++) {
+    if (x === 0 || x === 1) {
+      return x
+    }
     // @ts-ignore
-    err = ibeta(x, a, b) - p;
-    t = Math.exp(a1 * Math.log(x) + b1 * Math.log(1 - x) + afac);
-    u = err / t;
-    x -= (t = u / (1 - 0.5 * Math.min(1, u * (a1 / x - b1 / (1 - x)))));
-    if (x <= 0)
-      x = 0.5 * (x + t);
-    if (x >= 1)
-      x = 0.5 * (x + t + 1);
-    if (Math.abs(t) < EPS * x && j > 0)
-      break;
+    err = ibeta(x, a, b) - p
+    t = Math.exp(a1 * Math.log(x) + b1 * Math.log(1 - x) + afac)
+    u = err / t
+    x -= (t = u / (1 - 0.5 * Math.min(1, u * (a1 / x - b1 / (1 - x)))))
+    if (x <= 0) {
+      x = 0.5 * (x + t)
+    }
+    if (x >= 1) {
+      x = 0.5 * (x + t + 1)
+    }
+    if (Math.abs(t) < EPS * x && j > 0) {
+      break
+    }
   }
-  return x;
-};
+  return x
+}
 
 function ibeta(x: number, a: number, b: number) {
   // Factors in front of the continued fraction.
-  var bt = (x === 0 || x === 1) ?  0 :
+  var bt = (x === 0 || x === 1) ? 0 :
     Math.exp(gammaln(a + b) - gammaln(a) -
       gammaln(b) + a * Math.log(x) + b *
-      Math.log(1 - x));
-  if (x < 0 || x > 1)
-    return false;
+      Math.log(1 - x))
+  if (x < 0 || x > 1) {
+    return false
+  }
   if (x < (a + 1) / (a + b + 2))
     // Use continued fraction directly.
-    return bt * betacf(x, a, b) / a;
+  {
+    return bt * betacf(x, a, b) / a
+  }
   // else use continued fraction after making the symmetry transformation.
-  return 1 - bt * betacf(1 - x, b, a) / b;
-};
+  return 1 - bt * betacf(1 - x, b, a) / b
+}
 
 function betacf(x: number, a: number, b: number) {
-  var fpmin = 1e-30;
-  var m = 1;
-  var qab = a + b;
-  var qap = a + 1;
-  var qam = a - 1;
-  var c = 1;
-  var d = 1 - qab * x / qap;
-  var m2, aa, del, h;
+  var fpmin = 1e-30
+  var m = 1
+  var qab = a + b
+  var qap = a + 1
+  var qam = a - 1
+  var c = 1
+  var d = 1 - qab * x / qap
+  var m2, aa, del, h
 
   // These q's will be used in factors that occur in the coefficients
-  if (Math.abs(d) < fpmin)
-    d = fpmin;
-  d = 1 / d;
-  h = d;
+  if (Math.abs(d) < fpmin) {
+    d = fpmin
+  }
+  d = 1 / d
+  h = d
 
   for (; m <= 100; m++) {
-    m2 = 2 * m;
-    aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    m2 = 2 * m
+    aa = m * (b - m) * x / ((qam + m2) * (a + m2))
     // One step (the even one) of the recurrence
-    d = 1 + aa * d;
-    if (Math.abs(d) < fpmin)
-      d = fpmin;
-    c = 1 + aa / c;
-    if (Math.abs(c) < fpmin)
-      c = fpmin;
-    d = 1 / d;
-    h *= d * c;
-    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d
+    if (Math.abs(d) < fpmin) {
+      d = fpmin
+    }
+    c = 1 + aa / c
+    if (Math.abs(c) < fpmin) {
+      c = fpmin
+    }
+    d = 1 / d
+    h *= d * c
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2))
     // Next step of the recurrence (the odd one)
-    d = 1 + aa * d;
-    if (Math.abs(d) < fpmin)
-      d = fpmin;
-    c = 1 + aa / c;
-    if (Math.abs(c) < fpmin)
-      c = fpmin;
-    d = 1 / d;
-    del = d * c;
-    h *= del;
-    if (Math.abs(del - 1.0) < 3e-7)
-      break;
+    d = 1 + aa * d
+    if (Math.abs(d) < fpmin) {
+      d = fpmin
+    }
+    c = 1 + aa / c
+    if (Math.abs(c) < fpmin) {
+      c = fpmin
+    }
+    d = 1 / d
+    del = d * c
+    h *= del
+    if (Math.abs(del - 1.0) < 3e-7) {
+      break
+    }
   }
 
-  return h;
-};
+  return h
+}
 
 export const binomial = {
-  pdf: function (k: number, n: number, p: number): number {
+  pdf: function(k: number, n: number, p: number): number {
     return (p === 0 || p === 1) ?
       ((n * p) === k ? 1 : 0) :
-      combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+      combination(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k)
   },
 
-  cdf: function (x: number, n: number, p: number): number {
-    var betacdf;
-    var eps = 1e-10;
+  cdf: function(x: number, n: number, p: number): number {
+    var betacdf
+    var eps = 1e-10
 
-    if (x < 0)
-      return 0;
-    if (x >= n)
-      return 1;
-    if (p < 0 || p > 1 || n <= 0)
-      return NaN;
+    if (x < 0) {
+      return 0
+    }
+    if (x >= n) {
+      return 1
+    }
+    if (p < 0 || p > 1 || n <= 0) {
+      return NaN
+    }
 
-    x = Math.floor(x);
-    var z = p;
-    var a = x + 1;
-    var b = n - x;
-    var s = a + b;
+    x = Math.floor(x)
+    var z = p
+    var a = x + 1
+    var b = n - x
+    var s = a + b
     var bt = Math.exp(gammaln(s) - gammaln(b) -
-      gammaln(a) + a * Math.log(z) + b * Math.log(1 - z));
+      gammaln(a) + a * Math.log(z) + b * Math.log(1 - z))
 
-    if (z < (a + 1) / (s + 2))
-      betacdf = bt * betinc(z, a, b, eps);
-    else
-      betacdf = 1 - bt * betinc(1 - z, b, a, eps);
+    if (z < (a + 1) / (s + 2)) {
+      betacdf = bt * betinc(z, a, b, eps)
+    } else {
+      betacdf = 1 - bt * betinc(1 - z, b, a, eps)
+    }
 
-    return Math.round((1 - betacdf) * (1 / eps)) / (1 / eps);
+    return Math.round((1 - betacdf) * (1 / eps)) / (1 / eps)
   }
 }
 
 function betinc(x: number, a: number, b: number, eps: number) {
-  var a0 = 0;
-  var b0 = 1;
-  var a1 = 1;
-  var b1 = 1;
-  var m9 = 0;
-  var a2 = 0;
-  var c9;
+  var a0 = 0
+  var b0 = 1
+  var a1 = 1
+  var b1 = 1
+  var m9 = 0
+  var a2 = 0
+  var c9
 
   while (Math.abs((a1 - a2) / a1) > eps) {
-    a2 = a1;
-    c9 = -(a + m9) * (a + b + m9) * x / (a + 2 * m9) / (a + 2 * m9 + 1);
-    a0 = a1 + c9 * a0;
-    b0 = b1 + c9 * b0;
-    m9 = m9 + 1;
-    c9 = m9 * (b - m9) * x / (a + 2 * m9 - 1) / (a + 2 * m9);
-    a1 = a0 + c9 * a1;
-    b1 = b0 + c9 * b1;
-    a0 = a0 / b1;
-    b0 = b0 / b1;
-    a1 = a1 / b1;
-    b1 = 1;
+    a2 = a1
+    c9 = -(a + m9) * (a + b + m9) * x / (a + 2 * m9) / (a + 2 * m9 + 1)
+    a0 = a1 + c9 * a0
+    b0 = b1 + c9 * b0
+    m9 = m9 + 1
+    c9 = m9 * (b - m9) * x / (a + 2 * m9 - 1) / (a + 2 * m9)
+    a1 = a0 + c9 * a1
+    b1 = b0 + c9 * b1
+    a0 = a0 / b1
+    b0 = b0 / b1
+    a1 = a1 / b1
+    b1 = 1
   }
 
-  return a1 / a;
+  return a1 / a
 }
 
 function combination(n: number, m: number) {
   // make sure n or m don't exceed the upper limit of usable values
   return (n > 170 || m > 170)
     ? Math.exp(combinationln(n, m))
-    : (factorial(n) / factorial(m)) / factorial(n - m);
-};
+    : (factorial(n) / factorial(m)) / factorial(n - m)
+}
 
-function combinationln(n: number, m: number){
-  return factorialln(n) - factorialln(m) - factorialln(n - m);
-};
+function combinationln(n: number, m: number) {
+  return factorialln(n) - factorialln(m) - factorialln(n - m)
+}
 
 // natural log factorial of n
 export function factorialln(n: number) {
-  return n < 0 ? NaN : gammaln(n + 1);
-};
+  return n < 0 ? NaN : gammaln(n + 1)
+}
 
 // factorial of n
 export function factorial(n: number) {
-  return n < 0 ? NaN : gammafn(n + 1);
-};
+  return n < 0 ? NaN : gammafn(n + 1)
+}
 
 export const chisquare = {
   pdf: function pdf(x: number, dof: number) {
-    if (x < 0)
-      return 0;
+    if (x < 0) {
+      return 0
+    }
     return (x === 0 && dof === 2) ? 0.5 :
       Math.exp((dof / 2 - 1) * Math.log(x) - x / 2 - (dof / 2) *
-        Math.log(2) - gammaln(dof / 2));
+        Math.log(2) - gammaln(dof / 2))
   },
 
   cdf: function cdf(x: number, dof: number) {
-    if (x < 0)
-      return 0;
-    return lowRegGamma(dof / 2, x / 2);
+    if (x < 0) {
+      return 0
+    }
+    return lowRegGamma(dof / 2, x / 2)
   },
 
   inv: function(p: number, dof: number) {
-    return 2 * gammapinv(p, 0.5 * dof);
+    return 2 * gammapinv(p, 0.5 * dof)
   }
 }
 
@@ -539,71 +578,76 @@ export const centralF = {
   // See the way that R calculates this value:
   // https://svn.r-project.org/R/trunk/src/nmath/df.c
   pdf: function pdf(x: number, df1: number, df2: number) {
-    var p, q, f;
+    var p, q, f
 
-    if (x < 0)
-      return 0;
+    if (x < 0) {
+      return 0
+    }
 
     if (df1 <= 2) {
       if (x === 0 && df1 < 2) {
-        return Infinity;
+        return Infinity
       }
       if (x === 0 && df1 === 2) {
-        return 1;
+        return 1
       }
       return (1 / betafn(df1 / 2, df2 / 2)!) *
         Math.pow(df1 / df2, df1 / 2) *
         Math.pow(x, (df1 / 2) - 1) *
-        Math.pow((1 + (df1 / df2) * x), -(df1 + df2) / 2);
+        Math.pow((1 + (df1 / df2) * x), -(df1 + df2) / 2)
     }
 
-    p = (df1 * x) / (df2 + x * df1);
-    q = df2 / (df2 + x * df1);
-    f = df1 * q / 2.0;
-    return f * binomial.pdf((df1 - 2) / 2, (df1 + df2 - 2) / 2, p);
+    p = (df1 * x) / (df2 + x * df1)
+    q = df2 / (df2 + x * df1)
+    f = df1 * q / 2.0
+    return f * binomial.pdf((df1 - 2) / 2, (df1 + df2 - 2) / 2, p)
   },
 
   cdf: function cdf(x: number, df1: number, df2: number): number {
-    if (x < 0)
-      return 0;
-    return <number> ibeta((df1 * x) / (df1 * x + df2), df1 / 2, df2 / 2);
+    if (x < 0) {
+      return 0
+    }
+    return <number> ibeta((df1 * x) / (df1 * x + df2), df1 / 2, df2 / 2)
   },
 
   inv: function inv(x: number, df1: number, df2: number) {
-    return df2 / (df1 * (1 / ibetainv(x, df1 / 2, df2 / 2) - 1));
+    return df2 / (df1 * (1 / ibetainv(x, df1 / 2, df2 / 2) - 1))
   },
 }
 
 export const weibull = {
   pdf: function pdf(x: number, scale: number, shape: number) {
-    if (x < 0 || scale < 0 || shape < 0)
-      return 0;
+    if (x < 0 || scale < 0 || shape < 0) {
+      return 0
+    }
     return (shape / scale) * Math.pow((x / scale), (shape - 1)) *
-      Math.exp(-(Math.pow((x / scale), shape)));
+      Math.exp(-(Math.pow((x / scale), shape)))
   },
 
   cdf: function cdf(x: number, scale: number, shape: number) {
-    return x < 0 ? 0 : 1 - Math.exp(-Math.pow((x / scale), shape));
+    return x < 0 ? 0 : 1 - Math.exp(-Math.pow((x / scale), shape))
   },
 }
 
 export const poisson = {
   pdf: function pdf(k: number, l: number) {
     if (l < 0 || (k % 1) !== 0 || k < 0) {
-      return 0;
+      return 0
     }
 
-    return Math.pow(l, k) * Math.exp(-l) / factorial(k);
+    return Math.pow(l, k) * Math.exp(-l) / factorial(k)
   },
 
   cdf: function cdf(x: number, l: number) {
-    var k = 0;
-    if (x < 0) return 0;
-    var sum = 0;
-    for (; k <= x; k++) {
-      sum += poisson.pdf(k, l);
+    var k = 0
+    if (x < 0) {
+      return 0
     }
-    return sum;
+    var sum = 0
+    for (; k <= x; k++) {
+      sum += poisson.pdf(k, l)
+    }
+    return sum
   },
 }
 
@@ -621,34 +665,34 @@ export const hypgeom = {
     // if(k !== k | 0) {
     //   return false;
     // } else
-    if(k < 0 || k < m - (N - n)) {
+    if (k < 0 || k < m - (N - n)) {
       // It's impossible to have this few successes drawn.
-      return 0;
-    } else if(k > n || k > m) {
+      return 0
+    } else if (k > n || k > m) {
       // It's impossible to have this many successes drawn.
-      return 0;
+      return 0
     } else if (m * 2 > N) {
       // More than half the population is successes.
 
-      if(n * 2 > N) {
+      if (n * 2 > N) {
         // More than half the population is sampled.
 
         return hypgeom.pdf(N - m - n + k, N, N - m, N - n)
       } else {
         // Half or less of the population is sampled.
 
-        return hypgeom.pdf(n - k, N, N - m, n);
+        return hypgeom.pdf(n - k, N, N - m, n)
       }
 
-    } else if(n * 2 > N) {
+    } else if (n * 2 > N) {
       // Half or less is successes.
 
-      return hypgeom.pdf(m - k, N, m, N - n);
+      return hypgeom.pdf(m - k, N, m, N - n)
 
-    } else if(m < n) {
+    } else if (m < n) {
       // We want to have the number of things sampled to be less than the
       // successes available. So swap the definitions of successful and sampled.
-      return hypgeom.pdf(k, N, n, m);
+      return hypgeom.pdf(k, N, n, m)
     } else {
       // If we get here, half or less of the population was sampled, half or
       // less of it was successes, and we had fewer sampled things than
@@ -661,36 +705,36 @@ export const hypgeom = {
 
       // This variable holds the scaled probability of the current number of
       // successes.
-      var scaledPDF = 1;
+      var scaledPDF = 1
 
       // This keeps track of how much we have normalized.
-      var samplesDone = 0;
+      var samplesDone = 0
 
-      for(var i = 0; i < k; i++) {
+      for (var i = 0; i < k; i++) {
         // For every possible number of successes up to that observed...
 
-        while(scaledPDF > 1 && samplesDone < n) {
+        while (scaledPDF > 1 && samplesDone < n) {
           // Intermediate result is growing too big. Apply some of the
           // normalization to shrink everything.
 
-          scaledPDF *= 1 - (m / (N - samplesDone));
+          scaledPDF *= 1 - (m / (N - samplesDone))
 
           // Say we've normalized by this sample already.
-          samplesDone++;
+          samplesDone++
         }
 
         // Work out the partially-normalized hypergeometric PDF for the next
         // number of successes
-        scaledPDF *= (n - i) * (m - i) / ((i + 1) * (N - m - n + i + 1));
+        scaledPDF *= (n - i) * (m - i) / ((i + 1) * (N - m - n + i + 1))
       }
 
-      for(; samplesDone < n; samplesDone++) {
+      for (; samplesDone < n; samplesDone++) {
         // Apply all the rest of the normalization
-        scaledPDF *= 1 - (m / (N - samplesDone));
+        scaledPDF *= 1 - (m / (N - samplesDone))
       }
 
       // Bound answer sanely before returning.
-      return Math.min(1, Math.max(0, scaledPDF));
+      return Math.min(1, Math.max(0, scaledPDF))
     }
   },
 
@@ -706,34 +750,34 @@ export const hypgeom = {
     // m = number of successes in population
     // n = number of items drawn from population
 
-    if(x < 0 || x < m - (N - n)) {
+    if (x < 0 || x < m - (N - n)) {
       // It's impossible to have this few successes drawn or fewer.
-      return 0;
-    } else if(x >= n || x >= m) {
+      return 0
+    } else if (x >= n || x >= m) {
       // We will always have this many successes or fewer.
-      return 1;
+      return 1
     } else if (m * 2 > N) {
       // More than half the population is successes.
 
-      if(n * 2 > N) {
+      if (n * 2 > N) {
         // More than half the population is sampled.
 
         return cdf(N - m - n + x, N, N - m, N - n)
       } else {
         // Half or less of the population is sampled.
 
-        return 1 - hypgeom.cdf(n - x - 1, N, N - m, n);
+        return 1 - hypgeom.cdf(n - x - 1, N, N - m, n)
       }
 
-    } else if(n * 2 > N) {
+    } else if (n * 2 > N) {
       // Half or less is successes.
 
-      return 1 - hypgeom.cdf(m - x - 1, N, m, N - n);
+      return 1 - hypgeom.cdf(m - x - 1, N, m, N - n)
 
-    } else if(m < n) {
+    } else if (m < n) {
       // We want to have the number of things sampled to be less than the
       // successes available. So swap the definitions of successful and sampled.
-      return hypgeom.cdf(x, N, n, m);
+      return hypgeom.cdf(x, N, n, m)
     } else {
       // If we get here, half or less of the population was sampled, half or
       // less of it was successes, and we had fewer sampled things than
@@ -745,142 +789,149 @@ export const hypgeom = {
       // finish the normalization at the end.
 
       // Holds the intermediate, scaled total CDF.
-      var scaledCDF = 1;
+      var scaledCDF = 1
 
       // This variable holds the scaled probability of the current number of
       // successes.
-      var scaledPDF = 1;
+      var scaledPDF = 1
 
       // This keeps track of how much we have normalized.
-      var samplesDone = 0;
+      var samplesDone = 0
 
-      for(var i = 0; i < x; i++) {
+      for (var i = 0; i < x; i++) {
         // For every possible number of successes up to that observed...
 
-        while(scaledCDF > 1 && samplesDone < n) {
+        while (scaledCDF > 1 && samplesDone < n) {
           // Intermediate result is growing too big. Apply some of the
           // normalization to shrink everything.
 
-          var factor = 1 - (m / (N - samplesDone));
+          var factor = 1 - (m / (N - samplesDone))
 
-          scaledPDF *= factor;
-          scaledCDF *= factor;
+          scaledPDF *= factor
+          scaledCDF *= factor
 
           // Say we've normalized by this sample already.
-          samplesDone++;
+          samplesDone++
         }
 
         // Work out the partially-normalized hypergeometric PDF for the next
         // number of successes
-        scaledPDF *= (n - i) * (m - i) / ((i + 1) * (N - m - n + i + 1));
+        scaledPDF *= (n - i) * (m - i) / ((i + 1) * (N - m - n + i + 1))
 
         // Add to the CDF answer.
-        scaledCDF += scaledPDF;
+        scaledCDF += scaledPDF
       }
 
-      for(; samplesDone < n; samplesDone++) {
+      for (; samplesDone < n; samplesDone++) {
         // Apply all the rest of the normalization
-        scaledCDF *= 1 - (m / (N - samplesDone));
+        scaledCDF *= 1 - (m / (N - samplesDone))
       }
 
       // Bound answer sanely before returning.
-      return Math.min(1, Math.max(0, scaledCDF));
+      return Math.min(1, Math.max(0, scaledCDF))
     }
   }
 }
 
 export const studentt = {
   pdf: function pdf(x: number, dof: number) {
-    dof = dof > 1e100 ? 1e100 : dof;
+    dof = dof > 1e100 ? 1e100 : dof
     return (1 / (Math.sqrt(dof) * betafn(0.5, dof / 2)!)) *
-      Math.pow(1 + ((x * x) / dof), -((dof + 1) / 2));
+      Math.pow(1 + ((x * x) / dof), -((dof + 1) / 2))
   },
 
   cdf: function cdf(x: number, dof: number): number {
-    var dof2 = dof / 2;
+    var dof2 = dof / 2
     return <number> ibeta((x + Math.sqrt(x * x + dof)) /
-      (2 * Math.sqrt(x * x + dof)), dof2, dof2);
+      (2 * Math.sqrt(x * x + dof)), dof2, dof2)
   },
 
   inv: function(p: number, dof: number) {
-    var x = ibetainv(2 * Math.min(p, 1 - p), 0.5 * dof, 0.5);
-    x = Math.sqrt(dof * (1 - x) / x);
-    return (p > 0.5) ? x : -x;
+    var x = ibetainv(2 * Math.min(p, 1 - p), 0.5 * dof, 0.5)
+    x = Math.sqrt(dof * (1 - x) / x)
+    return (p > 0.5) ? x : -x
   },
 }
 
 export const lognormal = {
   pdf: function pdf(x: number, mu: number, sigma: number) {
-    if (x <= 0)
-      return 0;
+    if (x <= 0) {
+      return 0
+    }
     return Math.exp(-Math.log(x) - 0.5 * Math.log(2 * Math.PI) -
       Math.log(sigma) - Math.pow(Math.log(x) - mu, 2) /
-      (2 * sigma * sigma));
+      (2 * sigma * sigma))
   },
 
   cdf: function cdf(x: number, mu: number, sigma: number) {
-    if (x < 0)
-      return 0;
+    if (x < 0) {
+      return 0
+    }
     return 0.5 +
-      (0.5 * erf((Math.log(x) - mu) / Math.sqrt(2 * sigma * sigma)));
+      (0.5 * erf((Math.log(x) - mu) / Math.sqrt(2 * sigma * sigma)))
   },
 
   inv: function(p: number, mu: number, sigma: number) {
-    return Math.exp(-1.41421356237309505 * sigma * erfcinv(2 * p) + mu);
+    return Math.exp(-1.41421356237309505 * sigma * erfcinv(2 * p) + mu)
   },
 }
 
 export const negbin = {
   pdf: function pdf(k: number, r: number, p: number) {
-    if (k !== k >>> 0)
-      return false;
-    if (k < 0)
-      return 0;
+    if (k !== k >>> 0) {
+      return false
+    }
+    if (k < 0) {
+      return 0
+    }
     return combination(k + r - 1, r - 1) *
-      Math.pow(1 - p, k) * Math.pow(p, r);
+      Math.pow(1 - p, k) * Math.pow(p, r)
   },
 
   cdf: function cdf(x: number, r: number, p: number) {
     var sum = 0,
-      k = 0;
-    if (x < 0) return 0;
-    for (; k <= x; k++) {
-      sum += <number> negbin.pdf(k, r, p);
+      k = 0
+    if (x < 0) {
+      return 0
     }
-    return sum;
+    for (; k <= x; k++) {
+      sum += <number> negbin.pdf(k, r, p)
+    }
+    return sum
   }
 }
 
 function sum(arr: number[]): number {
-  var sum = 0;
-  var i = arr.length;
-  while (--i >= 0)
-    sum += arr[i];
-  return sum;
-};
+  var sum = 0
+  var i = arr.length
+  while (--i >= 0) {
+    sum += arr[i]
+  }
+  return sum
+}
 
 export function mean(arr: number[]): number {
-  return sum(arr) / arr.length;
-};
+  return sum(arr) / arr.length
+}
 
 export function sumsqerr(arr: number[]): number {
-  var meanv = mean(arr);
-  var sum = 0;
-  var i = arr.length;
-  var tmp;
+  var meanv = mean(arr)
+  var sum = 0
+  var i = arr.length
+  var tmp
   while (--i >= 0) {
-    tmp = arr[i] - meanv;
-    sum += tmp * tmp;
+    tmp = arr[i] - meanv
+    sum += tmp * tmp
   }
-  return sum;
-};
+  return sum
+}
 
 export function variance(arr: number[], flag: any) {
-  return sumsqerr(arr) / (arr.length - (flag ? 1 : 0));
+  return sumsqerr(arr) / (arr.length - (flag ? 1 : 0))
 }
 
 export function stdev(arr: number[], flag: any) {
-  return Math.sqrt(variance(arr, flag));
+  return Math.sqrt(variance(arr, flag))
 }
 
 // 2 different parameter setups
@@ -889,62 +940,64 @@ export function stdev(arr: number[], flag: any) {
 export function normalci() {
   var args = [].slice.call(arguments),
     ans = new Array(2),
-    change;
+    change
   if (args.length === 4) {
     change = Math.abs(normal.inv(args[1] / 2, 0, 1) *
-      args[2] / Math.sqrt(args[3]));
+      args[2] / Math.sqrt(args[3]))
   } else {
     // @ts-ignore
-    change = Math.abs(normal.inv(args[1] / 2, 0, 1) * stdev(args[2]) / Math.sqrt(args[2].length));
+    change = Math.abs(normal.inv(args[1] / 2, 0, 1) * stdev(args[2]) / Math.sqrt(args[2].length))
   }
-  ans[0] = args[0] - change;
-  ans[1] = args[0] + change;
-  return ans;
+  ans[0] = args[0] - change
+  ans[1] = args[0] + change
+  return ans
 }
 
 export function tci() {
   var args = [].slice.call(arguments),
     ans = new Array(2),
-    change;
+    change
   if (args.length === 4) {
     change = Math.abs(studentt.inv(args[1] / 2, args[3] - 1) *
-      args[2] / Math.sqrt(args[3]));
+      args[2] / Math.sqrt(args[3]))
   } else {
     // @ts-ignore
-    change = Math.abs(studentt.inv(args[1] / 2, args[2].length - 1) * stdev(args[2], true) / Math.sqrt(args[2].length));
+    change = Math.abs(studentt.inv(args[1] / 2, args[2].length - 1) * stdev(args[2], true) / Math.sqrt(args[2].length))
   }
-  ans[0] = args[0] - change;
-  ans[1] = args[0] + change;
-  return ans;
+  ans[0] = args[0] - change
+  ans[1] = args[0] + change
+  return ans
 }
 
 function product(arr: number[]): number {
-  var prod = 1;
-  var i = arr.length;
-  while (--i >= 0)
-    prod *= arr[i];
-  return prod;
+  var prod = 1
+  var i = arr.length
+  while (--i >= 0) {
+    prod *= arr[i]
+  }
+  return prod
 }
 
 export function geomean(arr: number[]): number {
-  return Math.pow(product(arr), 1 / arr.length);
+  return Math.pow(product(arr), 1 / arr.length)
 }
 
 export function covariance(arr1: number[], arr2: number[]): number {
-  var u = mean(arr1);
-  var v = mean(arr2);
-  var arr1Len = arr1.length;
-  var sq_dev = new Array(arr1Len);
-  var i;
+  var u = mean(arr1)
+  var v = mean(arr2)
+  var arr1Len = arr1.length
+  var sq_dev = new Array(arr1Len)
+  var i
 
-  for (i = 0; i < arr1Len; i++)
-    sq_dev[i] = (arr1[i] - u) * (arr2[i] - v);
+  for (i = 0; i < arr1Len; i++) {
+    sq_dev[i] = (arr1[i] - u) * (arr2[i] - v)
+  }
 
-  return sum(sq_dev) / (arr1Len - 1);
+  return sum(sq_dev) / (arr1Len - 1)
 }
 
 export function corrcoeff(arr1: number[], arr2: number[]): number {
   return covariance(arr1, arr2) /
     stdev(arr1, 1) /
-    stdev(arr2, 1);
+    stdev(arr2, 1)
 }

@@ -86,7 +86,6 @@ describe('string comparison', () => {
     expect(engine.getCellValue(adr('C4'))).toBe(true)
   })
 
-
   it('comparison case sensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['ą', 'A', '=A1>B1'],

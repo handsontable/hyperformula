@@ -95,7 +95,7 @@ describe('Evaluation suspension', () => {
 
     expect(engine.getCellFormula(adr('C1'))).toEqual('=A1+78')
     expect(engine.getSheetFormulas(0)).toEqual([[undefined, undefined, '=A1+78']])
-    expect(engine.getAllSheetsFormulas()).toEqual({ Sheet1: [[undefined, undefined, '=A1+78']] })
+    expect(engine.getAllSheetsFormulas()).toEqual({Sheet1: [[undefined, undefined, '=A1+78']]})
     expect(engine.getRangeFormulas(AbsoluteCellRange.spanFrom(adr('A1'), 3, 1))).toEqual([[undefined, undefined, '=A1+78']])
   })
 

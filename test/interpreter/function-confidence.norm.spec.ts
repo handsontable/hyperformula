@@ -46,7 +46,6 @@ describe('Function CONFIDENCE.NORM', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.561974627424251, 6)
   })
 
-
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(0.01, 0.01, 1)'],

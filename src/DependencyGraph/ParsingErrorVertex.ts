@@ -10,7 +10,8 @@ export class ParsingErrorVertex {
   constructor(
     public readonly errors: ParsingError[],
     public readonly rawInput: string
-  ) {}
+  ) {
+  }
 
   public getCellValue(): CellError {
     return CellError.parsingError()

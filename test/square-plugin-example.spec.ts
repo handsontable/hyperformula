@@ -6,7 +6,7 @@ import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
-class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<SquarePlugin>{
+class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<SquarePlugin> {
   public static implementedFunctions = {
     // Key of the mapping describes which function will be used to compute it
     'SQUARE': {

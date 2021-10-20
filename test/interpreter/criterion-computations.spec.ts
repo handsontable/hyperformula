@@ -2,8 +2,8 @@ import {HyperFormula} from '../../src'
 import {adr} from '../testUtils'
 
 describe('Criterions - operators computations', () => {
-  it('usage of greater than operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of greater than operator', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -13,8 +13,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(7)
   })
 
-  it('usage of greater than or equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of greater than or equal operator', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -24,8 +24,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(12)
   })
 
-  it('usage of less than operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of less than operator', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -35,8 +35,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
-  it('usage of less than or equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of less than or equal operator', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -46,8 +46,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(8)
   })
 
-  it('usage of equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of equal operator', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -57,8 +57,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 
-  it('usage of not equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of not equal operator', () => {
+    const engine = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -68,8 +68,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 
-  it('empty values #1',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #1', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '8'],
       ['3', '9'],
@@ -79,8 +79,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
-  it('empty values #2',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #2', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '8'],
       ['3', '9'],
@@ -90,8 +90,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
-  it('empty values #3',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #3', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', ' '],
       ['2', '1'],
       ['3', 'TRUE'],
@@ -101,8 +101,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
-  it('empty values #4',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #4', () => {
+    const engine = HyperFormula.buildFromArray([
       [''],
       ['8'],
       ['9'],
@@ -113,7 +113,7 @@ describe('Criterions - operators computations', () => {
   })
 })
 
-describe( 'big test', () => {
+describe('big test', () => {
   it('regex example', () => {
     const formulas = [
       ['w b 2r2 x', 8.89999999999418, null, 'w', '[^hrcsx]*w ?f?', '=COUNTIF(A1:A49,E1)', '=SUMIF($A$1:$A$49,E1,$B$1:$B$49)'],
@@ -219,7 +219,7 @@ describe( 'big test', () => {
 
   it('Gnumeric test file', () => {
     const formulas = [
-      [ null, null, '=IF(AND(C10:C49), "All ok", "Bug!")'],
+      [null, null, '=IF(AND(C10:C49), "All ok", "Bug!")'],
       [],
       [],
       [],

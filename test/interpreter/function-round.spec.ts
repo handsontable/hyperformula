@@ -40,7 +40,6 @@ describe('Function ROUND', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
-
   it('works with positive rounding argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ROUND(1.43, 1)', '=ROUND(1.47, 1)'],

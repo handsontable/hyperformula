@@ -13,7 +13,7 @@ import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 
-class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin>{
+class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin> {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -57,7 +57,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
   }
 }
 
-class SumWithExtra extends FunctionPlugin implements FunctionPluginTypecheck<SumWithExtra>{
+class SumWithExtra extends FunctionPlugin implements FunctionPluginTypecheck<SumWithExtra> {
   public static implementedFunctions = {
     'SUM': {
       method: 'sum',
@@ -75,7 +75,7 @@ class SumWithExtra extends FunctionPlugin implements FunctionPluginTypecheck<Sum
   }
 }
 
-class InvalidPlugin extends FunctionPlugin implements FunctionPluginTypecheck<InvalidPlugin>{
+class InvalidPlugin extends FunctionPlugin implements FunctionPluginTypecheck<InvalidPlugin> {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -87,8 +87,7 @@ class InvalidPlugin extends FunctionPlugin implements FunctionPluginTypecheck<In
   }
 }
 
-
-class EmptyAliasPlugin extends FunctionPlugin implements FunctionPluginTypecheck<EmptyAliasPlugin>{
+class EmptyAliasPlugin extends FunctionPlugin implements FunctionPluginTypecheck<EmptyAliasPlugin> {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -100,7 +99,7 @@ class EmptyAliasPlugin extends FunctionPlugin implements FunctionPluginTypecheck
   }
 }
 
-class OverloadedAliasPlugin extends FunctionPlugin implements FunctionPluginTypecheck<OverloadedAliasPlugin>{
+class OverloadedAliasPlugin extends FunctionPlugin implements FunctionPluginTypecheck<OverloadedAliasPlugin> {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -115,7 +114,7 @@ class OverloadedAliasPlugin extends FunctionPlugin implements FunctionPluginType
   }
 }
 
-class ReservedNamePlugin extends FunctionPlugin implements FunctionPluginTypecheck<ReservedNamePlugin>{
+class ReservedNamePlugin extends FunctionPlugin implements FunctionPluginTypecheck<ReservedNamePlugin> {
   public static implementedFunctions = {
     'VERSION': {
       method: 'version',
@@ -126,7 +125,6 @@ class ReservedNamePlugin extends FunctionPlugin implements FunctionPluginTypeche
     return 'foo'
   }
 }
-
 
 describe('Register static custom plugin', () => {
   it('should register plugin with translations', () => {
@@ -370,13 +368,13 @@ describe('Reserved functions', () => {
 
 describe('aliases', () => {
   it('should validate that alias target exists', () => {
-    expect( () => {
+    expect(() => {
       HyperFormula.registerFunctionPlugin(EmptyAliasPlugin)
     }).toThrow(FunctionPluginValidationError.functionMethodNotFound('foo', 'EmptyAliasPlugin'))
   })
 
   it('should validate that alias key is available', () => {
-    expect( () => {
+    expect(() => {
       HyperFormula.registerFunctionPlugin(OverloadedAliasPlugin)
     }).toThrow(new AliasAlreadyExisting('FOO', 'OverloadedAliasPlugin'))
   })
