@@ -66,13 +66,13 @@ describe('Function IFNA', () => {
   })
 
   it('preserves types of first arg', () => {
-    const engine = HyperFormula.buildFromArray([['=IFNA(B1, 1)', '1%' ]])
+    const engine = HyperFormula.buildFromArray([['=IFNA(B1, 1)', '1%']])
 
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('preserves types of second arg', () => {
-    const engine = HyperFormula.buildFromArray([['=IFNA(NA(), B1)', '1%' ]])
+    const engine = HyperFormula.buildFromArray([['=IFNA(NA(), B1)', '1%']])
 
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })

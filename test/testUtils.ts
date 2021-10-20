@@ -194,8 +194,8 @@ export function unregisterAllLanguages() {
 }
 
 export function expectVerticesOfTypes(engine: HyperFormula, types: any[][], sheet: number = 0) {
-  for (let row=0; row<types.length; ++row) {
-    for (let col=0; col<types[row].length; ++col) {
+  for (let row = 0; row < types.length; ++row) {
+    for (let col = 0; col < types[row].length; ++col) {
       const expectedType = types[row][col]
       const cell = engine.dependencyGraph.getCell(simpleCellAddress(sheet, col, row))
       if (expectedType === undefined) {
@@ -209,9 +209,9 @@ export function expectVerticesOfTypes(engine: HyperFormula, types: any[][], shee
 
 export function columnIndexToSheet(columnIndex: ColumnIndex, width: number, height: number, sheet: number = 0): any[][] {
   const result: any[][] = []
-  for (let col=0; col<width; ++col) {
+  for (let col = 0; col < width; ++col) {
     const columnMap = columnIndex.getColumnMap(sheet, col)
-    for (const [value, { index }] of columnMap.entries()) {
+    for (const [value, {index}] of columnMap.entries()) {
       columnIndex.ensureRecentData(sheet, col, value)
       for (const row of index) {
         result[row] = result[row] ?? []
@@ -222,10 +222,10 @@ export function columnIndexToSheet(columnIndex: ColumnIndex, width: number, heig
       }
     }
   }
-  return normalizeSheet(result, { width, height })
+  return normalizeSheet(result, {width, height})
 }
 
-function normalizeSheet(sheet: any[][], dimensions: SheetDimensions): any[][]  {
+function normalizeSheet(sheet: any[][], dimensions: SheetDimensions): any[][] {
   return Array.from(sheet, row => {
     if (row) {
       row.length = dimensions.width

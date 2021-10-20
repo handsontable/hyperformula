@@ -108,9 +108,9 @@ describe('Function WEEKDAY', () => {
     const args = [1, 2, 3, 11, 12, 13, 14, 15, 16, 17]
     const dates = ['13/08/2020', '14/08/2020', '15/08/2020', '16/08/2020', '17/08/2020', '18/08/2020', '19/08/2020']
     const arrs = []
-    for(const arg of args) {
+    for (const arg of args) {
       const arr = []
-      for(const date of dates) {
+      for (const date of dates) {
         arr.push(`=WEEKDAY("${date}", ${arg})`)
       }
       arrs.push(arr)

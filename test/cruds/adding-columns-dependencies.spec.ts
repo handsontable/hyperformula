@@ -22,7 +22,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol( 0, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 0))
     })
 
     it('same sheet, case Aa, absolute row and col', () => {
@@ -32,7 +32,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absolute( 0, 0))
+      expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absolute(0, 0))
     })
 
     it('same sheet, case Ab', () => {
@@ -42,7 +42,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [1, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol( 2, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(2, 0))
     })
 
     it('same sheet, case Raa', () => {
@@ -110,7 +110,7 @@ describe('Adding column, fixing dependency', () => {
 
       engine.addColumns(0, [0, 1])
 
-      expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absoluteCol( 0, 0, 1))
+      expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absoluteCol(0, 0, 1))
     })
 
     it('R < r', () => {
@@ -146,7 +146,7 @@ describe('Adding column, fixing dependency', () => {
     it('r < R', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          ['=Sheet2!A1' /* new col */ ],
+          ['=Sheet2!A1' /* new col */],
         ],
         Sheet2: [
           ['1'],
@@ -193,7 +193,7 @@ describe('Adding column, fixing dependency', () => {
     it('dependency address after added column', () => {
       const engine = HyperFormula.buildFromSheets({
         Sheet1: [
-          ['1' /* new col */ ],
+          ['1' /* new col */],
         ],
         Sheet2: [
           ['=Sheet1!A1'],

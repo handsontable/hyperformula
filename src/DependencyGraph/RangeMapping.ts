@@ -142,7 +142,7 @@ export class RangeMapping {
     })
   }
 
-  public moveAllRangesInSheetAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number): AdjustRangesResult  {
+  public moveAllRangesInSheetAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number): AdjustRangesResult {
     return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex) => {
       if (column <= vertex.start.col) {
         vertex.range.shiftByColumns(numberOfColumns)

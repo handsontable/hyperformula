@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('COVARIANCE.P', () => {
-  it('validates number of arguments',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('validates number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=COVARIANCE.P(B1:B5)'],
       ['=COVARIANCE.P(B1:B5, C1:C5, D1:D5)'],
     ])
@@ -14,15 +14,15 @@ describe('COVARIANCE.P', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('ranges need to have same amount of elements',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('ranges need to have same amount of elements', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=COVARIANCE.P(B1:B5, C1:C6)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.EqualLength))
   })
 
-  it('works (simple)',  () => {
+  it('works (simple)', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '20'],
@@ -32,7 +32,7 @@ describe('COVARIANCE.P', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(2.5)
   })
 
-  it('error when not enough data',  () => {
+  it('error when not enough data', () => {
     const engine = HyperFormula.buildFromArray([
       ['=COVARIANCE.P(A2:A2, A2:A2)'],
       [null]
@@ -41,7 +41,7 @@ describe('COVARIANCE.P', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessage.OneValue))
   })
 
-  it('works',  () => {
+  it('works', () => {
     const engine = HyperFormula.buildFromArray([
       ['2', '4'],
       ['5', '3'],
@@ -56,8 +56,8 @@ describe('COVARIANCE.P', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(0)
   })
 
-  it('doesnt do coercions, nonnumeric values are skipped',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('doesnt do coercions, nonnumeric values are skipped', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', '10'],
       ['="2"', '50'],
       ['3', '30'],

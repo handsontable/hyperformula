@@ -23,7 +23,7 @@ describe('Function ISERR', () => {
 
   it('should return false for valid formulas', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISERR(1)', '=ISERR(TRUE())',  '=ISERR("foo")', '=ISERR(ISERR(1/0))', '=ISERR(A1)'],
+      ['=ISERR(1)', '=ISERR(TRUE())', '=ISERR("foo")', '=ISERR(ISERR(1/0))', '=ISERR(A1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
     expect(engine.getCellValue(adr('B1'))).toEqual(false)

@@ -8,12 +8,12 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class RadiansPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadiansPlugin>{
+export class RadiansPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadiansPlugin> {
   public static implementedFunctions = {
     'RADIANS': {
       method: 'radians',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ],
     },
   }

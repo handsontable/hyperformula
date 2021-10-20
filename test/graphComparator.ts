@@ -11,13 +11,13 @@ import {
   ValueCellVertex,
   Vertex,
 } from '../src/DependencyGraph'
-import {simpleCellAddressToString} from '../src/parser'
 import {InterpreterValue} from '../src/interpreter/InterpreterValue'
+import {simpleCellAddressToString} from '../src/parser'
 
 export class EngineComparator {
 
   constructor(private expected: HyperFormula,
-    private actual: HyperFormula) {
+              private actual: HyperFormula) {
   }
 
   public compare() {
@@ -59,8 +59,8 @@ export class EngineComparator {
         if (expectedVertex === undefined && actualVertex === undefined) {
           continue
         } else if (
-          (expectedVertex instanceof FormulaCellVertex  && actualVertex instanceof FormulaCellVertex) ||
-          (expectedVertex instanceof ArrayVertex  && actualVertex instanceof ArrayVertex)
+          (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) ||
+          (expectedVertex instanceof ArrayVertex && actualVertex instanceof ArrayVertex)
         ) {
           const actualVertexAddress = actualVertex.getAddress(this.actual.dependencyGraph.lazilyTransformingAstService)
           const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)

@@ -22,8 +22,8 @@ describe('Parser - range offset', () => {
   it('OFFSET - range offset not allowed', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const { errors: errors1 } = parser.parse('=A1:OFFSET(B2, 0, 0, 2, 2)', adr('A1'))
-    const { errors: errors2 } = parser.parse('=OFFSET(A1,0,0,2,2):A2', adr('A1'))
+    const {errors: errors1} = parser.parse('=A1:OFFSET(B2, 0, 0, 2, 2)', adr('A1'))
+    const {errors: errors2} = parser.parse('=OFFSET(A1,0,0,2,2):A2', adr('A1'))
 
     expect(errors1[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)
     expect(errors2[0].type).toBe(ParsingErrorType.RangeOffsetNotAllowed)

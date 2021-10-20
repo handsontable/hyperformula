@@ -16,7 +16,7 @@ import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} fro
 export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarValue, dependencyGraph: DependencyGraph, coordinate: 'row' | 'col'): number {
   //IMPORTANT: this function does not normalize input strings
   let end
-  if(coordinate === 'col') {
+  if (coordinate === 'col') {
     end = range.effectiveEndColumn(dependencyGraph)
   } else {
     end = range.effectiveEndRow(dependencyGraph)
@@ -25,13 +25,13 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarV
 
   let centerValueFn
   if (coordinate === 'row') {
-    centerValueFn = (center: number) =>  getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, center)))
+    centerValueFn = (center: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, center)))
   } else {
-    centerValueFn = (center: number) =>  getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row)))
+    centerValueFn = (center: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row)))
   }
 
   const pos = lowerBound(centerValueFn, key, start, end)
-  if(typeof centerValueFn(pos) !== typeof key) {
+  if (typeof centerValueFn(pos) !== typeof key) {
     return -1
   } else {
     return pos - start
@@ -66,18 +66,18 @@ export function lowerBound(value: (index: number) => RawInterpreterValue, key: R
 * */
 export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue): number {
   if (typeof left === typeof right) {
-    if(left === EmptyValue) {
+    if (left === EmptyValue) {
       return 0
     }
     return (left < (right as string | number | boolean) ? -1 : (left > (right as string | number | boolean) ? 1 : 0))
   }
-  if(left === EmptyValue) {
+  if (left === EmptyValue) {
     return -1
   }
-  if(right === EmptyValue) {
+  if (right === EmptyValue) {
     return 1
   }
-  if(right instanceof CellError) {
+  if (right instanceof CellError) {
     return -1
   }
   if (typeof left === 'number' && typeof right === 'string') {

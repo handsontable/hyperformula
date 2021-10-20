@@ -98,7 +98,7 @@ describe('Function EDATE', () => {
   })
 
   it('use number coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=EDATE(TRUE(), 1)'],
       ['=EDATE(1, 1)'],
     ])
@@ -108,7 +108,7 @@ describe('Function EDATE', () => {
   })
 
   it('use number coercion for 2nd argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['="1"', '=EDATE(A1, A2)'],
       ['=TRUE()', '=EDATE(A1, A3)'],
@@ -119,7 +119,7 @@ describe('Function EDATE', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=EDATE(4/0, 0)'],
       ['=EDATE(0, 4/0)'],
       ['=EDATE(4/0, FOOBAR())'],

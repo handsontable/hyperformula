@@ -674,7 +674,6 @@ describe('Named expressions - cross scope', () => {
       'Sheet2': [['bar']]
     })
 
-
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('B1', 1))
@@ -690,7 +689,6 @@ describe('Named expressions - cross scope', () => {
       'Sheet1': [['foo', '=expr']],
       'Sheet2': [['bar']]
     })
-
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
@@ -709,7 +707,6 @@ describe('Named expressions - cross scope', () => {
       'Sheet2': [['bar']]
     })
 
-
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
@@ -726,7 +723,6 @@ describe('Named expressions - cross scope', () => {
       'Sheet1': [['foo', '=expr']],
       'Sheet2': [['bar']]
     })
-
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
@@ -769,7 +765,6 @@ describe('Named expressions - cross scope', () => {
       'Sheet1': [['foo', '=expr']],
       'Sheet2': [['bar']]
     })
-
 
     engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
     engine.addNamedExpression('expr', '=Sheet2!$A$1', 1)
@@ -883,7 +878,7 @@ describe('Named expressions - options', () => {
   it('should return named expression with options', () => {
     const engine = HyperFormula.buildEmpty()
 
-    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'bar' })
+    engine.addNamedExpression('foo', '=foo', undefined, {visible: false, comment: 'bar'})
 
     expect(engine.getNamedExpression('foo')).toEqual({
       name: 'foo',
@@ -899,7 +894,7 @@ describe('Named expressions - options', () => {
   it('should preserve options after undo-redo', () => {
     const engine = HyperFormula.buildEmpty()
 
-    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'bar' })
+    engine.addNamedExpression('foo', '=foo', undefined, {visible: false, comment: 'bar'})
 
     engine.undo()
     engine.redo()
@@ -918,9 +913,9 @@ describe('Named expressions - options', () => {
   it('should change options of named expression', () => {
     const engine = HyperFormula.buildEmpty()
 
-    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
+    engine.addNamedExpression('foo', '=foo', undefined, {visible: false, comment: 'foo'})
 
-    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+    engine.changeNamedExpression('foo', '=bar', undefined, {visible: true, comment: 'bar'})
 
     expect(engine.getNamedExpression('foo')).toEqual({
       name: 'foo',
@@ -936,8 +931,8 @@ describe('Named expressions - options', () => {
   it('should undo changing options of named expression', () => {
     const engine = HyperFormula.buildEmpty()
 
-    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
-    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+    engine.addNamedExpression('foo', '=foo', undefined, {visible: false, comment: 'foo'})
+    engine.changeNamedExpression('foo', '=bar', undefined, {visible: true, comment: 'bar'})
 
     engine.undo()
 
@@ -955,8 +950,8 @@ describe('Named expressions - options', () => {
   it('should undo-redo changing options of named expression', () => {
     const engine = HyperFormula.buildEmpty()
 
-    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
-    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+    engine.addNamedExpression('foo', '=foo', undefined, {visible: false, comment: 'foo'})
+    engine.changeNamedExpression('foo', '=bar', undefined, {visible: true, comment: 'bar'})
 
     engine.undo()
     engine.redo()
@@ -975,7 +970,7 @@ describe('Named expressions - options', () => {
   it('should restore named expression with options', () => {
     const engine = HyperFormula.buildEmpty()
 
-    engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
+    engine.addNamedExpression('foo', '=foo', undefined, {visible: false, comment: 'foo'})
     engine.removeNamedExpression('foo')
 
     engine.undo()
@@ -1004,9 +999,9 @@ describe('nested named expressions', () => {
 describe('serialization', () => {
   it('should work', () => {
     const engine = HyperFormula.buildFromArray([
-    ['42'],
-    ['50'],
-    ['60']])
+      ['42'],
+      ['50'],
+      ['60']])
     engine.addNamedExpression('prettyName', '=Sheet1!$A$1+100')
     engine.addNamedExpression('anotherPrettyName', '=Sheet1!$A$2+100')
     engine.addNamedExpression('alsoPrettyName', '=Sheet1!$A$3+100', 0)

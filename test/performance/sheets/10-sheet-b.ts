@@ -21,7 +21,7 @@ export function sheet(rows: number = 5000) {
   return sheet
 }
 
-export function expectedValues(sheet: string[][]): ExpectedValue[] {
+export function expectedValues(_sheet: string[][]): ExpectedValue[] {
   return [
     {address: 'A5000', value: 5000},
     {address: 'B5000', value: 2},

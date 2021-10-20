@@ -32,7 +32,7 @@ import {
 } from './3rdparty/jstat/jstat'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class StatisticalPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<StatisticalPlugin>{
+export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginTypecheck<StatisticalPlugin> {
   public static implementedFunctions = {
     'ERF': {
       method: 'erf',
@@ -390,9 +390,9 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   }
 
   public static aliases = {
-    NEGBINOMDIST : 'NEGBINOM.DIST',
-    EXPONDIST : 'EXPON.DIST',
-    BETADIST : 'BETA.DIST',
+    NEGBINOMDIST: 'NEGBINOM.DIST',
+    EXPONDIST: 'EXPON.DIST',
+    BETADIST: 'BETA.DIST',
     NORMDIST: 'NORM.DIST',
     NORMINV: 'NORM.INV',
     NORMSDIST: 'NORM.S.DIST',
@@ -440,11 +440,10 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     return this.runFunction(ast.args, state, this.metadata('ERFC'), erfc)
   }
 
-
   public expondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EXPON.DIST'),
       (x: number, lambda: number, cumulative: boolean) => {
-        if(cumulative) {
+        if (cumulative) {
           return exponential.cdf(x, lambda)
         } else {
           return exponential.pdf(x, lambda)
@@ -472,7 +471,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public gammadist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GAMMA.DIST'),
       (value: number, alphaVal: number, betaVal: number, cumulative: boolean) => {
-        if(cumulative) {
+        if (cumulative) {
           return gamma.cdf(value, alphaVal, betaVal)
         } else {
           return gamma.pdf(value, alphaVal, betaVal)
@@ -498,13 +497,13 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public betadist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BETA.DIST'),
       (x: number, alphaVal: number, betaVal: number, cumulative: boolean, A: number, B: number) => {
-        if(x<=A) {
+        if (x <= A) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
-        } else if(x>=B) {
+        } else if (x >= B) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         x = (x - A) / (B - A)
-        if(cumulative) {
+        if (cumulative) {
           return beta.cdf(x, alphaVal, betaVal)
         } else {
           return beta.pdf(x, alphaVal, betaVal)
@@ -528,12 +527,12 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public binomialdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BINOM.DIST'),
       (succ: number, trials: number, prob: number, cumulative: boolean) => {
-        if(succ>trials) {
+        if (succ > trials) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
         }
         succ = Math.trunc(succ)
         trials = Math.trunc(trials)
-        if(cumulative) {
+        if (cumulative) {
           return binomial.cdf(succ, trials, prob)
         } else {
           return binomial.pdf(succ, trials, prob)
@@ -548,9 +547,9 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
         trials = Math.trunc(trials)
         let lower = -1
         let upper = trials
-        while(upper>lower+1) {
-          const mid = Math.trunc((lower+upper)/2)
-          if(binomial.cdf(mid, trials, prob) >= alpha) {
+        while (upper > lower + 1) {
+          const mid = Math.trunc((lower + upper) / 2)
+          if (binomial.cdf(mid, trials, prob) >= alpha) {
             upper = mid
           } else {
             lower = mid
@@ -589,7 +588,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     return this.runFunction(ast.args, state, this.metadata('CHISQ.DIST'),
       (x: number, deg: number, cumulative: boolean) => {
         deg = Math.trunc(deg)
-        if(cumulative) {
+        if (cumulative) {
           return chisquare.cdf(x, deg)
         } else {
           return chisquare.pdf(x, deg)
@@ -621,7 +620,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
       (x: number, deg1: number, deg2: number, cumulative: boolean) => {
         deg1 = Math.trunc(deg1)
         deg2 = Math.trunc(deg2)
-        if(cumulative) {
+        if (cumulative) {
           return centralF.cdf(x, deg1, deg2)
         } else {
           return centralF.pdf(x, deg1, deg2)
@@ -633,7 +632,6 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public fdistrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('F.DIST.RT'),
       (x: number, deg1: number, deg2: number) => 1 - centralF.cdf(x, Math.trunc(deg1), Math.trunc(deg2))
-
     )
   }
 
@@ -652,7 +650,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public weibulldist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEIBULL.DIST'),
       (x: number, shape: number, scale: number, cumulative: boolean) => {
-        if(cumulative) {
+        if (cumulative) {
           return weibull.cdf(x, scale, shape)
         } else {
           return weibull.pdf(x, scale, shape)
@@ -665,7 +663,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     return this.runFunction(ast.args, state, this.metadata('POISSON.DIST'),
       (x: number, mean: number, cumulative: boolean) => {
         x = Math.trunc(x)
-        if(cumulative) {
+        if (cumulative) {
           return poisson.cdf(x, mean)
         } else {
           return poisson.pdf(x, mean)
@@ -677,10 +675,10 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public hypgeomdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HYPGEOM.DIST'),
       (s: number, numberS: number, populationS: number, numberPop: number, cumulative: boolean) => {
-        if(s > numberS || s > populationS || numberS > numberPop || populationS > numberPop) {
+        if (s > numberS || s > populationS || numberS > numberPop || populationS > numberPop) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
-        if(s+numberPop < populationS+numberS) {
+        if (s + numberPop < populationS + numberS) {
           return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
         }
         s = Math.trunc(s)
@@ -688,7 +686,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
         populationS = Math.trunc(populationS)
         numberPop = Math.trunc(numberPop)
 
-        if(cumulative) {
+        if (cumulative) {
           return hypgeom.cdf(s, numberPop, populationS, numberS)
         } else {
           return hypgeom.pdf(s, numberPop, populationS, numberS)
@@ -701,7 +699,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     return this.runFunction(ast.args, state, this.metadata('T.DIST'),
       (x: number, deg: number, cumulative: boolean) => {
         deg = Math.trunc(deg)
-        if(cumulative) {
+        if (cumulative) {
           return studentt.cdf(x, deg)
         } else {
           return studentt.pdf(x, deg)
@@ -724,7 +722,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
 
   public tdistold(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TDIST'),
-      (x: number, deg: number, mode: number) => mode*(1 - studentt.cdf(x, Math.trunc(deg)))
+      (x: number, deg: number, mode: number) => mode * (1 - studentt.cdf(x, Math.trunc(deg)))
     )
   }
 
@@ -736,14 +734,14 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
 
   public tinv2t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.INV.2T'),
-      (p: number, deg: number) => studentt.inv(1-p/2, Math.trunc(deg))
+      (p: number, deg: number) => studentt.inv(1 - p / 2, Math.trunc(deg))
     )
   }
 
   public lognormdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOGNORM.DIST'),
       (x: number, mean: number, stddev: number, cumulative: boolean) => {
-        if(cumulative) {
+        if (cumulative) {
           return lognormal.cdf(x, mean, stddev)
         } else {
           return lognormal.pdf(x, mean, stddev)
@@ -761,7 +759,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public normdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NORM.DIST'),
       (x: number, mean: number, stddev: number, cumulative: boolean) => {
-        if(cumulative) {
+        if (cumulative) {
           return normal.cdf(x, mean, stddev)
         } else {
           return normal.pdf(x, mean, stddev)
@@ -779,7 +777,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
   public normsdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NORM.S.DIST'),
       (x: number, cumulative: boolean) => {
-        if(cumulative) {
+        if (cumulative) {
           return normal.cdf(x, 0, 1)
         } else {
           return normal.pdf(x, 0, 1)
@@ -805,7 +803,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
       (nf: number, ns: number, p: number, cumulative: boolean) => {
         nf = Math.trunc(nf)
         ns = Math.trunc(ns)
-        if(cumulative) {
+        if (cumulative) {
           return negbin.cdf(nf, ns, p)
         } else {
           return negbin.pdf(nf, ns, p)
@@ -826,7 +824,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     return this.runFunction(ast.args, state, this.metadata('CONFIDENCE.T'),
       (alpha: number, stddev: number, size: number) => {
         size = Math.trunc(size)
-        if(size===1) {
+        if (size === 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         // eslint-disable-next-line
@@ -838,7 +836,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
 
   public standardize(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('STANDARDIZE'),
-      (x: number, mean: number, stddev: number) => (x-mean)/stddev
+      (x: number, mean: number, stddev: number) => (x - mean) / stddev
     )
   }
 }

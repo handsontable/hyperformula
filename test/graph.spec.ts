@@ -1,6 +1,6 @@
 import {Graph} from '../src/DependencyGraph'
 
-const identifiableString = (id: number, str: string) => ({ id, str })
+const identifiableString = (id: number, str: string) => ({id, str})
 
 const dummyGetDependenciesQuery: () => any[] = () => []
 

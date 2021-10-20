@@ -109,7 +109,6 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLong))
   })
 
-
   it('should allow for numbers from 1 to 10 as second argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=HEX2BIN(2, 0)'],

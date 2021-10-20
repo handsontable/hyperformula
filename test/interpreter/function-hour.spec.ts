@@ -30,7 +30,7 @@ describe('Function HOUR', () => {
   })
 
   it('use datenumber coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=HOUR(TRUE())'],
     ])
 
@@ -38,7 +38,7 @@ describe('Function HOUR', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=HOUR(4/0)'],
     ])
 

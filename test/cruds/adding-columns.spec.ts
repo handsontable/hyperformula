@@ -192,8 +192,6 @@ describe('Adding column - reevaluation', () => {
       ['1', '2', '=COLUMNS(A1:B1)'],
     ])
 
-    engine.addressMapping.getCell(adr('C1'))
-
     const changes = engine.addColumns(0, [1, 1])
 
     expect(changes.length).toBe(1)
@@ -288,7 +286,7 @@ describe('Adding column - column index', () => {
   it('should update column index when adding row', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(1, A1:A1, 1, TRUE())'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
     const index = (engine.columnSearch as ColumnIndex)
 
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)

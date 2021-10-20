@@ -13,7 +13,7 @@ export class ArrayMapping {
   public readonly arrayMapping: Map<string, ArrayVertex> = new Map()
 
   public getArray(range: AbsoluteCellRange): Maybe<ArrayVertex> {
-    const array =  this.getArrayByCorner(range.start)
+    const array = this.getArrayByCorner(range.start)
     if (array?.getRange().sameAs(range)) {
       return array
     }

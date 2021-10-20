@@ -48,7 +48,7 @@ describe('Function POWER', () => {
       ['=POWER(2, 1024)'],
       ['=POWER(-2, 1023)'],
       ['=POWER(-2, 1024)'],
-    ], { smartRounding : false})
+    ], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(8.98846567431158e+307)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
@@ -62,7 +62,7 @@ describe('Function POWER', () => {
       ['=POWER(2, 0)'],
       ['=POWER(2.4, 2.5)'],
       ['=POWER(3, -2.5)'],
-    ], { smartRounding : false})
+    ], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)

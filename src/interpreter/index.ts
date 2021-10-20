@@ -12,7 +12,7 @@ import {
   ImplementedFunctions
 } from './plugin/FunctionPlugin'
 
-export { 
+export {
   FunctionPluginDefinition,
   FunctionArgument,
   FunctionPlugin,

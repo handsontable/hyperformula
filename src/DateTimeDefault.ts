@@ -13,15 +13,15 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat?: stri
     dateTimeString = dateTimeString.substring(0, dateTimeString.length - 2).trim()
   } else {
     ampmtoken = dateTimeString.substring(dateTimeString.length - 1)
-    if(ampmtoken === 'a' || ampmtoken === 'p') {
+    if (ampmtoken === 'a' || ampmtoken === 'p') {
       dateTimeString = dateTimeString.substring(0, dateTimeString.length - 1).trim()
     } else {
       ampmtoken = undefined
     }
   }
   const dateItems = dateTimeString.split(/[ /.-]/g)
-  if(dateItems.length >= 2 && dateItems[dateItems.length-2].includes(':')) {
-    dateItems[dateItems.length-2] = dateItems[dateItems.length-2] + '.' + dateItems[dateItems.length-1]
+  if (dateItems.length >= 2 && dateItems[dateItems.length - 2].includes(':')) {
+    dateItems[dateItems.length - 2] = dateItems[dateItems.length - 2] + '.' + dateItems[dateItems.length - 1]
     dateItems.pop()
   }
   const timeItems = dateItems[dateItems.length - 1].split(':')
@@ -68,9 +68,9 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
     timeItems.pop()
   }
   let fractionOfSecondPrecision: number = 0
-  if(formatItems.length >= 1 && secondsExtendedRegexp.test(formatItems[formatItems.length-1])) {
-    fractionOfSecondPrecision = formatItems[formatItems.length-1].length-3
-    formatItems[formatItems.length-1] = 'ss'
+  if (formatItems.length >= 1 && secondsExtendedRegexp.test(formatItems[formatItems.length - 1])) {
+    fractionOfSecondPrecision = formatItems[formatItems.length - 1].length - 3
+    formatItems[formatItems.length - 1] = 'ss'
   }
   if (timeItems.length !== formatItems.length) {
     return undefined
@@ -105,7 +105,7 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
     return undefined
   }
   let seconds = Number(secondString)
-  seconds = Math.round(seconds * Math.pow(10, fractionOfSecondPrecision))/Math.pow(10, fractionOfSecondPrecision)
+  seconds = Math.round(seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
 
   return {hours, minutes, seconds}
 }

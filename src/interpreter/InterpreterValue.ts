@@ -17,7 +17,7 @@ export type RawScalarValue = RawNoErrorScalarValue | CellError
 export type RawInterpreterValue = RawScalarValue | SimpleRangeValue
 
 export function getRawValue<T>(num: RichNumber | T): number | T {
-  if(num instanceof RichNumber) {
+  if (num instanceof RichNumber) {
     return num.val
   } else {
     return num
@@ -26,15 +26,18 @@ export function getRawValue<T>(num: RichNumber | T): number | T {
 
 export abstract class RichNumber {
   constructor(public val: number,
-              public format?: string) {}
+              public format?: string) {
+  }
+
   public fromNumber(val: number): this {
     return new (this.constructor as any)(val)
   }
+
   abstract getDetailedType(): NumberType
 }
 
 export function cloneNumber(val: ExtendedNumber, newVal: number): ExtendedNumber {
-  if(typeof val === 'number') {
+  if (typeof val === 'number') {
     return newVal
   } else {
     const ret = val.fromNumber(newVal)
@@ -89,7 +92,7 @@ export enum NumberType {
 }
 
 export function getTypeOfExtendedNumber(num: ExtendedNumber): NumberType {
-  if(num instanceof RichNumber) {
+  if (num instanceof RichNumber) {
     return num.getDetailedType()
   } else {
     return NumberType.NUMBER_RAW
@@ -99,17 +102,17 @@ export function getTypeOfExtendedNumber(num: ExtendedNumber): NumberType {
 export type FormatInfo = string | undefined
 
 export function getFormatOfExtendedNumber(num: ExtendedNumber): FormatInfo {
-  if(num instanceof RichNumber) {
+  if (num instanceof RichNumber) {
     return num.format
   } else {
     return undefined
   }
 }
 
-export type NumberTypeWithFormat = {type: NumberType, format?: FormatInfo}
+export type NumberTypeWithFormat = { type: NumberType, format?: FormatInfo }
 
 export function getTypeFormatOfExtendedNumber(num: ExtendedNumber): NumberTypeWithFormat {
-  if(num instanceof RichNumber) {
+  if (num instanceof RichNumber) {
     return {type: num.getDetailedType(), format: num.format}
   } else {
     return {type: NumberType.NUMBER_RAW}

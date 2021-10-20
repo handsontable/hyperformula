@@ -26,7 +26,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [1, 1])
 
-      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absolute( 0, 0))
+      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absolute(0, 0))
     })
 
     it('same sheet, case Ab', () => {
@@ -119,7 +119,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [0, 1])
 
-      expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
+      expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
     })
 
     it('R < r', () => {

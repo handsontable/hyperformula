@@ -14,6 +14,7 @@ export class EmptyCellVertex {
     public address: SimpleCellAddress //might be outdated!
   ) {
   }
+
   /**
    * Retrieves cell value bound to that singleton
    */

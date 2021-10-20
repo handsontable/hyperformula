@@ -167,8 +167,7 @@ describe('Interpreter', () => {
         ['=Sheet1!A:Sheet2!B'],
         ['=Sheet1!2:Sheet2!3'],
       ],
-      'Sheet2': [
-      ]
+      'Sheet2': []
     })
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))

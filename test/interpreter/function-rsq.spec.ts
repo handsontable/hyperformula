@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('RSQ', () => {
-  it('validates number of arguments',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('validates number of arguments', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=RSQ(B1:B5)'],
       ['=RSQ(B1:B5, C1:C5, D1:D5)'],
     ])
@@ -14,15 +14,15 @@ describe('RSQ', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('ranges need to have same amount of elements',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('ranges need to have same amount of elements', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=RSQ(B1:B5, C1:C6)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.EqualLength))
   })
 
-  it('works (simple)',  () => {
+  it('works (simple)', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '20'],
@@ -32,7 +32,7 @@ describe('RSQ', () => {
     expect(engine.getCellValue(adr('A3'))).toBe(1)
   })
 
-  it('works',  () => {
+  it('works', () => {
     const engine = HyperFormula.buildFromArray([
       ['2', '4'],
       ['5', '3'],
@@ -45,7 +45,7 @@ describe('RSQ', () => {
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(0.628378378378378)
   })
 
-  it('error when not enough data',  () => {
+  it('error when not enough data', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=RSQ(A1:A1, B1:B1)'],
@@ -58,8 +58,8 @@ describe('RSQ', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues))
   })
 
-  it('doesnt do coercions, nonnumeric values are skipped',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('doesnt do coercions, nonnumeric values are skipped', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', '10'],
       ['="2"', '50'],
       ['3', '30'],

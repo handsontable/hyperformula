@@ -42,7 +42,6 @@ export function validateNumberToBeAtMost(value: number, paramName: string, maxim
   }
 }
 
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function configValueFromParamCheck(inputValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList) {
   if (typeCheck(inputValue)) {

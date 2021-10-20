@@ -16,7 +16,7 @@ describe('Function GCD', () => {
       ['=GCD(2*3*5,3*5*7)', '=GCD(0,1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(3*5)
+    expect(engine.getCellValue(adr('A1'))).toBe(3 * 5)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
   })
 

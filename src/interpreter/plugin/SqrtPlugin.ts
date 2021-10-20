@@ -8,12 +8,12 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class SqrtPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<SqrtPlugin>{
+export class SqrtPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SqrtPlugin> {
   public static implementedFunctions = {
     'SQRT': {
       method: 'sqrt',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ],
     },
   }

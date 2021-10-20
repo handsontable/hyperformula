@@ -8,108 +8,108 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class SimpleArithmerticPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SimpleArithmerticPlugin>{
+export class SimpleArithmerticPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SimpleArithmerticPlugin> {
   public static implementedFunctions = {
     'HF.ADD': {
       method: 'add',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
-    'HF.CONCAT' : {
+    'HF.CONCAT': {
       method: 'concat',
       parameters: [
-        { argumentType: ArgumentTypes.STRING, passSubtype: true },
-        { argumentType: ArgumentTypes.STRING, passSubtype: true },
+        {argumentType: ArgumentTypes.STRING, passSubtype: true},
+        {argumentType: ArgumentTypes.STRING, passSubtype: true},
       ],
     },
     'HF.DIVIDE': {
       method: 'divide',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
     'HF.EQ': {
       method: 'eq',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
       ]
     },
     'HF.GT': {
       method: 'gt',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
       ]
     },
     'HF.GTE': {
       method: 'gte',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
       ]
     },
     'HF.LT': {
       method: 'lt',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
       ]
     },
     'HF.LTE': {
       method: 'lte',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
       ]
     },
     'HF.MINUS': {
       method: 'minus',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
     'HF.MULTIPLY': {
       method: 'multiply',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
     'HF.NE': {
       method: 'ne',
       parameters: [
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
-        { argumentType: ArgumentTypes.NOERROR, passSubtype: true },
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
+        {argumentType: ArgumentTypes.NOERROR, passSubtype: true},
       ]
     },
     'HF.POW': {
       method: 'pow',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
     'HF.UMINUS': {
       method: 'uminus',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
     'HF.UNARY_PERCENT': {
       method: 'upercent',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
     'HF.UPLUS': {
       method: 'uplus',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER, passSubtype: true },
+        {argumentType: ArgumentTypes.NUMBER, passSubtype: true},
       ],
     },
   }
@@ -134,31 +134,31 @@ export class SimpleArithmerticPlugin extends FunctionPlugin implements FunctionP
 
   public eq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.EQ'),
-        this.arithmeticHelper.eq
+      this.arithmeticHelper.eq
     )
   }
 
   public gt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.GT'),
-        this.arithmeticHelper.gt
+      this.arithmeticHelper.gt
     )
   }
 
   public gte(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.GTE'),
-        this.arithmeticHelper.geq
+      this.arithmeticHelper.geq
     )
   }
 
   public lt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.LT'),
-        this.arithmeticHelper.lt
+      this.arithmeticHelper.lt
     )
   }
 
   public lte(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HF.LTE'),
-        this.arithmeticHelper.leq
+      this.arithmeticHelper.leq
     )
   }
 
