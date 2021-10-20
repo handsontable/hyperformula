@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.0] - 2021-10-20
 
 ### Added
-- Added static property `defaultConfig`. (#822)
-- Support for `getFillRangeData` using different sheets as source and target. (#836)
+- Added a new static property: `defaultConfig`. (#822)
+- The `getFillRangeData()` method can now use one sheet for its source and another sheet for its target. (#836)
 
 ### Fixed
-- Fixed handling of Unicode characters and non-letter characters in PROPER function. (#811)
-- Fixed unnecessary warnings of deprecated config options. (#830)
-- Fixed SUMPRODUCT function. (#810)
+- Fixed the handling of Unicode characters and non-letter characters in the `PROPER` function. (#811)
+- Fixed unnecessary warnings caused by deprecated configuration options. (#830)
+- Fixed the `SUMPRODUCT` function. (#810)
 
 ## [1.2.0] - 2021-09-23
 
