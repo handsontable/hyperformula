@@ -298,7 +298,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | ROUNDDOWN | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
 | SEC | Returns the secant of the given angle (in radians). | SEC(Number) |
-| SECH | Returns the hyperbolic secant of the given value. | SEC(Number) |
+| SECH | Return the hyperbolic secant of the given angle specified in radians. | SEC(Number) |
 | SERIESSUM | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
 | SIN | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH | Returns the hyperbolic sine of the given value. | SINH(Number) |
