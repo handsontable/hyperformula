@@ -245,14 +245,14 @@ export interface ConfigParams {
    * Sets a column separator symbol for array notation.
    *
    * @default ','
-   * @category Formula syntax
+   * @category Formula Syntax
    */
   arrayColumnSeparator: ',' | ';',
   /**
    * Sets a row separator symbol for array notation.
    *
    * @default ';'
-   * @category Formula syntax
+   * @category Formula Syntax
    */
   arrayRowSeparator: ';' | '|',
   /**
