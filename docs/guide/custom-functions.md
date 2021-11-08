@@ -294,7 +294,8 @@ export class CountHF extends FunctionPlugin {
   
   // wrap your custom function in `runFunction()`
   public hyper(ast, state) {
-    return this.runFunction(() => 'Hyperformula'.length)
+    return this.runFunction(ast, state, this.metadata('HYPER'),
+    () => 'Hyperformula'.length)
   }
 }
 ```
