@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class SqrtPlugin extends  FunctionPlugin implements FunctionPluginTypecheck<SqrtPlugin>{
@@ -18,7 +18,7 @@ export class SqrtPlugin extends  FunctionPlugin implements FunctionPluginTypeche
     },
   }
 
-  public sqrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public sqrt(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SQRT'), Math.sqrt)
   }
 }

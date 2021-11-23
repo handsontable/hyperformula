@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export function findNextOddNumber(arg: number): number {
@@ -112,7 +112,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     'TRUNC': 'ROUNDDOWN',
   }
 
-  public roundup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public roundup(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -123,7 +123,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public rounddown(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public rounddown(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -134,7 +134,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public round(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public round(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROUND'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
       if (numberToRound < 0) {
@@ -145,7 +145,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public intFunc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public intFunc(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('INT'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -Math.floor(-coercedNumberToRound)
@@ -155,7 +155,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public even(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public even(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EVEN'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextEvenNumber(-coercedNumberToRound)
@@ -165,7 +165,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public odd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public odd(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ODD'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
         return -findNextOddNumber(-coercedNumberToRound)
@@ -175,7 +175,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public ceilingmath(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public ceilingmath(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING.MATH'),
       (value: number, significance: number, mode: number) => {
       if (significance === 0 || value === 0) {
@@ -191,7 +191,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public ceiling(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public ceiling(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING'),
       (value: number, significance: number) => {
         if(value === 0) {
@@ -209,7 +209,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
-  public ceilingprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public ceilingprecise(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING.PRECISE'),
       (value: number, significance: number) => {
         if (significance === 0 || value === 0) {
@@ -220,7 +220,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
-  public floormath(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public floormath(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FLOOR.MATH'),
       (value: number, significance: number, mode: number) => {
         if (significance === 0 || value === 0) {
@@ -236,7 +236,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
-  public floor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public floor(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FLOOR'),
       (value: number, significance: number) => {
         if(value === 0) {
@@ -254,7 +254,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
-  public floorprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public floorprecise(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FLOOR.PRECISE'),
       (value: number, significance: number) => {
         if (significance === 0 || value === 0) {

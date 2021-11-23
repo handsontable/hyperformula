@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class BitwiseLogicOperationsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BitwiseLogicOperationsPlugin>{
@@ -33,19 +33,19 @@ export class BitwiseLogicOperationsPlugin extends FunctionPlugin implements Func
     },
   }
 
-  public bitand(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public bitand(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITAND'),
       (left: number, right: number) => left & right
     )
   }
 
-  public bitor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public bitor(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITOR'),
       (left: number, right: number) => left | right
     )
   }
 
-  public bitxor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public bitxor(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITXOR'),
       (left: number, right: number) => left ^ right
     )

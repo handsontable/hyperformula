@@ -9,7 +9,7 @@ import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue, InternalScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -45,7 +45,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
   }
 
-  public arrayformula(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public arrayformula(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARRAYFORMULA'), (value) => value)
   }
 
@@ -60,7 +60,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return subChecks[0]
   }
 
-  public arrayconstrain(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public arrayconstrain(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARRAY_CONSTRAIN'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
       numRows = Math.min(numRows, range.height())
       numCols = Math.min(numCols, range.width())
@@ -94,7 +94,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return new ArraySize(width, height)
   }
 
-  public filter(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public filter(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FILTER'), (rangeVals: SimpleRangeValue, ...rangeFilters: SimpleRangeValue[]) => {
       for(const filter of rangeFilters) {
         if (rangeVals.width() !== filter.width() || rangeVals.height() !== filter.height()) {

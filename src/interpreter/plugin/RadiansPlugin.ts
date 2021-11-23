@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class RadiansPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadiansPlugin>{
@@ -18,7 +18,7 @@ export class RadiansPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
   }
 
-  public radians(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public radians(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RADIANS'),
       (arg) => arg * (Math.PI / 180)
     )

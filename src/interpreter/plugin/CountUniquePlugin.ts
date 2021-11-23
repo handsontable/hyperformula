@@ -6,7 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValueType, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {EmptyValueType, AsyncInterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
@@ -32,7 +32,7 @@ export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public countunique(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public countunique(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COUNTUNIQUE'), (...args: RawScalarValue[]) => {
       const valuesSet = new Set<number | string | boolean | EmptyValueType>()
       const errorsSet = new Set<ErrorType>()

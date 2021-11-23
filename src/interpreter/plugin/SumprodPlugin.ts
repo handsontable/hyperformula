@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
+import {getRawValue, AsyncInterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -22,7 +22,7 @@ export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
   }
 
-  public sumproduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public sumproduct(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMPRODUCT'), (...args: SimpleRangeValue[]) => {
       const width = args[0].width()
       const height = args[0].height()

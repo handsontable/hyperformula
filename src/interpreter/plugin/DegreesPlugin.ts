@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class DegreesPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DegreesPlugin>{
@@ -18,7 +18,7 @@ export class DegreesPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
   }
 
-  public degrees(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public degrees(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEGREES'),
       (arg) => arg * (180 / Math.PI)
     )

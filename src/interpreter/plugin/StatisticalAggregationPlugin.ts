@@ -10,7 +10,7 @@ import {InterpreterState} from '../InterpreterState'
 import {
   getRawValue,
   InternalScalarValue,
-  InterpreterValue,
+  AsyncInterpreterValue,
   isExtendedNumber,
   RawInterpreterValue
 } from '../InterpreterValue'
@@ -160,7 +160,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
     SKEWP: 'SKEW.P',
   }
 
-  public avedev(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public avedev(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AVEDEV'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
@@ -175,7 +175,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public devsq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public devsq(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEVSQ'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
@@ -189,7 +189,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public geomean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public geomean(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GEOMEAN'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
@@ -208,7 +208,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public harmean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public harmean(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HARMEAN'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
@@ -227,7 +227,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public correl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public correl(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CORREL'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
@@ -245,7 +245,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
     })
   }
 
-  public rsq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public rsq(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RSQ'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
@@ -264,7 +264,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
     })
   }
 
-  public covariancep(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public covariancep(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COVARIANCE.P'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
@@ -286,7 +286,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
     })
   }
 
-  public covariances(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public covariances(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COVARIANCE.S'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
       if (dataX.numberOfElements() !== dataY.numberOfElements()) {
@@ -305,7 +305,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
     })
   }
 
-  public ztest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public ztest(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('Z.TEST'),
       (range: SimpleRangeValue, x: number, sigma?: number) => {
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
@@ -330,7 +330,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
     )
   }
 
-  public ftest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public ftest(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('F.TEST'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
         const arrX = this.arithmeticHelper.manyToExactNumbers(dataX.valuesFromTopLeftCorner())
@@ -355,7 +355,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
     })
   }
 
-  public steyx(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public steyx(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('STEYX'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
         if (dataX.numberOfElements() !== dataY.numberOfElements()) {
@@ -374,7 +374,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public slope(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public slope(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SLOPE'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
         if (dataX.numberOfElements() !== dataY.numberOfElements()) {
@@ -393,7 +393,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public chisqtest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public chisqtest(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHISQ.TEST'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue) => {
         const r = dataX.height()
@@ -423,7 +423,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public ttest(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public ttest(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.TEST'),
       (dataX: SimpleRangeValue, dataY: SimpleRangeValue, tails: number, type: number) => {
         const arrX = this.arithmeticHelper.manyToExactNumbers(dataX.valuesFromTopLeftCorner())
@@ -479,7 +479,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public skew(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public skew(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SKEW'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
@@ -499,7 +499,7 @@ export class StatisticalAggregationPlugin extends  FunctionPlugin implements Fun
       })
   }
 
-  public skewp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public skewp(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SKEW.P'),
       (...args: RawInterpreterValue[]) => {
         const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)

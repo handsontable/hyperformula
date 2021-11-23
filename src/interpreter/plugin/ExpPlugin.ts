@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class ExpPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ExpPlugin>{
@@ -26,7 +26,7 @@ export class ExpPlugin extends FunctionPlugin implements FunctionPluginTypecheck
    * @param ast
    * @param state
    */
-  public exp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public exp(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EXP'), Math.exp)
   }
 }

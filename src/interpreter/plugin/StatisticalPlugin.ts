@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {besseli, besselj, besselk, bessely} from './3rdparty/bessel/bessel'
 import {
   beta,
@@ -426,7 +426,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     POISSONDIST: 'POISSON.DIST',
   }
 
-  public erf(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public erf(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ERF'), (lowerBound, upperBound) => {
       if (upperBound === undefined) {
         return erf(lowerBound)
@@ -436,12 +436,12 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     })
   }
 
-  public erfc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public erfc(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ERFC'), erfc)
   }
 
 
-  public expondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public expondist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EXPON.DIST'),
       (x: number, lambda: number, cumulative: boolean) => {
         if(cumulative) {
@@ -453,23 +453,23 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public fisher(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public fisher(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FISHER'),
       (x: number) => Math.log((1 + x) / (1 - x)) / 2
     )
   }
 
-  public fisherinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public fisherinv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FISHERINV'),
       (y: number) => 1 - 2 / (Math.exp(2 * y) + 1)
     )
   }
 
-  public gamma(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public gamma(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GAMMA'), gammafn)
   }
 
-  public gammadist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public gammadist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GAMMA.DIST'),
       (value: number, alphaVal: number, betaVal: number, cumulative: boolean) => {
         if(cumulative) {
@@ -481,21 +481,21 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public gammaln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public gammaln(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GAMMALN'), gammaln)
   }
 
-  public gammainv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public gammainv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GAMMA.INV'), gamma.inv)
   }
 
-  public gauss(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public gauss(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GAUSS'),
       (z: number) => normal.cdf(z, 0, 1) - 0.5
     )
   }
 
-  public betadist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public betadist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BETA.DIST'),
       (x: number, alphaVal: number, betaVal: number, cumulative: boolean, A: number, B: number) => {
         if(x<=A) {
@@ -513,7 +513,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public betainv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public betainv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BETA.INV'),
       (x: number, alphaVal: number, betaVal: number, A: number, B: number) => {
         if (A >= B) {
@@ -525,7 +525,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public binomialdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public binomialdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BINOM.DIST'),
       (succ: number, trials: number, prob: number, cumulative: boolean) => {
         if(succ>trials) {
@@ -542,7 +542,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public binomialinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public binomialinv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BINOM.INV'),
       (trials: number, prob: number, alpha: number) => {
         trials = Math.trunc(trials)
@@ -561,31 +561,31 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public besselifn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public besselifn(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BESSELI'),
       (x: number, n: number) => besseli(x, Math.trunc(n))
     )
   }
 
-  public besseljfn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public besseljfn(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BESSELJ'),
       (x: number, n: number) => besselj(x, Math.trunc(n))
     )
   }
 
-  public besselkfn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public besselkfn(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BESSELK'),
       (x: number, n: number) => besselk(x, Math.trunc(n))
     )
   }
 
-  public besselyfn(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public besselyfn(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BESSELY'),
       (x: number, n: number) => bessely(x, Math.trunc(n))
     )
   }
 
-  public chisqdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public chisqdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHISQ.DIST'),
       (x: number, deg: number, cumulative: boolean) => {
         deg = Math.trunc(deg)
@@ -598,25 +598,25 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public chisqdistrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public chisqdistrt(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHISQ.DIST.RT'),
       (x: number, deg: number) => 1 - chisquare.cdf(x, Math.trunc(deg))
     )
   }
 
-  public chisqinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public chisqinv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHISQ.INV'),
       (p: number, deg: number) => chisquare.inv(p, Math.trunc(deg))
     )
   }
 
-  public chisqinvrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public chisqinvrt(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHISQ.INV.RT'),
       (p: number, deg: number) => chisquare.inv(1.0 - p, Math.trunc(deg))
     )
   }
 
-  public fdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public fdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('F.DIST'),
       (x: number, deg1: number, deg2: number, cumulative: boolean) => {
         deg1 = Math.trunc(deg1)
@@ -630,26 +630,26 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public fdistrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public fdistrt(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('F.DIST.RT'),
       (x: number, deg1: number, deg2: number) => 1 - centralF.cdf(x, Math.trunc(deg1), Math.trunc(deg2))
 
     )
   }
 
-  public finv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public finv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('F.INV'),
       (p: number, deg1: number, deg2: number) => centralF.inv(p, Math.trunc(deg1), Math.trunc(deg2))
     )
   }
 
-  public finvrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public finvrt(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('F.INV.RT'),
       (p: number, deg1: number, deg2: number) => centralF.inv(1.0 - p, Math.trunc(deg1), Math.trunc(deg2))
     )
   }
 
-  public weibulldist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public weibulldist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEIBULL.DIST'),
       (x: number, shape: number, scale: number, cumulative: boolean) => {
         if(cumulative) {
@@ -661,7 +661,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public poissondist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public poissondist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('POISSON.DIST'),
       (x: number, mean: number, cumulative: boolean) => {
         x = Math.trunc(x)
@@ -674,7 +674,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public hypgeomdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public hypgeomdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HYPGEOM.DIST'),
       (s: number, numberS: number, populationS: number, numberPop: number, cumulative: boolean) => {
         if(s > numberS || s > populationS || numberS > numberPop || populationS > numberPop) {
@@ -697,7 +697,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public tdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public tdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.DIST'),
       (x: number, deg: number, cumulative: boolean) => {
         deg = Math.trunc(deg)
@@ -710,37 +710,37 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public tdist2t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public tdist2t(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.DIST.2T'),
       (x: number, deg: number) => (1 - studentt.cdf(x, Math.trunc(deg))) * 2
     )
   }
 
-  public tdistrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public tdistrt(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.DIST.RT'),
       (x: number, deg: number) => 1 - studentt.cdf(x, Math.trunc(deg))
     )
   }
 
-  public tdistold(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public tdistold(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TDIST'),
       (x: number, deg: number, mode: number) => mode*(1 - studentt.cdf(x, Math.trunc(deg)))
     )
   }
 
-  public tinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public tinv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.INV'),
       (p: number, deg: number) => studentt.inv(p, Math.trunc(deg))
     )
   }
 
-  public tinv2t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public tinv2t(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T.INV.2T'),
       (p: number, deg: number) => studentt.inv(1-p/2, Math.trunc(deg))
     )
   }
 
-  public lognormdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public lognormdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOGNORM.DIST'),
       (x: number, mean: number, stddev: number, cumulative: boolean) => {
         if(cumulative) {
@@ -752,13 +752,13 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public lognorminv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public lognorminv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOGNORM.INV'),
       (p: number, mean: number, stddev: number) => lognormal.inv(p, mean, stddev)
     )
   }
 
-  public normdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public normdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NORM.DIST'),
       (x: number, mean: number, stddev: number, cumulative: boolean) => {
         if(cumulative) {
@@ -770,13 +770,13 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public norminv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public norminv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NORM.INV'),
       (p: number, mean: number, stddev: number) => normal.inv(p, mean, stddev)
     )
   }
 
-  public normsdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public normsdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NORM.S.DIST'),
       (x: number, cumulative: boolean) => {
         if(cumulative) {
@@ -788,19 +788,19 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public normsinv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public normsinv(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NORM.S.INV'),
       (p: number) => normal.inv(p, 0, 1)
     )
   }
 
-  public phi(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public phi(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PHI'),
       (x: number) => normal.pdf(x, 0, 1)
     )
   }
 
-  public negbinomdist(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public negbinomdist(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NEGBINOM.DIST'),
       (nf: number, ns: number, p: number, cumulative: boolean) => {
         nf = Math.trunc(nf)
@@ -814,7 +814,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public confidencenorm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public confidencenorm(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CONFIDENCE.NORM'),
       // eslint-disable-next-line
       // @ts-ignore
@@ -822,7 +822,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public confidencet(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public confidencet(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CONFIDENCE.T'),
       (alpha: number, stddev: number, size: number) => {
         size = Math.trunc(size)
@@ -836,7 +836,7 @@ export class StatisticalPlugin extends  FunctionPlugin implements FunctionPlugin
     )
   }
 
-  public standardize(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public standardize(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('STANDARDIZE'),
       (x: number, mean: number, stddev: number) => (x-mean)/stddev
     )

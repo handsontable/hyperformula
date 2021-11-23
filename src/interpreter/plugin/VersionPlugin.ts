@@ -7,7 +7,7 @@ import {LicenseKeyValidityState} from '../../helpers/licenseKeyValidator'
 import {HyperFormula} from '../../HyperFormula'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const LICENSE_STATUS_MAP = new Map([
@@ -25,7 +25,7 @@ export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
   }
 
-  public version(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public version(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('VERSION'), () => {
       const {
         licenseKeyValidityState: validityState,

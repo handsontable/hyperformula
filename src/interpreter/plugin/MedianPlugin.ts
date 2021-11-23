@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {AsyncInterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -48,7 +48,7 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param ast
    * @param state
    */
-  public median(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public median(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MEDIAN'),
       (...args: RawScalarValue[]) => {
         const values = this.arithmeticHelper.coerceNumbersExactRanges(args)
@@ -67,7 +67,7 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  public large(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public large(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LARGE'),
       (range: SimpleRangeValue, n: number) => {
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
@@ -84,7 +84,7 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
     )
   }
 
-  public small(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public small(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SMALL'),
       (range: SimpleRangeValue, n: number) => {
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())

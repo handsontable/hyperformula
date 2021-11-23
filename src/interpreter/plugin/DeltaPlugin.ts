@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypecheck<DeltaPlugin>{
@@ -19,7 +19,7 @@ export class DeltaPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
   }
 
-  public delta(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public delta(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DELTA'),
       (left: number, right: number) => (left === right ? 1 : 0)
     )

@@ -9,7 +9,7 @@ import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InternalScalarValue, AsyncInterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -90,7 +90,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
   }
 
-  public mmult(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public mmult(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MMULT'), (leftMatrix: SimpleRangeValue, rightMatrix: SimpleRangeValue) => {
       if (!leftMatrix.hasOnlyNumbers() || !rightMatrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
@@ -122,7 +122,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     return arraySizeForMultiplication(left, right)
   }
 
-  public maxpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public maxpool(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
@@ -145,7 +145,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  public medianpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public medianpool(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
       if (!matrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
@@ -252,7 +252,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     return this.maxpoolArraySize(ast, state)
   }
 
-  public transpose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public transpose(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRANSPOSE'), (matrix: SimpleRangeValue) => {
       const input = matrix.rawData()
       const inputSize = matrix.size

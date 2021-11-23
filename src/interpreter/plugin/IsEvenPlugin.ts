@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class IsEvenPlugin extends FunctionPlugin implements FunctionPluginTypecheck<IsEvenPlugin>{
@@ -18,7 +18,7 @@ export class IsEvenPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
   }
 
-  public iseven(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public iseven(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISEVEN'),
       (val) => (val % 2 === 0)
     )

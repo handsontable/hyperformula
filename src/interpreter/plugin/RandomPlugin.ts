@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RandomPlugin>{
@@ -36,11 +36,11 @@ export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param ast
    * @param state
    */
-  public rand(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public rand(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RAND'), Math.random)
   }
 
-  public randbetween(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public randbetween(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RANDBETWEEN'),
       (lower: number, upper: number) => {
         if(upper<lower) {

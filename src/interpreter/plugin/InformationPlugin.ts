@@ -8,7 +8,7 @@ import {FormulaVertex} from '../../DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
+import {EmptyValue, InternalScalarValue, AsyncInterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -160,7 +160,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public isbinary(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public isbinary(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISBINARY'), (arg: string) =>
       /^[01]{1,10}$/.test(arg)
     )
@@ -174,7 +174,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public iserr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public iserr(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISERR'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && arg.type !== ErrorType.NA)
     )
@@ -188,7 +188,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public iserror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public iserror(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISERROR'), (arg: InternalScalarValue) =>
       (arg instanceof CellError)
     )
@@ -202,7 +202,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public isformula(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public isformula(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('ISFORMULA'),
       () => new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber),
       (reference: SimpleCellAddress) => {
@@ -220,7 +220,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public isblank(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public isblank(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISBLANK'), (arg: InternalScalarValue) =>
       (arg === EmptyValue)
     )
@@ -234,7 +234,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public isna(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public isna(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISNA'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && arg.type == ErrorType.NA)
     )
@@ -248,7 +248,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public isnumber(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public isnumber(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISNUMBER'), isExtendedNumber)
   }
 
@@ -260,7 +260,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public islogical(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public islogical(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISLOGICAL'), (arg: InternalScalarValue) =>
       (typeof arg === 'boolean')
     )
@@ -274,7 +274,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public isref(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public isref(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISREF'), (arg: InternalScalarValue) =>
       (arg instanceof CellError && (arg.type == ErrorType.REF || arg.type == ErrorType.CYCLE))
     )
@@ -288,7 +288,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public istext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public istext(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISTEXT'), (arg: InternalScalarValue) =>
       (typeof arg === 'string')
     )
@@ -302,7 +302,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public isnontext(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public isnontext(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISNONTEXT'), (arg: InternalScalarValue) =>
       !(typeof arg === 'string')
     )
@@ -316,7 +316,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public column(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public column(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('COLUMN'),
       () => state.formulaAddress.col + 1,
       (reference: SimpleCellAddress) => reference.col + 1
@@ -368,7 +368,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public row(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public row(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('ROW'),
       () => state.formulaAddress.row + 1,
       (reference: SimpleCellAddress) => reference.row + 1
@@ -420,7 +420,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    */
-  public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public index(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
       if (col < 1 || row < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
@@ -455,7 +455,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    * */
-  public sheet(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public sheet(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEET'),
       () => state.formulaAddress.sheet + 1,
       (reference: SimpleCellAddress) => reference.sheet + 1,
@@ -479,7 +479,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param state
    * */
-  public sheets(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public sheets(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEETS'),
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
       () => 1, // return 1 for valid reference

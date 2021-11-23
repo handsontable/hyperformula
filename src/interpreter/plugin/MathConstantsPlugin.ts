@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue} from '../InterpreterValue'
+import {AsyncInterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export const PI = parseFloat(Math.PI.toFixed(14))
@@ -24,13 +24,13 @@ export class MathConstantsPlugin extends FunctionPlugin implements FunctionPlugi
     },
   }
 
-  public pi(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public pi(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PI'),
       () => PI
     )
   }
 
-  public sqrtpi(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public sqrtpi(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SQRTPI'),
       (arg: number) => Math.sqrt(PI*arg)
     )

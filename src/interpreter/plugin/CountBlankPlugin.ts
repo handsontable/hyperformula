@@ -5,7 +5,7 @@
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {EmptyValue, AsyncInterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
@@ -24,7 +24,7 @@ export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTy
     },
   }
 
-  public countblank(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+  public countblank(ast: ProcedureAst, state: InterpreterState): AsyncInterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
       let counter = 0
       args.forEach((arg) => {

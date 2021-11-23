@@ -289,7 +289,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
   protected coerceScalarToNumberOrError = (arg: InternalScalarValue): ExtendedNumber | CellError => this.arithmeticHelper.coerceScalarToNumberOrError(arg)
 
-  protected coerceToType(arg: InterpreterValue, coercedType: FunctionArgument, state: InterpreterState): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
+  protected coerceToType(arg: AsyncInterpreterValue, coercedType: FunctionArgument, state: InterpreterState): Maybe<InterpreterValue | complex | RawNoErrorScalarValue> {
     let ret
     if (arg instanceof SimpleRangeValue) {
       switch(coercedType.argumentType) {
@@ -461,7 +461,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return SimpleRangeValue.onlyValues(retArr)
   }
 
-  protected runFunctionWithReferenceArgument = (
+  protected runFunctionWithReferenceArgument = async(
     args: Ast[],
     state: InterpreterState,
     metadata: FunctionMetadata,
@@ -496,7 +496,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       return this.returnNumberWrapper(referenceCallback(cellReference), metadata.returnNumberType)
     }
 
-    return this.runFunction(args, state, metadata, nonReferenceCallback)
+    return await this.runFunction(args, state, metadata, nonReferenceCallback)
   }
 
   protected metadata(name: string): FunctionMetadata {
