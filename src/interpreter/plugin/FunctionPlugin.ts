@@ -25,6 +25,7 @@ import {
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {
+  AsyncInterpreterValue,
   ExtendedNumber,
   FormatInfo,
   getRawValue,
@@ -102,6 +103,13 @@ export interface FunctionMetadata {
    * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
    */
   arrayFunction?: boolean,
+
+  /**
+   * Engine.
+   * 
+   * If set to `true`, the function is treated as an async function and returns a promise.
+   */
+  asyncFunction?: boolean,
 
   /**
    * Internal.
@@ -211,7 +219,7 @@ export interface FunctionArgument {
   greaterThan?: number,
 }
 
-export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
+export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue | AsyncInterpreterValue
 
 export type PluginArraySizeFunctionType = (ast: ProcedureAst, state: InterpreterState) => ArraySize
 
@@ -250,18 +258,24 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     this.arithmeticHelper = interpreter.arithmeticHelper
   }
 
-  protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
-    return this.interpreter.evaluateAst(ast, state)
+  protected async evaluateAst(ast: Ast, state: InterpreterState): AsyncInterpreterValue {
+    return await this.interpreter.evaluateAst(ast, state)
   }
 
   protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
     return this.arraySizePredictor.checkArraySizeForAst(ast, state)
   }
 
-  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean][] {
+  protected async listOfScalarValues(asts: Ast[], state: InterpreterState): Promise<[InternalScalarValue, boolean][]> {
     const ret: [InternalScalarValue, boolean][] = []
-    for (const argAst of asts) {
-      const value = this.evaluateAst(argAst, state)
+
+    const promises = asts.map((ast) => {
+      return this.evaluateAst(ast, state)
+    })
+
+    const values = await Promise.all(promises)
+
+    for (const value of values) {
       if (value instanceof SimpleRangeValue) {
         for (const scalarValue of value.valuesFromTopLeftCorner()) {
           ret.push([scalarValue, true])
@@ -349,7 +363,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
   }
 
-  protected runFunction = (
+  protected runFunction = async(
     args: Ast[],
     state: InterpreterState,
     metadata: FunctionMetadata,
@@ -359,11 +373,13 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     let argValues: [InterpreterValue, boolean][]
 
     if (metadata.expandRanges) {
-      argValues = this.listOfScalarValues(args, state)
+      argValues = await this.listOfScalarValues(args, state)
     } else {
-      argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
-    }
+      const promises = args.map((ast) => this.evaluateAst(ast, state))
+      const values = await Promise.all(promises)
 
+      argValues = values.map((value) => [value, false])
+    }
 
     if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)

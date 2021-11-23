@@ -12,7 +12,7 @@ import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGra
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {AsyncInterpreterValue, EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
@@ -31,13 +31,13 @@ export class Evaluator {
   ) {
   }
 
-  public run(): void {
+  public async run(): Promise<void> {
     this.stats.start(StatType.TOP_SORT)
     const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
     this.stats.end(StatType.TOP_SORT)
 
-    this.stats.measure(StatType.EVALUATION, () => {
-      this.recomputeFormulas(cycled, sorted)
+    return this.stats.measureAsync(StatType.EVALUATION, async() => {
+      await this.recomputeFormulas(cycled, sorted)
     })
   }
 
@@ -50,6 +50,7 @@ export class Evaluator {
           if (vertex instanceof FormulaVertex) {
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
             const newCellValue = this.recomputeFormulaVertexValue(vertex)
+
             if (newCellValue !== currentValue) {
               const address = vertex.getAddress(this.lazilyTransformingAstService)
               changes.addChange(newCellValue, address)
@@ -104,36 +105,48 @@ export class Evaluator {
   /**
    * Recalculates formulas in the topological sort order
    */
-  private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
+  private async recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): Promise<void> {
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
         vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex))
       }
     })
-    sorted.forEach((vertex: Vertex) => {
+ 
+    const promises = sorted.map((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
-        const newCellValue = this.recomputeFormulaVertexValue(vertex)
-        const address = vertex.getAddress(this.lazilyTransformingAstService)
-        this.columnSearch.add(getRawValue(newCellValue), address)
+        return new Promise((resolve, reject) => {
+          this.recomputeFormulaVertexValue(vertex).then((newCellValue) => {
+            const address = vertex.getAddress(this.lazilyTransformingAstService)
+            
+            this.columnSearch.add(getRawValue(newCellValue), address)
+
+            resolve(undefined)
+          }).catch(reject)
+        })
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }
-    })
+      return null
+    }).filter(x => x !== null) as AsyncInterpreterValue[]
+
+    await Promise.all(promises)
   }
 
-  private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
+  private async recomputeFormulaVertexValue(vertex: FormulaVertex): AsyncInterpreterValue {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
     if (vertex instanceof ArrayVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
       return vertex.setNoSpace()
     } else {
       const formula = vertex.getFormula(this.lazilyTransformingAstService)
-      const newCellValue = this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic, vertex))
+      const newCellValue = await this.evaluateAstToCellValue(formula, new InterpreterState(address, this.config.useArrayArithmetic, vertex))
+
       return vertex.setCellValue(newCellValue)
     }
   }
 
-  private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
-    const interpreterValue = this.interpreter.evaluateAst(ast, state)
+  private async evaluateAstToCellValue(ast: Ast, state: InterpreterState): AsyncInterpreterValue {
+    const interpreterValue = await this.interpreter.evaluateAst(ast, state)
+
     if (interpreterValue instanceof SimpleRangeValue) {
       return interpreterValue
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {

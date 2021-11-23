@@ -5,7 +5,7 @@ import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
-import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
+import {AsyncInternalScalarValue, InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
@@ -25,6 +25,9 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
       method: 'arrayfoo',
       arraySizeMethod: 'arraysizeFoo',
     },
+    'ASYNC_FOO': {
+      method: 'asyncFoo',
+    }
   }
 
   public static translations = {
@@ -32,11 +35,13 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
       'FOO': 'FOO',
       'BAR': 'BAR',
       'ARRAYFOO': 'ARRAYFOO',
+      'ASYNC_FOO': 'ASYNC_FOO'
     },
     'plPL': {
       'FOO': 'FU',
       'BAR': 'BAR',
       'ARRAYFOO': 'ARRAYFOO',
+      'ASYNC_FOO': 'ASYNC_FOO'
     }
   }
 
@@ -54,6 +59,10 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
 
   public arraysizeFoo(_ast: ProcedureAst, _state: InterpreterState): ArraySize {
     return new ArraySize(2, 2)
+  }
+
+  public asyncFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {    
+    return new Promise(resolve => setTimeout(() => resolve('asyncFoo'), 1000))
   }
 }
 
@@ -126,7 +135,6 @@ class ReservedNamePlugin extends FunctionPlugin implements FunctionPluginTypeche
     return 'foo'
   }
 }
-
 
 describe('Register static custom plugin', () => {
   it('should register plugin with translations', () => {
@@ -379,5 +387,18 @@ describe('aliases', () => {
     expect( () => {
       HyperFormula.registerFunctionPlugin(OverloadedAliasPlugin)
     }).toThrow(new AliasAlreadyExisting('FOO', 'OverloadedAliasPlugin'))
+  })
+})
+
+describe.only('Async functions', () => {
+  it.only('should register simple async function', async() => {
+    HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
+    const engine = HyperFormula.buildFromArray([
+      ['=FOO()', '=ASYNC_FOO()']
+    ])
+
+    const values = await engine.getSheetValues(0)
+
+    expect(values).toEqual([['foo', 'asyncFoo']])
   })
 })

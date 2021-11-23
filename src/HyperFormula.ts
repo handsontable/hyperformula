@@ -652,6 +652,12 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  private async waitForEvaluatorToRun() {
+    await this.evaluator.run()
+
+    this._stats.end(StatType.BUILD_ENGINE_TOTAL)
+  }
+
   /**
    * Returns a normalized formula string from the cell of a given address or `undefined` for an address that does not exist and empty values.
    *
@@ -738,9 +744,12 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public getSheetValues(sheetId: number): CellValue[][] {
+  public async getSheetValues(sheetId: number): Promise<CellValue[][]> {
     validateArgToType(sheetId, 'number', 'sheetId')
     this.ensureEvaluationIsNotSuspended()
+
+    await this.waitForEvaluatorToRun()
+
     return this._serialization.getSheetValues(sheetId)
   }
 

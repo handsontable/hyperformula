@@ -7,7 +7,7 @@ import {Config} from '../Config'
 import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
-import {Maybe} from '../Maybe'
+import { Maybe} from '../Maybe'
 import {Interpreter} from './Interpreter'
 import {
   FunctionMetadata,

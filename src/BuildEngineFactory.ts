@@ -101,9 +101,6 @@ export class BuildEngineFactory {
     })
 
     const evaluator = new Evaluator(config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
-    evaluator.run()
-
-    stats.end(StatType.BUILD_ENGINE_TOTAL)
 
     return {
       config,

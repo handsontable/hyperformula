@@ -4,3 +4,5 @@
  */
 
 export type Maybe<T> = T | undefined
+
+export type AsyncMaybe<T> = Promise<T | undefined>

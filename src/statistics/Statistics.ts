@@ -70,16 +70,30 @@ export class Statistics {
     }
   }
 
-  /**
+    /**
    * Measure given statistic as execution of given function.
    *
    * @param name - statistic to track
    * @param func - function to call
    * @returns result of the function call
    */
-  public measure<T>(name: StatType, func: () => T): T {
+     public measure<T>(name: StatType, func: () => T): T {
+      this.start(name)
+      const result = func()
+      this.end(name)
+      return result
+    }
+
+  /**
+   * Measure given statistic as execution of given function.
+   *
+   * @param name - statistic to track
+   * @param func - async function to call
+   * @returns result of the function call
+   */
+  public async measureAsync<T>(name: StatType, func: () => Promise<T>): Promise<T> {
     this.start(name)
-    const result = func()
+    const result = await func()
     this.end(name)
     return result
   }
