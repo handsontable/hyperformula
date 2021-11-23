@@ -12,7 +12,7 @@ import {Ast, AstNodeType, CellRangeAst, ProcedureAst} from '../../parser'
 import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
+import {AsyncInternalScalarValue, EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -236,11 +236,11 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * @param ast
    * @param state
    */
-  public sum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sum(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doSum(ast.args, state)
   }
 
-  public sumsq(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public sumsq(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.reduce(ast.args, state, 0, 'SUMSQ', this.addWithEpsilonRaw, (arg: ExtendedNumber) => Math.pow(getRawValue(arg), 2), strictlyNumbers)
   }
 
@@ -252,12 +252,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * @param ast
    * @param state
    */
-  public max(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public max(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doMax(ast.args, state)
   }
 
-  public maxa(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const value = this.reduce(ast.args, state, Number.NEGATIVE_INFINITY, 'MAXA',
+  public async maxa(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const value = await this.reduce(ast.args, state, Number.NEGATIVE_INFINITY, 'MAXA',
       (left: number, right: number) => Math.max(left, right),
       getRawValue, numbersBooleans)
 
@@ -272,32 +272,32 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * @param ast
    * @param state
    */
-  public min(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public min(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doMin(ast.args, state)
   }
 
-  public mina(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const value = this.reduce(ast.args, state, Number.POSITIVE_INFINITY, 'MINA',
+  public async mina(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const value = await this.reduce(ast.args, state, Number.POSITIVE_INFINITY, 'MINA',
       (left: number, right: number) => Math.min(left, right),
       getRawValue, numbersBooleans)
 
     return zeroForInfinite(value)
   }
 
-  public count(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public count(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doCount(ast.args, state)
   }
 
-  public counta(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public counta(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doCounta(ast.args, state)
   }
 
-  public average(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public average(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doAverage(ast.args, state)
   }
 
-  public averagea(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const result = this.reduce<MomentsAggregate>(ast.args, state, MomentsAggregate.empty, '_AGGREGATE_A',
+  public async averagea(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduce<MomentsAggregate>(ast.args, state, MomentsAggregate.empty, '_AGGREGATE_A',
       (left, right) => left.compose(right),
       (arg): MomentsAggregate => MomentsAggregate.single(getRawValue(arg)),
       numbersBooleans
@@ -310,16 +310,16 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  public vars(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public vars(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doVarS(ast.args, state)
   }
 
-  public varp(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public varp(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doVarP(ast.args, state)
   }
 
-  public vara(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregateA(ast.args, state)
+  public async vara(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregateA(ast.args, state)
 
     if (result instanceof CellError) {
       return result
@@ -328,8 +328,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  public varpa(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregateA(ast.args, state)
+  public async varpa(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregateA(ast.args, state)
 
     if (result instanceof CellError) {
       return result
@@ -338,16 +338,16 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  public stdevs(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public stdevs(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doStdevS(ast.args, state)
   }
 
-  public stdevp(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public stdevp(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doStdevP(ast.args, state)
   }
 
-  public stdeva(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregateA(ast.args, state)
+  public async stdeva(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregateA(ast.args, state)
 
     if (result instanceof CellError) {
       return result
@@ -357,8 +357,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  public stdevpa(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregateA(ast.args, state)
+  public async stdevpa(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregateA(ast.args, state)
 
     if (result instanceof CellError) {
       return result
@@ -368,15 +368,16 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  public product(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public product(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return this.doProduct(ast.args, state)
   }
 
-  public subtotal(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public async subtotal(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     if (ast.args.length < 2) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const functionType = this.coerceToType(this.evaluateAst(ast.args[0], state), {argumentType: ArgumentTypes.NUMBER}, state)
+    const arg = await this.evaluateAst(ast.args[0], state)
+    const functionType = this.coerceToType(arg, {argumentType: ArgumentTypes.NUMBER}, state)
     const args = ast.args.slice(1)
     switch (functionType) {
       case 1:
@@ -417,7 +418,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  private reduceAggregate(args: Ast[], state: InterpreterState): MomentsAggregate | CellError{
+  private reduceAggregate(args: Ast[], state: InterpreterState): Promise<MomentsAggregate | CellError> {
     return this.reduce<MomentsAggregate>(args, state, MomentsAggregate.empty, '_AGGREGATE', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
@@ -427,7 +428,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     )
   }
 
-  private reduceAggregateA(args: Ast[], state: InterpreterState): MomentsAggregate | CellError{
+  private reduceAggregateA(args: Ast[], state: InterpreterState): Promise<MomentsAggregate | CellError> {
     return this.reduce<MomentsAggregate>(args, state, MomentsAggregate.empty, '_AGGREGATE_A', (left, right) => {
         return left.compose(right)
       }, (arg): MomentsAggregate => {
@@ -437,8 +438,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     )
   }
 
-  private doAverage(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregate(args, state)
+  private async doAverage(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregate(args, state)
 
     if (result instanceof CellError) {
       return result
@@ -447,8 +448,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  private doVarS(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregate(args, state)
+  private async doVarS(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregate(args, state)
 
     if (result instanceof CellError) {
       return result
@@ -457,8 +458,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  private doVarP(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregate(args, state)
+  private async doVarP(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregate(args, state)
 
     if (result instanceof CellError) {
       return result
@@ -467,8 +468,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  private doStdevS(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregate(args, state)
+  private async doStdevS(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregate(args, state)
 
     if (result instanceof CellError) {
       return result
@@ -478,8 +479,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  private doStdevP(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const result = this.reduceAggregate(args, state)
+  private async doStdevP(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
+    const result = await this.reduceAggregate(args, state)
 
     if (result instanceof CellError) {
       return result
@@ -489,7 +490,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
   }
 
-  private doCount(args: Ast[], state: InterpreterState): InternalScalarValue {
+  private doCount(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
     return this.reduce(args, state, 0, 'COUNT',
       (left: number, right: number) => left + right,
       getRawValue,
@@ -497,15 +498,15 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     )
   }
 
-  private doCounta(args: Ast[], state: InterpreterState): InternalScalarValue {
+  private doCounta(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
     return this.reduce(args, state, 0, 'COUNTA', (left: number, right: number) => left + right,
       getRawValue,
       (arg) => (arg === EmptyValue) ? 0 : 1
     )
   }
 
-  private doMax(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const value = this.reduce(args, state, Number.NEGATIVE_INFINITY, 'MAX',
+  private async doMax(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
+    const value = await this.reduce(args, state, Number.NEGATIVE_INFINITY, 'MAX',
       (left: number, right: number) => Math.max(left, right),
       getRawValue, strictlyNumbers
     )
@@ -513,8 +514,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     return zeroForInfinite(value)
   }
 
-  private doMin(args: Ast[], state: InterpreterState): InternalScalarValue {
-    const value = this.reduce(args, state, Number.POSITIVE_INFINITY, 'MIN',
+  private async doMin(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
+    const value = await this.reduce(args, state, Number.POSITIVE_INFINITY, 'MIN',
       (left: number, right: number) => Math.min(left, right),
       getRawValue, strictlyNumbers
     )
@@ -522,11 +523,11 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     return zeroForInfinite(value)
   }
 
-  private doSum(args: Ast[], state: InterpreterState): InternalScalarValue {
+  private doSum(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
     return this.reduce(args, state, 0, 'SUM', this.addWithEpsilonRaw, getRawValue, strictlyNumbers)
   }
 
-  private doProduct(args: Ast[], state: InterpreterState): InternalScalarValue {
+  private doProduct(args: Ast[], state: InterpreterState): AsyncInternalScalarValue {
     return this.reduce(args, state, 1, 'PRODUCT', (left, right) => left * right, getRawValue, strictlyNumbers)
   }
 
@@ -543,11 +544,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * @param mapFunction
    * @param coercionFunction
    * */
-  private reduce<T>(args: Ast[], state: InterpreterState, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): CellError | T {
+  private async reduce<T>(args: Ast[], state: InterpreterState, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): Promise<CellError | T> {
     if (args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    return args.reduce((acc: T | CellError, arg) => {
+
+    const accum = args.reduce((acc: T | CellError, arg) => {
       if (acc instanceof CellError) {
         return acc
       }
@@ -558,10 +560,26 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         }
         return reducingFunction(val, acc)
       }
+
+      return acc
+    }, initialAccValue)
+
+    const promises = args.map((arg) => {
+      const interpreterValue = this.evaluateAst(arg, state)
+      
+      return Promise.resolve(interpreterValue)
+    })
+
+    const values = await Promise.all(promises)
+    
+    return values.reduce((acc: T | CellError, interpreterValue, i) => {
+      const arg = args[i]
       let value
-      value = this.evaluateAst(arg, state)
-      if (value instanceof SimpleRangeValue) {
-        const coercedRangeValues = Array.from(value.valuesFromTopLeftCorner())
+
+      value = interpreterValue
+
+      if (arg instanceof SimpleRangeValue) {
+        const coercedRangeValues = Array.from(arg.valuesFromTopLeftCorner())
           .map(coercionFunction)
           .filter((arg) => (arg !== undefined)) as (CellError | number)[]
 
@@ -583,12 +601,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
             }
           }, acc)
       } else if (arg.type === AstNodeType.CELL_REFERENCE) {
-        value = coercionFunction(value)
+        value = coercionFunction(value as InternalScalarValue)
         if (value === undefined) {
           return acc
         }
       } else {
-        value = this.coerceScalarToNumberOrError(value)
+        value = this.coerceScalarToNumberOrError(value as InternalScalarValue)
         value = coercionFunction(value)
         if (value === undefined) {
           return acc
@@ -599,8 +617,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         return value
       }
 
-      return reducingFunction(acc, mapFunction(value))
-    }, initialAccValue)
+      return reducingFunction(acc as T, mapFunction(value))
+    }, accum)
   }
 
   /**
