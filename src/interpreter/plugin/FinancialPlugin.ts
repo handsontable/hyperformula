@@ -8,9 +8,9 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {
+  AsyncInterpreterValue,
   EmptyValue,
   getRawValue,
-  InterpreterValue,
   isExtendedNumber,
   NumberType,
   RawInterpreterValue
