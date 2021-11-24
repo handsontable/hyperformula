@@ -989,7 +989,7 @@ const engine = await HyperFormula.buildFromArray([['1']])
   it('should be aborted when swapping rows', async() => {
 const engine = await HyperFormula.buildFromArray([['1']])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.swapRowIndexes(0, [[0, 0]])
+    await engine.swapRowIndexes(0, [[0, 0]])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
@@ -1003,7 +1003,7 @@ const engine = await HyperFormula.buildFromArray([['1']])
   it('should be aborted when setting row order', async() => {
 const engine = await HyperFormula.buildFromArray([['1']])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.setRowOrder(0, [0])
+    await engine.setRowOrder(0, [0])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
