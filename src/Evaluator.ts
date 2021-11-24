@@ -46,29 +46,31 @@ export class Evaluator {
     const vertexCurrentValueMap = new Map<Vertex, InterpreterValue | undefined>()
     const vertexNewValueMap = new Map<Vertex, InterpreterValue>()
 
-    const promises = vertices.map((vertex) => {
-      if (vertex instanceof FormulaVertex) {
-        const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
-
-        vertexCurrentValueMap.set(vertex, currentValue)
-
-        return this.recomputeFormulaVertexValue(vertex)
-      }
-      return null
-    })
-
-    const calculatedVertexValues = await Promise.all(promises)
-
-    calculatedVertexValues.forEach((value, i) => {
-      if (value !== null) {
-        const vertex = vertices[i]
-
-        vertexNewValueMap.set(vertex, value)
-      }
-    })
-
-    this.stats.measure(StatType.EVALUATION, () => {
+    await this.stats.measureAsync(StatType.EVALUATION, async() => {
       const { sorted, cycled } = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices)
+      const allVertexes = [...sorted, ...cycled]
+
+      const promises = allVertexes.map((vertex) => {
+        if (vertex instanceof FormulaVertex) {
+          const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
+
+          vertexCurrentValueMap.set(vertex, currentValue)
+
+          return this.recomputeFormulaVertexValue(vertex)
+        }
+        return null
+      })
+
+      const calculatedVertexValues = await Promise.all(promises)
+
+      calculatedVertexValues.forEach((value, i) => {
+        if (value !== null) {
+          const vertex = allVertexes[i]
+
+          vertexNewValueMap.set(vertex, value)
+        }
+      })
+
       const shouldBeUpdatedMapping = new Set(vertices)
 
       const operatingFunction = (vertex: Vertex) => {
