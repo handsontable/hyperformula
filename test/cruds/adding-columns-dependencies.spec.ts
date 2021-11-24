@@ -20,7 +20,7 @@ const engine = await HyperFormula.buildFromArray([
         ['1', /* new col */ '=$A1'],
       ])
 
-      engine.addColumns(0, [1, 1])
+      await engine.addColumns(0, [1, 1])
 
       expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol( 0, 0))
     })
@@ -30,7 +30,7 @@ const engine = await HyperFormula.buildFromArray([
         ['1', /* new col */ '=$A$1'],
       ])
 
-      engine.addColumns(0, [1, 1])
+      await engine.addColumns(0, [1, 1])
 
       expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absolute( 0, 0))
     })
@@ -40,7 +40,7 @@ const engine = await HyperFormula.buildFromArray([
         ['=$B1' /* new col */, '42'],
       ])
 
-      engine.addColumns(0, [1, 1])
+      await engine.addColumns(0, [1, 1])
 
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol( 2, 0))
     })
@@ -50,7 +50,7 @@ const engine = await HyperFormula.buildFromArray([
         ['=B1', '13', /* new col */ '42'],
       ])
 
-      engine.addColumns(0, [2, 1])
+      await engine.addColumns(0, [2, 1])
 
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1))
     })
@@ -60,7 +60,7 @@ const engine = await HyperFormula.buildFromArray([
         ['42', '13', /* new col */ '=B1'],
       ])
 
-      engine.addColumns(0, [2, 1])
+      await engine.addColumns(0, [2, 1])
 
       expect(extractReference(engine, adr('D1'))).toEqual(CellAddress.relative(0, -2))
     })
@@ -70,7 +70,7 @@ const engine = await HyperFormula.buildFromArray([
         ['=C1', '13', /* new col */ '42'],
       ])
 
-      engine.addColumns(0, [2, 1])
+      await engine.addColumns(0, [2, 1])
 
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 3))
     })
@@ -80,7 +80,7 @@ const engine = await HyperFormula.buildFromArray([
         ['42', /* new col */ '=C1', '13'],
       ])
 
-      engine.addColumns(0, [1, 1])
+      await engine.addColumns(0, [1, 1])
 
       expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(0, 1))
     })
@@ -91,7 +91,7 @@ const engine = await HyperFormula.buildFromArray([
         [null, '=B1'],
       ])
 
-      engine.addColumns(0, [1, 1])
+      await engine.addColumns(0, [1, 1])
 
       expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(-1, 0))
     })
@@ -108,7 +108,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(0, [0, 1])
+      await engine.addColumns(0, [0, 1])
 
       expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absoluteCol( 0, 0, 1))
     })
@@ -123,7 +123,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(0, [0, 1])
+      await engine.addColumns(0, [0, 1])
 
       expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.relative(0, -2, 1))
     })
@@ -138,7 +138,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(0, [0, 1])
+      await engine.addColumns(0, [0, 1])
 
       expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, 0, 1))
     })
@@ -153,7 +153,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(0, [1, 1])
+      await engine.addColumns(0, [1, 1])
 
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
     })
@@ -170,7 +170,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(0, [0, 1])
+      await engine.addColumns(0, [0, 1])
 
       expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 2, 0))
     })
@@ -185,7 +185,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(0, [0, 1])
+      await engine.addColumns(0, [0, 1])
 
       expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 1, 0))
     })
@@ -200,7 +200,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(0, [1, 1])
+      await engine.addColumns(0, [1, 1])
 
       expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 0, 0))
     })
@@ -217,7 +217,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(1, [1, 1])
+      await engine.addColumns(1, [1, 1])
 
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1))
     })
@@ -237,7 +237,7 @@ const engine = await HyperFormula.buildFromSheets({
         ],
       })
 
-      engine.addColumns(2, [1, 1])
+      await engine.addColumns(2, [1, 1])
 
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 1))
     })
@@ -253,7 +253,7 @@ const engine = await HyperFormula.buildFromArray([
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(undefined)
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).toBe(undefined)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('D1'))).not.toBe(undefined)
@@ -272,7 +272,7 @@ const engine = await HyperFormula.buildFromArray([
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(undefined)
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).toBe(undefined)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('D1'))).not.toBe(undefined)
@@ -290,7 +290,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(undefined)
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).toBe(undefined)
     expect(engine.rangeMapping.getRange(adr('B1'), adr('D1'))).not.toBe(undefined)
 
@@ -307,7 +307,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(undefined)
-    engine.addColumns(0, [3, 1])
+    await engine.addColumns(0, [3, 1])
     expect(engine.rangeMapping.getRange(adr('A1'), adr('C1'))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
@@ -322,7 +322,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(A1:A1)', '=SUM(A1:B1)', /* */ '=SUM(A1:C1)', '=SUM(A1:D1)'],
     ])
 
-    engine.addColumns(0, [2, 1])
+    await engine.addColumns(0, [2, 1])
 
     const c1 = engine.addressMapping.fetchCell(adr('C1'))
     const a1d1 = engine.rangeMapping.fetchRange(adr('A1'), adr('D1'))
@@ -339,7 +339,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /* */ '=SUM(B1:D1)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(undefined)
@@ -356,7 +356,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /* */ '=SUM(A1:D1)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('E1'))
@@ -375,7 +375,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /* */ '=SUM(C1:D1)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(undefined)
@@ -392,7 +392,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /* */ '=SUM(A1:A1)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(undefined)
@@ -409,7 +409,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /* */ '=SUM(A1:B1)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -429,7 +429,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /* */ '=SUM(A1:C1)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -449,7 +449,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /* */ '=SUM(B1:B1)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(b1).toBe(undefined)
@@ -469,7 +469,7 @@ const engine = await HyperFormula.buildFromArray([
 
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('C'))).not.toBe(undefined)
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('C'))).toBe(undefined)
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('D'))).not.toBe(undefined)
@@ -485,7 +485,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('C'))).not.toBe(undefined)
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('C'))).toBe(undefined)
     expect(engine.rangeMapping.getRange(colStart('B'), colEnd('D'))).not.toBe(undefined)
 
@@ -500,7 +500,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('C'))).not.toBe(undefined)
-    engine.addColumns(0, [3, 1])
+    await engine.addColumns(0, [3, 1])
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('C'))).not.toBe(undefined)
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
@@ -517,7 +517,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, /*new column */null, '=SUM(1:2)'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(2))).not.toBe(undefined)
     const rowRange = extractRowRange(engine, adr('D3'))

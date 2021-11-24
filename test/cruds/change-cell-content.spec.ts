@@ -428,7 +428,7 @@ const engine = await HyperFormula.buildFromArray([
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })

@@ -89,7 +89,7 @@ const engine = await HyperFormula.buildFromArray([
       [1]
     ])
 
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
 
     expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(A3)')
     expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(A3)')

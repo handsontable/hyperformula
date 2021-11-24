@@ -89,7 +89,7 @@ const engine = await HyperFormula.buildFromArray([
       ['5', '6'],
     ], {chooseAddressMappingPolicy: new AlwaysDense()})
 
-    engine.addColumns(0, [3, 1])
+    await engine.addColumns(0, [3, 1])
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '2', 'foo', null, 'bar'],
@@ -105,7 +105,7 @@ const engine = await HyperFormula.buildFromArray([
       ['5', '6'],
     ], {chooseAddressMappingPolicy: new AlwaysDense()})
 
-    engine.addColumns(0, [3, 3])
+    await engine.addColumns(0, [3, 3])
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '2', 'foo', null, null, null, 'bar'],
@@ -120,7 +120,7 @@ const engine = await HyperFormula.buildFromArray([
       [undefined, undefined, '3', '4'],
     ])
 
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
 
     expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
@@ -134,7 +134,7 @@ const engine = await HyperFormula.buildFromArray([
       [undefined, undefined, '3', '4'],
     ])
 
-    engine.addColumns(0, [2, 1])
+    await engine.addColumns(0, [2, 1])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
@@ -150,7 +150,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
     expect(engine.getCellValue(adr('D1'))).toEqual(1)
   })
 
@@ -166,7 +166,7 @@ const engine = await HyperFormula.buildFromArray([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const a2setCellValueSpy = spyOn(a2 as any, 'setCellValue')
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(a2setCellValueSpy).not.toHaveBeenCalled()
     expect(c1setCellValueSpy).toHaveBeenCalled()
@@ -180,7 +180,7 @@ const engine = await HyperFormula.buildFromArray([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(c1setCellValueSpy).toHaveBeenCalled()
     expect(extractRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C1')))
@@ -207,7 +207,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', /* new col */ '=A1'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const c1 = engine.addressMapping.getCell(adr('C1')) as FormulaCellVertex
     expect(c1).toBeInstanceOf(FormulaCellVertex)
@@ -221,7 +221,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', /* new col */ '=A1'],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(engine.getSheetDimensions(0)).toEqual({
       width: 3,
@@ -241,7 +241,7 @@ const engine = await HyperFormula.buildFromSheets({
       ],
     })
 
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
 
     const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
 
@@ -259,8 +259,8 @@ const engine = await HyperFormula.buildFromArray([
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recalcSpy = spyOn(engine.evaluator as any, 'partialRun')
-    engine.addColumns(0, [1, 1])
-    engine.addColumns(0, [10, 15])
+    await engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [10, 15])
 
     expect(recalcSpy).not.toHaveBeenCalled()
     expect(engine.getSheetDimensions(0)).toEqual({
@@ -274,12 +274,12 @@ const engine = await HyperFormula.buildFromArray([
       Array(Config.defaultConfig.maxColumns - 1).fill('')
     ])
 
-    expect(() => {
-      engine.addColumns(0, [0, 2])
+    expect(async() => {
+      await engine.addColumns(0, [0, 2])
     }).toThrow(new SheetSizeLimitExceededError())
 
-    expect(() => {
-      engine.addColumns(0, [0, 1], [5, 1])
+    expect(async() => {
+      await engine.addColumns(0, [0, 1], [5, 1])
     }).toThrow(new SheetSizeLimitExceededError())
   })
 })
@@ -293,7 +293,7 @@ const engine = await HyperFormula.buildFromArray([
 
     expectArrayWithSameContent([0], index.getValueIndex(0, 0, 1).index)
 
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
 
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
     expectArrayWithSameContent([0], index.getValueIndex(0, 1, 1).index)
@@ -306,7 +306,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=-A3:C4', null, null, 'foo'],
     ], {useArrayArithmetic: true})
 
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
 
     const expected = await HyperFormula.buildFromArray([
       [null, '=-B3:D4', null, null, 'foo'],
@@ -320,7 +320,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, null, null, '=-A1:C1', null, null, 'foo']
     ], {useArrayArithmetic: true})
 
-    engine.addColumns(0, [4, 1])
+    await engine.addColumns(0, [4, 1])
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null, null, '=-A1:C1', null, null, null, 'foo']
@@ -333,7 +333,7 @@ const engine = await HyperFormula.buildFromArray([
       [3, 4],
     ], {useArrayArithmetic: true})
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [1, null, 2, '=TRANSPOSE(A1:C2)'],
@@ -347,7 +347,7 @@ const engine = await HyperFormula.buildFromArray([
       [3, 4],
     ], {useArrayArithmetic: true})
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
     await engine.undo()
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
@@ -362,7 +362,7 @@ const engine = await HyperFormula.buildFromArray([
       [3, 4],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
@@ -378,7 +378,7 @@ const engine = await HyperFormula.buildFromSheets({
       ],
     })
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
@@ -389,7 +389,7 @@ const engine = await HyperFormula.buildFromArray([
       [3, 4],
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))

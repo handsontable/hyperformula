@@ -119,26 +119,26 @@ const engine = await HyperFormula.buildFromArray([])
 
     await engine.addNamedExpression('foo', 'foo')
 
-    expect(() => {
-      engine.changeNamedExpression('foo', '=A1')
+    expect(async() => {
+      await engine.changeNamedExpression('foo', '=A1')
     }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A1')
+    expect(async() => {
+      await engine.changeNamedExpression('foo', '=Sheet1!A1')
     }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=$A$1')
+    expect(async() => {
+      await engine.changeNamedExpression('foo', '=$A$1')
     }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!$A1')
+    expect(async() => {
+      await engine.changeNamedExpression('foo', '=Sheet1!$A1')
     }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A$1')
+    expect(async() => {
+      await engine.changeNamedExpression('foo', '=Sheet1!A$1')
     }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A1:A2')
+    expect(async() => {
+      await engine.changeNamedExpression('foo', '=Sheet1!A1:A2')
     }).toThrow(new NoRelativeAddressesAllowedError())
-    expect(() => {
-      engine.changeNamedExpression('foo', '=Sheet1!A:B')
+    expect(async() => {
+      await engine.changeNamedExpression('foo', '=Sheet1!A:B')
     }).toThrow(new NoRelativeAddressesAllowedError())
   })
 })
@@ -292,7 +292,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
     await engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
-    engine.changeNamedExpression('myName', '=Sheet1!$A$1+11')
+    await engine.changeNamedExpression('myName', '=Sheet1!$A$1+11')
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(53)
   })
@@ -303,7 +303,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
     await engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
-    engine.changeNamedExpression('myName', 58)
+    await engine.changeNamedExpression('myName', 58)
 
     expect(engine.getNamedExpressionValue('myName')).toEqual(58)
   })
@@ -314,7 +314,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
     await engine.addNamedExpression('myName', '=100', 0)
 
-    engine.changeNamedExpression('myName', '=200', 0)
+    await engine.changeNamedExpression('myName', '=200', 0)
 
     expect(engine.getNamedExpressionValue('myName', 0)).toEqual(200)
   })
@@ -324,24 +324,24 @@ const engine = await HyperFormula.buildEmpty()
 
     await engine.addNamedExpression('myName', '=42')
 
-    expect(() => {
-      engine.changeNamedExpression('myName', '=TRANSPOSE(A1:B2)')
+    expect(async() => {
+      await engine.changeNamedExpression('myName', '=TRANSPOSE(A1:B2)')
     }).toThrowError(/Relative addresses not allowed in named expressions./)
   })
 
   it('changing not existing named expression', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    expect(() => {
-      engine.changeNamedExpression('myName', '=42')
+    expect(async() => {
+      await engine.changeNamedExpression('myName', '=42')
     }).toThrowError('Named Expression \'myName\' does not exist')
   })
 
   it('changing named expression from non existing sheet', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    expect(() => {
-      engine.changeNamedExpression('myName', '=42', 1)
+    expect(async() => {
+      await engine.changeNamedExpression('myName', '=42', 1)
     }).toThrowError(NoSheetWithIdError)
   })
 
@@ -376,8 +376,8 @@ const engine = await HyperFormula.buildEmpty()
     await engine.addNamedExpression('myName', '=42')
 
     expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
-    expect(() => {
-      engine.changeNamedExpression('MYname', '=43')
+    expect(async() => {
+      await engine.changeNamedExpression('MYname', '=43')
     }).not.toThrowError()
     expect(async() => {
       await engine.removeNamedExpression('MYname')
@@ -677,7 +677,7 @@ const engine = await HyperFormula.buildFromSheets({
 
     await engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('B1', 1))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
@@ -695,7 +695,7 @@ const engine = await HyperFormula.buildFromSheets({
     await engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
-    engine.paste(adr('B1', 1))
+    await engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
@@ -713,7 +713,7 @@ const engine = await HyperFormula.buildFromSheets({
     await engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
-    engine.paste(adr('B1', 1))
+    await engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
@@ -732,7 +732,7 @@ const engine = await HyperFormula.buildFromSheets({
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
     await engine.setCellContents(adr('B1'), [['baz']])
-    engine.paste(adr('B1', 1))
+    await engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
     expect(engine.getNamedExpressionFormula('expr')).toEqual('=Sheet1!$A$1')
@@ -749,7 +749,7 @@ const engine = await HyperFormula.buildFromSheets({
     await engine.addNamedExpression('expr', '=Sheet1!$A$1', 0)
     await engine.addNamedExpression('expr', '=Sheet2!$A$1', 1)
 
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('B1', 1))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1), adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
@@ -775,7 +775,7 @@ const engine = await HyperFormula.buildFromSheets({
     await engine.addNamedExpression('expr', '=Sheet2!$A$1', 1)
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
-    engine.paste(adr('B1', 1))
+    await engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
@@ -800,7 +800,7 @@ const engine = await HyperFormula.buildFromSheets({
     await engine.addNamedExpression('expr', '=Sheet2!$A$1', 1)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
-    engine.paste(adr('B1', 1))
+    await engine.paste(adr('B1', 1))
 
     expect(engine.getNamedExpressionFormula('expr')).toEqual(undefined)
     expect(engine.getNamedExpressionFormula('expr', 0)).toEqual('=Sheet1!$A$1')
@@ -849,7 +849,7 @@ const engine = await HyperFormula.buildFromArray([
 
     await engine.addNamedExpression('fooo', '=Sheet1!$A:Sheet1!$A')
     await engine.setCellContents(adr('C1'), [['=SUM(fooo)']])
-    engine.changeNamedExpression('fooo', '=Sheet1!$B:Sheet1!$B')
+    await engine.changeNamedExpression('fooo', '=Sheet1!$B:Sheet1!$B')
 
     expect(engine.getCellValue(adr('C1'))).toEqual(6)
   })
@@ -920,7 +920,7 @@ const engine = await HyperFormula.buildEmpty()
 
     await engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
 
-    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+    await engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
 
     expect(engine.getNamedExpression('foo')).toEqual({
       name: 'foo',
@@ -937,7 +937,7 @@ const engine = await HyperFormula.buildEmpty()
 const engine = await HyperFormula.buildEmpty()
 
     await engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
-    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+    await engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
 
     await engine.undo()
 
@@ -956,7 +956,7 @@ const engine = await HyperFormula.buildEmpty()
 const engine = await HyperFormula.buildEmpty()
 
     await engine.addNamedExpression('foo', '=foo', undefined, { visible: false, comment: 'foo' })
-    engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
+    await engine.changeNamedExpression('foo', '=bar', undefined, { visible: true, comment: 'bar' })
 
     await engine.undo()
     await engine.redo()

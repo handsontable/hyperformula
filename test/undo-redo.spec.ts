@@ -11,7 +11,7 @@ describe('Undo - removing rows', () => {
       ['3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     await engine.undo()
 
@@ -25,7 +25,7 @@ describe('Undo - removing rows', () => {
       ['3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     await engine.undo()
 
@@ -39,7 +39,7 @@ describe('Undo - removing rows', () => {
       ['3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     await engine.undo()
 
@@ -53,7 +53,7 @@ describe('Undo - removing rows', () => {
       ['3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     await engine.undo()
 
@@ -68,7 +68,7 @@ describe('Undo - removing rows', () => {
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
     engine.suspendEvaluation()
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     await engine.undo()
     await engine.resumeEvaluation()
@@ -83,7 +83,7 @@ describe('Undo - removing rows', () => {
       ['3'], // remove
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 2])
+    await engine.removeRows(0, [1, 2])
 
     await engine.undo()
 
@@ -95,7 +95,7 @@ describe('Undo - removing rows', () => {
       ['1']
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1000, 1])
+    await engine.removeRows(0, [1000, 1])
 
     await engine.undo()
 
@@ -110,7 +110,7 @@ describe('Undo - removing rows', () => {
       ['4'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 1], [3, 1])
+    await engine.removeRows(0, [1, 1], [3, 1])
 
     await engine.undo()
 
@@ -125,7 +125,7 @@ describe('Undo - adding rows', () => {
       ['3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
 
     await engine.undo()
 
@@ -137,7 +137,7 @@ describe('Undo - adding rows', () => {
       ['1']
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.addRows(0, [1000, 1])
+    await engine.addRows(0, [1000, 1])
 
     await engine.undo()
 
@@ -151,7 +151,7 @@ describe('Undo - adding rows', () => {
       ['3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.addRows(0, [1, 1], [2, 1])
+    await engine.addRows(0, [1, 1], [2, 1])
 
     await engine.undo()
 
@@ -165,7 +165,7 @@ describe('Undo - moving rows', () => {
       [0], [1], [2], [3], [4], [5], [6], [7],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.moveRows(0, 1, 3, 7)
+    await engine.moveRows(0, 1, 3, 7)
     await engine.undo()
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray(sheet))
@@ -176,7 +176,7 @@ describe('Undo - moving rows', () => {
       [0], [1], [2], [3], [4], [5], [6], [7],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.moveRows(0, 4, 3, 2)
+    await engine.moveRows(0, 4, 3, 2)
     await engine.undo()
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray(sheet))
@@ -187,7 +187,7 @@ const engine = await HyperFormula.buildFromArray([
       [1, null],
       [2, '=SUM(A1:A2)'],
     ])
-    engine.moveRows(0, 1, 1, 3)
+    await engine.moveRows(0, 1, 1, 3)
     await engine.undo()
 
     expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:A2)')
@@ -199,7 +199,7 @@ const engine = await HyperFormula.buildFromArray([
       [2, '=SUM(A1:A2)'],
     ])
 
-    engine.moveRows(0, 2, 1, 1)
+    await engine.moveRows(0, 2, 1, 1)
     await engine.undo()
 
     expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:A2)')
@@ -212,7 +212,7 @@ describe('Undo - moving columns', () => {
       [0, 1, 2, 3, 4, 5, 6, 7],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.moveColumns(0, 1, 3, 7)
+    await engine.moveColumns(0, 1, 3, 7)
     await engine.undo()
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray(sheet))
@@ -223,7 +223,7 @@ describe('Undo - moving columns', () => {
       [0, 1, 2, 3, 4, 5, 6, 7],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.moveColumns(0, 4, 3, 2)
+    await engine.moveColumns(0, 4, 3, 2)
     await engine.undo()
 
     expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray(sheet))
@@ -234,7 +234,7 @@ const engine = await HyperFormula.buildFromArray([
       [1, 2],
       [null, '=SUM(A1:B1)'],
     ])
-    engine.moveColumns(0, 1, 1, 3)
+    await engine.moveColumns(0, 1, 1, 3)
     await engine.undo()
 
     expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:B1)')
@@ -246,7 +246,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A1:B1)'],
     ])
 
-    engine.moveColumns(0, 2, 1, 1)
+    await engine.moveColumns(0, 2, 1, 1)
     await engine.undo()
 
     expect(engine.getCellFormula(adr('B2'))).toEqual('=SUM(A1:B1)')
@@ -259,7 +259,7 @@ describe('Undo - adding columns', () => {
       ['1', /* */ '3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     await engine.undo()
 
@@ -271,7 +271,7 @@ describe('Undo - adding columns', () => {
       ['1']
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.addColumns(0, [1000, 1])
+    await engine.addColumns(0, [1000, 1])
 
     await engine.undo()
 
@@ -283,7 +283,7 @@ describe('Undo - adding columns', () => {
       ['1', '2', '3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.addColumns(0, [1, 1], [2, 1])
+    await engine.addColumns(0, [1, 1], [2, 1])
 
     await engine.undo()
 
@@ -297,7 +297,7 @@ describe('Undo - removing columns', () => {
       ['1', null, '3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     await engine.undo()
 
@@ -309,7 +309,7 @@ describe('Undo - removing columns', () => {
       ['1', '2', '3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     await engine.undo()
 
@@ -321,7 +321,7 @@ describe('Undo - removing columns', () => {
       ['1', '=SUM(A1)', '3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     await engine.undo()
 
@@ -333,7 +333,7 @@ describe('Undo - removing columns', () => {
       ['=A2', '42', '3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     await engine.undo()
 
@@ -346,7 +346,7 @@ describe('Undo - removing columns', () => {
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
     engine.suspendEvaluation()
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     await engine.undo()
     await engine.resumeEvaluation()
@@ -359,7 +359,7 @@ describe('Undo - removing columns', () => {
       ['=SUM(B1:C1)', '2', '3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeColumns(0, [1, 2])
+    await engine.removeColumns(0, [1, 2])
 
     await engine.undo()
 
@@ -371,7 +371,7 @@ describe('Undo - removing columns', () => {
       ['1']
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeColumns(0, [1000, 1])
+    await engine.removeColumns(0, [1000, 1])
 
     await engine.undo()
 
@@ -383,7 +383,7 @@ describe('Undo - removing columns', () => {
       ['1', '2', '3', '4'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeColumns(0, [1, 1], [3, 1])
+    await engine.removeColumns(0, [1, 1], [3, 1])
 
     await engine.undo()
 
@@ -540,7 +540,7 @@ const engine = await HyperFormula.buildFromArray([])
 describe('Undo - clearing sheet', () => {
   it('works for empty sheet', async() => {
 const engine = await HyperFormula.buildFromArray([])
-    engine.clearSheet(0)
+    await engine.clearSheet(0)
 
     await engine.undo()
 
@@ -552,7 +552,7 @@ const engine = await HyperFormula.buildFromArray([])
       ['1'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.clearSheet(0)
+    await engine.clearSheet(0)
 
     await engine.undo()
 
@@ -564,7 +564,7 @@ const engine = await HyperFormula.buildFromArray([])
       ['=42'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.clearSheet(0)
+    await engine.clearSheet(0)
 
     await engine.undo()
 
@@ -603,7 +603,7 @@ describe('Undo - moving cells', () => {
       [null],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     await engine.undo()
 
@@ -616,7 +616,7 @@ describe('Undo - moving cells', () => {
       ['42'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     await engine.undo()
 
@@ -629,7 +629,7 @@ describe('Undo - moving cells', () => {
       ['42'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     await engine.undo()
 
@@ -643,7 +643,7 @@ describe('Undo - moving cells', () => {
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
     engine.suspendEvaluation()
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     await engine.undo()
     await engine.resumeEvaluation()
@@ -658,7 +658,7 @@ const engine = await HyperFormula.buildFromSheets({
     })
     await engine.addNamedExpression('foo', 'bar', 0)
     await engine.setCellContents(adr('A1'), '=foo')
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
 
     await engine.undo()
 
@@ -671,7 +671,7 @@ const engine = await HyperFormula.buildFromSheets({
       'Sheet2': []
     })
     await engine.addNamedExpression('foo', 'bar', 0)
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A1', 1))
 
     await engine.undo()
 
@@ -688,7 +688,7 @@ describe('Undo - cut-paste', () => {
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     await engine.undo()
 
@@ -702,7 +702,7 @@ describe('Undo - cut-paste', () => {
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
     await engine.undo()
 
     expect(engine.isClipboardEmpty()).toBe(true)
@@ -716,7 +716,7 @@ const engine = await HyperFormula.buildFromSheets({
     await engine.addNamedExpression('foo', 'bar', 0)
     await engine.setCellContents(adr('A1'), '=foo')
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A1', 1))
+    await engine.paste(adr('A1', 1))
 
     await engine.undo()
 
@@ -733,7 +733,7 @@ describe('Undo - copy-paste', () => {
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     await engine.undo()
 
@@ -748,7 +748,7 @@ const engine = await HyperFormula.buildFromSheets({
     await engine.addNamedExpression('foo', 'bar', 0)
     await engine.setCellContents(adr('A1'), '=foo')
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A1', 1))
+    await engine.paste(adr('A1', 1))
 
     await engine.undo()
 
@@ -795,7 +795,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     await engine.addNamedExpression('foo', 'foo')
-    engine.changeNamedExpression('foo', 'bar')
+    await engine.changeNamedExpression('foo', 'bar')
 
     await engine.undo()
 
@@ -848,7 +848,7 @@ const engine = await HyperFormula.buildFromArray([
     const engine = await HyperFormula.buildFromArray(sheet)
     await engine.batch(async() => {
       await engine.setCellContents(adr('A1'), '10')
-      engine.removeRows(0, [0, 1])
+      await engine.removeRows(0, [0, 1])
     })
 
     await engine.undo()
@@ -886,8 +886,8 @@ const engine = await HyperFormula.buildFromArray([
   it('restore AST after irreversible operation', async() => {
 const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('E1'), '=SUM(A1:C1)')
-    engine.addColumns(0, [3, 1])
-    engine.removeColumns(0, [0, 1])
+    await engine.addColumns(0, [3, 1])
+    await engine.removeColumns(0, [0, 1])
 
     expect(async() => await engine.undo()).not.toThrowError()
     expect(engine.getCellFormula(adr('F1'))).toEqual('=SUM(A1:C1)')
@@ -902,7 +902,7 @@ describe('UndoRedo', () => {
       ['3'],
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
     await engine.undo()
     await engine.redo()
 
@@ -921,7 +921,7 @@ const engine = await HyperFormula.buildEmpty()
 
   it('when there is some operation to undo', async() => {
 const engine = await HyperFormula.buildFromArray([])
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     expect(engine.isThereSomethingToUndo()).toBe(true)
   })
@@ -936,7 +936,7 @@ const engine = await HyperFormula.buildEmpty()
 
   it('when there is some operation to redo', async() => {
 const engine = await HyperFormula.buildFromArray([])
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
     await engine.undo()
 
     expect(engine.isThereSomethingToRedo()).toBe(true)
@@ -950,7 +950,7 @@ const engine = await HyperFormula.buildFromArray([
       [null], // remove
       ['3'],
     ])
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -965,7 +965,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2', '=A1'], // remove
       ['3'],
     ])
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -981,7 +981,7 @@ const engine = await HyperFormula.buildFromArray([
       ['3'],
       ['4'],
     ])
-    engine.removeRows(0, [1, 1], [3, 1])
+    await engine.removeRows(0, [1, 1], [3, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -994,7 +994,7 @@ const engine = await HyperFormula.buildFromArray([
 const engine = await HyperFormula.buildFromArray([
       ['1']
     ])
-    engine.removeRows(0, [1000, 1])
+    await engine.removeRows(0, [1000, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1008,7 +1008,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.removeRows(0, [1000, 1])
+    await engine.removeRows(0, [1000, 1])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1020,7 +1020,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1'], // add after that
       ['3'],
     ])
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1033,7 +1033,7 @@ const engine = await HyperFormula.buildFromArray([
 const engine = await HyperFormula.buildFromArray([
       ['1'],
     ])
-    engine.addRows(0, [1000, 1])
+    await engine.addRows(0, [1000, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1048,7 +1048,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2'],
       ['3'],
     ])
-    engine.addRows(0, [1, 1], [2, 1])
+    await engine.addRows(0, [1, 1], [2, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1062,7 +1062,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.addRows(0, [1000, 1])
+    await engine.addRows(0, [1000, 1])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1075,7 +1075,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2'],
       ['3'], // move first row before this one
     ])
-    engine.moveRows(0, 0, 1, 2)
+    await engine.moveRows(0, 0, 1, 2)
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1089,7 +1089,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.moveRows(0, 0, 1, 2)
+    await engine.moveRows(0, 0, 1, 2)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1100,7 +1100,7 @@ describe('Redo - moving columns', () => {
 const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3'],
     ])
-    engine.moveColumns(0, 0, 1, 2)
+    await engine.moveColumns(0, 0, 1, 2)
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1114,7 +1114,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.moveColumns(0, 0, 1, 2)
+    await engine.moveColumns(0, 0, 1, 2)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1126,7 +1126,7 @@ const engine = await HyperFormula.buildFromArray([
       ['42'],
       ['45'],
     ])
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1140,7 +1140,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1298,7 +1298,7 @@ describe('Redo - clearing sheet', () => {
 const engine = await HyperFormula.buildFromArray([
       ['1']
     ])
-    engine.clearSheet(0)
+    await engine.clearSheet(0)
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1312,7 +1312,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.clearSheet(0)
+    await engine.clearSheet(0)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1323,7 +1323,7 @@ describe('Redo - adding columns', () => {
 const engine = await HyperFormula.buildFromArray([
       ['1', '3'],
     ])
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1336,7 +1336,7 @@ const engine = await HyperFormula.buildFromArray([
 const engine = await HyperFormula.buildFromArray([
       ['1'],
     ])
-    engine.addColumns(0, [1000, 1])
+    await engine.addColumns(0, [1000, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1349,7 +1349,7 @@ const engine = await HyperFormula.buildFromArray([
 const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3'],
     ])
-    engine.addColumns(0, [1, 1], [2, 1])
+    await engine.addColumns(0, [1, 1], [2, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1363,7 +1363,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.addColumns(0, [1000, 1])
+    await engine.addColumns(0, [1000, 1])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1374,7 +1374,7 @@ describe('Redo - removing column', () => {
 const engine = await HyperFormula.buildFromArray([
       ['1', null, '3'],
     ])
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1388,7 +1388,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=B1']
     ])
-    engine.removeColumns(0, [0, 1])
+    await engine.removeColumns(0, [0, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1401,7 +1401,7 @@ const engine = await HyperFormula.buildFromArray([
 const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3', '4'],
     ])
-    engine.removeColumns(0, [1, 1], [3, 1])
+    await engine.removeColumns(0, [1, 1], [3, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1414,7 +1414,7 @@ const engine = await HyperFormula.buildFromArray([
 const engine = await HyperFormula.buildFromArray([
       ['1']
     ])
-    engine.removeColumns(0, [1000, 1])
+    await engine.removeColumns(0, [1000, 1])
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1428,7 +1428,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.removeColumns(0, [1000, 1])
+    await engine.removeColumns(0, [1000, 1])
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1441,7 +1441,7 @@ const engine = await HyperFormula.buildFromArray([
       ['bar'],
     ])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1466,7 +1466,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.undo()
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1479,7 +1479,7 @@ const engine = await HyperFormula.buildFromArray([
       ['bar', 'faz'],
     ])
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
-    engine.paste(adr('C3'))
+    await engine.paste(adr('C3'))
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()
 
@@ -1504,7 +1504,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.undo()
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1605,7 +1605,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     await engine.addNamedExpression('foo', 'foo')
-    engine.changeNamedExpression('foo', 'bar')
+    await engine.changeNamedExpression('foo', 'bar')
     await engine.undo()
 
     await engine.redo()
@@ -1620,7 +1620,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.setCellContents(adr('A1'), 42)
     await engine.undo()
 
-    engine.changeNamedExpression('foo', 'foo')
+    await engine.changeNamedExpression('foo', 'foo')
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
   })
@@ -1650,7 +1650,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
     await engine.batch(async() => {
       await engine.setCellContents(adr('A1'), '10')
-      engine.removeRows(0, [0, 1])
+      await engine.removeRows(0, [0, 1])
     })
     const snapshot = engine.getAllSheetsSerialized()
     await engine.undo()

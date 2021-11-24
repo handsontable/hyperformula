@@ -651,7 +651,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.addRows(0, [0, 1])
+    await engine.addRows(0, [0, 1])
 
     expectColumnIndexToMatchSheet([
       [null],
@@ -670,7 +670,7 @@ const engine = await HyperFormula.buildFromArray([
       [-1, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
 
     expectColumnIndexToMatchSheet([
       [-1],
@@ -689,7 +689,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeRows(0, [0, 1])
+    await engine.removeRows(0, [0, 1])
 
     expectColumnIndexToMatchSheet([
       [-1],
@@ -707,7 +707,7 @@ const engine = await HyperFormula.buildFromArray([
       [-1, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     expectColumnIndexToMatchSheet([
       [-1],
@@ -724,7 +724,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeRows(0, [0, 1])
+    await engine.removeRows(0, [0, 1])
 
     expectColumnIndexToMatchSheet([
       [null, 1],
@@ -739,7 +739,7 @@ const engine = await HyperFormula.buildFromArray([
       [3, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeRows(0, [1, 1])
+    await engine.removeRows(0, [1, 1])
 
     expectColumnIndexToMatchSheet([
       [],
@@ -753,7 +753,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, 'foo', 1, 2]
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
 
     expectColumnIndexToMatchSheet([
       [null, -1, -2],
@@ -767,7 +767,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, 'foo', 1, 2, 3]
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expectColumnIndexToMatchSheet([
       [-1, -2, -3, null, -3, -2, -1],
@@ -781,7 +781,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, null, 1, 2]
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeColumns(0, [0, 1])
+    await engine.removeColumns(0, [0, 1])
 
     expectColumnIndexToMatchSheet([
       [-1, -2],
@@ -795,7 +795,7 @@ const engine = await HyperFormula.buildFromArray([
       [-2, 'foo', null, 1, 2]
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     expectColumnIndexToMatchSheet([
       [-1, -2, -2, -1],
@@ -809,7 +809,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, 1, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeColumns(0, [0, 1])
+    await engine.removeColumns(0, [0, 1])
 
     expectColumnIndexToMatchSheet([
       [],
@@ -823,7 +823,7 @@ const engine = await HyperFormula.buildFromArray([
       [2, null, 3]
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     expectColumnIndexToMatchSheet([
       [null, 1],

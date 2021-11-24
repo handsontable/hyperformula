@@ -73,7 +73,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=COLUMNS(A1:B1)']
     ])
 
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
   })

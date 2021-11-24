@@ -20,7 +20,7 @@ describe('Clear sheet content', () => {
 const engine = await HyperFormula.buildFromArray([[]])
 
     expect(() => {
-      engine.clearSheet(1)
+      await engine.clearSheet(1)
     }).toThrow(new NoSheetWithIdError(1))
   })
 
@@ -29,7 +29,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', 'foo'],
     ])
 
-    engine.clearSheet(0)
+    await engine.clearSheet(0)
 
     expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('B1'))).toBe(null)
@@ -46,7 +46,7 @@ const engine = await HyperFormula.buildFromSheets({
       ],
     })
 
-    const changes = engine.clearSheet(0)
+    const changes = await engine.clearSheet(0)
 
     expect(engine.getCellValue(adr('A1', 1))).toBe(null)
     expect(engine.getCellValue(adr('A2', 1))).toEqual(1)
@@ -66,7 +66,7 @@ const engine = await HyperFormula.buildFromSheets({
       ],
     })
 
-    const changes = engine.clearSheet(0)
+    const changes = await engine.clearSheet(0)
 
     expect(engine.getCellValue(adr('A1', 1))).toBe(null)
     expect(engine.getCellValue(adr('A2', 1))).toBe(null)
@@ -84,7 +84,7 @@ const engine = await HyperFormula.buildFromSheets({
       ],
     })
 
-    engine.clearSheet(0)
+    await engine.clearSheet(0)
     await engine.setCellContents(adr('A1'), '2')
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
@@ -101,7 +101,7 @@ const engine = await HyperFormula.buildFromSheets({
     })
 
     // eslint-disable-next-line
-    const changes = engine.clearSheet(0)
+    const changes = await engine.clearSheet(0)
 
     await engine.setCellContents(adr('A1'), '2')
     await engine.setCellContents(adr('B1'), '3')

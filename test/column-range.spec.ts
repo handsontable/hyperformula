@@ -63,7 +63,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(B:B)']
     ])
 
-    engine.removeColumns(0, [1, 1])
+    await engine.removeColumns(0, [1, 1])
 
     expect(engine.graph.infiniteRanges.size).toBe(0)
   })
@@ -74,7 +74,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
     expect(engine.getCellValue(adr('E1'))).toEqual(3)
 
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('C1'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('C1'))
 
     expect(engine.getCellValue(adr('E1'))).toEqual(0)
     const range = extractColumnRange(engine, adr('E1'))

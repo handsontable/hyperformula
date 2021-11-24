@@ -91,12 +91,12 @@ const engine = await HyperFormula.buildFromArray([
       ['2']
     ])
 
-    expect(() => engine.moveRows(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('row number to be nonnegative and number of rows to add to be positive.'))
-    expect(() => engine.moveRows(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(() => engine.moveRows(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(() => engine.moveRows(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(() => engine.moveRows(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(() => engine.moveRows(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('row number to be nonnegative and number of rows to add to be positive.'))
+    expect(async() => await engine.moveRows(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
   })
 
   it('should move one row', async() => {
@@ -107,7 +107,7 @@ const engine = await HyperFormula.buildFromArray([
       ['4'],
     ])
 
-    engine.moveRows(0, 1, 1, 3)
+    await engine.moveRows(0, 1, 1, 3)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
@@ -123,7 +123,7 @@ const engine = await HyperFormula.buildFromArray([
       ['4'],
     ])
 
-    engine.moveRows(0, 2, 1, 1)
+    await engine.moveRows(0, 2, 1, 1)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
@@ -139,7 +139,7 @@ const engine = await HyperFormula.buildFromArray([
       ['4'],
     ])
 
-    engine.moveRows(0, 0, 3, 4)
+    await engine.moveRows(0, 0, 3, 4)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
@@ -154,7 +154,7 @@ const engine = await HyperFormula.buildFromArray([
       ['3'],
     ])
 
-    engine.moveRows(0, 1, 2, 5)
+    await engine.moveRows(0, 1, 2, 5)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toBe(null)
@@ -169,7 +169,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=A1'],
     ])
 
-    engine.moveRows(0, 1, 1, 0)
+    await engine.moveRows(0, 1, 1, 0)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
@@ -181,7 +181,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=$A$2', '=B2']
     ])
 
-    engine.moveRows(0, 0, 1, 2)
+    await engine.moveRows(0, 0, 1, 2)
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absolute( 0, 0))
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(-1, 0))
@@ -193,7 +193,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2', '=COUNTBLANK(A1:A2)'],
     ])
 
-    engine.moveRows(0, 1, 1, 3)
+    await engine.moveRows(0, 1, 1, 3)
 
     expect(engine.getCellFormula(adr('B3'))).toEqual('=COUNTBLANK(A1:A1)')
     expect(engine.getCellValue(adr('B3'))).toEqual(0)
@@ -205,7 +205,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, '=COUNTBLANK(A1:A2)'],
     ])
 
-    const changes = engine.moveRows(0, 1, 1, 3)
+    const changes = await engine.moveRows(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
     expect(changes).toContainEqual(new ExportedCellChange(adr('B3'), 0))
@@ -220,7 +220,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=AVERAGE(A1:A3)'],
     ])
 
-    engine.moveRows(0, 3, 1, 1)
+    await engine.moveRows(0, 3, 1, 1)
 
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.CYCLE))
@@ -231,7 +231,7 @@ const engine = await HyperFormula.buildFromArray([[0], [1], [2], [3]])
 
     const version = engine.lazilyTransformingAstService.version()
 
-    engine.moveRows(0, 1, 1, 3)
+    await engine.moveRows(0, 1, 1, 3)
 
     expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
   })
@@ -245,7 +245,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2']
     ])
 
-    engine.moveRows(0, 1, 2, 4)
+    await engine.moveRows(0, 1, 2, 4)
 
     const range = extractRowRange(engine, adr('A1'))
     expect(range.start).toEqual(rowStart(3))
@@ -260,7 +260,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2']
     ])
 
-    engine.moveRows(0, 0, 1, 3)
+    await engine.moveRows(0, 0, 1, 3)
 
     const range = extractRowRange(engine, adr('A3'))
     expect(range.start).toEqual(rowStart(1))
@@ -275,7 +275,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2']
     ])
 
-    engine.moveRows(0, 0, 1, 2)
+    await engine.moveRows(0, 0, 1, 2)
 
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('A2'))).toEqual('=SUM(1:3)')
@@ -288,7 +288,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(B:C)', '1', '2'],
     ])
 
-    engine.moveRows(0, 0, 1, 2)
+    await engine.moveRows(0, 0, 1, 2)
 
     const range = extractColumnRange(engine, adr('A2'))
     expect(range.start).toEqual(colStart('B'))
@@ -302,7 +302,7 @@ const engine = await HyperFormula.buildFromArray([
       [null, '3', '4'],
     ])
 
-    engine.moveRows(0, 1, 1, 3)
+    await engine.moveRows(0, 1, 1, 3)
 
     const range = extractColumnRange(engine, adr('A1'))
     expect(range.start).toEqual(colStart('B'))

@@ -106,7 +106,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
     engine.suspendEvaluation()
 
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
 
     expect(engine.getCellFormula(adr('C1'))).toEqual('=A3+42')
   })
@@ -171,8 +171,8 @@ const engine = await HyperFormula.buildFromArray([
       engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
       engine.suspendEvaluation()
 
-      expect(() => {
-        engine.paste(adr('A3'))
+      expect(async() => {
+        await engine.paste(adr('A3'))
       }).toThrow(new EvaluationSuspendedError())
     })
   })
@@ -183,7 +183,7 @@ const engine = await HyperFormula.buildFromArray([
       ['42']
     ])
     engine.suspendEvaluation()
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
 
     await engine.undo()
 

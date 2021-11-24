@@ -47,8 +47,8 @@ const engine = await HyperFormula.buildFromArray([])
   it('paste raise error when there is nothing in clipboard', async() => {
 const engine = await HyperFormula.buildFromArray([])
 
-    expect(() => {
-      engine.paste(adr('A2'))
+    expect(async() => {
+      await engine.paste(adr('A2'))
     }).toThrow(new NothingToPasteError())
   })
 
@@ -80,7 +80,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    const changes = engine.paste(adr('A2'))
+    const changes = await engine.paste(adr('A2'))
 
     expectArrayWithSameContent([new ExportedCellChange(adr('A2'), null)], changes)
   })
@@ -91,7 +91,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('B1'))
+    await engine.paste(adr('B1'))
 
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
@@ -103,7 +103,7 @@ const engine = await HyperFormula.buildFromArray([
     const engine = await HyperFormula.buildFromArray(sheet)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('B1'))
+    await engine.paste(adr('B1'))
 
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(')
   })
@@ -115,7 +115,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
-    engine.paste(adr('C1'))
+    await engine.paste(adr('C1'))
 
     expect(engine.getCellValue(adr('C1'))).toEqual(1)
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
@@ -129,7 +129,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     expect(engine.dependencyGraph.getCellValue(adr('A2'))).toEqual(1.0000000001)
     expect(engine.dependencyGraph.getCellValue(adr('B2'))).toEqual(1.000000000000001)
@@ -141,7 +141,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     const a2 = engine.dependencyGraph.fetchCell(adr('A2'))
@@ -158,7 +158,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
-    engine.paste(adr('B2'))
+    await engine.paste(adr('B2'))
 
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     const b1 = engine.dependencyGraph.fetchCell(adr('B1'))
@@ -176,7 +176,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
-    engine.paste(adr('B2'))
+    await engine.paste(adr('B2'))
 
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
   })
@@ -188,7 +188,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B2'), 1, 1))
-    engine.paste(adr('A1'))
+    await engine.paste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
@@ -201,7 +201,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B2'), 1, 1))
-    engine.paste(adr('A1'))
+    await engine.paste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
@@ -215,7 +215,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('C3'), 1, 1))
-    engine.paste(adr('B2'))
+    await engine.paste(adr('B2'))
 
     expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('B2'))).toEqual('=SUM(#REF!)')
@@ -228,7 +228,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B2'), 1, 1))
-    engine.paste(adr('A1'))
+    await engine.paste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
@@ -241,7 +241,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B2'), 1, 1))
-    engine.paste(adr('A1'))
+    await engine.paste(adr('A1'))
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#REF!')
@@ -256,7 +256,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A3'), 1, 1))
-    engine.paste(adr('B3'))
+    await engine.paste(adr('B3'))
 
     expect(engine.getCellValue(adr('B3'))).toEqual(7)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
@@ -271,7 +271,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('D1'), 1, 1))
-    engine.paste(adr('E1'))
+    await engine.paste(adr('E1'))
 
     expect(engine.getCellValue(adr('E1'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
@@ -288,7 +288,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(1)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A4'), 1, 1))
-    engine.paste(adr('A5'))
+    await engine.paste(adr('A5'))
 
     expect(engine.getCellValue(adr('A5'))).toEqual(18)
     expect(Array.from(engine.dependencyGraph.rangeMapping.rangesInSheet(0)).length).toBe(2)
@@ -301,9 +301,9 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
     engine.copy(AbsoluteCellRange.spanFrom(adr('C1'), 1, 1))
-    engine.paste(adr('A3'))
+    await engine.paste(adr('A3'))
 
     const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
     const a2 = engine.addressMapping.fetchCell(adr('A2'))
@@ -319,7 +319,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
-    const changes = engine.paste(adr('A2'))
+    const changes = await engine.paste(adr('A2'))
 
     expectArrayWithSameContent([
       new ExportedCellChange(adr('A2'), 1),
@@ -336,7 +336,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(engine.arrayMapping.arrayMapping.size).toEqual(1)
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A3'), 2, 2))
-    engine.paste(adr('A5'))
+    await engine.paste(adr('A5'))
 
     expect(engine.arrayMapping.arrayMapping.size).toEqual(1)
     expect(engine.getCellFormula(adr('A5'))).toBe(undefined)
@@ -355,8 +355,8 @@ const engine = await HyperFormula.buildFromArray([
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
 
-    expect(() => {
-      engine.paste(adr('A3'))
+    expect(async() => {
+      await engine.paste(adr('A3'))
     }).toThrowError('It is not possible to paste onto an array')
   })
 
@@ -367,8 +367,8 @@ const engine = await HyperFormula.buildFromSheets({
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
 
-    expect(() => {
-      engine.paste(adr('A1', 1))
+    expect(async() => {
+      await engine.paste(adr('A1', 1))
     }).toThrowError('Invalid arguments, expected a valid target address.')
   })
 
@@ -379,7 +379,7 @@ const engine = await HyperFormula.buildFromSheets({
     })
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
-    engine.paste(adr('A1', 1))
+    await engine.paste(adr('A1', 1))
 
     expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 0))
     expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 1))
@@ -392,7 +392,7 @@ const engine = await HyperFormula.buildFromSheets({
     })
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A1', 1))
+    await engine.paste(adr('A1', 1))
 
     expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0))
   })
@@ -405,8 +405,8 @@ const engine = await HyperFormula.buildFromArray([
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
 
-    expect(() => engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).toThrow(new SheetSizeLimitExceededError())
-    expect(() => engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
+    expect(async() => await engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).toThrow(new SheetSizeLimitExceededError())
+    expect(async() => await engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
   })
 })
 
@@ -433,7 +433,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1'],
     ])
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     expect(engine.isClipboardEmpty()).toBe(false)
   })
@@ -452,7 +452,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1'],
     ])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.paste(adr('A2'))
+    await engine.paste(adr('A2'))
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })

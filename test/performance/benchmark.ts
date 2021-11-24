@@ -75,9 +75,9 @@ export async function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine:
   }
 }
 
-export function batch(stats: BenchmarkResult[], ...benchmarks: (() => Maybe<BenchmarkResult>)[]): void {
+export async function batch(stats: BenchmarkResult[], ...benchmarks: (() => Promise<Maybe<BenchmarkResult>>)[]): Promise<void> {
   for (const benchmark of benchmarks) {
-    const result = benchmark()
+    const result = await benchmark()
     if (result !== undefined) {
       stats.push(result)
     }

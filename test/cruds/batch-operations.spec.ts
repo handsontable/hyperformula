@@ -13,10 +13,10 @@ const engine = await HyperFormula.buildFromArray([
 
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
-    await engine.batch(() => {
+    await engine.batch(async() => {
       await engine.setCellContents(adr('B1'), [['=A1']])
-      engine.addRows(0, [0, 1], [1, 1])
-      engine.removeRows(0, [0, 1])
+      await engine.addRows(0, [0, 1], [1, 1])
+      await engine.removeRows(0, [0, 1])
     })
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
@@ -36,12 +36,12 @@ const engine = await HyperFormula.buildFromArray([
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     try {
-      await engine.batch(() => {
+      await engine.batch(async() => {
         await engine.setCellContents(adr('B1'), [['=A1']])
-        engine.addRows(0, [0, 1], [1, 1])
-        engine.removeRows(0, [0, 1])
-        engine.addRows(1, [0, 1]) // fail
-        engine.addRows(0, [0, 1])
+        await engine.addRows(0, [0, 1], [1, 1])
+        await engine.removeRows(0, [0, 1])
+        await engine.addRows(1, [0, 1]) // fail
+        await engine.addRows(0, [0, 1])
       })
     } catch(e) {
       // empty line

@@ -172,8 +172,8 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(A1:A3)'],
     ])
 
-    engine.removeRows(0, [0, 2])
-    engine.removeRows(0, [2, 2])
+    await engine.removeRows(0, [0, 2])
+    await engine.removeRows(0, [2, 2])
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
@@ -188,9 +188,9 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(A1:A3)'],
     ])
 
-    engine.addRows(0, [2, 1])
-    engine.removeRows(0, [0, 2])
-    engine.removeRows(0, [2, 2])
+    await engine.addRows(0, [2, 1])
+    await engine.removeRows(0, [0, 2])
+    await engine.removeRows(0, [2, 2])
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
@@ -204,9 +204,9 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(A1:A2)'],
       ['=SUM(A1:A3)'],
     ])
-    engine.addRows(0, [2, 1])
+    await engine.addRows(0, [2, 1])
 
-    engine.removeRows(0, [4, 2])
+    await engine.removeRows(0, [4, 2])
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
@@ -220,14 +220,14 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(A1:A3)'],
       ['=SUM(A1:A2)'],
     ])
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
 
     await engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
 
     expect(engine.getCellValue(adr('A5'))).toBe(10)
     expect(engine.getCellValue(adr('A6'))).toBe(6)
 
-    engine.removeRows(0, [0, 6])
+    await engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
@@ -248,7 +248,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(engine.getCellValue(adr('A5'))).toBe(10)
     expect(engine.getCellValue(adr('A6'))).toBe(6)
 
-    engine.removeRows(0, [0, 6])
+    await engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
@@ -267,7 +267,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(engine.getCellValue(adr('A5'))).toBe(10)
     expect(engine.getCellValue(adr('A6'))).toBe(6)
 
-    engine.removeRows(0, [0, 6])
+    await engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
@@ -281,7 +281,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(A1:A2)', '=SUM(B1:B3)'],
       ['=SUM(A1:A3)', '=SUM(B1:B2)'],
     ])
-    engine.addRows(0, [1, 1])
+    await engine.addRows(0, [1, 1])
 
     await engine.setCellContents(adr('A1'), [[1, 1], [2, 2], [3, 3], [4, 4]])
 
@@ -290,7 +290,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(engine.getCellValue(adr('A6'))).toBe(10)
     expect(engine.getCellValue(adr('B6'))).toBe(6)
 
-    engine.removeRows(0, [0, 6])
+    await engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
@@ -304,7 +304,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(A1:B2)'],
       ['=SUM(A1:B3)']
     ])
-    engine.addColumns(0, [1, 1])
+    await engine.addColumns(0, [1, 1])
     await engine.setCellContents(adr('B3'), 1)
     expect(engine.getCellSerialized(adr('A4'))).toBe('=SUM(A1:C2)')
     expect(engine.getCellSerialized(adr('A5'))).toBe('=SUM(A1:C3)')
@@ -321,7 +321,7 @@ const engine = await HyperFormula.buildFromArray([
     ['=SUM(A1:A3)'],
     ['=SUM(A1:A4)'],
     ])
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3), adr('B1'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3), adr('B1'))
     await engine.setCellContents(adr('B1'), null)
     await engine.setCellContents(adr('B2'), null)
     await engine.setCellContents(adr('B3'), null)
@@ -340,9 +340,9 @@ const engine = await HyperFormula.buildFromArray([
       ['3', '=SUM($A$1:A2)'],
     ])
 
-    engine.addRows(0, [1, 1])
-    engine.addColumns(0, [0, 1])
-    engine.removeColumns(0, [0, 1])
+    await engine.addRows(0, [1, 1])
+    await engine.addColumns(0, [0, 1])
+    await engine.removeColumns(0, [0, 1])
 
     expect(engine.getCellValue(adr('B3'))).toEqual(1)
     expect(engine.getCellValue(adr('B4'))).toEqual(3)

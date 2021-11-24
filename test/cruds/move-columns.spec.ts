@@ -85,12 +85,12 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
     ])
 
-    expect(() => engine.moveColumns(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.'))
-    expect(() => engine.moveColumns(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
-    expect(() => engine.moveColumns(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
-    expect(() => engine.moveColumns(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
-    expect(() => engine.moveColumns(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
-    expect(() => engine.moveColumns(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(async() => await engine.moveColumns(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('column number to be nonnegative and number of columns to add to be positive.'))
+    expect(async() => await engine.moveColumns(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(async() => await engine.moveColumns(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(async() => await engine.moveColumns(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(async() => await engine.moveColumns(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
+    expect(async() => await engine.moveColumns(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of columns to move.'))
   })
 
   it('should move one column', async() => {
@@ -98,7 +98,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3', '4']
     ])
 
-    engine.moveColumns(0, 1, 1, 3)
+    await engine.moveColumns(0, 1, 1, 3)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
@@ -111,7 +111,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3', '4']
     ])
 
-    engine.moveColumns(0, 2, 1, 1)
+    await engine.moveColumns(0, 2, 1, 1)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(3)
@@ -124,7 +124,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3', '4']
     ])
 
-    engine.moveColumns(0, 0, 3, 4)
+    await engine.moveColumns(0, 0, 3, 4)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
@@ -137,7 +137,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3']
     ])
 
-    engine.moveColumns(0, 1, 2, 5)
+    await engine.moveColumns(0, 1, 2, 5)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toBe(null)
@@ -152,7 +152,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=B2', '1'],
     ])
 
-    engine.moveColumns(0, 1, 1, 0)
+    await engine.moveColumns(0, 1, 1, 0)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
@@ -168,7 +168,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=B2']
     ])
 
-    engine.moveColumns(0, 0, 1, 2)
+    await engine.moveColumns(0, 0, 1, 2)
 
     expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absolute( 0, 0))
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(0, -1))
@@ -180,7 +180,7 @@ const engine = await HyperFormula.buildFromArray([
       ['', '=COUNTBLANK(A1:B1)'],
     ])
 
-    engine.moveColumns(0, 1, 1, 3)
+    await engine.moveColumns(0, 1, 1, 3)
 
     expect(engine.getCellFormula(adr('C2'))).toEqual('=COUNTBLANK(A1:A1)')
     expect(engine.getCellValue(adr('C2'))).toEqual(0)
@@ -192,7 +192,7 @@ const engine = await HyperFormula.buildFromArray([
       ['', '=COUNTBLANK(A1:B1)'],
     ])
 
-    const changes = engine.moveColumns(0, 1, 1, 3)
+    const changes = await engine.moveColumns(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), 0))
@@ -203,7 +203,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3', '=AVERAGE(A1:C1)', '=SUM(A1:C1)']
     ])
 
-    engine.moveColumns(0, 3, 1, 1)
+    await engine.moveColumns(0, 3, 1, 1)
 
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.CYCLE))
@@ -214,7 +214,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3', '4', '=SUM(A1:C1)']
     ])
 
-    engine.moveColumns(0, 3, 1, 1)
+    await engine.moveColumns(0, 3, 1, 1)
 
     expect(engine.getCellValue(adr('E1'))).toEqual(10)
   })
@@ -224,7 +224,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(B1:C1)', '1', '2']
     ])
 
-    engine.moveColumns(0, 0, 1, 2)
+    await engine.moveColumns(0, 0, 1, 2)
 
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A1:C1)')
@@ -235,7 +235,7 @@ const engine = await HyperFormula.buildFromArray([[0, 1, 2, 3]])
 
     const version = engine.lazilyTransformingAstService.version()
 
-    engine.moveColumns(0, 1, 1, 3)
+    await engine.moveColumns(0, 1, 1, 3)
 
     expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
   })
@@ -247,7 +247,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(B:C)', '1', '2']
     ])
 
-    engine.moveColumns(0, 1, 2, 4)
+    await engine.moveColumns(0, 1, 2, 4)
 
     const range = extractColumnRange(engine, adr('A1'))
     expect(range.start).toEqual(colStart('C'))
@@ -260,7 +260,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(B:C)', '1', '2']
     ])
 
-    engine.moveColumns(0, 0, 1, 3)
+    await engine.moveColumns(0, 0, 1, 3)
 
     const range = extractColumnRange(engine, adr('C1'))
     expect(range.start).toEqual(colStart('A'))
@@ -273,7 +273,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=SUM(B:C)', '1', '2']
     ])
 
-    engine.moveColumns(0, 0, 1, 2)
+    await engine.moveColumns(0, 0, 1, 2)
 
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=SUM(A:C)')
@@ -288,7 +288,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2']
     ])
 
-    engine.moveColumns(0, 0, 1, 2)
+    await engine.moveColumns(0, 0, 1, 2)
 
     const range = extractRowRange(engine, adr('B1'))
     expect(range.start).toEqual(rowStart(2))
@@ -303,7 +303,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2', '4']
     ])
 
-    engine.moveColumns(0, 1, 1, 3)
+    await engine.moveColumns(0, 1, 1, 3)
 
     const range = extractRowRange(engine, adr('A1'))
     expect(range.start).toEqual(rowStart(2))

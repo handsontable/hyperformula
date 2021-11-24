@@ -75,13 +75,13 @@ const engine = await HyperFormula.buildFromArray([
       ['=NA()', '=A1']
     ])
 
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!B1'))
 
     await engine.setCellContents(adr('B1'), '=1/0')
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!B1'))
 
-    engine.moveCells(simpleCellRange(adr('B1'), adr('B1')), adr('C5'))
+    await engine.moveCells(simpleCellRange(adr('B1'), adr('B1')), adr('C5'))
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!C5'))
   })
 })

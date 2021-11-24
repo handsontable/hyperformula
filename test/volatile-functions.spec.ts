@@ -51,7 +51,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=RAND()', '42'],
     ])
 
-    engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
+    await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(engine.dependencyGraph.volatileVertices()).toEqual(new Set([a2]))

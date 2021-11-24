@@ -80,7 +80,7 @@ const engine = await HyperFormula.buildFromArray([
     ])
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
 
-    engine.addColumns(0, [0, 1])
+    await engine.addColumns(0, [0, 1])
 
     expect(engine.getCellValue(adr('B2'))).toEqual(2)
   })

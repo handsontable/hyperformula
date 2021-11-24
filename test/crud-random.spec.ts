@@ -164,19 +164,19 @@ function shuffleArray<T>(array: T[]): T[] {
  */
 async function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: number, sideY: number) {
   if(outputLog) {
-    console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}), {sheet: 0, col: 1000, row: 1000})`)
+    console.log(`await engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}), {sheet: 0, col: 1000, row: 1000})`)
   }
-  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY), {sheet: 0, col: 1000, row: 1000})
+  await engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY), {sheet: 0, col: 1000, row: 1000})
   await undoRedo(engine)
   if(outputLog) {
-    console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
+    console.log(`await engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
   }
-  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY), {sheet: 0, col: pts1.x, row: pts1.y})
+  await engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY), {sheet: 0, col: pts1.x, row: pts1.y})
   await undoRedo(engine)
   if(outputLog) {
-    console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
+    console.log(`await engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
   }
-  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, sideX, sideY), {sheet: 0, col: pts2.x, row: pts2.y})
+  await engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, sideX, sideY), {sheet: 0, col: pts2.x, row: pts2.y})
   await undoRedo(engine)
 }
 
@@ -228,16 +228,16 @@ const engine = await HyperFormula.buildFromArray([])
       for (let i=0; i<n; i++) {
         const columnPositionToAdd = randomInteger(0, sideX*(n+1)+1)
         if(outputLog) {
-          console.log(`engine.addColumns(0, [${columnPositionToAdd},2])`)
+          console.log(`await engine.addColumns(0, [${columnPositionToAdd},2])`)
         }
-        engine.addColumns(0, [columnPositionToAdd, 2])
+        await engine.addColumns(0, [columnPositionToAdd, 2])
         await undoRedo(engine)
         await verifyValues(engine)
         const columnPositionToRemove = randomInteger(0, sideX*(n+1))
         if(outputLog) {
-          console.log(`engine.removeColumns(0, [${columnPositionToRemove},1])`)
+          console.log(`await engine.removeColumns(0, [${columnPositionToRemove},1])`)
         }
-        engine.removeColumns(0, [columnPositionToRemove, 1])
+        await engine.removeColumns(0, [columnPositionToRemove, 1])
         await undoRedo(engine)
       }
       sideX += 1
@@ -246,15 +246,15 @@ const engine = await HyperFormula.buildFromArray([])
       if(outputLog) {
         console.log(`engine.addRows(0, [${rowPositionToAdd},2])`)
       }
-      engine.addRows(0, [rowPositionToAdd, 2])
+      await engine.addRows(0, [rowPositionToAdd, 2])
       await undoRedo(engine)
       sideY += 2
       await verifyValues(engine)
       const rowPositionToRemove = randomInteger(0, sideY)
       if(outputLog) {
-        console.log(`engine.removeRows(0, [${rowPositionToRemove},1])`)
+        console.log(`await engine.removeRows(0, [${rowPositionToRemove},1])`)
       }
-      engine.removeRows(0, [rowPositionToRemove, 1])
+      await engine.removeRows(0, [rowPositionToRemove, 1])
       await undoRedo(engine)
       sideY -= 1
       await verifyValues(engine)
