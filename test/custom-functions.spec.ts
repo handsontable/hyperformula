@@ -161,7 +161,7 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
+    expectArrayWithSameContent(['FU', 'BAR', 'ASYNC_FOO', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
   })
 
   it('should register all formulas from plugin', async() => {
@@ -390,8 +390,8 @@ describe('aliases', () => {
   })
 })
 
-describe.only('Async functions', () => {
-  it.only('should register simple async function', async() => {
+describe('Async functions', () => {
+  it('should register simple async function', async() => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const engine = await HyperFormula.buildFromArray([
       ['=FOO()', '=ASYNC_FOO()']
