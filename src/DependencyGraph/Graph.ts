@@ -178,7 +178,7 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {})
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes))
   }
 
   /**
@@ -190,7 +190,7 @@ export class Graph<T> {
    * @param operatingFunction - recomputes value of a node, and returns whether a change occured
    * @param onCycle - action to be performed when node is on cycle
    */
-  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
+  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[]): TopSortResult<T> {
 
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
@@ -277,7 +277,6 @@ export class Graph<T> {
       }
     })
 
-    const shouldBeUpdatedMapping = new Set(modifiedNodes)
 
     const sorted: T[] = []
     const cycled: T[] = []
@@ -286,13 +285,8 @@ export class Graph<T> {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
           cycled.push(t)
-          onCycle(t)
-          this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
         } else {
           sorted.push(t)
-          if ( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
-            this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
-          }
         }
       })
     return { sorted, cycled }

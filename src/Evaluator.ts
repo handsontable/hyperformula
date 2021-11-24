@@ -41,47 +41,82 @@ export class Evaluator {
     })
   }
 
-  public partialRun(vertices: Vertex[]): ContentChanges {
+  public async partialRun(vertices: Vertex[]): Promise<ContentChanges> {
     const changes = ContentChanges.empty()
+    const vertexCurrentValueMap = new Map<Vertex, InterpreterValue | undefined>()
+    const vertexNewValueMap = new Map<Vertex, InterpreterValue>()
+
+    const promises = vertices.map((vertex) => {
+      if (vertex instanceof FormulaVertex) {
+        const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
+
+        vertexCurrentValueMap.set(vertex, currentValue)
+
+        return this.recomputeFormulaVertexValue(vertex)
+      }
+      return null
+    })
+
+    const calculatedVertexValues = await Promise.all(promises)
+
+    calculatedVertexValues.forEach((value, i) => {
+      if (value !== null) {
+        const vertex = vertices[i]
+
+        vertexNewValueMap.set(vertex, value)
+      }
+    })
 
     this.stats.measure(StatType.EVALUATION, () => {
-      this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
-        (vertex: Vertex) => {
-          if (vertex instanceof FormulaVertex) {
-            const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
-            const newCellValue = this.recomputeFormulaVertexValue(vertex)
+      const { sorted, cycled } = this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices)
+      const shouldBeUpdatedMapping = new Set(vertices)
 
-            if (newCellValue !== currentValue) {
-              const address = vertex.getAddress(this.lazilyTransformingAstService)
-              changes.addChange(newCellValue, address)
-              this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
-              return true
-            }
-            return false
-          } else if (vertex instanceof RangeVertex) {
-            vertex.clearCache()
-            return true
-          } else {
-            return true
-          }
-        },
-        (vertex: Vertex) => {
-          if (vertex instanceof RangeVertex) {
-            vertex.clearCache()
-          } else if (vertex instanceof FormulaVertex) {
+      const operatingFunction = (vertex: Vertex) => {
+        if (vertex instanceof FormulaVertex) {
+          const currentValue = vertexCurrentValueMap.get(vertex)
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const newCellValue = vertexNewValueMap.get(vertex)!
+
+          if (newCellValue !== currentValue) {
             const address = vertex.getAddress(this.lazilyTransformingAstService)
-            this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
-            const error = new CellError(ErrorType.CYCLE, undefined, vertex)
-            vertex.setCellValue(error)
-            changes.addChange(error, address)
+            changes.addChange(newCellValue, address)
+            this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
+            return true
           }
-        },
-      )
+          return false
+        } else if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+          return true
+        } else {
+          return true
+        }
+      }
+
+      sorted.forEach((vertex) => {
+        if ( shouldBeUpdatedMapping.has(vertex) && operatingFunction(vertex)) {
+          this.dependencyGraph.graph.adjacentNodes(vertex).forEach((s: Vertex) => shouldBeUpdatedMapping.add(s) )
+        }
+      })
+
+      cycled.forEach((vertex) => {
+        if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+        } else if (vertex instanceof FormulaVertex) {
+          const address = vertex.getAddress(this.lazilyTransformingAstService)
+          this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
+          const error = new CellError(ErrorType.CYCLE, undefined, vertex)
+          vertex.setCellValue(error)
+          changes.addChange(error, address)
+        }
+
+        this.dependencyGraph.graph.adjacentNodes(vertex).forEach((s: Vertex) => shouldBeUpdatedMapping.add(s) )
+      })
     })
+
     return changes
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
+  public async runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): AsyncInterpreterValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -93,7 +128,7 @@ export class Evaluator {
         }
       }
     }
-    const ret = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
+    const ret = await this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
 
     tmpRanges.forEach((rangeVertex) => {
       this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
