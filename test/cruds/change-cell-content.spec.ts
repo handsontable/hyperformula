@@ -403,7 +403,7 @@ const engine = await HyperFormula.buildFromArray([
 
     expect(async() => {
       await engine.setCellContents(adr('B1', 1), '3')
-    }).toThrow(new NoSheetWithIdError(1))
+    }).rejects.toThrow(new NoSheetWithIdError(1))
   })
 
   it('is not possible to set cell content with invalid address', async() => {
@@ -415,7 +415,7 @@ const engine = await HyperFormula.buildFromArray([
     const address = {row: -1, col: 0, sheet: 0}
     expect(async() => {
       await engine.setCellContents(address, '3')
-    }).toThrow(new InvalidAddressError(address))
+    }).rejects.toThrow(new InvalidAddressError(address))
   })
 
   it('remembers if the new formula is structure dependent', async() => {

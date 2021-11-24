@@ -429,9 +429,8 @@ const engine = await HyperFormula.buildFromArray([
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
-      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2), adr('C1'))
-    }).toThrowError('Cannot perform this operation, source location has an array inside.')
+    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2), adr('C1'))
+    }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should not be possible to move cells to area with matrix', async() => {
@@ -440,9 +439,8 @@ const engine = await HyperFormula.buildFromArray([
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
-      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('A2'))
-    }).toThrowError('Cannot perform this operation, target location has an array inside.')
+    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('A2'))
+    }).rejects.toThrowError('Cannot perform this operation, target location has an array inside.')
   })
 
   it('should adjust edges when moving part of range', async() => {
@@ -920,9 +918,8 @@ describe('move cells with matrices', () => {
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
-      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1), adr('A3'))
-    }).toThrowError('Cannot perform this operation, source location has an array inside.')
+    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1), adr('A3'))
+    }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should not be possible to move formula matrix at all', async() => {
@@ -931,9 +928,8 @@ describe('move cells with matrices', () => {
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
-      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1), adr('A3'))
-    }).toThrowError('Cannot perform this operation, source location has an array inside.')
+    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1), adr('A3'))
+    }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 })
 

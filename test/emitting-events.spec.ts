@@ -96,7 +96,7 @@ const engine = await HyperFormula.buildFromArray([[]])
     engine.on(Events.NamedExpressionRemoved, handler)
     expect(async() => {
       await engine.removeNamedExpression('myName')
-    }).toThrow(new NamedExpressionDoesNotExistError('myName'))
+    }).rejects.toThrow(new NamedExpressionDoesNotExistError('myName'))
   })
 
   it('namedExpressionRemoved contains actual named expression name', async() => {

@@ -774,7 +774,7 @@ const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
     ])
 
-    expect(async() => await engine.removeColumns(0, [1, 0])).toThrowError()
+    expect(async() => await engine.removeColumns(0, [1, 0])).rejects.toThrowError()
   })
 })
 

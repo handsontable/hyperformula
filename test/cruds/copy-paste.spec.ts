@@ -49,7 +49,7 @@ const engine = await HyperFormula.buildFromArray([])
 
     expect(async() => {
       await engine.paste(adr('A2'))
-    }).toThrow(new NothingToPasteError())
+    }).rejects.toThrow(new NothingToPasteError())
   })
 
   it('copy should return values', async() => {
@@ -357,7 +357,7 @@ const engine = await HyperFormula.buildFromArray([
 
     expect(async() => {
       await engine.paste(adr('A3'))
-    }).toThrowError('It is not possible to paste onto an array')
+    }).rejects.toThrowError('It is not possible to paste onto an array')
   })
 
   it('should not be possible to paste to not existing sheet', async() => {
@@ -369,7 +369,7 @@ const engine = await HyperFormula.buildFromSheets({
 
     expect(async() => {
       await engine.paste(adr('A1', 1))
-    }).toThrowError('Invalid arguments, expected a valid target address.')
+    }).rejects.toThrowError('Invalid arguments, expected a valid target address.')
   })
 
   it('should copy references with absolute sheet id', async() => {

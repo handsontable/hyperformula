@@ -810,7 +810,7 @@ const engine = await HyperFormula.buildEmpty()
 
     expect(async() => {
       await engine.undo()
-    }).toThrow(new NoOperationToUndoError())
+    }).rejects.toThrow(new NoOperationToUndoError())
   })
 
   it('undo recomputes and return changes', async() => {
@@ -1667,7 +1667,7 @@ const engine = await HyperFormula.buildEmpty()
 
     expect(async() => {
       await engine.redo()
-    }).toThrow(new NoOperationToRedoError())
+    }).rejects.toThrow(new NoOperationToRedoError())
   })
 
   it('redo recomputes and return changes', async() => {

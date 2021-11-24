@@ -960,7 +960,7 @@ const engine = await HyperFormula.buildFromArray([['1']])
 
     expect(async() => {
       await engine.addRows(1, [1, 1])
-    }).toThrow(new NoSheetWithIdError(1))
+    }).rejects.toThrow(new NoSheetWithIdError(1))
 
     expect(engine.isClipboardEmpty()).toBe(false)
   })

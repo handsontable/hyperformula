@@ -33,7 +33,7 @@ const engine = await HyperFormula.buildFromArray([[]])
 
     expect(async() => {
       await engine.removeSheet(1)
-    }).toThrow(new NoSheetWithIdError(1))
+    }).rejects.toThrow(new NoSheetWithIdError(1))
   })
 
   it('should remove sheet by id', async() => {

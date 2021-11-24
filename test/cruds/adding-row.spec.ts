@@ -283,11 +283,11 @@ const engine = await HyperFormula.buildFromArray(Array(Config.defaultConfig.maxR
 
     expect(async() => {
       await engine.addRows(0, [0, 2])
-    }).toThrow(new SheetSizeLimitExceededError())
+    }).rejects.toThrow(new SheetSizeLimitExceededError())
 
     expect(async() => {
       await engine.addRows(0, [0, 1], [5, 1])
-    }).toThrow(new SheetSizeLimitExceededError())
+    }).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 })
 
