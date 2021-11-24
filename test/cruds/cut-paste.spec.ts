@@ -15,8 +15,8 @@ import {
 } from '../testUtils'
 
 describe('Address dependencies, moved formulas', () => {
-  it('should update dependency to external cell when not overriding it', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update dependency to external cell when not overriding it', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['foo'],
       ['=A1'],
       ['=$A1'],
@@ -33,8 +33,8 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute( 0, 0))
   })
 
-  it('should return #CYCLE when overriding referred dependency to external cell', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #CYCLE when overriding referred dependency to external cell', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=B1', '1'],
       ['=$B2', '2'],
       ['=B$3', '3'],
@@ -54,8 +54,8 @@ describe('Address dependencies, moved formulas', () => {
     expect(engine.getCellFormula(adr('B4'))).toEqual('=$B$4')
   })
 
-  it('should work when overriding moved dependency', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work when overriding moved dependency', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=B2', '1'],
       ['3', '2'],
     ])
@@ -66,8 +66,8 @@ describe('Address dependencies, moved formulas', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
   })
 
-  it('should update internal dependency when overriding dependent cell', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update internal dependency when overriding dependent cell', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=B$2', null],
       [null, null],
     ])
@@ -78,8 +78,8 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow( 1, 2))
   })
 
-  it('should update coordinates to internal dependency', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update coordinates to internal dependency', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=A1'],
       ['2', '=$A2'],
       ['3', '=A$3'],
@@ -97,8 +97,8 @@ describe('Address dependencies, moved formulas', () => {
     expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute( 1, 4))
   })
 
-  it('should evaluate formula when overriding external formula dependency', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should evaluate formula when overriding external formula dependency', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -115,8 +115,8 @@ describe('Address dependencies, moved formulas', () => {
 })
 
 describe('Move cells', () => {
-  it('should move static content', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should move static content', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['foo'],
       [null],
     ])
@@ -127,8 +127,8 @@ describe('Move cells', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('foo')
   })
 
-  it('should update reference of moved formula when moving to other sheet', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should update reference of moved formula when moving to other sheet', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['foo'],
         ['=A1'],
@@ -144,8 +144,8 @@ describe('Move cells', () => {
     expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(0, -1))
   })
 
-  it('should update reference', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update reference', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['foo' /* foo */],
       ['=A1'],
       ['=$A1'],
@@ -162,8 +162,8 @@ describe('Move cells', () => {
     expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute( 1, 0))
   })
 
-  it('value moved has appropriate edges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('value moved has appropriate edges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['foo' /* foo */],
       ['=A1'],
     ])
@@ -175,8 +175,8 @@ describe('Move cells', () => {
     expect(engine.graph.existsEdge(movedVertex, engine.dependencyGraph.fetchCell(adr('A2')))).toBe(true)
   })
 
-  it('should update reference when moving to different sheet', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should update reference when moving to different sheet', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['foo'],
         ['=A1'],
@@ -191,8 +191,8 @@ describe('Move cells', () => {
     expect(reference).toEqual(CellAddress.relative(-1, 1))
   })
 
-  it('should override and remove formula', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should override and remove formula', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['=A1'],
     ])
@@ -206,8 +206,8 @@ describe('Move cells', () => {
     expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 
-  it('moving empty vertex', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('moving empty vertex', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '42'],
     ])
 
@@ -218,8 +218,8 @@ describe('Move cells', () => {
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(undefined)
   })
 
-  it('replacing formula dependency with null one', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('replacing formula dependency with null one', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '42'],
       ['=B1'],
     ])
@@ -227,14 +227,14 @@ describe('Move cells', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null],
       ['=B1'],
     ]))
   })
 
-  it('moving empty vertex to empty vertex', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('moving empty vertex to empty vertex', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, null],
     ])
 
@@ -245,8 +245,8 @@ describe('Move cells', () => {
     expect(engine.addressMapping.getCell(adr('B1'))).toBe(undefined)
   })
 
-  it('should adjust edges properly', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges properly', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=A1'],
       ['2', '=A2'],
     ])
@@ -275,8 +275,8 @@ describe('Move cells', () => {
 })
 
 describe('moving ranges', () => {
-  it('should not update range when only part of it is moved', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not update range when only part of it is moved', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1' /* 1 */],
       ['2'],
       ['=SUM(A1:A2)'],
@@ -297,15 +297,15 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(a1, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, '1'],
       ['2'],
       ['=SUM(A1:A2)'],
     ]))
   })
 
-  it('should update moved range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update moved range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1' /* 1 */],
       ['2' /* 2 */],
       ['=SUM(A1:A2)'],
@@ -324,15 +324,15 @@ describe('moving ranges', () => {
     expect(engine.addressMapping.getCell(adr('A1'))).toBe(undefined)
     expect(engine.addressMapping.getCell(adr('A2'))).toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, '1'],
       [null, '2'],
       ['=SUM(B1:B2)'],
     ]))
   })
 
-  it('should not be possible to move area with matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not be possible to move area with matrix', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -343,8 +343,8 @@ describe('moving ranges', () => {
     }).toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
-  it('should not be possible to move cells to area with matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not be possible to move cells to area with matrix', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -355,8 +355,8 @@ describe('moving ranges', () => {
     }).toThrowError('Cannot perform this operation, target location has an array inside.')
   })
 
-  it('should adjust edges when moving part of range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges when moving part of range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A2)'],
       ['2', '=A2'],
     ])
@@ -389,14 +389,14 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, '=SUM(A1:A2)'],
       ['1', '=A2'],
     ]))
   })
 
-  it('should adjust edges when moving whole range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges when moving whole range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A2)'],
       ['2', '=A2'],
     ])
@@ -429,14 +429,14 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c2, range)).toBe(true)
     expect(engine.graph.existsEdge(range, b1)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, '=SUM(C1:C2)', '1'],
       [null, '=C2', '2'],
     ]))
   })
 
-  it('should adjust edges when moving smaller range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges when moving smaller range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null            /* 1 */],
       ['2', '=SUM(A1:A2)' /* 2 */],
       ['3', '=SUM(A1:A3)'],
@@ -467,15 +467,15 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(engine.addressMapping.fetchCell(adr('C1')), c1c2)).toBe(true)
     expect(engine.graph.existsEdge(engine.addressMapping.fetchCell(adr('C2')), c1c2)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null, '1'],
       [null, '=SUM(C1:C2)', '2'],
       ['3', '=SUM(A1:A3)'],
     ]))
   })
 
-  it('should adjust edges when moving smaller ranges - more complex', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges when moving smaller ranges - more complex', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null            /* 1 */],
       ['2', '=SUM(A1:A2)' /* 2 */],
       ['3', '=SUM(A1:A3)'  /* 3 */],
@@ -507,7 +507,7 @@ describe('moving ranges', () => {
     expect(engine.graph.existsEdge(c2, c1c3)).toBe(false)
     expect(engine.graph.existsEdge(c3, c1c3)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null, '1'],
       [null, '=SUM(C1:C2)', '2'],
       [null, '=SUM(C1:C3)', '3'],
@@ -515,8 +515,8 @@ describe('moving ranges', () => {
     ]))
   })
 
-  it('move wider dependent ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('move wider dependent ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -526,7 +526,7 @@ describe('moving ranges', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('C1'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null, '1', '2'],
       [null, null, '3', '4'],
       ['5', '6'],
@@ -536,8 +536,8 @@ describe('moving ranges', () => {
 })
 
 describe('overlapping areas', () => {
-  it('overlapped rows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('overlapped rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -546,15 +546,15 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('A2'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null],
       ['1', '2'],
       ['3', '4'],
     ]))
   })
 
-  it('overlapped rows - opposite way', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('overlapped rows - opposite way', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -563,15 +563,15 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2))
     engine.paste(adr('A1'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['3', '4'],
       ['5', '6'],
       [null, null],
     ]))
   })
 
-  it('overlapped columns', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('overlapped columns', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
     ])
@@ -579,14 +579,14 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('B1'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, '1', '2'],
       [null, '4', '5'],
     ]))
   })
 
-  it('overlapped columns - opposite way', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('overlapped columns - opposite way', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
     ])
@@ -594,14 +594,14 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('B1'), 2, 2))
     engine.paste(adr('A1'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['2', '3', null],
       ['5', '6', null],
     ]))
   })
 
-  it('moving along diagonal', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('moving along diagonal', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
     ])
@@ -609,15 +609,15 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 3, 2))
     engine.paste(adr('B2'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null, null, null],
       [null, '1', '2', '3'],
       [null, '4', '5', '6'],
     ]))
   })
 
-  it('overlapped rows with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('overlapped rows with ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -627,7 +627,7 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('A2'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null],
       ['1', '2'],
       ['3', '4'],
@@ -635,8 +635,8 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('overlapped columns with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('overlapped columns with ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
       ['=SUM(A1:B2)', '=SUM(A1:C2)', '=SUM(B1:B2)'],
@@ -645,15 +645,15 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
     engine.paste(adr('B1'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, '1', '2'],
       [null, '4', '5'],
       ['=SUM(B1:C2)', '=SUM(A1:C2)', '=SUM(C1:C2)'],
     ]))
   })
 
-  it('expecting range to be same when moving part of a range inside this range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('expecting range to be same when moving part of a range inside this range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -663,7 +663,7 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null],
       ['1'],
       ['3'],
@@ -671,8 +671,8 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('expecting range to be same when moving part of a range outside of this range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('expecting range to be same when moving part of a range outside of this range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -683,7 +683,7 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A4'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null],
       ['2'],
       ['3'],
@@ -692,8 +692,8 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('expecting range to be same when moving part of a range outside of this range - row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('expecting range to be same when moving part of a range outside of this range - row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3', null],
       ['=SUM(A1:C1)'],
     ])
@@ -701,14 +701,14 @@ describe('overlapping areas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('D1'))
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, '2', '3', '1'],
       ['=SUM(A1:C1)'],
     ]))
   })
 
-  it('ArrayVertex#formula should be updated', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('ArrayVertex#formula should be updated', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=TRANSPOSE(A1:B2)'],
@@ -720,8 +720,8 @@ describe('overlapping areas', () => {
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('ArrayVertex#formula should be updated when different sheets', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
         ['3', '4'],
@@ -741,8 +741,8 @@ describe('overlapping areas', () => {
 })
 
 describe('column index', () => {
-  it('should update column index when moving cell', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update column index when moving cell', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['1'],
       ['=VLOOKUP(1, A1:A2, 1, TRUE())'],
@@ -756,8 +756,8 @@ describe('column index', () => {
     expectArrayWithSameContent([0], index.getValueIndex(0, 1, 1).index)
   })
 
-  it('should update column index when moving cell - REFs', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update column index when moving cell - REFs', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=B1', '1'],
       ['3', '2'],
     ], {useColumnIndex: true})
@@ -772,8 +772,8 @@ describe('column index', () => {
     expectArrayWithSameContent([1], index.getValueIndex(0, 1, 3).index)
   })
 
-  it('should update column index when source and target overlaps', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update column index when source and target overlaps', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '5'],
       [null, '6', '7'],
@@ -792,8 +792,8 @@ describe('column index', () => {
     expectArrayWithSameContent([2], index.getValueIndex(0, 2, 4).index)
   })
 
-  it('should update column index when source and target overlaps - oposite way', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update column index when source and target overlaps - oposite way', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '5'],
       [null, '6', '7'],
@@ -814,8 +814,8 @@ describe('column index', () => {
 })
 
 describe('move cells with matrices', () => {
-  it('should not be possible to move part of formula matrix', function() {
-    const engine = HyperFormula.buildFromArray([
+  it('should not be possible to move part of formula matrix', async() => {
+    const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -826,8 +826,8 @@ describe('move cells with matrices', () => {
     }).toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
-  it('should not be possible to move formula matrix at all', function() {
-    const engine = HyperFormula.buildFromArray([
+  it('should not be possible to move formula matrix at all', async() => {
+    const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -840,8 +840,8 @@ describe('move cells with matrices', () => {
 })
 
 describe('aborting cut paste', () => {
-  it('should be aborted when addRows is done before paste', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be aborted when addRows is done before paste', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2']
     ])
@@ -852,8 +852,8 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when removeRows is done before paste', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be aborted when removeRows is done before paste', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2']
     ])
@@ -864,8 +864,8 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when addColumns is done before paste', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be aborted when addColumns is done before paste', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2']
     ])
 
@@ -875,8 +875,8 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when addColumns is done before paste', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be aborted when addColumns is done before paste', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2']
     ])
 
@@ -886,8 +886,8 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when moveCells is done before paste', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be aborted when moveCells is done before paste', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2']
     ])
 
@@ -897,31 +897,31 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when sheet is removed', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should be aborted when sheet is removed', async() => {
+const engine = await HyperFormula.buildFromSheets({
       'Sheet1': [['1']],
       'Sheet2': []
     })
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.removeSheet(1)
+    await engine.removeSheet(1)
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when setCellContents is done', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be aborted when setCellContents is done', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1']
     ])
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.setCellContents(adr('B1'), 'foo')
+    await engine.setCellContents(adr('B1'), 'foo')
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when sheet is cleared', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should be aborted when sheet is cleared', async() => {
+const engine = await HyperFormula.buildFromSheets({
       'Sheet1': [['1']],
       'Sheet2': []
     })
@@ -932,20 +932,20 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when sheet content is replaced', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should be aborted when sheet content is replaced', async() => {
+const engine = await HyperFormula.buildFromSheets({
       'Sheet1': [['1']],
       'Sheet2': []
     })
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
-    engine.setSheetContent(1, [])
+    await engine.setSheetContent(1, [])
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should not be aborted when adding new sheet', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
+  it('should not be aborted when adding new sheet', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.addSheet()
@@ -953,8 +953,8 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(false)
   })
 
-  it('should not be aborted when addRows is not successful', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
+  it('should not be aborted when addRows is not successful', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
@@ -965,50 +965,50 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(false)
   })
 
-  it('should be aborted when doing undo', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
-    engine.setCellContents(adr('A1'), 42)
+  it('should be aborted when doing undo', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
+    await engine.setCellContents(adr('A1'), 42)
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
-    engine.undo()
+    await engine.undo()
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when doing redo', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
-    engine.setCellContents(adr('A1'), 42)
-    engine.undo()
+  it('should be aborted when doing redo', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
+    await engine.setCellContents(adr('A1'), 42)
+    await engine.undo()
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
-    engine.redo()
+    await engine.redo()
 
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when swapping rows', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
+  it('should be aborted when swapping rows', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.swapRowIndexes(0, [[0, 0]])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when swapping columns', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
+  it('should be aborted when swapping columns', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.swapColumnIndexes(0, [[0, 0]])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when setting row order', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
+  it('should be aborted when setting row order', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.setRowOrder(0, [0])
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when setting column order', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
+  it('should be aborted when setting column order', async() => {
+const engine = await HyperFormula.buildFromArray([['1']])
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.setColumnOrder(0, [0])
     expect(engine.isClipboardEmpty()).toBe(true)

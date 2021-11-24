@@ -2,30 +2,30 @@ import {HyperFormula, NoSheetWithIdError} from '../../src'
 import {adr} from '../testUtils'
 
 describe('Clear sheet - checking if its possible', () => {
-  it('no if theres no such sheet', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('no if theres no such sheet', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToClearSheet(1)).toEqual(false)
   })
 
-  it('yes otherwise', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('yes otherwise', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToClearSheet(0)).toEqual(true)
   })
 })
 
 describe('Clear sheet content', () => {
-  it('should throw error when trying to clear not existing sheet', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('should throw error when trying to clear not existing sheet', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(() => {
       engine.clearSheet(1)
     }).toThrow(new NoSheetWithIdError(1))
   })
 
-  it('should clear sheet content', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should clear sheet content', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', 'foo'],
     ])
 
@@ -35,8 +35,8 @@ describe('Clear sheet content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
-  it('should recalculate and return changes', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should recalculate and return changes', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'],
       ],
@@ -54,8 +54,8 @@ describe('Clear sheet content', () => {
     expect(changes.length).toEqual(2)
   })
 
-  it('should clear sheet with matrix', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should clear sheet with matrix', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
         ['=TRANSPOSE(A1:B1)'],
@@ -74,8 +74,8 @@ describe('Clear sheet content', () => {
     expect(changes.length).toEqual(2)
   })
 
-  it('should clear sheet and dont break edge between cells', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should clear sheet and dont break edge between cells', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'],
       ],
@@ -85,13 +85,13 @@ describe('Clear sheet content', () => {
     })
 
     engine.clearSheet(0)
-    engine.setCellContents(adr('A1'), '2')
+    await engine.setCellContents(adr('A1'), '2')
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
   })
 
-  it('should clear sheet and dont break edge between cells, case with range', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should clear sheet and dont break edge between cells, case with range', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'],
       ],
@@ -103,8 +103,8 @@ describe('Clear sheet content', () => {
     // eslint-disable-next-line
     const changes = engine.clearSheet(0)
 
-    engine.setCellContents(adr('A1'), '2')
-    engine.setCellContents(adr('B1'), '3')
+    await engine.setCellContents(adr('A1'), '2')
+    await engine.setCellContents(adr('B1'), '3')
 
     expect(engine.getCellValue(adr('A1', 1))).toEqual(5)
   })

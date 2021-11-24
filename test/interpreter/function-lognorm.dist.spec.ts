@@ -5,8 +5,8 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function LOGNORM.DIST', () => {
   //in product #1, this function takes 3 arguments
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(1, 2, 3)'],
       ['=LOGNORM.DIST(1, 2, 3, 4, 5)'],
     ])
@@ -16,8 +16,8 @@ describe('Function LOGNORM.DIST', () => {
   })
 
   //in product #1, this function takes 3 arguments
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LOGNORM.DIST("foo", 2, 3, TRUE())'],
       ['=LOGNORM.DIST(1, "baz", 3, TRUE())'],
       ['=LOGNORM.DIST(1, 2, "baz", TRUE())'],
@@ -31,8 +31,8 @@ describe('Function LOGNORM.DIST', () => {
   })
 
   //in product #1, this function takes 3 arguments
-  it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as cdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(0.1, 1, 2, TRUE())'],
       ['=LOGNORM.DIST(0.5, 2, 4, TRUE())'],
     ])
@@ -42,8 +42,8 @@ describe('Function LOGNORM.DIST', () => {
   })
 
   //in product #1, this function takes 3 arguments
-  it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as pdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(0.1, 1, 2, FALSE())'],
       ['=LOGNORM.DIST(0.5, 2, 4, FALSE())'],
     ])
@@ -53,8 +53,8 @@ describe('Function LOGNORM.DIST', () => {
   })
 
   //in product #1, this function takes 3 arguments
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LOGNORM.DIST(0.01, 0, 0.01, FALSE())'],
       ['=LOGNORM.DIST(0, 0, 0.01, FALSE())'],
       ['=LOGNORM.DIST(0.01, 0, 0, FALSE())'],

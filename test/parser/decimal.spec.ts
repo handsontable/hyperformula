@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe( 'decimal parsing', () => {
-  it('parsing decimal without leading zero', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('parsing decimal without leading zero', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['.1', '=.1'],
       ['-.1', '=-.1'],
       ['+.1', '=+.1'],

@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NETWORKDAYS.INTL', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NETWORKDAYS.INTL(1)', '=NETWORKDAYS.INTL(1, 1, 1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function NETWORKDAYS.INTL', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should check for types or value of third argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should check for types or value of third argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NETWORKDAYS.INTL(0, 1, TRUE())'],
       ['=NETWORKDAYS.INTL(0, 1, "1")'],
       ['=NETWORKDAYS.INTL(0, 1, "1010102")'],
@@ -27,8 +27,8 @@ describe('Function NETWORKDAYS.INTL', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
   })
 
-  it('works correctly for first two arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works correctly for first two arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NETWORKDAYS.INTL(0, 1)'],
       ['=NETWORKDAYS.INTL(0, 6)'],
       ['=NETWORKDAYS.INTL(0, 6.9)'],
@@ -40,8 +40,8 @@ describe('Function NETWORKDAYS.INTL', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(-5)
   })
 
-  it('today', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('today', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NETWORKDAYS.INTL("29/09/2020", "29/09/2020")'],
       ['=NETWORKDAYS.INTL("29/09/2020", "29/09/2020", 3)'],
       ['=NETWORKDAYS.INTL("29/09/2020", "29/09/2020", 4)'],
@@ -55,8 +55,8 @@ describe('Function NETWORKDAYS.INTL', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(1)
   })
 
-  it('this year', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('this year', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['29/09/2020', '=A1+0.1', '31/12/2019', '01/01/2021', '27/09/2020'],
       ['=NETWORKDAYS.INTL("01/01/2020", "31/12/2020", 1)'],
       ['=NETWORKDAYS.INTL("01/01/2020", "31/12/2020", 1, A1:A1)'],
@@ -71,8 +71,8 @@ describe('Function NETWORKDAYS.INTL', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(261)
   })
 
-  it('should output correct values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should output correct values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['01/01/2020', '=A1+5', '=A1+8', '=A1+9', '=A1+15', '=A1+18', '=A1+19', '=A1+32', '=A1+54', '=A1+55'],
       ['=NETWORKDAYS.INTL(A1, A1+100, "0000000", A1:J1)'],
       ['=NETWORKDAYS.INTL(A1+7, A1+20, "0000000", A1:J1)'],
@@ -87,8 +87,8 @@ describe('Function NETWORKDAYS.INTL', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(5)
   })
 
-  it('checks types in last argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks types in last argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       [true, '\'1', null, '=NA()'],
       ['=NETWORKDAYS.INTL(1000, 1, 1, A1:A1)'],
       ['=NETWORKDAYS.INTL(1000, 1, 1, B1:B1)'],

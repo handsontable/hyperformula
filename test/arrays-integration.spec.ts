@@ -2,8 +2,8 @@ import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
 describe('integration test', () => {
-  it('should work', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromSheets({
       'Output':[['=INDEX(LookupRange,MATCH(1,(Lookup!A1:A8<=Inputs!A1)*(Lookup!B1:B8>=Inputs!A1)*(Lookup!C1:C8=Inputs!B1), 0), 4)']],
       'Inputs':[[23, 'B']],
       'Lookup':[
@@ -18,11 +18,11 @@ describe('integration test', () => {
       ]
     }, {useArrayArithmetic: true}) //flag that enables ArrayFormula() everywhere
 
-    engine.addNamedExpression('LookupRange', '=Lookup!$A$1:Lookup!$D$8')
+    await engine.addNamedExpression('LookupRange', '=Lookup!$A$1:Lookup!$D$8')
 
     expect(engine.getCellValue(adr('A1'))).toEqual(121)
 
-    engine.setCellContents(adr('B1', engine.getSheetId('Inputs')), 'A')
+    await engine.setCellContents(adr('B1', engine.getSheetId('Inputs')), 'A')
 
     expect(engine.getCellValue(adr('A1'))).toEqual(110)
   })

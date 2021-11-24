@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.POW', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HF.POW(1)', '=HF.POW(1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function HF.POW', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value with correct defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HF.POW(2,3)'],
       ['=HF.POW(,1)'],
       ['=HF.POW(,)']
@@ -24,8 +24,8 @@ describe('Function HF.POW', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
   })
 
-  it('should coerce to correct types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce to correct types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HF.POW(TRUE(),B1)'],
       ['=HF.POW("1",)'],
     ])
@@ -34,8 +34,8 @@ describe('Function HF.POW', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
   })
 
-  it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should throw correct error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HF.POW("abcd",)'],
       ['=HF.POW(NA(),)'],
       ['=HF.POW(B3:C3,)'],

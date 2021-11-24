@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MOD', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MOD(101)'],
       ['=MOD(1, 2, 3)'],
     ])
@@ -14,8 +14,8 @@ describe('Function MOD', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MOD(1, "foo")'],
       ['=MOD("bar", 4)'],
       ['=MOD("foo", "baz")'],
@@ -26,16 +26,16 @@ describe('Function MOD', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should return error when dividing by 0', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error when dividing by 0', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MOD(42, 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MOD(5, 2)'],
       ['=MOD(36, 6)'],
       ['=MOD(10.5, 3)'],

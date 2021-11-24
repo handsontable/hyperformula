@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function T', () => {
-  it('should take one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should take one argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T()'],
       ['=T("foo", "bar")'],
     ])
@@ -13,8 +13,8 @@ describe('Function T', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return given text', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return given text', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T("foo")'],
       ['=T(B2)', 'bar'],
     ])
@@ -23,8 +23,8 @@ describe('Function T', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('bar')
   })
 
-  it('should return empty string if given value is not a text', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return empty string if given value is not a text', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T(B1)', '=TRUE()'],
       ['=T(B2)', 42],
       ['=T(B3)', null],
@@ -35,8 +35,8 @@ describe('Function T', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual('')
   })
 
-  it('should propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should propagate errors', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T(B1)', '=1/0'],
       ['=T(B2)', '=FOO()'],
     ])

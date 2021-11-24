@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function XOR', () => {
-  it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=XOR(TRUE(), TRUE())'],
       ['=XOR(TRUE(), FALSE())'],
       ['=XOR(FALSE(), TRUE())'],
@@ -18,16 +18,16 @@ describe('Function XOR', () => {
     expect(engine.getCellValue(adr('A4'))).toBe(false)
   })
 
-  it('at least one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('at least one argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=XOR()'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('for one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('for one argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=XOR(TRUE())'],
       ['=XOR(FALSE())'],
     ])
@@ -36,8 +36,8 @@ describe('Function XOR', () => {
     expect(engine.getCellValue(adr('A2'))).toBe(false)
   })
 
-  it('use coercion #1', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('use coercion #1', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=XOR("TRUE")'],
       ['=XOR(1)'],
       ['=XOR(1, "foo")'],
@@ -48,8 +48,8 @@ describe('Function XOR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('use coercion #2', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('use coercion #2', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=XOR(A4:B4)'],
       ['=XOR(C4:D4)'],
       ['=XOR(C4:D4, "foo")'],
@@ -61,16 +61,16 @@ describe('Function XOR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('when no coercible to number arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('when no coercible to number arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=XOR("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('returns TRUE iff odd number of TRUEs present', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('returns TRUE iff odd number of TRUEs present', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=XOR(TRUE(), TRUE(), TRUE())'],
       ['=XOR(TRUE(), TRUE(), TRUE(), TRUE())'],
       ['=XOR(TRUE(), TRUE(), TRUE(), TRUE(), TRUE())'],
@@ -81,8 +81,8 @@ describe('Function XOR', () => {
     expect(engine.getCellValue(adr('A3'))).toBe(true)
   })
 
-  it('if error in range found, returns first one in row-by-row order', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('if error in range found, returns first one in row-by-row order', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '=4/0'],
       ['=FOOBAR()', '1'],
       ['=XOR(A1:B2)'],
@@ -91,8 +91,8 @@ describe('Function XOR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works with ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '0'],
       ['0', '1'],
       ['=XOR(A1:B2)'],
@@ -101,8 +101,8 @@ describe('Function XOR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(true)
   })
 
-  it('is computed eagerly', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('is computed eagerly', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['0', '1'],
       ['=XOR(A1:B2)'],

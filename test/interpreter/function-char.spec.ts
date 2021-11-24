@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CHAR', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CHAR()'],
       ['=CHAR(1, 2)'],
     ])
@@ -14,16 +14,16 @@ describe('Function CHAR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong type of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CHAR("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CHAR(1)'],
       ['=CHAR(33)'],
       ['=CHAR(65)'],
@@ -40,8 +40,8 @@ describe('Function CHAR', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual('ÿ')
   })
 
-  it('should round down floats', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should round down floats', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CHAR(42)'],
       ['=CHAR(42.2)'],
       ['=CHAR(42.8)'],
@@ -52,8 +52,8 @@ describe('Function CHAR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual('*')
   })
 
-  it('should work only for values from 1 to 255 truncating decimal part', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work only for values from 1 to 255 truncating decimal part', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CHAR(0)'],
       ['=CHAR(1)'],
       ['=CHAR(255)'],

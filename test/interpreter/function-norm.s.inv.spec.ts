@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NORM.S.INV', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.S.INV()'],
       ['=NORM.S.INV(3, 4)'],
     ])
@@ -14,16 +14,16 @@ describe('Function NORM.S.INV', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.S.INV("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.S.INV(0.9)'],
       ['=NORM.S.INV(0.5)'],
     ])
@@ -32,8 +32,8 @@ describe('Function NORM.S.INV', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0, 6)
   })
 
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.S.INV(0.01)'],
       ['=NORM.S.INV(0)'],
       ['=NORM.S.INV(0.99)'],

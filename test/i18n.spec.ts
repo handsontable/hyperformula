@@ -16,11 +16,11 @@ describe('i18n', () => {
     HyperFormula.registerLanguage('plPL', plPL)
   })
 
-  it('using functions in different languages', () => {
-    const enginePL = HyperFormula.buildFromArray([
+  it('using functions in different languages', async() => {
+    const enginePL = await HyperFormula.buildFromArray([
       ['=SUMA(42)'],
     ], {language: 'plPL'})
-    const engineEN = HyperFormula.buildFromArray([
+    const engineEN = await HyperFormula.buildFromArray([
       ['=SUM(42)'],
     ], {language: 'enGB'})
 
@@ -28,14 +28,14 @@ describe('i18n', () => {
     expect(engineEN.getCellValue(adr('A1'))).toBe(42)
   })
 
-  it('using functions in different languages with not standard characters', () => {
-    const enginePL = HyperFormula.buildFromArray([
+  it('using functions in different languages with not standard characters', async() => {
+    const enginePL = await HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
       ['=LICZ.JEŻELI(A1:A3, ">=1")'],
     ], {language: 'plPL'})
-    const engineEN = HyperFormula.buildFromArray([
+    const engineEN = await HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
@@ -46,11 +46,11 @@ describe('i18n', () => {
     expect(engineEN.getCellValue(adr('A4'))).toBe(2)
   })
 
-  it('translation works for parser hardcoded offset procedure', () => {
-    const enginePL = HyperFormula.buildFromArray([
+  it('translation works for parser hardcoded offset procedure', async() => {
+    const enginePL = await HyperFormula.buildFromArray([
       ['=PRZESUNIĘCIE(A1, 1, 1)'],
     ], {language: 'plPL'})
-    const engineEN = HyperFormula.buildFromArray([
+    const engineEN = await HyperFormula.buildFromArray([
       ['=OFFSET(A1, 1, 1)'],
     ])
 

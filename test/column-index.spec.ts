@@ -573,8 +573,8 @@ describe('ColumnIndex - lazy cruds', () => {
 })
 
 describe('Arrays', () => {
-  it('should update column index with array values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update column index with array values', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
@@ -583,68 +583,68 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should remove values from index when REF', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove values from index when REF', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.setCellContents(adr('D1'), [['foo']])
+    await engine.setCellContents(adr('D1'), [['foo']])
 
     expectColumnIndexToMatchSheet([
       [1, 2, null, 'foo']
     ], engine)
   })
 
-  it('should remove values from index when replacing array with scalar', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove values from index when replacing array with scalar', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.setCellContents(adr('C1'), [['foo']])
+    await engine.setCellContents(adr('C1'), [['foo']])
 
     expectColumnIndexToMatchSheet([
       [1, 2, 'foo']
     ], engine)
   })
 
-  it('should remove values when replacing array with smaller one', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove values when replacing array with smaller one', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.setCellContents(adr('C1'), [['=2*A1:A1']])
+    await engine.setCellContents(adr('C1'), [['=2*A1:A1']])
 
     expectColumnIndexToMatchSheet([
       [1, 2, 2]
     ], engine)
   })
 
-  it('shoud remove values when replacing array with parsing error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('shoud remove values when replacing array with parsing error', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.setCellContents(adr('C1'), [['=SUM(']])
+    await engine.setCellContents(adr('C1'), [['=SUM(']])
 
     expectColumnIndexToMatchSheet([
       [1, 2]
     ], engine)
   })
 
-  it('should update index when replacing array with another one', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update index when replacing array with another one', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
-    engine.setCellContents(adr('C1'), [['=2*A1:B1']])
+    await engine.setCellContents(adr('C1'), [['=2*A1:B1']])
 
     expectColumnIndexToMatchSheet([
       [1, 2, 2, 4]
     ], engine)
   })
 
-  it('should move array values when adding rows above array', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should move array values when adding rows above array', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B3:B4'],
       [null, 'foo'],
       [null, 1],
@@ -662,8 +662,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should not move array values when adding rows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not move array values when adding rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B3:B4'],
       [null, 'foo'],
       [-2, 1],
@@ -681,8 +681,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should move array values when removing rows above array', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should move array values when removing rows above array', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       ['=-B3:B4'],
       [null, 1],
@@ -698,8 +698,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should not move array values when removing rows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not move array values when removing rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B4:B5'],
       [null],
       [null, 'foo'],
@@ -717,8 +717,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should remove array values from index when removing row with left corner', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove array values from index when removing row with left corner', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B2:B3'],
       [null, 1],
       [null, 2],
@@ -732,8 +732,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should remove array values from index when REF after removing rows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove array values from index when REF after removing rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B2:B3'],
       [null, 1],
       [3, 2],
@@ -747,8 +747,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should move array values when adding columns before array', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should move array values when adding columns before array', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-C2:D2'],
       [null, 'foo', 1, 2]
     ], {useArrayArithmetic: true, useColumnIndex: true})
@@ -761,8 +761,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should not move array values when adding columns', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not move array values when adding columns', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-C2:E2', null, null, -3, -2, -1],
       [null, 'foo', 1, 2, 3]
     ], {useArrayArithmetic: true, useColumnIndex: true})
@@ -775,8 +775,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should move array values when removing columns before array', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should move array values when removing columns before array', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=-C2:D2'],
       [null, null, 1, 2]
     ], {useArrayArithmetic: true, useColumnIndex: true})
@@ -789,8 +789,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should not move array values when removing columns', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not move array values when removing columns', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-D2:E2', null, null, -2, -1],
       [-2, 'foo', null, 1, 2]
     ], {useArrayArithmetic: true, useColumnIndex: true})
@@ -803,8 +803,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should remove array values from index when removing column with left corner', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove array values from index when removing column with left corner', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B2:C2'],
       [null, 1, 2],
     ], {useArrayArithmetic: true, useColumnIndex: true})
@@ -817,8 +817,8 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('should remove array values from index when REF after removing columns', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove array values from index when REF after removing columns', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B2:C2', null, 1],
       [2, null, 3]
     ], {useArrayArithmetic: true, useColumnIndex: true})

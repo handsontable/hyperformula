@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function BITRSHIFT', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITRSHIFT(101)'],
       ['=BITRSHIFT(1, 2, 3)'],
     ])
@@ -14,8 +14,8 @@ describe('function BITRSHIFT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITRSHIFT(1, "foo")'],
       ['=BITRSHIFT("bar", 4)'],
       ['=BITRSHIFT("foo", "baz")'],
@@ -26,8 +26,8 @@ describe('function BITRSHIFT', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should not work for negative value', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for negative value', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITRSHIFT(-5, -2)'],
       ['=BITRSHIFT(-1, 2)'],
     ])
@@ -36,8 +36,8 @@ describe('function BITRSHIFT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
-  it('should work for positive positions', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for positive positions', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITRSHIFT(0, 0)'],
       ['=BITRSHIFT(0, 2)'],
       ['=BITRSHIFT(50, 2)'],
@@ -50,8 +50,8 @@ describe('function BITRSHIFT', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(15)
   })
 
-  it('should work for negative positions', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for negative positions', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITRSHIFT(0, -2)', '=BITLSHIFT(0, 2)'],
       ['=BITRSHIFT(2, -5)', '=BITLSHIFT(2, 5)'],
       ['=BITRSHIFT(123, -2)', '=BITLSHIFT(123, 2)'],
@@ -69,8 +69,8 @@ describe('function BITRSHIFT', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(engine.getCellValue(adr('B4')))
   })
 
-  it('works only for 48 bit results', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works only for 48 bit results', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITRSHIFT(2, -46)'],
       ['=BITRSHIFT(2, -47)'],
     ])
@@ -79,8 +79,8 @@ describe('function BITRSHIFT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.BitshiftLong))
   })
 
-  it('works only for positions from -53 to 53', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works only for positions from -53 to 53', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITRSHIFT(0, -54)'],
       ['=BITRSHIFT(0, -53)'],
       ['=BITRSHIFT(0, 53)'],

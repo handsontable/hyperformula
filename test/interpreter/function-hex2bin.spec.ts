@@ -4,16 +4,16 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function HEX2BIN', () => {
-  it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error when wrong number of argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN("foo", 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for non-hex arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for non-hex arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN("foo")'],
       ['=HEX2BIN("G418")'],
       ['=HEX2BIN(TRUE())'],
@@ -24,8 +24,8 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN("1")'],
       ['=HEX2BIN("F")'],
       ['=HEX2BIN("2A")'],
@@ -44,16 +44,16 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual('1000000000')
   })
 
-  it('should work for numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN(156)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('101010110')
   })
 
-  it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for reference', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['="12A"'],
       ['=HEX2BIN(A1)'],
     ])
@@ -61,16 +61,16 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('100101010')
   })
 
-  it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return string value', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN(11)'],
     ])
 
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.STRING)
   })
 
-  it('result cannot be longer than 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('result cannot be longer than 10 digits', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN("200")'],
       ['=HEX2BIN("FFFFFFFDFF")'],
     ])
@@ -79,8 +79,8 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
   })
 
-  it('should respect second argument and fill with zeros for positive arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should respect second argument and fill with zeros for positive arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN(12, 8)'],
       ['=HEX2BIN(3, "4")'],
     ])
@@ -89,8 +89,8 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('0011')
   })
 
-  it('second argument should not affect negative results', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('second argument should not affect negative results', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN("FFFFFFFF9C", 1)'],
       ['=HEX2BIN("FFFFFFFFF6", 10)'],
     ])
@@ -99,8 +99,8 @@ describe('function HEX2BIN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('1111110110')
   })
 
-  it('should fail if the result is longer than the desired length', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should fail if the result is longer than the desired length', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN("100", 2)'],
       ['=HEX2BIN("FF", "3")'],
     ])
@@ -110,8 +110,8 @@ describe('function HEX2BIN', () => {
   })
 
 
-  it('should allow for numbers from 1 to 10 as second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should allow for numbers from 1 to 10 as second argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2BIN(2, 0)'],
       ['=HEX2BIN(2, 12)'],
     ])

@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function LEFT', () => {
-  it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return N/A when number of arguments is incorrect', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LEFT()'],
       ['=LEFT("foo", 1, 2)']
     ])
@@ -13,40 +13,40 @@ describe('Function LEFT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return VALUE when wrong type of second parameter', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return VALUE when wrong type of second parameter', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LEFT("foo", "bar")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work with empty argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work with empty argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LEFT(, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('')
   })
 
-  it('should return one character by default', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return one character by default', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LEFT("bar")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
   })
 
-  it('should return VALUE when second parameter is less than 0', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return VALUE when second parameter is less than 0', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LEFT("foo", -1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NegativeLength))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LEFT("", 4)'],
       ['=LEFT("bar", 0)'],
       ['=LEFT("bar", 1)'],
@@ -63,8 +63,8 @@ describe('Function LEFT', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual('12')
   })
 
-  it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce other types to string', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=LEFT(1, 1)'],
       ['=LEFT(5+5, 1)'],
       ['=LEFT(TRUE(), 1)'],

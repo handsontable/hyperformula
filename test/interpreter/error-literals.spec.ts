@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Error literals', () => {
-  it('Errors should be parsed and propagated', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('Errors should be parsed and propagated', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['#DIV/0!', '=A1', '=#DIV/0!'],
       ['=ISERROR(A1)', '=ISERROR(B1)', '=ISERROR(C1)', '=ISERROR(#DIV/0!)']
     ])
@@ -18,8 +18,8 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('C2'))).toEqual(true)
   })
 
-  it('should return error when unknown error literal in formula', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error when unknown error literal in formula', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['#UNKNOWN!', '=#UNKNOWN!']
     ])
 
@@ -27,8 +27,8 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
-  it( 'error #N/A! with every combination should be supported by all comparison operators', () => {
-    const engine = HyperFormula.buildFromArray([
+  it( 'error #N/A! with every combination should be supported by all comparison operators', async() => {
+const engine = await HyperFormula.buildFromArray([
       [ '#N/A', 0, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
     ])
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NA)) // EQUAL
@@ -48,8 +48,8 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqualError(detailedError(ErrorType.NA)) // PERCENTAGE
   })
 
-  it( 'error #DIV/0! with every combination should be supported by all comparison operators', () => {
-    const engine = HyperFormula.buildFromArray([
+  it( 'error #DIV/0! with every combination should be supported by all comparison operators', async() => {
+const engine = await HyperFormula.buildFromArray([
       [ '#DIV/0!', null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
     ])
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))  // EQUAL
@@ -69,8 +69,8 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // PERCENTAGE
   })
 
-  it( 'error #CYCLE! with every combination should be supported by all comparison operators', () => {
-    const engine = HyperFormula.buildFromArray([
+  it( 'error #CYCLE! with every combination should be supported by all comparison operators', async() => {
+const engine = await HyperFormula.buildFromArray([
       [ '#CYCLE!', null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
     ])
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.CYCLE))  // EQUAL

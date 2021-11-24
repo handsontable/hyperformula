@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function COMBIN', () => {
-  it('checks number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMBIN(1)', '=COMBIN(1, 2, 3)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function COMBIN', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMBIN(0,0)'],
       ['=COMBIN(1,0)'],
       ['=COMBIN(4,2)'],
@@ -38,16 +38,16 @@ describe('Function COMBIN', () => {
     expect(engine.getCellValue(adr('A10')) as number/1.41325918108873e+308).toBeCloseTo(1, 6)
   })
 
-  it('truncates argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMBIN(9.9,6.6)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(84)
   })
 
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMBIN(1.1, 1.2)'],
       ['=COMBIN(1, 2)'],
       ['=COMBIN(2, -1)'],
@@ -63,16 +63,16 @@ describe('Function COMBIN', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
-  it('uses coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('uses coercion', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMBIN(TRUE(),"0")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
-  it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('propagates error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMBIN(NA(), NA())'],
     ])
 

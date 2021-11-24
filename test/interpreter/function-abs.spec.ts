@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ABS', () => {
-  it('happy path',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('happy path',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ABS(-1)', '=ABS(1)'],
     ])
 
@@ -13,16 +13,16 @@ describe('Function ABS', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
   })
 
-  it('given wrong argument type',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('given wrong argument type',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ABS("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['="2"', '=ABS(A1)'],
       ['=TRUE()', '=ABS(A2)'],
     ])
@@ -31,8 +31,8 @@ describe('Function ABS', () => {
     expect(engine.getCellValue(adr('B2'))).toEqual(1)
   })
 
-  it('given wrong number of arguments',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('given wrong number of arguments',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ABS()'],
       ['=ABS(1, 2)'],
     ])
@@ -41,8 +41,8 @@ describe('Function ABS', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('errors propagation', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ABS(4/0)'],
     ])
 

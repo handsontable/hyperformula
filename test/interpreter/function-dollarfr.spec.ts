@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DOLLARFR', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DOLLARFR(1)', '=DOLLARFR(1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function DOLLARFR', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('div/0 when second argument too small', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('div/0 when second argument too small', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DOLLARFR(1,0)', '=DOLLARFR(1, 0.9)'],
     ])
 
@@ -21,8 +21,8 @@ describe('Function DOLLARFR', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct arguments and defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       [
         '=DOLLARFR(1.0125, 8)',
         '=DOLLARFR(1.000000125, 8.9)',

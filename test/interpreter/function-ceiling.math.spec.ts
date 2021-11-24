@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CEILING.MATH', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING.MATH()'],
       ['=CEILING.MATH(1, 2, 3, 4)'],
     ])
@@ -14,8 +14,8 @@ describe('Function CEILING.MATH', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING.MATH("foo")'],
       ['=CEILING.MATH(1, "bar")'],
       ['=CEILING.MATH(1, 2, "baz")'],
@@ -26,8 +26,8 @@ describe('Function CEILING.MATH', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING.MATH(4.43, 0.3)'],
       ['=CEILING.MATH(4.43, 0.6)'],
       ['=CEILING.MATH(4.43, 2)'],
@@ -48,8 +48,8 @@ describe('Function CEILING.MATH', () => {
     expect(engine.getCellValue(adr('A8'))).toEqual(0)
   })
 
-  it('should work with mode for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work with mode for negative numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING.MATH(-11, -2)'],
       ['=CEILING.MATH(-11, -2, 0)'],
       ['=CEILING.MATH(-11, -2, 1)'],
@@ -64,8 +64,8 @@ describe('Function CEILING.MATH', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(0)
   })
 
-  it('negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('negative values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING.MATH(11, 2, 0)'],
       ['=CEILING.MATH(-11, 2, 0)'],
       ['=CEILING.MATH(11, -2, 0)'],

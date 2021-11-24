@@ -2,8 +2,8 @@ import {HyperFormula} from '../../src'
 import {adr} from '../testUtils'
 
 describe('Function ISBINARY', () => {
-  it('should return true for binary numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return true for binary numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ISBINARY("1010")', '=ISBINARY(1001)', '=ISBINARY(010)']
     ])
 
@@ -12,8 +12,8 @@ describe('Function ISBINARY', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(true)
   })
 
-  it('should return false otherwise', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return false otherwise', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ISBINARY("foo")', '=ISBINARY(123)', '=ISBINARY(TRUE())']
     ])
 

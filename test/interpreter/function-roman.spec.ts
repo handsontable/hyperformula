@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ROMAN', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ROMAN()', '=ROMAN(1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function ROMAN', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should properly truncate values and use defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should properly truncate values and use defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ROMAN(499)'],
       ['=ROMAN(499, TRUE())'],
       ['=ROMAN(499, FALSE())'],
@@ -27,8 +27,8 @@ describe('Function ROMAN', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual('LDVLIV')
   })
 
-  it('should throw correct error if arguments are out of bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should throw correct error if arguments are out of bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ROMAN(0)'],
       ['=ROMAN(4000)'],
       ['=ROMAN(-1)'],
@@ -42,28 +42,28 @@ describe('Function ROMAN', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ValueLarge))
   })
 
-  it('should output correct value for mode 0', () => {
-    const engine = HyperFormula.buildFromArray([input(0)])
+  it('should output correct value for mode 0', async() => {
+const engine = await HyperFormula.buildFromArray([input(0)])
     expect(engine.getSheetValues(0)).toEqual([mode0])
   })
 
-  it('should output correct value for mode 1', () => {
-    const engine = HyperFormula.buildFromArray([input(1)])
+  it('should output correct value for mode 1', async() => {
+const engine = await HyperFormula.buildFromArray([input(1)])
     expect(engine.getSheetValues(0)).toEqual([mode1])
   })
 
-  it('should output correct value for mode 2', () => {
-    const engine = HyperFormula.buildFromArray([input(2)])
+  it('should output correct value for mode 2', async() => {
+const engine = await HyperFormula.buildFromArray([input(2)])
     expect(engine.getSheetValues(0)).toEqual([mode2])
   })
 
-  it('should output correct value for mode 3', () => {
-    const engine = HyperFormula.buildFromArray([input(3)])
+  it('should output correct value for mode 3', async() => {
+const engine = await HyperFormula.buildFromArray([input(3)])
     expect(engine.getSheetValues(0)).toEqual([mode3])
   })
 
-  it('should output correct value for mode 4', () => {
-    const engine = HyperFormula.buildFromArray([input(4)])
+  it('should output correct value for mode 4', async() => {
+const engine = await HyperFormula.buildFromArray([input(4)])
     expect(engine.getSheetValues(0)).toEqual([mode4])
   })
 })

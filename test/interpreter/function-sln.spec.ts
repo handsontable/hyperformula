@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SLN', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SLN(1,1)', '=SLN(1, 1, 1, 1)'],
     ])
 
@@ -13,8 +13,8 @@ describe('Function SLN', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct arguments and defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SLN(1, 2, 1)', '=SLN(2, 1, -2)', '=SLN(3, 2, 0)'],
     ])
 

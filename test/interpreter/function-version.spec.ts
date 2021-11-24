@@ -6,8 +6,8 @@ import {adr} from '../testUtils'
 
 describe('Function VERSION', () => {
   describe('getting version', () => {
-    it('GPL license key', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('GPL license key', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
         licenseKey: 'gpl-v3',
@@ -16,8 +16,8 @@ describe('Function VERSION', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
     })
 
-    it('missing license key', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('missing license key', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
         licenseKey: '',
@@ -26,8 +26,8 @@ describe('Function VERSION', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 2`)
     })
 
-    it('invalid license key', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('invalid license key', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
         licenseKey: '11111-11111-11111-11111-11111',
@@ -36,8 +36,8 @@ describe('Function VERSION', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 3`)
     })
 
-    it('expired license key', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('expired license key', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
         licenseKey: '80584-cc272-2e7c4-06f16-4db00',
@@ -46,8 +46,8 @@ describe('Function VERSION', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 4`)
     })
 
-    it('correct license key', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('correct license key', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
         licenseKey: 'internal-use-in-handsontable',
@@ -81,12 +81,12 @@ describe('Function VERSION', () => {
       }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
     })
 
-    it('should be available even if anyone unregistered ', () => {
+    it('should be available even if anyone unregistered ', async() => {
       expect(() => {
         HyperFormula.unregisterFunction('VERSION')
       }).toThrow(ProtectedFunctionError.cannotUnregisterFunctionWithId('VERSION'))
 
-      const engine = HyperFormula.buildFromArray([
+      const engine = await HyperFormula.buildFromArray([
         ['=VERSION()'],
       ], {
         licenseKey: 'gpl-v3',

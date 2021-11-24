@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DB', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DB(1,1,1)', '=DB(1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -13,8 +13,8 @@ describe('Function DB', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct arguments and defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DB(10000,50,10,2,12)',
         '=DB(10000,50,10,2)',
         '=DB(10000,50,10,2,7)'],
@@ -34,8 +34,8 @@ describe('Function DB', () => {
     expect(engine.getCellValue(adr('B3'))).toBeCloseTo(45.26)
   })
 
-  it('compatibility', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('compatibility', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DB(1000000,100000,6,7,7)',
         '=DB(1000000,100000,6,8,7)',
         '=DB(1000000,100000,6,7)', ],

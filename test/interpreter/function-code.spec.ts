@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CODE', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CODE()'],
       ['=CODE("foo", "bar")'],
     ])
@@ -13,16 +13,16 @@ describe('Function CODE', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for empty strings', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for empty strings', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CODE("")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.EmptyString))
   })
 
-  it('should work for single chars', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for single chars', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CODE("")'],
       ['=CODE("!")'],
       ['=CODE("A")'],
@@ -43,8 +43,8 @@ describe('Function CODE', () => {
     expect(engine.getCellValue(adr('A8'))).toEqual(8364)
   })
 
-  it('should return code of first character', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return code of first character', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CODE("Abar")'],
       ['=CODE("Ñbaz")'],
     ])
@@ -54,16 +54,16 @@ describe('Function CODE', () => {
   })
 
 
-  it('should return number', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return number', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CODE("foo")']
     ])
 
     expect(engine.getCellValueType(adr('A1'))).toEqual(CellValueType.NUMBER)
   })
 
-  it('should be identity when composed with CHAR', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be identity when composed with CHAR', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CODE(CHAR(1))'],
       ['=CODE(CHAR(128))'],
       ['=CODE(CHAR(255))']

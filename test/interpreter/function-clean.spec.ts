@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CLEAN', () => {
-  it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return N/A when number of arguments is incorrect', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CLEAN()'],
       ['=CLEAN("foo", "bar")']
     ])
@@ -13,8 +13,8 @@ describe('Function CLEAN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CLEAN("foo\u0000")'],
       ['=CLEAN("foo\u0020")'],
     ])
@@ -23,10 +23,10 @@ describe('Function CLEAN', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('foo\u0020')
   })
 
-  it('should clean all non-printable ASCII characters', () => {
+  it('should clean all non-printable ASCII characters', async() => {
     const str = Array.from(Array(32).keys()).map(code => String.fromCharCode(code)).join('')
 
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       [str, '=LEN(A1)', '=CLEAN(A1)'],
     ])
 
@@ -34,8 +34,8 @@ describe('Function CLEAN', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual('')
   })
 
-  it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce other types to string', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CLEAN(1)'],
       ['=CLEAN(5+5)'],
       ['=CLEAN(TRUE())'],

@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function PDURATION', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PDURATION(1,1)', '=PDURATION(1, 1, 1, 1)'],
     ])
 
@@ -12,16 +12,16 @@ describe('Function PDURATION', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct arguments and defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PDURATION(2%, 12, 24)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(35.00278878, 6)
   })
 
-  it('should return proper error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return proper error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PDURATION(-1, 12, 24)'],
       ['=PDURATION(2%, -12, -24)'],
       ['=PDURATION(0, 1, 1)'],

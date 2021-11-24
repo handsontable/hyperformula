@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ERFC', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERFC()'],
       ['=ERFC(1, 2)'],
     ])
@@ -14,16 +14,16 @@ describe('Function ERFC', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERFC("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERFC(0)'],
       ['=ERFC(2)'],
       ['=ERFC(0.5)'],
@@ -34,8 +34,8 @@ describe('Function ERFC', () => {
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.4795001221869535, 6)
   })
 
-  it('should work for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for negative numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERFC(-10.123)'],
       ['=ERFC(-14.8)'],
     ])

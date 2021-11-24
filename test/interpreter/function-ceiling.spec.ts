@@ -4,8 +4,8 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CEILING', () => {
   /*Inconsistent with ODFF standard.*/
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING(1)'],
       ['=CEILING(1, 2, 3)'],
     ])
@@ -14,8 +14,8 @@ describe('Function CEILING', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING(1, "bar")'],
       ['=CEILING("bar", 1)'],
     ])
@@ -24,8 +24,8 @@ describe('Function CEILING', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING(4.43, 0.3)'],
       ['=CEILING(4.43, 0.6)'],
       ['=CEILING(4.43, 2)'],
@@ -45,8 +45,8 @@ describe('Function CEILING', () => {
   })
 
   /*Inconsistent with ODFF standard.*/
-  it('negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('negative values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CEILING(11, 2)'],
       ['=CEILING(-11, 2)'],
       ['=CEILING(11, -2)'],

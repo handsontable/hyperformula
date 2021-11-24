@@ -2,8 +2,8 @@ import {HyperFormula} from '../src'
 import {adr, rowEnd, rowStart} from './testUtils'
 
 describe('Row ranges', () => {
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(1:2)']
@@ -12,8 +12,8 @@ describe('Row ranges', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(3)
   })
 
-  it('should create correct edges for infinite range when building graph', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should create correct edges for infinite range when building graph', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SUM(3:4)'],
       ['=SUM(C3:D4)'],
     ])
@@ -31,13 +31,13 @@ describe('Row ranges', () => {
     expect(engine.graph.existsEdge(d4, rowRange)).toBe(true)
   })
 
-  it('should create correct edges for infinite range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should create correct edges for infinite range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SUM(3:5)'],
       ['=SUM(4:7)'],
     ])
 
-    engine.setCellContents(adr('B1'), '=SUM(Z4:Z8)')
+    await engine.setCellContents(adr('B1'), '=SUM(Z4:Z8)')
 
     const rowRange35 = engine.rangeMapping.getRange(rowStart(3), rowEnd(5))!
     const rowRange47 = engine.rangeMapping.getRange(rowStart(4), rowEnd(7))!

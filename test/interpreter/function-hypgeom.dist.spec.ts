@@ -5,8 +5,8 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HYPGEOM.DIST', () => {
   //In product #1, function takes 4 arguments.
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(1, 2, 3, 4)'],
       ['=HYPGEOM.DIST(1, 2, 3, 4, 5, 6)'],
     ])
@@ -16,8 +16,8 @@ describe('Function HYPGEOM.DIST', () => {
   })
 
   //In product #1, function takes 4 arguments.
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST("foo", 2, 3, 4, TRUE())'],
       ['=HYPGEOM.DIST(1, "baz", 3, 4, TRUE())'],
       ['=HYPGEOM.DIST(1, 2, "baz", 4, TRUE())'],
@@ -33,8 +33,8 @@ describe('Function HYPGEOM.DIST', () => {
   })
 
   //In product #1, function takes 4 arguments.
-  it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as cdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(4, 12, 20, 40, TRUE())'],
     ])
 
@@ -42,8 +42,8 @@ describe('Function HYPGEOM.DIST', () => {
   })
 
   //In product #1, function takes 4 arguments.
-  it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as pdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(4, 12, 20, 40, FALSE())'],
     ])
 
@@ -51,8 +51,8 @@ describe('Function HYPGEOM.DIST', () => {
   })
 
   //In product #1, function takes 4 arguments.
-  it('truncation works', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncation works', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(4.9, 12, 20, 40, TRUE())'],
       ['=HYPGEOM.DIST(4, 12.9, 20, 40, TRUE())'],
       ['=HYPGEOM.DIST(4, 12, 20.9, 40, TRUE())'],
@@ -66,8 +66,8 @@ describe('Function HYPGEOM.DIST', () => {
   })
 
   //In product #1, function takes 4 arguments.
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HYPGEOM.DIST(0, 12, 20, 40, TRUE())'],
       ['=HYPGEOM.DIST(-1, 12, 20, 40, TRUE())'],
       ['=HYPGEOM.DIST(12, 12, 20, 40, TRUE())'],

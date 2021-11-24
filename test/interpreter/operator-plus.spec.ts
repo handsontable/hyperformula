@@ -4,16 +4,16 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Operator PLUS', () => {
-  it('works for obvious case', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for obvious case', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=2+3'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(5)
   })
 
-  it('use number coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('use number coerce', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['="2"+"3"'],
       ['="foobar"+1'],
       ['\'3'],
@@ -25,8 +25,8 @@ describe('Operator PLUS', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
-  it('pass error from left operand', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('pass error from left operand', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A2+3'],
       ['=4/0'],
     ])
@@ -34,8 +34,8 @@ describe('Operator PLUS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('pass error from right operand', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('pass error from right operand', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=3+A2'],
       ['=4/0'],
     ])
@@ -43,8 +43,8 @@ describe('Operator PLUS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('pass error from left operand if both operands have error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('pass error from left operand if both operands have error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A2+B2'],
       ['=FOOBAR()', '=4/0'],
     ])
@@ -52,8 +52,8 @@ describe('Operator PLUS', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range value results in VALUE error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -65,8 +65,8 @@ describe('Operator PLUS', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
-  it('Plus propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('Plus propagates errors correctly', async() => {
+const engine = await HyperFormula.buildFromArray([
       [0b1, '2', '=(1/0)+2', '=2+(1/0)', '=(A1:B1)+(1/0)', '=(1/0)+(A1:B1)'],
     ])
 

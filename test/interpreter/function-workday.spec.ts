@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function WORKDAY', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WORKDAY(1)', '=WORKDAY(1, 1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function WORKDAY', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('works correctly for first two arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works correctly for first two arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WORKDAY(1000, 1)'],
       ['=WORKDAY(1000.9, 1.9)'],
       ['=WORKDAY(1000.9, -1)'],
@@ -31,8 +31,8 @@ describe('Function WORKDAY', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual(1000)
   })
 
-  it('this year', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('this year', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['29/09/2020', '=A1+0.1', '31/12/2019', '01/01/2021', '27/09/2020'],
       ['=WORKDAY("01/01/2020", 262)'],
       ['=WORKDAY("01/01/2020", 262, A1:A1)'],
@@ -47,8 +47,8 @@ describe('Function WORKDAY', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(44201)
   })
 
-  it('should output correct values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should output correct values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['01/01/2020', '=A1+5', '=A1+8', '=A1+9', '=A1+15', '=A1+18', '=A1+19', '=A1+32', '=A1+54', '=A1+55'],
       ['=WORKDAY(A1, 65, A1:J1)'],
       ['=WORKDAY(A1+7, 6, A1:J1)'],
@@ -63,8 +63,8 @@ describe('Function WORKDAY', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(43888)
   })
 
-  it('checks types in last argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks types in last argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       [true, '\'1', null, '=NA()'],
       ['=WORKDAY(1000, 1, A1:A1)'],
       ['=WORKDAY(1000, 1, B1:B1)'],

@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function EVEN', () => {
-  it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=EVEN()', '=EVEN(1, 2)'],
     ])
 
@@ -13,8 +13,8 @@ describe('Function EVEN', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for positive numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=EVEN(0.3)', '=EVEN(1.7)'],
     ])
 
@@ -22,8 +22,8 @@ describe('Function EVEN', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(2)
   })
 
-  it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for negative numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=EVEN(-0.3)', '=EVEN(-1.7)'],
     ])
 
@@ -31,16 +31,16 @@ describe('Function EVEN', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(-2)
   })
 
-  it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('use coercion', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=EVEN("42.3")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(44)
   })
 
-  it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('propagates error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=4/0'],
       ['=EVEN(A1)'],
     ])

@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function POWER', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=POWER(101)'],
       ['=POWER(1, 2, 3)'],
     ])
@@ -14,8 +14,8 @@ describe('Function POWER', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=POWER(1, "foo")'],
       ['=POWER("bar", 4)'],
       ['=POWER("foo", "baz")'],
@@ -26,24 +26,24 @@ describe('Function POWER', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should return 1 for 0^0', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return 1 for 0^0', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=POWER(0, 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
-  it('should return error for 0^N where N<0', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for 0^N where N<0', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=POWER(0, -2)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
-  it('should return error when result too large or too small', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error when result too large or too small', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=POWER(2, 1023)'],
       ['=POWER(2, 1024)'],
       ['=POWER(-2, 1023)'],
@@ -56,8 +56,8 @@ describe('Function POWER', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=POWER(0, 1)'],
       ['=POWER(2, 0)'],
       ['=POWER(2.4, 2.5)'],

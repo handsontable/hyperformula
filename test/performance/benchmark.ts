@@ -39,21 +39,22 @@ export interface BenchmarkResult {
   statistics: Stats,
 }
 
-export function benchmark(name: string, sheet: Sheet, expectedValues: ExpectedValue[], config: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
-  const runEngine = (engineConfig?: Partial<ConfigParams>) => HyperFormula.buildFromArray(sheet, engineConfig)
+export function benchmark(name: string, sheet: Sheet, expectedValues: ExpectedValue[], config: Partial<Config> = defaultConfig): Promise<Maybe<BenchmarkResult>> {
+  const runEngine = async(engineConfig?: Partial<ConfigParams>) => await HyperFormula.buildFromArray(sheet, engineConfig)
+
   return benchmarkBuild(name, runEngine, expectedValues, config)
 }
 
-export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: HyperFormula) => void,
-                               expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
+export async function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: HyperFormula) => Promise<void>,
+                               expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Promise<Maybe<BenchmarkResult>> {
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
   const engineConfig = Object.assign({}, config.engineConfig, defaultEngineConfig)
 
-  const engine = HyperFormula.buildFromArray(sheet, engineConfig)
+  const engine = await HyperFormula.buildFromArray(sheet, engineConfig)
 
-  const statistics = measureCruds(engine, name, cruds)
+  const statistics = await measureCruds(engine, name, cruds)
 
   if (!validate(engine, expectedValues)) {
     console.error('Sheet validation error')
@@ -83,8 +84,8 @@ export function batch(stats: BenchmarkResult[], ...benchmarks: (() => Maybe<Benc
   }
 }
 
-function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigParams>) => HyperFormula,
-                        expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
+async function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigParams>) => Promise<HyperFormula>,
+                        expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Promise<Maybe<BenchmarkResult>> {
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
@@ -96,7 +97,7 @@ function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigP
   let engine: HyperFormula
 
   do {
-    engine = runEngine(engineConfig)
+    engine = await runEngine(engineConfig)
     statistics.push(enrichStatistics(engine.getStats()))
 
     currentRun++

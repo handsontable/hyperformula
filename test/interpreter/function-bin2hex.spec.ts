@@ -4,16 +4,16 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function BIN2HEX', () => {
-  it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error when wrong number of argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX("foo", 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for non-binary arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for non-binary arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX("foo")'],
       ['=BIN2HEX(1234)'],
       ['=BIN2HEX(TRUE())'],
@@ -24,8 +24,8 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX(1)'],
       ['=BIN2HEX(10)'],
       ['=BIN2HEX(010)'],
@@ -44,16 +44,16 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A7'))).toEqual('1FF')
   })
 
-  it('should work for binary strings', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for binary strings', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX("1101")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('D')
   })
 
-  it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for reference', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['="1011"'],
       ['=BIN2HEX(A1)'],
     ])
@@ -61,16 +61,16 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('B')
   })
 
-  it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return string value', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX(10111)'],
     ])
 
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.STRING)
   })
 
-  it('should work only for 10 bits', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work only for 10 bits', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX(10101010101010)'],
       ['=BIN2HEX(1010101010)'],
     ])
@@ -79,8 +79,8 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFEAA')
   })
 
-  it('should respect second argument and fill with zeros for positive arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should respect second argument and fill with zeros for positive arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX(10, 8)'],
       ['=BIN2HEX(101, "4")'],
     ])
@@ -89,8 +89,8 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('0005')
   })
 
-  it('second argument should not affect negative results', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('second argument should not affect negative results', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX(1110110100, 1)'],
       ['=BIN2HEX(1110110100, 10)'],
     ])
@@ -99,8 +99,8 @@ describe('function BIN2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFFB4')
   })
 
-  it('should allow for numbers from 1 to 10 as second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should allow for numbers from 1 to 10 as second argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2HEX(2, 0)'],
       ['=BIN2HEX(-2, 12)'],
     ])

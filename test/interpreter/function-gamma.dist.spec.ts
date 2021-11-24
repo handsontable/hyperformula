@@ -5,8 +5,8 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function GAMMA.DIST', () => {
 
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=GAMMA.DIST(1, 2, 3)'],
       ['=GAMMA.DIST(1, 2, 3, 4, 5)'],
     ])
@@ -15,8 +15,8 @@ describe('Function GAMMA.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=GAMMA.DIST("foo", 2, 3, TRUE())'],
       ['=GAMMA.DIST(1, "baz", 3, TRUE())'],
       ['=GAMMA.DIST(1, 2, "baz", TRUE())'],
@@ -29,8 +29,8 @@ describe('Function GAMMA.DIST', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as cdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=GAMMA.DIST(1, 1, 2, TRUE())'],
       ['=GAMMA.DIST(3, 2, 4, TRUE())'],
     ])
@@ -39,8 +39,8 @@ describe('Function GAMMA.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.173358532703224, 6)
   })
 
-  it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as pdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=GAMMA.DIST(1, 1, 2, FALSE())'],
       ['=GAMMA.DIST(3, 2, 4, FALSE())'],
     ])
@@ -49,8 +49,8 @@ describe('Function GAMMA.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0885687286389403, 6)
   })
 
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=GAMMA.DIST(0, 1, 1, FALSE())'],
       ['=GAMMA.DIST(-0.00001, 1, 1, FALSE())'],
       ['=GAMMA.DIST(1, 0, 1, FALSE())'],

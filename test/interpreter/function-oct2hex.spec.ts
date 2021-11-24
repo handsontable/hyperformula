@@ -4,16 +4,16 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function OCT2HEX', () => {
-  it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error when wrong number of argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX("foo", 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for non-oct arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for non-oct arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX("foo")'],
       ['=OCT2HEX(418)'],
       ['=OCT2HEX(TRUE())'],
@@ -24,8 +24,8 @@ describe('function OCT2HEX', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotOctal))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX(1)'],
       ['=OCT2HEX(10)'],
       ['=OCT2HEX(71)'],
@@ -48,16 +48,16 @@ describe('function OCT2HEX', () => {
     expect(engine.getCellValue(adr('A9'))).toEqual('FFFFFFFFFF')
   })
 
-  it('should work for strings', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for strings', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX("456")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('12E')
   })
 
-  it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for reference', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['="123"'],
       ['=OCT2HEX(A1)'],
     ])
@@ -65,16 +65,16 @@ describe('function OCT2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('53')
   })
 
-  it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return string value', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX(11)'],
     ])
 
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.STRING)
   })
 
-  it('should work only for 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work only for 10 digits', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX(31030220101)'],
       ['=OCT2HEX(7777777042)'],
     ])
@@ -83,8 +83,8 @@ describe('function OCT2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFE22')
   })
 
-  it('should respect second argument and fill with zeros for positive arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should respect second argument and fill with zeros for positive arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX(12, 8)'],
       ['=OCT2HEX(3, "4")'],
     ])
@@ -93,8 +93,8 @@ describe('function OCT2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('0003')
   })
 
-  it('should fail if the result is longer than the desired length', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should fail if the result is longer than the desired length', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX(12123, 2)'],
       ['=OCT2HEX(34141, "3")'],
     ])
@@ -103,8 +103,8 @@ describe('function OCT2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLong))
   })
 
-  it('second argument should not affect negative results', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('second argument should not affect negative results', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX(7777777042, 1)'],
       ['=OCT2HEX(7777777022, 10)'],
     ])
@@ -113,8 +113,8 @@ describe('function OCT2HEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFE12')
   })
 
-  it('should allow for numbers from 1 to 10 as second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should allow for numbers from 1 to 10 as second argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=OCT2HEX(2, 0)'],
       ['=OCT2HEX(2, 12)'],
     ])

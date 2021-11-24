@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function UNICHAR', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UNICHAR()'],
       ['=UNICHAR(1, 2)'],
     ])
@@ -14,16 +14,16 @@ describe('Function UNICHAR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong type of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UNICHAR("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UNICHAR(1)'],
       ['=UNICHAR(33)'],
       ['=UNICHAR(65)'],
@@ -40,8 +40,8 @@ describe('Function UNICHAR', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual('ÿ')
   })
 
-  it('should round down floats', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should round down floats', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UNICHAR(42)'],
       ['=UNICHAR(42.2)'],
       ['=UNICHAR(42.8)'],
@@ -52,8 +52,8 @@ describe('Function UNICHAR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual('*')
   })
 
-  it('should work only for values from 1 to 1114111 truncating decimal part', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work only for values from 1 to 1114111 truncating decimal part', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UNICHAR(0)'],
       ['=UNICHAR(0.5)'],
       ['=UNICHAR(1)'],

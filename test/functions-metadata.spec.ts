@@ -1,8 +1,8 @@
 import {HyperFormula} from '../src'
 
 describe('All functions', () => {
-  it('should all contain metadata', () => {
-    const engine = HyperFormula.buildEmpty()
+  it('should all contain metadata', async() => {
+const engine = await HyperFormula.buildEmpty()
     for(const functionId of engine.getRegisteredFunctionNames()) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
@@ -11,8 +11,8 @@ describe('All functions', () => {
     }
   })
 
-  it('should all contain param definition in metadata', () => {
-    const engine = HyperFormula.buildEmpty()
+  it('should all contain param definition in metadata', async() => {
+const engine = await HyperFormula.buildEmpty()
     for(const functionId of engine.getRegisteredFunctionNames()) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore

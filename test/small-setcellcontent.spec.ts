@@ -2,10 +2,10 @@ import {ErrorType, HyperFormula} from '../src'
 import {detailedErrorWithOrigin} from './testUtils'
 
 describe('should properly build', () => {
-  it('for this test', () => {
-    const engine = HyperFormula.buildEmpty()
+  it('for this test', async() => {
+const engine = await HyperFormula.buildEmpty()
     engine.addSheet()
-    engine.setSheetContent(0, [
+    await engine.setSheetContent(0, [
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
     ])
@@ -17,8 +17,8 @@ describe('should properly build', () => {
     )
   })
 
-  it('and for this', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('and for this', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
     ])

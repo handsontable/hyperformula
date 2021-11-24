@@ -2,8 +2,8 @@ import {HyperFormula} from '../../src'
 import {adr} from '../testUtils'
 
 describe('Criterions - operators computations', () => {
-  it('usage of greater than operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of greater than operator',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -13,8 +13,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(7)
   })
 
-  it('usage of greater than or equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of greater than or equal operator',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -24,8 +24,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(12)
   })
 
-  it('usage of less than operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of less than operator',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -35,8 +35,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
-  it('usage of less than or equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of less than or equal operator',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -46,8 +46,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(8)
   })
 
-  it('usage of equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of equal operator',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -57,8 +57,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 
-  it('usage of not equal operator',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('usage of not equal operator',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -68,8 +68,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 
-  it('empty values #1',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #1',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '8'],
       ['3', '9'],
@@ -79,8 +79,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
-  it('empty values #2',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #2',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '8'],
       ['3', '9'],
@@ -90,8 +90,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(6)
   })
 
-  it('empty values #3',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #3',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', ' '],
       ['2', '1'],
       ['3', 'TRUE'],
@@ -101,8 +101,8 @@ describe('Criterions - operators computations', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
-  it('empty values #4',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('empty values #4',  async() => {
+const engine = await HyperFormula.buildFromArray([
       [''],
       ['8'],
       ['9'],
@@ -114,7 +114,7 @@ describe('Criterions - operators computations', () => {
 })
 
 describe( 'big test', () => {
-  it('regex example', () => {
+  it('regex example', async() => {
     const formulas = [
       ['w b 2r2 x', 8.89999999999418, null, 'w', '[^hrcsx]*w ?f?', '=COUNTIF(A1:A49,E1)', '=SUMIF($A$1:$A$49,E1,$B$1:$B$49)'],
       ['w F', 2.20000000001164, null, 'w b', '[^hrcsx]*w*b ?f?', '=COUNTIF(A2:A50,E2)', '=SUMIF($A$1:$A$49,E2,$B$1:$B$49)'],
@@ -169,7 +169,7 @@ describe( 'big test', () => {
       ['=COUNTA(A1:A49)', '=SUM(B1:B50)', null, null, 'codes counted  >  ', '=SUM(F1:F20)', '=SUM(G1:G21)'],
     ]
 
-    const engine = HyperFormula.buildFromArray(formulas, {useRegularExpressions: true, precisionRounding: 13})
+    const engine = await HyperFormula.buildFromArray(formulas, {useRegularExpressions: true, precisionRounding: 13})
 
     expect(engine.getCellValue(adr('B51'))).toEqual(304.5)
     expect(engine.getCellValue(adr('G51'))).toEqual(304.5)
@@ -217,7 +217,7 @@ describe( 'big test', () => {
     expect(engine.getCellValue(adr('G20'))).toEqual(49.099999999991)
   })
 
-  it('Gnumeric test file', () => {
+  it('Gnumeric test file', async() => {
     const formulas = [
       [ null, null, '=IF(AND(C10:C49), "All ok", "Bug!")'],
       [],
@@ -269,10 +269,10 @@ describe( 'big test', () => {
       ['=COUNTIF($M$6:$M$7, "*es*")', '2', '=A48=B48'],
       ['=COUNTIF($M$6:$M$7, "*ES*")', '2', '=A49=B49']
     ]
-    const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('TRUE', '=TRUE()', undefined)
-    engine.addNamedExpression('FALSE', '=FALSE()', undefined)
-    engine.setCellContents(adr('A1'), formulas)
+    const engine = await HyperFormula.buildFromArray([])
+    await engine.addNamedExpression('TRUE', '=TRUE()', undefined)
+    await engine.addNamedExpression('FALSE', '=FALSE()', undefined)
+    await engine.setCellContents(adr('A1'), formulas)
     expect(engine.getCellValue(adr('A10'))).toEqual(1)
     expect(engine.getCellValue(adr('A11'))).toEqual(0)
     expect(engine.getCellValue(adr('A12'))).toEqual(0)

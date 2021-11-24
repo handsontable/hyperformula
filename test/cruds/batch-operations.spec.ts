@@ -3,8 +3,8 @@ import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/Operatio
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('batch cruds', () => {
-  it('should run batch cruds and call recompute only once', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should run batch cruds and call recompute only once', async() => {
+const engine = await HyperFormula.buildFromArray([
       //
       ['foo'],
       //
@@ -13,8 +13,8 @@ describe('batch cruds', () => {
 
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
-    engine.batch(() => {
-      engine.setCellContents(adr('B1'), [['=A1']])
+    await engine.batch(() => {
+      await engine.setCellContents(adr('B1'), [['=A1']])
       engine.addRows(0, [0, 1], [1, 1])
       engine.removeRows(0, [0, 1])
     })
@@ -25,8 +25,8 @@ describe('batch cruds', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual('bar')
   })
 
-  it('should run batch cruds unitl fail and call recompute only once', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should run batch cruds unitl fail and call recompute only once', async() => {
+const engine = await HyperFormula.buildFromArray([
       //
       ['foo'],
       //
@@ -36,8 +36,8 @@ describe('batch cruds', () => {
     const evaluatorSpy = spyOn(engine.evaluator, 'partialRun')
 
     try {
-      engine.batch(() => {
-        engine.setCellContents(adr('B1'), [['=A1']])
+      await engine.batch(() => {
+        await engine.setCellContents(adr('B1'), [['=A1']])
         engine.addRows(0, [0, 1], [1, 1])
         engine.removeRows(0, [0, 1])
         engine.addRows(1, [0, 1]) // fail

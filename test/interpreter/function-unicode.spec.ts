@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function UNICODE', () => {
-    it('should not work for wrong number of arguments', () => {
-        const engine = HyperFormula.buildFromArray([
+    it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
             ['=UNICODE()'],
             ['=UNICODE("foo", "bar")'],
         ])
@@ -13,16 +13,16 @@ describe('Function UNICODE', () => {
         expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     })
 
-    it('should not work for empty strings', () => {
-        const engine = HyperFormula.buildFromArray([
+    it('should not work for empty strings', async() => {
+const engine = await HyperFormula.buildFromArray([
             ['=UNICODE("")'],
         ])
 
         expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.EmptyString))
     })
 
-    it('should work for single chars', () => {
-        const engine = HyperFormula.buildFromArray([
+    it('should work for single chars', async() => {
+const engine = await HyperFormula.buildFromArray([
             ['=UNICODE("")'],
             ['=UNICODE("!")'],
             ['=UNICODE("A")'],
@@ -45,8 +45,8 @@ describe('Function UNICODE', () => {
         expect(engine.getCellValue(adr('A9'))).toEqual(1114111)
     })
 
-    it('should return code of first character', () => {
-        const engine = HyperFormula.buildFromArray([
+    it('should return code of first character', async() => {
+const engine = await HyperFormula.buildFromArray([
             ['=UNICODE("Abar")'],
             ['=UNICODE("Ñbaz")'],
         ])
@@ -56,16 +56,16 @@ describe('Function UNICODE', () => {
     })
 
 
-    it('should return number', () => {
-        const engine = HyperFormula.buildFromArray([
+    it('should return number', async() => {
+const engine = await HyperFormula.buildFromArray([
             ['=UNICODE("foo")']
         ])
 
         expect(engine.getCellValueType(adr('A1'))).toEqual(CellValueType.NUMBER)
     })
 
-    it('should be identity when composed with UNICHAR', () => {
-        const engine = HyperFormula.buildFromArray([
+    it('should be identity when composed with UNICHAR', async() => {
+const engine = await HyperFormula.buildFromArray([
             ['=UNICODE(UNICHAR(1))'],
             ['=UNICODE(UNICHAR(128))'],
             ['=UNICODE(UNICHAR(256))'],

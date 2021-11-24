@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('CORREL', () => {
-  it('validates number of arguments',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('validates number of arguments',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CORREL(B1:B5)'],
       ['=CORREL(B1:B5, C1:C5, D1:D5)'],
     ])
@@ -14,16 +14,16 @@ describe('CORREL', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('ranges need to have same amount of elements',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('ranges need to have same amount of elements',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CORREL(B1:B5, C1:C6)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.EqualLength))
   })
 
-  it('works (simple)',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works (simple)',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '20'],
       ['=CORREL(A1:A2, B1:B2)']
@@ -32,8 +32,8 @@ describe('CORREL', () => {
     expect(engine.getCellValue(adr('A3'))).toBe(1)
   })
 
-  it('works',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['2', '4'],
       ['5', '3'],
       ['7', '6'],
@@ -45,8 +45,8 @@ describe('CORREL', () => {
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(0.7927032095)
   })
 
-  it('error when not enough data',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('error when not enough data',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '10'],
       ['=CORREL(A1:A1, B1:B1)'],
       ['=CORREL(42, 43)'],
@@ -58,8 +58,8 @@ describe('CORREL', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO, ErrorMessage.TwoValues))
   })
 
-  it('doesnt do coercions, nonnumeric values are skipped',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('doesnt do coercions, nonnumeric values are skipped',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '10'],
       ['="2"', '50'],
       ['3', '30'],
@@ -69,8 +69,8 @@ describe('CORREL', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
   })
 
-  it('over a range value', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('over a range value', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
       ['=CORREL(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
@@ -79,8 +79,8 @@ describe('CORREL', () => {
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.999248091927219, 6)
   })
 
-  it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('propagates errors', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '10'],
       ['=4/0', '50'],
       ['3', '30'],

@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function DDB', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DDB(1,1,1)', '=DDB(1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -13,8 +13,8 @@ describe('Function DDB', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct arguments and defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DDB(10000,50,10,2,1)',
         '=DDB(10000,50,10,2)',
         '=DDB(10000,50,10,2,1.2)',
@@ -33,8 +33,8 @@ describe('Function DDB', () => {
     expect(engine.getCellValue(adr('F1'))).toBeCloseTo(0)
   })
 
-  it('should return correct value for fractional period', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return correct value for fractional period', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DDB(10000,50,10,2.5,1)',
         '=DDB(10000,50,10,2.1)',
         '=DDB(10000,50,10,2.9,1.2)',

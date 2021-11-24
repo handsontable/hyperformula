@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function WEEKNUM', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM(1, 2, 3)'],
       ['=WEEKNUM()'],
     ])
@@ -14,8 +14,8 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong type of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM("foo", 1)'],
       ['=WEEKNUM(2, "bar")'],
     ])
@@ -24,8 +24,8 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should not work for wrong value of args', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong value of args', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM(-1, 1)'],
       ['=WEEKNUM(2, 9)'],
     ])
@@ -34,8 +34,8 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.BadMode))
   })
 
-  it('should work for strings', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for strings', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM("02/08/2020")'],
       ['=WEEKNUM("02/08/2020", "1")'],
       ['=WEEKNUM("02/08/2020", "2")'],
@@ -52,8 +52,8 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(31)
   })
 
-  it('should work for numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM(0)'],
       ['=WEEKNUM(0, 1)'],
       ['=WEEKNUM(0, 2)'],
@@ -64,8 +64,8 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(53)
   })
 
-  it('should work for strings with different nullDate', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for strings with different nullDate', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM("02/08/2020")'],
       ['=WEEKNUM("02/08/2020", "1")'],
       ['=WEEKNUM("02/08/2020", "2")'],
@@ -82,8 +82,8 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(31)
   })
 
-  it('should work for strings with compatibility mode', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for strings with compatibility mode', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM("02/08/2020")'],
       ['=WEEKNUM("02/08/2020", "1")'],
       ['=WEEKNUM("02/08/2020", "2")'],
@@ -99,8 +99,8 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(32)
     expect(engine.getCellValue(adr('A6'))).toEqual(31)
   })
-  it('should work for strings with compatibility mode and different nullDate', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for strings with compatibility mode and different nullDate', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=WEEKNUM("02/08/2020")'],
       ['=WEEKNUM("02/08/2020", "1")'],
       ['=WEEKNUM("02/08/2020", "2")'],
@@ -117,7 +117,7 @@ describe('Function WEEKNUM', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(31)
   })
 
-  it('big test', () => {
+  it('big test', async() => {
     const args = [1, 2, 11, 12, 13, 14, 15, 16, 17, 21]
     const dates = ['13/08/2020', '14/08/2020', '15/08/2020', '16/08/2020', '17/08/2020', '18/08/2020', '19/08/2020']
     const arrs = []
@@ -128,7 +128,7 @@ describe('Function WEEKNUM', () => {
       }
       arrs.push(arr)
     }
-    const engine = HyperFormula.buildFromArray(arrs)
+    const engine = await HyperFormula.buildFromArray(arrs)
     expect(engine.getSheetValues(0)).toEqual(
       [[33, 33, 33, 34, 34, 34, 34],
         [ 33, 33, 33, 33, 34, 34, 34],

@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMPOWER', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=IMPOWER(1)'],
       ['=IMPOWER(1, 2, 3)'],
     ])
@@ -13,8 +13,8 @@ describe('Function IMPOWER', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=IMPOWER("foo", 2)'],
       ['=IMPOWER(1, "foo")'],
     ])
@@ -23,8 +23,8 @@ describe('Function IMPOWER', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=IMPOWER(0, 1)'],
       ['=IMPOWER("-4", 0.1)'],
       ['=IMPOWER("-3+4i", -1)'],

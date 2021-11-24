@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - function RAND', () => {
-  it('works',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('works',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=RAND()'],
     ])
 
@@ -13,8 +13,8 @@ describe('Interpreter - function RAND', () => {
     expect(engine.getCellValue(adr('A1'))).toBeLessThan(1.0)
   })
 
-  it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('validates number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=RAND(42)'],
     ])
 

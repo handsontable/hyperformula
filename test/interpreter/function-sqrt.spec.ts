@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function SQRT', () => {
-  it('should return error for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for negative numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SQRT(-2)'],
       ['=SQRT(-2)+1']
     ])
@@ -14,8 +14,8 @@ describe('Function SQRT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SQRT()'],
       ['=SQRT(1, 2)'],
     ])
@@ -24,16 +24,16 @@ describe('Function SQRT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SQRT("foo")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SQRT(0)'],
       ['=SQRT(16)'],
       ['=SQRT(2)'],

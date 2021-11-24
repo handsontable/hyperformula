@@ -22,13 +22,13 @@ export function enrichStatistics(stats: Stats): Stats {
   return enriched
 }
 
-export function measureCruds(engine: HyperFormula, name: string, func: (engine: HyperFormula) => void): Stats {
+export async function measureCruds(engine: HyperFormula, name: string, func: (engine: HyperFormula) => Promise<void>): Promise<Stats> {
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore
   engine._stats.reset()
 
   const start = Date.now()
-  func(engine)
+  await func(engine)
   const end = Date.now()
 
   const time = end - start

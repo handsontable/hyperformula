@@ -3,49 +3,49 @@ import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {adr} from './testUtils'
 
 describe('vertex counting', () => {
-  it('one-time formula', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('one-time formula', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
-    engine.calculateFormula('=SUM(A1:B2)', 0)
+    await engine.calculateFormula('=SUM(A1:B2)', 0)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
   })
 
-  it('cruds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('cruds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
-    engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
+    await engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(5)
-    engine.setCellContents(adr('A1'), 1)
+    await engine.setCellContents(adr('A1'), 1)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
   })
 })
 
 describe('range mapping', () => {
-  it('one-time formula', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('one-time formula', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-    engine.calculateFormula('=SUM(A1:B2)', 0)
+    await engine.calculateFormula('=SUM(A1:B2)', 0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('cruds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('cruds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
-    engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
+    await engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(1)
-    engine.setCellContents(adr('A1'), 1)
+    await engine.setCellContents(adr('A1'), 1)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 })
@@ -56,7 +56,7 @@ function randomInteger(min: number, max: number) {
 
 describe('larger tests', () => {
 
-  it( 'large fixed', () => {
+  it( 'large fixed', async() => {
     const arr = [
       [
         '=SUM(B2:C4)',
@@ -69,17 +69,17 @@ describe('larger tests', () => {
         '=SUM(B2:C3)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
+    const engine = await HyperFormula.buildFromArray(arr)
     for(let x=0; x<3; x++) {
       for(let y=0; y<3; y++) {
-        engine.setCellContents({sheet: 0, col: x, row: y}, null)
+        await engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('large fixed #2', () => {
+  it('large fixed #2', async() => {
     const arr = [
       [
         null,
@@ -88,47 +88,47 @@ describe('larger tests', () => {
         '=SUM(A1:A2)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
-    engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
+    const engine = await HyperFormula.buildFromArray(arr)
+    await engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
+    await engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
+    await engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it( 'large fixed #3', () => {
+  it( 'large fixed #3', async() => {
     const arr =     [
       [
         '=SUM(A1:B1)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
+    const engine = await HyperFormula.buildFromArray(arr)
 
-    engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
+    await engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it( 'large fixed #4', () => {
+  it( 'large fixed #4', async() => {
     const arr =     [
       [
         null, '=SUM(A1:A1)', '=SUM(A1:A2)', '=SUM(A1:A3)', '=SUM(A1:A4)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
+    const engine = await HyperFormula.buildFromArray(arr)
 
-    engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
-    engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
+    await engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
+    await engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
+    await engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
+    await engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('repeat the same crud', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('repeat the same crud', async() => {
+const engine = await HyperFormula.buildFromArray([])
     for(let tmp = 0; tmp < 3; tmp++) {
       for (let x = 0; x < 10; x++) {
         for (let y = 0; y < 10; y++) {
@@ -147,13 +147,13 @@ describe('larger tests', () => {
             col: Math.max(col1, col2)
           }, 0)
           const formula = '=SUM(' + startAddress + ':' + endAddress + ')'
-          engine.setCellContents({sheet: 0, col: x, row: y}, formula)
+          await engine.setCellContents({sheet: 0, col: x, row: y}, formula)
         }
       }
     }
     for(let x=0; x<10; x++) {
       for(let y=0; y<10; y++) {
-        engine.setCellContents({sheet: 0, col: x, row: y}, null)
+        await engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
@@ -162,8 +162,8 @@ describe('larger tests', () => {
 })
 
 describe('cruds', () => {
-  it('should collect empty vertices when bigger range is no longer bind to smaller range #1', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #1', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -179,8 +179,8 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('should collect empty vertices when bigger range is no longer bind to smaller range #2', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #2', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -196,8 +196,8 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('should collect empty vertices when bigger range is no longer bind to smaller range #3', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #3', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -212,8 +212,8 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('should collect empty vertices when bigger range is no longer bind to smaller range #4', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #4', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -222,7 +222,7 @@ describe('cruds', () => {
     ])
     engine.addRows(0, [1, 1])
 
-    engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
+    await engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
 
     expect(engine.getCellValue(adr('A5'))).toBe(10)
     expect(engine.getCellValue(adr('A6'))).toBe(6)
@@ -233,8 +233,8 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('should collect empty vertices when bigger range is no longer bind to smaller range #5', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #5', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -243,7 +243,7 @@ describe('cruds', () => {
       ['=SUM(A1:A3)'],
     ])
 
-    engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
+    await engine.setCellContents(adr('A1'), [[1], [2], [3], [4]])
 
     expect(engine.getCellValue(adr('A5'))).toBe(10)
     expect(engine.getCellValue(adr('A6'))).toBe(6)
@@ -254,8 +254,8 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('should collect empty vertices when bigger range is no longer bind to smaller range #6', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #6', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1],
       [2],
       [3],
@@ -273,8 +273,8 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('should collect empty vertices when bigger range is no longer bind to smaller range #7', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should collect empty vertices when bigger range is no longer bind to smaller range #7', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -283,7 +283,7 @@ describe('cruds', () => {
     ])
     engine.addRows(0, [1, 1])
 
-    engine.setCellContents(adr('A1'), [[1, 1], [2, 2], [3, 3], [4, 4]])
+    await engine.setCellContents(adr('A1'), [[1, 1], [2, 2], [3, 3], [4, 4]])
 
     expect(engine.getCellValue(adr('A5'))).toBe(6)
     expect(engine.getCellValue(adr('B5'))).toBe(10)
@@ -296,8 +296,8 @@ describe('cruds', () => {
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('column adding', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('column adding', async() => {
+const engine = await HyperFormula.buildFromArray([
       [0, 0],
       [0, 0],
       [0, 0],
@@ -305,15 +305,15 @@ describe('cruds', () => {
       ['=SUM(A1:B3)']
     ])
     engine.addColumns(0, [1, 1])
-    engine.setCellContents(adr('B3'), 1)
+    await engine.setCellContents(adr('B3'), 1)
     expect(engine.getCellSerialized(adr('A4'))).toBe('=SUM(A1:C2)')
     expect(engine.getCellSerialized(adr('A5'))).toBe('=SUM(A1:C3)')
     expect(engine.getCellValue(adr('A4'))).toBe(0)
     expect(engine.getCellValue(adr('A5'))).toBe(1)
   })
 
-  it('movecell', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('movecell', async() => {
+const engine = await HyperFormula.buildFromArray([
     [1],
     [2],
     [3],
@@ -322,19 +322,19 @@ describe('cruds', () => {
     ['=SUM(A1:A4)'],
     ])
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3), adr('B1'))
-    engine.setCellContents(adr('B1'), null)
-    engine.setCellContents(adr('B2'), null)
-    engine.setCellContents(adr('B3'), null)
-    engine.setCellContents(adr('A4'), null)
-    engine.setCellContents(adr('A5'), null)
-    engine.setCellContents(adr('A6'), null)
+    await engine.setCellContents(adr('B1'), null)
+    await engine.setCellContents(adr('B2'), null)
+    await engine.setCellContents(adr('B3'), null)
+    await engine.setCellContents(adr('A4'), null)
+    await engine.setCellContents(adr('A5'), null)
+    await engine.setCellContents(adr('A6'), null)
 
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('addColumns after addRows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('addColumns after addRows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2', '=SUM($A$1:A1)'],
       ['3', '=SUM($A$1:A2)'],

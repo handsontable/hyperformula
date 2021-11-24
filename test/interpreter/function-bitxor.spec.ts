@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function BITXOR', () => {
-  it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITXOR(101)'],
       ['=BITXOR(1, 2, 3)'],
     ])
@@ -14,8 +14,8 @@ describe('function BITXOR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITXOR(1, "foo")'],
       ['=BITXOR("bar", 4)'],
       ['=BITXOR("foo", "baz")'],
@@ -26,8 +26,8 @@ describe('function BITXOR', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should not work for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for negative numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITXOR(1, -2)'],
       ['=BITXOR(-1, 2)'],
     ])
@@ -36,8 +36,8 @@ describe('function BITXOR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
-  it('should not work for non-integers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for non-integers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITXOR(1.2, 2)'],
       ['=BITXOR(3.14, 5)'],
     ])
@@ -46,8 +46,8 @@ describe('function BITXOR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.IntegerExpected))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITXOR(1, 5)'],
       ['=BITXOR(457, 111)'],
       ['=BITXOR(BIN2DEC(101), BIN2DEC(1))'],
@@ -62,8 +62,8 @@ describe('function BITXOR', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(0)
   })
 
-  it('should return numeric type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return numeric type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BITXOR(1, 5)'],
     ])
 

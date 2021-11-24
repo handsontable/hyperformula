@@ -44,9 +44,9 @@ describe('Documentation example spec', () => {
     HyperFormula.registerFunctionPlugin(SquarePlugin)
   })
 
-  it('works', () => {
+  it('works', async() => {
     HyperFormula.getLanguage('enGB').extendFunctions({SQUARE: 'SQUARE'})
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=SQUARE(2)'],
       ['=SQUARE()'],
       ['=SQUARE(TRUE())'],

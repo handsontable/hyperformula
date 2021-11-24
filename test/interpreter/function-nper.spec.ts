@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NPER', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NPER(1,1)', '=NPER(1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function NPER', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct arguments and defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NPER(1%, 1, 100, 1)', '=NPER(1%, 1, 100, 1, 1)', '=NPER(1%, 1, 100, 1, 2)'],
       ['=NPER(100%, -50, 100, 0, 1)', '=NPER(100%, -50, 100, -100, 1)', '=NPER(-100%, 1, 100, 1, 1)', '=NPER(-200%, 1, 100, 1, 1)'],
       ['=NPER(-20%, -50, 100, 300, 1)', ],

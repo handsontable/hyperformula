@@ -4,8 +4,8 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FLOOR', () => {
   /*Inconsistent with ODFF standard.*/
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FLOOR(1)'],
       ['=FLOOR(1, 2, 3)'],
     ])
@@ -14,8 +14,8 @@ describe('Function FLOOR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FLOOR(1, "bar")'],
       ['=FLOOR("bar", 1)'],
     ])
@@ -24,8 +24,8 @@ describe('Function FLOOR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FLOOR(4.43, 0.3)'],
       ['=FLOOR(4.43, 0.6)'],
       ['=FLOOR(4.43, 2)'],
@@ -45,8 +45,8 @@ describe('Function FLOOR', () => {
   })
 
   /*Inconsistent with ODFF standard.*/
-  it('negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('negative values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FLOOR(11, 2)'],
       ['=FLOOR(-11, 2)'],
       ['=FLOOR(11, -2)'],

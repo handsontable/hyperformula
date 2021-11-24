@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function REPT', () => {
-  it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return N/A when number of arguments is incorrect', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=REPT()'],
       ['=REPT("foo")'],
       ['=REPT("foo", 1, 2)']
@@ -15,24 +15,24 @@ describe('Function REPT', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return VALUE when wrong type of second parameter', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return VALUE when wrong type of second parameter', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=REPT("foo", "bar")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should return VALUE when second parameter is less than 0', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return VALUE when second parameter is less than 0', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=REPT("foo", -1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NegativeCount))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=REPT("foo", 0)'],
       ['=REPT("foo", 3)'],
       ['=REPT(1, 5)'],
@@ -47,8 +47,8 @@ describe('Function REPT', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual('NaNaNaNaNaNaNa Batman!')
   })
 
-  it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce other types to string', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=REPT(1, 1)'],
       ['=REPT(5+5, 1)'],
       ['=REPT(TRUE(), 1)'],

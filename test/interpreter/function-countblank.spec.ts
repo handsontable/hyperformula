@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('COUNTBLANK', () => {
-  it('with empty args', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('with empty args', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COUNTBLANK()'],
       ['=COUNTBLANK(,)']
     ])
@@ -13,23 +13,23 @@ describe('COUNTBLANK', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(2)
   })
 
-  it('with args', () => {
-    const engine = HyperFormula.buildFromArray([['=COUNTBLANK(B1, C1)', '3.14']])
+  it('with args', async() => {
+const engine = await HyperFormula.buildFromArray([['=COUNTBLANK(B1, C1)', '3.14']])
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
 
-  it('with range', () => {
-    const engine = HyperFormula.buildFromArray([['1', null, null, '=COUNTBLANK(A1:C1)']])
+  it('with range', async() => {
+const engine = await HyperFormula.buildFromArray([['1', null, null, '=COUNTBLANK(A1:C1)']])
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
   })
 
-  it('with empty strings', () => {
-    const engine = HyperFormula.buildFromArray([['', null, null, '=COUNTBLANK(A1:C1)']])
+  it('with empty strings', async() => {
+const engine = await HyperFormula.buildFromArray([['', null, null, '=COUNTBLANK(A1:C1)']])
     expect(engine.getCellValue(adr('D1'))).toEqual(2)
   })
 
-  it('does not propagate errors from ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('does not propagate errors from ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null],
       ['=4/0'],
       ['=COUNTBLANK(A1:A2)'],
@@ -38,16 +38,16 @@ describe('COUNTBLANK', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(1)
   })
 
-  it('does not propagate errors from arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('does not propagate errors from arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COUNTBLANK(4/0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 
-  it('works even when range vertex is in cycle', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works even when range vertex is in cycle', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['=COUNTBLANK(A1:A3)'],
       [null],

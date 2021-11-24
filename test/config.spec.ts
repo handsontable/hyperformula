@@ -205,14 +205,14 @@ describe('Config', () => {
 })
 
 describe('getConfig', () => {
-  it('should not be an instance of Config', () => {
-    const engine = HyperFormula.buildEmpty()
+  it('should not be an instance of Config', async() => {
+const engine = await HyperFormula.buildEmpty()
     expect(engine.getConfig()).not.toBeInstanceOf(Config)
   })
 
   it('should copy returned values', () => {
     const arr = ['mm']
-    const engine = HyperFormula.buildEmpty({dateFormats: arr})
+    const engine = await HyperFormula.buildEmpty({dateFormats: arr})
     const arr2 = engine.getConfig().dateFormats
     expect(arr).toEqual(arr2)
     expect(arr).not.toBe(arr2)

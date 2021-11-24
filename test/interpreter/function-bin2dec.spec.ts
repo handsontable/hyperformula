@@ -4,16 +4,16 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function BIN2DEC', () => {
-  it('should work only for one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work only for one argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2DEC(101)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(5)
   })
 
-  it('should not work for non-binary arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for non-binary arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2DEC("foo")'],
       ['=BIN2DEC(1234)'],
       ['=BIN2DEC(TRUE())'],
@@ -24,8 +24,8 @@ describe('function BIN2DEC', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
   })
 
-  it('should work only for 10 bits', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work only for 10 bits', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2DEC(10101010101010)'],
       ['=BIN2DEC(1010101010)'],
     ])
@@ -34,8 +34,8 @@ describe('function BIN2DEC', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(-342)
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2DEC(1111111111)'],
       ['=BIN2DEC(1000000000)'],
       ['=BIN2DEC(111111111)'],
@@ -51,8 +51,8 @@ describe('function BIN2DEC', () => {
 
   })
 
-  it('should work with references', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work with references', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1101'],
       ['=BIN2DEC(A1)'],
     ])
@@ -60,8 +60,8 @@ describe('function BIN2DEC', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(13)
   })
 
-  it('should return numeric type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return numeric type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BIN2DEC(101)'],
     ])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.NUMBER)

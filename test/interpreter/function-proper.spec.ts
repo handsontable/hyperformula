@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function PROPER', () => {
-  it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return N/A when number of arguments is incorrect', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PROPER()'],
       ['=PROPER("foo", "bar")']
     ])
@@ -13,8 +13,8 @@ describe('Function PROPER', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PROPER("foo")'],
       ['=PROPER("foo bar")'],
       ['=PROPER(" foo    bar   ")'],
@@ -27,16 +27,16 @@ describe('Function PROPER', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual('Foo Bar')
   })
 
-  it('should work with punctuation marks and numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work with punctuation marks and numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PROPER("123aa123bb.cc.dd")']
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('123Aa123Bb.Cc.Dd')
   })
 
-  it('should work with accents', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work with accents', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PROPER("MAI ANH ĐỨC")'],
       ['=PROPER("MAI CHÍ THỌ")'],
     ])
@@ -45,8 +45,8 @@ describe('Function PROPER', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual('Mai Chí Thọ')
   })
 
-  it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce other types to string', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=PROPER(1)'],
       ['=PROPER(5+5)'],
       ['=PROPER(TRUE())'],

@@ -5,8 +5,8 @@ import {SheetSizeLimitExceededError} from '../src/errors'
 import {adr, colEnd, colStart} from './testUtils'
 
 describe('GraphBuilder', () => {
-  it('build sheet with simple number cell', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('build sheet with simple number cell', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['42'],
     ])
 
@@ -15,8 +15,8 @@ describe('GraphBuilder', () => {
     expect(vertex.getCellValue()).toBe(42)
   })
 
-  it('build sheet with simple string cell', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('build sheet with simple string cell', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['foo'],
     ])
 
@@ -25,8 +25,8 @@ describe('GraphBuilder', () => {
     expect(vertex.getCellValue()).toBe('foo')
   })
 
-  it('building for cell with null should give empty vertex', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('building for cell with null should give empty vertex', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=A1'],
     ])
 
@@ -34,8 +34,8 @@ describe('GraphBuilder', () => {
     expect(vertex).toBeInstanceOf(EmptyCellVertex)
   })
 
-  it('#buildGraph works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('#buildGraph works with ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=A1:B1'],
     ])
@@ -49,8 +49,8 @@ describe('GraphBuilder', () => {
     expect(engine.graph.adjacentNodes(a1b2)).toContain(a2)
   })
 
-  it('#buildGraph works with column ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('#buildGraph works with column ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '=A:B'],
     ])
 
@@ -63,8 +63,8 @@ describe('GraphBuilder', () => {
     expect(engine.graph.adjacentNodes(ab)).toContain(c1)
   })
 
-  it('#loadSheet - it should build graph with only one RangeVertex', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('#loadSheet - it should build graph with only one RangeVertex', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=A1:B1'],
       ['=A1:B1'],
@@ -86,8 +86,8 @@ describe('GraphBuilder', () => {
     )
   })
 
-  it('build with range one row smaller', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('build with range one row smaller', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '0'],
       ['3', '=A1:A2'],
       ['5', '=A1:A3'],
@@ -106,8 +106,8 @@ describe('GraphBuilder', () => {
     )
   })
 
-  it('#buildGraph should work even if range dependencies are empty', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('#buildGraph should work even if range dependencies are empty', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '0', '=SUM(A1:B2)'],
     ])
 
@@ -123,8 +123,8 @@ describe('GraphBuilder', () => {
     )
   })
 
-  it("optimization doesn't work if smaller range is after bigger", () => {
-    const engine = HyperFormula.buildFromArray([
+  it("optimization doesn't work if smaller range is after bigger", async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '0'],
       ['3', '=A1:A3'],
       ['5', '=A1:A2'],

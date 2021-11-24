@@ -18,14 +18,14 @@ import {
 } from '../testUtils'
 
 describe('Removing rows - checking if its possible', () => {
-  it('no if starting row is negative', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('no if starting row is negative', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, [-1, 1])).toEqual(false)
   })
 
-  it('no if starting row is not an integer', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('no if starting row is not an integer', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, [1.5, 2])).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(0, [NaN, 2])).toEqual(false)
@@ -33,14 +33,14 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(0, [-Infinity, 2])).toEqual(false)
   })
 
-  it('no if number of rows is negative', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('no if number of rows is negative', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, [0, -1])).toEqual(false)
   })
 
-  it('no if number of rows is not an integer', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('no if number of rows is not an integer', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, [0, 1.5])).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(0, [0, NaN])).toEqual(false)
@@ -48,8 +48,8 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(0, [0, -Infinity])).toEqual(false)
   })
 
-  it('no if sheet does not exist', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('no if sheet does not exist', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(1, [0, 1])).toEqual(false)
     expect(engine.isItPossibleToRemoveRows(1.5, [0, 1])).toEqual(false)
@@ -59,8 +59,8 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(-Infinity, [0, 1])).toEqual(false)
   })
 
-  it('yes if theres an array in place where we remove', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('yes if theres an array in place where we remove', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=TRANSPOSE(A1:B2)'],
@@ -73,8 +73,8 @@ describe('Removing rows - checking if its possible', () => {
     expect(engine.isItPossibleToRemoveRows(0, [4, 1])).toEqual(true)
   })
 
-  it('yes otherwise', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('yes otherwise', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToRemoveRows(0, [0, 1])).toEqual(true)
     expect(engine.isItPossibleToRemoveRows(0, [1, 1])).toEqual(true)
@@ -83,8 +83,8 @@ describe('Removing rows - checking if its possible', () => {
 })
 
 describe('Address dependencies, Case 1: same sheet', () => {
-  it('case Aa: absolute dependency above removed row should not be affected', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Aa: absolute dependency above removed row should not be affected', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null],
       ['1'],
       [null], // row to delete
@@ -96,8 +96,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow( 0, 1))
   })
 
-  it('case Ab: absolute dependency below removed row should be shifted', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Ab: absolute dependency below removed row should be shifted', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A$3'],
       [null], // row to delete
       ['42'],
@@ -108,8 +108,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow( 0, 1))
   })
 
-  it('case Ac: absolute dependency in removed row range should be replaced by #REF', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Ac: absolute dependency in removed row range should be replaced by #REF', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A$2'],
       [null], // row to delete
     ])
@@ -119,8 +119,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expectReferenceToHaveRefError(engine, adr('A1'))
   })
 
-  it('case Raa: relative dependency and formula above removed rows should not be affected', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Raa: relative dependency and formula above removed rows should not be affected', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['42'],
       ['=A1'],
       ['2'],
@@ -131,8 +131,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(-1, 0))
   })
 
-  it('case Rab: relative address should be shifted when only formula is moving', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Rab: relative address should be shifted when only formula is moving', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['42'],
       ['1'],
       ['2'],
@@ -144,8 +144,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(-1, 0))
   })
 
-  it('case Rba: relative address should be shifted when only dependency is moving', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Rba: relative address should be shifted when only dependency is moving', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A4'],
       ['1'],
       ['2'],
@@ -157,8 +157,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
   })
 
-  it('case Rbb: relative address should not be affected when dependency and formula is moving', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Rbb: relative address should not be affected when dependency and formula is moving', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=A4'],
@@ -169,8 +169,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
   })
 
-  it('case Rca: relative dependency in deleted row range should be replaced by #REF', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Rca: relative dependency in deleted row range should be replaced by #REF', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A3'],
       ['1'],
       ['2'],
@@ -181,8 +181,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expectReferenceToHaveRefError(engine, adr('A1'))
   })
 
-  it('case Rcb: relative dependency in deleted row range should be replaced by #REF', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Rcb: relative dependency in deleted row range should be replaced by #REF', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -193,8 +193,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
     expectReferenceToHaveRefError(engine, adr('A2'))
   })
 
-  it('case Rca, range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('case Rca, range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=SUM(A2:A3)'],
       ['1'], //
       ['2'], //
@@ -205,8 +205,8 @@ describe('Address dependencies, Case 1: same sheet', () => {
 })
 
 describe('Address dependencies, Case 2: formula in sheet where we make crud with dependency to other sheet', () => {
-  it('case A: should not affect absolute dependencies', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('case A: should not affect absolute dependencies', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
         ['=Sheet2!A$1'],
@@ -221,8 +221,8 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
   })
 
-  it('case Ra: removing row above formula should shift dependency', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('case Ra: removing row above formula should shift dependency', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // row to delete
         ['=Sheet2!A1'],
@@ -237,8 +237,8 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
   })
 
-  it('case Rb: removing row below formula should not affect dependency', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('case Rb: removing row below formula should not affect dependency', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!A1'],
         ['1'], // row to delete
@@ -255,8 +255,8 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
 })
 
 describe('Address dependencies, Case 3: formula in different sheet', () => {
-  it('case ARa: relative/absolute dependency below removed row should be shifted ', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('case ARa: relative/absolute dependency below removed row should be shifted ', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!A3'],
         ['=Sheet2!A3'],
@@ -278,8 +278,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow( 0, 1, 1))
   })
 
-  it('case ARb: relative/absolute dependency above removed row should not be affected', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('case ARb: relative/absolute dependency above removed row should not be affected', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!A1'],
         ['=Sheet2!A$1'],
@@ -296,8 +296,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
   })
 
-  it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!A$1'],
         ['=Sheet2!A1'],
@@ -314,8 +314,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     expectReferenceToHaveRefError(engine, adr('A2'))
   })
 
-  it('does not truncate any ranges if rows are removed from different sheet', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('does not truncate any ranges if rows are removed from different sheet', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         [null, '=SUM(A2:A3)'],
         ['2'],
@@ -333,8 +333,8 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
 })
 
 describe('Address dependencies, Case 4: remove rows in sheet different than formula or dependency sheet', () => {
-  it('should not affect dependency when removing rows in not relevant sheet', function() {
-    const engine = HyperFormula.buildFromSheets({
+  it('should not affect dependency when removing rows in not relevant sheet', async() => {
+    const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // to remove
       ],
@@ -349,8 +349,8 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
     expect(extractReference(engine, adr('A2', 1))).toEqual(CellAddress.relative(-1, 0))
   })
 
-  it('should not affect dependency when removing rows in not relevant sheet, more sheets', function() {
-    const engine = HyperFormula.buildFromSheets({
+  it('should not affect dependency when removing rows in not relevant sheet, more sheets', async() => {
+    const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1'], // to remove
       ],
@@ -370,8 +370,8 @@ describe('Address dependencies, Case 4: remove rows in sheet different than form
 })
 
 describe('Removing rows - range dependencies, same sheet', () => {
-  it('truncates range by one row from top if topmost row removed', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by one row from top if topmost row removed', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A2:A3)'],
       ['1'],
       ['2'],
@@ -382,8 +382,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A2')))
   })
 
-  it('truncates range by one row from bottom if last row removed', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by one row from bottom if last row removed', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A2:A3)'],
       ['1'],
       ['2'],
@@ -394,8 +394,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A2')))
   })
 
-  it('truncates range by rows from top if topmost rows removed', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by rows from top if topmost rows removed', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -408,8 +408,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
 
-  it('truncates range by rows from top if topmost rows removed - removing does not have to start with range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by rows from top if topmost rows removed - removing does not have to start with range', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A3:A6)'],
       [null],
       ['3'],
@@ -423,8 +423,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
 
-  it('truncates range by rows from top if topmost rows removed - removing does not have to start with range but may end on start', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by rows from top if topmost rows removed - removing does not have to start with range but may end on start', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A3:A6)'],
       [null],
       ['3'],
@@ -438,8 +438,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A4')))
   })
 
-  it('truncates range by rows from bottom if bottomest rows removed', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by rows from bottom if bottomest rows removed', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -452,8 +452,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
 
-  it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -467,8 +467,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
     expect(extractRange(engine, adr('B1'))).toEqual(new AbsoluteCellRange(adr('A2'), adr('A3')))
   })
 
-  it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range but may start on end', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('truncates range by rows from bottom if bottomest rows removed - removing does not have to end with range but may start on end', async() => {
+const engine = await HyperFormula.buildFromArray([
       [null, '=SUM(A2:A5)'],
       ['2'],
       ['3'],
@@ -484,8 +484,8 @@ describe('Removing rows - range dependencies, same sheet', () => {
 })
 
 describe('Removing rows - reevaluation', () => {
-  it('reevaluates cells', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('reevaluates cells', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)'],
       [null], // deleted
       ['3'],
@@ -496,8 +496,8 @@ describe('Removing rows - reevaluation', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
   })
 
-  it('dont reevaluate everything', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('dont reevaluate everything', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=COUNTBLANK(A1:A3)', '=SUM(A1:A1)'],
       [null], // deleted
       ['3'],
@@ -515,8 +515,8 @@ describe('Removing rows - reevaluation', () => {
     expect(c1setCellValueSpy).not.toHaveBeenCalled()
   })
 
-  it('reevaluates cells which are dependent on structure changes', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('reevaluates cells which are dependent on structure changes', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '=COLUMNS(A1:B1)'],
       ['1'],
     ])
@@ -529,8 +529,8 @@ describe('Removing rows - reevaluation', () => {
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })
 
-  it('should reevaluate formula when range reduced to zero', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should reevaluate formula when range reduced to zero', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(A1:A2)'],
@@ -548,8 +548,8 @@ describe('Removing rows - reevaluation', () => {
 })
 
 describe('Removing rows - arrays', () => {
-  it('ArrayVertex#formula should be updated', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('ArrayVertex#formula should be updated', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
@@ -561,8 +561,8 @@ describe('Removing rows - arrays', () => {
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 
-  it('ArrayVertex#address should be updated', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('ArrayVertex#address should be updated', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '4'],
       ['2', '5'],
       ['3', '6'],
@@ -575,8 +575,8 @@ describe('Removing rows - arrays', () => {
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A3'))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('ArrayVertex#formula should be updated when different sheets', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '4'],
         ['2', '5'],
@@ -592,8 +592,8 @@ describe('Removing rows - arrays', () => {
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 
-  it('should be possible to remove row above array', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be possible to remove row above array', async() => {
+const engine = await HyperFormula.buildFromArray([
       [],
       ['=-C2:D4'],
       [],
@@ -603,7 +603,7 @@ describe('Removing rows - arrays', () => {
 
     engine.removeRows(0, [0, 1])
 
-    const expected = HyperFormula.buildFromArray([
+    const expected = await HyperFormula.buildFromArray([
       ['=-C1:D3'],
       [],
       [],
@@ -613,8 +613,8 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('removing row across array should not change array', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('removing row across array should not change array', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2], [3, 4], [5, 6],
       ['=-A1:B3'],
       [], [], [],
@@ -623,7 +623,7 @@ describe('Removing rows - arrays', () => {
 
     engine.removeRows(0, [4, 1])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [1, 2], [3, 4], [5, 6],
       ['=-A1:B3'],
       [], [],
@@ -631,8 +631,8 @@ describe('Removing rows - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('removing row should shrink dependent array', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('removing row should shrink dependent array', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2],
       [],
       [3, 4],
@@ -641,15 +641,15 @@ describe('Removing rows - arrays', () => {
 
     engine.removeRows(0, [1, 1])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [1, 2],
       [3, 4],
       ['=TRANSPOSE(A1:B2)']
     ], {useArrayArithmetic: true}))
   })
 
-  it('it should be REF if no space after removing row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('it should be REF if no space after removing row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-B3:B4'],
       [],
       [1, 1],
@@ -664,7 +664,7 @@ describe('Removing rows - arrays', () => {
       [null, 2],
     ])
 
-    const expected = HyperFormula.buildFromArray([
+    const expected = await HyperFormula.buildFromArray([
       ['=-B2:B3'],
       [1, 1],
       [null, 2]
@@ -672,8 +672,8 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should be REF, not CYCLE, after removing rows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('it should be REF, not CYCLE, after removing rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=-A3:A4'],
       [],
       [1],
@@ -688,7 +688,7 @@ describe('Removing rows - arrays', () => {
       [2]
     ])
 
-    const expected = HyperFormula.buildFromArray([
+    const expected = await HyperFormula.buildFromArray([
       ['=-A2:A3'],
       [1],
       [2]
@@ -696,8 +696,8 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should remove array when removing row with left corner', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('it should remove array when removing row with left corner', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=MMULT(A1:B2, A1:B2)'],
@@ -705,14 +705,14 @@ describe('Removing rows - arrays', () => {
 
     engine.removeRows(0, [2, 1])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [1, 2],
       [3, 4]
     ]))
   })
 
-  it('it should remove array when removing rows with whole matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('it should remove array when removing rows with whole matrix', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=MMULT(A1:B2, A1:B2)'],
@@ -720,16 +720,16 @@ describe('Removing rows - arrays', () => {
 
     engine.removeRows(0, [2, 2])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [1, 2],
       [3, 4]
     ]))
   })
 })
 
-describe('Removing rows - graph', function() {
-  it('should remove edges from other cells to removed nodes', () => {
-    const engine = HyperFormula.buildFromArray([
+describe('Removing rows - graph', () => {
+  it('should remove edges from other cells to removed nodes', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=A2'], //
@@ -741,8 +741,8 @@ describe('Removing rows - graph', function() {
     expect(engine.graph.adjacentNodes(a2)).toEqual(new Set())
   })
 
-  it('should remove vertices from graph', function() {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove vertices from graph', async() => {
+    const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
     ])
@@ -751,8 +751,8 @@ describe('Removing rows - graph', function() {
     expect(engine.graph.nodes.size).toBe(0)
   })
 
-  it('works if there are empty cells removed', function() {
-    const engine = HyperFormula.buildFromArray([
+  it('works if there are empty cells removed', async() => {
+    const engine = await HyperFormula.buildFromArray([
       ['1'],
       [null],
       ['3'],
@@ -763,9 +763,9 @@ describe('Removing rows - graph', function() {
   })
 })
 
-describe('Removing rows - range mapping', function() {
-  it('shift ranges in range mapping, range start below removed rows', () => {
-    const engine = HyperFormula.buildFromArray([
+describe('Removing rows - range mapping', () => {
+  it('shift ranges in range mapping, range start below removed rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       ['2', '=SUM(A2:A3)'],
       ['3', null],
@@ -777,8 +777,8 @@ describe('Removing rows - range mapping', function() {
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 
-  it('shift ranges in range mapping, range start above removed rows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('shift ranges in range mapping, range start above removed rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       ['2', null],
       ['3', null],
@@ -790,8 +790,8 @@ describe('Removing rows - range mapping', function() {
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 
-  it('shift ranges in range mapping, whole range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('shift ranges in range mapping, whole range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -805,8 +805,8 @@ describe('Removing rows - range mapping', function() {
     expect(engine.graph.hasNode(range)).toBe(false)
   })
 
-  it('should remove smaller range dependency', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should remove smaller range dependency', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -824,8 +824,8 @@ describe('Removing rows - range mapping', function() {
 })
 
 describe('Removing rows - sheet dimensions', () => {
-  it('should do nothing when removed row outside effective sheet', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should do nothing when removed row outside effective sheet', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
     ])
 
@@ -841,8 +841,8 @@ describe('Removing rows - sheet dimensions', () => {
     })
   })
 
-  it('should throw error when trying to remove non positive number of rows', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should throw error when trying to remove non positive number of rows', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
     ])
@@ -850,8 +850,8 @@ describe('Removing rows - sheet dimensions', () => {
     expect(() => engine.removeRows(0, [1, 0])).toThrow(new InvalidArgumentsError('starting row to be smaller than the ending row.'))
   })
 
-  it('returns changed values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('returns changed values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(A1:A2)'],
@@ -865,8 +865,8 @@ describe('Removing rows - sheet dimensions', () => {
 })
 
 describe('Removing rows - column index', () => {
-  it('should update column index when adding row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should update column index when adding row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=VLOOKUP(2, A1:A10, 1, TRUE())'],
       [null],
       ['2'],
@@ -882,8 +882,8 @@ describe('Removing rows - column index', () => {
 })
 
 describe('Removing rows - row range', () => {
-  it('removing rows - start of row range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('removing rows - start of row range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['1', '2'],
@@ -892,15 +892,15 @@ describe('Removing rows - row range', () => {
 
     engine.removeRows(0, [0, 1])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['=SUM(1:2)']
     ]))
   })
 
-  it('removing rows - middle of row range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('removing rows - middle of row range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['1', '2'],
@@ -909,15 +909,15 @@ describe('Removing rows - row range', () => {
 
     engine.removeRows(0, [1, 1])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['=SUM(1:2)']
     ]))
   })
 
-  it('removing rows - end of row range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('removing rows - end of row range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['1', '2'],
@@ -926,7 +926,7 @@ describe('Removing rows - row range', () => {
 
     engine.removeRows(0, [2, 1])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['=SUM(1:2)']
@@ -935,8 +935,8 @@ describe('Removing rows - row range', () => {
 })
 
 describe('Removing rows - column range', () => {
-  it('should not affect column range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not affect column range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
       ['1', '2', '=SUM(A:B)'],
@@ -944,7 +944,7 @@ describe('Removing rows - column range', () => {
 
     engine.removeRows(0, [0, 1])
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2', '=SUM(A:B)'],
     ]))
@@ -952,11 +952,11 @@ describe('Removing rows - column range', () => {
 })
 
 describe('Removing rows - merge ranges', () => {
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C1)')
-    engine.setCellContents({sheet: 0, col: 3, row: 1}, '=SUM(A1:C2)')
-    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C2)')
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C1)')
+    await engine.setCellContents({sheet: 0, col: 3, row: 1}, '=SUM(A1:C2)')
+    await engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C2)')
 
     verifyRangesInSheet(engine, 0, ['A1:C1', 'A1:C2'])
 
@@ -965,16 +965,16 @@ describe('Removing rows - merge ranges', () => {
 
     verifyRangesInSheet(engine, 0, ['A1:C1', 'A1:C2', 'A1:C3'])
 
-    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(B2:B3)')
+    await engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(B2:B3)')
     engine.addRows(0, [1, 2])
 
     verifyRangesInSheet(engine, 0, ['B4:B5'])
   })
 
-  it('should not remove too much', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(A1:C2)')
-    engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C1)')
+  it('should not remove too much', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(A1:C2)')
+    await engine.setCellContents({sheet: 0, col: 4, row: 0}, '=SUM(A1:C1)')
 
     verifyRangesInSheet(engine, 0, ['A1:C1', 'A1:C2'])
 
@@ -982,150 +982,150 @@ describe('Removing rows - merge ranges', () => {
     engine.removeRows(0, [3, 1])
 
     verifyRangesInSheet(engine, 0, ['A3:C3'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
-    engine.setCellContents({sheet: 0, col: 3, row: 2}, '=SUM(A2:B3)')
-    engine.setCellContents({sheet: 0, col: 4, row: 2}, '=SUM(A2:B3)')
+    await engine.setCellContents({sheet: 0, col: 3, row: 2}, '=SUM(A2:B3)')
+    await engine.setCellContents({sheet: 0, col: 4, row: 2}, '=SUM(A2:B3)')
 
     verifyRangesInSheet(engine, 0, ['A2:B3'])
-    verifyValues(engine)
+    await verifyValues(engine)
   })
 
-  it('should merge ranges', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
-    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
-    engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(D1:F2)')
-    engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(D1:F1)')
+  it('should merge ranges', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
+    await engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
+    await engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(D1:F2)')
+    await engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(D1:F1)')
 
     verifyRangesInSheet(engine, 0, ['D1:F1', 'D1:F2', 'B2:C3'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
     engine.addRows(0, [0, 2])
 
     verifyRangesInSheet(engine, 0, ['D3:F3', 'D3:F4', 'B4:C5'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
     engine.removeRows(0, [3, 1])
 
     verifyRangesInSheet(engine, 0, ['D3:F3', 'B4:C4'])
-    verifyValues(engine)
+    await verifyValues(engine)
   })
 
-  it('Should properly deallocate all nodes', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 3, row: 2}, '=SUM(B2:C2)')
-    engine.setCellContents({sheet: 0, col: 5, row: 3}, '=SUM(B2:C3)')
+  it('Should properly deallocate all nodes', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 3, row: 2}, '=SUM(B2:C2)')
+    await engine.setCellContents({sheet: 0, col: 5, row: 3}, '=SUM(B2:C3)')
 
     engine.addRows(0, [2, 2])
     engine.removeRows(0, [4, 1])
 
     verifyRangesInSheet(engine, 0, ['B2:C2', 'B2:C3', 'B2:C4'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
-    engine.setCellContents({sheet: 0, col: 5, row: 4}, null)
+    await engine.setCellContents({sheet: 0, col: 5, row: 4}, null)
 
     verifyRangesInSheet(engine, 0, [])
-    verifyValues(engine)
+    await verifyValues(engine)
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
-  it('should merge ranges in proper order', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(A4:A6)')
-    engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(A4:A5)')
-    engine.setCellContents({sheet: 0, col: 0, row: 2}, '=SUM(A4:A4)')
+  it('should merge ranges in proper order', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(A4:A6)')
+    await engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(A4:A5)')
+    await engine.setCellContents({sheet: 0, col: 0, row: 2}, '=SUM(A4:A4)')
 
     engine.removeRows(0, [4, 1])
 
     verifyRangesInSheet(engine, 0, ['A4:A5', 'A4:A4'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
-    engine.setCellContents(adr('A1'), null)
-    engine.setCellContents(adr('A2'), null)
-    engine.setCellContents(adr('A3'), null)
+    await engine.setCellContents(adr('A1'), null)
+    await engine.setCellContents(adr('A2'), null)
+    await engine.setCellContents(adr('A3'), null)
 
     verifyRangesInSheet(engine, 0, [])
-    verifyValues(engine)
+    await verifyValues(engine)
   })
 
-  it('should merge ranges with subranges in proper order', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(E1:E1)')
-    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(E1:E2)')
+  it('should merge ranges with subranges in proper order', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 0, row: 1}, '=SUM(E1:E1)')
+    await engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(E1:E2)')
 
     engine.addRows(0, [1, 2])
 
     verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3', 'E1:E4'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
     engine.removeRows(0, [2, 1])
 
     verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
-    engine.setCellContents(adr('A1'), null)
-    engine.setCellContents(adr('A3'), null)
+    await engine.setCellContents(adr('A1'), null)
+    await engine.setCellContents(adr('A3'), null)
 
     verifyRangesInSheet(engine, 0, [])
-    verifyValues(engine)
+    await verifyValues(engine)
   })
 
-  it('should merge ranges when removing multiple rows', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(E1:E1)')
-    engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(E1:E3)')
+  it('should merge ranges when removing multiple rows', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(E1:E1)')
+    await engine.setCellContents({sheet: 0, col: 0, row: 0}, '=SUM(E1:E3)')
 
     verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E3'])
 
     engine.removeRows(0, [1, 2])
 
     verifyRangesInSheet(engine, 0, ['E1:E1'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
-    engine.setCellContents(adr('A1'), null)
-    engine.setCellContents(adr('A2'), null)
+    await engine.setCellContents(adr('A1'), null)
+    await engine.setCellContents(adr('A2'), null)
 
     verifyRangesInSheet(engine, 0, [])
-    verifyValues(engine)
+    await verifyValues(engine)
   })
 
-  it('should merge ranges when removing multiple rows 2', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(E1:E1)')
-    engine.setCellContents({sheet: 0, col: 0, row: 2}, '=SUM(E1:E2)')
+  it('should merge ranges when removing multiple rows 2', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 0, row: 3}, '=SUM(E1:E1)')
+    await engine.setCellContents({sheet: 0, col: 0, row: 2}, '=SUM(E1:E2)')
 
     engine.addRows(0, [1, 2])
 
     verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3', 'E1:E4'])
 
-    engine.setCellContents({sheet: 0, col: 0, row: 5}, '=SUM(E4:E4)')
+    await engine.setCellContents({sheet: 0, col: 0, row: 5}, '=SUM(E4:E4)')
 
     verifyRangesInSheet(engine, 0, ['E1:E1', 'E1:E2', 'E1:E3', 'E1:E4', 'E4:E4'])
 
     engine.removeRows(0, [1, 3])
 
     verifyRangesInSheet(engine, 0, ['E1:E1'])
-    verifyValues(engine)
+    await verifyValues(engine)
   })
 
-  it('should undo merge ranges', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
-    engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
-    engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(D1:F2)')
-    engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(D1:F1)')
+  it('should undo merge ranges', async() => {
+const engine = await HyperFormula.buildFromArray([])
+    await engine.setCellContents({sheet: 0, col: 2, row: 1}, 7)
+    await engine.setCellContents({sheet: 0, col: 3, row: 0}, '=SUM(B2:C3)')
+    await engine.setCellContents({sheet: 0, col: 6, row: 0}, '=SUM(D1:F2)')
+    await engine.setCellContents({sheet: 0, col: 6, row: 2}, '=SUM(D1:F1)')
 
     engine.addRows(0, [0, 2])
     engine.removeRows(0, [3, 1])
 
     verifyRangesInSheet(engine, 0, ['D3:F3', 'B4:C4'])
-    verifyValues(engine)
+    await verifyValues(engine)
 
-    engine.undo()
+    await engine.undo()
 
     verifyRangesInSheet(engine, 0, ['D3:F3', 'D3:F4', 'B4:C5'])
-    verifyValues(engine)
+    await verifyValues(engine)
   })
 })

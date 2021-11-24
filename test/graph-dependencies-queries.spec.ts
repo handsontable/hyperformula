@@ -3,8 +3,8 @@ import {simpleCellRange} from '../src/AbsoluteCellRange'
 import {adr} from './testUtils'
 
 describe('address queries', () => {
-  it('reverse dependencies should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('reverse dependencies should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, 3],
       ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
       ['=A2+B2'],
@@ -19,8 +19,8 @@ describe('address queries', () => {
     expect(engine.getCellDependents(simpleCellRange(adr('A3'), adr('B3')))).toEqual([])
   })
 
-  it('dependencies should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('dependencies should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       [1, 2, 3],
       ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
       ['=A2+B2'],

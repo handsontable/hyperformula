@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function FACT', () => {
-  it('checks number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FACT()', '=FACT(1, 2)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function FACT', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FACT(0)'],
       ['=FACT(1)'],
       ['=FACT(10)'],
@@ -26,8 +26,8 @@ describe('Function FACT', () => {
     expect(engine.getCellValue(adr('A4')) as number / 7.257415615307999e+306).toBeCloseTo(1, 6)
   })
 
-  it('rounds argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('rounds argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FACT(0.9)'],
       ['=FACT(1.1)'],
       ['=FACT(10.42)'],
@@ -40,8 +40,8 @@ describe('Function FACT', () => {
     expect(engine.getCellValue(adr('A4')) as number / 4.2690680090046997e+304).toBeCloseTo(1, 6)
   })
 
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FACT(-1)'],
       ['=FACT(171)'],
     ])
@@ -50,16 +50,16 @@ describe('Function FACT', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
-  it('uses coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('uses coercion', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FACT("0")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
-  it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('propagates error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=FACT(NA())'],
     ])
 

@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.GT', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HF.GT(1)', '=HF.GT(1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function HF.GT', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HF.GT(1,0)'],
       ['=HF.GT(1,1)'],
       ['=HF.GT("1","0")'],
@@ -44,8 +44,8 @@ describe('Function HF.GT', () => {
     expect(engine.getCellValue(adr('A13'))).toEqual(true)
   })
 
-  it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should throw correct error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HF.GT(NA(),)'],
       ['=HF.GT(B2:C2,)'],
     ])

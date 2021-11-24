@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NORM.DIST', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.DIST(1, 2, 3)'],
       ['=NORM.DIST(1, 2, 3, 4, 5)'],
     ])
@@ -14,8 +14,8 @@ describe('Function NORM.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.DIST("foo", 2, 3, TRUE())'],
       ['=NORM.DIST(1, "baz", 3, TRUE())'],
       ['=NORM.DIST(1, 2, "baz", TRUE())'],
@@ -28,8 +28,8 @@ describe('Function NORM.DIST', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
   })
 
-  it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as cdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.DIST(-1, 1, 2, TRUE())'],
       ['=NORM.DIST(0.5, 2, 4, TRUE())'],
     ])
@@ -38,8 +38,8 @@ describe('Function NORM.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.353830233327276, 6)
   })
 
-  it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work as pdf', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.DIST(-1, 1, 2, FALSE())'],
       ['=NORM.DIST(0.5, 2, 4, FALSE())'],
     ])
@@ -48,8 +48,8 @@ describe('Function NORM.DIST', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0929637734674423, 6)
   })
 
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NORM.DIST(-1, -1, 0.01, FALSE())'],
       ['=NORM.DIST(-1, -1, 0, FALSE())'],
     ])

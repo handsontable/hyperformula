@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function CONFIDENCE.NORM', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(1, 2)'],
       ['=CONFIDENCE.NORM(1, 2, 3, 4)'],
     ])
@@ -14,8 +14,8 @@ describe('Function CONFIDENCE.NORM', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM("foo", 2, 3)'],
       ['=CONFIDENCE.NORM(0.5, "baz", 3)'],
       ['=CONFIDENCE.NORM(0.5, 2, "abcd")'],
@@ -26,8 +26,8 @@ describe('Function CONFIDENCE.NORM', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(0.1, 1, 1)'],
       ['=CONFIDENCE.NORM(0.9, 10, 5)'],
     ])
@@ -36,8 +36,8 @@ describe('Function CONFIDENCE.NORM', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.561974627424251, 6)
   })
 
-  it('should truncate third argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should truncate third argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(0.1, 1, 1.9)'],
       ['=CONFIDENCE.NORM(0.9, 10, 5.9)'],
     ])
@@ -47,8 +47,8 @@ describe('Function CONFIDENCE.NORM', () => {
   })
 
 
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(0.01, 0.01, 1)'],
       ['=CONFIDENCE.NORM(0, 0.01, 1)'],
       ['=CONFIDENCE.NORM(0.01, 0, 1)'],

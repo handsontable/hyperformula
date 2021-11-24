@@ -4,16 +4,16 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('function HEX2DEC', () => {
-  it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error when wrong number of argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2DEC("foo", 2, 3)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should not work for non-hex arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should not work for non-hex arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2DEC("foo")'],
       ['=HEX2DEC("23G")'],
       ['=HEX2DEC(TRUE())'],
@@ -24,8 +24,8 @@ describe('function HEX2DEC', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2DEC("1")'],
       ['=HEX2DEC("10")'],
       ['=HEX2DEC("AD")'],
@@ -52,16 +52,16 @@ describe('function HEX2DEC', () => {
     expect(engine.getCellValue(adr('A11'))).toEqual(-1)
   })
 
-  it('should work for numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2DEC(456)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1110)
   })
 
-  it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for reference', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['="1A3"'],
       ['=HEX2DEC(A1)'],
     ])
@@ -69,16 +69,16 @@ describe('function HEX2DEC', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(419)
   })
 
-  it('should return a number', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return a number', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2DEC("11")'],
     ])
 
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.NUMBER)
   })
 
-  it('should work only for 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work only for 10 digits', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HEX2DEC("1010B040205")'],
       ['=HEX2DEC("7777EE70D2")'],
     ])

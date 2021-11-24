@@ -20,55 +20,55 @@ describe('Interpreter - function NOW', () => {
     }
   })
 
-  it('works',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('works',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NOW()'],
     ])
     const t1 = engine.getCellValue(adr('A1')) as number
     expect(t1).toBeCloseTo(31275.1565856481)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
-    engine.setCellContents(adr('A2'), null)
+    await engine.setCellContents(adr('A2'), null)
     const delta = engine.getCellValue(adr('A1')) as number - t1
     expect(delta*24*60*60).toBeGreaterThanOrEqual(1) //internals of the engine are also using Date.now(), so the value should be actually 4 or even more
   })
 
-  it('works #2',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works #2',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=YEAR(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(1985)
   })
 
-  it('works #3',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works #3',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MONTH(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(8)
   })
 
-  it('works #4',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works #4',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DAY(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(16)
   })
 
-  it('works #5',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works #5',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=HOUR(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 
-  it('works #6',  () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works #6',  async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MINUTE(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(45)
   })
 
-  it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('validates number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NOW(42)'],
     ])
 

@@ -5,12 +5,12 @@ import {plPL} from '../src/i18n/languages'
 import {adr, detailedError} from './testUtils'
 
 describe('update config', () => {
-  it('simple reload preserves all values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('simple reload preserves all values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']
     ])
-    engine.updateConfig({})
+    await engine.updateConfig({})
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
@@ -19,12 +19,12 @@ describe('update config', () => {
     expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
-  it('simple reload preserves formulas', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('simple reload preserves formulas', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']
     ])
-    engine.updateConfig({})
+    await engine.updateConfig({})
 
     expect(engine.getCellFormula(adr('B1'))).toBe('=A1')
     expect(engine.getCellFormula(adr('C1'))).toBe('=SUM(A1:B1)')
@@ -32,22 +32,22 @@ describe('update config', () => {
     expect(engine.getCellFormula(adr('C2'))).toBe('=F(')
   })
 
-  it('simple reload preserves values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('simple reload preserves values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1.00000000000001', '1', '=A1-B1'],
     ], {smartRounding: false})
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.00000000000001)
 
-    engine.updateConfig({smartRounding: true})
+    await engine.updateConfig({smartRounding: true})
 
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
   })
-  it('language reload', () => {
+  it('language reload', async() => {
     HyperFormula.registerLanguage('plPL', plPL)
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=FOO()', '=SUM()', '=SUMA()', 'SUM()', '=SUM('],
     ])
-    engine.updateConfig({language: 'plPL'})
+    await engine.updateConfig({language: 'plPL'})
 
     expect(engine.getCellFormula(adr('A1'))).toBe('=FOO()')
     expect(engine.getCellFormula(adr('B1'))).toBe('=SUMA()')
@@ -56,13 +56,13 @@ describe('update config', () => {
     expect(engine.getCellFormula(adr('E1'))).toBe('=SUM(')
   })
 
-  it('simple reload preserves namedexpressions', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('simple reload preserves namedexpressions', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=TRUE', '=FALSE'],
     ])
-    engine.addNamedExpression('TRUE', true)
-    engine.addNamedExpression('FALSE', false)
-    engine.updateConfig({})
+    await engine.addNamedExpression('TRUE', true)
+    await engine.addNamedExpression('FALSE', false)
+    await engine.updateConfig({})
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)

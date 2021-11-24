@@ -105,9 +105,9 @@ export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, ex
   expect(expectedVal[1]).toBeCloseTo(actualVal[1], precision)
 }
 
-export const verifyValues = (engine: HyperFormula) => {
+export const verifyValues = async(engine: HyperFormula) => {
   const serialization = engine.getAllSheetsSerialized()
-  const engine2 = HyperFormula.buildFromSheets(serialization)
+  const engine2 = await HyperFormula.buildFromSheets(serialization)
   expect(engine.getAllSheetsValues()).toEqual(engine2.getAllSheetsValues())
 }
 

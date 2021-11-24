@@ -3,8 +3,8 @@ import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {adr} from '../testUtils'
 
 describe('Set matrix empty', () => {
-  it('should set matrix empty', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should set matrix empty', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -19,8 +19,8 @@ describe('Set matrix empty', () => {
     expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
   })
 
-  it('should adjust edges between matrix cells and formula', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges between matrix cells and formula', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '=A1+A2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -44,8 +44,8 @@ describe('Set matrix empty', () => {
     expect(a3).toBe(undefined)
   })
 
-  it('should adjust edges between matrix cells and formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges between matrix cells and formula matrix', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '=TRANSPOSE(A1:B1)'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -65,8 +65,8 @@ describe('Set matrix empty', () => {
     expect(dependencyGraph.existsEdge(a1, formulaMatrix)).toBe(false)
   })
 
-  it('should adjust edges between matrix cells and range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges between matrix cells and range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A2:A3)'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -91,8 +91,8 @@ describe('Set matrix empty', () => {
     expect(dependencyGraph.existsEdge(a3, rangeVertex)).toBe(true)
   })
 
-  it('should adjust edges between matrix cells and range crossing matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should adjust edges between matrix cells and range crossing matrix', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A1:A2)'],
       ['=TRANSPOSE(A1:B1)'],
     ])

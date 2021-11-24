@@ -77,9 +77,9 @@ class SumWithExtra extends FunctionPlugin implements FunctionPluginTypecheck<Sum
     'SUMALIAS': 'SUM',
   }
 
-  public sum(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
-    const left = this.evaluateAst(ast.args[0], state) as number
-    const right = this.evaluateAst(ast.args[1], state) as number
+  public async sum(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const left = await this.evaluateAst(ast.args[0], state) as number
+    const right = await this.evaluateAst(ast.args[1], state) as number
     return 42 + left + right
   }
 }
@@ -146,10 +146,10 @@ describe('Register static custom plugin', () => {
     expect(pl.getFunctionTranslation('FOO')).toEqual('FU')
   })
 
-  it('should register single function with translations', () => {
+  it('should register single function with translations', async() => {
     HyperFormula.registerFunction('FOO', FooPlugin, FooPlugin.translations)
 
-    const engine = HyperFormula.buildFromArray([['=FOO()']])
+    const engine = await HyperFormula.buildFromArray([['=FOO()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
@@ -164,10 +164,10 @@ describe('Register static custom plugin', () => {
     expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
   })
 
-  it('should register all formulas from plugin', () => {
+  it('should register all formulas from plugin', async() => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
 
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
 
@@ -177,9 +177,9 @@ describe('Register static custom plugin', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
 
-  it('should register single formula from plugin', () => {
+  it('should register single formula from plugin', async() => {
     HyperFormula.registerFunction('BAR', FooPlugin, FooPlugin.translations)
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
 
@@ -189,18 +189,18 @@ describe('Register static custom plugin', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
   })
 
-  it('should register single array functions', () => {
+  it('should register single array functions', async() => {
     HyperFormula.registerFunction('ARRAYFOO', FooPlugin, FooPlugin.translations)
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=ARRAYFOO()']
     ])
 
     expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
   })
 
-  it('should override one formula with custom implementation', () => {
+  it('should override one formula with custom implementation', async() => {
     HyperFormula.registerFunction('SUM', SumWithExtra)
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=SUM(1, 2)', '=MAX(1, 2)']
     ])
 
@@ -208,9 +208,9 @@ describe('Register static custom plugin', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(2)
   })
 
-  it('should allow to register only alias', () => {
+  it('should allow to register only alias', async() => {
     HyperFormula.registerFunction('SUMALIAS', SumWithExtra, {'enGB': {'SUMALIAS': 'SUMALIAS'}})
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=SUMALIAS(1, 2)', '=MAX(1, 2)']
     ])
 
@@ -270,14 +270,14 @@ describe('Instance level formula registry', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({BAR: 'BAR'})
   })
 
-  it('should return registered formula ids', () => {
-    const engine = HyperFormula.buildFromArray([], {functionPlugins: [FooPlugin, SumWithExtra]})
+  it('should return registered formula ids', async() => {
+const engine = await HyperFormula.buildFromArray([], {functionPlugins: [FooPlugin, SumWithExtra]})
 
     expectArrayWithSameContent(engine.getRegisteredFunctionNames(), ['SUM', 'FOO', 'BAR', 'VERSION'])
   })
 
-  it('should create engine only with plugins passed to configuration', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should create engine only with plugins passed to configuration', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=foo()', '=bar()', '=SUM(1, 2)']
     ], {functionPlugins: [FooPlugin]})
 
@@ -287,28 +287,28 @@ describe('Instance level formula registry', () => {
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('SUM')))
   })
 
-  it('modifying static plugins should not affect existing engine instance registry', () => {
+  it('modifying static plugins should not affect existing engine instance registry', async() => {
     HyperFormula.registerFunctionPlugin(FooPlugin)
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=foo()', '=bar()']
     ])
     HyperFormula.unregisterFunction('FOO')
 
-    engine.setCellContents(adr('C1'), '=A1')
+    await engine.setCellContents(adr('C1'), '=A1')
 
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
     expect(engine.getCellValue(adr('B1'))).toEqual('bar')
     expect(engine.getCellValue(adr('C1'))).toEqual('foo')
   })
 
-  it('should return registered plugins', () => {
-    const engine = HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
+  it('should return registered plugins', async() => {
+const engine = await HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
 
     expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
-  it('should instantiate engine with additional plugin', () => {
-    const engine = HyperFormula.buildFromArray([], {
+  it('should instantiate engine with additional plugin', async() => {
+const engine = await HyperFormula.buildFromArray([], {
       functionPlugins: [...HyperFormula.getAllFunctionPlugins(), FooPlugin]
     })
 
@@ -318,21 +318,21 @@ describe('Instance level formula registry', () => {
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
   })
 
-  it('should rebuild engine and override plugins', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('should rebuild engine and override plugins', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     let registeredPlugins = new Set(engine.getAllFunctionPlugins())
     expect(registeredPlugins.has(SumifPlugin)).toBe(true)
     expect(registeredPlugins.has(FooPlugin)).toBe(false)
 
-    engine.updateConfig({functionPlugins: [FooPlugin]})
+    await engine.updateConfig({functionPlugins: [FooPlugin]})
     registeredPlugins = new Set(engine.getAllFunctionPlugins())
     expect(registeredPlugins.has(FooPlugin)).toBe(true)
     expect(registeredPlugins.size).toBe(1)
   })
 
-  it('should return plugin for given functionId', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('should return plugin for given functionId', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     expect(engine.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
   })
@@ -393,11 +393,11 @@ describe('aliases', () => {
 describe.only('Async functions', () => {
   it.only('should register simple async function', async() => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=FOO()', '=ASYNC_FOO()']
     ])
 
-    const values = await engine.getSheetValues(0)
+    const values = engine.getSheetValues(0)
 
     expect(values).toEqual([['foo', 'asyncFoo']])
   })

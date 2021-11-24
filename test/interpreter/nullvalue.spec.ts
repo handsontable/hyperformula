@@ -3,8 +3,8 @@ import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
 describe('EmptyValue tests', () => {
-  it('EmptyValue vs EmptyValue tests', () => {
-    const engine = HyperFormula.buildFromArray(
+  it('EmptyValue vs EmptyValue tests', async() => {
+const engine = await HyperFormula.buildFromArray(
       [
         [null, null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
       ])
@@ -26,8 +26,8 @@ describe('EmptyValue tests', () => {
     expect(engine.getCellValue(adr('Q1'))).toEqual(0) // PERCENTAGE
   })
 
-  it('Boolean vs EmptyValue tests', () => {
-    const engine = HyperFormula.buildFromArray(
+  it('Boolean vs EmptyValue tests', async() => {
+const engine = await HyperFormula.buildFromArray(
       [
         ['=TRUE()', null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
       ])

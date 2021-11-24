@@ -5,8 +5,8 @@ import {adr, colEnd, colStart, expectEngineToBeTheSameAs, extractReference, rowE
 
 describe('Adding row - fixing dependencies', () => {
   describe('all in same sheet (case 1)', () => {
-    it('same sheet, case Aa, absolute row', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, case Aa, absolute row', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['1'],
         // new row
         ['=A$1'],
@@ -17,8 +17,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 0))
     })
 
-    it('same sheet, case Aa, absolute row and col', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, case Aa, absolute row and col', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['1'],
         // new row
         ['=$A$1'],
@@ -29,8 +29,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absolute( 0, 0))
     })
 
-    it('same sheet, case Ab', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, case Ab', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=A$2'],
         // new row
         ['42'],
@@ -41,8 +41,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 2))
     })
 
-    it('same sheet, case Raa', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, case Raa', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=A2'],
         ['13'],
         // new row
@@ -54,8 +54,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
     })
 
-    it('same sheet, case Rab', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, case Rab', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['42'],
         ['13'],
         // new row
@@ -67,8 +67,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.relative(-2, 0))
     })
 
-    it('same sheet, case Rba', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, case Rba', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=A3'],
         ['13'],
         // new row
@@ -80,8 +80,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(3, 0))
     })
 
-    it('same sheet, case Rbb', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, case Rbb', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['42'],
         // new row
         ['=A3'],
@@ -93,8 +93,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0))
     })
 
-    it('same sheet, same row', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('same sheet, same row', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['42'],
         ['43', '=A2'],
       ])
@@ -106,8 +106,8 @@ describe('Adding row - fixing dependencies', () => {
   })
 
   describe('dependency address sheet different than formula address sheet and sheet in which we add rows (case 2)', () => {
-    it('absolute case', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('absolute case', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['=Sheet2!A$1'],
@@ -122,8 +122,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
     })
 
-    it('R < r', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('R < r', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           [null],
@@ -139,8 +139,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(-2, 0, 1))
     })
 
-    it('r = R', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('r = R', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['=Sheet2!A2'],
@@ -156,8 +156,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, 1))
     })
 
-    it('r < R', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('r < R', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           ['=Sheet2!A1'],
           // new row
@@ -174,8 +174,8 @@ describe('Adding row - fixing dependencies', () => {
   })
 
   describe('formula address sheet different than dependency address sheet and sheet in which we add rows (case 3)', () => {
-    it('dependency address before added row', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('dependency address before added row', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['1'],
@@ -191,8 +191,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(2, 0, 0))
     })
 
-    it('dependency address at added row', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('dependency address at added row', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['1'],
@@ -207,8 +207,8 @@ describe('Adding row - fixing dependencies', () => {
       expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 0))
     })
 
-    it('dependency address after added row', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('dependency address after added row', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           ['1'],
           // new row
@@ -225,8 +225,8 @@ describe('Adding row - fixing dependencies', () => {
   })
 
   describe('sheet where we add rows different than dependency address and formula address (case 4)', () => {
-    it('works', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('works', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           ['=A2'],
           ['13'],
@@ -245,8 +245,8 @@ describe('Adding row - fixing dependencies', () => {
   })
 
   describe('each sheet different (case 5)', () => {
-    it('works', () => {
-      const engine = HyperFormula.buildFromSheets({
+    it('works', async() => {
+const engine = await HyperFormula.buildFromSheets({
         Sheet1: [
           ['=Sheet2!A2'],
           ['13'],
@@ -270,8 +270,8 @@ describe('Adding row - fixing dependencies', () => {
 })
 
 describe('Adding row, ranges', () => {
-  it('insert row in middle of range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('insert row in middle of range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       // new row
       ['2', null],
@@ -283,7 +283,7 @@ describe('Adding row, ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(undefined)
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A4'))).not.toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A4)'],
       [null, null],
       ['2', null],
@@ -291,8 +291,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('insert row above range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('insert row above range', async() => {
+const engine = await HyperFormula.buildFromArray([
       // new row
       ['1', '=SUM(A1:A3)'],
       ['2', null],
@@ -304,7 +304,7 @@ describe('Adding row, ranges', () => {
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).toBe(undefined)
     expect(engine.rangeMapping.getRange(adr('A2'), adr('A4'))).not.toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null, null],
       ['1', '=SUM(A2:A4)'],
       ['2', null],
@@ -312,8 +312,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('insert row below range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('insert row below range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       ['2', null],
       ['3', null],
@@ -324,7 +324,7 @@ describe('Adding row, ranges', () => {
     engine.addRows(0, [3, 1])
     expect(engine.rangeMapping.getRange(adr('A1'), adr('A3'))).not.toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       ['2', null],
       ['3', null],
@@ -332,8 +332,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('it should insert new cell with edge to all ranges below', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('it should insert new cell with edge to all ranges below', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A1)'],
       ['2', '=SUM(A1:A2)'],
       // new row
@@ -358,8 +358,8 @@ describe('Adding row, ranges', () => {
     expect(engine.graph.adjacentNodesCount(a2)).toBe(1)
   })
 
-  it('it should insert new cell with edge to only one range below, shifted by 1', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('it should insert new cell with edge to only one range below, shifted by 1', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       ['2', '=SUM(A1:A1)'],
       ['3', '=SUM(A1:A2)'],
@@ -372,7 +372,7 @@ describe('Adding row, ranges', () => {
     const a4 = engine.addressMapping.getCell(adr('A4'))
     expect(a4).toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       ['2', '=SUM(A1:A1)'],
       ['3', '=SUM(A1:A2)'],
@@ -381,8 +381,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('range start in row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range start in row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A2:A4)'],
@@ -395,7 +395,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       [null, null],
       ['2', '=SUM(A3:A5)'],
@@ -404,8 +404,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('range start above row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range start above row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A4)'],
@@ -420,7 +420,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       [null, null],
       ['2', '=SUM(A1:A5)'],
@@ -429,8 +429,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('range start below row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range start below row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A3:A4)'],
@@ -443,7 +443,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       [null, null],
       ['2', '=SUM(A4:A5)'],
@@ -452,8 +452,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('range end above row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range end above row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A1)'],
@@ -466,7 +466,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       [null, null],
       ['2', '=SUM(A1:A1)'],
@@ -475,8 +475,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('range end in a row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range end in a row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A2)'],
@@ -492,7 +492,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       [null, null],
       ['2', '=SUM(A1:A3)'],
@@ -501,8 +501,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('range end below row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range end below row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A3)'],
@@ -518,7 +518,7 @@ describe('Adding row, ranges', () => {
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       [null, null],
       ['2', '=SUM(A1:A4)'],
@@ -527,8 +527,8 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('range start and end in a row', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range start and end in a row', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A2:A2)'],
@@ -541,7 +541,7 @@ describe('Adding row, ranges', () => {
     const a2 = engine.addressMapping.getCell(adr('A2'))
     expect(a2).toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', null],
       [null, null],
       ['2', '=SUM(A3:A3)'],
@@ -552,8 +552,8 @@ describe('Adding row, ranges', () => {
 })
 
 describe('Adding row, column range', () => {
-  it('column range should not be affected', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('column range should not be affected', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1', '=SUM(A:B)'],
       // new row
       ['2', '2'],
@@ -564,7 +564,7 @@ describe('Adding row, column range', () => {
 
     expect(engine.rangeMapping.getRange(colStart('A'), colEnd('B'))).not.toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1', '1', '=SUM(A:B)'],
       [null, null],
       ['2', '2'],
@@ -574,8 +574,8 @@ describe('Adding row, column range', () => {
 })
 
 describe('Adding row, fixing row ranges', () => {
-  it('insert row in middle of row range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('insert row in middle of row range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       /* new row */
       ['2'],
@@ -590,7 +590,7 @@ describe('Adding row, fixing row ranges', () => {
     expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(undefined)
     expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(4))).not.toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1'],
       [null],
       ['2'],
@@ -599,8 +599,8 @@ describe('Adding row, fixing row ranges', () => {
     ]))
   })
 
-  it('insert row before row range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('insert row before row range', async() => {
+const engine = await HyperFormula.buildFromArray([
       /* new row */
       ['1'],
       ['2'],
@@ -613,7 +613,7 @@ describe('Adding row, fixing row ranges', () => {
     expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).toBe(undefined)
     expect(engine.rangeMapping.getRange(rowStart(2), rowEnd(4))).not.toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       [null],
       ['1'],
       ['2'],
@@ -622,8 +622,8 @@ describe('Adding row, fixing row ranges', () => {
     ]))
   })
 
-  it('insert row after row range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('insert row after row range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -635,7 +635,7 @@ describe('Adding row, fixing row ranges', () => {
     engine.addRows(0, [3, 1])
     expect(engine.rangeMapping.getRange(rowStart(1), rowEnd(3))).not.toBe(undefined)
 
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
+    expectEngineToBeTheSameAs(engine, await HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],

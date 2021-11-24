@@ -3,8 +3,8 @@ import {CellValueDetailedType} from '../src/Cell'
 import {adr} from './testUtils'
 
 describe('arithmetic operations', () => {
-  it('addition should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('addition should correctly infer types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1+A1', '=A1+B1', '=A1+C1', '=A1+D1', '=A1+E1', '=A1+F1'],
       ['=B1+A1', '=B1+B1', '=B1+C1', '=B1+D1', '=B1+E1', '=B1+F1'],
@@ -51,8 +51,8 @@ describe('arithmetic operations', () => {
     expect(engine.getCellValueDetailedType(adr('F7'))).toBe(CellValueDetailedType.NUMBER_RAW)
   })
 
-  it('subtraction should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('subtraction should correctly infer types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1-A1', '=A1-B1', '=A1-C1', '=A1-D1', '=A1-E1', '=A1-F1'],
       ['=B1-A1', '=B1-B1', '=B1-C1', '=B1-D1', '=B1-E1', '=B1-F1'],
@@ -99,8 +99,8 @@ describe('arithmetic operations', () => {
     expect(engine.getCellValueDetailedType(adr('F7'))).toBe(CellValueDetailedType.NUMBER_RAW)
   })
 
-  it('multiplication should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('multiplication should correctly infer types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1*A1', '=A1*B1', '=A1*C1', '=A1*D1', '=A1*E1', '=A1*F1'],
       ['=B1*A1', '=B1*B1', '=B1*C1', '=B1*D1', '=B1*E1', '=B1*F1'],
@@ -147,8 +147,8 @@ describe('arithmetic operations', () => {
     expect(engine.getCellValueDetailedType(adr('F7'))).toBe(CellValueDetailedType.NUMBER_RAW)
   })
 
-  it('division should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('division should correctly infer types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1/A1', '=A1/B1', '=A1/C1', '=A1/D1', '=A1/E1', '=A1/F1'],
       ['=B1/A1', '=B1/B1', '=B1/C1', '=B1/D1', '=B1/E1', '=B1/F1'],
@@ -195,8 +195,8 @@ describe('arithmetic operations', () => {
     expect(engine.getCellValueDetailedType(adr('F7'))).toBe(CellValueDetailedType.NUMBER_RAW)
   })
 
-  it('percent should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('percent should correctly infer types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1%', '=B1%', '=C1%', '=D1%', '=E1%', '=F1%'],
     ])
@@ -208,8 +208,8 @@ describe('arithmetic operations', () => {
     expect(engine.getCellValueDetailedType(adr('F2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
-  it('unary minus should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('unary minus should correctly infer types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=-A1', '=-B1', '=-C1', '=-D1', '=-E1', '=-F1'],
     ])
@@ -221,8 +221,8 @@ describe('arithmetic operations', () => {
     expect(engine.getCellValueDetailedType(adr('F2'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
   })
 
-  it('unary plus should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('unary plus should correctly infer types', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=+A1', '=+B1', '=+C1', '=+D1', '=+E1', '=+F1'],
     ])
@@ -236,8 +236,8 @@ describe('arithmetic operations', () => {
 })
 
 describe('formatting info', () => {
-  it('should be preserved by unary minus', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be preserved by unary minus', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=-A1', '=-B1', '=C1'],
     ], {currencySymbol: ['$', 'PLN']})
@@ -246,8 +246,8 @@ describe('formatting info', () => {
     expect(engine.getCellValueFormat(adr('C2'))).toBe('PLN')
   })
 
-  it('should be preserved by unary plus', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be preserved by unary plus', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=+A1', '=+B1', '=+C1'],
     ], {currencySymbol: ['$', 'PLN']})
@@ -256,8 +256,8 @@ describe('formatting info', () => {
     expect(engine.getCellValueFormat(adr('C2'))).toBe('PLN')
   })
 
-  it('should be preserved by addition', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be preserved by addition', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1+A1', '=A1+B1', '=A1+C1'],
       ['=B1+A1', '=B1+B1', '=B1+C1'],
@@ -274,8 +274,8 @@ describe('formatting info', () => {
     expect(engine.getCellValueFormat(adr('C4'))).toBe('PLN')
   })
 
-  it('should be preserved by subtraction', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be preserved by subtraction', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1-A1', '=A1-B1', '=A1-C1'],
       ['=B1-A1', '=B1-B1', '=B1-C1'],
@@ -292,8 +292,8 @@ describe('formatting info', () => {
     expect(engine.getCellValueFormat(adr('C4'))).toBe('PLN')
   })
 
-  it('should be preserved by multiplication', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be preserved by multiplication', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1*A1', '=A1*B1', '=A1*C1'],
       ['=B1*A1', '=B1*B1', '=B1*C1'],
@@ -310,8 +310,8 @@ describe('formatting info', () => {
     expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
   })
 
-  it('should be preserved by division', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be preserved by division', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1/A1', '=A1/B1', '=A1/C1'],
       ['=B1/A1', '=B1/B1', '=B1/C1'],
@@ -330,8 +330,8 @@ describe('formatting info', () => {
 })
 
 describe('Datetime formatting', () => {
-  it('should be correctly inferred by addition', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should be correctly inferred by addition', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1+A1', '=A1+B1', '=A1+C1'],
       ['=B1+A1', '=B1+B1', '=B1+C1'],

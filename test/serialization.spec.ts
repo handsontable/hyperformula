@@ -3,8 +3,8 @@ import {CellValueDetailedType} from '../src/Cell'
 import {adr} from './testUtils'
 
 describe('serialization', () => {
-  it('should not loose sheet information on serialization', () => {
-    const engine1 = HyperFormula.buildFromArray([
+  it('should not loose sheet information on serialization', async() => {
+    const engine1 = await HyperFormula.buildFromArray([
       [1, '2', 'foo', true, '\'1', '33$', '12/01/15', '1%', '=FOO(', '#DIV/0!', new Date(1995, 11, 17) ]
     ])
 
@@ -56,7 +56,7 @@ describe('serialization', () => {
     const serialized = engine1.getAllSheetsSerialized()
 
     // reload data and "restore" the previous state
-    const engine2 = HyperFormula.buildFromSheets(serialized)
+    const engine2 = await HyperFormula.buildFromSheets(serialized)
 
     expect(engine2.getCellSerialized(adr('A1'))).toEqual(1)
     expect(engine2.getCellValueFormat(adr('A1'))).toEqual(undefined)

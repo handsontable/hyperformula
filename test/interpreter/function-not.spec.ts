@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NOT', () => {
-  it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NOT()', '=NOT(TRUE(), TRUE())'],
     ])
 
@@ -13,8 +13,8 @@ describe('Function NOT', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NOT(TRUE())', '=NOT(FALSE())'],
     ])
 
@@ -22,16 +22,16 @@ describe('Function NOT', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(true)
   })
 
-  it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('use coercion', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=NOT("FALSE")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
   })
 
-  it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('propagates error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=4/0'],
       ['=NOT(A1)'],
     ])

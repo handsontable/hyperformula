@@ -9,8 +9,8 @@ const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, date
 }
 
 describe('Function EDATE', () => {
-  it('validate arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('validate arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EDATE("foo", 0)'],
       ['=EDATE(A1, "bar")'],
@@ -24,8 +24,8 @@ describe('Function EDATE', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('works for 0', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for 0', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 10)'],
       ['=EDATE(A1, 0)'],
     ])
@@ -34,8 +34,8 @@ describe('Function EDATE', () => {
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 
-  it('works for exact end of month', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for exact end of month', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EDATE(A1, 0)'],
     ])
@@ -43,8 +43,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '31/03/2019')
   })
 
-  it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for positive numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 7, 31)'],
       ['=EDATE(A1, 1)'],
     ])
@@ -52,8 +52,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '31/08/2019')
   })
 
-  it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for negative numbers', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 8, 31)'],
       ['=EDATE(A1, -1)'],
     ])
@@ -61,8 +61,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '31/07/2019')
   })
 
-  it('works when next date will have more days', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works when next date will have more days', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 6, 30)'],
       ['=EDATE(A1, 1)'],
     ])
@@ -70,8 +70,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '30/07/2019')
   })
 
-  it('works when next date will have less days', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works when next date will have less days', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 1, 31)'],
       ['=EDATE(A1, 1)'],
     ])
@@ -79,8 +79,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '28/02/2019')
   })
 
-  it('works when previous date will have more days', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works when previous date will have more days', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 2, 28)'],
       ['=EDATE(A1, -1)'],
     ])
@@ -88,8 +88,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '28/01/2019')
   })
 
-  it('works when previous date will have less days', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works when previous date will have less days', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EDATE(A1, -1)'],
     ])
@@ -97,8 +97,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '28/02/2019')
   })
 
-  it('use number coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion for 1st argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=EDATE(TRUE(), 1)'],
       ['=EDATE(1, 1)'],
     ])
@@ -107,8 +107,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '31/01/1900')
   })
 
-  it('use number coercion for 2nd argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion for 2nd argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['="1"', '=EDATE(A1, A2)'],
       ['=TRUE()', '=EDATE(A1, A3)'],
@@ -118,8 +118,8 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('B3'), '30/04/2019')
   })
 
-  it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('propagate errors', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=EDATE(4/0, 0)'],
       ['=EDATE(0, 4/0)'],
       ['=EDATE(4/0, FOOBAR())'],

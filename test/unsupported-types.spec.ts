@@ -77,37 +77,37 @@ describe( 'unsupported types should result in error', () => {
       ).toThrowError('Unable to parse value: \"BigInt(9007199254740991)\"')
     }
   })
-  it('should give parsing error for setCellContents', () => {
+  it('should give parsing error for setCellContents', async() => {
     const sheet = [
       [],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const engine = await HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setCellContents(adr('A1'), ()=>{}))
+    expect(() => await engine.setCellContents(adr('A1'), ()=>{}))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setSheetContent(0, [[ () => {} ]]))
+    expect(async() => await engine.setSheetContent(0, [[ () => {} ]]))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
 
-  it('should give error when not an array', () => {
+  it('should give error when not an array', async() => {
     const sheet = [
       [],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const engine = await HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => engine.setSheetContent(0, 1)
+    expect(async() => await engine.setSheetContent(0, 1)
     ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => engine.setSheetContent(0, [1])
+    expect(async() => await engine.setSheetContent(0, [1])
     ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setCellContents(adr('A1'), [1]))
+    expect(() => await engine.setCellContents(adr('A1'), [1]))
       .toThrowError('Invalid arguments, expected an array of arrays or a raw cell value.')
   })
 })

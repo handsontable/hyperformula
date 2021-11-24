@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function COMPLEX', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMPLEX(1)'],
       ['=COMPLEX(1, 2, 3, 4)'],
     ])
@@ -13,8 +13,8 @@ describe('Function COMPLEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMPLEX("foo", 2)'],
       ['=COMPLEX(1, "bar")'],
     ])
@@ -23,8 +23,8 @@ describe('Function COMPLEX', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMPLEX(0, 0)'],
       ['=COMPLEX(0, 1)'],
       ['=COMPLEX(0, -1)'],
@@ -59,8 +59,8 @@ describe('Function COMPLEX', () => {
     expect(engine.getCellValue(adr('A15'))).toEqual('-1-2i')
   })
 
-  it('should work with third argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work with third argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=COMPLEX(1, 1, "i")'],
       ['=COMPLEX(1, 1, "j")'],
       ['=COMPLEX(1, 1, "k")'],

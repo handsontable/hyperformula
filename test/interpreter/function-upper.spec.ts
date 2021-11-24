@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function UPPER', () => {
-  it('should take one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should take one argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UPPER()'],
       ['=UPPER("foo", "bar")'],
     ])
@@ -13,8 +13,8 @@ describe('Function UPPER', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should convert text to uppercase', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should convert text to uppercase', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UPPER("")'],
       ['=UPPER(B1)'],
       ['=UPPER("FOO")'],
@@ -29,8 +29,8 @@ describe('Function UPPER', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual('BAR')
   })
 
-  it('should coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=UPPER(TRUE())'],
       ['=UPPER(0)'],
     ])

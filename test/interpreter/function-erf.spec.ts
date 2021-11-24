@@ -5,8 +5,8 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ERF', () => {
 
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERF()'],
       ['=ERF(1, 2, 3)'],
     ])
@@ -15,8 +15,8 @@ describe('Function ERF', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERF("foo")'],
       ['=ERF(1, "bar")'],
     ])
@@ -25,8 +25,8 @@ describe('Function ERF', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work for single argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work for single argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERF(0)'],
       ['=ERF(1)'],
       ['=ERF(3.14)'],
@@ -38,8 +38,8 @@ describe('Function ERF', () => {
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.999705836979508, 6)
   })
 
-  it('should work with second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work with second argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ERF(-2.3, -0.7)'],
       ['=ERF(-2.3, 2)'],
       ['=ERF(5.6, -3.1)'],

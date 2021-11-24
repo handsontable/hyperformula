@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function T.INV', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T.INV(1)'],
       ['=T.INV(1, 2, 3)'],
     ])
@@ -14,8 +14,8 @@ describe('Function T.INV', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T.INV("foo", 2)'],
       ['=T.INV(0.5, "baz")'],
     ])
@@ -24,8 +24,8 @@ describe('Function T.INV', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T.INV(0.1, 1)'],
       ['=T.INV(0.9, 2)'],
     ])
@@ -34,8 +34,8 @@ describe('Function T.INV', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.88561804936468, 6)
   })
 
-  it('should truncate input', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should truncate input', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T.INV(0.1, 1.9)'],
       ['=T.INV(0.9, 2.9)'],
     ])
@@ -44,8 +44,8 @@ describe('Function T.INV', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.88561804936468, 6)
   })
 
-  it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('checks bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=T.INV(0.01, 1)'],
       ['=T.INV(0, 1)'],
       ['=T.INV(0.99, 1)'],

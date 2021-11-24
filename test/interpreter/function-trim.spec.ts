@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function TRIM', () => {
-  it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return N/A when number of arguments is incorrect', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=TRIM()'],
       ['=TRIM("foo", "bar")']
     ])
@@ -13,8 +13,8 @@ describe('Function TRIM', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=TRIM("   foo")'],
       ['=TRIM("foo   ")'],
       ['=TRIM(" foo   ")'],
@@ -27,8 +27,8 @@ describe('Function TRIM', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual('f o o')
   })
 
-  it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce other types to string', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=TRIM(1)'],
       ['=TRIM(5+5)'],
       ['=TRIM(TRUE())'],

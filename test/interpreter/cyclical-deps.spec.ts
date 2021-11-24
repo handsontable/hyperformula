@@ -3,8 +3,8 @@ import {ErrorType} from '../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
 describe('Cyclical dependencies and error literals', () => {
-  it('Cyclical errors might not propagate', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('Cyclical errors might not propagate', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A2', '=A1'],
       ['=ISERROR(A1)', '=ISERROR(B1)']
     ])
@@ -14,8 +14,8 @@ describe('Cyclical dependencies and error literals', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('B2'))).toEqual(true)
   })
-  it('Errors should be parsed and propagated', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('Errors should be parsed and propagated', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=B1', '=A1', '=ISERROR(B1)', '=C1+D1', '=ISERROR(D1)'],
     ])
 

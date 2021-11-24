@@ -4,8 +4,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function MIRR', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MIRR(1,1)'],
       ['=MIRR(1,1,1,1)'],
     ])
@@ -14,8 +14,8 @@ describe('Function MIRR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return correct value', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return correct value', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MIRR(B1:F1,0.3,-0.1)', 1, 2, -3, -5, 8],
       ['=MIRR(B2:C2,1,1)', -1, 1],
       ['=MIRR(B3:E3,0.2,0.1)', -1, 0, -1, 1],
@@ -30,8 +30,8 @@ describe('Function MIRR', () => {
     expect(engine.getCellValue(adr('A5'))).toBeCloseTo(1.58198889747161, 6)
   })
   
-  it('should return #DIV/0! if "contains at least one positive and one negative value" condition is not met', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #DIV/0! if "contains at least one positive and one negative value" condition is not met', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MIRR(B1:E1,0.2,0.1)', -1, 0, -1, -1],
       ['=MIRR(B2:E2,0.2,0.1)', 1, 0, 1, 1],
     ])
@@ -39,8 +39,8 @@ describe('Function MIRR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('should return #DIV/0! if any rate is -1', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #DIV/0! if any rate is -1', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MIRR(B1:E1,-1,0.1)', -1, 1, -1, -1],
       ['=MIRR(B2:E2,0.2,-1)', 1, -1, 1, 1],
     ])
@@ -48,8 +48,8 @@ describe('Function MIRR', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('should ignore text, boolean and empty values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should ignore text, boolean and empty values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=MIRR(B1:H1,0.2,0.1)', -1, 0, 'abcd', true, null, -1, 1],
     ])
 

@@ -2,39 +2,39 @@ import {ExportedCellChange, HyperFormula} from '../../src'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('Replace sheet content - checking if its possible', () => {
-  it('no if theres no such sheet', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('no if theres no such sheet', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToReplaceSheetContent(1, [])).toEqual(false)
   })
 
-  it('yes otherwise', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+  it('yes otherwise', async() => {
+const engine = await HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToReplaceSheetContent(0, [])).toEqual(true)
   })
 })
 
 describe('Replace sheet content', () => {
-  it('should throw error trying to replace not existing sheet', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should throw error trying to replace not existing sheet', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', 'foo'],
     ])
 
-    expect(() => {
-      engine.setSheetContent(1, [['3', '4']])
+    expect(async() => {
+      await engine.setSheetContent(1, [['3', '4']])
 
     }).toThrowError("There's no sheet with id = 1")
   })
 
-  it('should replace sheet content with new values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should replace sheet content with new values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', 'foo'],
     ])
 
-    engine.setSheetContent(0, [['3', '4']])
+    await engine.setSheetContent(0, [['3', '4']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
@@ -43,13 +43,13 @@ describe('Replace sheet content', () => {
   })
 
   /* for now return only new values */
-  it('should return changes', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return changes', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', 'foo'],
     ])
 
-    const changes = engine.setSheetContent(0, [['3', '4']])
+    const changes = await engine.setSheetContent(0, [['3', '4']])
 
     expectArrayWithSameContent(changes, [
       new ExportedCellChange(adr('A1'), 3),
@@ -58,13 +58,13 @@ describe('Replace sheet content', () => {
   })
 
   /* should we return removed values? */
-  xit('should return new values', () => {
-    const engine = HyperFormula.buildFromArray([
+  xit('should return new values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', 'foo'],
     ])
 
-    const changes = engine.setSheetContent(0, [['3', '4']])
+    const changes = await engine.setSheetContent(0, [['3', '4']])
 
     expect(changes.length).toEqual(4)
 
@@ -76,8 +76,8 @@ describe('Replace sheet content', () => {
     ])
   })
 
-  it('should replace content of a sheet with formula matrix', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should replace content of a sheet with formula matrix', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
         ['{=TRANSPOSE(A1:B1)}'],
@@ -88,7 +88,7 @@ describe('Replace sheet content', () => {
       ],
     })
 
-    engine.setSheetContent(0, [
+    await engine.setSheetContent(0, [
       ['3', '4'],
       ['foo', '5'],
     ])
@@ -97,8 +97,8 @@ describe('Replace sheet content', () => {
     expect(engine.getCellValue(adr('A2', 1))).toBe(null)
   })
 
-  it('should replace content of a sheet with formula matrix and recalculate range formula', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('should replace content of a sheet with formula matrix and recalculate range formula', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
         ['{=TRANSPOSE(A1:B1)}'],
@@ -108,7 +108,7 @@ describe('Replace sheet content', () => {
       ],
     })
 
-    engine.setSheetContent(0, [
+    await engine.setSheetContent(0, [
       ['3', '4'],
       [null, '5'],
     ])

@@ -4,24 +4,24 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ISREF', () => {
-  it('should return true for #REF!', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return true for #REF!', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=#REF!', '=ISREF(A1)'],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(true)
   })
 
-  it('should return true for #CYCLE!', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return true for #CYCLE!', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A1', '=ISREF(A1)'],
     ])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(true)
   })
 
-  it('should return false for other values', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return false for other values', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ISREF(1)', '=ISREF(TRUE())',  '=ISREF("foo")', '=ISREF(A1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
@@ -30,8 +30,8 @@ describe('Function ISREF', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(false)
   })
 
-  it('takes exactly one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('takes exactly one argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ISREF(1, 2)', '=ISREF()'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -39,8 +39,8 @@ describe('Function ISREF', () => {
   })
 
   // Inconsistency with Product 1
-  it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('range value results in VALUE error', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=A1'],
       ['=A2'],
       [],
@@ -51,9 +51,9 @@ describe('Function ISREF', () => {
   })
 
   // Inconsistency with Product 1
-  it('returns #CYCLE! for itself', () => {
+  it('returns #CYCLE! for itself', async() => {
     /* TODO can we handle such case correctly? */
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=ISREF(A1)'],
     ])
 

@@ -5,9 +5,9 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError, timeNumberToString} from '../testUtils'
 
 describe('Function TIME', () => {
-  it('with 3 numerical arguments', () => {
+  it('with 3 numerical arguments', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME(0, 0, 0)', '=TIME(21, 0, 54)', '=TIME(3, 10, 24)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -19,9 +19,9 @@ describe('Function TIME', () => {
     expect(timeNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('03:10:24')
   })
 
-  it('truncation', () => {
+  it('truncation', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME(0.9, 0, 0)', '=TIME(21, 0.5, 54)', '=TIME(3, 10, 24.99)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -32,9 +32,9 @@ describe('Function TIME', () => {
     expect(timeNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('03:10:24')
   })
 
-  it('rollover', () => {
+  it('rollover', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME(24, 0, 0)', '=TIME(19, 120, 54)', '=TIME(0, 189, 84)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -45,9 +45,9 @@ describe('Function TIME', () => {
     expect(timeNumberToString(engine.getCellValue(adr('C1')), config)).toEqual('03:10:24')
   })
 
-  it('negative', () => {
+  it('negative', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME(-1, 59, 0)', '=TIME(0, -1, 59)', '=TIME(0, 1, -61)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NegativeTime))
@@ -55,9 +55,9 @@ describe('Function TIME', () => {
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NegativeTime))
   })
 
-  it('fractions', () => {
+  it('fractions', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME(0, 0.9, 0)', '=TIME(0, 0, -0.9)', '=TIME(0.9, 0, 0)'],
     ], config)
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
@@ -65,9 +65,9 @@ describe('Function TIME', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual(0)
   })
 
-  it('number of arguments', () => {
+  it('number of arguments', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME(0, 1)'],
       ['=TIME(0, 1, 1, 1)'],
     ], config)
@@ -75,9 +75,9 @@ describe('Function TIME', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('with incoercible argument', () => {
+  it('with incoercible argument', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME("foo", 1, 1)'],
       ['=TIME(0, "foo", 1)'],
       ['=TIME(0, 1, "foo")'],
@@ -87,9 +87,9 @@ describe('Function TIME', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('with coercible argument', () => {
+  it('with coercible argument', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['="0"', '=TRUE()'],
       ['=TIME(A1, 1, 1)'],
       ['=TIME(0, B1, 1)'],
@@ -100,9 +100,9 @@ describe('Function TIME', () => {
     expect(timeNumberToString(engine.getCellValue(adr('A4')), config)).toEqual('00:01:01')
   })
 
-  it('precedence of errors', () => {
+  it('precedence of errors', async() => {
     const config = new Config()
-    const engine = HyperFormula.buildFromArray([
+    const engine = await HyperFormula.buildFromArray([
       ['=TIME(FOOBAR(), 4/0, 1)'],
       ['=TIME(0, FOOBAR(), 4/0)'],
       ['=TIME(0, 1, FOOBAR())'],

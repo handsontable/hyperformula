@@ -1,19 +1,16 @@
 import {HyperFormula} from '../src'
-import {ErrorType} from '../src/Cell'
-import {ErrorMessage} from '../src/error-message'
-import {detailedError} from './testUtils'
 
 describe('Temporary formulas - normalization', () => {
-  it('works', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('works', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     const normalizedFormula = engine.normalizeFormula('=SHEET1!A1+10')
 
     expect(normalizedFormula).toEqual('=Sheet1!A1+10')
   })
 
-  it('fail with a typo', () => { 
-    const engine = HyperFormula.buildFromArray([])
+  it('fail with a typo', async() => { 
+    const engine = await HyperFormula.buildFromArray([])
 
     const normalizedFormula = engine.normalizeFormula('=SHET1!A1+10')
     const normalizedFormula2 = engine.normalizeFormula('=SUM(SHET1!A1:A100)')
@@ -22,16 +19,16 @@ describe('Temporary formulas - normalization', () => {
     expect(normalizedFormula2).toEqual('=SUM(SHET1!A1:A100)')
   })
 
-  it('works with absolute addressing', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('works with absolute addressing', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     const normalizedFormula = engine.normalizeFormula('=3*$a$1')
 
     expect(normalizedFormula).toEqual('=3*$A$1')
   })
 
-  it('wont normalize sheet names of not existing sheets', () => {
-    const engine = HyperFormula.buildEmpty()
+  it('wont normalize sheet names of not existing sheets', async() => {
+const engine = await HyperFormula.buildEmpty()
 
     const formula = '=ShEeT1!A1+10'
 
@@ -40,35 +37,35 @@ describe('Temporary formulas - normalization', () => {
 })
 
 describe('Temporary formulas - validation', () => {
-  it('ok for formulas', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('ok for formulas', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     const formula = '=Sheet1!A1+10'
 
     expect(engine.validateFormula(formula)).toBe(true)
   })
 
-  it('fail for simple values', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('fail for simple values', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     expect(engine.validateFormula('42')).toBe(false)
     expect(engine.validateFormula('some text')).toBe(false)
   })
 
-  it('fail when not a formula', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('fail when not a formula', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     expect(engine.validateFormula('=SOME SYNTAX ERRORS')).toBe(false)
   })
 
-  it('ok when literal error', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('ok when literal error', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
     expect(engine.validateFormula('=#N/A')).toBe(true)
   })
 
-  it('validateFormula fails with an empty engine', () => {
-    const engine = HyperFormula.buildEmpty()
+  it('validateFormula fails with an empty engine', async() => {
+const engine = await HyperFormula.buildEmpty()
 
     const formula = '=Sheet1!A1+10'
 
@@ -77,69 +74,69 @@ describe('Temporary formulas - validation', () => {
 })
 
 describe('Temporary formulas - calculation', () => {
-  it('basic usage', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('basic usage', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['42'],
     ])
 
-    const result = engine.calculateFormula('=Sheet1!A1+10', 0)
+    const result = await engine.calculateFormula('=Sheet1!A1+10', 0)
 
     expect(result).toEqual(52)
   })
 
-  it('formulas are executed in context of given sheet', () => {
-    const engine = HyperFormula.buildFromSheets({
+  it('formulas are executed in context of given sheet', async() => {
+const engine = await HyperFormula.buildFromSheets({
       Sheet1: [['42']],
       Sheet2: [['58']],
     })
 
-    expect(engine.calculateFormula('=A1+10', 0)).toEqual(52)
-    expect(engine.calculateFormula('=A1+10', 1)).toEqual(68)
+    expect(await engine.calculateFormula('=A1+10', 0)).toEqual(52)
+    expect(await engine.calculateFormula('=A1+10', 1)).toEqual(68)
   })
 
-  it('when sheet name does not exist', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('when sheet name does not exist', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['42'],
     ])
 
-    expect(() => {
-      engine.calculateFormula('=Sheet1!A1+10', 1)
+    expect(async() => {
+      await engine.calculateFormula('=Sheet1!A1+10', 1)
     }).toThrowError(/no sheet with id/)
   })
 
-  it('SUM with range args', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('SUM with range args', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
-    expect(engine.calculateFormula('=SUM(A1:B2)', 0)).toEqual(10)
+    expect(await engine.calculateFormula('=SUM(A1:B2)', 0)).toEqual(10)
   })
 
-  it('non-scalars work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('non-scalars work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['1', '2'],
       ['1', '2'],
     ])
 
-    const result = engine.calculateFormula('=TRANSPOSE(A1:B2)', 0)
+    const result = await engine.calculateFormula('=TRANSPOSE(A1:B2)', 0)
 
     expect(result).toEqual([[1, 1], [2, 2]])
   })
 
-  it('more non-scalars', () => {
-    const engine = HyperFormula.buildFromArray([[0, 1]])
-    expect(engine.calculateFormula('=ARRAYFORMULA(ISEVEN(A1:B2*3))', 0)).toEqual([[true, false], [true, true]])
+  it('more non-scalars', async() => {
+const engine = await HyperFormula.buildFromArray([[0, 1]])
+    expect(await engine.calculateFormula('=ARRAYFORMULA(ISEVEN(A1:B2*3))', 0)).toEqual([[true, false], [true, true]])
   })
 
-  it('passing something which is not a formula doesnt work', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('passing something which is not a formula doesnt work', async() => {
+const engine = await HyperFormula.buildFromArray([])
 
-    expect(() => {
-      engine.calculateFormula('{=TRANSPOSE(A1:B2)}', 0)
+    expect(async() => {
+      await engine.calculateFormula('{=TRANSPOSE(A1:B2)}', 0)
     }).toThrowError(/not a formula/)
 
-    expect(() => {
-      engine.calculateFormula('42', 0)
+    expect(async() => {
+      await engine.calculateFormula('42', 0)
     }).toThrowError(/not a formula/)
   })
 })

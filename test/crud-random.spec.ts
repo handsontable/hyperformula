@@ -68,15 +68,15 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
   return '=SUM(' + startAddress + ':' + endAddress + ')'
 }
 
-function undoRedo(engine: HyperFormula) {
+async function undoRedo(engine: HyperFormula) {
   if(outputLog) {
-    console.log('engine.undo()')
+    console.log('await engine.undo()')
   }
-  engine.undo()
+  await engine.undo()
   if(outputLog) {
-    console.log('engine.redo()')
+    console.log('await engine.redo()')
   }
-  engine.redo()
+  await engine.redo()
 }
 
 /**
@@ -85,15 +85,17 @@ function undoRedo(engine: HyperFormula) {
  * @param rectFormulas
  * @param rectValues
  */
-function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: Rectangle) {
-  allPts(rectFormulas).forEach((pts) => {
+async function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: Rectangle) {
+  const rectPoints = allPts(rectFormulas)
+
+  for (const pts of rectPoints) {
     const formula = randomRange(engine, rectValues)
     if(outputLog) {
-      console.log(`engine.setCellContents({sheet: 0, col: ${pts.x}, row: ${pts.y}}, '${formula}')`)
+      console.log(`await engine.setCellContents({sheet: 0, col: ${pts.x}, row: ${pts.y}}, '${formula}')`)
     }
-    engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, formula)
-    undoRedo(engine)
-  })
+    await engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, formula)
+    await undoRedo(engine)
+  }
 }
 
 /**
@@ -101,15 +103,17 @@ function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: R
  * @param engine
  * @param rectValues
  */
-function randomVals(engine: HyperFormula, rectValues: Rectangle) {
-  allPts(rectValues).forEach((pts) => {
+async function randomVals(engine: HyperFormula, rectValues: Rectangle) {
+  const rectPoints = allPts(rectValues)
+
+  for (const pts of rectPoints) {
     const val = randomInteger(-10, 10)
     if(outputLog) {
-      console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, ${val})`)
+      console.log(`await engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, ${val})`)
     }
-    engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, val)
-    undoRedo(engine)
-  })
+    await engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, val)
+    await undoRedo(engine)
+  }
 }
 
 /**
@@ -158,22 +162,22 @@ function shuffleArray<T>(array: T[]): T[] {
  * @param sideX
  * @param sideY
  */
-function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: number, sideY: number) {
+async function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: number, sideY: number) {
   if(outputLog) {
     console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}), {sheet: 0, col: 1000, row: 1000})`)
   }
   engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY), {sheet: 0, col: 1000, row: 1000})
-  undoRedo(engine)
+  await undoRedo(engine)
   if(outputLog) {
     console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
   }
   engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY), {sheet: 0, col: pts1.x, row: pts1.y})
-  undoRedo(engine)
+  await undoRedo(engine)
   if(outputLog) {
     console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
   }
   engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, sideX, sideY), {sheet: 0, col: pts2.x, row: pts2.y})
-  undoRedo(engine)
+  await undoRedo(engine)
 }
 
 /**
@@ -185,39 +189,41 @@ function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: nu
  *
  * The outcome should be that there are no cells in the engine.
  */
-function randomCleanup(engine: HyperFormula, rect: Rectangle) {
-  shuffleArray(allPts(rect)).forEach((pts) => {
-      if(outputLog) {
-        console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null)`)
-      }
-      engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
-      undoRedo(engine)
+async function randomCleanup(engine: HyperFormula, rect: Rectangle) {
+  const rectPoints = shuffleArray(allPts(rect))
+
+  for (const pts of rectPoints) {
+    if(outputLog) {
+      console.log(`await engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null)`)
     }
-  )
+    await engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
+    await undoRedo(engine)
+  }
+
 }
 
 describe('large psuedo-random test', () => {
-  it('growing rectangle + addRows + addColumns + removeRows + removeColumns should produce the same sheet as static sheet', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('growing rectangle + addRows + addColumns + removeRows + removeColumns should produce the same sheet as static sheet', async() => {
+const engine = await HyperFormula.buildFromArray([])
     let sideX = 3
     const n = 4
     let sideY = 3
     for(let rep=0;rep<3;rep++) {
-      randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
-      verifyValues(engine)
+      await randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
+      await verifyValues(engine)
       for (let i = 0; i < n; i++) {
-        randomSums(engine,
+        await randomSums(engine,
           rectangleFromCorner({x: sideX * (i + 1), y: 0}, sideX, sideY),
           rectangleFromCorner({x: sideX * i, y: 0}, sideX, sideY)
         )
-        verifyValues(engine)
+        await verifyValues(engine)
       }
       for (let i = 0; i < n; i++) {
-        randomSums(engine,
+        await randomSums(engine,
           rectangleFromCorner({x: sideX * (i + 1), y: 0}, sideX, sideY),
           rectangleFromCorner({x: 0, y: 0}, sideX * (i+1), sideY)
         )
-        verifyValues(engine)
+        await verifyValues(engine)
       }
       for (let i=0; i<n; i++) {
         const columnPositionToAdd = randomInteger(0, sideX*(n+1)+1)
@@ -225,14 +231,14 @@ describe('large psuedo-random test', () => {
           console.log(`engine.addColumns(0, [${columnPositionToAdd},2])`)
         }
         engine.addColumns(0, [columnPositionToAdd, 2])
-        undoRedo(engine)
-        verifyValues(engine)
+        await undoRedo(engine)
+        await verifyValues(engine)
         const columnPositionToRemove = randomInteger(0, sideX*(n+1))
         if(outputLog) {
           console.log(`engine.removeColumns(0, [${columnPositionToRemove},1])`)
         }
         engine.removeColumns(0, [columnPositionToRemove, 1])
-        undoRedo(engine)
+        await undoRedo(engine)
       }
       sideX += 1
 
@@ -241,25 +247,25 @@ describe('large psuedo-random test', () => {
         console.log(`engine.addRows(0, [${rowPositionToAdd},2])`)
       }
       engine.addRows(0, [rowPositionToAdd, 2])
-      undoRedo(engine)
+      await undoRedo(engine)
       sideY += 2
-      verifyValues(engine)
+      await verifyValues(engine)
       const rowPositionToRemove = randomInteger(0, sideY)
       if(outputLog) {
         console.log(`engine.removeRows(0, [${rowPositionToRemove},1])`)
       }
       engine.removeRows(0, [rowPositionToRemove, 1])
-      undoRedo(engine)
+      await undoRedo(engine)
       sideY -= 1
-      verifyValues(engine)
+      await verifyValues(engine)
       const x1 = randomInteger(0, n*sideX)
       const x2 = randomInteger(0, n*sideX)
       const y1 = randomInteger(0, sideY)
       const y2 = randomInteger(0, sideY)
-      swapTwoRectangles(engine, {x: x1, y: y1}, {x: x2, y: y2}, sideX, sideY)
-      verifyValues(engine)
+      await swapTwoRectangles(engine, {x: x1, y: y1}, {x: x2, y: y2}, sideX, sideY)
+      await verifyValues(engine)
     }
-    randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, 2 * (n + 1) * sideX, 2 * sideY))
+    await randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, 2 * (n + 1) * sideX, 2 * sideY))
     expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })

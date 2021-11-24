@@ -72,8 +72,8 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     })
 
-    it('should propagate errors properly', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('should propagate errors properly', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=VLOOKUP(1/0, B1:B1, 1)'],
         ['=VLOOKUP(1, B1:B1, 1/0)'],
         ['=VLOOKUP(1, A10:A11, 1, NA())']
@@ -257,7 +257,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
     })
 
-    it('should work after updating standard matrix', () => {
+    it('should work after updating standard matrix', async() => {
       const engine = builder([
         ['=VLOOKUP(4, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
@@ -267,7 +267,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
       expect(engine.getCellValue(adr('A1'))).toEqual(6)
 
-      engine.setCellContents(adr('C2'), '5')
+      await engine.setCellContents(adr('C2'), '5')
 
       expect(engine.getCellValue(adr('A1'))).toEqual(5)
     })
@@ -308,8 +308,8 @@ describe('BinarySearchStrategy', () => {
     })
   })
 
-  it('should calculate indexes properly when using binary search', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate indexes properly when using binary search', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
       [],
       [],
@@ -324,8 +324,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
-  it('should calculate indexes properly when using naive approach', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate indexes properly when using naive approach', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=VLOOKUP(4, A5:A10, 1, FALSE())'],
       [],
       [],
@@ -340,8 +340,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
-  it('should coerce null to zero when using naive approach', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should coerce null to zero when using naive approach', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=VLOOKUP(, A2:A4, 1, FALSE())'],
       [1],
       [3],
@@ -351,8 +351,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 
-  it('should work on column ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work on column ranges', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=VLOOKUP(2,B:C,2)', 1, 'a'],
       [null, 2, 'b'],
       [null, 3, 'c'],
@@ -360,8 +360,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('b')
   })
 
-  it('works for strings, is not case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for strings, is not case sensitive', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['a', '1'],
       ['b', '2'],
       ['c', '3'],
@@ -373,8 +373,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(1)
   })
 
-  it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('works for strings, is not case sensitive even if config defines case sensitivity', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['a', '1'],
       ['b', '2'],
       ['c', '3'],
@@ -386,8 +386,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(1)
   })
 
-  it('should find value in sorted range', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should find value in sorted range', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['a', '1'],
       ['B', '2'],
       ['c', '3'],
@@ -398,8 +398,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(2)
   })
 
-  it('should properly report no match', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should properly report no match', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=VLOOKUP("0", A2:A5, 1)'],
       [1],
       [2],
@@ -410,8 +410,8 @@ describe('BinarySearchStrategy', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
   })
 
-  it('should properly report approximate matching', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should properly report approximate matching', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=VLOOKUP("2", A2:A5, 1)'],
       [1],
       [2],

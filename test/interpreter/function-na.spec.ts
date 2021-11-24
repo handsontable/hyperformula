@@ -2,8 +2,8 @@ import {ErrorType, HyperFormula} from '../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NA', () => {
-    it('should work', () => {
-      const engine = HyperFormula.buildFromArray([
+    it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
         ['=NA()', '=NA(1)'],
       ])
 

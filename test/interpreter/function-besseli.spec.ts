@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function BESSELI', () => {
-  it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BESSELI(1)'],
       ['=BESSELI(1, 2, 3)'],
     ])
@@ -13,8 +13,8 @@ describe('Function BESSELI', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return error for arguments of wrong type', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BESSELI("foo", 1)'],
       ['=BESSELI(2, "foo")'],
     ])
@@ -23,8 +23,8 @@ describe('Function BESSELI', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-  it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should work', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BESSELI(-1,0)'],
       ['=BESSELI(0,0)'],
       ['=BESSELI(5,0)'],
@@ -47,8 +47,8 @@ describe('Function BESSELI', () => {
     expect(engine.getCellValue(adr('A9'))).toBeCloseTo(10.3311501959992, 6)
   })
 
-  it('should check bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should check bounds', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BESSELI(1, -0.001)'],
     ])
 
@@ -56,8 +56,8 @@ describe('Function BESSELI', () => {
 
   })
 
-  it('should truncate second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should truncate second argument', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=BESSELI(-1,0.9)'],
       ['=BESSELI(0,0.9)'],
       ['=BESSELI(5,0.9)'],

@@ -3,8 +3,8 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function ISPMT', () => {
-  it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should return #NA! error with the wrong number of arguments', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ISPMT(1,1,1)', '=ISPMT(1, 1, 1, 1, 1)'],
     ])
 
@@ -12,8 +12,8 @@ describe('Function ISPMT', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('should calculate the correct value with correct arguments and defaults', async() => {
+const engine = await HyperFormula.buildFromArray([
       ['=ISPMT(1, 1, 10, 1)', '=ISPMT(1, 1, 0, 1)', '=ISPMT(1, -1, 1, 1)', '=ISPMT(-1, -1, 1, -1)'],
     ])
 
