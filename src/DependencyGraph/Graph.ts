@@ -178,7 +178,20 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes))
+    const { order, sccNonSingletons } = this.getOrderOfNodes(Array.from(this.nodes))
+    const sorted: T[] = []
+    const cycled: T[] = []
+
+    order.forEach( (t: T) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
+        cycled.push(t)
+      } else {
+        sorted.push(t)
+      }
+    })
+
+    return { sorted, cycled }
   }
 
   /**
@@ -187,10 +200,11 @@ export class Graph<T> {
    * returns vertices in order of topological sort, but vertices that are on cycles are kept separate
    *
    * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
-   * @param operatingFunction - recomputes value of a node, and returns whether a change occured
-   * @param onCycle - action to be performed when node is on cycle
    */
-  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[]): TopSortResult<T> {
+  public getOrderOfNodes(modifiedNodes: T[]): {
+    order: T[],
+    sccNonSingletons: Set<T>,
+  } {
 
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
@@ -277,18 +291,31 @@ export class Graph<T> {
       }
     })
 
+    order.reverse()
 
+    return { order, sccNonSingletons }
+  }
+
+  public async getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => Promise<boolean>, onCycle: (node: T) => void): Promise<TopSortResult<T>> {
+    const { order, sccNonSingletons } = this.getOrderOfNodes(modifiedNodes)
+    const shouldBeUpdatedMapping = new Set(modifiedNodes)
     const sorted: T[] = []
     const cycled: T[] = []
-    order.reverse()
-    order.forEach( (t: T) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
-          cycled.push(t)
-        } else {
-          sorted.push(t)
+
+    for (const t of order) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
+        cycled.push(t)
+        onCycle(t)
+        this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
+      } else {
+        sorted.push(t)
+        if ( shouldBeUpdatedMapping.has(t) && await operatingFunction(t)) {
+          this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
         }
-      })
+      }
+    }
+
     return { sorted, cycled }
   }
 

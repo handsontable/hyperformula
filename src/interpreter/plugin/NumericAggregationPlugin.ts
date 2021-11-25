@@ -549,25 +549,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
 
-    const accum = args.reduce((acc: T | CellError, arg) => {
-      if (acc instanceof CellError) {
-        return acc
-      }
-      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
-        const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
-        if(val instanceof CellError) {
-          return val
-        }
-        return reducingFunction(val, acc)
-      }
-
-      return acc
-    }, initialAccValue)
-
     const promises = args.map((arg) => {
-      const interpreterValue = this.evaluateAst(arg, state)
-      
-      return Promise.resolve(interpreterValue)
+      return this.evaluateAst(arg, state)
     })
 
     const values = await Promise.all(promises)
@@ -578,8 +561,20 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
 
       value = interpreterValue
 
-      if (arg instanceof SimpleRangeValue) {
-        const coercedRangeValues = Array.from(arg.valuesFromTopLeftCorner())
+      if (acc instanceof CellError) {
+        return acc
+      }
+
+      if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
+        const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
+        if(val instanceof CellError) {
+          return val
+        }
+        return reducingFunction(val, acc)
+      }
+
+      if (value instanceof SimpleRangeValue) {
+        const coercedRangeValues = Array.from(value.valuesFromTopLeftCorner())
           .map(coercionFunction)
           .filter((arg) => (arg !== undefined)) as (CellError | number)[]
 
@@ -601,12 +596,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
             }
           }, acc)
       } else if (arg.type === AstNodeType.CELL_REFERENCE) {
-        value = coercionFunction(value as InternalScalarValue)
+        value = coercionFunction(value)
         if (value === undefined) {
           return acc
         }
       } else {
-        value = this.coerceScalarToNumberOrError(value as InternalScalarValue)
+        value = this.coerceScalarToNumberOrError(value)
         value = coercionFunction(value)
         if (value === undefined) {
           return acc
@@ -617,8 +612,8 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         return value
       }
 
-      return reducingFunction(acc as T, mapFunction(value))
-    }, accum)
+      return reducingFunction(acc, mapFunction(value))
+    }, initialAccValue)
   }
 
   /**
