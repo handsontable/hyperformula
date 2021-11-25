@@ -1007,8 +1007,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Instance
    */
-  public rebuildAndRecalculate(): void {
-    this.updateConfig({})
+  public rebuildAndRecalculate(): Promise<void> {
+    return this.updateConfig({})
   }
 
   /**
@@ -3392,11 +3392,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Batch
    */
-  public async batch(batchOperations: () => any): Promise<ExportedChange[]> {
+  public async batch(batchOperations: () => Promise<void>): Promise<ExportedChange[]> {
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
-      batchOperations()
+      await batchOperations()
     } catch (e) {
       this._crudOperations.commitUndoRedoBatchMode()
       this.resumeEvaluation()

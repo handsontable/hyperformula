@@ -6,7 +6,7 @@ describe('Rebuilding engine', () => {
   it('should preserve absolute named expression', async() => {
 const engine = await HyperFormula.buildFromArray([['=FALSE']])
     await engine.addNamedExpression('FALSE', '=FALSE()')
-    engine.rebuildAndRecalculate()
+    await engine.rebuildAndRecalculate()
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
   })
 
@@ -16,7 +16,7 @@ const engine = await HyperFormula.buildFromSheets({
       'Sheet2': [['=FALSE']]
     })
     await engine.addNamedExpression('FALSE', '=FALSE()', 0)
-    engine.rebuildAndRecalculate()
+    await engine.rebuildAndRecalculate()
     expect(engine.getCellValue(adr('A1', 0))).toEqual(false)
     expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FALSE')))
   })
@@ -26,7 +26,7 @@ const engine = await HyperFormula.buildFromSheets({
       'Sheet1': [['42', '=FOO']],
     })
     await engine.addNamedExpression('FOO', '=Sheet1!$A$1')
-    engine.rebuildAndRecalculate()
+    await engine.rebuildAndRecalculate()
 
     expect(engine.getCellValue(adr('B1', 0))).toEqual(42)
   })
@@ -38,7 +38,7 @@ const engine = await HyperFormula.buildFromSheets({
     }, {}, [{name: 'FALSE', expression: false, scope: 1}])
 
     await engine.removeSheet(0)
-    engine.rebuildAndRecalculate()
+    await engine.rebuildAndRecalculate()
     expect(engine.getCellValue(adr('B1'))).toEqual(false)
   })
 })

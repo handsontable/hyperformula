@@ -60,7 +60,7 @@ const engine = await HyperFormula.buildFromArray([])
 
     engine.addSheet('Sheet2')
     await engine.setSheetContent(1, [['1']])
-    engine.rebuildAndRecalculate()
+    await engine.rebuildAndRecalculate()
 
     expect(engine.getCellValue(adr('A1', 1))).toBe(1)
     expect(engine.getCellValue(adr('A1', 0))).toBe(1)
@@ -74,7 +74,7 @@ const engine = await HyperFormula.buildFromArray([])
         null, // broken sheet
         [6, 7]
       ] as any)
-    }).toThrowError('Invalid arguments, expected an array of arrays.')
+    }).rejects.toThrowError('Invalid arguments, expected an array of arrays.')
   })
 })
 
