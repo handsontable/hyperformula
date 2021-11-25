@@ -26,7 +26,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
       arraySizeMethod: 'arraysizeFoo',
     },
     'ASYNC_FOO': {
-      method: 'asyncFoo',
+      method: 'asyncFoo'
     }
   }
 
@@ -61,7 +61,9 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     return new ArraySize(2, 2)
   }
 
-  public asyncFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {    
+  public async asyncFoo(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    const left = await this.evaluateAst(ast.args[0], state) as number
+
     return new Promise(resolve => setTimeout(() => resolve('asyncFoo'), 1000))
   }
 }
@@ -390,15 +392,16 @@ describe('aliases', () => {
   })
 })
 
-describe('Async functions', () => {
-  it('should register simple async function', async() => {
+describe.only('async functions', () => {
+  it.only('should optimize with Promise.all async functions at each level', async() => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const engine = await HyperFormula.buildFromArray([
-      ['=FOO()', '=ASYNC_FOO()']
+      [1, '=ASYNC_FOO(A1)', '=ASYNC_FOO(A1+A5)', '=ASYNC_FOO(A2)', 6],
+      [2, '=ASYNC_FOO(B1)']
     ])
 
     const values = engine.getSheetValues(0)
 
-    expect(values).toEqual([['foo', 'asyncFoo']])
+    expect(values).toEqual([['3', 'asyncFoo']])
   })
 })
