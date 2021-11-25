@@ -11,43 +11,43 @@ const BigIntSupported = (function(): boolean {
 })()
 
 describe( 'unsupported types should result in error', () => {
-  it('should give parsing error #1', () => {
+  it('should give parsing error #1', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[[]]])
     )()).rejects.toThrowError('Unable to parse value: []')
   })
-  it('should give parsing error #2', () => {
+  it('should give parsing error #2', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[{}]])
     )()).rejects.toThrowError('Unable to parse value: {}')
   })
-  it('should give parsing error #3', () => {
+  it('should give parsing error #3', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[() => {}]]))())
       .rejects.toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
-  it('should give parsing error #4', () => {
+  it('should give parsing error #4', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromSheets({Sheet1: [[ () => {}]], Sheet2: [[ () => {}]]}))())
       .rejects.toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
-  it('should give parsing error #5', () => {
+  it('should give parsing error #5', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[Symbol()]])
     )()).rejects.toThrowError('Unable to parse value: \"Symbol()\"')
   })
-  it('should give parsing error #6', () => {
+  it('should give parsing error #6', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[/abcd/]])
     )()).rejects.toThrowError('Unable to parse value: \"RegExp(/abcd/)\"')
   })
-  it('should give parsing error #7', () => {
+  it('should give parsing error #7', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[{sym: Symbol()}]])
@@ -55,13 +55,13 @@ describe( 'unsupported types should result in error', () => {
       '    \"sym\": \"Symbol()\"\n' +
       '}')
   })
-  it('should give parsing error #9', () => {
+  it('should give parsing error #9', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[Symbol('a')]])
     )()).rejects.toThrowError('Unable to parse value: \"Symbol(a)\"')
   })
-  it('should give parsing error #10', () => {
+  it('should give parsing error #10', async() => {
     // eslint-disable-next-line
     // @ts-ignore
     await expect((async() => await HyperFormula.buildFromArray([[[Symbol(/abcd/)]]])
@@ -69,7 +69,7 @@ describe( 'unsupported types should result in error', () => {
       '    \"Symbol(/abcd/)\"\n' +
       ']')
   })
-  it('should give parsing error #11', () => {
+  it('should give parsing error #11', async() => {
     if(BigIntSupported) {
       // eslint-disable-next-line
       // @ts-ignore
