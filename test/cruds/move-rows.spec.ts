@@ -91,12 +91,12 @@ const engine = await HyperFormula.buildFromArray([
       ['2']
     ])
 
-    expect(async() => await engine.moveRows(0, 0, 1, -1)).toThrow(new InvalidArgumentsError('row number to be nonnegative and number of rows to add to be positive.'))
-    expect(async() => await engine.moveRows(0, 0, 1, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(async() => await engine.moveRows(0, 0, 1, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(async() => await engine.moveRows(0, 0, 2, 0)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(async() => await engine.moveRows(0, 0, 2, 1)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
-    expect(async() => await engine.moveRows(0, 0, 2, 2)).toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 1, -1)).rejects.toThrow(new InvalidArgumentsError('row number to be nonnegative and number of rows to add to be positive.'))
+    expect(async() => await engine.moveRows(0, 0, 1, 1)).rejects.toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 1, 0)).rejects.toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 2, 0)).rejects.toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 2, 1)).rejects.toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
+    expect(async() => await engine.moveRows(0, 0, 2, 2)).rejects.toThrow(new InvalidArgumentsError('a valid range of rows to move.'))
   })
 
   it('should move one row', async() => {

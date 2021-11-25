@@ -405,8 +405,8 @@ const engine = await HyperFormula.buildFromArray([
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
 
-    expect(async() => await engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).toThrow(new SheetSizeLimitExceededError())
-    expect(async() => await engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
+    expect(async() => await engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).rejects.toThrow(new SheetSizeLimitExceededError())
+    expect(async() => await engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 })
 

@@ -363,8 +363,8 @@ const engine = await HyperFormula.buildFromArray([
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
 
-    expect(async() => await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), cellInLastColumn)).toThrow(new SheetSizeLimitExceededError())
-    expect(async() => await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), cellInLastRow)).toThrow(new SheetSizeLimitExceededError())
+    expect(async() => await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), cellInLastColumn)).rejects.toThrow(new SheetSizeLimitExceededError())
+    expect(async() => await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), cellInLastRow)).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 })
 
@@ -429,7 +429,8 @@ const engine = await HyperFormula.buildFromArray([
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2), adr('C1'))
+    expect(async() => {
+      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2), adr('C1'))
     }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
@@ -439,7 +440,8 @@ const engine = await HyperFormula.buildFromArray([
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('A2'))
+    expect(async() => {
+      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('A2'))
     }).rejects.toThrowError('Cannot perform this operation, target location has an array inside.')
   })
 
@@ -918,7 +920,8 @@ describe('move cells with matrices', () => {
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1), adr('A3'))
+    expect(async() => {
+      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1), adr('A3'))
     }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
@@ -928,7 +931,8 @@ describe('move cells with matrices', () => {
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1), adr('A3'))
+    expect(async() => {
+      await engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1), adr('A3'))
     }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 })

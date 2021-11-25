@@ -13,7 +13,7 @@ const engine = await HyperFormula.buildEmpty()
     expect(engine?.dependencyGraph).toBeUndefined()
   })
 
-  it('should not affect other instances', () => {
+  it('should not affect other instances', async() => {
     const engine1 = await HyperFormula.buildEmpty()
     const engine2 = await HyperFormula.buildEmpty()
     engine1.destroy()
@@ -22,7 +22,7 @@ const engine = await HyperFormula.buildEmpty()
     expect(() => engine3.getConfig()).not.toThrow()
   })
 
-  it('should not affect static methods', () => {
+  it('should not affect static methods', async() => {
     const engine1 = await HyperFormula.buildEmpty()
     engine1.destroy()
     expect(() => HyperFormula.getAllFunctionPlugins()).not.toThrow()
