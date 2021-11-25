@@ -808,9 +808,9 @@ describe('Undo', () => {
   it('when there is no operation to undo', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.undo()
-    }).rejects.toThrow(new NoOperationToUndoError())
+    })()).rejects.toThrow(new NoOperationToUndoError())
   })
 
   it('undo recomputes and return changes', async() => {
@@ -889,7 +889,7 @@ const engine = await HyperFormula.buildFromArray([])
     await engine.addColumns(0, [3, 1])
     await engine.removeColumns(0, [0, 1])
 
-    await expect(async() => await engine.undo()).resolves.not.toThrowError()
+    await expect((async() => await engine.undo())()).resolves.not.toThrowError()
     expect(engine.getCellFormula(adr('F1'))).toEqual('=SUM(A1:C1)')
   })
 })
@@ -1665,9 +1665,9 @@ describe('Redo', () => {
   it('when there is no operation to redo', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.redo()
-    }).rejects.toThrow(new NoOperationToRedoError())
+    })()).rejects.toThrow(new NoOperationToRedoError())
   })
 
   it('redo recomputes and return changes', async() => {

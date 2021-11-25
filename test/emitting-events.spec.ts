@@ -94,9 +94,9 @@ const engine = await HyperFormula.buildFromArray([[]])
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
-    await expect(async() => {
+    await expect((async() => {
       await engine.removeNamedExpression('myName')
-    }).rejects.toThrow(new NamedExpressionDoesNotExistError('myName'))
+    })()).rejects.toThrow(new NamedExpressionDoesNotExistError('myName'))
   })
 
   it('namedExpressionRemoved contains actual named expression name', async() => {

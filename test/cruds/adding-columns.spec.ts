@@ -274,13 +274,13 @@ const engine = await HyperFormula.buildFromArray([
       Array(Config.defaultConfig.maxColumns - 1).fill('')
     ])
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addColumns(0, [0, 2])
-    }).rejects.toThrow(new SheetSizeLimitExceededError())
+    })()).rejects.toThrow(new SheetSizeLimitExceededError())
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addColumns(0, [0, 1], [5, 1])
-    }).rejects.toThrow(new SheetSizeLimitExceededError())
+    })()).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 })
 

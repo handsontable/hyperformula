@@ -6,57 +6,57 @@ describe('swapping rows - checking if it is possible', () => {
   it('should validate numbers for negative rows', async() => {
 const engine = await HyperFormula.buildFromArray([[]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[-1, 0]])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.swapRowIndexes(0, [[-1, 0]])
-    ).rejects.toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
+    )()).rejects.toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 
   it('should validate sources for noninteger values', async() => {
 const engine = await HyperFormula.buildFromArray([[]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[1, 1], [0.5, 0]])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.swapRowIndexes(0, [[1, 1], [0.5, 0]])
-    ).rejects.toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
+    )()).rejects.toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 
   it('should validate sources for values exceeding sheet height', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], [0]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[1, 1], [3, 0]])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.swapRowIndexes(0, [[3, 0]])
-    ).rejects.toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
+    )()).rejects.toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 
   it('should validate sources to be unique', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], [0]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 0], [1, 1], [1, 2]])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.swapRowIndexes(0, [[0, 0], [1, 1], [1, 2]])
-    ).rejects.toThrowError('Invalid arguments, expected source row numbers to be unique.')
+    )()).rejects.toThrowError('Invalid arguments, expected source row numbers to be unique.')
   })
 
   it('should validate sources to be permutation of targets', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], [0]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 0], [1, 1], [2, 1]])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.swapRowIndexes(0, [[0, 0], [1, 1], [2, 1]])
-    ).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
+    )()).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
   })
 
   it('should check for matrices', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.swapRowIndexes(0, [[0, 2], [1, 1], [2, 0]])
-    ).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
+    )()).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should check for matrices only in moved rows', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])).toEqual(true)
-    await expect(async() =>
+    await expect((async() =>
       await engine.swapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])
-    ).resolves.not.toThrowError()
+    )()).resolves.not.toThrowError()
   })
 })
 
@@ -186,49 +186,49 @@ describe('setting row order - checking if it is possible', () => {
   it('should check for length', async() => {
 const engine = await HyperFormula.buildFromArray([[]])
     expect(engine.isItPossibleToSetRowOrder(0, [0])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.setRowOrder(0, [0])
-    ).rejects.toThrowError('Invalid arguments, expected number of rows provided to be sheet height.')
+    )()).rejects.toThrowError('Invalid arguments, expected number of rows provided to be sheet height.')
   })
 
   it('should validate sources for noninteger values', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0]])
     expect(engine.isItPossibleToSetRowOrder(0, [0, 0.5])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.setRowOrder(0, [0, 0.5])
-    ).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
+    )()).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
   })
 
   it('should validate for repeated values', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], [0]])
     expect(engine.isItPossibleToSetRowOrder(0, [0, 1, 1])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.setRowOrder(0, [0, 1, 1])
-    ).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
+    )()).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
   })
 
   it('should validate sources to be permutation of targets', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], [0]])
     expect(engine.isItPossibleToSetRowOrder(0, [1, 2, 3])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.setRowOrder(0, [1, 2, 3])
-    ).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
+    )()).rejects.toThrowError('Invalid arguments, expected target row numbers to be permutation of source row numbers.')
   })
 
   it('should check for matrices', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSetRowOrder(0, [2, 1, 0])).toEqual(false)
-    await expect(async() =>
+    await expect((async() =>
       await engine.setRowOrder(0, [2, 1, 0])
-    ).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
+    )()).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
   })
 
   it('should check for matrices only in moved rows', async() => {
 const engine = await HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)']])
     expect(engine.isItPossibleToSetRowOrder(0, [1, 0, 2])).toEqual(true)
-    await expect(async() =>
+    await expect((async() =>
       await engine.setRowOrder(0, [1, 0, 2])
-    ).resolves.not.toThrowError()
+    )()).resolves.not.toThrowError()
   })
 })
 

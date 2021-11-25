@@ -19,9 +19,9 @@ describe('Clear sheet content', () => {
   it('should throw error when trying to clear not existing sheet', async() => {
 const engine = await HyperFormula.buildFromArray([[]])
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.clearSheet(1)
-    }).rejects.toThrow(new NoSheetWithIdError(1))
+    })()).rejects.toThrow(new NoSheetWithIdError(1))
   })
 
   it('should clear sheet content', async() => {

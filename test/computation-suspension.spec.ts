@@ -171,9 +171,9 @@ const engine = await HyperFormula.buildFromArray([
       engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
       engine.suspendEvaluation()
 
-      await expect(async() => {
+      await expect((async() => {
         await engine.paste(adr('A3'))
-      }).rejects.toThrow(new EvaluationSuspendedError())
+      })()).rejects.toThrow(new EvaluationSuspendedError())
     })
   })
 

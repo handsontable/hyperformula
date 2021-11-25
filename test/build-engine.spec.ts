@@ -67,14 +67,14 @@ const engine = await HyperFormula.buildFromArray([])
   })
 
   it('corrupted sheet definition', async() => {
-    await expect(async() => {
+    await expect((async() => {
       await HyperFormula.buildFromArray([
         [0, 1],
         [2, 3],
         null, // broken sheet
         [6, 7]
       ] as any)
-    }).rejects.toThrowError('Invalid arguments, expected an array of arrays.')
+    })()).rejects.toThrowError('Invalid arguments, expected an array of arrays.')
   })
 })
 

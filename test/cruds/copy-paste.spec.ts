@@ -47,9 +47,9 @@ const engine = await HyperFormula.buildFromArray([])
   it('paste raise error when there is nothing in clipboard', async() => {
 const engine = await HyperFormula.buildFromArray([])
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.paste(adr('A2'))
-    }).rejects.toThrow(new NothingToPasteError())
+    })()).rejects.toThrow(new NothingToPasteError())
   })
 
   it('copy should return values', async() => {
@@ -355,9 +355,9 @@ const engine = await HyperFormula.buildFromArray([
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.paste(adr('A3'))
-    }).rejects.toThrowError('It is not possible to paste onto an array')
+    })()).rejects.toThrowError('It is not possible to paste onto an array')
   })
 
   it('should not be possible to paste to not existing sheet', async() => {
@@ -367,9 +367,9 @@ const engine = await HyperFormula.buildFromSheets({
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.paste(adr('A1', 1))
-    }).rejects.toThrowError('Invalid arguments, expected a valid target address.')
+    })()).rejects.toThrowError('Invalid arguments, expected a valid target address.')
   })
 
   it('should copy references with absolute sheet id', async() => {
@@ -405,8 +405,8 @@ const engine = await HyperFormula.buildFromArray([
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
 
-    await expect(async() => await engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).rejects.toThrow(new SheetSizeLimitExceededError())
-    await expect(async() => await engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect((async() => await engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)))()).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect((async() => await engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows)))()).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 })
 

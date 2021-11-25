@@ -91,27 +91,27 @@ describe('Named expressions - absolute references only', () => {
   it('adding named expression allows only for absolute addresses', async() => {
 const engine = await HyperFormula.buildFromArray([])
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addNamedExpression('foo', '=A1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.addNamedExpression('foo', '=Sheet1!A1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.addNamedExpression('foo', '=$A$1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.addNamedExpression('foo', '=Sheet1!$A1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.addNamedExpression('foo', '=Sheet1!A$1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.addNamedExpression('foo', '=Sheet1!A1:A2')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.addNamedExpression('foo', '=Sheet1!A:B')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
   })
 
   it('changing named expression allows only for absolute addresses', async() => {
@@ -119,27 +119,27 @@ const engine = await HyperFormula.buildFromArray([])
 
     await engine.addNamedExpression('foo', 'foo')
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.changeNamedExpression('foo', '=A1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.changeNamedExpression('foo', '=Sheet1!A1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.changeNamedExpression('foo', '=$A$1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.changeNamedExpression('foo', '=Sheet1!$A1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.changeNamedExpression('foo', '=Sheet1!A$1')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.changeNamedExpression('foo', '=Sheet1!A1:A2')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
-    await expect(async() => {
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    await expect((async() => {
       await engine.changeNamedExpression('foo', '=Sheet1!A:B')
-    }).rejects.toThrow(new NoRelativeAddressesAllowedError())
+    })()).rejects.toThrow(new NoRelativeAddressesAllowedError())
   })
 })
 
@@ -224,34 +224,34 @@ const engine = await HyperFormula.buildFromArray([
 const engine = await HyperFormula.buildFromArray([])
     await engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addNamedExpression('myName', '=Sheet1!A1+10')
-    }).rejects.toThrowError('Name of Named Expression \'myName\' is already present')
+    })()).rejects.toThrowError('Name of Named Expression \'myName\' is already present')
   })
 
   it('adding the same named expression twice on local level is forbidden', async() => {
 const engine = await HyperFormula.buildFromArray([])
     await engine.addNamedExpression('myName', '=Sheet1!$A$1+10', 0)
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addNamedExpression('myName', '=Sheet1!A1+10', 0)
-    }).rejects.toThrowError('Name of Named Expression \'myName\' is already present')
+    })()).rejects.toThrowError('Name of Named Expression \'myName\' is already present')
   })
 
   it('named expressions is validated when added', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addNamedExpression('1definitelyIncorrectName', '=42')
-    }).rejects.toThrowError('Name of Named Expression \'1definitelyIncorrectName\' is invalid')
+    })()).rejects.toThrowError('Name of Named Expression \'1definitelyIncorrectName\' is invalid')
   })
 
   it('when adding named expression, matrix formulas are not accepted', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addNamedExpression('myName', '=TRANSPOSE(A1:B2)')
-    }).rejects.toThrowError(/Relative addresses not allowed in named expressions./)
+    })()).rejects.toThrowError(/Relative addresses not allowed in named expressions./)
   })
 
   it('retrieving non-existing named expression', async() => {
@@ -324,25 +324,25 @@ const engine = await HyperFormula.buildEmpty()
 
     await engine.addNamedExpression('myName', '=42')
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.changeNamedExpression('myName', '=TRANSPOSE(A1:B2)')
-    }).rejects.toThrowError(/Relative addresses not allowed in named expressions./)
+    })()).rejects.toThrowError(/Relative addresses not allowed in named expressions./)
   })
 
   it('changing not existing named expression', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.changeNamedExpression('myName', '=42')
-    }).rejects.toThrowError('Named Expression \'myName\' does not exist')
+    })()).rejects.toThrowError('Named Expression \'myName\' does not exist')
   })
 
   it('changing named expression from non existing sheet', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.changeNamedExpression('myName', '=42', 1)
-    }).rejects.toThrowError(NoSheetWithIdError)
+    })()).rejects.toThrowError(NoSheetWithIdError)
   })
 
   it('listing named expressions', async() => {
@@ -376,12 +376,12 @@ const engine = await HyperFormula.buildEmpty()
     await engine.addNamedExpression('myName', '=42')
 
     expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
-    await expect(async() => {
+    await expect((async() => {
       await engine.changeNamedExpression('MYname', '=43')
-    }).resolves.not.toThrowError()
-    await expect(async() => {
+    })()).resolves.not.toThrowError()
+    await expect((async() => {
       await engine.removeNamedExpression('MYname')
-    }).resolves.not.toThrowError()
+    })()).resolves.not.toThrowError()
   })
 
   it('allow even 255 character named expressions', async() => {
@@ -390,25 +390,25 @@ const engine = await HyperFormula.buildEmpty()
     const longExpressionName = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 
     expect(longExpressionName.length).toBe(255)
-    await expect(async() => {
+    await expect((async() => {
       await engine.addNamedExpression(longExpressionName, '=42')
-    }).resolves.not.toThrowError()
+    })()).resolves.not.toThrowError()
   })
 
   it('validates characters which are allowed in name', async() => {
 const engine = await HyperFormula.buildEmpty()
 
-    await expect(async() => await engine.addNamedExpression('1CantStartWithNumber', '=42')).rejects.toThrowError(/Name .* is invalid/)
-    await expect(async() => await engine.addNamedExpression('Spaces Are Not Allowed', '=42')).rejects.toThrowError(/Name .* is invalid/)
-    await expect(async() => await engine.addNamedExpression('.CantStartWithDot', '=42')).rejects.toThrowError(/Name .* is invalid/)
-    await expect(async() => await engine.addNamedExpression('_CanStartWithUnderscore', '=42')).resolves.not.toThrowError()
-    await expect(async() => await engine.addNamedExpression('dots.are.fine', '=42')).resolves.not.toThrowError()
-    await expect(async() => await engine.addNamedExpression('underscores_are_fine', '=42')).resolves.not.toThrowError()
-    await expect(async() => await engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).resolves.not.toThrowError()
-    await expect(async() => await engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).resolves.not.toThrowError()
-    await expect(async() => await engine.addNamedExpression('A100', '=42')).rejects.toThrowError(/Name .* is invalid/)
-    await expect(async() => await engine.addNamedExpression('$A$50', '=42')).rejects.toThrowError(/Name .* is invalid/)
-    await expect(async() => await engine.addNamedExpression('SheetName!$A$50', '=42')).rejects.toThrowError(/Name .* is invalid/)
+    await expect((async() => await engine.addNamedExpression('1CantStartWithNumber', '=42'))()).rejects.toThrowError(/Name .* is invalid/)
+    await expect((async() => await engine.addNamedExpression('Spaces Are Not Allowed', '=42'))()).rejects.toThrowError(/Name .* is invalid/)
+    await expect((async() => await engine.addNamedExpression('.CantStartWithDot', '=42'))()).rejects.toThrowError(/Name .* is invalid/)
+    await expect((async() => await engine.addNamedExpression('_CanStartWithUnderscore', '=42'))()).resolves.not.toThrowError()
+    await expect((async() => await engine.addNamedExpression('dots.are.fine', '=42'))()).resolves.not.toThrowError()
+    await expect((async() => await engine.addNamedExpression('underscores_are_fine', '=42'))()).resolves.not.toThrowError()
+    await expect((async() => await engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42'))()).resolves.not.toThrowError()
+    await expect((async() => await engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42'))()).resolves.not.toThrowError()
+    await expect((async() => await engine.addNamedExpression('A100', '=42'))()).rejects.toThrowError(/Name .* is invalid/)
+    await expect((async() => await engine.addNamedExpression('$A$50', '=42'))()).rejects.toThrowError(/Name .* is invalid/)
+    await expect((async() => await engine.addNamedExpression('SheetName!$A$50', '=42'))()).rejects.toThrowError(/Name .* is invalid/)
   })
 
   it('#getNamedExpressionFormula when it exists', async() => {
@@ -460,9 +460,9 @@ const engine = await HyperFormula.buildFromArray([
       ['42'],
     ])
 
-    await expect(async() => {
+    await expect((async() => {
       await engine.addNamedExpression('myName', '=13', 1)
-    }).rejects.toThrowError(NoSheetWithIdError)
+    })()).rejects.toThrowError(NoSheetWithIdError)
   })
 })
 

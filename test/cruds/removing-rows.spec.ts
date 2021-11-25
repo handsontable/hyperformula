@@ -847,7 +847,7 @@ const engine = await HyperFormula.buildFromArray([
       ['2'],
     ])
 
-    await expect(async() => await engine.removeRows(0, [1, 0])).rejects.toThrow(new InvalidArgumentsError('starting row to be smaller than the ending row.'))
+    await expect((async() => await engine.removeRows(0, [1, 0]))()).rejects.toThrow(new InvalidArgumentsError('starting row to be smaller than the ending row.'))
   })
 
   it('returns changed values', async() => {
