@@ -60,6 +60,9 @@ describe('Config', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({precisionEpsilon: {}})).toThrowError('Expected value of type: number for config parameter: precisionEpsilon')
+    // eslint-disable-next-line
+    // @ts-ignore
+    expect(() => new Config({timeoutTime: 'true'})).toThrowError('Expected value of type: number for config parameter: timeoutTime')
   })
 
   it( 'validation: string params', () => {

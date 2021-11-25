@@ -17,6 +17,7 @@ const dictionary: RawTranslationPackage = {
     REF: '#ССЫЛКА!',
     SPILL: '#ПЕРЕНОС!',
     VALUE: '#ЗНАЧ!',
+    TIMEOUT: '#TIMEOUT!'
   },
   functions: {
     FILTER: 'FILTER',

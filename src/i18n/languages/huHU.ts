@@ -17,6 +17,7 @@ const dictionary: RawTranslationPackage = {
     REF: '#HIV!',
     SPILL: '#KIBONTÁS!',
     VALUE: '#ÉRTÉK!',
+    TIMEOUT: '#TIMEOUT!'
   },
   functions: {
     FILTER: 'FILTER',

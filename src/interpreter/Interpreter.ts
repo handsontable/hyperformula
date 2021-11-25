@@ -6,7 +6,7 @@
  import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
  import {ArraySizePredictor} from '../ArraySize'
  import {ArrayValue, NotComputedArray} from '../ArrayValue'
- import {CellError, ErrorType, invalidSimpleCellAddress} from '../Cell'
+ import {CellError, ErrorType, invalidSimpleCellAddress, withTimeout} from '../Cell'
  import {Config} from '../Config'
  import {DateTimeHelper} from '../DateTimeHelper'
  import {DependencyGraph} from '../DependencyGraph'
@@ -182,10 +182,22 @@
          if (pluginFunction === undefined) {
            return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
          }
+
+         const promise = pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)) as AsyncInterpreterValue
+         
+         let interpreterValue
+
+         try {
+          interpreterValue = await withTimeout(promise, this.config.timeoutTime)
+         } catch (error) {
+           if (error instanceof CellError) {
+            interpreterValue = error
+          } else {
+            throw error
+          }
+         }
  
-         const interpreterValue = pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)) as AsyncInterpreterValue
- 
-         return await interpreterValue
+         return interpreterValue
        }
        case AstNodeType.NAMED_EXPRESSION: {
          const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, state.formulaAddress.sheet)

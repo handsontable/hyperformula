@@ -17,6 +17,7 @@ const dictionary: RawTranslationPackage = {
     REF: '#VERW!',
     SPILL: '#OVERLOOP!',
     VALUE: '#WAARDE!',
+    TIMEOUT: '#TIMEOUT!'
   },
   functions: {
     FILTER: 'FILTER',
