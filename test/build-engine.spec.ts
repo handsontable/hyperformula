@@ -66,8 +66,8 @@ const engine = await HyperFormula.buildFromArray([])
     expect(engine.getCellValue(adr('A1', 0))).toBe(1)
   })
 
-  it('corrupted sheet definition', () => {
-    expect(async() => {
+  it('corrupted sheet definition', async() => {
+    await expect(async() => {
       await HyperFormula.buildFromArray([
         [0, 1],
         [2, 3],

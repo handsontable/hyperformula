@@ -145,20 +145,20 @@ const engine = await HyperFormula.buildFromArray([
 })
 
 describe('Sheet size limits', () => {
-  it('should throw error when trying to build engine with too many columns', () => {
+  it('should throw error when trying to build engine with too many columns', async() => {
     const maxColumns = Config.defaultConfig.maxColumns
     const sheet = [new Array(maxColumns + 1).fill('')]
 
-    expect(async() => {
+    await expect(async() => {
       await HyperFormula.buildFromArray(sheet)
     }).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 
-  it('should throw error when trying to build engine with too many rows', () => {
+  it('should throw error when trying to build engine with too many rows', async() => {
     const maxRows = Config.defaultConfig.maxRows
     const sheet = new Array(maxRows + 1).fill([''])
 
-    expect(async() => {
+    await expect(async() => {
       await HyperFormula.buildFromArray(sheet)
     }).rejects.toThrow(new SheetSizeLimitExceededError())
   })

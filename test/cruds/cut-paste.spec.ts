@@ -337,7 +337,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
+    await expect(async() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 2))
       await engine.paste(adr('C1'))
     }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
@@ -349,7 +349,7 @@ const engine = await HyperFormula.buildFromArray([
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
+    await expect(async() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
       await engine.paste(adr('A2'))
     }).rejects.toThrowError('Cannot perform this operation, target location has an array inside.')
@@ -820,7 +820,7 @@ describe('move cells with matrices', () => {
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
+    await expect(async() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1))
       await engine.paste(adr('A3'))
     }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
@@ -832,7 +832,7 @@ describe('move cells with matrices', () => {
       ['=TRANSPOSE(A1:B1)'],
     ])
 
-    expect(async() => {
+    await expect(async() => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1))
       await engine.paste(adr('A3'))
     }).rejects.toThrowError('Cannot perform this operation, source location has an array inside.')
@@ -958,7 +958,7 @@ const engine = await HyperFormula.buildFromArray([['1']])
 
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
 
-    expect(async() => {
+    await expect(async() => {
       await engine.addRows(1, [1, 1])
     }).rejects.toThrow(new NoSheetWithIdError(1))
 

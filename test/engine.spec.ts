@@ -764,23 +764,23 @@ const engine = await HyperFormula.buildEmpty()
 })
 
 describe('Graph dependency topological ordering module', () => {
-  it('should build correctly when rows are dependant on cells that are not yet processed #1', () => {
-    expect(async() => await HyperFormula.buildFromArray([
+  it('should build correctly when rows are dependant on cells that are not yet processed #1', async() => {
+    await expect(async() => await HyperFormula.buildFromArray([
       ['=A3+A2'],
       ['=A3'],
     ])).resolves.not.toThrowError()
   })
 
-  it('should build correctly when rows are dependant on cells that are not yet processed #2', () => {
-    expect(async() => await HyperFormula.buildFromArray([
+  it('should build correctly when rows are dependant on cells that are not yet processed #2', async() => {
+    await expect(async() => await HyperFormula.buildFromArray([
       ['=A4+A3+A2'],
       ['=A4+A3'],
       ['=A4'],
     ])).resolves.not.toThrowError()
   })
 
-  it('should build correctly when rows are dependant on cells that are not yet processed #3', () => {
-    expect(async() => await HyperFormula.buildFromArray([
+  it('should build correctly when rows are dependant on cells that are not yet processed #3', async() => {
+    await expect(async() => await HyperFormula.buildFromArray([
       ['=A5+A4+A3+A2'],
       ['=A5+A4+A3'],
       ['=A5+A4'],

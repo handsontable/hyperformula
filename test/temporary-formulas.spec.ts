@@ -99,7 +99,7 @@ const engine = await HyperFormula.buildFromArray([
       ['42'],
     ])
 
-    expect(async() => {
+    await expect(async() => {
       await engine.calculateFormula('=Sheet1!A1+10', 1)
     }).rejects.toThrowError(/no sheet with id/)
   })
@@ -131,11 +131,11 @@ const engine = await HyperFormula.buildFromArray([[0, 1]])
   it('passing something which is not a formula doesnt work', async() => {
 const engine = await HyperFormula.buildFromArray([])
 
-    expect(async() => {
+    await expect(async() => {
       await engine.calculateFormula('{=TRANSPOSE(A1:B2)}', 0)
     }).rejects.toThrowError(/not a formula/)
 
-    expect(async() => {
+    await expect(async() => {
       await engine.calculateFormula('42', 0)
     }).rejects.toThrowError(/not a formula/)
   })

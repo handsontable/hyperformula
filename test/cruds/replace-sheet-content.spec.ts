@@ -22,7 +22,7 @@ const engine = await HyperFormula.buildFromArray([
       ['3', 'foo'],
     ])
 
-    expect(async() => {
+    await expect(async() => {
       await engine.setSheetContent(1, [['3', '4']])
 
     }).rejects.toThrowError("There's no sheet with id = 1")

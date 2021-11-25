@@ -70,8 +70,8 @@ const engine = await HyperFormula.buildFromArray([
       }
     }
 
-    it('should not allow registering VERSION formula', () => {
-      expect(async() => {
+    it('should not allow registering VERSION formula', async() => {
+      await expect(async() => {
         await HyperFormula.buildFromArray([
           ['=VERSION()'],
         ], {

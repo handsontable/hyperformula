@@ -47,7 +47,7 @@ const engine = await HyperFormula.buildFromArray([])
   it('paste raise error when there is nothing in clipboard', async() => {
 const engine = await HyperFormula.buildFromArray([])
 
-    expect(async() => {
+    await expect(async() => {
       await engine.paste(adr('A2'))
     }).rejects.toThrow(new NothingToPasteError())
   })
@@ -355,7 +355,7 @@ const engine = await HyperFormula.buildFromArray([
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
 
-    expect(async() => {
+    await expect(async() => {
       await engine.paste(adr('A3'))
     }).rejects.toThrowError('It is not possible to paste onto an array')
   })
@@ -367,7 +367,7 @@ const engine = await HyperFormula.buildFromSheets({
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
 
-    expect(async() => {
+    await expect(async() => {
       await engine.paste(adr('A1', 1))
     }).rejects.toThrowError('Invalid arguments, expected a valid target address.')
   })
@@ -405,8 +405,8 @@ const engine = await HyperFormula.buildFromArray([
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
 
-    expect(async() => await engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).rejects.toThrow(new SheetSizeLimitExceededError())
-    expect(async() => await engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect(async() => await engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect(async() => await engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 })
 

@@ -401,7 +401,7 @@ const engine = await HyperFormula.buildFromArray([
     ]
     const engine = await HyperFormula.buildFromArray(sheet)
 
-    expect(async() => {
+    await expect(async() => {
       await engine.setCellContents(adr('B1', 1), '3')
     }).rejects.toThrow(new NoSheetWithIdError(1))
   })
@@ -413,7 +413,7 @@ const engine = await HyperFormula.buildFromArray([
     const engine = await HyperFormula.buildFromArray(sheet)
 
     const address = {row: -1, col: 0, sheet: 0}
-    expect(async() => {
+    await expect(async() => {
       await engine.setCellContents(address, '3')
     }).rejects.toThrow(new InvalidAddressError(address))
   })
@@ -538,8 +538,8 @@ const engine = await HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
 
-    expect(async() => await engine.setCellContents(cellInLastColumn, '1')).rejects.toThrow(new SheetSizeLimitExceededError())
-    expect(async() => await engine.setCellContents(cellInLastRow, '1')).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect(async() => await engine.setCellContents(cellInLastColumn, '1')).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect(async() => await engine.setCellContents(cellInLastRow, '1')).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 
   it('setting empty cells outside sheet limits does not produce error', async() => {
@@ -655,8 +655,8 @@ const engine = await HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
 
-    expect(async() => await engine.setCellContents(cellInLastColumn, [['1', '2']])).rejects.toThrow(new SheetSizeLimitExceededError())
-    expect(async() => await engine.setCellContents(cellInLastRow, [['1'], ['2']])).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect(async() => await engine.setCellContents(cellInLastColumn, [['1', '2']])).rejects.toThrow(new SheetSizeLimitExceededError())
+    await expect(async() => await engine.setCellContents(cellInLastRow, [['1'], ['2']])).rejects.toThrow(new SheetSizeLimitExceededError())
   })
 })
 

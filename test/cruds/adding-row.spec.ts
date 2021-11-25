@@ -281,11 +281,11 @@ const engine = await HyperFormula.buildFromArray([
   it('should throw error when trying to expand sheet beyond limits', async() => {
 const engine = await HyperFormula.buildFromArray(Array(Config.defaultConfig.maxRows - 1).fill(['']))
 
-    expect(async() => {
+    await expect(async() => {
       await engine.addRows(0, [0, 2])
     }).rejects.toThrow(new SheetSizeLimitExceededError())
 
-    expect(async() => {
+    await expect(async() => {
       await engine.addRows(0, [0, 1], [5, 1])
     }).rejects.toThrow(new SheetSizeLimitExceededError())
   })

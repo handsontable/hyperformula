@@ -31,7 +31,7 @@ describe('remove sheet', () => {
   it('should throw error when trying to remove not existing sheet', async() => {
 const engine = await HyperFormula.buildFromArray([[]])
 
-    expect(async() => {
+    await expect(async() => {
       await engine.removeSheet(1)
     }).rejects.toThrow(new NoSheetWithIdError(1))
   })
