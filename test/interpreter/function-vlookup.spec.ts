@@ -291,8 +291,8 @@ const engine = await HyperFormula.buildFromArray([
 
 describe('ColumnIndex strategy', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HyperFormula.buildFromArray(sheet, {
+  sharedExamples(async(sheet: Sheet, config: any = {}) => {
+    return await HyperFormula.buildFromArray(sheet, {
       useColumnIndex: true,
       ...config,
     })
@@ -301,8 +301,8 @@ describe('ColumnIndex strategy', () => {
 
 describe('BinarySearchStrategy', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sharedExamples((sheet: Sheet, config: any = {}) => {
-    return HyperFormula.buildFromArray(sheet, {
+  sharedExamples(async(sheet: Sheet, config: any = {}) => {
+    return await HyperFormula.buildFromArray(sheet, {
       useColumnIndex: false,
       ...config,
     })

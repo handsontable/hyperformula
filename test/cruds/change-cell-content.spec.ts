@@ -547,8 +547,8 @@ const engine = await HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
 
-    expect(async() => await engine.setCellContents(cellInLastColumn, null)).not.toThrow()
-    expect(async() => await engine.setCellContents(cellInLastRow, null)).not.toThrow()
+    expect((async() => await engine.setCellContents(cellInLastColumn, null))()).resolves.not.toThrow()
+    expect((async() => await engine.setCellContents(cellInLastRow, null))()).resolves.not.toThrow()
   })
 
   it('should set matrix with range out of current sheet scope', async() => {

@@ -378,10 +378,10 @@ const engine = await HyperFormula.buildEmpty()
     expect(engine.getNamedExpressionValue('MYname')).toEqual(42)
     expect(async() => {
       await engine.changeNamedExpression('MYname', '=43')
-    }).not.toThrowError()
+    }).resolves.not.toThrowError()
     expect(async() => {
       await engine.removeNamedExpression('MYname')
-    }).not.toThrowError()
+    }).resolves.not.toThrowError()
   })
 
   it('allow even 255 character named expressions', async() => {
@@ -392,7 +392,7 @@ const engine = await HyperFormula.buildEmpty()
     expect(longExpressionName.length).toBe(255)
     expect(async() => {
       await engine.addNamedExpression(longExpressionName, '=42')
-    }).not.toThrowError()
+    }).resolves.not.toThrowError()
   })
 
   it('validates characters which are allowed in name', async() => {
@@ -401,11 +401,11 @@ const engine = await HyperFormula.buildEmpty()
     expect(async() => await engine.addNamedExpression('1CantStartWithNumber', '=42')).rejects.toThrowError(/Name .* is invalid/)
     expect(async() => await engine.addNamedExpression('Spaces Are Not Allowed', '=42')).rejects.toThrowError(/Name .* is invalid/)
     expect(async() => await engine.addNamedExpression('.CantStartWithDot', '=42')).rejects.toThrowError(/Name .* is invalid/)
-    expect(async() => await engine.addNamedExpression('_CanStartWithUnderscore', '=42')).not.toThrowError()
-    expect(async() => await engine.addNamedExpression('dots.are.fine', '=42')).not.toThrowError()
-    expect(async() => await engine.addNamedExpression('underscores_are_fine', '=42')).not.toThrowError()
-    expect(async() => await engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).not.toThrowError()
-    expect(async() => await engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).not.toThrowError()
+    expect(async() => await engine.addNamedExpression('_CanStartWithUnderscore', '=42')).resolves.not.toThrowError()
+    expect(async() => await engine.addNamedExpression('dots.are.fine', '=42')).resolves.not.toThrowError()
+    expect(async() => await engine.addNamedExpression('underscores_are_fine', '=42')).resolves.not.toThrowError()
+    expect(async() => await engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).resolves.not.toThrowError()
+    expect(async() => await engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).resolves.not.toThrowError()
     expect(async() => await engine.addNamedExpression('A100', '=42')).rejects.toThrowError(/Name .* is invalid/)
     expect(async() => await engine.addNamedExpression('$A$50', '=42')).rejects.toThrowError(/Name .* is invalid/)
     expect(async() => await engine.addNamedExpression('SheetName!$A$50', '=42')).rejects.toThrowError(/Name .* is invalid/)

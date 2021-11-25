@@ -56,7 +56,7 @@ const engine = await HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)'
     expect(engine.isItPossibleToSwapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])).toEqual(true)
     expect(async() =>
       await engine.swapRowIndexes(0, [[0, 1], [1, 0], [2, 2]])
-    ).not.toThrowError()
+    ).resolves.not.toThrowError()
   })
 })
 
@@ -228,7 +228,7 @@ const engine = await HyperFormula.buildFromArray([[0], [0], ['=TRANSPOSE(A1:A2)'
     expect(engine.isItPossibleToSetRowOrder(0, [1, 0, 2])).toEqual(true)
     expect(async() =>
       await engine.setRowOrder(0, [1, 0, 2])
-    ).not.toThrowError()
+    ).resolves.not.toThrowError()
   })
 })
 
