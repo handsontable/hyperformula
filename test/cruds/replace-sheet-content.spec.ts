@@ -25,7 +25,7 @@ const engine = await HyperFormula.buildFromArray([
     expect(async() => {
       await engine.setSheetContent(1, [['3', '4']])
 
-    }).toThrowError("There's no sheet with id = 1")
+    }).rejects.toThrowError("There's no sheet with id = 1")
   })
 
   it('should replace sheet content with new values', async() => {

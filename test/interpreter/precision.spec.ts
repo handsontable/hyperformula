@@ -3,7 +3,7 @@ import {adr} from '../testUtils'
 
 describe('Imprecise comparisons', () => {
 
-  it('less-than', () => {
+  it('less-than', async() => {
     const chunk1 = '.0000000001'
     const chunk2 = '.00000000000005'
     const engine = await HyperFormula.buildFromArray([
@@ -35,7 +35,7 @@ describe('Imprecise comparisons', () => {
     expect(engine.getCellValue(adr('B8'))).toBe(false)
   })
 
-  it('greater-than', () => {
+  it('greater-than', async() => {
     const chunk1 = '.0000000001'
     const chunk2 = '.0000000000001'
     const engine = await HyperFormula.buildFromArray([
@@ -67,7 +67,7 @@ describe('Imprecise comparisons', () => {
     expect(engine.getCellValue(adr('B8'))).toBe(true)
   })
 
-  it('greater-equal', () => {
+  it('greater-equal', async() => {
     const chunk1 = '.0000000001'
     const chunk2 = '.0000000000001'
     const engine = await HyperFormula.buildFromArray([
@@ -99,7 +99,7 @@ describe('Imprecise comparisons', () => {
     expect(engine.getCellValue(adr('B8'))).toBe(true)
   })
 
-  it('less-equal', () => {
+  it('less-equal', async() => {
     const chunk1 = '.0000000001'
     const chunk2 = '.0000000000001'
     const engine = await HyperFormula.buildFromArray([
@@ -135,7 +135,7 @@ describe('Imprecise comparisons', () => {
 
 describe('Snap to zero', () => {
 
-  it('minus', () => {
+  it('minus', async() => {
     const chunk1 = '.0000000001'
     const chunk2 = '.0000000000001'
     const engine = await HyperFormula.buildFromArray([
@@ -167,7 +167,7 @@ describe('Snap to zero', () => {
     expect(engine.dependencyGraph.getCellValue(adr('B8'))).toBeCloseTo(0.0000000000001, 5)
   })
 
-  it('plus', () => {
+  it('plus', async() => {
     const chunk1 = '.0000000001'
     const chunk2 = '.0000000000001'
     const engine = await HyperFormula.buildFromArray([

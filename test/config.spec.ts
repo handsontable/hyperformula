@@ -210,7 +210,7 @@ const engine = await HyperFormula.buildEmpty()
     expect(engine.getConfig()).not.toBeInstanceOf(Config)
   })
 
-  it('should copy returned values', () => {
+  it('should copy returned values', async() => {
     const arr = ['mm']
     const engine = await HyperFormula.buildEmpty({dateFormats: arr})
     const arr2 = engine.getConfig().dateFormats

@@ -8,7 +8,7 @@ import {FormulaVertex} from '../../DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValue, InternalScalarValue, AsyncInterpreterValue, isExtendedNumber} from '../InterpreterValue'
+import {EmptyValue, InternalScalarValue, AsyncInterpreterValue, isExtendedNumber, AsyncInternalScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -331,7 +331,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param _state
    */
-  public columns(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public async columns(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -349,7 +349,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else if(argAst.type === AstNodeType.ROW_RANGE) {
       return this.config.maxColumns
     } else {
-      const val = this.evaluateAst(argAst, state)
+      const val = await this.evaluateAst(argAst, state)
       if(val instanceof SimpleRangeValue) {
         return val.width()
       } else if (val instanceof CellError){
@@ -383,7 +383,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param ast
    * @param _state
    */
-  public rows(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public async rows(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     if (ast.args.length !== 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -401,7 +401,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     } else if(argAst.type === AstNodeType.COLUMN_RANGE) {
       return this.config.maxRows
     } else {
-      const val = this.evaluateAst(argAst, state)
+      const val = await this.evaluateAst(argAst, state)
       if(val instanceof SimpleRangeValue) {
         return val.height()
       } else if (val instanceof CellError){

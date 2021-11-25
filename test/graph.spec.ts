@@ -253,7 +253,7 @@ describe('Basic Graph manipulation', () => {
 })
 
 describe('Graph#getTopologicallySortedSubgraphFrom', () => {
-  it('case without edges', () => {
+  it('case without edges', async() => {
     const graph = new Graph<string>(dummyGetDependenciesQuery)
     const node0 = 'foo'
     const node1 = 'bar'
@@ -263,13 +263,13 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     const fn = jasmine.createSpy().and.returnValue(true)
     const fn2 = jasmine.createSpy()
 
-    graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
+    await graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn.calls.argsFor(0)).toContain(node0)
   })
 
-  it('case with obvious edge', () => {
+  it('case with obvious edge', async() => {
     const graph = new Graph<string>(dummyGetDependenciesQuery)
     const node0 = 'foo'
     const node1 = 'bar'
@@ -281,14 +281,14 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     const fn = jasmine.createSpy().and.returnValue(true)
     const fn2 = jasmine.createSpy()
 
-    graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
+    await graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(2)
     expect(fn.calls.argsFor(0)).toContain(node0)
     expect(fn.calls.argsFor(1)).toContain(node1)
   })
 
-  it('it doesnt call other if didnt change', () => {
+  it('it doesnt call other if didnt change', async() => {
     const graph = new Graph<string>(dummyGetDependenciesQuery)
     const node0 = 'foo'
     const node1 = 'bar'
@@ -300,13 +300,13 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     const fn = jasmine.createSpy().and.returnValue(false)
     const fn2 = jasmine.createSpy()
 
-    graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
+    await graph.getTopSortedWithSccSubgraphFrom([node0], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn.calls.argsFor(0)).toContain(node0)
   })
 
-  it('does call if some previous vertex marked as changed', () => {
+  it('does call if some previous vertex marked as changed', async() => {
     const graph = new Graph<string>(dummyGetDependenciesQuery)
     const nodes = ['foo', 'bar', 'baz']
 
@@ -317,13 +317,13 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     const fn = jasmine.createSpy().and.callFake((node: string) => node === nodes[0])
     const fn2 = jasmine.createSpy()
 
-    graph.getTopSortedWithSccSubgraphFrom([nodes[0], nodes[1]], fn, fn2)
+    await graph.getTopSortedWithSccSubgraphFrom([nodes[0], nodes[1]], fn, fn2)
 
     expect(fn).toHaveBeenCalledTimes(3)
     expect(fn.calls.argsFor(2)).toContain(nodes[2])
   })
 
-  it('returns cycled vertices', () => {
+  it('returns cycled vertices', async() => {
     const graph = new Graph<string>(dummyGetDependenciesQuery)
     const nodes = ['foo', 'c0', 'c1', 'c2']
 
@@ -335,13 +335,13 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
 
     const fn = jasmine.createSpy().and.returnValue(true)
     const fn2 = jasmine.createSpy()
-    const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
+    const cycled = (await graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2)).cycled
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
   })
 
-  it('doesnt call first one of the given vertices if its on cycle', () => {
+  it('doesnt call first one of the given vertices if its on cycle', async() => {
     const graph = new Graph<string>(dummyGetDependenciesQuery)
     const nodes = ['c0', 'c1', 'c2']
     nodes.forEach((n) => graph.addNode(n))
@@ -351,13 +351,13 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
 
     const fn = jasmine.createSpy().and.returnValue(true)
     const fn2 = jasmine.createSpy()
-    const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
+    const cycled = (await graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2)).cycled
 
     expect(fn).not.toHaveBeenCalled()
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
   })
 
-  it('returns cycled vertices even if they were not tried to be computed', () => {
+  it('returns cycled vertices even if they were not tried to be computed', async() => {
     const graph = new Graph<string>(dummyGetDependenciesQuery)
     const nodes = ['foo', 'c0', 'c1', 'c2']
     nodes.forEach((n) => graph.addNode(n))
@@ -368,7 +368,7 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
 
     const fn = jasmine.createSpy().and.returnValue(true)
     const fn2 = jasmine.createSpy()
-    const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2).cycled
+    const cycled = (await graph.getTopSortedWithSccSubgraphFrom([nodes[0]], fn, fn2)).cycled
 
     expect(fn).toHaveBeenCalledTimes(1)
     expect(cycled).toEqual(['c0', 'c1', 'c2'])

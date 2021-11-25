@@ -1,7 +1,7 @@
 import {HyperFormula} from '../src'
 import {CellError, ErrorType} from '../src/Cell'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
-import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
+import {AsyncInternalScalarValue, InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
@@ -14,7 +14,7 @@ class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<Squ
     },
   }
 
-  public square(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+  public async square(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     // Take ast of first argument from list of arguments
     const arg = ast.args[0]
 
@@ -24,7 +24,7 @@ class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<Squ
     }
 
     // Compute value of argument
-    const argValue = this.evaluateAst(arg, state)
+    const argValue = await this.evaluateAst(arg, state)
 
     if (argValue instanceof CellError) {
       // If the value is some error, return that error

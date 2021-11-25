@@ -4,66 +4,66 @@ import {ErrorMessage} from '../../src/error-message'
 import {Sheet} from '../../src/Sheet'
 import {adr, detailedError} from '../testUtils'
 
-const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => HyperFormula) => {
+const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) => Promise<HyperFormula>) => {
   describe('VLOOKUP - args validation', () => {
-    it('not enough parameters', () => {
-      const engine = builder([
+    it('not enough parameters', async() => {
+      const engine = await builder([
         ['=VLOOKUP(1, A2:B3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     })
 
-    it('too many parameters', () => {
-      const engine = builder([
+    it('too many parameters', async() => {
+      const engine = await builder([
         ['=VLOOKUP(1, A2:B3, 2, TRUE(), "foo")'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     })
 
-    it('wrong type of first argument', () => {
-      const engine = builder([
+    it('wrong type of first argument', async() => {
+      const engine = await builder([
         ['=VLOOKUP(D1:E1, A2:B3, 2, TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     })
 
-    it('wrong type of second argument', () => {
-      const engine = builder([
+    it('wrong type of second argument', async() => {
+      const engine = await builder([
         ['=VLOOKUP(1, "foo", 2, TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     })
 
-    it('wrong type of third argument', () => {
-      const engine = builder([
+    it('wrong type of third argument', async() => {
+      const engine = await builder([
         ['=VLOOKUP(1, A2:B3, "foo", TRUE())'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
 
-    it('wrong type of fourth argument', () => {
-      const engine = builder([
+    it('wrong type of fourth argument', async() => {
+      const engine = await builder([
         ['=VLOOKUP(1, A2:B3, 2, "bar")'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     })
 
-    it('should return error when index argument greater that range width', () => {
-      const engine = builder([
+    it('should return error when index argument greater that range width', async() => {
+      const engine = await builder([
         ['=VLOOKUP(1, A2:B3, 3)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.IndexLarge))
     })
 
-    it('should return error when index is less than one', () => {
-      const engine = builder([
+    it('should return error when index is less than one', async() => {
+      const engine = await builder([
         ['=VLOOKUP(1, C2:D3, 0)'],
         ['=VLOOKUP(1, C2:D3, -1)'],
       ])
@@ -86,8 +86,8 @@ const engine = await HyperFormula.buildFromArray([
   })
 
   describe('VLOOKUP', () => {
-    it('should find value in sorted range', () => {
-      const engine = builder([
+    it('should find value in sorted range', async() => {
+      const engine = await builder([
         ['1', 'a'],
         ['2', 'b'],
         ['3', 'c'],
@@ -99,8 +99,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('b')
     })
 
-    it('should find value in sorted range using linearSearch', () => {
-      const engine = builder([
+    it('should find value in sorted range using linearSearch', async() => {
+      const engine = await builder([
         ['1', 'a'],
         ['2', 'b'],
         ['3', 'c'],
@@ -112,8 +112,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('b')
     })
 
-    it('works with wildcards', () => {
-      const engine = builder([
+    it('works with wildcards', async() => {
+      const engine = await builder([
         ['abd', 'a'],
         [1, 'b'],
         ['aaaa', 'c'],
@@ -125,8 +125,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('e')
     })
 
-    it('on sorted data ignores wildcards', () => {
-      const engine = builder([
+    it('on sorted data ignores wildcards', async() => {
+      const engine = await builder([
         ['abd', 'a'],
         [1, 'b'],
         ['*c*', 'c'],
@@ -138,8 +138,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('c')
     })
 
-    it('should find value in unsorted range using linearSearch', () => {
-      const engine = builder([
+    it('should find value in unsorted range using linearSearch', async() => {
+      const engine = await builder([
         ['5', 'a'],
         ['4', 'b'],
         ['3', 'c'],
@@ -151,8 +151,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
-    it('should find value in unsorted range using linearSearch', () => {
-      const engine = builder([
+    it('should find value in unsorted range using linearSearch', async() => {
+      const engine = await builder([
         ['5', 'a'],
         ['4', 'b'],
         ['3', 'c'],
@@ -164,8 +164,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
-    it('should find value in sorted range with different types', () => {
-      const engine = builder([
+    it('should find value in sorted range with different types', async() => {
+      const engine = await builder([
         ['1', 'a'],
         ['2', 'b'],
         ['3', 'c'],
@@ -177,8 +177,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
-    it('should find value in unsorted range with different types', () => {
-      const engine = builder([
+    it('should find value in unsorted range with different types', async() => {
+      const engine = await builder([
         ['=TRUE()', 'a'],
         ['4', 'b'],
         ['foo', 'c'],
@@ -190,8 +190,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
-    it('should return lower bound for sorted values', () => {
-      const engine = builder([
+    it('should return lower bound for sorted values', async() => {
+      const engine = await builder([
         ['1', 'a'],
         ['2', 'b'],
         ['3', 'c'],
@@ -201,8 +201,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A4'))).toEqual('c')
     })
 
-    it('should return error when all values are greater', () => {
-      const engine = builder([
+    it('should return error when all values are greater', async() => {
+      const engine = await builder([
         ['1', 'a'],
         ['2', 'b'],
         ['3', 'c'],
@@ -212,8 +212,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
-    it('should return error when value not present using linear search', () => {
-      const engine = builder([
+    it('should return error when value not present using linear search', async() => {
+      const engine = await builder([
         ['1', 'a'],
         ['2', 'b'],
         ['3', 'c'],
@@ -223,8 +223,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
-    it('should find value if index build during evaluation', () => {
-      const engine = builder([
+    it('should find value if index build during evaluation', async() => {
+      const engine = await builder([
         ['=A2', 'a'],
         ['1', 'b'],
         ['2', 'c'],
@@ -234,8 +234,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A4'))).toEqual('a')
     })
 
-    it('should properly calculate absolute row index', () => {
-      const engine = builder([
+    it('should properly calculate absolute row index', async() => {
+      const engine = await builder([
         ['=VLOOKUP(3, A3:A5, 1, TRUE())'],
         ['foo'],
         ['1'],
@@ -246,8 +246,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A1'))).toEqual(3)
     })
 
-    it('should work for standard matrices', () => {
-      const engine = builder([
+    it('should work for standard matrices', async() => {
+      const engine = await builder([
         ['=VLOOKUP(3, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
@@ -258,7 +258,7 @@ const engine = await HyperFormula.buildFromArray([
     })
 
     it('should work after updating standard matrix', async() => {
-      const engine = builder([
+      const engine = await builder([
         ['=VLOOKUP(4, A4:B6, 2, TRUE())'],
         ['1', '2', '3'],
         ['4', '5', '6'],
@@ -272,8 +272,8 @@ const engine = await HyperFormula.buildFromArray([
       expect(engine.getCellValue(adr('A1'))).toEqual(5)
     })
 
-    it('should coerce empty arg to 0', () => {
-      const engine = builder([
+    it('should coerce empty arg to 0', async() => {
+      const engine = await builder([
         ['0', 'a'],
         ['2', 'b'],
         ['3', 'c'],

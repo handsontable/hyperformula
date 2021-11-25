@@ -71,14 +71,14 @@ const engine = await HyperFormula.buildFromArray([
     }
 
     it('should not allow registering VERSION formula', () => {
-      expect(() => {
-        HyperFormula.buildFromArray([
+      expect(async() => {
+        await HyperFormula.buildFromArray([
           ['=VERSION()'],
         ], {
           licenseKey: 'gpl-v3',
           functionPlugins: [VersionExtra]
         })
-      }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
+      }).rejects.toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
     })
 
     it('should be available even if anyone unregistered ', async() => {
