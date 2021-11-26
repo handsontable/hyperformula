@@ -402,7 +402,7 @@ describe('aliases', () => {
   })
 })
 
-describe.only('async functions', () => {
+describe('async functions', () => {
   it('should return #TIMEOUT error if function does not resolve due to the request taking too long', async() => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const engine = await HyperFormula.buildFromArray([
