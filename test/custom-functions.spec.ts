@@ -28,7 +28,10 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     },
     'TIMEOUT_FOO': {
       method: 'timeoutFoo'
-    }
+    },
+    'ASYNC_ERROR_FOO': {
+      method: 'asyncErrorFoo'
+    },
   }
 
   public static translations = {
@@ -36,13 +39,15 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
       'FOO': 'FOO',
       'BAR': 'BAR',
       'ARRAYFOO': 'ARRAYFOO',
-      'TIMEOUT_FOO': 'TIMEOUT_FOO'
+      'TIMEOUT_FOO': 'TIMEOUT_FOO',
+      'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
     },
     'plPL': {
       'FOO': 'FU',
       'BAR': 'BAR',
       'ARRAYFOO': 'ARRAYFOO',
-      'TIMEOUT_FOO': 'TIMEOUT_FOO'
+      'TIMEOUT_FOO': 'TIMEOUT_FOO',
+      'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
     }
   }
 
@@ -64,6 +69,12 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
 
   public async timeoutFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
     return new Promise(resolve => setTimeout(() => resolve('timeoutFoo'), Config.defaultConfig.timeoutTime + 10000))
+  }
+
+  public async asyncErrorFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
+    return new Promise(() => {
+      throw new Error('asyncErrorFoo')
+    })
   }
 }
 
@@ -392,7 +403,7 @@ describe('aliases', () => {
 })
 
 describe.only('async functions', () => {
-  it.only('should return #TIMEOUT error if function does not resolve', async() => {
+  it('should return #TIMEOUT error if function does not resolve due to the request taking too long', async() => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const engine = await HyperFormula.buildFromArray([
       ['=TIMEOUT_FOO()', '=FOO()'],
@@ -401,4 +412,14 @@ describe.only('async functions', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.TIMEOUT, ErrorMessage.FunctionTimeout))
     expect(engine.getCellValue(adr('B1'))).toBe('foo')
   }, Config.defaultConfig.timeoutTime + 3000)
+
+  it('should throw an error if function does not resolve', async() => {
+    HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
+
+    await expect(async() => {
+      await HyperFormula.buildFromArray([
+        ['=ASYNC_ERROR_FOO()'],
+      ])
+    }).rejects.toThrow()
+  })
 })
