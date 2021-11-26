@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Breaking change**: Changed API of many public methods to be async and return promises. Added #TIMEOUT! error. (#862)
+
 ## [1.3.0] - 2021-10-20
 
 ### Added

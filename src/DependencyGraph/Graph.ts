@@ -175,7 +175,7 @@ export class Graph<T> {
   }
 
   /*
-   * return a topological sort order, but separates vertices that exist in some cycle
+   * an iterative implementation of Tarjan's algorithm for finding strongly connected compontents
    */
   public topSortWithScc(): TopSortResult<T> {
     const { order, sccNonSingletons } = this.getOrderOfNodes(Array.from(this.nodes))
@@ -197,7 +197,6 @@ export class Graph<T> {
   /**
    *
    * an iterative implementation of Tarjan's algorithm for finding strongly connected compontents
-   * returns vertices in order of topological sort, but vertices that are on cycles are kept separate
    *
    * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
    */
@@ -296,6 +295,15 @@ export class Graph<T> {
     return { order, sccNonSingletons }
   }
 
+  /**
+   *
+   * an async iterative implementation of Tarjan's algorithm for finding strongly connected compontents
+   * returns vertices in order of topological sort, but vertices that are on cycles are kept separate
+   *
+   * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
+   * @param operatingFunction - recomputes value of a node, and returns whether a change occured
+   * @param onCycle - action to be performed when node is on cycle
+   */
   public async getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => Promise<boolean>, onCycle: (node: T) => void): Promise<TopSortResult<T>> {
     const { order, sccNonSingletons } = this.getOrderOfNodes(modifiedNodes)
     const shouldBeUpdatedMapping = new Set(modifiedNodes)
