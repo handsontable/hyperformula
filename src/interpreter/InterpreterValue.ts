@@ -7,10 +7,16 @@ import {CellError} from '../Cell'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 export const EmptyValue = Symbol('Empty value')
+
 export type EmptyValueType = typeof EmptyValue
+
 export type InternalNoErrorScalarValue = RichNumber | RawNoErrorScalarValue
+
 export type InternalScalarValue = RichNumber | RawScalarValue
+export type AsyncInternalScalarValue = Promise<InternalScalarValue>
+
 export type InterpreterValue = RichNumber | RawInterpreterValue
+export type AsyncInterpreterValue = Promise<InterpreterValue>
 
 export type RawNoErrorScalarValue = number | string | boolean | EmptyValueType
 export type RawScalarValue = RawNoErrorScalarValue | CellError

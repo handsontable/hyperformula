@@ -25,6 +25,7 @@ import {
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {
+  AsyncInterpreterValue,
   ExtendedNumber,
   FormatInfo,
   getRawValue,
@@ -102,6 +103,13 @@ export interface FunctionMetadata {
    * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
    */
   arrayFunction?: boolean,
+
+  /**
+   * Engine.
+   * 
+   * If set to `true`, the function is classed as an async function that will not resolve immediately.
+   */
+  asyncFunction?: boolean,
 
   /**
    * Internal.
@@ -212,11 +220,11 @@ export interface FunctionArgument {
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
-
+export type AsyncPluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => AsyncInterpreterValue
 export type PluginArraySizeFunctionType = (ast: ProcedureAst, state: InterpreterState) => ArraySize
 
 export type FunctionPluginTypecheck<T> = {
-  [K in keyof T]: T[K] extends PluginFunctionType | PluginArraySizeFunctionType ? T[K] : never
+  [K in keyof T]: T[K] extends PluginFunctionType | PluginArraySizeFunctionType | AsyncPluginFunctionType ? T[K] : never
 }
 
 /**

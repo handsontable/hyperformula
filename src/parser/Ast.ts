@@ -5,6 +5,8 @@
 
 import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
+import { InterpreterState } from '../interpreter/InterpreterState'
+import { InterpreterValue } from '../interpreter/InterpreterValue'
 import {AddressWithSheet} from './Address'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
@@ -44,6 +46,12 @@ export type Ast =
 export interface ParsingError {
   type: ParsingErrorType,
   message: string,
+}
+
+export interface AsyncFunctionValue {
+  ast: Ast,
+  state: InterpreterState,
+  interpreterValue: InterpreterValue,
 }
 
 export const parsingError = (type: ParsingErrorType, message: string) => ({

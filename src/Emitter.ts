@@ -5,6 +5,7 @@
 
 import {TinyEmitter} from 'tiny-emitter'
 import {ExportedChange} from './Exporter'
+import { AsyncFunctionValue } from './parser/Ast'
 
 export enum Events {
   SheetAdded = 'sheetAdded',
@@ -15,6 +16,7 @@ export enum Events {
   ValuesUpdated = 'valuesUpdated',
   EvaluationSuspended = 'evaluationSuspended',
   EvaluationResumed = 'evaluationResumed',
+  AsyncFunctionValuesCalculated = 'asyncFunctionValuesCalculated',
 }
 
 export interface Listeners {
@@ -314,6 +316,8 @@ export interface Listeners {
    * @category Batch
    */
   evaluationResumed: (changes: ExportedChange[]) => any,
+
+  asyncFunctionValuesCalculated: (asyncFunctionValues: AsyncFunctionValue[]) => any,
 }
 
 export interface TypedEmitter {

@@ -44,6 +44,9 @@ export enum ErrorType {
   /** Invalid/missing licence error. */
   LIC = 'LIC',
 
+  /** Async functions timeout error. */
+  TIMEOUT = 'TIMEOUT',
+
   /** Generic error */
   ERROR = 'ERROR'
 }
@@ -108,6 +111,22 @@ export const CellValueTypeOrd = (arg: CellValueType): number => {
       return 4
   }
   throw new Error('Cell value not computed')
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const withTimeout = (promise: Promise<any>, ms: number) => {
+  const timeoutPromise = new Promise((_resolve, reject) => {
+    return setTimeout(
+      () => {
+        reject(new CellError(ErrorType.TIMEOUT, ErrorMessage.FunctionTimeout))
+      }, ms
+    )
+  })
+
+  return Promise.race([
+    promise,
+    timeoutPromise
+  ])
 }
 
 export const getCellValueType = (cellValue: InterpreterValue): CellValueType => {

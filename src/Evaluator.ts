@@ -10,6 +10,7 @@ import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
 import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
+import { Emitter, Events } from './Emitter'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
@@ -17,11 +18,14 @@ import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Ast, RelativeDependency} from './parser'
+import { AsyncFunctionValue } from './parser/Ast'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
+  recomputedAsyncFunctionsPromise?: Promise<void>
 
   constructor(
+    private readonly emitter: Emitter,
     private readonly config: Config,
     private readonly stats: Statistics,
     public readonly interpreter: Interpreter,
@@ -39,6 +43,29 @@ export class Evaluator {
     this.stats.measure(StatType.EVALUATION, () => {
       this.recomputeFormulas(cycled, sorted)
     })
+
+    this.recomputedAsyncFunctionsPromise = this.recomputeAsyncFunctions()
+  }
+
+  private async recomputeAsyncFunctions() {
+    const asyncFunctionValues: AsyncFunctionValue[] = []
+
+    while (this.interpreter.asyncFunctionValuesQueue.length > 0) {
+      const asyncFunctionValue = await this.interpreter.asyncFunctionValuesQueue[0]
+      const { ast, state, interpreterValue } = asyncFunctionValue
+      
+      state.asyncFunctionResolved = true
+      state.formulaVertex?.setCellValue(interpreterValue)
+      this.evaluateAstToCellValue(ast, state)
+
+      this.interpreter.asyncFunctionValuesQueue.shift()
+
+      asyncFunctionValues.push(asyncFunctionValue)
+    }
+
+    if (asyncFunctionValues.length) {
+      this.emitter.emit(Events.AsyncFunctionValuesCalculated, asyncFunctionValues)
+    }  
   }
 
   public partialRun(vertices: Vertex[]): ContentChanges {
@@ -113,8 +140,12 @@ export class Evaluator {
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
         const newCellValue = this.recomputeFormulaVertexValue(vertex)
-        const address = vertex.getAddress(this.lazilyTransformingAstService)
-        this.columnSearch.add(getRawValue(newCellValue), address)
+
+        // TODO: Use proper instanceof here for async functions
+        if (newCellValue !== 'Loading...') {
+          const address = vertex.getAddress(this.lazilyTransformingAstService)
+          this.columnSearch.add(getRawValue(newCellValue), address)  
+        }
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }

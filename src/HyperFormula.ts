@@ -113,7 +113,6 @@ export class HyperFormula implements TypedEmitter {
    */
   public static languages: Record<string, RawTranslationPackage> = {}
   private static registeredLanguages: Map<string, TranslationPackage> = new Map()
-  private readonly _emitter: Emitter = new Emitter()
   private _evaluationSuspended: boolean = false
 
   protected constructor(
@@ -131,6 +130,7 @@ export class HyperFormula implements TypedEmitter {
     private _namedExpressions: NamedExpressions,
     private _serialization: Serialization,
     private _functionRegistry: FunctionRegistry,
+    private _emitter: Emitter
   ) {
   }
 
@@ -607,6 +607,7 @@ export class HyperFormula implements TypedEmitter {
       engine.namedExpressions,
       engine.serialization,
       engine.functionRegistry,
+      engine.emitter
     )
   }
 

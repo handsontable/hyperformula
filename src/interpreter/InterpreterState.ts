@@ -11,6 +11,7 @@ export class InterpreterState {
     public formulaAddress: SimpleCellAddress,
     public arraysFlag: boolean,
     public formulaVertex?: FormulaVertex,
+    public asyncFunctionResolved?: boolean
   ) {
   }
 }

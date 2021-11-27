@@ -10,6 +10,7 @@ import {Config, ConfigParams} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph} from './DependencyGraph'
+import { Emitter } from './Emitter'
 import {SheetSizeLimitExceededError} from './errors'
 import {Evaluator} from './Evaluator'
 import {Exporter} from './Exporter'
@@ -44,6 +45,7 @@ export type EngineState = {
   namedExpressions: NamedExpressions,
   serialization: Serialization,
   functionRegistry: FunctionRegistry,
+  emitter: Emitter,
 }
 
 export class BuildEngineFactory {
@@ -69,6 +71,7 @@ export class BuildEngineFactory {
   private static buildEngine(config: Config, sheets: Sheets = {}, inputNamedExpressions: SerializedNamedExpression[] = [], stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
+    const emitter = new Emitter()
     const namedExpressions = new NamedExpressions()
     const functionRegistry = new FunctionRegistry(config)
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
@@ -119,7 +122,8 @@ export class BuildEngineFactory {
       graphBuilder.buildGraph(sheets, stats)
     })
 
-    const evaluator = new Evaluator(config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
+    const evaluator = new Evaluator(emitter, config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
+
     evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
@@ -139,6 +143,7 @@ export class BuildEngineFactory {
       namedExpressions,
       serialization,
       functionRegistry,
+      emitter
     }
   }
 }

@@ -6,7 +6,7 @@
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
-import {CellError, ErrorType, invalidSimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, withTimeout} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
@@ -17,7 +17,7 @@ import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {Ast, AstNodeType, AsyncFunctionValue, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
 import {
@@ -43,6 +43,7 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
+  public readonly asyncFunctionValuesQueue: Promise<AsyncFunctionValue>[]
   private gpu?: any
 
   constructor(
@@ -59,6 +60,7 @@ export class Interpreter {
   ) {
     this.functionRegistry.initializePlugins(this)
     this.criterionBuilder = new CriterionBuilder(config)
+    this.asyncFunctionValuesQueue = []
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
@@ -193,12 +195,59 @@ export class Interpreter {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
           return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
         }
-        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
-        if (pluginFunction !== undefined) {
-          return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex))
-        } else {
-          return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
+
+        const metadata = this.functionRegistry.getMetadata(ast.procedureName)
+        const cellError = new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
+        const interpreterState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex, state.asyncFunctionResolved)
+
+        if (metadata?.asyncFunction) {
+          if (interpreterState.asyncFunctionResolved) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            return interpreterState.formulaVertex!.getCellValue()
+          }else {
+            const pluginFunction = this.functionRegistry.getAsyncFunction(ast.procedureName)
+
+            if (pluginFunction === undefined) {
+              return cellError
+            }
+
+            let functionPromise = pluginFunction(ast, interpreterState)
+            
+            functionPromise = withTimeout(functionPromise, this.config.timeoutTime)
+            
+            const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
+              functionPromise.then((interpreterValue) => {
+                resolve({
+                  ast,
+                  state,
+                  interpreterValue
+                })
+              }).catch((error) => {
+                if (error instanceof CellError) {
+                  resolve({
+                    ast,
+                    state,
+                    interpreterValue: error
+                  })
+                } else {
+                  reject(error)
+                }
+              })
+            })
+    
+            this.asyncFunctionValuesQueue.push(promise)
+    
+            return 'Loading...'
+          }
         }
+
+        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
+
+        if (pluginFunction === undefined) {
+          return cellError
+        }
+
+        return pluginFunction(ast, interpreterState)
       }
       case AstNodeType.NAMED_EXPRESSION: {
         const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, state.formulaAddress.sheet)
