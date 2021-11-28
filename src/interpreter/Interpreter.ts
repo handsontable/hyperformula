@@ -52,7 +52,7 @@ export class Interpreter {
     public readonly columnSearch: ColumnSearchStrategy,
     public readonly stats: Statistics,
     public readonly arithmeticHelper: ArithmeticHelper,
-    private readonly functionRegistry: FunctionRegistry,
+    public readonly functionRegistry: FunctionRegistry,
     private readonly namedExpressions: NamedExpressions,
     public readonly serialization: Serialization,
     public readonly arraySizePredictor: ArraySizePredictor,
@@ -198,10 +198,14 @@ export class Interpreter {
 
         const metadata = this.functionRegistry.getMetadata(ast.procedureName)
         const cellError = new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
-        const interpreterState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex, state.asyncFunctionResolved)
+        const interpreterState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
 
         if (metadata?.asyncFunction) {
-          if (interpreterState.asyncFunctionResolved) {
+          if (state.formulaVertex) {
+            state.formulaVertex.isAsync = true
+          }
+
+          if (state.formulaVertex?.isComputed()) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return interpreterState.formulaVertex!.getCellValue()
           }else {

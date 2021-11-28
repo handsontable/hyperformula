@@ -18,7 +18,7 @@ import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Ast, RelativeDependency} from './parser'
-import { AsyncFunctionValue } from './parser/Ast'
+import {AsyncFunctionValue} from './parser/Ast'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
@@ -52,12 +52,14 @@ export class Evaluator {
 
     while (this.interpreter.asyncFunctionValuesQueue.length > 0) {
       const asyncFunctionValue = await this.interpreter.asyncFunctionValuesQueue[0]
-      const { ast, state, interpreterValue } = asyncFunctionValue
-      
-      state.asyncFunctionResolved = true
-      state.formulaVertex?.setCellValue(interpreterValue)
-      this.evaluateAstToCellValue(ast, state)
+      const { state, interpreterValue } = asyncFunctionValue
 
+      if (state.formulaVertex) {
+        state.formulaVertex.setCellValue(interpreterValue)
+
+        this.partialRun([state.formulaVertex])
+      }
+      
       this.interpreter.asyncFunctionValuesQueue.shift()
 
       asyncFunctionValues.push(asyncFunctionValue)
@@ -77,7 +79,8 @@ export class Evaluator {
           if (vertex instanceof FormulaVertex) {
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
             const newCellValue = this.recomputeFormulaVertexValue(vertex)
-            if (newCellValue !== currentValue) {
+
+            if (newCellValue !== currentValue || vertex.isAsync) {
               const address = vertex.getAddress(this.lazilyTransformingAstService)
               changes.addChange(newCellValue, address)
               this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
@@ -137,14 +140,14 @@ export class Evaluator {
         vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex))
       }
     })
+
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
         const newCellValue = this.recomputeFormulaVertexValue(vertex)
 
-        // TODO: Use proper instanceof here for async functions
-        if (newCellValue !== 'Loading...') {
+        if (!vertex.isAsync) {
           const address = vertex.getAddress(this.lazilyTransformingAstService)
-          this.columnSearch.add(getRawValue(newCellValue), address)  
+          this.columnSearch.add(getRawValue(newCellValue), address)
         }
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()

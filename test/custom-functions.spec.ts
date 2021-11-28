@@ -8,7 +8,7 @@ import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslati
 import {plPL} from '../src/i18n/languages'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {AsyncInternalScalarValue, InternalScalarValue} from '../src/interpreter/InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
+import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
@@ -19,9 +19,6 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
-      parameters: [
-        {argumentType: ArgumentTypes.ANY}
-      ],
     },
     'BAR': {
       method: 'bar',
@@ -80,7 +77,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
   }
 
   public async asyncFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
-    return new Promise(resolve => setTimeout(() => resolve('asyncFoo'), 1000))
+    return new Promise(resolve => setTimeout(() => resolve(1), 1000))
   }
 
   public async timeoutFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
@@ -422,20 +419,20 @@ describe.only('async functions', () => {
     it('should return all sync values immediately', () => {
       HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
       const engine = HyperFormula.buildFromArray([
-        [1, '=ASYNC_FOO()'],
+        [1, '=ASYNC_FOO()', '=SUM(A1:B1)'],
       ])
 
-      expect(engine.getSheetValues(0)).toEqual([[1, 'Loading...']])
+      expect(engine.getSheetValues(0)).toEqual([[1, 'Loading...', 1]])
     })
 
-    it('async values are calculated after promises resolve', (done) => {
+    it.only('async values are calculated after promises resolve', (done) => {
       HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
       const engine = HyperFormula.buildFromArray([
-        [1, '=ASYNC_FOO()'],
+        [1, '=ASYNC_FOO()', '=SUM(A1:B1)', '=B1'],
       ])
 
       const handler = () => {
-        expect(engine.getSheetValues(0)).toEqual([[1, 'asyncFoo']])
+        expect(engine.getSheetValues(0)).toEqual([[1, 1, 2, 1]])
 
         done()
       }
