@@ -49,7 +49,6 @@ export interface ParsingError {
 }
 
 export interface AsyncFunctionValue {
-  ast: Ast,
   state: InterpreterState,
   interpreterValue: InterpreterValue,
 }

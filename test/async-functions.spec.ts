@@ -1,4 +1,4 @@
-import {HyperFormula} from '../src'
+import {ExportedNamedExpressionChange, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Events} from '../src/Emitter'
@@ -96,7 +96,7 @@ describe('async functions', () => {
         done()
       }
 
-      engine.on(Events.AsyncFunctionValuesCalculated, handler)
+      engine.on(Events.AsyncValuesUpdated, handler)
     })
   })
    
@@ -120,7 +120,7 @@ describe('async functions', () => {
         done()
       }
 
-      engine.on(Events.AsyncFunctionValuesCalculated, handler)
+      engine.on(Events.AsyncValuesUpdated, handler)
     })
 
     it('should return #TIMEOUT error if function does not resolve due to the request taking too long', (done) => {
@@ -135,7 +135,7 @@ describe('async functions', () => {
         done()
       }
 
-      engine.on(Events.AsyncFunctionValuesCalculated, handler)
+      engine.on(Events.AsyncValuesUpdated, handler)
     }, Config.defaultConfig.timeoutTime + 3000)
 
     it('should throw an error if function does not resolve', async() => {      
@@ -148,6 +148,24 @@ describe('async functions', () => {
       } catch (error) {
         expect(error).toEqualError(new Error('asyncErrorFoo'))
       }
+    })
+  })
+
+  describe('named expressions', () => {
+    it('using native boolean as expression', (done) => {
+      const engine = HyperFormula.buildEmpty()
+      const changes = engine.addNamedExpression('asyncFoo', '=ASYNC_FOO()')
+  
+      const handler = () => {
+        expect(engine.getNamedExpressionValue('asyncFoo')).toEqual(1)
+
+        done()
+      }
+
+      engine.on(Events.AsyncValuesUpdated, handler)
+
+      expect(changes).toEqual([new ExportedNamedExpressionChange('asyncFoo', 'Loading...')])
+      expect(engine.getNamedExpressionValue('asyncFoo')).toEqual('Loading...')
     })
   })
 })

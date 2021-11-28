@@ -122,7 +122,7 @@ export class BuildEngineFactory {
       graphBuilder.buildGraph(sheets, stats)
     })
 
-    const evaluator = new Evaluator(emitter, config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
+    const evaluator = new Evaluator(exporter, crudOperations, emitter, config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
 
     evaluator.run()
 

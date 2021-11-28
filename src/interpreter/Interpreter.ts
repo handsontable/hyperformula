@@ -221,14 +221,12 @@ export class Interpreter {
             const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
               functionPromise.then((interpreterValue) => {
                 resolve({
-                  ast,
                   state,
                   interpreterValue
                 })
               }).catch((error) => {
                 if (error instanceof CellError) {
                   resolve({
-                    ast,
                     state,
                     interpreterValue: error
                   })

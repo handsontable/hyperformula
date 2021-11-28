@@ -3,14 +3,17 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import { ExportedCellChange, ExportedNamedExpressionChange } from '.'
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {ContentChanges} from './ContentChanges'
+import { CrudOperations } from './CrudOperations'
 import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import { Emitter, Events } from './Emitter'
+import { Exporter } from './Exporter'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
 import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
@@ -18,13 +21,14 @@ import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Ast, RelativeDependency} from './parser'
-import {AsyncFunctionValue} from './parser/Ast'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
   recomputedAsyncFunctionsPromise?: Promise<void>
 
   constructor(
+    private readonly exporter: Exporter,
+    private readonly crudOperations: CrudOperations,
     private readonly emitter: Emitter,
     private readonly config: Config,
     private readonly stats: Statistics,
@@ -48,25 +52,32 @@ export class Evaluator {
   }
 
   private async recomputeAsyncFunctions() {
-    const asyncFunctionValues: AsyncFunctionValue[] = []
+    const allChanges: (ExportedCellChange | ExportedNamedExpressionChange)[] = []
 
     while (this.interpreter.asyncFunctionValuesQueue.length > 0) {
       const asyncFunctionValue = await this.interpreter.asyncFunctionValuesQueue[0]
       const { state, interpreterValue } = asyncFunctionValue
 
-      if (state.formulaVertex) {
-        state.formulaVertex.setCellValue(interpreterValue)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const formulaVertex = state.formulaVertex!
 
-        this.partialRun([state.formulaVertex], false)
-      }
+      formulaVertex.setCellValue(interpreterValue)
       
+      const changes = this.crudOperations.getAndClearContentChanges()
+
+      changes.addAll(this.partialRun([formulaVertex], false))
+      
+      const exportedChanges = changes.exportChanges(this.exporter)
+
       this.interpreter.asyncFunctionValuesQueue.shift()
 
-      asyncFunctionValues.push(asyncFunctionValue)
+      exportedChanges.forEach((change) => {
+        allChanges.push(change)
+      })
     }
 
-    if (asyncFunctionValues.length) {
-      this.emitter.emit(Events.AsyncFunctionValuesCalculated, asyncFunctionValues)
+    if (allChanges.length) {
+      this.emitter.emit(Events.AsyncValuesUpdated, allChanges)
     }  
   }
 
