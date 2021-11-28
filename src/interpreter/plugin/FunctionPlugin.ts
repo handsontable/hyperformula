@@ -252,7 +252,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   }
 
   protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
-    return this.interpreter.evaluateAst(ast, state)
+    return this.interpreter.evaluateAst(ast, state)[0]
   }
 
   protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {

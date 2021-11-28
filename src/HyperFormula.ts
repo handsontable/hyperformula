@@ -20,6 +20,7 @@ import {
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
 import {Config, ConfigParams, getDefaultConfig} from './Config'
+import { ContentChanges } from './ContentChanges'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {
@@ -114,6 +115,7 @@ export class HyperFormula implements TypedEmitter {
   public static languages: Record<string, RawTranslationPackage> = {}
   private static registeredLanguages: Map<string, TranslationPackage> = new Map()
   private _evaluationSuspended: boolean = false
+  private readonly _emitter: Emitter = new Emitter()
 
   protected constructor(
     private _config: Config,
@@ -130,7 +132,6 @@ export class HyperFormula implements TypedEmitter {
     private _namedExpressions: NamedExpressions,
     private _serialization: Serialization,
     private _functionRegistry: FunctionRegistry,
-    private _emitter: Emitter
   ) {
   }
 
@@ -257,8 +258,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Factories
    */
-  public static buildFromArray(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
-    return this.buildFromEngineState(BuildEngineFactory.buildFromSheet(sheet, configInput, namedExpressions))
+  public static buildFromArray(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): [HyperFormula, Promise<void>] {
+    const [engine, evaluatorPromise] = BuildEngineFactory.buildFromSheet(sheet, configInput, namedExpressions)
+    
+    return [this.buildFromEngineState(engine), evaluatorPromise]
   }
 
   /**
@@ -297,8 +300,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Factories
    */
-  public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
-    return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput, namedExpressions))
+  public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): [HyperFormula, Promise<void>] {
+    const [engine, evaluatorPromise]  = BuildEngineFactory.buildFromSheets(sheets, configInput, namedExpressions)
+
+    return [this.buildFromEngineState(engine), evaluatorPromise]
   }
 
   /**
@@ -317,8 +322,10 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Factories
    */
-  public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
-    return this.buildFromEngineState(BuildEngineFactory.buildEmpty(configInput, namedExpressions))
+  public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): [HyperFormula, Promise<void>] {
+    const [engine, evaluatorPromise]  = BuildEngineFactory.buildEmpty(configInput, namedExpressions)
+
+    return [this.buildFromEngineState(engine), evaluatorPromise]
   }
 
   /**
@@ -607,7 +614,6 @@ export class HyperFormula implements TypedEmitter {
       engine.namedExpressions,
       engine.serialization,
       engine.functionRegistry,
-      engine.emitter
     )
   }
 
@@ -949,7 +955,7 @@ export class HyperFormula implements TypedEmitter {
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
     const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 
-    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
+    const [newEngine] = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
 
     this._config = newEngine.config
     this._stats = newEngine.stats
@@ -1033,7 +1039,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Undo and Redo
    */
-  public undo(): ExportedChange[] {
+  public undo(): [ExportedChange[], Promise<ExportedChange[]>] {
     this._crudOperations.undo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1067,7 +1073,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Undo and Redo
    */
-  public redo(): ExportedChange[] {
+  public redo(): [ExportedChange[], Promise<ExportedChange[]>] {
     this._crudOperations.redo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1193,7 +1199,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Cells
    */
-  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
+  public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): [ExportedChange[], Promise<ExportedChange[]>] {
     this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1243,7 +1249,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+  public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1331,7 +1337,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+  public setRowOrder(sheetId: number, newRowOrder: number[]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
     return this.swapRowIndexes(sheetId, mapping)
@@ -1418,7 +1424,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+  public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1502,7 +1508,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+  public setColumnOrder(sheetId: number, newColumnOrder: number[]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
     return this.swapColumnIndexes(sheetId, mapping)
@@ -1608,7 +1614,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+  public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1678,7 +1684,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+  public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1752,7 +1758,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+  public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1825,7 +1831,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+  public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1916,7 +1922,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Cells
    */
-  public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+  public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): [ExportedChange[], Promise<ExportedChange[]>] {
     if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
@@ -2000,7 +2006,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Rows
    */
-  public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+  public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startRow, 'number', 'startRow')
     validateArgToType(numberOfRows, 'number', 'numberOfRows')
@@ -2086,7 +2092,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Columns
    */
-  public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+  public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startColumn, 'number', 'startColumn')
     validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
@@ -2193,7 +2199,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Clipboard
    */
-  public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+  public paste(targetLeftCorner: SimpleCellAddress): [ExportedChange[], Promise<ExportedChange[]>] {
     if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
@@ -2575,13 +2581,19 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public removeSheet(sheetId: number): ExportedChange[] {
+  public removeSheet(sheetId: number): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     const displayName = this.sheetMapping.getDisplayName(sheetId)!
     this._crudOperations.removeSheet(sheetId)
-    const changes = this.recomputeIfDependencyGraphNeedsIt()
+    const [changes, asyncChanges] = this.recomputeIfDependencyGraphNeedsIt()
+    
+    asyncChanges.then((exportedChanges) => {
+      this._emitter.emit(Events.SheetRemoved, displayName, exportedChanges)
+    })
+    
     this._emitter.emit(Events.SheetRemoved, displayName, changes)
-    return changes
+
+    return [changes, asyncChanges]
   }
 
   /**
@@ -2647,7 +2659,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public clearSheet(sheetId: number): ExportedChange[] {
+  public clearSheet(sheetId: number): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.clearSheet(sheetId)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2714,7 +2726,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public setSheetContent(sheetId: number, values: RawCellContent[][]): ExportedChange[] {
+  public setSheetContent(sheetId: number, values: RawCellContent[][]): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setSheetContent(sheetId, values)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -3377,7 +3389,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Batch
    */
-  public batch(batchOperations: () => void): ExportedChange[] {
+  public batch(batchOperations: () => void): [ExportedChange[], Promise<ExportedChange[]>] {
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
@@ -3460,11 +3472,18 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Batch
    */
-  public resumeEvaluation(): ExportedChange[] {
+  public resumeEvaluation(): [ExportedChange[], Promise<ExportedChange[]>] {
     this._evaluationSuspended = false
-    const changes = this.recomputeIfDependencyGraphNeedsIt()
+
+    const [changes, asyncChanges] = this.recomputeIfDependencyGraphNeedsIt()
+    
+    asyncChanges.then((exportedChanges) => {
+      this._emitter.emit(Events.EvaluationResumed, exportedChanges)
+    })
+
     this._emitter.emit(Events.EvaluationResumed, changes)
-    return changes
+
+    return [changes, asyncChanges]
   }
 
   /**
@@ -3565,15 +3584,20 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+  public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     this._crudOperations.addNamedExpression(expressionName, expression, scope, options)
-    const changes = this.recomputeIfDependencyGraphNeedsIt()
-    this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
-    return changes
+
+    const [changes, asyncChanges] = this.recomputeIfDependencyGraphNeedsIt()
+    
+    asyncChanges.then((exportedChanges) => {
+      this._emitter.emit(Events.NamedExpressionAdded, expressionName, exportedChanges)
+    })
+
+    return [changes, asyncChanges]
   }
 
   /**
@@ -3779,7 +3803,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+  public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -3858,18 +3882,24 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
+  public removeNamedExpression(expressionName: string, scope?: number): [ExportedChange[], Promise<ExportedChange[]>] {
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
     }
     const removedNamedExpression = this._crudOperations.removeNamedExpression(expressionName, scope)
     if (removedNamedExpression) {
-      const changes = this.recomputeIfDependencyGraphNeedsIt()
+      const [changes, asyncChanges] = this.recomputeIfDependencyGraphNeedsIt()
+    
+      asyncChanges.then((exportedChanges) => {
+        this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, exportedChanges)
+      })
+
       this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)
-      return changes
+
+      return [changes, asyncChanges]
     } else {
-      return []
+      return [[], Promise.resolve([])]
     }
   }
 
@@ -4312,15 +4342,35 @@ export class HyperFormula implements TypedEmitter {
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    */
-  private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
+  private recomputeIfDependencyGraphNeedsIt(): [ExportedChange[], Promise<ExportedChange[]>] {
     if (!this._evaluationSuspended) {
       const changes = this._crudOperations.getAndClearContentChanges()
       const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
       this.dependencyGraph.clearRecentlyChangedVertices()
 
+      let evaluatorPromise: Promise<ContentChanges[]> = Promise.resolve([])
+
       if (verticesToRecomputeFrom.length > 0) {
-        changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom, true))
+        const [contentChanges, promise] = this.evaluator.partialRun(verticesToRecomputeFrom)
+
+        evaluatorPromise = promise
+
+        changes.addAll(contentChanges)
       }
+
+      const promise = new Promise<ExportedChange[]>((resolve, reject) => {
+        evaluatorPromise.then((contentChanges) => {
+          let exportedChanges: ExportedChange[] = []
+
+          contentChanges.forEach((changes) => {
+            exportedChanges = [...exportedChanges, ...changes.exportChanges(this._exporter)]
+  
+            this._emitter.emit(Events.AsyncValuesUpdated, exportedChanges)  
+          })
+
+          resolve(exportedChanges)
+        }).catch(reject)
+      })
 
       const exportedChanges = changes.exportChanges(this._exporter)
 
@@ -4328,9 +4378,9 @@ export class HyperFormula implements TypedEmitter {
         this._emitter.emit(Events.ValuesUpdated, exportedChanges)
       }
 
-      return exportedChanges
+      return [exportedChanges, promise]
     } else {
-      return []
+      return [[], Promise.resolve([])]
     }
   }
 }
