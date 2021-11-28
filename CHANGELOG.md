@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added async functionality for custom functions. (#862)
 - Added `AsyncValuesUpdated` event which is the async equivalent of `ValuesUpdated`. (#862)
-- Added `AsyncValuesUpdated` event which is the async equivalent of `ValuesUpdated`. (#862)
 - Added `#TIMEOUT!` error returned when async function takes too long to resolve. (#862)
 - Added `timeoutTime` configuration option to customize async functions timeout. (#862)
 - Added `Loading...` text to the translations for async cells with a pending promise. (#862)
