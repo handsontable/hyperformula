@@ -412,6 +412,7 @@ const dictionary: RawTranslationPackage = {
   langCode: 'nlNL',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
+    LOADING: 'Loading...'
   },
 }
 

@@ -412,6 +412,7 @@ const dictionary: RawTranslationPackage = {
   langCode: 'plPL',
   ui: {
     NEW_SHEET_PREFIX: 'Arkusz',
+    LOADING: 'Loading...'
   },
 }
 

@@ -98,37 +98,6 @@ describe('async functions', () => {
 
       engine.on(Events.AsyncFunctionValuesCalculated, handler)
     })
-
-    it('should return #TIMEOUT error if function does not resolve due to the request taking too long', (done) => {
-      const engine = HyperFormula.buildEmpty()
-
-      engine.addSheet('Sheet1')
-
-      engine.setSheetContent(0, [['=TIMEOUT_FOO()', 'foo']])
-
-      const handler = () => {
-        expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.TIMEOUT, ErrorMessage.FunctionTimeout))
-        expect(engine.getCellValue(adr('B1'))).toBe('foo')
-    
-        done()
-      }
-
-      engine.on(Events.AsyncFunctionValuesCalculated, handler)
-    }, Config.defaultConfig.timeoutTime + 3000)
-
-    it('should throw an error if function does not resolve', async() => {      
-      const engine = HyperFormula.buildEmpty()
-
-      engine.addSheet('Sheet1')
-
-      engine.setSheetContent(0, [['=ASYNC_ERROR_FOO()']])      
-
-      try {
-        await engine.evaluator.recomputedAsyncFunctionsPromise
-      } catch (error) {
-        expect(error).toEqualError(new Error('asyncErrorFoo'))
-      }
-    })
   })
    
   describe('recompute all formulas', () => {

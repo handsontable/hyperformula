@@ -412,6 +412,7 @@ export const dictionary: RawTranslationPackage = {
   langCode: 'esES',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
+    LOADING: 'Loading...'
   },
 }
 

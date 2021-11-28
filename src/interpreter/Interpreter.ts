@@ -13,6 +13,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
+import { UIElement } from '../i18n'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -40,7 +41,6 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import { AsyncPluginFunctionType } from './plugin/FunctionPlugin'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
@@ -240,7 +240,7 @@ export class Interpreter {
     
             this.asyncFunctionValuesQueue.push(promise)
     
-            return 'Loading...'
+            return this.config.translationPackage.getUITranslation(UIElement.LOADING)
           }
         }
 
