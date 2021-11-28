@@ -57,7 +57,7 @@ export class Evaluator {
       if (state.formulaVertex) {
         state.formulaVertex.setCellValue(interpreterValue)
 
-        this.partialRun([state.formulaVertex])
+        this.partialRun([state.formulaVertex], false)
       }
       
       this.interpreter.asyncFunctionValuesQueue.shift()
@@ -70,7 +70,7 @@ export class Evaluator {
     }  
   }
 
-  public partialRun(vertices: Vertex[]): ContentChanges {
+  public partialRun(vertices: Vertex[], recomputeAsyncFunctions: boolean): ContentChanges {
     const changes = ContentChanges.empty()
 
     this.stats.measure(StatType.EVALUATION, () => {
@@ -107,6 +107,11 @@ export class Evaluator {
         },
       )
     })
+
+    if (recomputeAsyncFunctions) {
+      this.recomputedAsyncFunctionsPromise = this.recomputeAsyncFunctions()
+    }
+
     return changes
   }
 
@@ -144,11 +149,9 @@ export class Evaluator {
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
         const newCellValue = this.recomputeFormulaVertexValue(vertex)
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
 
-        if (!vertex.isAsync) {
-          const address = vertex.getAddress(this.lazilyTransformingAstService)
-          this.columnSearch.add(getRawValue(newCellValue), address)
-        }
+        this.columnSearch.add(getRawValue(newCellValue), address)
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }

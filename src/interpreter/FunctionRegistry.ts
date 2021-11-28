@@ -211,21 +211,11 @@ export class FunctionRegistry {
     return this.instancePlugins.get(functionId)
   }
 
-  public getFunction(functionId: string): Maybe<PluginFunctionType> {
+  public getFunction(functionId: string): Maybe<PluginFunctionType | AsyncPluginFunctionType> {
     const pluginEntry = this.functions.get(functionId)
     if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
       const [pluginFunction, pluginInstance] = pluginEntry
-      return (ast, state) => (pluginInstance as any as Record<string, PluginFunctionType>)[pluginFunction](ast, state)
-    } else {
-      return undefined
-    }
-  }
-
-  public getAsyncFunction(functionId: string): Maybe<AsyncPluginFunctionType> {
-    const pluginEntry = this.functions.get(functionId)
-    if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
-      const [pluginFunction, pluginInstance] = pluginEntry
-      return (ast, state) => (pluginInstance as any as Record<string, AsyncPluginFunctionType>)[pluginFunction](ast, state)
+      return (ast, state) => (pluginInstance as any as (Record<string, PluginFunctionType>))[pluginFunction](ast, state)
     } else {
       return undefined
     }

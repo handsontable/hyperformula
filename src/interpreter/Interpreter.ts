@@ -6,7 +6,7 @@
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
-import {CellError, ErrorType, invalidSimpleCellAddress, withTimeout} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, isPromise, withTimeout} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
@@ -32,6 +32,7 @@ import {CriterionBuilder} from './Criterion'
 import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterState} from './InterpreterState'
 import {
+  AsyncInterpreterValue,
   cloneNumber,
   EmptyValue,
   getRawValue,
@@ -39,6 +40,7 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
+import { AsyncPluginFunctionType } from './plugin/FunctionPlugin'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
@@ -196,11 +198,16 @@ export class Interpreter {
           return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
         }
 
-        const metadata = this.functionRegistry.getMetadata(ast.procedureName)
-        const cellError = new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
         const interpreterState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
+        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
 
-        if (metadata?.asyncFunction) {
+        if (pluginFunction === undefined) {
+          return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
+        }
+
+        const pluginFunctionValue = pluginFunction(ast, interpreterState)
+
+        if (isPromise(pluginFunctionValue)) {
           if (state.formulaVertex) {
             state.formulaVertex.isAsync = true
           }
@@ -208,16 +215,8 @@ export class Interpreter {
           if (state.formulaVertex?.isComputed()) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return interpreterState.formulaVertex!.getCellValue()
-          }else {
-            const pluginFunction = this.functionRegistry.getAsyncFunction(ast.procedureName)
-
-            if (pluginFunction === undefined) {
-              return cellError
-            }
-
-            let functionPromise = pluginFunction(ast, interpreterState)
-            
-            functionPromise = withTimeout(functionPromise, this.config.timeoutTime)
+          }else {            
+            const functionPromise = withTimeout(pluginFunctionValue as AsyncInterpreterValue, this.config.timeoutTime)
             
             const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
               functionPromise.then((interpreterValue) => {
@@ -245,13 +244,7 @@ export class Interpreter {
           }
         }
 
-        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
-
-        if (pluginFunction === undefined) {
-          return cellError
-        }
-
-        return pluginFunction(ast, interpreterState)
+        return pluginFunctionValue as InterpreterValue
       }
       case AstNodeType.NAMED_EXPRESSION: {
         const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, state.formulaAddress.sheet)

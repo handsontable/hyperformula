@@ -4319,7 +4319,7 @@ export class HyperFormula implements TypedEmitter {
       this.dependencyGraph.clearRecentlyChangedVertices()
 
       if (verticesToRecomputeFrom.length > 0) {
-        changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
+        changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom, true))
       }
 
       const exportedChanges = changes.exportChanges(this._exporter)

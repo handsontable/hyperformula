@@ -105,13 +105,6 @@ export interface FunctionMetadata {
   arrayFunction?: boolean,
 
   /**
-   * Engine.
-   * 
-   * If set to `true`, the function is classed as an async function that will not resolve immediately.
-   */
-  asyncFunction?: boolean,
-
-  /**
    * Internal.
    *
    * If set to `true`, prevents the function from ever being vectorized.

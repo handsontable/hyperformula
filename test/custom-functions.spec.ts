@@ -1,13 +1,11 @@
 import {FunctionPluginValidationError, HyperFormula, SimpleRangeValue} from '../src'
 import {ArraySize} from '../src/ArraySize'
 import {ErrorType} from '../src/Cell'
-import { Config } from '../src/Config'
-import { Events } from '../src/Emitter'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
-import {AsyncInternalScalarValue, InternalScalarValue} from '../src/interpreter/InterpreterValue'
+import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
 import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
@@ -27,18 +25,6 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
       method: 'arrayfoo',
       arraySizeMethod: 'arraysizeFoo',
     },
-    'ASYNC_FOO': {
-      method: 'asyncFoo',
-      asyncFunction: true,
-    },
-    'TIMEOUT_FOO': {
-      method: 'timeoutFoo',
-      asyncFunction: true,
-    },
-    'ASYNC_ERROR_FOO': {
-      method: 'asyncErrorFoo',
-      asyncFunction: true,
-    },
   }
 
   public static translations = {
@@ -46,17 +32,11 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
       'FOO': 'FOO',
       'BAR': 'BAR',
       'ARRAYFOO': 'ARRAYFOO',
-      'ASYNC_FOO': 'ASYNC_FOO',
-      'TIMEOUT_FOO': 'TIMEOUT_FOO',
-      'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
     },
     'plPL': {
       'FOO': 'FU',
       'BAR': 'BAR',
       'ARRAYFOO': 'ARRAYFOO',
-      'ASYNC_FOO': 'ASYNC_FOO',
-      'TIMEOUT_FOO': 'TIMEOUT_FOO',
-      'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
     }
   }
 
@@ -74,20 +54,6 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
 
   public arraysizeFoo(_ast: ProcedureAst, _state: InterpreterState): ArraySize {
     return new ArraySize(2, 2)
-  }
-
-  public async asyncFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
-    return new Promise(resolve => setTimeout(() => resolve(1), 1000))
-  }
-
-  public async timeoutFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
-    return new Promise(resolve => setTimeout(() => resolve('timeoutFoo'), Config.defaultConfig.timeoutTime + 10000))
-  }
-
-  public async asyncErrorFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
-    return new Promise(() => {
-      throw new Error('asyncErrorFoo')
-    })
   }
 }
 
@@ -185,7 +151,7 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FU', 'BAR', 'TIMEOUT_FOO', 'ASYNC_FOO', 'ASYNC_ERROR_FOO', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
+    expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
   })
 
   it('should register all formulas from plugin', () => {
@@ -411,63 +377,5 @@ describe('aliases', () => {
     expect(() => {
       HyperFormula.registerFunctionPlugin(OverloadedAliasPlugin)
     }).toThrow(new AliasAlreadyExisting('FOO', 'OverloadedAliasPlugin'))
-  })
-})
-
-describe.only('async functions', () => {
-  describe('static buildFrom', () => {
-    it('should return all sync values immediately', () => {
-      HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
-      const engine = HyperFormula.buildFromArray([
-        [1, '=ASYNC_FOO()', '=SUM(A1:B1)'],
-      ])
-
-      expect(engine.getSheetValues(0)).toEqual([[1, 'Loading...', 1]])
-    })
-
-    it.only('async values are calculated after promises resolve', (done) => {
-      HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
-      const engine = HyperFormula.buildFromArray([
-        [1, '=ASYNC_FOO()', '=SUM(A1:B1)', '=B1'],
-      ])
-
-      const handler = () => {
-        expect(engine.getSheetValues(0)).toEqual([[1, 1, 2, 1]])
-
-        done()
-      }
-
-      engine.on(Events.AsyncFunctionValuesCalculated, handler)
-    })
-
-    it('should return #TIMEOUT error if function does not resolve due to the request taking too long', (done) => {
-      HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
-      const engine = HyperFormula.buildFromArray([
-        ['=TIMEOUT_FOO()', '=FOO()'],
-      ])
-
-      const handler = () => {
-        expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.TIMEOUT, ErrorMessage.FunctionTimeout))
-        expect(engine.getCellValue(adr('B1'))).toBe('foo')
-    
-        done()
-      }
-
-      engine.on(Events.AsyncFunctionValuesCalculated, handler)
-    }, Config.defaultConfig.timeoutTime + 3000)
-
-    it('should throw an error if function does not resolve', async() => {
-      HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
-      
-      const engine = HyperFormula.buildFromArray([
-        ['=ASYNC_ERROR_FOO()'],
-      ])
-
-      try {
-        await engine.evaluator.recomputedAsyncFunctionsPromise
-      } catch (error) {
-        expect(error).toEqualError(new Error('asyncErrorFoo'))
-      }
-    })
   })
 })
