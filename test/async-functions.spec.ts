@@ -1,7 +1,9 @@
-import {ExportedNamedExpressionChange, HyperFormula} from '../src'
+import {ExportedChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
+import {Events} from '../src/Emitter'
 import {ErrorMessage} from '../src/error-message'
+import {UIElement} from '../src/i18n'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {AsyncInternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
@@ -61,6 +63,11 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
     })
   }
 }
+
+const config = new Config()
+
+const loadingText = config.translationPackage.getUITranslation(UIElement.LOADING)
+
 beforeEach(() => {
   HyperFormula.registerFunctionPlugin(AsyncPlugin, AsyncPlugin.translations)
 })
@@ -75,11 +82,27 @@ describe('recompute partial formulas', () => {
 
     const [, promise] = engine.setSheetContent(0, [[1, '=ASYNC_FOO()', '=SUM(A1:B1)', '=ASYNC_FOO(A1)']])
 
-    expect(engine.getSheetValues(0)).toEqual([[1, 'Loading...', 1, 'Loading...']])
+    expect(engine.getSheetValues(0)).toEqual([[1, loadingText, 1, loadingText]])
 
     await promise
 
     expect(engine.getSheetValues(0)).toEqual([[1, 1, 2, 6]])
+  })
+
+  it('asyncValuesUpdated fires with changes', (done) => {
+    const [engine] = HyperFormula.buildFromArray([])
+
+    engine.setSheetContent(0, [[1, '=ASYNC_FOO()']])
+
+    const handler = (changes?: ExportedChange[]) => {
+      expect(engine.getSheetValues(0)).toEqual([[1, 1]])
+      // TODO: Make this strict when parallel evaluation is fixed
+      expect(changes).toBeTruthy()
+
+      done()
+    }
+
+    engine.on(Events.AsyncValuesUpdated, handler)
   })
 })
   
@@ -89,7 +112,7 @@ describe('recompute all formulas', () => {
       [1, '=ASYNC_FOO()', '=SUM(A1:B1)', '=ASYNC_FOO(A1)'],
     ])
 
-    expect(engine.getSheetValues(0)).toEqual([[1, 'Loading...', 1, 'Loading...']])
+    expect(engine.getSheetValues(0)).toEqual([[1, loadingText, 1, loadingText]])
 
     await promise
 
@@ -120,22 +143,28 @@ describe('recompute all formulas', () => {
   })
 })
 
-it('named expressions', async() => {
+it('named expressions works with async functions', async() => {
   const [engine] = HyperFormula.buildEmpty()
   const [changes, promise] = engine.addNamedExpression('asyncFoo', '=ASYNC_FOO()')
 
-  expect(changes).toEqual([new ExportedNamedExpressionChange('asyncFoo', 'Loading...')])
-  expect(engine.getNamedExpressionValue('asyncFoo')).toEqual('Loading...')
+  expect(changes).toEqual([new ExportedNamedExpressionChange('asyncFoo', loadingText)])
+  expect(engine.getNamedExpressionValue('asyncFoo')).toEqual(loadingText)
 
   await promise
 
   expect(engine.getNamedExpressionValue('asyncFoo')).toEqual(1)
 })
 
-// it('calculateFormula', () => {
-//   const [engine] = HyperFormula.buildFromArray([[
-//     2
-//   ]])
+it('calculateFormula works with async functions', async() => {
+  const [engine] = HyperFormula.buildFromArray([[
+    1
+  ]])
   
-//   engine.calculateFormula('=ASYNC_FOO(A1)', 0)
-// })
+  const [cellValue, promise] = engine.calculateFormula('=ASYNC_FOO(A1)', 0)
+
+  expect(cellValue).toEqual(loadingText)
+
+  const newCellValue = await promise
+
+  expect(newCellValue).toEqual(6)
+})

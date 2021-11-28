@@ -15,7 +15,7 @@ export enum Events {
   ValuesUpdated = 'valuesUpdated',
   AsyncValuesUpdated = 'asyncValuesUpdated',
   EvaluationSuspended = 'evaluationSuspended',
-  EvaluationResumed = 'evaluationResumed'
+  EvaluationResumed = 'evaluationResumed',
 }
 
 export interface Listeners {

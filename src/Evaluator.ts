@@ -113,7 +113,7 @@ export class Evaluator {
     return [changes, this.recomputeAsyncFunctions(promises)]
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): [InterpreterValue, Promise<InterpreterValue>] {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -125,19 +125,19 @@ export class Evaluator {
         }
       }
     }
-    const [ret] = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
+    const [ret, asyncFunctionValuePromise] = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
 
     tmpRanges.forEach((rangeVertex) => {
       this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
     })
 
-    // const promise = new Promise<void>((resolve, reject) => {
-    //   this.setAsyncFunctionValue(asyncFunctionValuePromise).then(() => {
-    //     resolve(undefined)
-    //   }).catch(reject)
-    // })
+    const promise = new Promise<InterpreterValue>((resolve, reject) => {
+      asyncFunctionValuePromise?.then(({ interpreterValue }) => {
+        resolve(interpreterValue)
+      }).catch(reject)
+    })
 
-    return ret
+    return [ret, promise]
   }
 
   /**

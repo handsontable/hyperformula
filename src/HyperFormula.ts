@@ -260,7 +260,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildFromArray(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): [HyperFormula, Promise<void>] {
     const [engine, evaluatorPromise] = BuildEngineFactory.buildFromSheet(sheet, configInput, namedExpressions)
-    
+
     return [this.buildFromEngineState(engine), evaluatorPromise]
   }
 
@@ -4035,7 +4035,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public calculateFormula(formulaString: string, sheetId: number): CellValue | CellValue[][] {
+  public calculateFormula(formulaString: string, sheetId: number): [CellValue | CellValue[][], Promise<CellValue | CellValue[][]>] {
     validateArgToType(formulaString, 'string', 'formulaString')
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.ensureScopeIdIsValid(sheetId)
@@ -4043,8 +4043,15 @@ export class HyperFormula implements TypedEmitter {
     if (ast === undefined) {
       throw new NotAFormulaError()
     }
-    const internalCellValue = this.evaluator.runAndForget(ast, address, dependencies)
-    return this._exporter.exportScalarOrRange(internalCellValue)
+    const [interpreterValue, promise] = this.evaluator.runAndForget(ast, address, dependencies)
+    
+    const cellValuePromise = new Promise<CellValue | CellValue[][]>((resolve, reject) => {
+      promise.then((interpreterValue) => {
+        resolve(this._exporter.exportScalarOrRange(interpreterValue))
+      }).catch(reject)
+    })
+
+    return [this._exporter.exportScalarOrRange(interpreterValue), cellValuePromise]
   }
 
   /**
@@ -4361,17 +4368,17 @@ export class HyperFormula implements TypedEmitter {
       const promise = new Promise<ExportedChange[]>((resolve, reject) => {
         evaluatorPromise.then((contentChanges) => {
           let exportedChanges: ExportedChange[] = []
-
+  
           contentChanges.forEach((changes) => {
             exportedChanges = [...exportedChanges, ...changes.exportChanges(this._exporter)]
   
             this._emitter.emit(Events.AsyncValuesUpdated, exportedChanges)  
           })
-
+  
           resolve(exportedChanges)
         }).catch(reject)
       })
-
+  
       const exportedChanges = changes.exportChanges(this._exporter)
 
       if (!changes.isEmpty()) {
