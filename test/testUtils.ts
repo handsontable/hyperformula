@@ -107,7 +107,7 @@ export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, ex
 
 export const verifyValues = (engine: HyperFormula) => {
   const serialization = engine.getAllSheetsSerialized()
-  const engine2 = HyperFormula.buildFromSheets(serialization)
+  const [engine2] = HyperFormula.buildFromSheets(serialization)
   expect(engine.getAllSheetsValues()).toEqual(engine2.getAllSheetsValues())
 }
 
