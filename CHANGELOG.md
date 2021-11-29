@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `timeoutTime` configuration option to customize async functions timeout. (#862)
 - Added `Loading...` cell error to the translations for async cells with a pending promise. All dependent cells will have this error. (#862)
 - Added `runAsyncFunction` for custom async functions. (#862)
+- Added `CellError` type to `getNamedExpressionValue` return types. (#862)
 
 ## [1.3.0] - 2021-10-20
 

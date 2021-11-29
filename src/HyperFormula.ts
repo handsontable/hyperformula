@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import { CellError } from '.'
 import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange} from './AbsoluteCellRange'
 import {validateArgToType} from './ArgumentSanitization'
 import {BuildEngineFactory, EngineState} from './BuildEngineFactory'
@@ -3627,7 +3628,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Named Expressions
    */
-  public getNamedExpressionValue(expressionName: string, scope?: number): CellValue | undefined {
+  public getNamedExpressionValue(expressionName: string, scope?: number): CellValue | CellError | undefined {
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
