@@ -17,6 +17,12 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
         {argumentType: ArgumentTypes.ANY}
       ],
     },
+    'LONG_ASYNC_FOO': {
+      method: 'longAsyncFoo',
+      parameters: [
+        {argumentType: ArgumentTypes.ANY}
+      ],
+    },
     'TIMEOUT_FOO': {
       method: 'timeoutFoo',
     },
@@ -28,11 +34,13 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
   public static translations = {
     'enGB': {
       'ASYNC_FOO': 'ASYNC_FOO',
+      'LONG_ASYNC_FOO': 'LONG_ASYNC_FOO',
       'TIMEOUT_FOO': 'TIMEOUT_FOO',
       'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
     },
     'plPL': {
       'ASYNC_FOO': 'ASYNC_FOO',
+      'LONG_ASYNC_FOO': 'LONG_ASYNC_FOO',
       'TIMEOUT_FOO': 'TIMEOUT_FOO',
       'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
     }
@@ -50,6 +58,14 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
   
       resolve(1)
     }, 100))
+  }
+  
+  public async longAsyncFoo(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
+    return new Promise(resolve => setTimeout(() => {
+      const argument = this.evaluateAst(ast.args[0], state) as number
+
+      resolve(argument + ' longAsyncFoo')
+    }, 3000))
   }
 
   public async timeoutFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
@@ -139,6 +155,24 @@ describe('async functions', () => {
         expect(error).toEqualError(new Error('asyncErrorFoo'))
       }
     })
+  })
+
+  it('Handles promise races gracefully', async() => {
+    const [engine, enginePromise] = HyperFormula.buildFromArray([[
+      'foo', '=LONG_ASYNC_FOO(A1)'
+    ]])
+
+    const [, cellContentPromise] = engine.setCellContents(adr('A1'), '=ASYNC_FOO()')
+
+    expect(engine.getSheetValues(0)).toEqual([[getLoadingError('Sheet1!A1'), getLoadingError('Sheet1!B1')]])
+
+    await cellContentPromise
+
+    expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1')]])
+
+    await enginePromise
+
+    expect(engine.getSheetValues(0)).toEqual([[1, '1 longAsyncFoo']])
   })
 
   it('works with multiple async functions one after another', async() => {

@@ -121,8 +121,8 @@ export const isPromise = (value: any) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const withTimeout = (promise: Promise<any>, ms: number) => {
-  const timeoutPromise = new Promise((_resolve, reject) => {
+export const withTimeout = <T>(promise: Promise<T>, ms: number) => {
+  const timeoutPromise = new Promise<CellError>((_resolve, reject) => {
     return setTimeout(
       () => {
         reject(new CellError(ErrorType.TIMEOUT, ErrorMessage.FunctionTimeout))
