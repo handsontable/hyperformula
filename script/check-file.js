@@ -18,7 +18,7 @@ try {
         // differences of up to several seconds. Here the only day we check.
     assert(HyperFormula.buildDate.split(' ')[0] === htConfig.HT_BUILD_DATE.split(' ')[0])
 
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
         ['42', '=A1 + 2']
     ], { gpuMode: 'cpu', licenseKey: 'gpl-v3' })
 
