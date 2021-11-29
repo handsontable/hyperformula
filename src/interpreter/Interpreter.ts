@@ -213,10 +213,6 @@ export class Interpreter {
         const pluginFunctionValue = pluginFunction(ast, interpreterState)
     
         if (isPromise(pluginFunctionValue)) {
-          if (state.formulaVertex) {
-            state.formulaVertex.isAsync = true
-          }
-    
           if (state.formulaVertex?.isComputed()) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return [interpreterState.formulaVertex!.getCellValue()]

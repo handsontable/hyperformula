@@ -8,7 +8,7 @@ import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {AsyncInternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
-import {adr, detailedError} from './testUtils'
+import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
 
 class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AsyncPlugin> {
   public static implementedFunctions = {
@@ -50,7 +50,7 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
       }
   
       resolve(1)
-    }, 1000))
+    }, 100))
   }
 
   public async timeoutFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncInternalScalarValue {
@@ -144,6 +144,23 @@ describe('async functions', () => {
     })
   })
 
+  it('works with multiple async functions one after another', async() => {
+    const sheet = [[
+      1, '=ASYNC_FOO()'
+    ]]
+    const [engine] = HyperFormula.buildFromArray(sheet)
+
+    const [,promise] = engine.setSheetContent(0, [[
+      '=ASYNC_FOO()', 1
+    ]])
+
+    await promise
+
+    expect(engine.getSheetValues(0)).toEqual([[
+      1, 1
+    ]])
+  })
+
   it('named expressions works with async functions', async() => {
     const [engine] = HyperFormula.buildEmpty()
     const [changes, promise] = engine.addNamedExpression('asyncFoo', '=ASYNC_FOO()')
@@ -191,5 +208,89 @@ describe('async functions', () => {
 
     expect(engine.getSheetValues(0)).toEqual([[1, 1]])
     expect(asyncChanges).toEqual([new ExportedCellChange(adr('B1'), 1)])
+  })
+
+  describe('undo', () => {
+    it('undo works with async functions before promises resolve', () => {
+      const sheet = [[
+        1, '=ASYNC_FOO()'
+      ]]
+      const [engine] = HyperFormula.buildFromArray(sheet)
+  
+      engine.setSheetContent(0, [[
+        '=ASYNC_FOO()', 1
+      ]])
+  
+      engine.undo()
+
+      const [expectedEngine] = HyperFormula.buildFromArray(sheet)
+
+      expectEngineToBeTheSameAs(engine, expectedEngine)
+    })
+
+    it('undo works with async functions after promises resolve', async() => {
+      const sheet = [[
+        2, '=ASYNC_FOO()'
+      ]]
+      const [engine] = HyperFormula.buildFromArray(sheet)
+  
+      const [,promise] = engine.setSheetContent(0, [[
+        '=ASYNC_FOO()', 2
+      ]])
+
+      await promise
+  
+      engine.undo()
+
+      const [expectedEngine, enginePromise] = HyperFormula.buildFromArray(sheet)
+
+      await enginePromise
+
+      expectEngineToBeTheSameAs(engine, expectedEngine)
+    })
+  })
+
+  describe('redo', () => {
+    it('redo works with async functions before promises resolve', () => {
+      const [engine] = HyperFormula.buildFromArray([[
+        1, '=ASYNC_FOO()'
+      ]])
+  
+      const sheet = [[
+        '=ASYNC_FOO()', 1
+      ]]
+
+      engine.setSheetContent(0, sheet)
+  
+      engine.undo()
+      engine.redo()
+
+      const [expectedEngine] = HyperFormula.buildFromArray(sheet)
+
+      expectEngineToBeTheSameAs(engine, expectedEngine)
+    })
+
+    it('redo works with async functions after promises resolve', async() => {
+      const [engine] = HyperFormula.buildFromArray([[
+        '=ASYNC_FOO()', 2
+      ]])
+  
+      const sheet = [[
+        2, '=ASYNC_FOO()'
+      ]]
+
+      const [,promise] = engine.setSheetContent(0, sheet)
+
+      await promise
+  
+      engine.undo()
+      engine.redo()
+
+      const [expectedEngine, enginePromise] = HyperFormula.buildFromArray(sheet)
+
+      await enginePromise
+
+      expectEngineToBeTheSameAs(engine, expectedEngine)
+    })
   })
 })

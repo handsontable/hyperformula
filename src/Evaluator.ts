@@ -41,7 +41,7 @@ export class Evaluator {
     })
   }
 
-  private async recomputeAsyncFunctions(asyncFunctionValuePromise: Promise<AsyncFunctionValue>[]): Promise<ContentChanges[]> {
+  private async recomputeAsyncFunctions(asyncFunctionValuePromise: Promise<AsyncFunctionValue>[], sortedVertices: Vertex[]): Promise<ContentChanges[]> {
     let allChanges: ContentChanges[] = []
 
     for (const promise of asyncFunctionValuePromise) {
@@ -52,21 +52,43 @@ export class Evaluator {
       const formulaVertex = state.formulaVertex!
   
       formulaVertex.setCellValue(interpreterValue)
-  
-      const [changes] = this.partialRunWithoutAsync([formulaVertex])
 
+      const indexOfCurrent = sortedVertices.indexOf(formulaVertex)
+
+      const changes = ContentChanges.empty()
+
+      // TODO: Not efficient algorithm code
+      for (let index = indexOfCurrent; index < sortedVertices.length; index++) {
+        const vertex = sortedVertices[index]
+        const isAsyncVertex = indexOfCurrent === index
+
+        if (vertex instanceof FormulaVertex) {
+          const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
+          const [newCellValue] = this.recomputeFormulaVertexValue(vertex)
+
+          if (newCellValue !== currentValue || isAsyncVertex) {
+            const address = vertex.getAddress(this.lazilyTransformingAstService)
+
+            changes.addChange(newCellValue, address)
+            this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
+          }
+        } else if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+        }
+      }
+  
       allChanges = [...allChanges, changes]
     }
 
     return allChanges
   }
 
-  private partialRunWithoutAsync(vertices: Vertex[]): [ContentChanges, Promise<AsyncFunctionValue>[]] {
+  private partialRunWithoutAsync(vertices: Vertex[]): [ContentChanges, Vertex[], Promise<AsyncFunctionValue>[]] {
     const changes = ContentChanges.empty()
     const promises: Promise<AsyncFunctionValue>[] = []
 
-    this.stats.measure(StatType.EVALUATION, () => {
-      this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
+    const { sorted } = this.stats.measure(StatType.EVALUATION, () => {
+      return this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
         (vertex: Vertex) => {
           if (vertex instanceof FormulaVertex) {
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
@@ -76,7 +98,7 @@ export class Evaluator {
               promises.push(promise)
             }
 
-            if (newCellValue !== currentValue || vertex.isAsync) {
+            if (newCellValue !== currentValue) {
               const address = vertex.getAddress(this.lazilyTransformingAstService)
               changes.addChange(newCellValue, address)
               this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
@@ -104,13 +126,13 @@ export class Evaluator {
       )
     })
 
-    return [changes, promises]
+    return [changes, sorted, promises]
   }
 
   public partialRun(vertices: Vertex[]): [ContentChanges, Promise<ContentChanges[]>] {
-    const [changes, promises] = this.partialRunWithoutAsync(vertices)
+    const [changes, sorted, promises] = this.partialRunWithoutAsync(vertices)
 
-    return [changes, this.recomputeAsyncFunctions(promises)]
+    return [changes, this.recomputeAsyncFunctions(promises, sorted)]
   }
 
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): [InterpreterValue, Promise<InterpreterValue>] {
@@ -168,7 +190,7 @@ export class Evaluator {
     })
 
     return new Promise<void>((resolve, reject) => {
-      this.recomputeAsyncFunctions(promises).then(() => {
+      this.recomputeAsyncFunctions(promises, sorted).then(() => {
         resolve(undefined)
       }).catch(reject)
     })
