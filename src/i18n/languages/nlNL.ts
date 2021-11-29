@@ -17,7 +17,8 @@ const dictionary: RawTranslationPackage = {
     REF: '#VERW!',
     SPILL: '#OVERLOOP!',
     VALUE: '#WAARDE!',
-    TIMEOUT: '#TIMEOUT!'
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -411,8 +412,7 @@ const dictionary: RawTranslationPackage = {
   },
   langCode: 'nlNL',
   ui: {
-    NEW_SHEET_PREFIX: 'Sheet',
-    LOADING: 'Loading...'
+    NEW_SHEET_PREFIX: 'Sheet'
   },
 }
 

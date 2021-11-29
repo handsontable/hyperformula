@@ -13,5 +13,4 @@ export {RawTranslationPackage, TranslationPackage, buildTranslationPackage}
 
 export enum UIElement {
   NEW_SHEET_PREFIX = 'NEW_SHEET_PREFIX',
-  LOADING = 'LOADING'
 }

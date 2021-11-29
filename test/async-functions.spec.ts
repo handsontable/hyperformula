@@ -3,12 +3,11 @@ import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Events} from '../src/Emitter'
 import {ErrorMessage} from '../src/error-message'
-import {UIElement} from '../src/i18n'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {AsyncInternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
-import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
+import {adr, detailedError, detailedErrorWithOrigin, expectEngineToBeTheSameAs} from './testUtils'
 
 class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AsyncPlugin> {
   public static implementedFunctions = {
@@ -64,9 +63,7 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
   }
 }
 
-const config = new Config()
-
-const loadingText = config.translationPackage.getUITranslation(UIElement.LOADING)
+const getLoadingError = (address: string) =>  detailedErrorWithOrigin(ErrorType.LOADING, address, ErrorMessage.FunctionLoading)
 
 describe('async functions', () => {
   beforeEach(() => {
@@ -83,7 +80,7 @@ describe('async functions', () => {
 
       const [, promise] = engine.setSheetContent(0, [[1, '=ASYNC_FOO()', '=SUM(A1:B1)', '=ASYNC_FOO(A1)']])
 
-      expect(engine.getSheetValues(0)).toEqual([[1, loadingText, 1, loadingText]])
+      expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1'), getLoadingError('Sheet1!B1'), getLoadingError('Sheet1!D1')]])
 
       const asyncChanges = await promise
 
@@ -113,7 +110,7 @@ describe('async functions', () => {
         [1, '=ASYNC_FOO()', '=SUM(A1:B1)', '=ASYNC_FOO(A1)'],
       ])
 
-      expect(engine.getSheetValues(0)).toEqual([[1, loadingText, 1, loadingText]])
+      expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1'), getLoadingError('Sheet1!B1'), getLoadingError('Sheet1!D1')]])
 
       await promise
 
@@ -165,8 +162,8 @@ describe('async functions', () => {
     const [engine] = HyperFormula.buildEmpty()
     const [changes, promise] = engine.addNamedExpression('asyncFoo', '=ASYNC_FOO()')
 
-    expect(changes).toEqual([new ExportedNamedExpressionChange('asyncFoo', loadingText)])
-    expect(engine.getNamedExpressionValue('asyncFoo')).toEqual(loadingText)
+    expect(changes).toEqual([new ExportedNamedExpressionChange('asyncFoo', getLoadingError('asyncFoo'))])
+    expect(engine.getNamedExpressionValue('asyncFoo')).toEqual(getLoadingError('asyncFoo'))
 
     const asyncChanges = await promise
 
@@ -181,7 +178,7 @@ describe('async functions', () => {
     
     const [cellValue, promise] = engine.calculateFormula('=ASYNC_FOO(A1)', 0)
 
-    expect(cellValue).toEqual(loadingText)
+    expect(cellValue).toEqual(detailedError(ErrorType.LOADING, ErrorMessage.FunctionLoading))
 
     const newCellValue = await promise
 
@@ -202,7 +199,7 @@ describe('async functions', () => {
       }
     })
 
-    expect(engine.getSheetValues(0)).toEqual([[1, loadingText]])
+    expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1')]])
 
     const asyncChanges = await promise
 

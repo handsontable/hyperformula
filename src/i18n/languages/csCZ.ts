@@ -17,7 +17,8 @@ const dictionary: RawTranslationPackage = {
     REF: '#ODKAZ!',
     SPILL: '#PRESAH!',
     VALUE: '#HODNOTA!',
-    TIMEOUT: '#TIMEOUT!'
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -411,8 +412,7 @@ const dictionary: RawTranslationPackage = {
   },
   langCode: 'csCZ',
   ui: {
-    NEW_SHEET_PREFIX: 'Sheet',
-    LOADING: 'Loading...'
+    NEW_SHEET_PREFIX: 'Sheet'
   },
 }
 

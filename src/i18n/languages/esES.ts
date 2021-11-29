@@ -17,7 +17,8 @@ export const dictionary: RawTranslationPackage = {
     REF: '#¡REF!',
     SPILL: '#¡DESBORDAMIENTO!',
     VALUE: '#¡VALOR!',
-    TIMEOUT: '#TIMEOUT!'
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -412,7 +413,6 @@ export const dictionary: RawTranslationPackage = {
   langCode: 'esES',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
-    LOADING: 'Loading...'
   },
 }
 

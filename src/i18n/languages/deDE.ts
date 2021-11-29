@@ -17,7 +17,8 @@ const dictionary: RawTranslationPackage = {
     REF: '#BEZUG!',
     SPILL: '#ÜBERLAUF!',
     VALUE: '#WERT!',
-    TIMEOUT: '#TIMEOUT!'
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -412,7 +413,6 @@ const dictionary: RawTranslationPackage = {
   langCode: 'deDE',
   ui: {
     NEW_SHEET_PREFIX: 'Sheet',
-    LOADING: 'Loading...'
   },
 }
 

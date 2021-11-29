@@ -76,4 +76,5 @@ export class ErrorMessage {
   public static NamedExpressionName = (arg: string) => `Named expression ${arg} not recognized.`
   public static LicenseKey = (arg: string) => `License key is ${arg}.`
   public static FunctionTimeout = 'Function took too long to resolve.'
+  public static FunctionLoading = 'Loading data...'
 }

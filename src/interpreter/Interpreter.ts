@@ -236,8 +236,8 @@ export class Interpreter {
                 }
               })
             })
-        
-            return [this.config.translationPackage.getUITranslation(UIElement.LOADING), promise]
+            
+            return [new CellError(ErrorType.LOADING, ErrorMessage.FunctionLoading), promise]
           }
         }
     

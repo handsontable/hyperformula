@@ -47,6 +47,9 @@ export enum ErrorType {
   /** Async functions timeout error. */
   TIMEOUT = 'TIMEOUT',
 
+  /** Async functions loading error. */
+  LOADING = 'LOADING',
+
   /** Generic error */
   ERROR = 'ERROR'
 }

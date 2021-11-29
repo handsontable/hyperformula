@@ -46,7 +46,7 @@ export class ExportedCellChange {
 export class ExportedNamedExpressionChange {
   constructor(
     public readonly name: string,
-    public readonly newValue: CellValue | CellValue[][],
+    public readonly newValue: CellValue | CellValue[][] | CellError,
   ) {
   }
 }

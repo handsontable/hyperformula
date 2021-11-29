@@ -17,7 +17,8 @@ const dictionary: RawTranslationPackage = {
     REF: '#ADR!',
     SPILL: '#ROZLANIE!',
     VALUE: '#ARG!',
-    TIMEOUT: '#TIMEOUT!'
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -411,8 +412,7 @@ const dictionary: RawTranslationPackage = {
   },
   langCode: 'plPL',
   ui: {
-    NEW_SHEET_PREFIX: 'Arkusz',
-    LOADING: 'Loading...'
+    NEW_SHEET_PREFIX: 'Arkusz'
   },
 }
 
