@@ -3597,6 +3597,8 @@ export class HyperFormula implements TypedEmitter {
       this._emitter.emit(Events.NamedExpressionAdded, expressionName, exportedChanges)
     })
 
+    this._emitter.emit(Events.NamedExpressionAdded, expressionName, changes)
+
     return [changes, asyncChanges]
   }
 
