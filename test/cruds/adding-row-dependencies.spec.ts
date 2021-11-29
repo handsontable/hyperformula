@@ -6,7 +6,7 @@ import {adr, colEnd, colStart, expectEngineToBeTheSameAs, extractReference, rowE
 describe('Adding row - fixing dependencies', () => {
   describe('all in same sheet (case 1)', () => {
     it('same sheet, case Aa, absolute row', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1'],
         // new row
         ['=A$1'],
@@ -18,7 +18,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Aa, absolute row and col', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1'],
         // new row
         ['=$A$1'],
@@ -30,7 +30,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Ab', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=A$2'],
         // new row
         ['42'],
@@ -42,7 +42,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Raa', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=A2'],
         ['13'],
         // new row
@@ -55,7 +55,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Rab', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['42'],
         ['13'],
         // new row
@@ -68,7 +68,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Rba', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=A3'],
         ['13'],
         // new row
@@ -81,7 +81,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, case Rbb', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['42'],
         // new row
         ['=A3'],
@@ -94,7 +94,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('same sheet, same row', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['42'],
         ['43', '=A2'],
       ])
@@ -107,7 +107,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('dependency address sheet different than formula address sheet and sheet in which we add rows (case 2)', () => {
     it('absolute case', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['=Sheet2!A$1'],
@@ -123,7 +123,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('R < r', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           [null],
@@ -140,7 +140,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('r = R', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['=Sheet2!A2'],
@@ -157,7 +157,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('r < R', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           ['=Sheet2!A1'],
           // new row
@@ -175,7 +175,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('formula address sheet different than dependency address sheet and sheet in which we add rows (case 3)', () => {
     it('dependency address before added row', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['1'],
@@ -192,7 +192,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('dependency address at added row', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           // new row
           ['1'],
@@ -208,7 +208,7 @@ describe('Adding row - fixing dependencies', () => {
     })
 
     it('dependency address after added row', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           ['1'],
           // new row
@@ -226,7 +226,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('sheet where we add rows different than dependency address and formula address (case 4)', () => {
     it('works', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           ['=A2'],
           ['13'],
@@ -246,7 +246,7 @@ describe('Adding row - fixing dependencies', () => {
 
   describe('each sheet different (case 5)', () => {
     it('works', () => {
-      const engine = HyperFormula.buildFromSheets({
+      const [engine] = HyperFormula.buildFromSheets({
         Sheet1: [
           ['=Sheet2!A2'],
           ['13'],
@@ -271,7 +271,7 @@ describe('Adding row - fixing dependencies', () => {
 
 describe('Adding row, ranges', () => {
   it('insert row in middle of range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       // new row
       ['2', null],
@@ -288,11 +288,11 @@ describe('Adding row, ranges', () => {
       [null, null],
       ['2', null],
       ['3', null],
-    ]))
+    ])[0])
   })
 
   it('insert row above range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       // new row
       ['1', '=SUM(A1:A3)'],
       ['2', null],
@@ -309,11 +309,11 @@ describe('Adding row, ranges', () => {
       ['1', '=SUM(A2:A4)'],
       ['2', null],
       ['3', null],
-    ]))
+    ])[0])
   })
 
   it('insert row below range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A3)'],
       ['2', null],
       ['3', null],
@@ -329,11 +329,11 @@ describe('Adding row, ranges', () => {
       ['2', null],
       ['3', null],
       [null, null],
-    ]))
+    ])[0])
   })
 
   it('it should insert new cell with edge to all ranges below', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A1)'],
       ['2', '=SUM(A1:A2)'],
       // new row
@@ -359,7 +359,7 @@ describe('Adding row, ranges', () => {
   })
 
   it('it should insert new cell with edge to only one range below, shifted by 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       ['2', '=SUM(A1:A1)'],
       ['3', '=SUM(A1:A2)'],
@@ -378,11 +378,11 @@ describe('Adding row, ranges', () => {
       ['3', '=SUM(A1:A2)'],
       [null, null],
       ['4', '=SUM(A1:A3)'],
-    ]))
+    ])[0])
   })
 
   it('range start in row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A2:A4)'],
@@ -401,11 +401,11 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A3:A5)'],
       ['3', null],
       ['4', null],
-    ]))
+    ])[0])
   })
 
   it('range start above row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A4)'],
@@ -426,11 +426,11 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A1:A5)'],
       ['3', null],
       ['4', null],
-    ]))
+    ])[0])
   })
 
   it('range start below row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A3:A4)'],
@@ -449,11 +449,11 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A4:A5)'],
       ['3', null],
       ['4', null],
-    ]))
+    ])[0])
   })
 
   it('range end above row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A1)'],
@@ -472,11 +472,11 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A1:A1)'],
       ['3', null],
       ['4', null],
-    ]))
+    ])[0])
   })
 
   it('range end in a row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A2)'],
@@ -498,11 +498,11 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A1:A3)'],
       ['3', null],
       ['4', null],
-    ]))
+    ])[0])
   })
 
   it('range end below row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A1:A3)'],
@@ -524,11 +524,11 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A1:A4)'],
       ['3', null],
       ['4', null],
-    ]))
+    ])[0])
   })
 
   it('range start and end in a row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', null],
       // new row
       ['2', '=SUM(A2:A2)'],
@@ -547,13 +547,13 @@ describe('Adding row, ranges', () => {
       ['2', '=SUM(A3:A3)'],
       ['3', null],
       ['4', null],
-    ]))
+    ])[0])
   })
 })
 
 describe('Adding row, column range', () => {
   it('column range should not be affected', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1', '=SUM(A:B)'],
       // new row
       ['2', '2'],
@@ -569,13 +569,13 @@ describe('Adding row, column range', () => {
       [null, null],
       ['2', '2'],
       ['3', '3'],
-    ]))
+    ])[0])
   })
 })
 
 describe('Adding row, fixing row ranges', () => {
   it('insert row in middle of row range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       /* new row */
       ['2'],
@@ -596,11 +596,11 @@ describe('Adding row, fixing row ranges', () => {
       ['2'],
       ['3'],
       ['=SUM(1:4)'],
-    ]))
+    ])[0])
   })
 
   it('insert row before row range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       /* new row */
       ['1'],
       ['2'],
@@ -619,11 +619,11 @@ describe('Adding row, fixing row ranges', () => {
       ['2'],
       ['3'],
       ['=SUM(2:4)'],
-    ]))
+    ])[0])
   })
 
   it('insert row after row range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -641,6 +641,6 @@ describe('Adding row, fixing row ranges', () => {
       ['3'],
       [null],
       ['=SUM(1:3)'],
-    ]))
+    ])[0])
   })
 })

@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function WORKDAY', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WORKDAY(1)', '=WORKDAY(1, 1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function WORKDAY', () => {
   })
 
   it('works correctly for first two arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WORKDAY(1000, 1)'],
       ['=WORKDAY(1000.9, 1.9)'],
       ['=WORKDAY(1000.9, -1)'],
@@ -32,7 +32,7 @@ describe('Function WORKDAY', () => {
   })
 
   it('this year', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['29/09/2020', '=A1+0.1', '31/12/2019', '01/01/2021', '27/09/2020'],
       ['=WORKDAY("01/01/2020", 262)'],
       ['=WORKDAY("01/01/2020", 262, A1:A1)'],
@@ -48,7 +48,7 @@ describe('Function WORKDAY', () => {
   })
 
   it('should output correct values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['01/01/2020', '=A1+5', '=A1+8', '=A1+9', '=A1+15', '=A1+18', '=A1+19', '=A1+32', '=A1+54', '=A1+55'],
       ['=WORKDAY(A1, 65, A1:J1)'],
       ['=WORKDAY(A1+7, 6, A1:J1)'],
@@ -64,7 +64,7 @@ describe('Function WORKDAY', () => {
   })
 
   it('checks types in last argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [true, '\'1', null, '=NA()'],
       ['=WORKDAY(1000, 1, A1:A1)'],
       ['=WORKDAY(1000, 1, B1:B1)'],

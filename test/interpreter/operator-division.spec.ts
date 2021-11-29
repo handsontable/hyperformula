@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Operator DIVISION', () => {
   it('works for obvious case', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=9/3'],
     ])
 
@@ -13,7 +13,7 @@ describe('Operator DIVISION', () => {
   })
 
   it('returns div when dividing by zero', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=10/0'],
     ])
 
@@ -21,7 +21,7 @@ describe('Operator DIVISION', () => {
   })
 
   it('use number coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="9"/"3"'],
       ['="foobar"/1'],
     ])
@@ -31,7 +31,7 @@ describe('Operator DIVISION', () => {
   })
 
   it('pass error from left operand', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A2/3'],
       ['=FOOBAR()'],
     ])
@@ -40,7 +40,7 @@ describe('Operator DIVISION', () => {
   })
 
   it('pass error from right operand', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=3/A2'],
       ['=FOOBAR()'],
     ])
@@ -49,7 +49,7 @@ describe('Operator DIVISION', () => {
   })
 
   it('pass error from left operand if both operands have error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A2/B2'],
       ['=FOOBAR()', '=4/0'],
     ])
@@ -58,7 +58,7 @@ describe('Operator DIVISION', () => {
   })
 
   it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['9'],
       ['3'],
@@ -71,7 +71,7 @@ describe('Operator DIVISION', () => {
   })
 
   it('Division propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)/2', '=2/(1/0)', '=(A1:B1)/(1/0)', '=(1/0)/(A1:B1)'],
     ])
 

@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.LT', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.LT(1)', '=HF.LT(1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function HF.LT', () => {
   })
 
   it('should calculate the correct value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.LT(1,0)'],
       ['=HF.LT(1,1)'],
       ['=HF.LT("1","0")'],
@@ -45,7 +45,7 @@ describe('Function HF.LT', () => {
   })
 
   it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.LT(NA(),)'],
       ['=HF.LT(B2:C2,)'],
     ])

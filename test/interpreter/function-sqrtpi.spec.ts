@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SQRTPI', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SQRTPI()', '=SQRTPI(1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function SQRTPI', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SQRTPI(0)'],
       ['=SQRTPI(1)'],
       ['=SQRTPI(PI())'],
@@ -26,7 +26,7 @@ describe('Function SQRTPI', () => {
   })
 
   it('pass error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SQRTPI(NA())'],
     ])
 

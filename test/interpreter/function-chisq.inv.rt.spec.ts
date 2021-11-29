@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CHISQ.INV.RT', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.INV.RT(1)'],
       ['=CHISQ.INV.RT(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function CHISQ.INV.RT', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.INV.RT("foo", 2)'],
       ['=CHISQ.INV.RT(1, "baz")'],
     ])
@@ -25,7 +25,7 @@ describe('Function CHISQ.INV.RT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.INV.RT(0.1, 1)'],
       ['=CHISQ.INV.RT(0.9, 2)'],
     ])
@@ -35,7 +35,7 @@ describe('Function CHISQ.INV.RT', () => {
   })
 
   it('truncates second arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.INV.RT(0.1, 1.9)'],
       ['=CHISQ.INV.RT(0.9, 2.9)'],
     ])
@@ -45,7 +45,7 @@ describe('Function CHISQ.INV.RT', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.INV.RT(0.5, 0.999)'],
       ['=CHISQ.INV.RT(-0.0001, 2)'],
       ['=CHISQ.INV.RT(1.0001, 2)'],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('STEYX', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=STEYX(B1:B5)'],
       ['=STEYX(B1:B5, C1:C5, D1:D5)'],
     ])
@@ -15,7 +15,7 @@ describe('STEYX', () => {
   })
 
   it('ranges need to have same amount of elements', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=STEYX(B1:B5, C1:C6)'],
     ])
 
@@ -23,7 +23,7 @@ describe('STEYX', () => {
   })
 
   it('works (simple)', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [0, 0, 1],
       [0, 1, 0],
       ['=STEYX(A1:C1, A2:C2)']
@@ -33,7 +33,7 @@ describe('STEYX', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['2', '4'],
       ['5', '3'],
       ['7', '6'],
@@ -46,7 +46,7 @@ describe('STEYX', () => {
   })
 
   it('error when not enough data', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=STEYX(A1:B1, A1:B1)'],
       ['=STEYX(42, 43)'],
@@ -59,7 +59,7 @@ describe('STEYX', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [0, 0],
       ['="2"', '50'],
       [1, 0],
@@ -71,7 +71,7 @@ describe('STEYX', () => {
   })
 
   it('over a range value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
       ['=STEYX(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
@@ -81,7 +81,7 @@ describe('STEYX', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=NA()', '50'],
       ['3', '30'],

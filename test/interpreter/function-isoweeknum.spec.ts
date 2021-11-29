@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ISOWEEKNUM', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM(1, 2)'],
       ['=ISOWEEKNUM()'],
     ])
@@ -15,7 +15,7 @@ describe('Function ISOWEEKNUM', () => {
   })
 
   it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function ISOWEEKNUM', () => {
   })
 
   it('should not work for wrong value of args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM(-1)'],
     ])
 
@@ -31,7 +31,7 @@ describe('Function ISOWEEKNUM', () => {
   })
 
   it('should work for strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM("02/08/2020")'],
       ['=ISOWEEKNUM("02/08/2017")'],
       ['=ISOWEEKNUM("01/01/2020")'],
@@ -46,14 +46,14 @@ describe('Function ISOWEEKNUM', () => {
   })
 
   it('should work for numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM(0)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(52)
   })
 
   it('should work for strings with different nullDate', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM("02/08/2020")'],
       ['=ISOWEEKNUM("02/08/2017")'],
       ['=ISOWEEKNUM("01/01/2020")'],
@@ -68,7 +68,7 @@ describe('Function ISOWEEKNUM', () => {
   })
 
   it('should work for strings with compatibility mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM("02/08/2020")'],
       ['=ISOWEEKNUM("02/08/2017")'],
       ['=ISOWEEKNUM("01/01/2020")'],
@@ -82,7 +82,7 @@ describe('Function ISOWEEKNUM', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(53)
   })
   it('should work for strings with compatibility mode and different nullDate', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISOWEEKNUM("02/08/2020")'],
       ['=ISOWEEKNUM("02/08/2017")'],
       ['=ISOWEEKNUM("01/01/2020")'],

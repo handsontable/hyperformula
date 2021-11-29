@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COMBIN', () => {
   it('checks number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMBIN(1)', '=COMBIN(1, 2, 3)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function COMBIN', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMBIN(0,0)'],
       ['=COMBIN(1,0)'],
       ['=COMBIN(4,2)'],
@@ -39,7 +39,7 @@ describe('Function COMBIN', () => {
   })
 
   it('truncates argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMBIN(9.9,6.6)'],
     ])
 
@@ -47,7 +47,7 @@ describe('Function COMBIN', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMBIN(1.1, 1.2)'],
       ['=COMBIN(1, 2)'],
       ['=COMBIN(2, -1)'],
@@ -64,7 +64,7 @@ describe('Function COMBIN', () => {
   })
 
   it('uses coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMBIN(TRUE(),"0")'],
     ])
 
@@ -72,7 +72,7 @@ describe('Function COMBIN', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMBIN(NA(), NA())'],
     ])
 

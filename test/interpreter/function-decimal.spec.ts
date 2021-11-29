@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function DECIMAL', () => {
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DECIMAL(123)'],
       ['=DECIMAL("foo", 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function DECIMAL', () => {
   })
 
   it('should return error when value does not correspond to base', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DECIMAL(12, 2)'],
       ['=DECIMAL("123XYZ", 33)'],
     ])
@@ -25,7 +25,7 @@ describe('Function DECIMAL', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DECIMAL(10, 2)'],
       ['=DECIMAL("11111111111111111111111111111111110", 2)'],
       ['=DECIMAL(123, 4)'],
@@ -47,7 +47,7 @@ describe('Function DECIMAL', () => {
   it('should work for of max length 255', () => {
     const longNumber = '1'.repeat(255)
     const tooLongNumber = '1'.repeat(256)
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [`=DECIMAL(\"${longNumber}\", 2)`],
       [`=DECIMAL(\"${tooLongNumber}\", 2)`],
     ])
@@ -57,7 +57,7 @@ describe('Function DECIMAL', () => {
   })
 
   it('should work only for bases from 2 to 36', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DECIMAL("0", 0)'],
       ['=DECIMAL("10", 2)'],
       ['=DECIMAL("XYZ", 36)'],
@@ -71,7 +71,7 @@ describe('Function DECIMAL', () => {
   })
 
   it('should return number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DECIMAL("123", 4)'],
     ])
 

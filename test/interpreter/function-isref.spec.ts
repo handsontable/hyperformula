@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ISREF', () => {
   it('should return true for #REF!', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=#REF!', '=ISREF(A1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function ISREF', () => {
   })
 
   it('should return true for #CYCLE!', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A1', '=ISREF(A1)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Function ISREF', () => {
   })
 
   it('should return false for other values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISREF(1)', '=ISREF(TRUE())', '=ISREF("foo")', '=ISREF(A1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
@@ -31,7 +31,7 @@ describe('Function ISREF', () => {
   })
 
   it('takes exactly one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISREF(1, 2)', '=ISREF()'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -40,7 +40,7 @@ describe('Function ISREF', () => {
 
   // Inconsistency with Product 1
   it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A1'],
       ['=A2'],
       [],
@@ -53,7 +53,7 @@ describe('Function ISREF', () => {
   // Inconsistency with Product 1
   it('returns #CYCLE! for itself', () => {
     /* TODO can we handle such case correctly? */
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISREF(A1)'],
     ])
 

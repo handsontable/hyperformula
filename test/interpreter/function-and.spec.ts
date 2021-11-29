@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function AND', () => {
   it('usage', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AND(TRUE(), TRUE())', '=AND(TRUE(), FALSE())'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function AND', () => {
   })
 
   it('with numerical arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AND(1)', '=AND(0)', '=AND(1, TRUE())'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function AND', () => {
   })
 
   it('use coercion #1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AND("TRUE", 1)'],
       ['=AND("foo", TRUE())'],
     ])
@@ -33,7 +33,7 @@ describe('Function AND', () => {
   })
 
   it('use coercion #2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AND(A4:B4)'],
       ['=AND(C4:D4)'],
       ['=AND(C4:D4, "foo")'],
@@ -46,7 +46,7 @@ describe('Function AND', () => {
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '1'],
       ['=AND(A1:B2)'],
@@ -56,7 +56,7 @@ describe('Function AND', () => {
   })
 
   it('works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1'],
       ['1', '1'],
       ['=AND(A1:B2)'],
@@ -66,7 +66,7 @@ describe('Function AND', () => {
   })
 
   it('takes at least one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AND()'],
     ])
 
@@ -74,7 +74,7 @@ describe('Function AND', () => {
   })
 
   it('is computed eagerly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '=4/0'],
       ['1', '1'],
       ['=AND(A1:B2)'],

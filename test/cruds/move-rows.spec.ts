@@ -15,7 +15,7 @@ import {
 
 describe('Ensure it is possible to move rows', () => {
   it('should return false when target makes no sense', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2']
     ])
@@ -29,7 +29,7 @@ describe('Ensure it is possible to move rows', () => {
   })
 
   it('should not be possible to move rows when sheet does not exists', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
     ])
@@ -38,7 +38,7 @@ describe('Ensure it is possible to move rows', () => {
   })
 
   it('should not be possible to move rows when number of rows is non-positive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1']
     ])
 
@@ -47,7 +47,7 @@ describe('Ensure it is possible to move rows', () => {
   })
 
   it('should be possible to move rows', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
@@ -62,7 +62,7 @@ describe('Ensure it is possible to move rows', () => {
   })
 
   it('should not be possible to move row with formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -72,7 +72,7 @@ describe('Ensure it is possible to move rows', () => {
   })
 
   it('should not be possible to move row inside formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       [''],
       ['=TRANSPOSE(A1:B1)'],
@@ -86,7 +86,7 @@ describe('Ensure it is possible to move rows', () => {
 
 describe('Move rows', () => {
   it('should throw error when target makes no sense', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2']
     ])
@@ -100,7 +100,7 @@ describe('Move rows', () => {
   })
 
   it('should move one row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -116,7 +116,7 @@ describe('Move rows', () => {
   })
 
   it('should move row when moving upward', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -132,7 +132,7 @@ describe('Move rows', () => {
   })
 
   it('should move multiple rows', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -148,7 +148,7 @@ describe('Move rows', () => {
   })
 
   it('should work when moving multiple rows far away', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -164,7 +164,7 @@ describe('Move rows', () => {
   })
 
   it('should adjust reference when swapping formula with dependency ', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['=A1'],
     ])
@@ -177,7 +177,7 @@ describe('Move rows', () => {
   })
 
   it('should adjust absolute references', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=$A$2', '=B2']
     ])
 
@@ -188,7 +188,7 @@ describe('Move rows', () => {
   })
 
   it('should adjust range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2', '=COUNTBLANK(A1:A2)'],
     ])
@@ -200,19 +200,19 @@ describe('Move rows', () => {
   })
 
   it('should return changes', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       [null, '=COUNTBLANK(A1:A2)'],
     ])
 
-    const changes = engine.moveRows(0, 1, 1, 3)
+    const [changes] = engine.moveRows(0, 1, 1, 3)
 
     expect(changes.length).toEqual(1)
     expect(changes).toContainEqual(new ExportedCellChange(adr('B3'), 0))
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['3'],
@@ -227,7 +227,7 @@ describe('Move rows', () => {
   })
 
   it('should produce only one history entry', () => {
-    const engine = HyperFormula.buildFromArray([[0], [1], [2], [3]])
+    const [engine] = HyperFormula.buildFromArray([[0], [1], [2], [3]])
 
     const version = engine.lazilyTransformingAstService.version()
 
@@ -239,7 +239,7 @@ describe('Move rows', () => {
 
 describe('Move rows - row ranges', () => {
   it('should adjust relative references of dependent formulas', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(2:3)'],
       ['1'],
       ['2']
@@ -254,7 +254,7 @@ describe('Move rows - row ranges', () => {
   })
 
   it('should adjust relative dependencies of moved formulas', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(2:3)'],
       ['1'],
       ['2']
@@ -269,7 +269,7 @@ describe('Move rows - row ranges', () => {
   })
 
   it('should return #CYCLE when moving formula onto referred range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(2:3)'],
       ['1'],
       ['2']
@@ -284,7 +284,7 @@ describe('Move rows - row ranges', () => {
 
 describe('Move rows - column ranges', () => {
   it('should not affect moved column range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(B:C)', '1', '2'],
     ])
 
@@ -297,7 +297,7 @@ describe('Move rows - column ranges', () => {
   })
 
   it('should not affect dependent column range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(B:C)', '1', '2'],
       [null, '3', '4'],
     ])

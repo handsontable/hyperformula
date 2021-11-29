@@ -20,7 +20,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
 describe('Plugins', () => {
   it('Extending with a plugin', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({'FOO': 'FOO'})
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
 
@@ -28,7 +28,7 @@ describe('Plugins', () => {
   })
 
   it('cleanup', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=foo()'],
     ], {functionPlugins: [FooPlugin]})
 

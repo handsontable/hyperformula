@@ -22,19 +22,19 @@ import {
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+    const [engine] = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToSetCellContents(simpleCellAddress(0, -1, 0))).toEqual(false)
   })
 
   it('address should be in existing sheet', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+    const [engine] = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToSetCellContents(adr('A1', 1))).toEqual(false)
   })
 
   it('yes if there is an array', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=TRANSPOSE(A1:B2)'],
@@ -49,7 +49,7 @@ describe('Changing cell content - checking if its possible', () => {
   })
 
   it('no if content exceeds sheet size limits', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
     expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastColumn, 1, 1))).toEqual(true)
@@ -59,7 +59,7 @@ describe('Changing cell content - checking if its possible', () => {
   })
 
   it('yes otherwise', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+    const [engine] = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
   })
@@ -70,7 +70,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2', '=A1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
     let c1 = engine.addressMapping.fetchCell(adr('C1'))
@@ -91,7 +91,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=A1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -106,7 +106,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=A1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -118,7 +118,7 @@ describe('changing cell content', () => {
   })
 
   it('set vertex with edge to empty cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=A1'],
     ])
 
@@ -135,7 +135,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=A1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     const b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -151,7 +151,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     const a1 = engine.addressMapping.fetchCell(adr('A1'))
     let b1 = engine.addressMapping.fetchCell(adr('B1'))
 
@@ -168,7 +168,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), [['3']])
@@ -179,7 +179,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2', '=SUM(A1:B1)'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     const b1 = engine.addressMapping.getCell(adr('B1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const b1setCellValueSpy = spyOn(b1 as any, 'setCellValue')
@@ -197,7 +197,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
@@ -206,7 +206,7 @@ describe('changing cell content', () => {
   })
 
   it('update value cell to error literal', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1']
     ])
 
@@ -216,7 +216,7 @@ describe('changing cell content', () => {
   })
 
   it('update value cell to error-like literal', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1']
     ])
 
@@ -226,7 +226,7 @@ describe('changing cell content', () => {
   })
 
   it('update value cell to invalid formula', () => {
-    const engine = HyperFormula.buildFromArray([[1]])
+    const [engine] = HyperFormula.buildFromArray([[1]])
 
     engine.setCellContents(adr('A1'), '=SUM(')
 
@@ -235,7 +235,7 @@ describe('changing cell content', () => {
   })
 
   it('changing value inside range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '0'],
       ['2', '0'],
       ['3', '=SUM(A1:A3)'],
@@ -247,7 +247,7 @@ describe('changing cell content', () => {
   })
 
   it('changing value inside column range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '0'],
       ['2', '0'],
       ['3', '0', '=SUM(A:B)'],
@@ -259,7 +259,7 @@ describe('changing cell content', () => {
   })
 
   it('changing value inside row range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '0'],
       ['2', '0'],
       ['=SUM(1:2)'],
@@ -274,7 +274,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['42', ''],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('B1'), '=A1')
 
@@ -288,7 +288,7 @@ describe('changing cell content', () => {
     const sheet = [
       [null],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
@@ -300,7 +300,7 @@ describe('changing cell content', () => {
     const sheet = [
       [null],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), '7')
 
@@ -311,7 +311,7 @@ describe('changing cell content', () => {
     const sheet = [
       [null],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), 'foo')
 
@@ -322,7 +322,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['42', null, '=B1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('B1'), '=A1')
 
@@ -339,7 +339,7 @@ describe('changing cell content', () => {
     const sheet = [
       [null, '=A1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), null)
 
@@ -353,7 +353,7 @@ describe('changing cell content', () => {
     const sheet = [
       [null, '=A1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), '7')
 
@@ -367,7 +367,7 @@ describe('changing cell content', () => {
     const sheet = [
       [null, '=A1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), 'foo')
 
@@ -382,7 +382,7 @@ describe('changing cell content', () => {
       ['1', '2'],
       ['=A1', '=B1'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const b2 = engine.addressMapping.getCell(adr('B2'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -399,7 +399,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     expect(() => {
       engine.setCellContents(adr('B1', 1), '3')
@@ -410,7 +410,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     const address = {row: -1, col: 0, sheet: 0}
     expect(() => {
@@ -419,7 +419,7 @@ describe('changing cell content', () => {
   })
 
   it('remembers if the new formula is structure dependent', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=TRUE()'],
       ['1'],
     ])
@@ -438,9 +438,9 @@ describe('changing cell content', () => {
       ['1'],
     ]
 
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContents(adr('A1'), '2')
+    const [changes] = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(1)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), 2))
@@ -451,9 +451,9 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
 
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContents(adr('A1'), '2')
+    const [changes] = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(2)
     expect(changes[0]).toMatchObject(new ExportedCellChange(adr('A1'), 2))
@@ -466,16 +466,16 @@ describe('changing cell content', () => {
       ['3', '4'],
       ['=MMULT(A1:B2,A1:B2)'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContents(adr('A1'), '2')
+    const [changes] = engine.setCellContents(adr('A1'), '2')
 
     expect(changes.length).toBe(5)
     expectArrayWithSameContent(changes.map((change) => change.newValue), [2, 10, 12, 18, 22])
   })
 
   it('update empty cell to parsing error ', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
 
     engine.setCellContents(adr('A1'), '=SUM(')
 
@@ -486,7 +486,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=SUM(A1)'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), '=SUM(')
 
@@ -501,7 +501,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=SUM(A1)'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('B1'), '=SUM(')
 
@@ -517,7 +517,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '=SUM('],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('B1'), '=SUM(A1)')
 
@@ -525,7 +525,7 @@ describe('changing cell content', () => {
   })
 
   it('update empty cell to unparsable matrix formula', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
 
     engine.setCellContents(adr('A1'), '=TRANSPOSE(')
 
@@ -534,7 +534,7 @@ describe('changing cell content', () => {
   })
 
   it('should throw when trying to set cell content outside sheet limits', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
 
@@ -543,7 +543,7 @@ describe('changing cell content', () => {
   })
 
   it('setting empty cells outside sheet limits does not produce error', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows)
 
@@ -555,7 +555,7 @@ describe('changing cell content', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     engine.setCellContents(adr('C1'), '=MMULT(A1:B2,A1:B2)')
   })
 })
@@ -565,7 +565,7 @@ describe('change multiple cells contents', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('B1'), [['3']])
     expect(engine.getCellValue(adr('B1'))).toBe(3)
@@ -576,7 +576,7 @@ describe('change multiple cells contents', () => {
       ['1', '2', '3'],
       ['4', '5', '6'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('B1'), [
       ['12', '13'],
@@ -596,7 +596,7 @@ describe('change multiple cells contents', () => {
       ['1', '2', '3'],
       ['4', '5', '6'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const evaluatorCallSpy = spyOn(engine.evaluator as any, 'partialRun')
 
@@ -613,7 +613,7 @@ describe('change multiple cells contents', () => {
     const sheet = [
       ['1', '2'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), [['42', '18', '=MMULT(A1:B1,TRANSPOSE(A1:B1))']])
     expect(engine.getCellValue(adr('A1'))).toBe(42)
@@ -627,9 +627,9 @@ describe('change multiple cells contents', () => {
       ['3', '4'],
       ['5', '6'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
+    const [changes] = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(4)
     expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10])
@@ -642,16 +642,16 @@ describe('change multiple cells contents', () => {
       ['5', '6'],
       ['=SUM(A1:B1)', '=SUM(B1:B2)'],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
 
-    const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
+    const [changes] = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
     expect(changes.length).toEqual(6)
     expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10, 15, 18])
   })
 
   it('should throw when trying to set cell contents outside sheet limits', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
 
@@ -662,7 +662,7 @@ describe('change multiple cells contents', () => {
 
 describe('updating column index', () => {
   it('should update column index when changing simple value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '15'],
     ], {useColumnIndex: true})
@@ -674,7 +674,7 @@ describe('updating column index', () => {
   })
 
   it('should update column index when clearing cell content', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
     ], {useColumnIndex: true})
 
@@ -684,7 +684,7 @@ describe('updating column index', () => {
   })
 
   it('should update column index when changing to ParsingError', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
     ], {useColumnIndex: true})
 
@@ -694,7 +694,7 @@ describe('updating column index', () => {
   })
 
   it('should update column index when changing to formula', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
     ], {useColumnIndex: true})
 
@@ -707,7 +707,7 @@ describe('updating column index', () => {
 
 describe('column ranges', () => {
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A:B)']
     ])
 
@@ -717,7 +717,7 @@ describe('column ranges', () => {
   })
 
   it('works when new content is added beyond previous sheet size', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A:B)']
     ])
 
@@ -730,7 +730,7 @@ describe('column ranges', () => {
   })
 
   it('works when adding matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(B:C)'],
       ['1'],
       ['2'],
@@ -749,7 +749,7 @@ describe('column ranges', () => {
 
 describe('row ranges', () => {
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(1:2)']
@@ -761,7 +761,7 @@ describe('row ranges', () => {
   })
 
   it('works when new content is added beyond previous sheet size', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(1:2)']
@@ -776,7 +776,7 @@ describe('row ranges', () => {
   })
 
   it('works when adding matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(2:3)', '1', '2'],
     ])
 
@@ -793,7 +793,7 @@ describe('row ranges', () => {
 
 describe('arrays', () => {
   it('should set array to cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2],
       [3, 4],
     ], {useArrayArithmetic: true})
@@ -803,11 +803,11 @@ describe('arrays', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [1, 2, '=-A1:B2'],
       [3, 4],
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   it('should be REF array if no space for result', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [1],
     ], {useArrayArithmetic: true})
@@ -818,11 +818,11 @@ describe('arrays', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['=-B2:B3'],
       [1],
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   it('should be REF array if no space and potential cycle', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [1],
     ], {useArrayArithmetic: true})
@@ -833,11 +833,11 @@ describe('arrays', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['=-A2:A3'],
       [1],
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   it('should shrink to one vertex if there is more content colliding with array', () => {
-    const engine = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
+    const [engine] = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
 
     engine.setCellContents(adr('A1'), [
       ['=-C1:D2'],
@@ -852,11 +852,11 @@ describe('arrays', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['=-C1:D2', null],
       [1, null]
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   it('should be separate arrays', () => {
-    const engine = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
+    const [engine] = HyperFormula.buildFromArray([], {useArrayArithmetic: true})
 
     engine.setCellContents(adr('A1'), [
       ['=TRANSPOSE(D1:E2)', '=TRANSPOSE(D1:E2)'],
@@ -873,7 +873,7 @@ describe('arrays', () => {
   })
 
   it('should REF last array', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [null, null, null, 1, 2],
       [null, null, null, 1, 2],
     ], {useArrayArithmetic: true})
@@ -897,7 +897,7 @@ describe('arrays', () => {
   })
 
   it('should make existing array REF and change cell content to simple value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '=B4'],
       ['=-A1:B2'],
@@ -914,7 +914,7 @@ describe('arrays', () => {
   })
 
   it('should not change cell to empty if part of an array', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '=B4'],
       ['=-A1:B2'],
@@ -931,7 +931,7 @@ describe('arrays', () => {
   })
 
   it('should make existing array REF and change cell content to formula', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '=B4'],
       ['=-A1:B2'],
@@ -944,7 +944,7 @@ describe('arrays', () => {
       [3, 4, '=B4'],
       ['=-A1:B2'],
       [undefined, '=SUM(A1:B2)']
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
     expect(engine.getSheetValues(0)).toEqual([
       [1, 2],
       [3, 4, 10],
@@ -954,7 +954,7 @@ describe('arrays', () => {
   })
 
   it('should make existing array REF and change cell content to parsing error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '=B4'],
       ['=-A1:B2'],
@@ -967,11 +967,11 @@ describe('arrays', () => {
       [3, 4, '=B4'],
       ['=-A1:B2'],
       [null, '=SUM(']
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   it('should make existing matrix REF and set new array', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4', '=B4'],
       ['=-A1:B2'],
@@ -988,7 +988,7 @@ describe('arrays', () => {
   })
 
   it('should replace one array with another', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=-A1:B2'],
@@ -1005,7 +1005,7 @@ describe('arrays', () => {
   })
 
   it('should adjust dependent formulas after shrinking array', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1', null, null, 4],
       ['=D1', '=E1', '=SUM(E1, F1:G1)'],
     ], {useArrayArithmetic: true})
@@ -1016,11 +1016,11 @@ describe('arrays', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [1, 2, 3, 4, 5, 6, 4],
       ['=D1', '=E1', '=SUM(E1, F1:G1)']
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   it('should adjust dependent ranges after shrinking array taking smaller vertices into account', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, '=-A1:A3', '=SUM(B1:B2)', '=SUM(B1:B3)'],
       [2],
       [3],
@@ -1046,13 +1046,13 @@ describe('arrays', () => {
       [1, 4, '=SUM(B1:B2)', '=SUM(B1:B3)'],
       [2, 5],
       [3, 6],
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   it('should return values of a range in changes', () => {
-    const engine = HyperFormula.buildFromArray([[1, 2]], {useArrayArithmetic: true})
+    const [engine] = HyperFormula.buildFromArray([[1, 2]], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
+    const [changes] = engine.setCellContents(adr('A2'), [['=-A1:B1']])
 
     expect(changes.length).toEqual(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), -1))
@@ -1060,12 +1060,12 @@ describe('arrays', () => {
   })
 
   it('should return changed content when replacing array left corner', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('A2'), [['foo']])
+    const [changes] = engine.setCellContents(adr('A2'), [['foo']])
 
     expect(changes.length).toEqual(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 'foo'))
@@ -1073,12 +1073,12 @@ describe('arrays', () => {
   })
 
   it('should return changed content when replacing any array cell with simple value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('B2'), [['foo']])
+    const [changes] = engine.setCellContents(adr('B2'), [['foo']])
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
@@ -1087,12 +1087,12 @@ describe('arrays', () => {
   })
 
   it('should return changed content when replacing any array cell with parsing error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('B2'), [['=SUM(']])
+    const [changes] = engine.setCellContents(adr('B2'), [['=SUM(']])
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
@@ -1101,12 +1101,12 @@ describe('arrays', () => {
   })
 
   it('should return changed content when clearing array left corner', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('A2'), null)
+    const [changes] = engine.setCellContents(adr('A2'), null)
 
     expect(changes.length).toEqual(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), null))
@@ -1114,23 +1114,23 @@ describe('arrays', () => {
   })
 
   it('should return no changes when trying to clear array cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=-A1:B1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('B2'), null)
+    const [changes] = engine.setCellContents(adr('B2'), null)
 
     expect(changes.length).toEqual(0)
   })
 
   it('should return changed content when replacing array to another smaller one', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('A2'), [['=+A1:B1']])
+    const [changes] = engine.setCellContents(adr('A2'), [['=+A1:B1']])
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 1))
@@ -1139,12 +1139,12 @@ describe('arrays', () => {
   })
 
   it('should return changed content when replacing array to smaller one even if values are same', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['=-A1:C1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
+    const [changes] = engine.setCellContents(adr('A2'), [['=-A1:B1']])
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), -1))
@@ -1153,11 +1153,11 @@ describe('arrays', () => {
   })
 
   it('should return REF in changes', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1'],
     ], {useArrayArithmetic: true})
 
-    const changes = engine.setCellContents(adr('E1'), [['foo']])
+    const [changes] = engine.setCellContents(adr('E1'), [['foo']])
 
     expect(changes).toContainEqual(new ExportedCellChange(adr('D1'), noSpace()))
     expect(changes).toContainEqual(new ExportedCellChange(adr('E1'), 'foo'))
@@ -1165,7 +1165,7 @@ describe('arrays', () => {
   })
 
   it('should undo REF', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1', null, null, 4],
       ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
     ], {useArrayArithmetic: true})
@@ -1178,7 +1178,7 @@ describe('arrays', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1', null, null, 4],
       ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(-1)
     expect(engine.getCellValue(adr('B2'))).toEqual(-2)
@@ -1187,7 +1187,7 @@ describe('arrays', () => {
   })
 
   it('should redo REF', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1', null, null, 4],
       ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
     ], {useArrayArithmetic: true})
@@ -1199,11 +1199,11 @@ describe('arrays', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [1, 2, 3, '=-A1:C1', 'foo', null, 4],
       ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
-    ], {useArrayArithmetic: true}))
+    ], {useArrayArithmetic: true})[0])
   })
 
   xit('should recalculate matrix if space is available', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=+C1:D1', 'foo', 1, 2]
     ], {useArrayArithmetic: true})
     expect(engine.getCellValue(adr('A1'))).toEqual(noSpace())

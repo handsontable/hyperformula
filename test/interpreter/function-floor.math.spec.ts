@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FLOOR.MATH', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FLOOR.MATH()'],
       ['=FLOOR.MATH(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function FLOOR.MATH', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FLOOR.MATH("foo")'],
       ['=FLOOR.MATH(1, "bar")'],
       ['=FLOOR.MATH(1, 2, "baz")'],
@@ -27,7 +27,7 @@ describe('Function FLOOR.MATH', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FLOOR.MATH(4.43, 0.3)'],
       ['=FLOOR.MATH(4.43, 0.6)'],
       ['=FLOOR.MATH(4.43, 2)'],
@@ -49,7 +49,7 @@ describe('Function FLOOR.MATH', () => {
   })
 
   it('should work with mode for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FLOOR.MATH(-11, -2)'],
       ['=FLOOR.MATH(-11, -2, 0)'],
       ['=FLOOR.MATH(-11, -2, 1)'],
@@ -65,7 +65,7 @@ describe('Function FLOOR.MATH', () => {
   })
 
   it('negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FLOOR.MATH(11, 2, 0)'],
       ['=FLOOR.MATH(-11, 2, 0)'],
       ['=FLOOR.MATH(11, -2, 0)'],

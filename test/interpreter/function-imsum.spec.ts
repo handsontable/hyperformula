@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IMSUM', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSUM()'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function IMSUM', () => {
   })
 
   it('should coerce explicit arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSUM(0)'],
       ['=IMSUM("i", "-1.5")'],
       ['=IMSUM("-3+4i", "1+i", 1, 2, "3")'],
@@ -26,7 +26,7 @@ describe('Function IMSUM', () => {
   })
 
   it('should fail for non-coercible explicit arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSUM(1, TRUE())'],
       ['=IMSUM(2, "abcd")'],
     ])
@@ -36,7 +36,7 @@ describe('Function IMSUM', () => {
   })
 
   it('should not coerce range arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSUM(B1:C1)', 1, '2+i'],
       ['=IMSUM(B2:D2)', 1, null, null],
       ['=IMSUM(B3:D3)', 'i', 'abcd', true],

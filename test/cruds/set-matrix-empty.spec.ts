@@ -4,7 +4,7 @@ import {adr} from '../testUtils'
 
 describe('Set matrix empty', () => {
   it('should set matrix empty', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -20,7 +20,7 @@ describe('Set matrix empty', () => {
   })
 
   it('should adjust edges between matrix cells and formula', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A1+A2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -45,7 +45,7 @@ describe('Set matrix empty', () => {
   })
 
   it('should adjust edges between matrix cells and formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=TRANSPOSE(A1:B1)'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -66,7 +66,7 @@ describe('Set matrix empty', () => {
   })
 
   it('should adjust edges between matrix cells and range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A2:A3)'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -92,7 +92,7 @@ describe('Set matrix empty', () => {
   })
 
   it('should adjust edges between matrix cells and range crossing matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A1:A2)'],
       ['=TRANSPOSE(A1:B1)'],
     ])

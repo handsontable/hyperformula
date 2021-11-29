@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function TRIM', () => {
   it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRIM()'],
       ['=TRIM("foo", "bar")']
     ])
@@ -14,7 +14,7 @@ describe('Function TRIM', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRIM("   foo")'],
       ['=TRIM("foo   ")'],
       ['=TRIM(" foo   ")'],
@@ -28,7 +28,7 @@ describe('Function TRIM', () => {
   })
 
   it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRIM(1)'],
       ['=TRIM(5+5)'],
       ['=TRIM(TRUE())'],

@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - concatenate operator', () => {
   it('Ampersand with string arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo"&"bar"'],
     ])
 
@@ -12,7 +12,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with cell address', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['foo', '=A1&"bar"'],
     ])
 
@@ -20,7 +20,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1&2'],
     ])
 
@@ -28,7 +28,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with bool', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo"&TRUE()'],
     ])
 
@@ -36,7 +36,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with null', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo"&B1'],
     ])
 
@@ -44,7 +44,7 @@ describe('Interpreter - concatenate operator', () => {
   })
 
   it('Ampersand with error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1/0', '=A1&TRUE()'],
     ])
 

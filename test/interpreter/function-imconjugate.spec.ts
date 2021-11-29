@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IMCONJUGATE', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCONJUGATE()'],
       ['=IMCONJUGATE(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMCONJUGATE', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCONJUGATE("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMCONJUGATE', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCONJUGATE(0)'],
       ['=IMCONJUGATE("i")'],
       ['=IMCONJUGATE("-3+4i")'],

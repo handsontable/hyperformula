@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function DOLLARFR', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DOLLARFR(1)', '=DOLLARFR(1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function DOLLARFR', () => {
   })
 
   it('div/0 when second argument too small', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DOLLARFR(1,0)', '=DOLLARFR(1, 0.9)'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function DOLLARFR', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [
         '=DOLLARFR(1.0125, 8)',
         '=DOLLARFR(1.000000125, 8.9)',

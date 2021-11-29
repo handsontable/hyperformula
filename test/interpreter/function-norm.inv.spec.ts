@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function NORM.INV', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.INV(1, 2)'],
       ['=NORM.INV(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function NORM.INV', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.INV("foo", 2, 3)'],
       ['=NORM.INV(0.5, "baz", 3)'],
       ['=NORM.INV(0.5, 2, "baz")'],
@@ -27,7 +27,7 @@ describe('Function NORM.INV', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.INV(0.9, 1, 2)'],
       ['=NORM.INV(0.5, 2, 4)'],
     ])
@@ -37,7 +37,7 @@ describe('Function NORM.INV', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.INV(0.5, -1, 0.01)'],
       ['=NORM.INV(0.5, -1, 0)'],
       ['=NORM.INV(0.01, -1, 0.01)'],

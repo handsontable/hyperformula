@@ -73,7 +73,7 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
     })
 
     it('should propagate errors properly', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=VLOOKUP(1/0, B1:B1, 1)'],
         ['=VLOOKUP(1, B1:B1, 1/0)'],
         ['=VLOOKUP(1, A10:A11, 1, NA())']
@@ -295,7 +295,7 @@ describe('ColumnIndex strategy', () => {
     return HyperFormula.buildFromArray(sheet, {
       useColumnIndex: true,
       ...config,
-    })
+    })[0]
   })
 })
 
@@ -305,11 +305,11 @@ describe('BinarySearchStrategy', () => {
     return HyperFormula.buildFromArray(sheet, {
       useColumnIndex: false,
       ...config,
-    })
+    })[0]
   })
 
   it('should calculate indexes properly when using binary search', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=VLOOKUP(4, A5:A10, 1, TRUE())'],
       [],
       [],
@@ -325,7 +325,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('should calculate indexes properly when using naive approach', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=VLOOKUP(4, A5:A10, 1, FALSE())'],
       [],
       [],
@@ -341,7 +341,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('should coerce null to zero when using naive approach', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=VLOOKUP(, A2:A4, 1, FALSE())'],
       [1],
       [3],
@@ -352,7 +352,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('should work on column ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=VLOOKUP(2,B:C,2)', 1, 'a'],
       [null, 2, 'b'],
       [null, 3, 'c'],
@@ -361,7 +361,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('works for strings, is not case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['a', '1'],
       ['b', '2'],
       ['c', '3'],
@@ -374,7 +374,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['a', '1'],
       ['b', '2'],
       ['c', '3'],
@@ -387,7 +387,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('should find value in sorted range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['a', '1'],
       ['B', '2'],
       ['c', '3'],
@@ -399,7 +399,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('should properly report no match', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=VLOOKUP("0", A2:A5, 1)'],
       [1],
       [2],
@@ -411,7 +411,7 @@ describe('BinarySearchStrategy', () => {
   })
 
   it('should properly report approximate matching', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=VLOOKUP("2", A2:A5, 1)'],
       [1],
       [2],

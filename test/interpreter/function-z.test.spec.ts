@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Z.TEST', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=Z.TEST(1)'],
       ['=Z.TEST(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Z.TEST', () => {
   })
 
   it('works (no sigma)', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=Z.TEST(A2:D2, 1)'],
       [1, 2, 3, 4]
     ])
@@ -24,7 +24,7 @@ describe('Z.TEST', () => {
   })
 
   it('works (with sigma)', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=Z.TEST(A2:D2, 1, 1)'],
       [1, 2, 3, 4]
     ])
@@ -33,7 +33,7 @@ describe('Z.TEST', () => {
   })
 
   it('validates input', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=Z.TEST(B1:C1, 1)', 1, null],
       ['=Z.TEST(B2:C2, 1, 1)', null, null],
       ['=Z.TEST(B3:C3, 1)', 1, 1],
@@ -45,7 +45,7 @@ describe('Z.TEST', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=Z.TEST(B1:E1, 1, 1)', null, 2, 3, 4],
       ['=Z.TEST(B2:E2, 1, 1)', true, 2, 3, 4],
     ])
@@ -54,7 +54,7 @@ describe('Z.TEST', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=NA()', '50'],
       ['3', '30'],

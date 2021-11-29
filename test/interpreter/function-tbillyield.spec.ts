@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function TBILLYIELD', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TBILLYIELD(1,1)', '=TBILLYIELD(1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function TBILLYIELD', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TBILLYIELD(0, 100, 10)'],
       ['=TBILLYIELD(0, 360, 10)', '=TBILLYIELD(0, 183, 10)', ],
       ['=TBILLYIELD(0, 180, 10)', '=TBILLYIELD(0, 180, 100)', '=TBILLYIELD(0, 180, 110)', ],

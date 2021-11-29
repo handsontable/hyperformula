@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CLEAN', () => {
   it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CLEAN()'],
       ['=CLEAN("foo", "bar")']
     ])
@@ -14,7 +14,7 @@ describe('Function CLEAN', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CLEAN("foo\u0000")'],
       ['=CLEAN("foo\u0020")'],
     ])
@@ -26,7 +26,7 @@ describe('Function CLEAN', () => {
   it('should clean all non-printable ASCII characters', () => {
     const str = Array.from(Array(32).keys()).map(code => String.fromCharCode(code)).join('')
 
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [str, '=LEN(A1)', '=CLEAN(A1)'],
     ])
 
@@ -35,7 +35,7 @@ describe('Function CLEAN', () => {
   })
 
   it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CLEAN(1)'],
       ['=CLEAN(5+5)'],
       ['=CLEAN(TRUE())'],

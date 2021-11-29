@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function BETA.INV', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BETA.INV(1, 2)'],
       ['=BETA.INV(1, 2, 3, 4, 5, 6)'],
     ])
@@ -15,7 +15,7 @@ describe('Function BETA.INV', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BETA.INV("foo", 2, 3)'],
       ['=BETA.INV(1, "baz", 3)'],
       ['=BETA.INV(1, 2, "baz")'],
@@ -31,7 +31,7 @@ describe('Function BETA.INV', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BETA.INV(0.1, 1, 2)'],
       ['=BETA.INV(0.5, 2, 4)'],
     ])
@@ -41,7 +41,7 @@ describe('Function BETA.INV', () => {
   })
 
   it('scaling works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BETA.INV(0.1, 1, 2, 2, 10)'],
       ['=BETA.INV(0.5, 2, 4, -1, 0)'],
     ])
@@ -51,7 +51,7 @@ describe('Function BETA.INV', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BETA.INV(0, 1, 1)'],
       ['=BETA.INV(0.5, 0, 1)'],
       ['=BETA.INV(0.5, 1, 0)'],

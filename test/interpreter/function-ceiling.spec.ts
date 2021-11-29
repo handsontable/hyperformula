@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 describe('Function CEILING', () => {
   /*Inconsistent with ODFF standard.*/
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING(1)'],
       ['=CEILING(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function CEILING', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING(1, "bar")'],
       ['=CEILING("bar", 1)'],
     ])
@@ -25,7 +25,7 @@ describe('Function CEILING', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING(4.43, 0.3)'],
       ['=CEILING(4.43, 0.6)'],
       ['=CEILING(4.43, 2)'],
@@ -46,7 +46,7 @@ describe('Function CEILING', () => {
 
   /*Inconsistent with ODFF standard.*/
   it('negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING(11, 2)'],
       ['=CEILING(-11, 2)'],
       ['=CEILING(11, -2)'],

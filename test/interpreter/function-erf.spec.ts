@@ -6,7 +6,7 @@ import {adr, detailedError} from '../testUtils'
 describe('Function ERF', () => {
 
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERF()'],
       ['=ERF(1, 2, 3)'],
     ])
@@ -16,7 +16,7 @@ describe('Function ERF', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERF("foo")'],
       ['=ERF(1, "bar")'],
     ])
@@ -26,7 +26,7 @@ describe('Function ERF', () => {
   })
 
   it('should work for single argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERF(0)'],
       ['=ERF(1)'],
       ['=ERF(3.14)'],
@@ -39,7 +39,7 @@ describe('Function ERF', () => {
   })
 
   it('should work with second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERF(-2.3, -0.7)'],
       ['=ERF(-2.3, 2)'],
       ['=ERF(5.6, -3.1)'],

@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function LCM', () => {
   it('checks required number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM()'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function LCM', () => {
   })
 
   it('computes correct answer for two args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(2*3*5,3*5*7)', '=LCM(0,1)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Function LCM', () => {
   })
 
   it('computes correct answer for more than two args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(2*3*5,3*5*7, 2*5*7)', '=LCM(100,101,102,103, 104)'],
     ])
 
@@ -30,7 +30,7 @@ describe('Function LCM', () => {
   })
 
   it('works with zeroes', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(2*3*5,3*5*7, 2*5*7, 0, 0, 0)', '=LCM(0, 0, 100,101,102,103,104, 0)'],
     ])
 
@@ -39,7 +39,7 @@ describe('Function LCM', () => {
   })
 
   it('accepts single arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(1)', '=LCM(0)'],
     ])
 
@@ -48,7 +48,7 @@ describe('Function LCM', () => {
   })
 
   it('handles overflow', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(1000000,1000001,1000002,1000003)'],
     ])
 
@@ -57,7 +57,7 @@ describe('Function LCM', () => {
   })
 
   it('coerces to number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM("4",2)'],
       ['=LCM(B2:C2)', '\'4', 2],
       ['=LCM(FALSE(),4)'],
@@ -73,7 +73,7 @@ describe('Function LCM', () => {
   })
 
   it('ignores non-coercible values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(B1:C1)', 'abcd', 4],
       ['=LCM(B2:C2)', null, 4],
     ])
@@ -83,7 +83,7 @@ describe('Function LCM', () => {
   })
 
   it('throws error for non-coercible values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM("abcd",4)'],
     ])
 
@@ -91,7 +91,7 @@ describe('Function LCM', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(-1,5)'],
     ])
 
@@ -99,7 +99,7 @@ describe('Function LCM', () => {
   })
 
   it('truncates numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(B1:C1)', 5.5, 10],
     ])
 
@@ -107,7 +107,7 @@ describe('Function LCM', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LCM(NA(),4)'],
       ['=LCM(B2:C2)', '=NA()', 4],
     ])

@@ -12,7 +12,7 @@ describe('Matrix plugin', () => {
 
   const sharedExamples = (config: Partial<ConfigParams>) => {
     it('matrix multiplication', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2'],
         ['3', '4'],
         ['5', '6'],
@@ -30,7 +30,7 @@ describe('Matrix plugin', () => {
     })
 
     it('matrix multiplication wrong size', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2'],
         ['3', '4'],
         ['5', '6'],
@@ -45,7 +45,7 @@ describe('Matrix plugin', () => {
     })
 
     it('matrix multiplication with string in data', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '=MMULT(A1:B2,A3:B4)'],
         ['3', 'foo'],
         ['1', '2', '=MMULT(A3:B4,A1:B2)'],
@@ -63,7 +63,7 @@ describe('Matrix plugin', () => {
     })
 
     it('nested matrix multiplication', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2'],
         ['3', '4'],
         ['=MMULT(A1:B2, MMULT(A1:B2,A1:B2))'],
@@ -76,7 +76,7 @@ describe('Matrix plugin', () => {
     })
 
     it('mmult of other mmult', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '=MMULT(A1:B2, A1:B2)'],
         ['3', '4'],
         ['=MMULT(A1:B2, C1:D2)'],
@@ -89,7 +89,7 @@ describe('Matrix plugin', () => {
     })
 
     it('mmult of a number', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=MMULT(3, 4)'],
       ], config)
 
@@ -97,7 +97,7 @@ describe('Matrix plugin', () => {
     })
 
     it('mmult wrong number of arguments', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=MMULT(0)', '=MMULT(0,0,0)'],
       ], config)
 
@@ -106,7 +106,7 @@ describe('Matrix plugin', () => {
     })
 
     it('matrix multiplication by sumproduct', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2'],
         ['3', '4'],
         ['5', '6'],
@@ -126,7 +126,7 @@ describe('Matrix plugin', () => {
     })
 
     it('matrix maxpool', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '3', '4', '5', '6'],
         ['11', '12', '13', '14', '15', '16'],
         ['21', '22', '23', '24', '25', '26'],
@@ -138,7 +138,7 @@ describe('Matrix plugin', () => {
     })
 
     it('matrix maxpool, custom stride', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '3', '4', '5', '6'],
         ['11', '12', '13', '14', '15', '16'],
         ['21', '22', '23', '24', '25', '26'],
@@ -157,7 +157,7 @@ describe('Matrix plugin', () => {
     })
 
     it('maxpool wrong number of arguments', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=MAXPOOL(0)', '=MAXPOOL(0, 0,0,0)'],
       ], config)
 
@@ -166,7 +166,7 @@ describe('Matrix plugin', () => {
     })
 
     it('matrix medianpool on even square', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '1', '2', '1', '5'],
         ['3', '4', '3', '7', '6', '7'],
         ['=medianpool(A1:F2,2)'],
@@ -178,7 +178,7 @@ describe('Matrix plugin', () => {
     })
 
     it('medianpool wrong number of arguments', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['=MEDIANPOOL(0)', '=MEDIANPOOL(0,0,0,0)'],
       ], config)
 
@@ -187,7 +187,7 @@ describe('Matrix plugin', () => {
     })
 
     it('matrix medianpool on odd square', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '1', '1'], // right shot from the beginning
         ['1', '2', '3'],
         ['3', '3', '3'],
@@ -216,7 +216,7 @@ describe('Matrix plugin', () => {
 
 describe('Function TRANSPOSE', () => {
   it('transpose works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -232,7 +232,7 @@ describe('Function TRANSPOSE', () => {
   })
 
   it('transpose works for scalar', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRANSPOSE(1)'],
     ])
 
@@ -240,7 +240,7 @@ describe('Function TRANSPOSE', () => {
   })
 
   it('transpose returns error if argument evaluates to error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRANSPOSE(4/0)'],
     ])
 
@@ -248,7 +248,7 @@ describe('Function TRANSPOSE', () => {
   })
 
   it('transpose wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRANSPOSE()', '=TRANSPOSE(C1:C2, D1:D2)'],
     ])
 
@@ -257,7 +257,7 @@ describe('Function TRANSPOSE', () => {
   })
 
   it('transpose without braces', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['5', '6'],
@@ -270,7 +270,7 @@ describe('Function TRANSPOSE', () => {
   })
 
   it('transpose any values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['foo', 'bar'],
       ['=1/0', '=TRUE()'],

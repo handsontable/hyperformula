@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IMARGUMENT', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMARGUMENT()'],
       ['=IMARGUMENT(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMARGUMENT', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMARGUMENT("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMARGUMENT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMARGUMENT(0)'],
       ['=IMARGUMENT("i")'],
       ['=IMARGUMENT("-3+4i")'],

@@ -6,7 +6,7 @@ import {adr, detailedError} from '../testUtils'
 describe('Function NORM.S.DIST', () => {
   //in product #1, this function takes 1 argument
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.S.DIST(2)'],
       ['=NORM.S.DIST(1, 4, 5)'],
     ])
@@ -17,7 +17,7 @@ describe('Function NORM.S.DIST', () => {
 
   //in product #1, this function takes 1 argument
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.S.DIST("foo", TRUE())'],
       ['=NORM.S.DIST(1, "abcd")'],
     ])
@@ -28,7 +28,7 @@ describe('Function NORM.S.DIST', () => {
 
   //in product #1, this function takes 1 argument
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.S.DIST(-1, TRUE())'],
       ['=NORM.S.DIST(0.5, TRUE())'],
     ])
@@ -39,7 +39,7 @@ describe('Function NORM.S.DIST', () => {
 
   //in product #1, this function takes 1 argument
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NORM.S.DIST(-1, FALSE())'],
       ['=NORM.S.DIST(0.5, FALSE())'],
     ])

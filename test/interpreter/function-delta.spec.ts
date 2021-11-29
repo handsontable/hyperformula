@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function DELTA', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DELTA()'],
       ['=DELTA(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function DELTA', () => {
   })
 
   it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DELTA("foo")'],
       ['=DELTA(1, "bar")'],
     ])
@@ -25,7 +25,7 @@ describe('Function DELTA', () => {
   })
 
   it('should compare to 0 if one argument provided', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DELTA(0)'],
       ['=DELTA("123")'],
       ['=DELTA(FALSE())'],
@@ -37,7 +37,7 @@ describe('Function DELTA', () => {
   })
 
   it('should compare two arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DELTA(1, 0)'],
       ['=DELTA(2, 2)'],
       ['=DELTA(123, "123")']
@@ -49,7 +49,7 @@ describe('Function DELTA', () => {
   })
 
   it('should return number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DELTA(3, 3)'],
       ['=DELTA("123")'],
     ])

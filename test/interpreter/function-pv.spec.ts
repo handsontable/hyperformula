@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function PV', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PV(1,1)', '=PV(1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function PV', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PV(2%, 24, 100)', '=PV(2%, 24, 100, 400)', '=PV(2%, 24, 100, 400, 1)'],
       ['=PV(-99%, 24, 100)', '=PV(-1, 24, 100, 400)', '=PV(-2, 24, 100, 400, 1)'],
     ])

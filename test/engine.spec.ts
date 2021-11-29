@@ -8,7 +8,7 @@ import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 
 describe('#buildFromArray', () => {
   it('load single value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
     ])
 
@@ -16,7 +16,7 @@ describe('#buildFromArray', () => {
   })
 
   it('load simple sheet', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
     ])
@@ -25,20 +25,20 @@ describe('#buildFromArray', () => {
   })
 
   it('evaluate empty vertex', () => {
-    const engine = HyperFormula.buildFromArray([['=A5']])
+    const [engine] = HyperFormula.buildFromArray([['=A5']])
 
     expect(engine.getCellValue(adr('A5'))).toBe(null)
     expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
   it('evaluate empty vertex reference', () => {
-    const engine = HyperFormula.buildFromArray([[null, '=A1']])
+    const [engine] = HyperFormula.buildFromArray([[null, '=A1']])
 
     expect(engine.getCellValue(adr('B1'))).toBe(null)
   })
 
   it('cycle', () => {
-    const engine = HyperFormula.buildFromArray([['=B1', '=C1', '=A1']])
+    const [engine] = HyperFormula.buildFromArray([['=B1', '=C1', '=A1']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
@@ -46,33 +46,33 @@ describe('#buildFromArray', () => {
   })
 
   it('cycle with formula', () => {
-    const engine = HyperFormula.buildFromArray([['5', '=A1+B1']])
+    const [engine] = HyperFormula.buildFromArray([['5', '=A1+B1']])
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 
   it('operator precedence', () => {
-    const engine = HyperFormula.buildFromArray([['=3*7*2-4*1+2']])
+    const [engine] = HyperFormula.buildFromArray([['=3*7*2-4*1+2']])
     expect(engine.getCellValue(adr('A1'))).toBe(40)
   })
 
   it('operator precedence and brackets', () => {
-    const engine = HyperFormula.buildFromArray([['=3*7+((2-4)*(1+2)+3)*2']])
+    const [engine] = HyperFormula.buildFromArray([['=3*7+((2-4)*(1+2)+3)*2']])
     expect(engine.getCellValue(adr('A1'))).toBe(15)
   })
 
   it('operator precedence with cells', () => {
-    const engine = HyperFormula.buildFromArray([['3', '4', '=B1*2+A1']])
+    const [engine] = HyperFormula.buildFromArray([['3', '4', '=B1*2+A1']])
     expect(engine.getCellValue(adr('C1'))).toBe(11)
   })
 
   it('parsing error', () => {
-    const engine = HyperFormula.buildFromArray([['=A1B1']])
+    const [engine] = HyperFormula.buildFromArray([['=A1B1']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
   it('dependency before value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=B1', '1', '2'],
       ['=SUM(B2:C2)', '1', '2'],
     ])
@@ -81,7 +81,7 @@ describe('#buildFromArray', () => {
   })
 
   it('should handle different input types', () => {
-    const engine = HyperFormula.buildFromArray([['', null, undefined, 1, true]])
+    const [engine] = HyperFormula.buildFromArray([['', null, undefined, 1, true]])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('')
     expect(engine.getCellValue(adr('B1'))).toBe(null)
@@ -91,7 +91,7 @@ describe('#buildFromArray', () => {
   })
 
   it('should work with other numerals', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [0o777, 0xFF, 0b1010, 1_000_000_000_000],
     ])
 
@@ -102,14 +102,14 @@ describe('#buildFromArray', () => {
   })
 
   it('should be possible to build graph with reference to not existing sheet', () => {
-    const engine = HyperFormula.buildFromArray([['=Sheet2!A2']])
+    const [engine] = HyperFormula.buildFromArray([['=Sheet2!A2']])
 
     expect(engine.getCellFormula(adr('A1'))).toEqual('=Sheet2!A2')
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
   })
 
   it('should propagate parsing errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(', '=A1']
     ])
 
@@ -123,7 +123,7 @@ describe('#buildFromArray', () => {
 
 describe('#getCellFormula', () => {
   it('returns formula when present', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1,2,3,C3)'],
     ])
 
@@ -131,7 +131,7 @@ describe('#getCellFormula', () => {
   })
 
   it('works with -0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=-0'],
     ])
 
@@ -139,7 +139,7 @@ describe('#getCellFormula', () => {
   })
 
   it('returns undefined for simple values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [''],
       ['42'],
       ['foobar'],
@@ -152,7 +152,7 @@ describe('#getCellFormula', () => {
   })
 
   it('returns matrix formula for matrix vertices', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1'],
       ['1', '1'],
       ['=MMULT(A1:B2,A1:B2)'],
@@ -165,7 +165,7 @@ describe('#getCellFormula', () => {
   })
 
   it('returns invalid formula literal', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(']
     ])
 
@@ -174,7 +174,7 @@ describe('#getCellFormula', () => {
   })
 
   it('returns invalid matrix formula literal', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRANSPOSE(']
     ])
 
@@ -185,7 +185,7 @@ describe('#getCellFormula', () => {
 
 describe('#getAllFormulas', () => {
   it('should return formulas from all sheets', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
       Sheet1: [['=A()']],
       Foo: [[1, '=SUM(A1)']],
     })
@@ -196,7 +196,7 @@ describe('#getAllFormulas', () => {
 
 describe('#getRangeFormulas', () => {
   it('should return formulas', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, A2)', '=TRUE()'],
       ['=SUM(', null, 1]
     ])
@@ -209,7 +209,7 @@ describe('#getRangeFormulas', () => {
 
 describe('#getSheetFormulas', () => {
   it('should return formulas from sheet', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, A2)', '=TRUE()'],
       ['=SUM(', null, 1]
     ])
@@ -222,7 +222,7 @@ describe('#getSheetFormulas', () => {
 
 describe('#getCellValue', () => {
   it('should return simple value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['', 1, '1', 'foo', true, -1.000000000000001]
     ])
 
@@ -235,7 +235,7 @@ describe('#getCellValue', () => {
   })
 
   it('should return null for empty cells', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [null, undefined]
     ])
 
@@ -245,7 +245,7 @@ describe('#getCellValue', () => {
   })
 
   it('should return value of a formula', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1', '=SUM(1, A1)', '=TRUE()', '=1/0']
     ])
 
@@ -256,7 +256,7 @@ describe('#getCellValue', () => {
   })
 
   it('should return parsing error value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(']
     ])
 
@@ -264,7 +264,7 @@ describe('#getCellValue', () => {
   })
 
   it('should return value of a cell in a formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
     ])
@@ -275,7 +275,7 @@ describe('#getCellValue', () => {
 
   it('should return translated error', () => {
     HyperFormula.registerLanguage('plPL', plPL)
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=#ARG!'],
     ], {language: 'plPL'})
 
@@ -287,13 +287,13 @@ describe('#getCellValue', () => {
 
 describe('#getSheetDimensions', () => {
   it('should work for empty sheet', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
 
     expect(engine.getSheetDimensions(0)).toEqual({height: 0, width: 0})
   })
 
   it('should return sheet dimensions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 1],
       [1, null, 1],
     ])
@@ -304,7 +304,7 @@ describe('#getSheetDimensions', () => {
 
 describe('#getAllSheetsDimensions', () => {
   it('should return dimension of all sheets', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
       'Sheet1': [],
       'Sheet2': [[1]],
       'Foo': [[null]],
@@ -322,7 +322,7 @@ describe('#getAllSheetsDimensions', () => {
 
 describe('#getRangeValues', () => {
   it('should return values from range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, B1)', '=TRUE()', null]
     ])
 
@@ -334,7 +334,7 @@ describe('#getRangeValues', () => {
 
 describe('#getSheetValues', () => {
   it('should return values from sheet', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 'foo', '=SUM(1, A1)', null, '=TRUE()', null]
     ])
 
@@ -346,7 +346,7 @@ describe('#getSheetValues', () => {
 
 describe('#getAllValues', () => {
   it('should return values from all sheets', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
       Sheet1: [],
       Foo: [[1]],
     })
@@ -357,7 +357,7 @@ describe('#getAllValues', () => {
 
 describe('#getCellSerialized', () => {
   it('should return formula for formula vertex', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, A2)']
     ])
 
@@ -365,7 +365,7 @@ describe('#getCellSerialized', () => {
   })
 
   it('should return formula for parsing error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(']
     ])
 
@@ -373,7 +373,7 @@ describe('#getCellSerialized', () => {
   })
 
   it('should return simple value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, '2', 'foo', true]
     ])
 
@@ -384,7 +384,7 @@ describe('#getCellSerialized', () => {
   })
 
   it('should return empty value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [null, undefined]
     ])
 
@@ -394,7 +394,7 @@ describe('#getCellSerialized', () => {
   })
 
   it('should return formula of a formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['{=TRANSPOSE(A1:B1)}'],
       ['{=TRANSPOSE(A1:B1)}'],
@@ -406,7 +406,7 @@ describe('#getCellSerialized', () => {
 
   it('should return translated error', () => {
     HyperFormula.registerLanguage('plPL', plPL)
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=#ARG!'],
     ], {language: 'plPL'})
 
@@ -416,7 +416,7 @@ describe('#getCellSerialized', () => {
 
 describe('#getAllSheetsSerialized', () => {
   it('should serialize all sheets', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
       Sheet1: [['=A()']],
       Foo: [[1]],
       Err1: [['=A1']],
@@ -436,13 +436,13 @@ describe('#getAllSheetsSerialized', () => {
 
 describe('#getRangeSerialized', () => {
   it('should return empty values', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
 
     expectArrayWithSameContent([[null, null]], engine.getRangeSerialized(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1)))
   })
 
   it('should return serialized cells from range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, B1)', '2', '#VALUE!', null, '=#DIV/0!', '{=TRANSPOSE(A1:B1)}']
     ])
 
@@ -454,7 +454,7 @@ describe('#getRangeSerialized', () => {
 
 describe('#sheetName', () => {
   it('returns sheet name if sheet exists', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     engine.addSheet()
 
@@ -462,7 +462,7 @@ describe('#sheetName', () => {
   })
 
   it('returns undefined if sheet doesnt exists', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     expect(engine.getSheetName(0)).toBeUndefined()
   })
@@ -470,7 +470,7 @@ describe('#sheetName', () => {
 
 describe('#sheetId', () => {
   it('returns id if sheet exists', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     engine.addSheet('foobar')
 
@@ -478,7 +478,7 @@ describe('#sheetId', () => {
   })
 
   it('returns undefined if sheet doesnt exists', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     expect(engine.getSheetId('doesntexist')).toBeUndefined()
   })
@@ -486,7 +486,7 @@ describe('#sheetId', () => {
 
 describe('#doesSheetExist', () => {
   it('true if sheet exists', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     engine.addSheet('foobar')
 
@@ -494,7 +494,7 @@ describe('#doesSheetExist', () => {
   })
 
   it('false if sheet doesnt exist', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     expect(engine.doesSheetExist('foobar')).toBe(false)
   })
@@ -502,13 +502,13 @@ describe('#doesSheetExist', () => {
 
 describe('#numberOfSheets', () => {
   it('returns 0 if empty', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     expect(engine.countSheets()).toBe(0)
   })
 
   it('returns number of sheets', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     engine.addSheet('foo')
 
@@ -518,13 +518,13 @@ describe('#numberOfSheets', () => {
 
 describe('#sheetNames', () => {
   it('empty engine', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     expect(engine.getSheetNames()).toEqual([])
   })
 
   it('returns sheet names', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     engine.addSheet('Foo')
 
     expect(engine.getSheetNames()).toEqual(['Sheet1', 'Foo'])
@@ -533,7 +533,7 @@ describe('#sheetNames', () => {
 
 describe('#getCellType', () => {
   it('empty cell', () => {
-    const engine = HyperFormula.buildFromArray([[null, undefined]])
+    const [engine] = HyperFormula.buildFromArray([[null, undefined]])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.EMPTY)
     expect(engine.getCellType(adr('B1'))).toBe(CellType.EMPTY)
@@ -541,27 +541,27 @@ describe('#getCellType', () => {
   })
 
   it('simple value', () => {
-    const engine = HyperFormula.buildFromArray([['1', 'foo']])
+    const [engine] = HyperFormula.buildFromArray([['1', 'foo']])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.VALUE)
     expect(engine.getCellType(adr('B1'))).toBe(CellType.VALUE)
   })
 
   it('formula', () => {
-    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)']])
+    const [engine] = HyperFormula.buildFromArray([['=SUM(1, 2)']])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.FORMULA)
   })
 
   it('formula matrix', () => {
-    const engine = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
+    const [engine] = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.ARRAYFORMULA)
     expect(engine.getCellType(adr('B1'))).toBe(CellType.ARRAY)
   })
 
   it('parsing error is a formula cell', () => {
-    const engine = HyperFormula.buildFromArray([['=SUM(']])
+    const [engine] = HyperFormula.buildFromArray([['=SUM(']])
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.FORMULA)
   })
@@ -569,60 +569,60 @@ describe('#getCellType', () => {
 
 describe('#getCellValueDetailedType', () => {
   it('string', () => {
-    const engine = HyperFormula.buildFromArray([['foo']])
+    const [engine] = HyperFormula.buildFromArray([['foo']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.STRING)
   })
 
   it('number data', () => {
-    const engine = HyperFormula.buildFromArray([['42']])
+    const [engine] = HyperFormula.buildFromArray([['42']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_RAW)
   })
 
   it('number currency', () => {
-    const engine = HyperFormula.buildFromArray([['42$']])
+    const [engine] = HyperFormula.buildFromArray([['42$']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
   })
 
   it('number percent', () => {
-    const engine = HyperFormula.buildFromArray([['42%']])
+    const [engine] = HyperFormula.buildFromArray([['42%']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('number date', () => {
-    const engine = HyperFormula.buildFromArray([['01/01/1967']])
+    const [engine] = HyperFormula.buildFromArray([['01/01/1967']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 
   it('number datetime', () => {
-    const engine = HyperFormula.buildFromArray([['01/01/1967 15:34']])
+    const [engine] = HyperFormula.buildFromArray([['01/01/1967 15:34']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATETIME)
   })
 
   it('number time', () => {
-    const engine = HyperFormula.buildFromArray([['15:34']])
+    const [engine] = HyperFormula.buildFromArray([['15:34']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_TIME)
   })
 
   it('boolean', () => {
-    const engine = HyperFormula.buildFromArray([['=TRUE()']])
+    const [engine] = HyperFormula.buildFromArray([['=TRUE()']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.BOOLEAN)
   })
 
   it('empty value', () => {
-    const engine = HyperFormula.buildFromArray([[null]])
+    const [engine] = HyperFormula.buildFromArray([[null]])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.EMPTY)
     expect(engine.getCellValueDetailedType(adr('B1'))).toBe(CellValueDetailedType.EMPTY)
   })
 
   it('error', () => {
-    const engine = HyperFormula.buildFromArray([['=1/0', '=SU()', '=A1']])
+    const [engine] = HyperFormula.buildFromArray([['=1/0', '=SU()', '=A1']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.ERROR)
     expect(engine.getCellValueDetailedType(adr('B1'))).toBe(CellValueDetailedType.ERROR)
     expect(engine.getCellValueDetailedType(adr('C1'))).toBe(CellValueDetailedType.ERROR)
   })
 
   it('formula evaluating to range', () => {
-    const engine = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
+    const [engine] = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.ERROR)
     expect(engine.getCellValueDetailedType(adr('B1'))).toBe(CellValueDetailedType.ERROR)
   })
@@ -630,19 +630,19 @@ describe('#getCellValueDetailedType', () => {
 
 describe('#getCellValueFormat', () => {
   it('non-currency', () => {
-    const engine = HyperFormula.buildFromArray([['foo']])
+    const [engine] = HyperFormula.buildFromArray([['foo']])
     expect(engine.getCellValueFormat(adr('A1'))).toEqual(undefined)
   })
 
   it('currency', () => {
-    const engine = HyperFormula.buildFromArray([['1PLN']], {currencySymbol: ['PLN', '$']})
+    const [engine] = HyperFormula.buildFromArray([['1PLN']], {currencySymbol: ['PLN', '$']})
     expect(engine.getCellValueFormat(adr('A1'))).toEqual('PLN')
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
   })
 
   it('unicode currency', () => {
-    const engine = HyperFormula.buildFromArray([['1₪']], {currencySymbol: ['₪']})
+    const [engine] = HyperFormula.buildFromArray([['1₪']], {currencySymbol: ['₪']})
     expect(engine.getCellValueFormat(adr('A1'))).toEqual('₪')
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
@@ -651,36 +651,36 @@ describe('#getCellValueFormat', () => {
 
 describe('#getCellValueType', () => {
   it('string', () => {
-    const engine = HyperFormula.buildFromArray([['foo']])
+    const [engine] = HyperFormula.buildFromArray([['foo']])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.STRING)
   })
 
   it('number', () => {
-    const engine = HyperFormula.buildFromArray([['42', '=SUM(1, A1)']])
+    const [engine] = HyperFormula.buildFromArray([['42', '=SUM(1, A1)']])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.NUMBER)
     expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.NUMBER)
   })
 
   it('boolean', () => {
-    const engine = HyperFormula.buildFromArray([['=TRUE()']])
+    const [engine] = HyperFormula.buildFromArray([['=TRUE()']])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.BOOLEAN)
   })
 
   it('empty value', () => {
-    const engine = HyperFormula.buildFromArray([[null]])
+    const [engine] = HyperFormula.buildFromArray([[null]])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.EMPTY)
     expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.EMPTY)
   })
 
   it('error', () => {
-    const engine = HyperFormula.buildFromArray([['=1/0', '=SU()', '=A1']])
+    const [engine] = HyperFormula.buildFromArray([['=1/0', '=SU()', '=A1']])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.ERROR)
     expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.ERROR)
     expect(engine.getCellValueType(adr('C1'))).toBe(CellValueType.ERROR)
   })
 
   it('formula evaluating to range', () => {
-    const engine = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
+    const [engine] = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.ERROR)
     expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.ERROR)
   })
@@ -688,13 +688,13 @@ describe('#getCellValueType', () => {
 
 describe('#doesCellHaveSimpleValue', () => {
   it('true', () => {
-    const engine = HyperFormula.buildFromArray([['1', 'foo']])
+    const [engine] = HyperFormula.buildFromArray([['1', 'foo']])
     expect(engine.doesCellHaveSimpleValue(adr('A1'))).toEqual(true)
     expect(engine.doesCellHaveSimpleValue(adr('B1'))).toEqual(true)
   })
 
   it('false', () => {
-    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', null, '=TRANSPOSE(A1:A1)']])
+    const [engine] = HyperFormula.buildFromArray([['=SUM(1, 2)', null, '=TRANSPOSE(A1:A1)']])
     expect(engine.doesCellHaveSimpleValue(adr('A1'))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr('B1'))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr('C1'))).toEqual(false)
@@ -703,12 +703,12 @@ describe('#doesCellHaveSimpleValue', () => {
 
 describe('#doesCellHaveFormula', () => {
   it('true', () => {
-    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)']])
+    const [engine] = HyperFormula.buildFromArray([['=SUM(1, 2)']])
     expect(engine.doesCellHaveFormula(adr('A1'))).toEqual(true)
   })
 
   it('false', () => {
-    const engine = HyperFormula.buildFromArray([['1', '', '{=TRANSPOSE(A1:A1)}', 'foo', null]])
+    const [engine] = HyperFormula.buildFromArray([['1', '', '{=TRANSPOSE(A1:A1)}', 'foo', null]])
     expect(engine.doesCellHaveFormula(adr('A1'))).toEqual(false)
     expect(engine.doesCellHaveFormula(adr('B1'))).toEqual(false)
     expect(engine.doesCellHaveFormula(adr('C1'))).toEqual(false)
@@ -717,21 +717,21 @@ describe('#doesCellHaveFormula', () => {
   })
 
   it('arrayformula', () => {
-    const engine = HyperFormula.buildFromArray([['=ARRAYFORMULA(ISEVEN(B1:B2*2))']])
+    const [engine] = HyperFormula.buildFromArray([['=ARRAYFORMULA(ISEVEN(B1:B2*2))']])
     expect(engine.doesCellHaveFormula(adr('A1'))).toEqual(true)
   })
 })
 
 describe('#isCellEmpty', () => {
   it('true', () => {
-    const engine = HyperFormula.buildFromArray([[null, undefined]])
+    const [engine] = HyperFormula.buildFromArray([[null, undefined]])
     expect(engine.isCellEmpty(adr('A1'))).toEqual(true)
     expect(engine.isCellEmpty(adr('B1'))).toEqual(true)
     expect(engine.isCellEmpty(adr('C1'))).toEqual(true)
   })
 
   it('false', () => {
-    const engine = HyperFormula.buildFromArray([['1', '=SUM(1, 2)', '{=TRANSPOSE(A1:A1)}', 'foo']])
+    const [engine] = HyperFormula.buildFromArray([['1', '=SUM(1, 2)', '{=TRANSPOSE(A1:A1)}', 'foo']])
     expect(engine.isCellEmpty(adr('A1'))).toEqual(false)
     expect(engine.isCellEmpty(adr('B1'))).toEqual(false)
     expect(engine.isCellEmpty(adr('C1'))).toEqual(false)
@@ -741,12 +741,12 @@ describe('#isCellEmpty', () => {
 
 describe('#isCellPartOfArray', () => {
   it('true', () => {
-    const engine = HyperFormula.buildFromArray([['=TRANSPOSE(B1:C1)']])
+    const [engine] = HyperFormula.buildFromArray([['=TRANSPOSE(B1:C1)']])
     expect(engine.isCellPartOfArray(adr('A1'))).toEqual(true)
   })
 
   it('false', () => {
-    const engine = HyperFormula.buildFromArray([['1', '', '=SUM(1, 2)', 'foo']])
+    const [engine] = HyperFormula.buildFromArray([['1', '', '=SUM(1, 2)', 'foo']])
     expect(engine.isCellPartOfArray(adr('A1'))).toEqual(false)
     expect(engine.isCellPartOfArray(adr('B1'))).toEqual(false)
     expect(engine.isCellPartOfArray(adr('C1'))).toEqual(false)
@@ -756,7 +756,7 @@ describe('#isCellPartOfArray', () => {
 
 describe('dateTime', () => {
   it('dateTime', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     expect(engine.numberToDateTime(43845.1)).toEqual({
       'day': 15,
       'hours': 2,
@@ -798,21 +798,21 @@ describe('Graph dependency topological ordering module', () => {
 
 describe('#getFillRangeData from corner source', () => {
   it('should properly apply wrap-around #1', () => {
-    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+    const [engine] = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('C3'), 3, 3))
     ).toEqual([['2', '=$A$1', '2'], ['=A3', 1, '=C3'], ['2', '=$A$1', '2']])
   })
 
   it('should properly apply wrap-around #2', () => {
-    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+    const [engine] = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('B2'), 3, 3))
     ).toEqual([[1, '=A1', 1], ['=$A$1', '2', '=$A$1'], [1, '=A3', 1]])
   })
 
   it('should properly apply wrap-around #3', () => {
-    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+    const [engine] = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('A1'), 3, 3))
     ).toEqual([['2', '=$A$1', '2'], ['=#REF!', 1, '=A1'], ['2', '=$A$1', '2']])
@@ -821,21 +821,21 @@ describe('#getFillRangeData from corner source', () => {
 
 describe('#getFillRangeData from target source', () => {
   it('should properly apply wrap-around #1', () => {
-    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+    const [engine] = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('C3'), 3, 3), true)
     ).toEqual([[1, '=B2', 1], ['=$A$1', '2', '=$A$1'], [1, '=B4', 1]])
   })
 
   it('should properly apply wrap-around #2', () => {
-    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+    const [engine] = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('B2'), 3, 3), true)
     ).toEqual([[1, '=A1', 1], ['=$A$1', '2', '=$A$1'], [1, '=A3', 1]])
   })
 
   it('should properly apply wrap-around #3', () => {
-    const engine = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
+    const [engine] = HyperFormula.buildFromArray([[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']])
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), AbsoluteCellRange.spanFrom(adr('A1'), 3, 3), true)
     ).toEqual([[1, '=#REF!', 1], ['=$A$1', '2', '=$A$1'], [1, '=#REF!', 1]])
@@ -844,7 +844,7 @@ describe('#getFillRangeData from target source', () => {
 
 describe('#getFillRangeData', () => {
   it('should move between sheets - sheet relative addresses', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
         'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
         'Sheet2': [],
       }
@@ -855,7 +855,7 @@ describe('#getFillRangeData', () => {
   })
 
   it('should move between sheets - sheet absolute addresses', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
         'Sheet1': [[], [undefined, 1, '=Sheet1!A1'], [undefined, '=Sheet2!$A$1', '2']],
         'Sheet2': [],
       }
@@ -866,7 +866,7 @@ describe('#getFillRangeData', () => {
   })
 
   it('should move between sheets - no sheet of a given name', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
         'Sheet1': [],
       }
     )

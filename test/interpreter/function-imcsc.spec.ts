@@ -4,7 +4,7 @@ import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMCSC', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCSC()'],
       ['=IMCSC(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMCSC', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCSC("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMCSC', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCSC(0)'],
       ['=IMCSC("i")'],
       ['=IMCSC("-3+4i")'],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('COVARIANCE.S', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COVARIANCE.S(B1:B5)'],
       ['=COVARIANCE.S(B1:B5, C1:C5, D1:D5)'],
     ])
@@ -15,7 +15,7 @@ describe('COVARIANCE.S', () => {
   })
 
   it('ranges need to have same amount of elements', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COVARIANCE.S(B1:B5, C1:C6)'],
     ])
 
@@ -23,7 +23,7 @@ describe('COVARIANCE.S', () => {
   })
 
   it('works (simple)', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '20'],
       ['=COVARIANCE.S(A1:A2, B1:B2)']
@@ -33,7 +33,7 @@ describe('COVARIANCE.S', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['2', '4'],
       ['5', '3'],
       ['7', '6'],
@@ -46,7 +46,7 @@ describe('COVARIANCE.S', () => {
   })
 
   it('error when not enough data', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=COVARIANCE.S(A1:A1, B1:B1)'],
       ['=COVARIANCE.S(42, 43)'],
@@ -59,7 +59,7 @@ describe('COVARIANCE.S', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['="2"', '50'],
       ['3', '30'],
@@ -70,7 +70,7 @@ describe('COVARIANCE.S', () => {
   })
 
   it('over a range value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
       ['=COVARIANCE.S(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
@@ -80,7 +80,7 @@ describe('COVARIANCE.S', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=4/0', '50'],
       ['3', '30'],

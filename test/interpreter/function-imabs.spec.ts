@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IMABS', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMABS()'],
       ['=IMABS(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMABS', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMABS("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMABS', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMABS(0)'],
       ['=IMABS("i")'],
       ['=IMABS("-3+4i")'],

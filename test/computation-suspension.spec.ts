@@ -5,7 +5,7 @@ import {adr} from './testUtils'
 
 describe('Evaluation suspension', () => {
   it('by default, evaluation is automatic', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A1'],
     ])
 
@@ -15,7 +15,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('when evaluation is stopped, getting cell values is forbidden', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '42'],
     ])
 
@@ -39,7 +39,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('when evaluation is stopped, getting serialized cell values is forbidden', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '42'],
     ])
 
@@ -60,7 +60,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('when evaluation is stopped, getting cell value types is forbidden', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '42'],
     ])
 
@@ -72,7 +72,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('when evaluation is stopped, getting cell types is possible', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '42'],
     ])
 
@@ -87,7 +87,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('when evaluation is stopped, getting cell formulas is possible', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A1+42'],
     ])
     engine.suspendEvaluation()
@@ -100,7 +100,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('formulas are rebuild even if evaluation is suspended', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A2+42'],
       ['42']
     ])
@@ -112,20 +112,20 @@ describe('Evaluation suspension', () => {
   })
 
   it('resuming evaluation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A1'],
     ])
     engine.suspendEvaluation()
     engine.setCellContents(adr('C1'), [['=B1']])
 
-    const changes = engine.resumeEvaluation()
+    const [changes] = engine.resumeEvaluation()
 
     expect(engine.getCellValue(adr('C1'))).toBe(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('C1'), 2))
   })
 
   it('#isEvaluationSuspended when evaluation is suspended', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A1'],
     ])
     engine.suspendEvaluation()
@@ -134,7 +134,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('#isEvaluationSuspended when evaluation is resumed', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A1'],
     ])
 
@@ -143,7 +143,7 @@ describe('Evaluation suspension', () => {
 
   describe('clipboard operations depend on values, so they are forbidden', () => {
     it('copy', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '=A1'],
       ])
       engine.suspendEvaluation()
@@ -154,7 +154,7 @@ describe('Evaluation suspension', () => {
     })
 
     it('cut', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '=A1'],
       ])
       engine.suspendEvaluation()
@@ -165,7 +165,7 @@ describe('Evaluation suspension', () => {
     })
 
     it('paste', () => {
-      const engine = HyperFormula.buildFromArray([
+      const [engine] = HyperFormula.buildFromArray([
         ['1', '2', '=A1'],
       ])
       engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2))
@@ -178,7 +178,7 @@ describe('Evaluation suspension', () => {
   })
 
   it('undo-redo works when computation suspended', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A2+42'],
       ['42']
     ])

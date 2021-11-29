@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('CHISQ.TEST', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.TEST(1)'],
       ['=CHISQ.TEST(1, 2, 3)'],
     ])
@@ -14,7 +14,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10],
       [2, 5],
       ['=CHISQ.TEST(A1:A2, B1:B2)']
@@ -24,7 +24,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('works for larger ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, 8],
       ['=CHISQ.TEST(A1:C2, D1:F2)']
@@ -37,7 +37,7 @@ describe('CHISQ.TEST', () => {
    * product #2 accepts this as a valid input
    */
   it('validates dimensions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, 8],
       ['=CHISQ.TEST(A1:C2, A1:F1)']
@@ -47,7 +47,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('validates values #1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, 0],
       ['=CHISQ.TEST(A1:C2, D1:F2)']
@@ -57,7 +57,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('accepts negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, -1],
       ['=CHISQ.TEST(A1:C2, D1:F2)']
@@ -67,7 +67,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('but checks intermediate values for negatives', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, -0.001],
       ['=CHISQ.TEST(A1:C2, D1:F2)']
@@ -77,7 +77,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, null, 1, 4, 8],
       ['=CHISQ.TEST(A1:C2, D1:F2)']
@@ -87,7 +87,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=NA()', '50'],
       ['3', '30'],
@@ -98,7 +98,7 @@ describe('CHISQ.TEST', () => {
   })
 
   it('error when not enough data', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.TEST(1, 2)'],
     ])
 

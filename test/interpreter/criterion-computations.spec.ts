@@ -3,7 +3,7 @@ import {adr} from '../testUtils'
 
 describe('Criterions - operators computations', () => {
   it('usage of greater than operator', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -14,7 +14,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('usage of greater than or equal operator', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -25,7 +25,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('usage of less than operator', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -36,7 +36,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('usage of less than or equal operator', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -47,7 +47,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('usage of equal operator', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -58,7 +58,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('usage of not equal operator', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '3'],
       ['1', '5'],
       ['2', '7'],
@@ -69,7 +69,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('empty values #1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '8'],
       ['3', '9'],
@@ -80,7 +80,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('empty values #2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', ''],
       ['2', '8'],
       ['3', '9'],
@@ -91,7 +91,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('empty values #3', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', ' '],
       ['2', '1'],
       ['3', 'TRUE'],
@@ -102,7 +102,7 @@ describe('Criterions - operators computations', () => {
   })
 
   it('empty values #4', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [''],
       ['8'],
       ['9'],
@@ -169,7 +169,7 @@ describe('big test', () => {
       ['=COUNTA(A1:A49)', '=SUM(B1:B50)', null, null, 'codes counted  >  ', '=SUM(F1:F20)', '=SUM(G1:G21)'],
     ]
 
-    const engine = HyperFormula.buildFromArray(formulas, {useRegularExpressions: true, precisionRounding: 13})
+    const [engine] = HyperFormula.buildFromArray(formulas, {useRegularExpressions: true, precisionRounding: 13})
 
     expect(engine.getCellValue(adr('B51'))).toEqual(304.5)
     expect(engine.getCellValue(adr('G51'))).toEqual(304.5)
@@ -269,7 +269,7 @@ describe('big test', () => {
       ['=COUNTIF($M$6:$M$7, "*es*")', '2', '=A48=B48'],
       ['=COUNTIF($M$6:$M$7, "*ES*")', '2', '=A49=B49']
     ]
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     engine.addNamedExpression('TRUE', '=TRUE()', undefined)
     engine.addNamedExpression('FALSE', '=FALSE()', undefined)
     engine.setCellContents(adr('A1'), formulas)

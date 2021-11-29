@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FVSCHEDULE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FVSCHEDULE(1)', '=FVSCHEDULE(1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function FVSCHEDULE', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FVSCHEDULE(1, 1)'],
       ['=FVSCHEDULE(2, B2:D2)', 1, 1, null],
     ])
@@ -25,7 +25,7 @@ describe('Function FVSCHEDULE', () => {
   })
 
   it('should return proper error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FVSCHEDULE(2, B1:C1)', '\'1', true],
       ['=FVSCHEDULE(1, B2:C2)', 'abcd', '=NA()'],
       ['=FVSCHEDULE(1, B3)', 'abcd']

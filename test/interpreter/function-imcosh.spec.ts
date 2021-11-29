@@ -4,7 +4,7 @@ import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMCOSH', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOSH()'],
       ['=IMCOSH(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMCOSH', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOSH("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMCOSH', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOSH(0)'],
       ['=IMCOSH("i")'],
       ['=IMCOSH("-3+4i")'],

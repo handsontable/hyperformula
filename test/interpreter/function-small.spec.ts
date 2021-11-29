@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SMALL', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SMALL(1)'],
       ['=SMALL(1, 2, 3)'],
     ])
@@ -14,7 +14,7 @@ describe('Function SMALL', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SMALL(1, "baz")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function SMALL', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SMALL(A2:D2,0)', '=SMALL(A2:D2,1)', '=SMALL(A2:D2,2)', '=SMALL(A2:D2,3)', '=SMALL(A2:D2,4)', '=SMALL(A2:D2,5)'],
       [1, 4, 2, 4],
     ])
@@ -36,7 +36,7 @@ describe('Function SMALL', () => {
   })
 
   it('should ignore non-numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SMALL(A2:D2,0)', '=SMALL(A2:D2,1)', '=SMALL(A2:D2,2)', '=SMALL(A2:D2,3)'],
       [1, 4, true, 'abcd'],
     ])
@@ -48,7 +48,7 @@ describe('Function SMALL', () => {
   })
 
   it('should propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SMALL(A2:D2,0)', '=SMALL(A2:D2,1)', '=SMALL(A2:D2,2)', '=SMALL(A2:D2,3)'],
       [1, 4, '=NA()', 'abcd'],
     ])
@@ -60,7 +60,7 @@ describe('Function SMALL', () => {
   })
 
   it('should truncate second arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SMALL(A2:D2,0.9)', '=SMALL(A2:D2,1.9)', '=SMALL(A2:D2,2.9)', '=SMALL(A2:D2,3.9)', '=SMALL(A2:D2,4.9)', '=SMALL(A2:D2,5.9)'],
       [1, 4, 2, 4],
     ])
@@ -74,7 +74,7 @@ describe('Function SMALL', () => {
   })
 
   it('should work for non-ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SMALL(1,0)', '=SMALL(1,1)', '=SMALL(1,2)', '=SMALL(TRUE(),1)'],
     ])
 

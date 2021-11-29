@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function TBILLEQ', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TBILLEQ(1,1)', '=TBILLEQ(1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function TBILLEQ', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TBILLEQ(0, 100, 0.1)'],
       ['=TBILLEQ(0, 360, 0.1)', '=TBILLEQ(0, 183, 0.1)', ],
       ['=TBILLEQ(0, 180, 1.9)', '=TBILLEQ(0, 180, 2)', '=TBILLEQ(0, 180, 2.1)', ],

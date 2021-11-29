@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function LOGNORM.INV', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOGNORM.INV(1, 2)'],
       ['=LOGNORM.INV(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function LOGNORM.INV', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOGNORM.INV("foo", 2, 3)'],
       ['=LOGNORM.INV(0.5, "baz", 3)'],
       ['=LOGNORM.INV(0.5, 2, "baz")'],
@@ -27,7 +27,7 @@ describe('Function LOGNORM.INV', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOGNORM.INV(0.1, 1, 2)'],
       ['=LOGNORM.INV(0.5, 2, 4)'],
     ])
@@ -37,7 +37,7 @@ describe('Function LOGNORM.INV', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOGNORM.INV(0.01, 0, 0.01)'],
       ['=LOGNORM.INV(0, 0, 0.01)'],
       ['=LOGNORM.INV(0.01, 0, 0)'],

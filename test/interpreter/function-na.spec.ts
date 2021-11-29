@@ -3,7 +3,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function NA', () => {
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NA()', '=NA(1)'],
     ])
 

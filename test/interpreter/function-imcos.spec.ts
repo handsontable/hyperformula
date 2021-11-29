@@ -4,7 +4,7 @@ import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMCOS', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOS()'],
       ['=IMCOS(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMCOS', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOS("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMCOS', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOS(0)'],
       ['=IMCOS("i")'],
       ['=IMCOS("-3+4i")'],

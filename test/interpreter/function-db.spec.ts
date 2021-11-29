@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function DB', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DB(1,1,1)', '=DB(1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function DB', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DB(10000,50,10,2,12)',
         '=DB(10000,50,10,2)',
         '=DB(10000,50,10,2,7)'],
@@ -35,7 +35,7 @@ describe('Function DB', () => {
   })
 
   it('compatibility', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DB(1000000,100000,6,7,7)',
         '=DB(1000000,100000,6,8,7)',
         '=DB(1000000,100000,6,7)', ],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function GAUSS', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GAUSS()'],
       ['=GAUSS(1, 2)'],
     ])
@@ -15,7 +15,7 @@ describe('Function GAUSS', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GAUSS("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function GAUSS', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GAUSS(-10)'],
       ['=GAUSS(0)'],
       ['=GAUSS(1)'],

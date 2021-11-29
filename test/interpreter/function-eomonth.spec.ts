@@ -10,7 +10,7 @@ const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, date
 
 describe('Function EOMONTH', () => {
   it('validate arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EOMONTH("foo", 0)'],
       ['=EOMONTH(A1, "bar")'],
@@ -25,7 +25,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works for 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 10)'],
       ['=EOMONTH(A1, 0)'],
     ])
@@ -35,7 +35,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works for exact end of month', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EOMONTH(A1, 0)'],
     ])
@@ -44,7 +44,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 7, 31)'],
       ['=EOMONTH(A1, 1)'],
     ])
@@ -53,7 +53,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 8, 31)'],
       ['=EOMONTH(A1, -1)'],
     ])
@@ -62,7 +62,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works when next date will have more days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 6, 30)'],
       ['=EOMONTH(A1, 1)'],
     ])
@@ -71,7 +71,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works when next date will have less days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 1, 31)'],
       ['=EOMONTH(A1, 1)'],
     ])
@@ -80,7 +80,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works when previous date will have more days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 2, 28)'],
       ['=EOMONTH(A1, -1)'],
     ])
@@ -89,7 +89,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works when previous date will have less days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EOMONTH(A1, -1)'],
     ])
@@ -98,7 +98,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works for leap years', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2020, 2, 28)'],
       ['=EOMONTH(A1, 0)'],
     ])
@@ -107,7 +107,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('works for non-leap years', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 2, 28)'],
       ['=EOMONTH(A1, 0)'],
     ])
@@ -116,7 +116,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('use number coercion for 1st argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EOMONTH(TRUE(), 1)'],
       ['=EOMONTH(1, 1)'],
     ])
@@ -126,7 +126,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('use number coercion for 2nd argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['="1"', '=EOMONTH(A1, A2)'],
       ['=TRUE()', '=EOMONTH(A1, A3)'],
@@ -137,7 +137,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EOMONTH(4/0, 0)'],
       ['=EOMONTH(0, 4/0)'],
       ['=EOMONTH(4/0, FOOBAR())'],

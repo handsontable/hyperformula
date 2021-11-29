@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Percent operator', () => {
   it('works for obvious case', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=3%'],
     ])
 
@@ -13,7 +13,7 @@ describe('Percent operator', () => {
   })
 
   it('use number coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="3"%'],
       ['="foobar"%'],
       ['=TRUE()%'],
@@ -25,7 +25,7 @@ describe('Percent operator', () => {
   })
 
   it('pass reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A2%'],
       ['=42'],
     ])
@@ -34,7 +34,7 @@ describe('Percent operator', () => {
   })
 
   it('pass error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A2%'],
       ['=FOOBAR()'],
     ])
@@ -43,13 +43,13 @@ describe('Percent operator', () => {
   })
 
   it('works with other operator and coercion', () => {
-    const engine = HyperFormula.buildFromArray([['=TRUE()%*1']])
+    const [engine] = HyperFormula.buildFromArray([['=TRUE()%*1']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0.01)
   })
 
   it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['9'],
       ['3'],

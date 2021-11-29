@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function GCD', () => {
   it('checks required number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD()'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function GCD', () => {
   })
 
   it('computes correct answer for two args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(2*3*5,3*5*7)', '=GCD(0,1)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Function GCD', () => {
   })
 
   it('computes correct answer for more than two args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(2*3*5,3*5*7, 2*5*7)', '=GCD(100,101,102,103,104)'],
     ])
 
@@ -30,7 +30,7 @@ describe('Function GCD', () => {
   })
 
   it('works with zeroes', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(2*3*5,3*5*7, 2*5*7, 0, 0, 0)', '=GCD(0, 0, 100,101,102,103,104, 0)'],
     ])
 
@@ -39,7 +39,7 @@ describe('Function GCD', () => {
   })
 
   it('accepts single arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(1)', '=GCD(0)'],
     ])
 
@@ -48,7 +48,7 @@ describe('Function GCD', () => {
   })
 
   it('coerces to number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD("2",4)'],
       ['=GCD(B2:C2)', '\'2', 4],
       ['=GCD(TRUE(),4)'],
@@ -66,7 +66,7 @@ describe('Function GCD', () => {
   })
 
   it('ignores non-coercible values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(B1:C1)', 'abcd', 4],
     ])
 
@@ -74,7 +74,7 @@ describe('Function GCD', () => {
   })
 
   it('throws error for non-coercible values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD("abcd",4)'],
     ])
 
@@ -82,7 +82,7 @@ describe('Function GCD', () => {
   })
 
   it('handles overflow', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(1000000000000000000.0)'],
     ])
 
@@ -91,7 +91,7 @@ describe('Function GCD', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(-1,5)'],
     ])
 
@@ -99,7 +99,7 @@ describe('Function GCD', () => {
   })
 
   it('truncates numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(B1:C1)', 5.5, 10],
     ])
 
@@ -107,7 +107,7 @@ describe('Function GCD', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GCD(NA(),4)'],
       ['=GCD(B2:C2)', '=NA()', 4],
     ])

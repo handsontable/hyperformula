@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function BITAND', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITAND(101)'],
       ['=BITAND(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('function BITAND', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITAND(1, "foo")'],
       ['=BITAND("bar", 4)'],
       ['=BITAND("foo", "baz")'],
@@ -27,7 +27,7 @@ describe('function BITAND', () => {
   })
 
   it('should not work for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITAND(1, -2)'],
       ['=BITAND(-1, 2)'],
     ])
@@ -37,7 +37,7 @@ describe('function BITAND', () => {
   })
 
   it('should not work for non-integers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITAND(1.2, 2)'],
       ['=BITAND(3.14, 5)'],
     ])
@@ -47,7 +47,7 @@ describe('function BITAND', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITAND(1, 5)'],
       ['=BITAND(457, 111)'],
       ['=BITAND(BIN2DEC(101), BIN2DEC(1))'],
@@ -61,7 +61,7 @@ describe('function BITAND', () => {
   })
 
   it('should return numeric type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITAND(1, 5)'],
     ])
 

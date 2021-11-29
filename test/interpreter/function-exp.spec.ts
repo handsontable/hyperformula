@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function EXP', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXP(0)', '=EXP(2)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function EXP', () => {
   })
 
   it('given wrong argument type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXP("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function EXP', () => {
   })
 
   it('use number coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="2"', '=EXP(A1)'],
       ['=FALSE()', '=EXP(A2)'],
     ])
@@ -32,7 +32,7 @@ describe('Function EXP', () => {
   })
 
   it('given wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXP()'],
       ['=EXP(1, 2)'],
     ])
@@ -42,7 +42,7 @@ describe('Function EXP', () => {
   })
 
   it('errors propagation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXP(4/0)'],
     ])
 

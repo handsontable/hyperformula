@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function EXACT', () => {
   it('should take two arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXACT("foo")'],
       ['=EXACT("foo", "bar", "baz")'],
     ])
@@ -14,7 +14,7 @@ describe('Function EXACT', () => {
   })
 
   it('should compare strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXACT(B1, C1)', '', ''],
       ['=EXACT(B2, C2)', 'foo', 'foo'],
       ['=EXACT(B3, C3)', 'foo', 'fo'],
@@ -28,7 +28,7 @@ describe('Function EXACT', () => {
   })
 
   it('should be case/accent sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXACT(B1, C1)', 'foo', 'FOO'],
       ['=EXACT(B2, C2)', 'foo', 'fóó'],
     ], {caseSensitive: false})
@@ -38,7 +38,7 @@ describe('Function EXACT', () => {
   })
 
   it('should be case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXACT(B1, C1)', 'foo', 'Foo'],
     ])
 
@@ -46,7 +46,7 @@ describe('Function EXACT', () => {
   })
 
   it('should coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXACT(,)'],
       ['=EXACT(B2, "0")', 0],
       ['=EXACT(B3, "")', null],
@@ -60,7 +60,7 @@ describe('Function EXACT', () => {
   })
 
   it('should return error for range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXACT("foo",B1:C1)'],
       ['=EXACT(B1:C1,"foo")'],
     ])

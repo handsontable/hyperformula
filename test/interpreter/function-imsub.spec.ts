@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IMSUB', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSUB(1)'],
       ['=IMSUB(1, 2, 3)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMSUB', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSUB("foo", 1)'],
       ['=IMSUB(1, "foo")'],
     ])
@@ -24,7 +24,7 @@ describe('Function IMSUB', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSUB(0, 1)'],
       ['=IMSUB("i", "-i")'],
       ['=IMSUB("-3+4i", "1+i")'],

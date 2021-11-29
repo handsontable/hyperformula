@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function PRODUCT', () => {
   it('should take at least one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PRODUCT()']
     ])
 
@@ -12,7 +12,7 @@ describe('Function PRODUCT', () => {
   })
 
   it('should calculate product', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PRODUCT(2, 3)'],
       ['=PRODUCT(B2:D2, E2, F2)', 2, 3, 'foo', 'bar', 4],
       ['=PRODUCT(5, "foo")']

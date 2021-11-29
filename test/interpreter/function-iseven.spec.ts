@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ISEVEN', () => {
   it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISEVEN()', '=ISEVEN(1, 2)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function ISEVEN', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISEVEN(1)', '=ISEVEN(2)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function ISEVEN', () => {
   })
 
   it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISEVEN("42")'],
     ])
 
@@ -31,7 +31,7 @@ describe('Function ISEVEN', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=ISEVEN(A1)'],
     ])

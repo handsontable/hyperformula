@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COUNTUNIQUE', () => {
   it('error when no arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTUNIQUE()'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('single number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTUNIQUE(1)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('three numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTUNIQUE(2, 1, 2)'],
       ['=COUNTUNIQUE(2, 1, 1)'],
       ['=COUNTUNIQUE(2, 1, 3)'],
@@ -33,7 +33,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('theres no coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '="1"'],
       ['=COUNTUNIQUE(A1:B1)'],
     ])
@@ -42,7 +42,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('errors in arguments are not propagated', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTUNIQUE(5/0)'],
     ])
 
@@ -50,7 +50,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('different errors are counted by type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0', '=COUNTUNIQUE(A1:A4)'],
       ['=FOOBAR()'],
       ['=5/0'],
@@ -61,7 +61,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('empty string doesnt count', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=""', '=COUNTUNIQUE("", A1)'],
     ])
 
@@ -69,7 +69,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('different strings are recognized are counted by type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['foo', '=COUNTUNIQUE(A1:A4)'],
       ['bar'],
       ['foo'],
@@ -80,7 +80,7 @@ describe('Function COUNTUNIQUE', () => {
   })
 
   it('singular values are counted', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['TRUE()', '=COUNTUNIQUE(A1:A6)'],
       ['FALSE()'],
       [null],

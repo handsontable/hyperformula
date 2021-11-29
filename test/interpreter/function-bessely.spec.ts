@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function BESSELY', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BESSELY(1)'],
       ['=BESSELY(1, 2, 3)'],
     ])
@@ -14,7 +14,7 @@ describe('Function BESSELY', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BESSELY("foo", 1)'],
       ['=BESSELY(2, "foo")'],
     ])
@@ -24,7 +24,7 @@ describe('Function BESSELY', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BESSELY(0.1,0)'],
       ['=BESSELY(1,0)'],
       ['=BESSELY(5,0)'],
@@ -48,7 +48,7 @@ describe('Function BESSELY', () => {
   })
 
   it('should check bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BESSELY(1, -0.001)'],
     ])
 
@@ -57,7 +57,7 @@ describe('Function BESSELY', () => {
   })
 
   it('should truncate second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BESSELY(0.1,0.9)'],
       ['=BESSELY(1,0.9)'],
       ['=BESSELY(5,0.9)'],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.MULTIPLY', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.MULTIPLY(1)', '=HF.MULTIPLY(1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function HF.MULTIPLY', () => {
   })
 
   it('should calculate the correct value with correct defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.MULTIPLY(2,3)'],
       ['=HF.MULTIPLY(1,)'],
       ['=HF.MULTIPLY(,)']
@@ -26,7 +26,7 @@ describe('Function HF.MULTIPLY', () => {
   })
 
   it('should coerce to correct types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.MULTIPLY(TRUE(),1)'],
       ['=HF.MULTIPLY(B2,1)'],
       ['=HF.MULTIPLY("1",1)'],
@@ -38,7 +38,7 @@ describe('Function HF.MULTIPLY', () => {
   })
 
   it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.MULTIPLY("abcd",)'],
       ['=HF.MULTIPLY(NA(),)'],
       ['=HF.MULTIPLY(B3:C3,)'],
@@ -50,7 +50,7 @@ describe('Function HF.MULTIPLY', () => {
   })
 
   it('passes subtypes', () => {
-    const engine = HyperFormula.buildFromArray([['=HF.MULTIPLY(B1,C1)', '1$', 1]])
+    const [engine] = HyperFormula.buildFromArray([['=HF.MULTIPLY(B1,C1)', '1$', 1]])
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
   })
 })

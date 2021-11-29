@@ -5,27 +5,27 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SEC', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=SEC(0)', '=SEC(1)']])
+    const [engine] = HyperFormula.buildFromArray([['=SEC(0)', '=SEC(1)']])
 
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(1.85081571768093)
   })
 
   it('when value not numeric', () => {
-    const engine = HyperFormula.buildFromArray([['=SEC("foo")']])
+    const [engine] = HyperFormula.buildFromArray([['=SEC("foo")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
   it('wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=SEC()', '=SEC(1,-1)']])
+    const [engine] = HyperFormula.buildFromArray([['=SEC()', '=SEC(1,-1)']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('use number coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="-1"', '=SEC(A1)'],
     ])
 
@@ -33,7 +33,7 @@ describe('Function SEC', () => {
   })
 
   it('close to div/zero', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1.57079632679486, '=SEC(A1)'],
     ])
 
@@ -41,7 +41,7 @@ describe('Function SEC', () => {
   })
 
   it('errors propagation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SEC(4/0)'],
     ])
 

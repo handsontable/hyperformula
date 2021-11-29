@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function REPT', () => {
   it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=REPT()'],
       ['=REPT("foo")'],
       ['=REPT("foo", 1, 2)']
@@ -16,7 +16,7 @@ describe('Function REPT', () => {
   })
 
   it('should return VALUE when wrong type of second parameter', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=REPT("foo", "bar")'],
     ])
 
@@ -24,7 +24,7 @@ describe('Function REPT', () => {
   })
 
   it('should return VALUE when second parameter is less than 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=REPT("foo", -1)'],
     ])
 
@@ -32,7 +32,7 @@ describe('Function REPT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=REPT("foo", 0)'],
       ['=REPT("foo", 3)'],
       ['=REPT(1, 5)'],
@@ -48,7 +48,7 @@ describe('Function REPT', () => {
   })
 
   it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=REPT(1, 1)'],
       ['=REPT(5+5, 1)'],
       ['=REPT(TRUE(), 1)'],

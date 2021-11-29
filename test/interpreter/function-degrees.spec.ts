@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function DEGREES', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEGREES(0)', '=DEGREES(3.14)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function DEGREES', () => {
   })
 
   it('given wrong argument type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEGREES("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function DEGREES', () => {
   })
 
   it('use number coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="3.14"', '=DEGREES(A1)'],
       ['=TRUE()', '=DEGREES(A2)'],
     ])
@@ -32,7 +32,7 @@ describe('Function DEGREES', () => {
   })
 
   it('given wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEGREES()'],
       ['=DEGREES(1, 2)'],
     ])
@@ -42,7 +42,7 @@ describe('Function DEGREES', () => {
   })
 
   it('errors propagation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEGREES(4/0)'],
     ])
 

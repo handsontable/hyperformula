@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function LEFT', () => {
   it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEFT()'],
       ['=LEFT("foo", 1, 2)']
     ])
@@ -14,7 +14,7 @@ describe('Function LEFT', () => {
   })
 
   it('should return VALUE when wrong type of second parameter', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEFT("foo", "bar")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function LEFT', () => {
   })
 
   it('should work with empty argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEFT(, 1)'],
     ])
 
@@ -30,7 +30,7 @@ describe('Function LEFT', () => {
   })
 
   it('should return one character by default', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEFT("bar")'],
     ])
 
@@ -38,7 +38,7 @@ describe('Function LEFT', () => {
   })
 
   it('should return VALUE when second parameter is less than 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEFT("foo", -1)'],
     ])
 
@@ -46,7 +46,7 @@ describe('Function LEFT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEFT("", 4)'],
       ['=LEFT("bar", 0)'],
       ['=LEFT("bar", 1)'],
@@ -64,7 +64,7 @@ describe('Function LEFT', () => {
   })
 
   it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEFT(1, 1)'],
       ['=LEFT(5+5, 1)'],
       ['=LEFT(TRUE(), 1)'],

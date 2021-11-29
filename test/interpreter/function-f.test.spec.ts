@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('F.TEST', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.TEST(1)'],
       ['=F.TEST(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('F.TEST', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '5'],
       ['=F.TEST(A1:A2, B1:B2)']
@@ -25,7 +25,7 @@ describe('F.TEST', () => {
   })
 
   it('works for uneven ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1'],
       ['2', '3'],
       [null, '1'],
@@ -36,7 +36,7 @@ describe('F.TEST', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['5', '3'],
       [null, '6'],
       [true, false],
@@ -48,7 +48,7 @@ describe('F.TEST', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=4/0', '50'],
       ['3', '30'],
@@ -59,7 +59,7 @@ describe('F.TEST', () => {
   })
 
   it('error when not enough data', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.TEST(1, 2)'],
     ])
 
@@ -67,7 +67,7 @@ describe('F.TEST', () => {
   })
 
   it('error when 0 variance', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.TEST(A2:C2, A3:C3)'],
       [1, 1, 1],
       [0, 1, 0],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ISODD', () => {
   it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISODD()', '=ISODD(1, 2)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function ISODD', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISODD(1)', '=ISODD(2)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function ISODD', () => {
   })
 
   it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISODD("42")'],
     ])
 
@@ -31,7 +31,7 @@ describe('Function ISODD', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=ISODD(A1)'],
     ])

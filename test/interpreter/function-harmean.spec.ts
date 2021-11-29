@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HARMEAN', () => {
   it('single number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HARMEAN(1)'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('two numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HARMEAN(1, 4)'],
     ])
 
@@ -20,7 +20,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('more numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HARMEAN(8, 1, 2, 4, 16)'],
     ])
 
@@ -28,7 +28,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('validates input', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HARMEAN(8, 0, 2, 4, 16)'],
       ['=HARMEAN(8, -1, -2, 4, 16)'],
     ])
@@ -38,7 +38,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '9', '3'],
       ['=HARMEAN(A1:C1)'],
     ])
@@ -47,7 +47,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('propagates error from regular argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=3/0', '=HARMEAN(A1)'],
     ])
 
@@ -55,7 +55,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('propagates first error from range argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=3/0', '=FOO(', '=HARMEAN(A1:B1)'],
     ])
 
@@ -63,7 +63,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('returns error for empty ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HARMEAN(A2:A3)'],
       [null],
       [null],
@@ -76,7 +76,7 @@ describe('Function HARMEAN', () => {
    * product #1 does not coerce the input
    */
   it('does coercions of nonnumeric explicit arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HARMEAN(TRUE(),"4")']
     ])
 
@@ -84,7 +84,7 @@ describe('Function HARMEAN', () => {
   })
 
   it('ignores nonnumeric values in ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HARMEAN(A2:D2)'],
       [1, 1, false, null, '\'0']
     ])

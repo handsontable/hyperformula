@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function MATCH', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(1)'],
       ['=MATCH(1, B1:B3, 0, 42)'],
     ])
@@ -15,7 +15,7 @@ describe('Function MATCH', () => {
   })
 
   it('validates that 1st argument is number, string or boolean', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(C2:C3, B1:B1)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function MATCH', () => {
   })
 
   it('2nd argument can be a scalar', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(42, 42)'],
     ])
 
@@ -31,7 +31,7 @@ describe('Function MATCH', () => {
   })
 
   it('validates that 3rd argument is number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(0, B1:B1, "a")'],
     ])
 
@@ -39,7 +39,7 @@ describe('Function MATCH', () => {
   })
 
   it('should propagate errors properly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(1/0, B1:B1)'],
       ['=MATCH(1, B1:B1, 1/0)'],
     ])
@@ -49,7 +49,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - works when value is in first cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['103'],
       ['200'],
@@ -61,7 +61,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - works when value is in the last cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['200'],
       ['200'],
@@ -73,7 +73,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - returns the position in the range, not the row number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(102, A6:A9, 0)'],
       [''],
       [''],
@@ -89,7 +89,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - returns first result', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['200'],
       ['103'],
@@ -101,7 +101,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - doesnt return result if value after searched range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:A5, 0)'],
       ['200'],
       ['200'],
@@ -114,7 +114,7 @@ describe('Function MATCH', () => {
   })
 
   it('column - doesnt return result if value before searched range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A3:A5, 0)'],
       ['103'],
       ['200'],
@@ -126,7 +126,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - works when value is in first cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['103', '200', '200', '200'],
     ])
@@ -135,7 +135,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - works when value is in the last cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['200', '200', '200', '103'],
     ])
@@ -144,7 +144,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - returns the position in the range, not the column number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(102, E2:H2, 0)'],
       ['', '', '', '', '100', '101', '102', '103'],
     ])
@@ -153,7 +153,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - returns first result', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['200', '103', '103', '200'],
     ])
@@ -162,7 +162,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - doesnt return result if value after searched range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, A2:D2, 0)'],
       ['200', '200', '200', '200', '103'],
     ])
@@ -171,7 +171,7 @@ describe('Function MATCH', () => {
   })
 
   it('row - doesnt return result if value before searched range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(103, B2:D2, 0)'],
       ['103', '200', '200', '200'],
     ])
@@ -183,7 +183,7 @@ describe('Function MATCH', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
 
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 1)'],
       ['100'],
       ['200'],
@@ -200,7 +200,7 @@ describe('Function MATCH', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
 
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(400, A2:A5, 0)'],
       ['100'],
       ['200'],
@@ -214,7 +214,7 @@ describe('Function MATCH', () => {
   })
 
   it('returns lower bound match for sorted data', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(203, A2:A5, 1)'],
       ['100'],
       ['200'],
@@ -227,7 +227,7 @@ describe('Function MATCH', () => {
   })
 
   it('should coerce empty arg to 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['-5'],
       ['-2'],
       ['0'],
@@ -242,7 +242,7 @@ describe('Function MATCH', () => {
   })
 
   it('should return NA when range is not a single column or row', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '1'],
       ['2', '3'],
       ['=MATCH(0, A1:B2)'],
@@ -252,7 +252,7 @@ describe('Function MATCH', () => {
   })
 
   it('should properly report no match', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH("0", A2:A5)'],
       [1],
       [2],
@@ -264,7 +264,7 @@ describe('Function MATCH', () => {
   })
 
   it('should properly report approximate match', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH("2", A2:A5)'],
       [1],
       [2],
@@ -276,7 +276,7 @@ describe('Function MATCH', () => {
   })
 
   it('should coerce null to zero when using naive approach', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH(, A2:A4, 0)'],
       [1],
       [3],
@@ -287,7 +287,7 @@ describe('Function MATCH', () => {
   })
 
   it('works for strings, is not case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH("A", A2:A5, 0)'],
       ['a'],
       ['A'],
@@ -297,7 +297,7 @@ describe('Function MATCH', () => {
   })
 
   it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MATCH("A", A2:A5, 0)'],
       ['a'],
       ['A'],

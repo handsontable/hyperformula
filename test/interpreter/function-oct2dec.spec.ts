@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function OCT2DEC', () => {
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2DEC("foo", 2, 3)'],
     ])
 
@@ -13,7 +13,7 @@ describe('function OCT2DEC', () => {
   })
 
   it('should not work for non-oct arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2DEC("foo")'],
       ['=OCT2DEC(418)'],
       ['=OCT2DEC(TRUE())'],
@@ -25,7 +25,7 @@ describe('function OCT2DEC', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2DEC(1)'],
       ['=OCT2DEC(10)'],
       ['=OCT2DEC(71)'],
@@ -49,7 +49,7 @@ describe('function OCT2DEC', () => {
   })
 
   it('should work for strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2DEC("456")'],
     ])
 
@@ -57,7 +57,7 @@ describe('function OCT2DEC', () => {
   })
 
   it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="123"'],
       ['=OCT2DEC(A1)'],
     ])
@@ -66,7 +66,7 @@ describe('function OCT2DEC', () => {
   })
 
   it('should return a number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2DEC(11)'],
     ])
 
@@ -74,7 +74,7 @@ describe('function OCT2DEC', () => {
   })
 
   it('should work only for 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2DEC(10107040205)'],
       ['=OCT2DEC(7777777042)'],
     ])

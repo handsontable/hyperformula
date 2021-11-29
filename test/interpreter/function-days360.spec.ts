@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function DAYS360', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DAYS360(1, 2, 3, 4)'],
       ['=DAYS360(1)'],
     ])
@@ -15,7 +15,7 @@ describe('Function DAYS360', () => {
   })
 
   it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DAYS360("foo", 1, TRUE())'],
       ['=DAYS360(2, "bar")'],
     ])
@@ -25,7 +25,7 @@ describe('Function DAYS360', () => {
   })
 
   it('US mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DAYS360("30/03/2020", "31/03/2020")'],
       ['=DAYS360("28/02/2020", "29/02/2020")'],
       ['=DAYS360("29/02/2020", "01/03/2020")'],
@@ -47,7 +47,7 @@ describe('Function DAYS360', () => {
   })
 
   it('EU mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DAYS360("30/03/2020", "31/03/2020", TRUE())'],
       ['=DAYS360("28/02/2020", "29/02/2020", TRUE())'],
       ['=DAYS360("29/02/2020", "01/03/2020", TRUE())'],

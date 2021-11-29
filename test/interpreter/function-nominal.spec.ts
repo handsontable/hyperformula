@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function NOMINAL', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NOMINAL(1)', '=NOMINAL(1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function NOMINAL', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NOMINAL(2%, 1)', '=NOMINAL(2%, 2)', '=NOMINAL(2%, 2.9)', '=NOMINAL(2%, 24)'],
     ])
 

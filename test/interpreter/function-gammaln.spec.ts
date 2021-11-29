@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function GAMMALN', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GAMMALN()'],
       ['=GAMMALN(1, 2)'],
     ])
@@ -15,7 +15,7 @@ describe('Function GAMMALN', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GAMMALN("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function GAMMALN', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GAMMALN(0.1)'],
       ['=GAMMALN(1)'],
       ['=GAMMALN(10)'],
@@ -35,7 +35,7 @@ describe('Function GAMMALN', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=GAMMALN(0)'],
     ])
 

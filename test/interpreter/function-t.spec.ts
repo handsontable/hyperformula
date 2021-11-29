@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function T', () => {
   it('should take one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T()'],
       ['=T("foo", "bar")'],
     ])
@@ -14,7 +14,7 @@ describe('Function T', () => {
   })
 
   it('should return given text', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T("foo")'],
       ['=T(B2)', 'bar'],
     ])
@@ -24,7 +24,7 @@ describe('Function T', () => {
   })
 
   it('should return empty string if given value is not a text', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T(B1)', '=TRUE()'],
       ['=T(B2)', 42],
       ['=T(B3)', null],
@@ -36,7 +36,7 @@ describe('Function T', () => {
   })
 
   it('should propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T(B1)', '=1/0'],
       ['=T(B2)', '=FOO()'],
     ])

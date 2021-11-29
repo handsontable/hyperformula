@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IMREAL', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMREAL()'],
       ['=IMREAL(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMREAL', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMREAL("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMREAL', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMREAL(1)'],
       ['=IMREAL("i")'],
       ['=IMREAL("-3+4i")'],

@@ -7,7 +7,7 @@ import {adr, detailedErrorWithOrigin} from './testUtils'
 
 describe('Events', () => {
   it('sheetAdded works', function() {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
 
     engine.on(Events.SheetAdded, handler)
@@ -18,7 +18,7 @@ describe('Events', () => {
   })
 
   it('sheetRemoved works', function() {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
       Sheet1: [['=Sheet2!A1']],
       Sheet2: [['42']],
     })
@@ -32,7 +32,7 @@ describe('Events', () => {
   })
 
   it('sheetRemoved name contains actual display name', function() {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
       Sheet1: [['=Sheet2!A1']],
       Sheet2: [['42']],
     })
@@ -46,7 +46,7 @@ describe('Events', () => {
   })
 
   it('sheetRenamed works', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+    const [engine] = HyperFormula.buildFromArray([[]])
     const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRenamed, handler)
@@ -57,7 +57,7 @@ describe('Events', () => {
   })
 
   it('sheetRenamed is not triggered when sheet didnt change', () => {
-    const engine = HyperFormula.buildFromArray([[]])
+    const [engine] = HyperFormula.buildFromArray([[]])
     const handler = jasmine.createSpy()
 
     engine.on(Events.SheetRenamed, handler)
@@ -67,7 +67,7 @@ describe('Events', () => {
   })
 
   it('namedExpressionAdded works', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionAdded, handler)
@@ -78,7 +78,7 @@ describe('Events', () => {
   })
 
   it('namedExpressionRemoved works', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jasmine.createSpy()
 
@@ -90,7 +90,7 @@ describe('Events', () => {
   })
 
   it('namedExpressionRemoved throws error when named expression not exists', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
@@ -100,7 +100,7 @@ describe('Events', () => {
   })
 
   it('namedExpressionRemoved contains actual named expression name', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jasmine.createSpy()
 
@@ -112,7 +112,7 @@ describe('Events', () => {
   })
 
   it('valuesUpdated works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['42']
     ])
     const handler = jasmine.createSpy()
@@ -125,7 +125,7 @@ describe('Events', () => {
   })
 
   it('valuesUpdated may sometimes be triggered even if nothing changed', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['42']
     ])
     const handler = jasmine.createSpy()
@@ -138,7 +138,7 @@ describe('Events', () => {
   })
 
   it('suspension and resuming of evaluation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['42']
     ])
     const handlerUpdated = jasmine.createSpy()
@@ -167,7 +167,7 @@ describe('Events', () => {
   })
 
   it('batching', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['42']
     ])
     const handlerUpdated = jasmine.createSpy()
@@ -188,7 +188,7 @@ describe('Events', () => {
 
 describe('Subscribing only once', () => {
   it('works', function() {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
 
     engine.once(Events.SheetAdded, handler)
@@ -201,7 +201,7 @@ describe('Subscribing only once', () => {
 
 describe('Unsubscribing', () => {
   it('works', function() {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
     engine.on(Events.SheetAdded, handler)
     engine.addSheet('FooBar1')

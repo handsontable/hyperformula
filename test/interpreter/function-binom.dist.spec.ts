@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function BINOM.DIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BINOM.DIST(1, 2, 3)'],
       ['=BINOM.DIST(1, 2, 3, 4, 5)'],
     ])
@@ -15,7 +15,7 @@ describe('Function BINOM.DIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BINOM.DIST("foo", 2, 3, TRUE())'],
       ['=BINOM.DIST(1, "baz", 3, TRUE())'],
       ['=BINOM.DIST(1, 2, "baz", TRUE())'],
@@ -29,7 +29,7 @@ describe('Function BINOM.DIST', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BINOM.DIST(1, 1, 0.1, TRUE())'],
       ['=BINOM.DIST(10, 20, 0.7, TRUE())'],
     ])
@@ -40,7 +40,7 @@ describe('Function BINOM.DIST', () => {
   })
 
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BINOM.DIST(1, 1, 0.1, FALSE())'],
       ['=BINOM.DIST(10, 20, 0.7, FALSE())'],
     ])
@@ -50,7 +50,7 @@ describe('Function BINOM.DIST', () => {
   })
 
   it('truncation works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BINOM.DIST(1.9, 1.99, 0.1, FALSE())'],
       ['=BINOM.DIST(10.5, 20.2, 0.7, FALSE())'],
     ])
@@ -60,7 +60,7 @@ describe('Function BINOM.DIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BINOM.DIST(-0.00001, 1, 1, FALSE())'],
       ['=BINOM.DIST(0.5, -0.01, 1, FALSE())'],
       ['=BINOM.DIST(0.5, 0.4, 1, FALSE())'],

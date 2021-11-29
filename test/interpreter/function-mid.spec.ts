@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function MID', () => {
   it('should take three arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID()'],
       ['=MID("foo", "bar")'],
       ['=MID("foo", "bar", "baz", "qux")'],
@@ -16,7 +16,7 @@ describe('Function MID', () => {
   })
 
   it('should return substring', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID("foo", 1, 2)'],
       ['=MID("bar", 2, 2)'],
     ])
@@ -26,7 +26,7 @@ describe('Function MID', () => {
   })
 
   it('should return empty string if start is greater than text length', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID("", 2, 1)'],
       ['=MID("foo", 5, 42)'],
     ])
@@ -36,7 +36,7 @@ describe('Function MID', () => {
   })
 
   it('should return chars up to string length if end start + number of chars exceeds string length', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID("foo", 2, 5)'],
     ])
 
@@ -44,7 +44,7 @@ describe('Function MID', () => {
   })
 
   it('should return #VALUE! if start num is less than 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID("foo", 0, 1)'],
       ['=MID("foo", -1, 1)'],
     ])
@@ -54,7 +54,7 @@ describe('Function MID', () => {
   })
 
   it('should return #VALUE! if number of chars is negative', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID("foo", 1, -1)'],
     ])
 
@@ -62,7 +62,7 @@ describe('Function MID', () => {
   })
 
   it('should coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID(TRUE(), 2, 2)'],
       ['=MID(0, 1, 5)'],
     ])
@@ -72,7 +72,7 @@ describe('Function MID', () => {
   })
 
   it('should return error for range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MID(B2:B3, 1, 2)'],
     ])
 

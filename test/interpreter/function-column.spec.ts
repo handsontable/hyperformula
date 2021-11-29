@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COLUMN', () => {
   it('should take one or zero arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN(B1, B2)'],
       ['=COLUMN(B1, B2, B3)'],
     ])
@@ -14,7 +14,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should take only reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN(42)'],
       ['=COLUMN("foo")'],
       ['=COLUMN(TRUE())'],
@@ -26,7 +26,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN(1/0)'],
     ])
 
@@ -34,7 +34,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should return row of a reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN(A2)'],
       ['=COLUMN(G7)'],
       ['=COLUMN($E5)'],
@@ -46,7 +46,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should work for itself', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN(A1)']
     ])
 
@@ -54,7 +54,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should return row of a cell in which formula is', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [null, '=COLUMN()'],
       ['=COLUMN()'],
     ])
@@ -64,7 +64,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should return row of range start', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN(C1:D1)'],
       ['=COLUMN(A1:B1)']
     ])
@@ -74,7 +74,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should be dependent on sheet structure changes', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['=COLUMN(A1)']
     ])
@@ -86,7 +86,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should collect dependencies of inner function and return argument type error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SIN(1)'],
       ['=COLUMN(SUM(A1,A3))'],
       ['=SIN(1)'],
@@ -96,7 +96,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should propagate error of inner function', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1/0'],
       ['=COLUMN(SUM(A1, A3))'],
       ['=1/0']
@@ -106,7 +106,7 @@ describe('Function COLUMN', () => {
   })
 
   it('should return #CYCLE! when cyclic reference occurs not directly in COLUMN', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN(SUM(A1))'],
       ['=COLUMN(A1+A2)'],
     ])

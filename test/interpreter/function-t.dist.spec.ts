@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function T.DIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST(1, 2)'],
       ['=T.DIST(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function T.DIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST("foo", 2, TRUE())'],
       ['=T.DIST(1, "baz", TRUE())'],
       ['=T.DIST(1, 2, "abcd")'],
@@ -27,7 +27,7 @@ describe('Function T.DIST', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST(1, 1, TRUE())'],
       ['=T.DIST(3, 2, TRUE())'],
     ])
@@ -37,7 +37,7 @@ describe('Function T.DIST', () => {
   })
 
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST(1, 1, FALSE())'],
       ['=T.DIST(3, 2, FALSE())'],
     ])
@@ -47,7 +47,7 @@ describe('Function T.DIST', () => {
   })
 
   it('should truncate input', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST(1, 1.9, TRUE())'],
       ['=T.DIST(3, 2.9, TRUE())'],
     ])
@@ -57,7 +57,7 @@ describe('Function T.DIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST(-1, 1, FALSE())'],
       ['=T.DIST(1, 0.9, FALSE())'],
     ])

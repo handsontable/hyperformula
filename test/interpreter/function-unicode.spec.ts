@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function UNICODE', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UNICODE()'],
       ['=UNICODE("foo", "bar")'],
     ])
@@ -14,7 +14,7 @@ describe('Function UNICODE', () => {
   })
 
   it('should not work for empty strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UNICODE("")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function UNICODE', () => {
   })
 
   it('should work for single chars', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UNICODE("")'],
       ['=UNICODE("!")'],
       ['=UNICODE("A")'],
@@ -46,7 +46,7 @@ describe('Function UNICODE', () => {
   })
 
   it('should return code of first character', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UNICODE("Abar")'],
       ['=UNICODE("Ñbaz")'],
     ])
@@ -56,7 +56,7 @@ describe('Function UNICODE', () => {
   })
 
   it('should return number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UNICODE("foo")']
     ])
 
@@ -64,7 +64,7 @@ describe('Function UNICODE', () => {
   })
 
   it('should be identity when composed with UNICHAR', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UNICODE(UNICHAR(1))'],
       ['=UNICODE(UNICHAR(128))'],
       ['=UNICODE(UNICHAR(256))'],

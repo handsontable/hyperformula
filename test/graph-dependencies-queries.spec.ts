@@ -4,7 +4,7 @@ import {adr} from './testUtils'
 
 describe('address queries', () => {
   it('reverse dependencies should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2, 3],
       ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
       ['=A2+B2'],
@@ -20,7 +20,7 @@ describe('address queries', () => {
   })
 
   it('dependencies should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2, 3],
       ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
       ['=A2+B2'],

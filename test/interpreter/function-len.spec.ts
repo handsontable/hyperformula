@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function LEN', () => {
   it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEN()'],
       ['=LEN("foo", "bar")']
     ])
@@ -14,7 +14,7 @@ describe('Function LEN', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEN("foo")']
     ])
 
@@ -22,7 +22,7 @@ describe('Function LEN', () => {
   })
 
   it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LEN(1)'],
       ['=LEN(5+5)'],
       ['=LEN(TRUE())'],

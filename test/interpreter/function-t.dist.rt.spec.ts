@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function T.DIST.RT', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST.RT(1)'],
       ['=T.DIST.RT(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function T.DIST.RT', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST.RT("foo", 2)'],
       ['=T.DIST.RT(1, "baz")'],
     ])
@@ -25,7 +25,7 @@ describe('Function T.DIST.RT', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST.RT(1, 1)'],
       ['=T.DIST.RT(3, 2)'],
     ])
@@ -35,7 +35,7 @@ describe('Function T.DIST.RT', () => {
   })
 
   it('should truncate input', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST.RT(1, 1.9)'],
       ['=T.DIST.RT(3, 2.9)'],
     ])
@@ -45,7 +45,7 @@ describe('Function T.DIST.RT', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.DIST.RT(0, 1)'],
       ['=T.DIST.RT(-0.01, 1)'],
       ['=T.DIST.RT(1, 0.9)'],

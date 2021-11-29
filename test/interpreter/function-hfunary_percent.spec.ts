@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.UNARY_PERCENT', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UNARY_PERCENT()', '=HF.UNARY_PERCENT(1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function HF.UNARY_PERCENT', () => {
   })
 
   it('should calculate the correct value with correct defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UNARY_PERCENT(2)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Function HF.UNARY_PERCENT', () => {
   })
 
   it('should coerce to correct types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UNARY_PERCENT(TRUE())'],
       ['=HF.UNARY_PERCENT(B2)'],
       ['=HF.UNARY_PERCENT("1")'],
@@ -33,7 +33,7 @@ describe('Function HF.UNARY_PERCENT', () => {
   })
 
   it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UNARY_PERCENT("abcd")'],
       ['=HF.UNARY_PERCENT(NA())'],
       ['=HF.UNARY_PERCENT(B3:C3)'],

@@ -10,7 +10,7 @@ const expectToHaveDate = (engine: HyperFormula, address: SimpleCellAddress, date
 
 describe('Function EDATE', () => {
   it('validate arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EDATE("foo", 0)'],
       ['=EDATE(A1, "bar")'],
@@ -25,7 +25,7 @@ describe('Function EDATE', () => {
   })
 
   it('works for 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 10)'],
       ['=EDATE(A1, 0)'],
     ])
@@ -35,7 +35,7 @@ describe('Function EDATE', () => {
   })
 
   it('works for exact end of month', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EDATE(A1, 0)'],
     ])
@@ -44,7 +44,7 @@ describe('Function EDATE', () => {
   })
 
   it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 7, 31)'],
       ['=EDATE(A1, 1)'],
     ])
@@ -53,7 +53,7 @@ describe('Function EDATE', () => {
   })
 
   it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 8, 31)'],
       ['=EDATE(A1, -1)'],
     ])
@@ -62,7 +62,7 @@ describe('Function EDATE', () => {
   })
 
   it('works when next date will have more days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 6, 30)'],
       ['=EDATE(A1, 1)'],
     ])
@@ -71,7 +71,7 @@ describe('Function EDATE', () => {
   })
 
   it('works when next date will have less days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 1, 31)'],
       ['=EDATE(A1, 1)'],
     ])
@@ -80,7 +80,7 @@ describe('Function EDATE', () => {
   })
 
   it('works when previous date will have more days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 2, 28)'],
       ['=EDATE(A1, -1)'],
     ])
@@ -89,7 +89,7 @@ describe('Function EDATE', () => {
   })
 
   it('works when previous date will have less days', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['=EDATE(A1, -1)'],
     ])
@@ -98,7 +98,7 @@ describe('Function EDATE', () => {
   })
 
   it('use number coercion for 1st argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EDATE(TRUE(), 1)'],
       ['=EDATE(1, 1)'],
     ])
@@ -108,7 +108,7 @@ describe('Function EDATE', () => {
   })
 
   it('use number coercion for 2nd argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['="1"', '=EDATE(A1, A2)'],
       ['=TRUE()', '=EDATE(A1, A3)'],
@@ -119,7 +119,7 @@ describe('Function EDATE', () => {
   })
 
   it('propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EDATE(4/0, 0)'],
       ['=EDATE(0, 4/0)'],
       ['=EDATE(4/0, FOOBAR())'],

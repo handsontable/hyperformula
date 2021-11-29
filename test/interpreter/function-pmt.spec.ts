@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function PMT', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PMT(1,1)', '=PMT(1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function PMT', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PMT(1%, 360, 10000)', '=PMT(1%, 360, 10000, 1000)', '=PMT(1%, 360, 10000, 1000, 1)'],
     ])
 

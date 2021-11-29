@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function DEC2OCT', () => {
   it('should return error when wrong type of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT("foo")'],
     ])
 
@@ -13,7 +13,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT("foo", 2, 3)'],
     ])
 
@@ -21,7 +21,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT(1)'],
       ['=DEC2OCT(10)'],
       ['=DEC2OCT(98)'],
@@ -35,7 +35,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should work for numeric strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT("123")'],
       ['=DEC2OCT("-15")'],
     ])
@@ -45,7 +45,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['12'],
       ['=DEC2OCT(A1)'],
     ])
@@ -54,7 +54,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT(123)'],
     ])
 
@@ -62,7 +62,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should work for numbers fitting in 10 bits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT(-536870913)'],
       ['=DEC2OCT(-536870912)'],
       ['=DEC2OCT(536870911)'],
@@ -76,7 +76,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT(2, 8)'],
       ['=DEC2OCT(5, "4")'],
     ])
@@ -86,7 +86,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should ignore second argument for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT(-2, 1)'],
       ['=DEC2OCT(-2, 10)'],
     ])
@@ -96,7 +96,7 @@ describe('function DEC2OCT', () => {
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DEC2OCT(2, 0)'],
       ['=DEC2OCT(-2, 12)'],
     ])

@@ -86,7 +86,7 @@ describe('unsupported types should result in error', () => {
     const sheet = [
       [],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => engine.setCellContents(adr('A1'), () => {}))
@@ -101,7 +101,7 @@ describe('unsupported types should result in error', () => {
     const sheet = [
       [],
     ]
-    const engine = HyperFormula.buildFromArray(sheet)
+    const [engine] = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => engine.setSheetContent(0, 1)

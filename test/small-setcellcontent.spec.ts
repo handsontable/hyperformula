@@ -3,7 +3,7 @@ import {detailedErrorWithOrigin} from './testUtils'
 
 describe('should properly build', () => {
   it('for this test', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     engine.addSheet()
     engine.setSheetContent(0, [
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
@@ -18,7 +18,7 @@ describe('should properly build', () => {
   })
 
   it('and for this', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
     ])

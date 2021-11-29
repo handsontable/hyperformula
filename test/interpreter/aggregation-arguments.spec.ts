@@ -3,7 +3,7 @@ import {adr} from '../testUtils'
 
 describe('AVERAGE function', () => {
   it('should work for empty arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(1,)'],
     ])
 
@@ -11,7 +11,7 @@ describe('AVERAGE function', () => {
   })
 
   it('should work for empty reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(A2,B2)'],
       [1, null]
     ])
@@ -20,7 +20,7 @@ describe('AVERAGE function', () => {
   })
 
   it('should work for range with empty val', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(A2:B2)'],
       [1, null]
     ])
@@ -29,7 +29,7 @@ describe('AVERAGE function', () => {
   })
 
   it('should work for empty reference + empty arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(A2,B2,)'],
       [1, null]
     ])
@@ -38,7 +38,7 @@ describe('AVERAGE function', () => {
   })
 
   it('should work for range with empty val + empty arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(A2:B2,)'],
       [1, null]
     ])
@@ -47,7 +47,7 @@ describe('AVERAGE function', () => {
   })
 
   it('should work for coercible arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(2,TRUE())'],
     ])
 
@@ -55,7 +55,7 @@ describe('AVERAGE function', () => {
   })
 
   it('should work for coercible value in reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(A2,B2)'],
       [2, true]
     ])
@@ -64,7 +64,7 @@ describe('AVERAGE function', () => {
   })
 
   it('should work for coercible value in range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGE(A2:B2)'],
       [2, true]
     ])

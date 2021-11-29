@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function BITOR', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITOR(101)'],
       ['=BITOR(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('function BITOR', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITOR(1, "foo")'],
       ['=BITOR("bar", 4)'],
       ['=BITOR("foo", "baz")'],
@@ -27,7 +27,7 @@ describe('function BITOR', () => {
   })
 
   it('should not work for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITOR(1, -2)'],
       ['=BITOR(-1, 2)'],
     ])
@@ -37,7 +37,7 @@ describe('function BITOR', () => {
   })
 
   it('should not work for non-integers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITOR(1.2, 2)'],
       ['=BITOR(3.14, 5)'],
     ])
@@ -47,7 +47,7 @@ describe('function BITOR', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITOR(1, 5)'],
       ['=BITOR(457, 111)'],
       ['=BITOR(BIN2DEC(101), BIN2DEC(1))'],
@@ -63,7 +63,7 @@ describe('function BITOR', () => {
   })
 
   it('should return numeric type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITOR(1, 5)'],
     ])
 

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CEILING.MATH', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.MATH()'],
       ['=CEILING.MATH(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function CEILING.MATH', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.MATH("foo")'],
       ['=CEILING.MATH(1, "bar")'],
       ['=CEILING.MATH(1, 2, "baz")'],
@@ -27,7 +27,7 @@ describe('Function CEILING.MATH', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.MATH(4.43, 0.3)'],
       ['=CEILING.MATH(4.43, 0.6)'],
       ['=CEILING.MATH(4.43, 2)'],
@@ -49,7 +49,7 @@ describe('Function CEILING.MATH', () => {
   })
 
   it('should work with mode for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.MATH(-11, -2)'],
       ['=CEILING.MATH(-11, -2, 0)'],
       ['=CEILING.MATH(-11, -2, 1)'],
@@ -65,7 +65,7 @@ describe('Function CEILING.MATH', () => {
   })
 
   it('negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.MATH(11, 2, 0)'],
       ['=CEILING.MATH(-11, 2, 0)'],
       ['=CEILING.MATH(11, -2, 0)'],

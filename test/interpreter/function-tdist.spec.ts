@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function TDIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TDIST(1, 1)'],
       ['=TDIST(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function TDIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TDIST("foo", 2, 3)'],
       ['=TDIST(1, "baz", 3)'],
       ['=TDIST(1, 2, "bar")'],
@@ -27,7 +27,7 @@ describe('Function TDIST', () => {
   })
 
   it('should work as T.DIST.RT', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TDIST(1, 1, 1)'],
       ['=TDIST(3, 2, 1)'],
     ])
@@ -37,7 +37,7 @@ describe('Function TDIST', () => {
   })
 
   it('should work as T.DIST.2T', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TDIST(1, 1, 2)'],
       ['=TDIST(3, 2, 2)'],
     ])
@@ -47,7 +47,7 @@ describe('Function TDIST', () => {
   })
 
   it('should truncate input', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TDIST(1, 1.9, 2)'],
       ['=TDIST(3, 2.9, 2)'],
     ])
@@ -57,7 +57,7 @@ describe('Function TDIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TDIST(0, 1, 1)'],
       ['=TDIST(0, 1, 2)'],
       ['=TDIST(-0.01, 1, 1)'],

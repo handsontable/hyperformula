@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function AVEDEV', () => {
   it('single number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVEDEV(1)'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function AVEDEV', () => {
   })
 
   it('two numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVEDEV(1, 2)'],
     ])
 
@@ -20,7 +20,7 @@ describe('Function AVEDEV', () => {
   })
 
   it('more numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVEDEV(3, 1, 2, 4, 5)'],
     ])
 
@@ -28,7 +28,7 @@ describe('Function AVEDEV', () => {
   })
 
   it('works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '9', '0'],
       ['=AVEDEV(A1:C1)'],
     ])
@@ -37,7 +37,7 @@ describe('Function AVEDEV', () => {
   })
 
   it('propagates error from regular argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=3/0', '=AVEDEV(A1)'],
     ])
 
@@ -45,7 +45,7 @@ describe('Function AVEDEV', () => {
   })
 
   it('propagates first error from range argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=3/0', '=FOO(', '=AVEDEV(A1:B1)'],
     ])
 
@@ -53,7 +53,7 @@ describe('Function AVEDEV', () => {
   })
 
   it('returns error for empty ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVEDEV(A2:A3)'],
       [null],
       [null],
@@ -66,7 +66,7 @@ describe('Function AVEDEV', () => {
    * Product #1 returns 0
    */
   it('does coercions of nonnumeric explicit arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVEDEV(TRUE(),FALSE(),)']
     ])
 
@@ -78,7 +78,7 @@ describe('Function AVEDEV', () => {
    * average is computed from numbers, but sum of distances to avg is divided by the original range size.
    */
   it('ignores nonnumeric values in ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVEDEV(A2:E2)'],
       [0, 1, false, null, '\'0']
     ])

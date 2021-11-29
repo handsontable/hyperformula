@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CEILING.PRECISE', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.PRECISE()'],
       ['=CEILING.PRECISE(1, 2, 3)'],
     ])
@@ -14,7 +14,7 @@ describe('Function CEILING.PRECISE', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.PRECISE(1, "bar")'],
       ['=CEILING.PRECISE("bar", 1)'],
     ])
@@ -24,7 +24,7 @@ describe('Function CEILING.PRECISE', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.PRECISE(4.43, 0.3)'],
       ['=CEILING.PRECISE(4.43, 0.6)'],
       ['=CEILING.PRECISE(4.43, 2)'],
@@ -46,7 +46,7 @@ describe('Function CEILING.PRECISE', () => {
   })
 
   it('negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CEILING.PRECISE(11, 2)'],
       ['=CEILING.PRECISE(-11, 2)'],
       ['=CEILING.PRECISE(11, -2)'],

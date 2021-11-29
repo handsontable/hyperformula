@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.POW', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.POW(1)', '=HF.POW(1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function HF.POW', () => {
   })
 
   it('should calculate the correct value with correct defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.POW(2,3)'],
       ['=HF.POW(,1)'],
       ['=HF.POW(,)']
@@ -25,7 +25,7 @@ describe('Function HF.POW', () => {
   })
 
   it('should coerce to correct types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.POW(TRUE(),B1)'],
       ['=HF.POW("1",)'],
     ])
@@ -35,7 +35,7 @@ describe('Function HF.POW', () => {
   })
 
   it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.POW("abcd",)'],
       ['=HF.POW(NA(),)'],
       ['=HF.POW(B3:C3,)'],

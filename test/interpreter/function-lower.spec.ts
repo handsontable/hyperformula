@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function LOWER', () => {
   it('should take one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOWER()'],
       ['=LOWER("foo", "bar")'],
     ])
@@ -14,7 +14,7 @@ describe('Function LOWER', () => {
   })
 
   it('should convert text to lowercase', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOWER("")'],
       ['=LOWER(B1)'],
       ['=LOWER("foo")'],
@@ -30,7 +30,7 @@ describe('Function LOWER', () => {
   })
 
   it('should coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOWER(TRUE())'],
       ['=LOWER(0)'],
     ])
