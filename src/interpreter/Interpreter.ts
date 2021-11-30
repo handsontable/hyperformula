@@ -464,13 +464,15 @@ export class Interpreter {
 
   private unaryAsyncRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterTuple, state: InterpreterState): InterpreterTuple {
     const getValue = (arg: InterpreterValue) => this.unaryRangeWrapper(op, arg, state)
+    const value = getValue(arg[0])
+    const promiseArg = arg[1]
+
+    if (promiseArg === undefined) {
+      return [value]
+    }
 
     const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
-      if (arg[1] === undefined) {
-        throw new Error(`arg should not be undefined for state: ${state}`)
-      }
-
-      arg[1].then((value) => {
+      promiseArg.then((value) => {
         const interpreterValue = getValue(value.interpreterValue)
 
         resolve({
@@ -480,8 +482,6 @@ export class Interpreter {
       }).catch(reject)
     })
     
-    const value = getValue(arg[0])
-
     return [value, promise]
   }
 
@@ -504,17 +504,16 @@ export class Interpreter {
 
   private binaryAsyncRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterTuple, arg2: InterpreterTuple, state: InterpreterState): InterpreterTuple {
     const getValue = (arg1: InterpreterValue, arg2: InterpreterValue) => this.binaryRangeWrapper(op, arg1, arg2, state)
+    const value = getValue(arg1[0], arg2[0])
+    const promiseArg1 = arg1[1]
+    const promiseArg2 = arg2[1]
+
+    if (promiseArg1 === undefined || promiseArg2 === undefined) {
+      return [value]
+    }
 
     const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
-      if (arg1[1] === undefined) {
-        throw new Error(`arg1 should not be undefined for state: ${state}`)
-      }
-
-      if (arg2[1] === undefined) {
-        throw new Error(`arg2 should not be undefined for state: ${state}`)
-      }
-
-      Promise.all([arg1[1], arg2[1]]).then(([leftValue, rightValue]) => {
+      Promise.all([promiseArg1, promiseArg2]).then(([leftValue, rightValue]) => {
         const interpreterValue = getValue(leftValue.interpreterValue, rightValue.interpreterValue)
 
         resolve({
@@ -523,8 +522,6 @@ export class Interpreter {
         })
       }).catch(reject)
     })
-    
-    const value = getValue(arg1[0], arg2[0])
 
     return [value, promise]
   }
