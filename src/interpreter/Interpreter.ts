@@ -290,42 +290,105 @@ export class Interpreter {
         return this.evaluateAst(ast.expression, state)
       }
       case AstNodeType.ARRAY: {
-        let totalWidth: Maybe<number> = undefined
-        const ret: InternalScalarValue[][] = []
+        const interpreterValues: InterpreterValue[][] = []
+        const promises: Promise<InterpreterValue[]>[] = []
+
         for (const astRow of ast.args) {
-          let rowHeight: Maybe<number> = undefined
-          const rowRet: InternalScalarValue[][] = []
+          const rowRet: InterpreterValue[] = []
+          const promiseRowRet: Promise<InterpreterValue>[] = []
+
           for (const astIt of astRow) {
-            const arr = coerceToRange(this.evaluateAst(astIt, state)[0])
-            const height = arr.height()
-            if (rowHeight === undefined) {
-              rowHeight = height
-              rowRet.push(...arr.data)
-            } else if (rowHeight === height) {
-              for (let i = 0; i < height; i++) {
-                rowRet[i].push(...arr.data[i])
-              }
-            } else {
-              return [new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)]
-            }
+            const [value, evaluatorPromise] = this.evaluateAst(astIt, state)
+            const newEvaluatorPromise = evaluatorPromise ?? Promise.resolve({
+              interpreterValue: value,
+              state
+            })
+
+            const promise = new Promise<InterpreterValue>((resolve, reject) => {
+              newEvaluatorPromise?.then((value) => {
+                resolve(value.interpreterValue)
+              }).catch(reject)
+            })
+
+            promiseRowRet.push(promise)
+
+            rowRet.push(value)
           }
-          const width = rowRet[0].length
-          if (totalWidth === undefined) {
-            totalWidth = width
-            ret.push(...rowRet)
-          } else if (totalWidth === width) {
-            ret.push(...rowRet)
-          } else {
-            return [new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)]
-          }
+
+          interpreterValues.push(rowRet)
+
+          promises.push(Promise.all(promiseRowRet))
         }
-        return [SimpleRangeValue.onlyValues(ret)]
+
+        const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
+          Promise.all(promises).then((values) => {
+            const simpleRangeValues = this.getSimpleRangeValues(values)
+
+            if (simpleRangeValues instanceof CellError) {
+              resolve({
+                interpreterValue: simpleRangeValues,
+                state
+              })
+              return
+            }
+
+            resolve({
+              interpreterValue: SimpleRangeValue.onlyValues(simpleRangeValues),
+              state
+            })
+          }).catch(reject)
+        })
+
+        const simpleRangeValues = this.getSimpleRangeValues(interpreterValues)
+
+        if (simpleRangeValues instanceof CellError) {
+          return [simpleRangeValues, promise]
+        }
+
+        return [SimpleRangeValue.onlyValues(simpleRangeValues), promise]
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.ERROR: {
         return [ast.error]
       }
     }
+  }
+
+  private getSimpleRangeValues(interpreterValues: InterpreterValue[][]): InternalScalarValue[][] | CellError {
+    const ret: InternalScalarValue[][] = []
+    let totalWidth: Maybe<number> = undefined
+
+    for (const interpreterValueRow of interpreterValues) {
+      let rowHeight: Maybe<number> = undefined
+      const rowRet: InternalScalarValue[][] = []
+
+      for (const interpreterValue of interpreterValueRow) {
+        const simpleRangeValue = coerceToRange(interpreterValue)
+        const height = simpleRangeValue.height()
+
+        if (rowHeight === undefined) {
+          rowHeight = height
+          rowRet.push(...simpleRangeValue.data)
+        } else if (rowHeight === height) {
+          for (let i = 0; i < height; i++) {
+            rowRet[i].push(...simpleRangeValue.data[i])
+          }
+        } else {
+          return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
+        }
+      }
+      const width = rowRet[0].length
+      if (totalWidth === undefined) {
+        totalWidth = width
+        ret.push(...rowRet)
+      } else if (totalWidth === width) {
+        ret.push(...rowRet)
+      } else {
+        return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
+      }
+    }
+
+    return ret
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
