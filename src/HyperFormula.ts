@@ -949,14 +949,14 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Instance
    */
-  public updateConfig(newParams: Partial<ConfigParams>): void {
+  public updateConfig(newParams: Partial<ConfigParams>): Promise<void> {
     const newConfig = this._config.mergeConfig(newParams)
 
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
     const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 
-    const [newEngine] = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
+    const [newEngine, promise] = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
 
     this._config = newEngine.config
     this._stats = newEngine.stats
@@ -972,6 +972,8 @@ export class HyperFormula implements TypedEmitter {
     this._namedExpressions = newEngine.namedExpressions
     this._serialization = newEngine.serialization
     this._functionRegistry = newEngine.functionRegistry
+
+    return promise
   }
 
   /**
@@ -999,8 +1001,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Instance
    */
-  public rebuildAndRecalculate(): void {
-    this.updateConfig({})
+  public rebuildAndRecalculate(): Promise<void> {
+    return this.updateConfig({})
   }
 
   /**
@@ -4358,7 +4360,7 @@ export class HyperFormula implements TypedEmitter {
       const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
       this.dependencyGraph.clearRecentlyChangedVertices()
 
-      let evaluatorPromise: Promise<ContentChanges[]> = Promise.resolve([])
+      let evaluatorPromise: Promise<ContentChanges> = Promise.resolve(ContentChanges.empty())
 
       if (verticesToRecomputeFrom.length > 0) {
         const [contentChanges, promise] = this.evaluator.partialRun(verticesToRecomputeFrom)
@@ -4370,13 +4372,11 @@ export class HyperFormula implements TypedEmitter {
 
       const promise = new Promise<ExportedChange[]>((resolve, reject) => {
         evaluatorPromise.then((contentChanges) => {
-          let exportedChanges: ExportedChange[] = []
+          const exportedChanges = contentChanges.exportChanges(this._exporter)
   
-          contentChanges.forEach((changes) => {
-            exportedChanges = [...exportedChanges, ...changes.exportChanges(this._exporter)]
-  
+          if (!contentChanges.isEmpty()) {
             this._emitter.emit(Events.AsyncValuesUpdated, exportedChanges)  
-          })
+          }
   
           resolve(exportedChanges)
         }).catch(reject)

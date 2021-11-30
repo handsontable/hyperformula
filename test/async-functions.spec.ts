@@ -104,19 +104,20 @@ describe('async functions', () => {
       expect(asyncChanges).toEqual([new ExportedCellChange(adr('B1'), 1), new ExportedCellChange(adr('C1'), 2), new ExportedCellChange(adr('D1'), 6)])
     })
 
-    it('asyncValuesUpdated fires with changes', (done) => {
+    it('asyncValuesUpdated fires once per public async action', async() => {
       const [engine] = HyperFormula.buildFromArray([])
-
-      engine.setSheetContent(0, [[1, '=ASYNC_FOO()']])
-
-      const handler = (asyncChanges?: ExportedChange[]) => {
-        expect(engine.getSheetValues(0)).toEqual([[1, 1]])
-        expect(asyncChanges).toEqual([new ExportedCellChange(adr('B1'), 1)])
-
-        done()
-      }
+      const handler = jasmine.createSpy()
 
       engine.on(Events.AsyncValuesUpdated, handler)
+
+      await engine.setSheetContent(0, [['=ASYNC_FOO()']])[1]
+
+      expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 1)])
+
+      await engine.setSheetContent(0, [['=ASYNC_FOO()', '=ASYNC_FOO()', '=ASYNC_FOO()']])[1]
+
+      expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 1), new ExportedCellChange(adr('B1'), 1), new ExportedCellChange(adr('C1'), 1)])
+      expect(handler).toHaveBeenCalledTimes(2)
     })
   })
     

@@ -41,8 +41,8 @@ export class Evaluator {
     })
   }
 
-  private async recomputeAsyncFunctions(asyncFunctionValuePromise: Promise<AsyncFunctionValue>[], sortedVertices: Vertex[]): Promise<ContentChanges[]> {
-    let allChanges: ContentChanges[] = []
+  private async recomputeAsyncFunctions(asyncFunctionValuePromise: Promise<AsyncFunctionValue>[], sortedVertices: Vertex[]): Promise<ContentChanges> {
+    const changes = ContentChanges.empty()
 
     for (const promise of asyncFunctionValuePromise) {
       const asyncFunctionValue = await promise
@@ -54,8 +54,6 @@ export class Evaluator {
       formulaVertex.setCellValue(interpreterValue)
 
       const indexOfCurrent = sortedVertices.indexOf(formulaVertex)
-
-      const changes = ContentChanges.empty()
 
       // TODO: Not efficient algorithm code
       for (let index = indexOfCurrent; index < sortedVertices.length; index++) {
@@ -76,11 +74,9 @@ export class Evaluator {
           vertex.clearCache()
         }
       }
-  
-      allChanges = [...allChanges, changes]
     }
 
-    return allChanges
+    return changes
   }
 
   private partialRunWithoutAsync(vertices: Vertex[]): [ContentChanges, Vertex[], Promise<AsyncFunctionValue>[]] {
@@ -129,7 +125,7 @@ export class Evaluator {
     return [changes, sorted, promises]
   }
 
-  public partialRun(vertices: Vertex[]): [ContentChanges, Promise<ContentChanges[]>] {
+  public partialRun(vertices: Vertex[]): [ContentChanges, Promise<ContentChanges>] {
     const [changes, sorted, promises] = this.partialRunWithoutAsync(vertices)
 
     return [changes, this.recomputeAsyncFunctions(promises, sorted)]
