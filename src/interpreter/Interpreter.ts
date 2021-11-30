@@ -37,6 +37,7 @@ import {
   EmptyValue,
   getRawValue,
   InternalScalarValue,
+  InterpreterTuple,
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
@@ -128,74 +129,74 @@ export class Interpreter {
       case AstNodeType.CONCATENATE_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.concatOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.concatOp, leftResult, rightResult, state)
       }
       case AstNodeType.EQUALS_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.equalOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.equalOp, leftResult, rightResult, state)
       }
       case AstNodeType.NOT_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.notEqualOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.notEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.GREATER_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.greaterThanOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.greaterThanOp, leftResult, rightResult, state)
       }
       case AstNodeType.LESS_THAN_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.lessThanOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.lessThanOp, leftResult, rightResult, state)
       }
       case AstNodeType.GREATER_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.greaterThanOrEqualOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.greaterThanOrEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.LESS_THAN_OR_EQUAL_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.lessThanOrEqualOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.lessThanOrEqualOp, leftResult, rightResult, state)
       }
       case AstNodeType.PLUS_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.plusOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.plusOp, leftResult, rightResult, state)
       }
       case AstNodeType.MINUS_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.minusOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.minusOp, leftResult, rightResult, state)
       }
       case AstNodeType.TIMES_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.timesOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.timesOp, leftResult, rightResult, state)
       }
       case AstNodeType.POWER_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.powerOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.powerOp, leftResult, rightResult, state)
       }
       case AstNodeType.DIV_OP: {
         const leftResult = this.evaluateAst(ast.left, state)
         const rightResult = this.evaluateAst(ast.right, state)
-        return [this.binaryRangeWrapper(this.divOp, leftResult[0], rightResult[0], state)]
+        return this.binaryAsyncRangeWrapper(this.divOp, leftResult, rightResult, state)
       }
       case AstNodeType.PLUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, state)
-        return [this.unaryRangeWrapper(this.unaryPlusOp, result[0], state)]
+        return this.unaryAsyncRangeWrapper(this.unaryPlusOp, result, state)
       }
       case AstNodeType.MINUS_UNARY_OP: {
         const result = this.evaluateAst(ast.value, state)
-        return [this.unaryRangeWrapper(this.unaryMinusOp, result[0], state)]
+        return this.unaryAsyncRangeWrapper(this.unaryMinusOp, result, state)
       }
       case AstNodeType.PERCENT_OP: {
         const result = this.evaluateAst(ast.value, state)
-        return [this.unaryRangeWrapper(this.percentOp, result[0], state)]
+        return this.unaryAsyncRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
         if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
@@ -398,6 +399,29 @@ export class Interpreter {
 
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
+  private unaryAsyncRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterTuple, state: InterpreterState): InterpreterTuple {
+    const getValue = (arg: InterpreterValue) => this.unaryRangeWrapper(op, arg, state)
+
+    const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
+      if (arg[1] === undefined) {
+        throw new Error(`arg should not be undefined for state: ${state}`)
+      }
+
+      arg[1].then((value) => {
+        const interpreterValue = getValue(value.interpreterValue)
+
+        resolve({
+          interpreterValue,
+          state
+        })
+      }).catch(reject)
+    })
+    
+    const value = getValue(arg[0])
+
+    return [value, promise]
+  }
+
   private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg instanceof SimpleRangeValue && !state.arraysFlag) {
       arg = coerceRangeToScalar(arg, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
@@ -413,6 +437,33 @@ export class Interpreter {
     }
 
     return op(arg)
+  }
+
+  private binaryAsyncRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterTuple, arg2: InterpreterTuple, state: InterpreterState): InterpreterTuple {
+    const getValue = (arg1: InterpreterValue, arg2: InterpreterValue) => this.binaryRangeWrapper(op, arg1, arg2, state)
+
+    const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
+      if (arg1[1] === undefined) {
+        throw new Error(`arg1 should not be undefined for state: ${state}`)
+      }
+
+      if (arg2[1] === undefined) {
+        throw new Error(`arg2 should not be undefined for state: ${state}`)
+      }
+
+      Promise.all([arg1[1], arg2[1]]).then(([leftValue, rightValue]) => {
+        const interpreterValue = getValue(leftValue.interpreterValue, rightValue.interpreterValue)
+
+        resolve({
+          interpreterValue,
+          state
+        })
+      }).catch(reject)
+    })
+    
+    const value = getValue(arg1[0], arg2[0])
+
+    return [value, promise]
   }
 
   private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {

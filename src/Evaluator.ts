@@ -44,6 +44,12 @@ export class Evaluator {
   private async recomputeAsyncFunctions(asyncFunctionValuePromise: Promise<AsyncFunctionValue>[], sortedVertices: Vertex[]): Promise<ContentChanges> {
     const changes = ContentChanges.empty()
 
+    const addNewValueToChanges = (address: SimpleCellAddress, currentValue: InterpreterValue | undefined, value: InterpreterValue) => {
+      changes.addChange(value, address)
+
+      this.columnSearch.change(getRawValue(currentValue), getRawValue(value), address)
+    }
+
     for (const promise of asyncFunctionValuePromise) {
       const asyncFunctionValue = await promise
       const { state, interpreterValue } = asyncFunctionValue
@@ -53,22 +59,24 @@ export class Evaluator {
   
       formulaVertex.setCellValue(interpreterValue)
 
-      const indexOfCurrent = sortedVertices.indexOf(formulaVertex)
+      const indexOfNext = sortedVertices.indexOf(formulaVertex) + 1
+      const currentValue = formulaVertex.isComputed() ? formulaVertex.getCellValue() : undefined
+      const address = formulaVertex.getAddress(this.lazilyTransformingAstService)
+
+      addNewValueToChanges(address, currentValue, interpreterValue)
 
       // TODO: Not efficient algorithm code
-      for (let index = indexOfCurrent; index < sortedVertices.length; index++) {
+      for (let index = indexOfNext; index < sortedVertices.length; index++) {
         const vertex = sortedVertices[index]
-        const isAsyncVertex = indexOfCurrent === index
 
         if (vertex instanceof FormulaVertex) {
           const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
           const [newCellValue] = this.recomputeFormulaVertexValue(vertex)
 
-          if (newCellValue !== currentValue || isAsyncVertex) {
+          if (newCellValue !== currentValue) {
             const address = vertex.getAddress(this.lazilyTransformingAstService)
 
-            changes.addChange(newCellValue, address)
-            this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
+            addNewValueToChanges(address, currentValue, newCellValue)
           }
         } else if (vertex instanceof RangeVertex) {
           vertex.clearCache()

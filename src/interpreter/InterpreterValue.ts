@@ -4,6 +4,7 @@
  */
 
 import {CellError} from '../Cell'
+import { AsyncFunctionValue } from '../parser/Ast'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 export const EmptyValue = Symbol('Empty value')
@@ -125,3 +126,4 @@ export function getTypeFormatOfExtendedNumber(num: ExtendedNumber): NumberTypeWi
   }
 }
 
+export type InterpreterTuple = [InterpreterValue, (Promise<AsyncFunctionValue> | undefined)?]

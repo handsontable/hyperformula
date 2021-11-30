@@ -1,4 +1,4 @@
-import {EvaluationSuspendedError, ExportedCellChange, ExportedChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
+import {EvaluationSuspendedError, ExportedCellChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
 import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Events} from '../src/Emitter'
@@ -79,7 +79,7 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
   }
 }
 
-const getLoadingError = (address: string) =>  detailedErrorWithOrigin(ErrorType.LOADING, address, ErrorMessage.FunctionLoading)
+const getLoadingError = (address: string) => detailedErrorWithOrigin(ErrorType.LOADING, address, ErrorMessage.FunctionLoading)
 
 describe('async functions', () => {
   beforeEach(() => {
@@ -88,6 +88,32 @@ describe('async functions', () => {
   
   afterEach(() => {
     HyperFormula.unregisterFunctionPlugin(AsyncPlugin)
+  })
+
+  describe('operations', () => {
+    it('plus op', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([
+        [1, '=ASYNC_FOO()+ASYNC_FOO(A1)'],
+      ])
+  
+      expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1')]])
+  
+      await promise
+  
+      expect(engine.getSheetValues(0)).toEqual([[1, 7]])
+    })
+
+    it('unary minus op', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([
+        [1, '=-ASYNC_FOO()'],
+      ])
+  
+      expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1')]])
+  
+      await promise
+  
+      expect(engine.getSheetValues(0)).toEqual([[1, -1]])
+    })
   })
 
   describe('recompute partial formulas', () => {
@@ -158,7 +184,7 @@ describe('async functions', () => {
     })
   })
 
-  it('Handles promise races gracefully', async() => {
+  it('handles promise races gracefully', async() => {
     const [engine, enginePromise] = HyperFormula.buildFromArray([[
       'foo', '=LONG_ASYNC_FOO(A1)'
     ]])
