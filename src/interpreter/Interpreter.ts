@@ -37,9 +37,9 @@ import {
   EmptyValue,
   getRawValue,
   InternalScalarValue,
-  InterpreterTuple,
   InterpreterValue,
   isExtendedNumber,
+  OptionalInterpreterTuple,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
@@ -79,7 +79,7 @@ export class Interpreter {
     return wrapperForRootVertex(newVal, state.formulaVertex)
   }
 
-  public evaluateAst(ast: Ast, state: InterpreterState): [InterpreterValue, Promise<AsyncFunctionValue>?] {
+  public evaluateAst(ast: Ast, state: InterpreterState): OptionalInterpreterTuple {
     const val = this.evaluateAstWithoutPostprocessing(ast, state)
 
     return [this.convertPostProcessingValue(val[0], state), val[1]]
@@ -110,7 +110,7 @@ export class Interpreter {
    * @param formula - abstract syntax tree of formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState): [InterpreterValue, Promise<AsyncFunctionValue>?] {
+  private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState): OptionalInterpreterTuple {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
         return [EmptyValue]
@@ -293,36 +293,46 @@ export class Interpreter {
         const interpreterValues: InterpreterValue[][] = []
         const promises: Promise<InterpreterValue[]>[] = []
 
-        for (const astRow of ast.args) {
+        for (let outerIndex = 0; outerIndex < ast.args.length; outerIndex++) {
+          const astRow = ast.args[outerIndex]
           const rowRet: InterpreterValue[] = []
           const promiseRowRet: Promise<InterpreterValue>[] = []
-
-          for (const astIt of astRow) {
+          
+          for (let innerIndex = 0; innerIndex < astRow.length; innerIndex++) {
+            const astIt = astRow[innerIndex]
             const [value, evaluatorPromise] = this.evaluateAst(astIt, state)
-            const newEvaluatorPromise = evaluatorPromise ?? Promise.resolve({
-              interpreterValue: value,
-              state
-            })
 
-            const promise = new Promise<InterpreterValue>((resolve, reject) => {
-              newEvaluatorPromise?.then((value) => {
-                resolve(value.interpreterValue)
-              }).catch(reject)
-            })
-
-            promiseRowRet.push(promise)
+            if (evaluatorPromise) {
+              const promise = new Promise<InterpreterValue>((resolve, reject) => {
+                evaluatorPromise?.then((value) => {
+                  resolve(value.interpreterValue)
+                }).catch(reject)
+              })
+              promiseRowRet[innerIndex] = promise
+            }
 
             rowRet.push(value)
           }
-
           interpreterValues.push(rowRet)
 
-          promises.push(Promise.all(promiseRowRet))
+          if (promiseRowRet.length) {
+            promises[outerIndex] = Promise.all(promiseRowRet)
+          }
         }
 
         const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
           Promise.all(promises).then((values) => {
-            const simpleRangeValues = this.getSimpleRangeValues(values)
+            const newInterpreterValues = [...interpreterValues]
+
+            values.forEach((valueRow, outerIndex) => {
+              valueRow.forEach((value, innerIndex) => {
+                if (value !== undefined) {
+                  newInterpreterValues[outerIndex][innerIndex] = value
+                }
+              })
+            })
+            
+            const simpleRangeValues = this.getSimpleRangeValues(newInterpreterValues)
 
             if (simpleRangeValues instanceof CellError) {
               resolve({
@@ -462,7 +472,7 @@ export class Interpreter {
 
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
-  private unaryAsyncRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterTuple, state: InterpreterState): InterpreterTuple {
+  private unaryAsyncRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: OptionalInterpreterTuple, state: InterpreterState): OptionalInterpreterTuple {
     const getValue = (arg: InterpreterValue) => this.unaryRangeWrapper(op, arg, state)
     const value = getValue(arg[0])
     const promiseArg = arg[1]
@@ -502,19 +512,19 @@ export class Interpreter {
     return op(arg)
   }
 
-  private binaryAsyncRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterTuple, arg2: InterpreterTuple, state: InterpreterState): InterpreterTuple {
+  private binaryAsyncRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: OptionalInterpreterTuple, arg2: OptionalInterpreterTuple, state: InterpreterState): OptionalInterpreterTuple {
     const getValue = (arg1: InterpreterValue, arg2: InterpreterValue) => this.binaryRangeWrapper(op, arg1, arg2, state)
     const value = getValue(arg1[0], arg2[0])
     const promiseArg1 = arg1[1]
     const promiseArg2 = arg2[1]
 
-    if (promiseArg1 === undefined || promiseArg2 === undefined) {
+    if (promiseArg1 === undefined && promiseArg2 === undefined) {
       return [value]
     }
 
-    const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
+    const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {      
       Promise.all([promiseArg1, promiseArg2]).then(([leftValue, rightValue]) => {
-        const interpreterValue = getValue(leftValue.interpreterValue, rightValue.interpreterValue)
+        const interpreterValue = getValue(leftValue?.interpreterValue ?? arg1[0], rightValue?.interpreterValue ?? arg2[0])
 
         resolve({
           interpreterValue,

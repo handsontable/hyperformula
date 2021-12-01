@@ -204,6 +204,18 @@ describe('async functions', () => {
     })
   })
 
+  it('rebuildAndRecalculate', async() => {
+    const [engine, promise] = HyperFormula.buildFromArray([
+      ['=ASYNC_FOO()+2'],
+    ])
+
+    await promise
+
+    await engine.rebuildAndRecalculate()
+
+    expect(engine.getSheetValues(0)).toEqual([[3]])
+  })
+
   it('handles promise races gracefully', async() => {
     const [engine, enginePromise] = HyperFormula.buildFromArray([[
       'foo', '=LONG_ASYNC_FOO(A1)'

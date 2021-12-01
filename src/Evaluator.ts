@@ -12,7 +12,7 @@ import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGra
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {EmptyValue, getRawValue, InterpreterValue, OptionalInterpreterTuple} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
@@ -200,7 +200,7 @@ export class Evaluator {
     })
   }
 
-  private recomputeFormulaVertexValue(vertex: FormulaVertex): [InterpreterValue, Promise<AsyncFunctionValue>?] {
+  private recomputeFormulaVertexValue(vertex: FormulaVertex): OptionalInterpreterTuple {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
     if (vertex instanceof ArrayVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
       return [vertex.setNoSpace()]
@@ -212,7 +212,7 @@ export class Evaluator {
     }
   }
 
-  private evaluateAstToCellValue(ast: Ast, state: InterpreterState): [InterpreterValue, Promise<AsyncFunctionValue>?] {
+  private evaluateAstToCellValue(ast: Ast, state: InterpreterState): OptionalInterpreterTuple {
     const [interpreterValue, promise] = this.interpreter.evaluateAst(ast, state)
 
     if (interpreterValue instanceof SimpleRangeValue) {
