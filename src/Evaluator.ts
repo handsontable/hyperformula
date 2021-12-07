@@ -43,6 +43,10 @@ export class Evaluator {
   }
 
   private async recomputeAsyncFunctions(asyncPromiseVertices: AsyncPromiseVertex[]): Promise<ContentChanges> {
+    if (!asyncPromiseVertices.length) {
+      return ContentChanges.empty()
+    }
+    
     const asyncPromiseGroupedVertices = this.dependencyGraph.getAsyncGroupedVertices(asyncPromiseVertices)
     
     for (const asyncPromiseGroupedVerticesRow of asyncPromiseGroupedVertices) {
@@ -63,9 +67,22 @@ export class Evaluator {
       })
     }
 
-    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
+    const asyncNodes = this.dependencyGraph.asyncVertices()
+
+    // Filter out async nodes as they were just computed
+    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute()).filter(vertex => !asyncNodes.get(vertex))
 
     const [contentChanges] = this.partialRunWithoutAsync(verticesToRecomputeFrom)
+
+    asyncNodes.forEach((vertex) => {
+      const formulaVertex = vertex as FormulaVertex
+      const value = formulaVertex.getCellValue()
+      const address = formulaVertex.getAddress(this.lazilyTransformingAstService)
+
+      this.columnSearch.add(getRawValue(value), address)
+    
+      contentChanges.addChange(value, address)
+    })
 
     return contentChanges
   }

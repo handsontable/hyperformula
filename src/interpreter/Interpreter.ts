@@ -493,6 +493,19 @@ export class Interpreter {
       return [value]
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const getPromise1 = asyncArg.getPromise!
+
+    const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
+      getPromise1().then((value) => {
+        const interpreterValue = getValue(value)
+
+        resolve(interpreterValue)
+      }).catch(reject)
+    })
+
+    asyncArg.getPromise = getPromise
+
     return [value, asyncArg]
   }
 

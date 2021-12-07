@@ -4,7 +4,7 @@ import {Config} from '../src/Config'
 import {Events} from '../src/Emitter'
 import {ErrorMessage} from '../src/error-message'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
-import {AsyncInternalScalarValue, InterpreterValue} from '../src/interpreter/InterpreterValue'
+import {AsyncInternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, detailedErrorWithOrigin, expectEngineToBeTheSameAs} from './testUtils'
@@ -20,15 +20,18 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
     },
     'LONG_ASYNC_FOO': {
       method: 'longAsyncFoo',
+      isAsyncMethod: true,
       parameters: [
         {argumentType: ArgumentTypes.ANY}
       ],
     },
     'TIMEOUT_FOO': {
       method: 'timeoutFoo',
+      isAsyncMethod: true,
     },
     'ASYNC_ERROR_FOO': {
       method: 'asyncErrorFoo',
+      isAsyncMethod: true,
     },
   }
 
@@ -111,7 +114,7 @@ describe('async functions', () => {
   //   })
   // })
 
-  describe.only('operations', () => {
+  describe('operations', () => {
     it('plus op', async() => {
       const [engine, promise] = HyperFormula.buildFromArray([
         [1, '=ASYNC_FOO()+ASYNC_FOO(A1)'],
@@ -124,17 +127,17 @@ describe('async functions', () => {
       expect(engine.getSheetValues(0)).toEqual([[1, 7]])
     })
 
-    // it('unary minus op', async() => {
-    //   const [engine, promise] = HyperFormula.buildFromArray([
-    //     [1, '=-ASYNC_FOO()'],
-    //   ])
+    it('unary minus op', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([
+        [1, '=-ASYNC_FOO()'],
+      ])
   
-    //   expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1')]])
+      expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1')]])
   
-    //   await promise
+      await promise
   
-    //   expect(engine.getSheetValues(0)).toEqual([[1, -1]])
-    // })
+      expect(engine.getSheetValues(0)).toEqual([[1, -1]])
+    })
   })
 
   describe('recompute partial formulas', () => {
@@ -148,7 +151,7 @@ describe('async functions', () => {
       const asyncChanges = await promise
 
       expect(engine.getSheetValues(0)).toEqual([[1, 1, 2, 6]])
-      expect(asyncChanges).toEqual([new ExportedCellChange(adr('B1'), 1), new ExportedCellChange(adr('C1'), 2), new ExportedCellChange(adr('D1'), 6)])
+      expect(asyncChanges).toEqual([new ExportedCellChange(adr('C1'), 2), new ExportedCellChange(adr('B1'), 1), new ExportedCellChange(adr('D1'), 6)])
     })
 
     it('asyncValuesUpdated fires once per public async action', async() => {
@@ -374,12 +377,10 @@ describe('async functions', () => {
         2, '=ASYNC_FOO()'
       ]]
 
-      const [,promise] = engine.setSheetContent(0, sheet)
+      await engine.setSheetContent(0, sheet)[1]
 
-      await promise
-  
-      engine.undo()
-      engine.redo()
+      await engine.undo()[1]
+      await engine.redo()[1]
 
       const [expectedEngine, enginePromise] = HyperFormula.buildFromArray(sheet)
 
