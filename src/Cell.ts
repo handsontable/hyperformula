@@ -116,13 +116,9 @@ export const CellValueTypeOrd = (arg: CellValueType): number => {
   throw new Error('Cell value not computed')
 }
 
-export const isPromise = (value: any) => {
-  return value && value.then && typeof value.then === 'function'
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const withTimeout = <T>(promise: Promise<T>, ms: number) => {
-  const timeoutPromise = new Promise<CellError>((_resolve, reject) => {
+  const timeoutPromise = new Promise<T>((_resolve, reject) => {
     return setTimeout(
       () => {
         reject(new CellError(ErrorType.TIMEOUT, ErrorMessage.FunctionTimeout))

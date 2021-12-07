@@ -6,7 +6,7 @@
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
-import {CellError, ErrorType, invalidSimpleCellAddress, isPromise, withTimeout} from '../Cell'
+import {CellError, ErrorType, invalidSimpleCellAddress, withTimeout} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
@@ -17,7 +17,7 @@ import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
 // noinspection TypeScriptPreferShortImport
-import {Ast, AstNodeType, AsyncFunctionValue, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
+import {Ast, AstNodeType, CellRangeAst, ColumnRangeAst, RowRangeAst} from '../parser/Ast'
 import {Serialization} from '../Serialization'
 import {Statistics} from '../statistics/Statistics'
 import {
@@ -204,44 +204,55 @@ export class Interpreter {
         }
     
         const interpreterState = new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex)
-        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
+        const cellError = new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
     
-        if (pluginFunction === undefined) {
-          return [new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))]
-        }
+        const metadata = this.functionRegistry.getMetadata(ast.procedureName)
+
+        if (metadata?.isAsyncMethod) {
+          const pluginFunction = this.functionRegistry.getAsyncFunction(ast.procedureName)
+
+          if (pluginFunction === undefined) {
+            return [cellError]
+          }
     
-        const pluginFunctionValue = pluginFunction(ast, interpreterState)
-    
-        if (isPromise(pluginFunctionValue)) {
           if (state.formulaVertex?.isComputed()) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             return [interpreterState.formulaVertex!.getCellValue()]
           }else {            
-            const functionPromise = withTimeout(pluginFunctionValue as AsyncInterpreterValue, this.config.timeoutTime)
-            
-            const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
+            const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
+              const pluginFunctionValue = pluginFunction(ast, interpreterState)
+              const functionPromise = withTimeout(pluginFunctionValue, this.config.timeoutTime)
+
               functionPromise.then((interpreterValue) => {
-                resolve({
-                  state,
-                  interpreterValue
-                })
+                resolve(interpreterValue)
               }).catch((error) => {
                 if (error instanceof CellError) {
-                  resolve({
-                    state,
-                    interpreterValue: error
-                  })
+                  resolve(error)
                 } else {
                   reject(error)
                 }
               })
             })
+
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const asyncVertex = state.formulaVertex!
             
-            return [new CellError(ErrorType.LOADING, ErrorMessage.FunctionLoading), promise]
+            return [new CellError(ErrorType.LOADING, ErrorMessage.FunctionLoading), {
+              asyncVertex,
+              getPromise
+            }]
           }
         }
+
+        const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
+
+        if (pluginFunction === undefined) {
+          return [cellError]
+        }
+
+        const pluginFunctionValue = pluginFunction(ast, interpreterState)
     
-        return [pluginFunctionValue as InterpreterValue]
+        return [pluginFunctionValue]
       }
       case AstNodeType.NAMED_EXPRESSION: {
         const namedExpression = this.namedExpressions.nearestNamedExpression(ast.expressionName, state.formulaAddress.sheet)
@@ -290,72 +301,73 @@ export class Interpreter {
         return this.evaluateAst(ast.expression, state)
       }
       case AstNodeType.ARRAY: {
-        const interpreterValues: InterpreterValue[][] = []
-        const promises: Promise<InterpreterValue[]>[] = []
+        // const interpreterValues: InterpreterValue[][] = []
+        // const asyncValues: AysncValue[][] = []
 
-        for (let outerIndex = 0; outerIndex < ast.args.length; outerIndex++) {
-          const astRow = ast.args[outerIndex]
-          const rowRet: InterpreterValue[] = []
-          const promiseRowRet: Promise<InterpreterValue>[] = []
+        // for (let outerIndex = 0; outerIndex < ast.args.length; outerIndex++) {
+        //   const astRow = ast.args[outerIndex]
+        //   const rowRet: InterpreterValue[] = []
+        //   const asyncValueRowRet: AysncValue[] = []
           
-          for (let innerIndex = 0; innerIndex < astRow.length; innerIndex++) {
-            const astIt = astRow[innerIndex]
-            const [value, evaluatorPromise] = this.evaluateAst(astIt, state)
+        //   for (let innerIndex = 0; innerIndex < astRow.length; innerIndex++) {
+        //     const astIt = astRow[innerIndex]
+        //     const [value, asyncValue] = this.evaluateAst(astIt, state)
 
-            if (evaluatorPromise) {
-              const promise = new Promise<InterpreterValue>((resolve, reject) => {
-                evaluatorPromise?.then((value) => {
-                  resolve(value.interpreterValue)
-                }).catch(reject)
-              })
-              promiseRowRet[innerIndex] = promise
-            }
+        //     // if (asyncValue) {
+        //     //   const promise = new Promise<InterpreterValue>((resolve, reject) => {
+        //     //     asyncValue.promise?.then((interpreterValue) => {
+        //     //       resolve(interpreterValue)
+        //     //     }).catch(reject)
+        //     //   })
+        //     //   asyncValueRowRet[innerIndex] = promise
+        //     // }
 
-            rowRet.push(value)
-          }
-          interpreterValues.push(rowRet)
+        //     rowRet.push(value)
+        //   }
+        //   interpreterValues.push(rowRet)
 
-          if (promiseRowRet.length) {
-            promises[outerIndex] = Promise.all(promiseRowRet)
-          }
-        }
+        //   if (asyncValueRowRet.length) {
+        //     asyncValues[outerIndex] = Promise.all(asyncValueRowRet.map(x => x.promise))
+        //   }
+        // }
 
-        const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
-          Promise.all(promises).then((values) => {
-            const newInterpreterValues = [...interpreterValues]
+        // const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
+        //   Promise.all(promises).then((values) => {
+        //     const newInterpreterValues = [...interpreterValues]
 
-            values.forEach((valueRow, outerIndex) => {
-              valueRow.forEach((value, innerIndex) => {
-                if (value !== undefined) {
-                  newInterpreterValues[outerIndex][innerIndex] = value
-                }
-              })
-            })
+        //     values.forEach((valueRow, outerIndex) => {
+        //       valueRow.forEach((value, innerIndex) => {
+        //         if (value !== undefined) {
+        //           newInterpreterValues[outerIndex][innerIndex] = value
+        //         }
+        //       })
+        //     })
             
-            const simpleRangeValues = this.getSimpleRangeValues(newInterpreterValues)
+        //     const simpleRangeValues = this.getSimpleRangeValues(newInterpreterValues)
 
-            if (simpleRangeValues instanceof CellError) {
-              resolve({
-                interpreterValue: simpleRangeValues,
-                state
-              })
-              return
-            }
+        //     if (simpleRangeValues instanceof CellError) {
+        //       resolve({
+        //         interpreterValue: simpleRangeValues,
+        //         state
+        //       })
+        //       return
+        //     }
 
-            resolve({
-              interpreterValue: SimpleRangeValue.onlyValues(simpleRangeValues),
-              state
-            })
-          }).catch(reject)
-        })
+        //     resolve({
+        //       interpreterValue: SimpleRangeValue.onlyValues(simpleRangeValues),
+        //       state
+        //     })
+        //   }).catch(reject)
+        // })
 
-        const simpleRangeValues = this.getSimpleRangeValues(interpreterValues)
+        // const simpleRangeValues = this.getSimpleRangeValues(interpreterValues)
 
-        if (simpleRangeValues instanceof CellError) {
-          return [simpleRangeValues, promise]
-        }
+        // if (simpleRangeValues instanceof CellError) {
+        //   return [simpleRangeValues, promise]
+        // }
 
-        return [SimpleRangeValue.onlyValues(simpleRangeValues), promise]
+        // return [SimpleRangeValue.onlyValues(simpleRangeValues), promise]
+        return [EmptyValue]
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.ERROR: {
@@ -475,24 +487,13 @@ export class Interpreter {
   private unaryAsyncRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: OptionalInterpreterTuple, state: InterpreterState): OptionalInterpreterTuple {
     const getValue = (arg: InterpreterValue) => this.unaryRangeWrapper(op, arg, state)
     const value = getValue(arg[0])
-    const promiseArg = arg[1]
+    const asyncArg = arg[1]
 
-    if (promiseArg === undefined) {
+    if (asyncArg === undefined) {
       return [value]
     }
 
-    const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
-      promiseArg.then((value) => {
-        const interpreterValue = getValue(value.interpreterValue)
-
-        resolve({
-          interpreterValue,
-          state
-        })
-      }).catch(reject)
-    })
-    
-    return [value, promise]
+    return [value, asyncArg]
   }
 
   private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
@@ -515,25 +516,35 @@ export class Interpreter {
   private binaryAsyncRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: OptionalInterpreterTuple, arg2: OptionalInterpreterTuple, state: InterpreterState): OptionalInterpreterTuple {
     const getValue = (arg1: InterpreterValue, arg2: InterpreterValue) => this.binaryRangeWrapper(op, arg1, arg2, state)
     const value = getValue(arg1[0], arg2[0])
-    const promiseArg1 = arg1[1]
-    const promiseArg2 = arg2[1]
+    const asyncArg1 = arg1[1]
+    const asyncArg2 = arg2[1]
+    const getPromise1 = asyncArg1?.getPromise ? asyncArg1.getPromise : () => undefined
+    const getPromise2 = asyncArg2?.getPromise ? asyncArg2.getPromise : () => undefined
 
-    if (promiseArg1 === undefined && promiseArg2 === undefined) {
+    if (asyncArg1 === undefined && asyncArg2 === undefined) {
       return [value]
     }
 
-    const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {      
-      Promise.all([promiseArg1, promiseArg2]).then(([leftValue, rightValue]) => {
-        const interpreterValue = getValue(leftValue?.interpreterValue ?? arg1[0], rightValue?.interpreterValue ?? arg2[0])
+    const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {  
+      const promise1 = getPromise1()
+      const promise2 = getPromise2()
 
-        resolve({
-          interpreterValue,
-          state
-        })
+      Promise.all([promise1, promise2]).then(([leftValue, rightValue]) => {
+        const interpreterValue = getValue(leftValue ?? arg1[0], rightValue ?? arg2[0])
+
+        resolve(interpreterValue)
       }).catch(reject)
     })
 
-    return [value, promise]
+    // Use the vertex which is going to be resolved last
+    const asyncResolveIndex1 = asyncArg1?.asyncVertex.asyncResolveIndex ?? -Infinity
+    const asyncResolveIndex2 = asyncArg2?.asyncVertex.asyncResolveIndex ?? -Infinity
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const asyncPromiseVertex = (asyncResolveIndex2 > asyncResolveIndex1 ? asyncArg2 : asyncArg1)!
+
+    asyncPromiseVertex.getPromise = getPromise
+
+    return [value, asyncPromiseVertex]
   }
 
   private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {

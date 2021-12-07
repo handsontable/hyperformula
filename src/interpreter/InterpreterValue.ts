@@ -4,7 +4,7 @@
  */
 
 import {CellError} from '../Cell'
-import {AsyncFunctionValue} from '../parser/Ast'
+import {AsyncVertex} from '../DependencyGraph/FormulaCellVertex'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
 export const EmptyValue = Symbol('Empty value')
@@ -126,5 +126,10 @@ export function getTypeFormatOfExtendedNumber(num: ExtendedNumber): NumberTypeWi
   }
 }
 
-export type InterpreterTuple = [InterpreterValue, Promise<AsyncFunctionValue>]
-export type OptionalInterpreterTuple = [InterpreterValue, Promise<AsyncFunctionValue>?]
+export interface AsyncPromiseVertex {
+  getPromise?: () => AsyncInterpreterValue,
+  asyncVertex: AsyncVertex,
+} 
+
+export type InterpreterTuple = [InterpreterValue, AsyncPromiseVertex]
+export type OptionalInterpreterTuple = [InterpreterValue, AsyncPromiseVertex?]

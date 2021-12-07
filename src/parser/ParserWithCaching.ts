@@ -35,6 +35,7 @@ export interface ParsingResult {
   dependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
   hasStructuralChangeFunction: boolean,
+  hasAsyncFunction: boolean,
 }
 
 /**
@@ -79,6 +80,7 @@ export class ParserWithCaching {
         errors,
         hasVolatileFunction: false,
         hasStructuralChangeFunction: false,
+        hasAsyncFunction: false,
         dependencies: []
       }
     }
@@ -93,14 +95,14 @@ export class ParserWithCaching {
       const parsingResult = this.formulaParser.parseFromTokens(processedTokens, formulaAddress)
 
       if (parsingResult.errors.length > 0) {
-        return {...parsingResult, hasVolatileFunction: false, hasStructuralChangeFunction: false, dependencies: []}
+        return {...parsingResult, hasVolatileFunction: false, hasStructuralChangeFunction: false, hasAsyncFunction: false, dependencies: []}
       } else {
         cacheResult = this.cache.set(hash, parsingResult.ast)
       }
     }
-    const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction, relativeDependencies} = cacheResult
 
-    return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
+    return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction, dependencies: relativeDependencies}
   }
 
   public fetchCachedResultForAst(ast: Ast): ParsingResult {
@@ -113,8 +115,8 @@ export class ParserWithCaching {
     if (cacheResult === undefined) {
       throw new Error('There is no AST with such key in the cache')
     } else {
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
-      return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction, relativeDependencies} = cacheResult
+      return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction, dependencies: relativeDependencies}
     }
   }
 

@@ -75,9 +75,15 @@ export interface FunctionMetadata {
   /**
    * Engine.
    *
-   * If set to `true`, the function is volatile.
+   * If set to `true`, the function will be checked for an array size.
    */
   arraySizeMethod?: string,
+  /**
+   * Engine.
+   * 
+   * If set to `true`, the function will be treated as an async method.
+   */
+  isAsyncMethod?: boolean,
   /**
    * Engine.
    */

@@ -12,12 +12,12 @@ import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGra
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {EmptyValue, getRawValue, InterpreterValue, OptionalInterpreterTuple} from './interpreter/InterpreterValue'
+import {AsyncPromiseVertex, EmptyValue, getRawValue, OptionalInterpreterTuple} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {Operations} from './Operations'
 import {Ast, RelativeDependency} from './parser'
-import { AsyncFunctionValue } from './parser/Ast'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
@@ -28,6 +28,7 @@ export class Evaluator {
     private readonly lazilyTransformingAstService: LazilyTransformingAstService,
     private readonly dependencyGraph: DependencyGraph,
     private readonly columnSearch: ColumnSearchStrategy,
+    private readonly operations: Operations,
   ) {
   }
 
@@ -41,65 +42,47 @@ export class Evaluator {
     })
   }
 
-  private async recomputeAsyncFunctions(asyncFunctionValuePromise: Promise<AsyncFunctionValue>[], sortedVertices: Vertex[]): Promise<ContentChanges> {
-    const changes = ContentChanges.empty()
-
-    const addNewValueToChanges = (address: SimpleCellAddress, currentValue: InterpreterValue | undefined, value: InterpreterValue) => {
-      changes.addChange(value, address)
-
-      this.columnSearch.change(getRawValue(currentValue), getRawValue(value), address)
-    }
-
-    for (const promise of asyncFunctionValuePromise) {
-      const asyncFunctionValue = await promise
-      const { state, interpreterValue } = asyncFunctionValue
-
+  private async recomputeAsyncFunctions(asyncPromiseVertices: AsyncPromiseVertex[]): Promise<ContentChanges> {
+    const asyncPromiseGroupedVertices = this.dependencyGraph.getAsyncGroupedVertices(asyncPromiseVertices)
+    
+    for (const asyncPromiseGroupedVerticesRow of asyncPromiseGroupedVertices) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const formulaVertex = state.formulaVertex!
-  
-      formulaVertex.setCellValue(interpreterValue)
+      const promises = asyncPromiseGroupedVerticesRow.map(({ getPromise }) => getPromise!())
+      const interpreterValues = await Promise.all(promises)
 
-      const indexOfNext = sortedVertices.indexOf(formulaVertex) + 1
-      const currentValue = formulaVertex.isComputed() ? formulaVertex.getCellValue() : undefined
-      const address = formulaVertex.getAddress(this.lazilyTransformingAstService)
+      interpreterValues.forEach((value, i) => {
+        const vertex = asyncPromiseGroupedVerticesRow[i].asyncVertex as FormulaVertex
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        const ast = vertex.getFormula(this.lazilyTransformingAstService)
 
-      addNewValueToChanges(address, currentValue, interpreterValue)
+        this.operations.setFormulaToCellFromAst(address, ast)
 
-      // TODO: Not efficient algorithm code
-      for (let index = indexOfNext; index < sortedVertices.length; index++) {
-        const vertex = sortedVertices[index]
+        const newVertex = this.dependencyGraph.getCell(address) as FormulaVertex
 
-        if (vertex instanceof FormulaVertex) {
-          const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
-          const [newCellValue] = this.recomputeFormulaVertexValue(vertex)
-
-          if (newCellValue !== currentValue) {
-            const address = vertex.getAddress(this.lazilyTransformingAstService)
-
-            addNewValueToChanges(address, currentValue, newCellValue)
-          }
-        } else if (vertex instanceof RangeVertex) {
-          vertex.clearCache()
-        }
-      }
+        newVertex.setCellValue(value)
+      })
     }
 
-    return changes
+    const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
+
+    const [contentChanges] = this.partialRunWithoutAsync(verticesToRecomputeFrom)
+
+    return contentChanges
   }
 
-  private partialRunWithoutAsync(vertices: Vertex[]): [ContentChanges, Vertex[], Promise<AsyncFunctionValue>[]] {
+  private partialRunWithoutAsync(vertices: Vertex[]): [ContentChanges, Vertex[], AsyncPromiseVertex[]] {
     const changes = ContentChanges.empty()
-    const promises: Promise<AsyncFunctionValue>[] = []
+    const asyncPromiseVertices: AsyncPromiseVertex[] = []
 
     const { sorted } = this.stats.measure(StatType.EVALUATION, () => {
       return this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
         (vertex: Vertex) => {
           if (vertex instanceof FormulaVertex) {
             const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
-            const [newCellValue, promise] = this.recomputeFormulaVertexValue(vertex)
+            const [newCellValue, asyncPromiseVertex] = this.recomputeFormulaVertexValue(vertex)
 
-            if (promise) {
-              promises.push(promise)
+            if (asyncPromiseVertex) {
+              asyncPromiseVertices.push(asyncPromiseVertex)
             }
 
             if (newCellValue !== currentValue) {
@@ -130,16 +113,16 @@ export class Evaluator {
       )
     })
 
-    return [changes, sorted, promises]
+    return [changes, sorted, asyncPromiseVertices]
   }
 
   public partialRun(vertices: Vertex[]): [ContentChanges, Promise<ContentChanges>] {
-    const [changes, sorted, promises] = this.partialRunWithoutAsync(vertices)
+    const [changes,, asyncPromiseVertices] = this.partialRunWithoutAsync(vertices)
 
-    return [changes, this.recomputeAsyncFunctions(promises, sorted)]
+    return [changes, this.recomputeAsyncFunctions(asyncPromiseVertices)]
   }
 
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): [InterpreterValue, Promise<InterpreterValue>] {
+  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): OptionalInterpreterTuple {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -151,19 +134,17 @@ export class Evaluator {
         }
       }
     }
-    const [ret, asyncFunctionValuePromise] = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
+    const [ret, asyncPromiseVertex] = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
 
     tmpRanges.forEach((rangeVertex) => {
       this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
     })
 
-    const promise = new Promise<InterpreterValue>((resolve, reject) => {
-      asyncFunctionValuePromise?.then(({ interpreterValue }) => {
-        resolve(interpreterValue)
-      }).catch(reject)
-    })
+    if (!asyncPromiseVertex) {
+      return [ret]
+    }
 
-    return [ret, promise]
+    return [ret, asyncPromiseVertex]
   }
 
   /**
@@ -176,17 +157,17 @@ export class Evaluator {
       }
     })
 
-    const promises: Promise<AsyncFunctionValue>[] = []
+    const asyncPromiseVertices: AsyncPromiseVertex[] = []
 
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
-        const [newCellValue, promise] = this.recomputeFormulaVertexValue(vertex)
+        const [newCellValue, asyncPromiseVertex] = this.recomputeFormulaVertexValue(vertex)
         const address = vertex.getAddress(this.lazilyTransformingAstService)
 
         this.columnSearch.add(getRawValue(newCellValue), address)
 
-        if (promise) {
-          promises.push(promise)
+        if (asyncPromiseVertex) {
+          asyncPromiseVertices.push(asyncPromiseVertex)
         }
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
@@ -194,7 +175,7 @@ export class Evaluator {
     })
 
     return new Promise<void>((resolve, reject) => {
-      this.recomputeAsyncFunctions(promises, sorted).then(() => {
+      this.recomputeAsyncFunctions(asyncPromiseVertices).then(() => {
         resolve(undefined)
       }).catch(reject)
     })

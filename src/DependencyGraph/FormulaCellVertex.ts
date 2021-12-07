@@ -15,7 +15,13 @@ import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
-export abstract class FormulaVertex {
+export interface AsyncVertex {
+  asyncResolveIndex?: number,
+}
+
+export abstract class FormulaVertex implements AsyncVertex {
+  public asyncResolveIndex?: number
+
   protected constructor(
     protected formula: Ast,
     protected cellAddress: SimpleCellAddress,

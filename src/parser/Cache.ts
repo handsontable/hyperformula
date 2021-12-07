@@ -13,13 +13,15 @@ export interface CacheEntry {
   relativeDependencies: RelativeDependency[],
   hasVolatileFunction: boolean,
   hasStructuralChangeFunction: boolean,
+  hasAsyncFunction: boolean,
 }
 
-const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean) => ({
+const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean, hasAsyncFunction: boolean) => ({
   ast,
   relativeDependencies,
   hasVolatileFunction,
-  hasStructuralChangeFunction
+  hasStructuralChangeFunction,
+  hasAsyncFunction
 })
 
 export class Cache {
@@ -32,7 +34,7 @@ export class Cache {
 
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies = collectDependencies(ast, this.functionRegistry)
-    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.functionRegistry.isFunctionVolatile), doesContainFunctions(ast, this.functionRegistry.isFunctionDependentOnSheetStructureChange))
+    const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.functionRegistry.isFunctionVolatile), doesContainFunctions(ast, this.functionRegistry.isFunctionDependentOnSheetStructureChange), doesContainFunctions(ast, this.functionRegistry.isAsyncFunction))
     this.cache.set(hash, cacheEntry)
     return cacheEntry
   }
