@@ -321,9 +321,13 @@ export interface ConfigParams {
    */
   precisionEpsilon: number,
   /**
-   * Sets calculations' precision level.
+   * Sets the precision level of calculations' output.
    *
-   * Numerical outputs are rounded to the `precisionRounding` number of digits after the decimal.
+   * Internally, all arithmetic operations are performed using JavaScript's built-in numbers.
+   * But when HyperFormula exports a cell's value, it rounds the output
+   * to the `precisionRounding` number of significant digits.
+   *
+   * We recommend setting `precisionRounding` to a value between `1` and `14`.
    *
    * @default 14
    *
