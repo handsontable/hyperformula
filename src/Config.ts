@@ -327,7 +327,10 @@ export interface ConfigParams {
    * But when HyperFormula exports a cell's value, it rounds the output
    * to the `precisionRounding` number of significant digits.
    *
-   * We recommend setting `precisionRounding` to a value between `1` and `14`.
+   * Setting `precisionRounding` too low can cause large numbers' imprecision
+   * (for example, with `precisionRounding` set to `4`, 100005 becomes 100010).
+   *
+   * We recommend setting `precisionRounding` to a value between `10` and `14`.
    *
    * @default 14
    *
