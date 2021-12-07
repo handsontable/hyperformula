@@ -94,25 +94,25 @@ describe('async functions', () => {
     HyperFormula.unregisterFunctionPlugin(AsyncPlugin)
   })
 
-  // describe('arrays', () => {
-  //   it('with arrayformula', async() => {
-  //     const [engine, promise] = HyperFormula.buildFromArray([[1, 2, '=ASYNC_FOO(A1)'], ['=ARRAYFORMULA(SUM(A1:C1))']])
+  describe('arrays', () => {
+    it('with arrayformula', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([[1, 2, '=ASYNC_FOO(A1)'], ['=ARRAYFORMULA(SUM(A1:C1))']])
 
-  //     await promise
+      await promise
 
-  //     expect(engine.getCellValue(adr('A2'))).toEqual(9)  
-  //   })
+      expect(engine.getCellValue(adr('A2'))).toEqual(9)  
+    })
 
-  //   it('array parsing', async() => {
-  //     const [engine, promise] = HyperFormula.buildFromArray([['={ASYNC_FOO(),2;3,ASYNC_FOO()}']])
+    it('array parsing', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([['={ASYNC_FOO(),2;3,ASYNC_FOO()}']])
 
-  //     expect(engine.getSheetValues(0)).toEqual([[getLoadingError('Sheet1!A1'), 2], [3, getLoadingError('Sheet1!A1')]])
+      expect(engine.getSheetValues(0)).toEqual([[getLoadingError('Sheet1!A1'), 2], [3, getLoadingError('Sheet1!A1')]])
 
-  //     await promise
+      await promise
 
-  //     expect(engine.getSheetValues(0)).toEqual([[1, 2], [3, 1]])
-  //   })
-  // })
+      expect(engine.getSheetValues(0)).toEqual([[1, 2], [3, 1]])
+    })
+  })
 
   describe('operations', () => {
     it('plus op', async() => {

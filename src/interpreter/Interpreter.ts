@@ -33,6 +33,7 @@ import {FunctionRegistry} from './FunctionRegistry'
 import {InterpreterState} from './InterpreterState'
 import {
   AsyncInterpreterValue,
+  AsyncPromiseVertex,
   cloneNumber,
   EmptyValue,
   getRawValue,
@@ -301,73 +302,97 @@ export class Interpreter {
         return this.evaluateAst(ast.expression, state)
       }
       case AstNodeType.ARRAY: {
-        // const interpreterValues: InterpreterValue[][] = []
-        // const asyncValues: AysncValue[][] = []
+        const interpreterValues: InterpreterValue[][] = []
+        const asyncPromiseVertices: AsyncPromiseVertex[][] = []
 
-        // for (let outerIndex = 0; outerIndex < ast.args.length; outerIndex++) {
-        //   const astRow = ast.args[outerIndex]
-        //   const rowRet: InterpreterValue[] = []
-        //   const asyncValueRowRet: AysncValue[] = []
+        for (let outerIndex = 0; outerIndex < ast.args.length; outerIndex++) {
+          const astRow = ast.args[outerIndex]
+          const rowRet: InterpreterValue[] = []
+          const asyncPromiseValueRowRet: AsyncPromiseVertex[] = []
           
-        //   for (let innerIndex = 0; innerIndex < astRow.length; innerIndex++) {
-        //     const astIt = astRow[innerIndex]
-        //     const [value, asyncValue] = this.evaluateAst(astIt, state)
+          for (let innerIndex = 0; innerIndex < astRow.length; innerIndex++) {
+            const astIt = astRow[innerIndex]
+            const [value, asyncPromiseVertex] = this.evaluateAst(astIt, state)
 
-        //     // if (asyncValue) {
-        //     //   const promise = new Promise<InterpreterValue>((resolve, reject) => {
-        //     //     asyncValue.promise?.then((interpreterValue) => {
-        //     //       resolve(interpreterValue)
-        //     //     }).catch(reject)
-        //     //   })
-        //     //   asyncValueRowRet[innerIndex] = promise
-        //     // }
+            if (asyncPromiseVertex) {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              const promiseGetter = asyncPromiseVertex.getPromise!
 
-        //     rowRet.push(value)
-        //   }
-        //   interpreterValues.push(rowRet)
+              const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
+                promiseGetter().then((interpreterValue) => {
+                  resolve(interpreterValue)
+                }).catch(reject)
+              })
 
-        //   if (asyncValueRowRet.length) {
-        //     asyncValues[outerIndex] = Promise.all(asyncValueRowRet.map(x => x.promise))
-        //   }
-        // }
+              const newAsyncPromiseVertex = {
+                asyncVertex: asyncPromiseVertex.asyncVertex,
+                getPromise
+              }
 
-        // const promise = new Promise<AsyncFunctionValue>((resolve, reject) => {
-        //   Promise.all(promises).then((values) => {
-        //     const newInterpreterValues = [...interpreterValues]
+              asyncPromiseValueRowRet[innerIndex] = newAsyncPromiseVertex
+            }
 
-        //     values.forEach((valueRow, outerIndex) => {
-        //       valueRow.forEach((value, innerIndex) => {
-        //         if (value !== undefined) {
-        //           newInterpreterValues[outerIndex][innerIndex] = value
-        //         }
-        //       })
-        //     })
+            rowRet.push(value)
+          }
+          interpreterValues.push(rowRet)
+
+          if (asyncPromiseValueRowRet.length) {
+            asyncPromiseVertices[outerIndex] = asyncPromiseValueRowRet
+          }
+        }
+        
+        const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
+          const asyncInterpreterValuePromises: Promise<InterpreterValue[]>[] = []
+
+          asyncPromiseVertices.forEach((asyncPromiseVertexRow, outerIndex) => {
+            const asyncPromiseValueRowRet: AsyncInterpreterValue[] = []
+
+            asyncPromiseVertexRow.forEach((vertex, innerIndex) => {
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              asyncPromiseValueRowRet[innerIndex] = vertex.getPromise!()
+            })
+
+            const promise = Promise.all(asyncPromiseValueRowRet)
+
+            asyncInterpreterValuePromises[outerIndex] = promise
+          })
+
+          const interpreterValuePromises = Promise.all(asyncInterpreterValuePromises)
+
+          interpreterValuePromises.then((values) => {
+            const newInterpreterValues = [...interpreterValues]
+
+            values.forEach((valueRow, outerIndex) => {
+              valueRow.forEach((value, innerIndex) => {
+                if (value !== undefined) {
+                  newInterpreterValues[outerIndex][innerIndex] = value
+                }
+              })
+            })
             
-        //     const simpleRangeValues = this.getSimpleRangeValues(newInterpreterValues)
+            const simpleRangeValues = this.getSimpleRangeValues(newInterpreterValues)
 
-        //     if (simpleRangeValues instanceof CellError) {
-        //       resolve({
-        //         interpreterValue: simpleRangeValues,
-        //         state
-        //       })
-        //       return
-        //     }
+            if (simpleRangeValues instanceof CellError) {
+              resolve(simpleRangeValues)
+              return
+            }
 
-        //     resolve({
-        //       interpreterValue: SimpleRangeValue.onlyValues(simpleRangeValues),
-        //       state
-        //     })
-        //   }).catch(reject)
-        // })
+            resolve(SimpleRangeValue.onlyValues(simpleRangeValues))
+          }).catch(reject)
+        })
 
-        // const simpleRangeValues = this.getSimpleRangeValues(interpreterValues)
+        const asyncPromiseVertex: AsyncPromiseVertex = {
+          asyncVertex: state.formulaVertex!,
+          getPromise
+        }
 
-        // if (simpleRangeValues instanceof CellError) {
-        //   return [simpleRangeValues, promise]
-        // }
+        const simpleRangeValues = this.getSimpleRangeValues(interpreterValues)
 
-        // return [SimpleRangeValue.onlyValues(simpleRangeValues), promise]
-        return [EmptyValue]
+        if (simpleRangeValues instanceof CellError) {
+          return [simpleRangeValues, asyncPromiseVertex]
+        }
+
+        return [SimpleRangeValue.onlyValues(simpleRangeValues), asyncPromiseVertex]
       }
       case AstNodeType.ERROR_WITH_RAW_INPUT:
       case AstNodeType.ERROR: {

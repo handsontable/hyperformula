@@ -117,6 +117,10 @@ export class SimpleStrategy implements GraphBuilderStrategy {
                 const vertex = new ArrayVertex(parseResult.ast, address, new ArraySize(size.width, size.height))
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addArrayVertex(address, vertex)
+
+                if (parseResult.hasAsyncFunction) {
+                  this.dependencyGraph.markAsAsync(vertex)
+                }
               }
             }
           } else if (parsedCellContent instanceof CellContent.Empty) {
