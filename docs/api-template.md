@@ -29,7 +29,6 @@ An example set of options:
 ```javascript
 const options = {
   licenseKey: 'gpl-v3',
-  precisionRounding: 10,
   nullDate: { year: 1900, month: 1, day: 1 },
   functionArgSeparator: '.'
 };
