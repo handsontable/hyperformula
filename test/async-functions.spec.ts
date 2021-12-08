@@ -1,4 +1,5 @@
-import {EvaluationSuspendedError, ExportedCellChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
+import {EvaluationSuspendedError, ExportedCellChange, ExportedNamedExpressionChange, HyperFormula, SimpleRangeValue} from '../src'
+import {ArraySize} from '../src/ArraySize'
 import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {Events} from '../src/Emitter'
@@ -6,6 +7,7 @@ import {ErrorMessage} from '../src/error-message'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {AsyncInternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
+import {AsyncSimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, detailedErrorWithOrigin, expectEngineToBeTheSameAs} from './testUtils'
 
@@ -17,6 +19,11 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
       parameters: [
         {argumentType: ArgumentTypes.ANY}
       ],
+    },
+    'ASYNC_ARRAY_FOO': {
+      method: 'asyncArrayFoo',
+      arraySizeMethod: 'asyncArrayFooSize',
+      isAsyncMethod: true,
     },
     'LONG_ASYNC_FOO': {
       method: 'longAsyncFoo',
@@ -38,16 +45,11 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
   public static translations = {
     'enGB': {
       'ASYNC_FOO': 'ASYNC_FOO',
+      'ASYNC_ARRAY_FOO': 'ASYNC_ARRAY_FOO',
       'LONG_ASYNC_FOO': 'LONG_ASYNC_FOO',
       'TIMEOUT_FOO': 'TIMEOUT_FOO',
       'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
     },
-    'plPL': {
-      'ASYNC_FOO': 'ASYNC_FOO',
-      'LONG_ASYNC_FOO': 'LONG_ASYNC_FOO',
-      'TIMEOUT_FOO': 'TIMEOUT_FOO',
-      'ASYNC_ERROR_FOO': 'ASYNC_ERROR_FOO'
-    }
   }
 
   public async asyncFoo(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
@@ -61,7 +63,23 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
       }
   
       resolve(1)
-    }, 1000))
+    }, 100))
+  }
+
+  public asyncArrayFoo(_ast: ProcedureAst, _state: InterpreterState): AsyncSimpleRangeValue {
+    return new Promise(resolve => setTimeout(() => {
+      resolve(SimpleRangeValue.onlyValues([[1, 1], [1, 1]]))
+    }, 100))
+  }
+
+  public asyncArrayFooSize(ast: ProcedureAst, state: InterpreterState) {
+    if (!state.formulaVertex) {
+      return ArraySize.error()
+    }
+
+    const cellValue = (state.formulaVertex).getCellValue() as SimpleRangeValue
+
+    return new ArraySize(cellValue.width(), cellValue.height())
   }
   
   public async longAsyncFoo(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
@@ -111,6 +129,16 @@ describe('async functions', () => {
       await promise
 
       expect(engine.getSheetValues(0)).toEqual([[1, 2], [3, 1]])
+    })
+
+    it('custom array', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([['=ASYNC_ARRAY_FOO()']])
+
+      expect(engine.getSheetValues(0)).toEqual([[getLoadingError('Sheet1!A1')]])
+
+      await promise
+
+      expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
     })
   })
 

@@ -12,12 +12,12 @@ import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGra
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {AsyncPromiseVertex, EmptyValue, getRawValue, OptionalInterpreterTuple} from './interpreter/InterpreterValue'
+import {AsyncPromiseVertex, EmptyValue, getRawValue, InterpreterValue, OptionalInterpreterTuple} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Operations} from './Operations'
-import {Ast, RelativeDependency} from './parser'
+import {Ast, ProcedureAst, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
@@ -57,9 +57,13 @@ export class Evaluator {
       interpreterValues.forEach((value, i) => {
         const vertex = asyncPromiseGroupedVerticesRow[i].asyncVertex as FormulaVertex
         const address = vertex.getAddress(this.lazilyTransformingAstService)
-        const ast = vertex.getFormula(this.lazilyTransformingAstService)
+        const ast = vertex.getFormula(this.lazilyTransformingAstService) as ProcedureAst
 
-        this.operations.setFormulaToCellFromAst(address, ast)
+        // Have to set it before it before for the
+        // arraySize check and then again for the new vertex
+        vertex.setCellValue(value)
+
+        this.operations.setAsyncFormulaToCell(address, ast, vertex)
 
         const newVertex = this.dependencyGraph.getCell(address) as FormulaVertex
 

@@ -10,6 +10,8 @@ import {DependencyGraph} from '../DependencyGraph'
 import {ErrorMessage} from '../error-message'
 import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
 
+export type AsyncSimpleRangeValue = Promise<SimpleRangeValue>
+
 export class SimpleRangeValue {
   public readonly size: ArraySize
 

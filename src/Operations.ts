@@ -551,11 +551,13 @@ export class Operations {
 
     if (parsedCellContent instanceof CellContent.Formula) {
       const parserResult = this.parser.parse(parsedCellContent.formula, address)
-      const {errors} = parserResult
+      const {ast, errors} = parserResult
       if (errors.length > 0) {
         this.setParsingErrorToCell(parsedCellContent.formula, errors, address)
       } else {
-        this.setFormulaToCell(address, parserResult)
+        const size = this.arraySizePredictor.checkArraySize(ast, address)
+
+        this.setFormulaToCell(address, size, parserResult)
       }
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.setCellEmpty(address)
@@ -586,20 +588,20 @@ export class Operations {
     this.changes.addChange(vertex.getCellValue(), address)
   }
 
-  public setFormulaToCellFromAst(address: SimpleCellAddress, ast: Ast) {
+  public setAsyncFormulaToCell(address: SimpleCellAddress, ast: Ast, formulaVertex: FormulaVertex) {
     const parserResult = this.parser.fetchCachedResultForAst(ast)
+    const size = this.arraySizePredictor.checkArraySize(ast, address, formulaVertex)
 
-    this.setFormulaToCell(address, parserResult)
+    this.setFormulaToCell(address, size, parserResult)
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, {
+  public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
     ast,
     hasVolatileFunction,
     hasStructuralChangeFunction,
     hasAsyncFunction,
     dependencies
   }: ParsingResult) {
-    const size = this.arraySizePredictor.checkArraySize(ast, address)
     const oldValue = this.dependencyGraph.getCellValue(address)
     const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction)
     this.columnSearch.remove(getRawValue(oldValue), address)
