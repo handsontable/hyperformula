@@ -5,6 +5,7 @@
 
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
+import { CellContentParser } from '../../CellContentParser'
 import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {Interpreter} from '../Interpreter'
@@ -81,8 +82,8 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
 
   private readonly createKernel: (kernel: KernelFunction, outputSize: ArraySize) => KernelRunShortcut
 
-  constructor(interpreter: Interpreter) {
-    super(interpreter)
+  constructor(interpreter: Interpreter, cellContentParser: CellContentParser) {
+    super(interpreter, cellContentParser)
     if (this.config.gpujs === undefined) {
       this.createKernel = this.createCpuKernel
     } else {
