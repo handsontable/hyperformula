@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {ArraySize, ArraySizePredictor} from '../../ArraySize'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
+import {CellContent, CellContentParser} from '../../CellContentParser'
 import {Config} from '../../Config'
 import {DateTimeHelper} from '../../DateTimeHelper'
 import {DependencyGraph} from '../../DependencyGraph'
@@ -27,7 +28,6 @@ import {InterpreterState} from '../InterpreterState'
 import {
   AsyncInterpreterValue,
   ExtendedNumber,
-  FormatInfo,
   getRawValue,
   InternalScalarValue,
   InterpreterValue,
@@ -68,6 +68,14 @@ export interface FunctionMetadata {
    * Return number value is packed into this subtype.
    */
   returnNumberType?: NumberType,
+
+  /**
+   * Internal.
+   *
+   * Infers the return type automatically based on the content.
+   */
+  inferReturnType?: boolean,
+
   /**
    * Engine.
    */
@@ -124,7 +132,7 @@ export interface FunctionPluginDefinition {
   implementedFunctions: ImplementedFunctions,
   aliases?: { [formulaId: string]: string },
 
-  new(interpreter: Interpreter): FunctionPlugin,
+  new(interpreter: Interpreter, cellContentParser: CellContentParser): FunctionPlugin,
 }
 
 export enum ArgumentTypes {
@@ -243,6 +251,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   public static implementedFunctions: ImplementedFunctions
   public static aliases?: { [formulaId: string]: string }
   protected readonly interpreter: Interpreter
+  protected readonly cellContentParser: CellContentParser
   protected readonly dependencyGraph: DependencyGraph
   protected readonly columnSearch: SearchStrategy
   protected readonly config: Config
@@ -251,8 +260,9 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   protected readonly dateTimeHelper: DateTimeHelper
   protected readonly arithmeticHelper: ArithmeticHelper
 
-  constructor(interpreter: Interpreter) {
+  constructor(interpreter: Interpreter, cellContentParser: CellContentParser) {
     this.interpreter = interpreter
+    this.cellContentParser = cellContentParser
     this.dependencyGraph = interpreter.dependencyGraph
     this.columnSearch = interpreter.columnSearch
     this.config = interpreter.config
@@ -398,7 +408,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       const rowArr: InternalScalarValue[] = []
 
       for (const value of row) {
-        const ret = this.returnNumberWrapper(value, metadata.returnNumberType)
+        const ret = this.returnNumberWrapper(value, metadata)
     
         if (maxHeight === 1 && maxWidth === 1) {
           return ret
@@ -434,7 +444,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       const rowArr: InternalScalarValue[] = []
 
       for (const { argCoerceFailure, coercedArguments } of row) {
-        const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata.returnNumberType)
+        const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata)
     
         if (maxHeight === 1 && maxWidth === 1) {
           return ret
@@ -461,7 +471,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     nonReferenceCallback: (...arg: any) => InternalScalarValue = () => new CellError(ErrorType.NA, ErrorMessage.CellRefExpected)
   ) => {
     if (args.length === 0) {
-      return this.returnNumberWrapper(noArgCallback(), metadata.returnNumberType)
+      return this.returnNumberWrapper(noArgCallback(), metadata)
     } else if (args.length > 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
@@ -484,7 +494,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
 
     if (cellReference !== undefined) {
-      return this.returnNumberWrapper(referenceCallback(cellReference), metadata.returnNumberType)
+      return this.returnNumberWrapper(referenceCallback(cellReference), metadata)
     }
 
     return this.runFunction(args, state, metadata, nonReferenceCallback)
@@ -589,12 +599,48 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return { maxWidth, maxHeight, retArr}
   }
 
-  private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
-    if (type !== undefined && isExtendedNumber(val)) {
-      return this.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
+  private returnNumberWrapper<T>(val: T | ExtendedNumber, metadata: FunctionMetadata): T | InterpreterValue | ExtendedNumber {
+    const {inferReturnType, returnNumberType} = metadata
+    
+    if (returnNumberType !== undefined && isExtendedNumber(val)) {
+      return this.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type: returnNumberType})
     } else {
+      if (inferReturnType) {
+        if (val instanceof SimpleRangeValue) {
+          const values = val.data.map((arr) => {
+            return arr.map((value) => {
+              return this.parseReturnVal(value)
+            })
+          })
+
+          return SimpleRangeValue.onlyValues(values)
+        }
+
+        return this.parseReturnVal(val)
+      }
+
       return val
     }
+  }
+
+  private parseReturnVal<T>(val: T | ExtendedNumber) {
+    if (typeof val === 'string' || 
+      typeof val === 'boolean' || 
+      typeof val === 'number') {
+      const parsedValue = this.cellContentParser.parse(val)
+    
+      if (parsedValue instanceof CellContent.Formula) {
+        return parsedValue.formula
+      }
+
+      if (parsedValue instanceof CellContent.Empty) {
+        return val
+      }
+    
+      return parsedValue.value
+    }
+
+    return val
   }
 }
 

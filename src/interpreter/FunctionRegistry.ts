@@ -3,6 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
+import {CellContentParser} from '../CellContentParser'
 import {Config} from '../Config'
 import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionError} from '../errors'
 import {HyperFormula} from '../HyperFormula'
@@ -186,13 +187,13 @@ export class FunctionRegistry {
     }
   }
 
-  public initializePlugins(interpreter: Interpreter): void {
+  public initializePlugins(interpreter: Interpreter, cellContentParser: CellContentParser): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instances: any[] = []
     for (const [functionId, plugin] of this.instancePlugins.entries()) {
       let foundPluginInstance = instances.find(pluginInstance => pluginInstance instanceof plugin)
       if (foundPluginInstance === undefined) {
-        foundPluginInstance = new plugin(interpreter)
+        foundPluginInstance = new plugin(interpreter, cellContentParser)
         instances.push(foundPluginInstance)
       }
       const metadata = validateAndReturnMetadataFromName(functionId, plugin)
