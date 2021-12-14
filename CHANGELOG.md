@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Added support for inferring return types based on their values in custom function plugins.
+- Added support for inferring return types based on their values in custom function plugins. (#875)
 
 ## [1.3.0] - 2021-10-20
 
