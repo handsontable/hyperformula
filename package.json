@@ -1,16 +1,16 @@
 {
-  "name": "hyperformula",
+  "name": "@tracktak/hyperformula",
   "description": "HyperFormula is a JavaScript engine for efficient processing of spreadsheet-like data and formulas",
   "homepage": "https://handsontable.com/docs/hyperformula",
   "repository": {
     "type": "git",
-    "url": "https://github.com/handsontable/hyperformula.git"
+    "url": "https://github.com/TrackTak/hyperformula.git"
   },
   "bugs": {
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "1.3.0",
+  "version": "2.0.5",
   "keywords": [
     "formula",
     "spreadsheet",
