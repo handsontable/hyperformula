@@ -78,6 +78,11 @@ describe('tokenizeFormula', () => {
     expect(tokens[1].tokenType).toEqual(WhiteSpace)
   })
 
+  it('should treat non-breaking space as a whitespace', () => {
+    const tokens = lexer.tokenizeFormula('=\u00A01').tokens
+    expect(tokens[1].tokenType).toEqual(WhiteSpace)
+  })
+
   it('should treat line feed (U+000A) as whitespace ', () => {
     const tokens = lexer.tokenizeFormula('=\n1').tokens
     expect(tokens[1].tokenType).toEqual(WhiteSpace)
