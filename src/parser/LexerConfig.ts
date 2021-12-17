@@ -95,7 +95,7 @@ export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-
 /* skipping whitespaces */
 export const WhiteSpace = createToken({
   name: 'WhiteSpace',
-  pattern: /[ \t\n\r]+/,
+  pattern: /\s+/,
 })
 
 export interface ILexerConfig {
