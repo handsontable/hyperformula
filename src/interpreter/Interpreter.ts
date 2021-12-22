@@ -217,34 +217,29 @@ export class Interpreter {
           if (pluginFunction === undefined) {
             return [cellError]
           }
-    
-          if (state.formulaVertex?.isComputed()) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            return [interpreterState.formulaVertex!.getCellValue()]
-          }else {            
-            const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
-              const pluginFunctionValue = pluginFunction(ast, interpreterState)
-              const functionPromise = withTimeout(pluginFunctionValue, this.config.timeoutTime)
 
-              functionPromise.then((interpreterValue) => {
-                resolve(interpreterValue)
-              }).catch((error) => {
-                if (error instanceof CellError) {
-                  resolve(error)
-                } else {
-                  reject(error)
-                }
-              })
+          const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
+            const pluginFunctionValue = pluginFunction(ast, interpreterState)
+            const functionPromise = withTimeout(pluginFunctionValue, this.config.timeoutTime)
+
+            functionPromise.then((interpreterValue) => {
+              resolve(interpreterValue)
+            }).catch((error) => {
+              if (error instanceof CellError) {
+                resolve(error)
+              } else {
+                reject(error)
+              }
             })
+          })
 
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const asyncVertex = state.formulaVertex!
-            
-            return [new CellError(ErrorType.LOADING, ErrorMessage.FunctionLoading), {
-              asyncVertex,
-              getPromise
-            }]
-          }
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const asyncVertex = state.formulaVertex!
+          
+          return [new CellError(ErrorType.LOADING, ErrorMessage.FunctionLoading), {
+            asyncVertex,
+            getPromise
+          }]
         }
 
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)

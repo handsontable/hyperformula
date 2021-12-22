@@ -54,8 +54,8 @@ export class GraphBuilder {
   }
 
   private processDependencies(dependencies: Dependencies) {
-    dependencies.forEach((cellDependencies: CellDependency[], endVertex: Vertex) => {
-      this.dependencyGraph.processCellDependencies(cellDependencies, endVertex)
+    dependencies.forEach((cellPrecedents: CellDependency[], endVertex: Vertex) => {
+      this.dependencyGraph.processCellPrecedents(cellPrecedents, endVertex)
     })
   }
 }
