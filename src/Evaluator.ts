@@ -12,7 +12,7 @@ import {ArrayVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGra
 import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {Interpreter} from './interpreter/Interpreter'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {AsyncPromiseVertex, EmptyValue, getRawValue, InterpreterValue, OptionalInterpreterTuple} from './interpreter/InterpreterValue'
+import {AsyncPromiseVertex, EmptyValue, getRawValue, OptionalInterpreterTuple} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'

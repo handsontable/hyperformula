@@ -1,4 +1,4 @@
-import {EvaluationSuspendedError, ExportedCellChange, ExportedNamedExpressionChange, HyperFormula, SimpleRangeValue} from '../src'
+import {CellError, EvaluationSuspendedError, ExportedCellChange, ExportedNamedExpressionChange, HyperFormula, SimpleRangeValue} from '../src'
 import {ArraySize} from '../src/ArraySize'
 import {ErrorType} from '../src/Cell'
 import {Config} from '../src/Config'
@@ -55,9 +55,9 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
   public async asyncFoo(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return new Promise(resolve => setTimeout(() => {
       if (ast.args[0]) {
-        const argument = this.evaluateAst(ast.args[0], state) as number
+        const argument = this.evaluateAst(ast.args[0], state)
 
-        resolve(argument + 5)
+        resolve(argument as number + 5)
 
         return
       }
@@ -84,9 +84,15 @@ class AsyncPlugin extends FunctionPlugin implements FunctionPluginTypecheck<Asyn
   
   public async longAsyncFoo(ast: ProcedureAst, state: InterpreterState): AsyncInternalScalarValue {
     return new Promise(resolve => setTimeout(() => {
-      const argument = this.evaluateAst(ast.args[0], state) as number
+      const argument = this.evaluateAst(ast.args[0], state)
 
-      resolve(argument + ' longAsyncFoo')
+      if (argument instanceof CellError) {
+        resolve(argument)
+
+        return
+      }
+      
+      resolve(argument as number + ' longAsyncFoo')
     }, 3000))
   }
 
@@ -261,11 +267,10 @@ describe('async functions', () => {
 
     expect(engine.getSheetValues(0)).toEqual([[getLoadingError('Sheet1!A1'), getLoadingError('Sheet1!B1')]])
 
-    await cellContentPromise
-
-    expect(engine.getSheetValues(0)).toEqual([[1, getLoadingError('Sheet1!B1')]])
-
-    await enginePromise
+    await Promise.all([
+      enginePromise,
+      cellContentPromise
+    ])
 
     expect(engine.getSheetValues(0)).toEqual([[1, '1 longAsyncFoo']])
   })
@@ -284,6 +289,20 @@ describe('async functions', () => {
 
     expect(engine.getSheetValues(0)).toEqual([[
       1, 1
+    ]])
+  })
+
+  it('async value recalculated when dependency changes', async() => {
+    const sheet = [[
+      1, '=ASYNC_FOO(A1)'
+    ]]
+    const [engine, promise] = HyperFormula.buildFromArray(sheet)
+
+    await promise
+    await engine.setCellContents(adr('A1'), 5)[1]
+
+    expect(engine.getSheetValues(0)).toEqual([[
+      5, 10
     ]])
   })
 
