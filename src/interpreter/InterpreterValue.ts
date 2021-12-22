@@ -128,7 +128,7 @@ export function getTypeFormatOfExtendedNumber(num: ExtendedNumber): NumberTypeWi
 
 export interface AsyncPromiseVertex {
   getPromise?: () => AsyncInterpreterValue,
-  asyncVertex: AsyncVertex,
+  asyncVertex?: AsyncVertex,
 } 
 
 export type InterpreterTuple = [InterpreterValue, AsyncPromiseVertex]

@@ -9,7 +9,7 @@ import {ArrayValue, ErroredArray, IArray, NotComputedArray} from '../ArrayValue'
 import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
-import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
+import {AsyncInterpreterValue, EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
@@ -17,10 +17,12 @@ import {ColumnsSpan, RowsSpan} from '../Span'
 
 export interface AsyncVertex {
   asyncResolveIndex?: number,
+  getPromise?: () => AsyncInterpreterValue,
 }
 
 export abstract class FormulaVertex implements AsyncVertex {
   public asyncResolveIndex?: number
+  public getPromise?: () => AsyncInterpreterValue
 
   protected constructor(
     protected formula: Ast,

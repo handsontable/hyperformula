@@ -123,7 +123,19 @@ export class Interpreter {
         if (invalidSimpleCellAddress(address)) {
           return [new CellError(ErrorType.REF, ErrorMessage.BadRef)]
         }
-        return [this.dependencyGraph.getCellValue(address)]
+        const cell = this.dependencyGraph.getCell(address)
+        const cellValue = this.dependencyGraph.getCellValue(address)
+
+        if (cell instanceof FormulaVertex) {
+          const asyncPromiseVertex = {
+            asyncVertex: cell,
+            getPromise: cell.getPromise
+          }
+
+          return [cellValue, asyncPromiseVertex]
+        }
+
+        return [cellValue]
       }
       case AstNodeType.NUMBER:
       case AstNodeType.STRING: {
@@ -233,8 +245,11 @@ export class Interpreter {
             })
           })
 
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const asyncVertex = state.formulaVertex!
+          const asyncVertex = state.formulaVertex
+
+          if (asyncVertex) {
+            asyncVertex.getPromise = getPromise
+          }
           
           return [new CellError(ErrorType.LOADING, ErrorMessage.FunctionLoading), {
             asyncVertex,
@@ -379,7 +394,7 @@ export class Interpreter {
         })
 
         const asyncPromiseVertex: AsyncPromiseVertex = {
-          asyncVertex: state.formulaVertex!,
+          asyncVertex: state.formulaVertex,
           getPromise
         }
 
@@ -571,13 +586,10 @@ export class Interpreter {
       }).catch(reject)
     })
 
-    // Use the vertex which is going to be resolved last
-    const asyncResolveIndex1 = asyncArg1?.asyncVertex.asyncResolveIndex ?? -Infinity
-    const asyncResolveIndex2 = asyncArg2?.asyncVertex.asyncResolveIndex ?? -Infinity
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const asyncPromiseVertex = (asyncResolveIndex2 > asyncResolveIndex1 ? asyncArg2 : asyncArg1)!
-
-    asyncPromiseVertex.getPromise = getPromise
+    const asyncPromiseVertex: AsyncPromiseVertex = {
+      getPromise,
+      asyncVertex: state.formulaVertex
+    }
 
     return [value, asyncPromiseVertex]
   }

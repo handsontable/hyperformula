@@ -557,7 +557,7 @@ export class Operations {
       } else {
         const size = this.arraySizePredictor.checkArraySize(ast, address)
 
-        this.setFormulaToCell(address, size, parserResult)
+        this.setFormulaToCell(address, size, true, parserResult)
       }
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.setCellEmpty(address)
@@ -592,10 +592,10 @@ export class Operations {
     const parserResult = this.parser.fetchCachedResultForAst(ast)
     const size = this.arraySizePredictor.checkArraySize(ast, address, formulaVertex)
 
-    this.setFormulaToCell(address, size, parserResult)
+    this.setFormulaToCell(address, size, false, parserResult)
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
+  public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, markNodeAsSpecialRecentlyChanged: boolean, {
     ast,
     hasVolatileFunction,
     hasStructuralChangeFunction,
@@ -603,7 +603,7 @@ export class Operations {
     dependencies
   }: ParsingResult) {
     const oldValue = this.dependencyGraph.getCellValue(address)
-    const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction)
+    const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction, markNodeAsSpecialRecentlyChanged)
     this.columnSearch.remove(getRawValue(oldValue), address)
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)

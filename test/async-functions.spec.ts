@@ -275,6 +275,18 @@ describe('async functions', () => {
     expect(engine.getSheetValues(0)).toEqual([[1, '1 longAsyncFoo']])
   })
 
+   it('works with async value operations on dependent async value', async() => {
+    const [engine, promise] = HyperFormula.buildFromArray([[
+      '=ASYNC_FOO()', '=ASYNC_FOO()+A1'
+    ]])
+
+    await promise
+
+    expect(engine.getSheetValues(0)).toEqual([[
+      1, 2
+    ]])
+  })
+
   it('works with multiple async functions one after another', async() => {
     const sheet = [[
       1, '=ASYNC_FOO()'
@@ -331,6 +343,16 @@ describe('async functions', () => {
     const newCellValue = await promise
 
     expect(newCellValue).toEqual(6)
+  })
+
+  it.only('running sync cells should not re-calculate async cells', async() => {
+    const [engine, promise] = HyperFormula.buildFromArray([[
+      '=ASYNC_FOO()'
+    ]])
+
+    await promise
+    
+    engine.setCellContents(adr('B1'), 1)
   })
 
   it('batch works with async functions', async() => {

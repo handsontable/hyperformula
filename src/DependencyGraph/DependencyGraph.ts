@@ -82,7 +82,7 @@ export class DependencyGraph {
     )
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, precedents: CellDependency[], size: ArraySize, hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean, hasAsyncFunction: boolean): ContentChanges {
+  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, precedents: CellDependency[], size: ArraySize, hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean, hasAsyncFunction: boolean, markNodeAsSpecialRecentlyChanged = true): ContentChanges {
     const newVertex = FormulaVertex.fromAst(ast, address, size, this.lazilyTransformingAstService.version())
     
     if (hasAsyncFunction) {
@@ -91,7 +91,10 @@ export class DependencyGraph {
 
     this.exchangeOrAddFormulaVertex(newVertex)
     this.processCellPrecedents(precedents, newVertex)
-    this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
+    
+    if (markNodeAsSpecialRecentlyChanged) {
+      this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
+    }
 
     if (hasVolatileFunction) {
       this.markAsVolatile(newVertex)
@@ -686,7 +689,7 @@ export class DependencyGraph {
 
     for (const vertex of vertices) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const index = vertex.asyncVertex.asyncResolveIndex!
+      const index = vertex.asyncVertex!.asyncResolveIndex!
 
       asyncGroupedVertices[index] = asyncGroupedVertices[index] ? [
         ...asyncGroupedVertices[index],
