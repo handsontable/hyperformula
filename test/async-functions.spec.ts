@@ -345,16 +345,6 @@ describe('async functions', () => {
     expect(newCellValue).toEqual(6)
   })
 
-  it.only('running sync cells should not re-calculate async cells', async() => {
-    const [engine, promise] = HyperFormula.buildFromArray([[
-      '=ASYNC_FOO()'
-    ]])
-
-    await promise
-    
-    engine.setCellContents(adr('B1'), 1)
-  })
-
   it('batch works with async functions', async() => {
     const [engine] = HyperFormula.buildFromArray([[]])
 
