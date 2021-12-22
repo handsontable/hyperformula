@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function PROPER', () => {
   it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PROPER()'],
       ['=PROPER("foo", "bar")']
     ])
@@ -14,7 +14,7 @@ describe('Function PROPER', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PROPER("foo")'],
       ['=PROPER("foo bar")'],
       ['=PROPER(" foo    bar   ")'],
@@ -28,7 +28,7 @@ describe('Function PROPER', () => {
   })
 
   it('should work with punctuation marks and numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PROPER("123aa123bb.cc.dd")']
     ])
 
@@ -36,7 +36,7 @@ describe('Function PROPER', () => {
   })
 
   it('should work with accents', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PROPER("MAI ANH ĐỨC")'],
       ['=PROPER("MAI CHÍ THỌ")'],
     ])
@@ -46,7 +46,7 @@ describe('Function PROPER', () => {
   })
 
   it('should coerce other types to string', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PROPER(1)'],
       ['=PROPER(5+5)'],
       ['=PROPER(TRUE())'],

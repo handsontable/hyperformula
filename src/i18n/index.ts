@@ -12,5 +12,5 @@ export type ErrorTranslationSet = Record<TranslatableErrorType, string>
 export {RawTranslationPackage, TranslationPackage, buildTranslationPackage}
 
 export enum UIElement {
-  NEW_SHEET_PREFIX = 'NEW_SHEET_PREFIX'
+  NEW_SHEET_PREFIX = 'NEW_SHEET_PREFIX',
 }

@@ -4,7 +4,7 @@ import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMCOT', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOT()'],
       ['=IMCOT(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMCOT', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOT("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMCOT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMCOT(0)'],
       ['=IMCOT("i")'],
       ['=IMCOT("-3+4i")'],

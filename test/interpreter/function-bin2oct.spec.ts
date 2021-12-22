@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function BIN2OCT', () => {
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT("foo", 2, 3)'],
     ])
 
@@ -13,7 +13,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should not work for non-binary arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT("foo")'],
       ['=BIN2OCT(1234)'],
       ['=BIN2OCT(TRUE())'],
@@ -25,7 +25,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT(1)'],
       ['=BIN2OCT(10)'],
       ['=BIN2OCT(010)'],
@@ -45,7 +45,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should work for binary strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT("1101")'],
     ])
 
@@ -53,7 +53,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="1011"'],
       ['=BIN2OCT(A1)'],
     ])
@@ -62,7 +62,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT(10111)'],
     ])
 
@@ -70,7 +70,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should work only for 10 bits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT(10101010101010)'],
       ['=BIN2OCT(1010101010)'],
     ])
@@ -80,7 +80,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT(10, 8)'],
       ['=BIN2OCT(101, "4")'],
     ])
@@ -90,7 +90,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('second argument should not affect negative results', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT(1110110100, 1)'],
       ['=BIN2OCT(1110110100, 10)'],
     ])
@@ -100,7 +100,7 @@ describe('function BIN2OCT', () => {
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2OCT(2, 0)'],
       ['=BIN2OCT(-2, 12)'],
     ])

@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function WORKDAY.INTL', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WORKDAY.INTL(1)', '=WORKDAY.INTL(1, 1, 1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function WORKDAY.INTL', () => {
   })
 
   it('should check for types or value of third argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WORKDAY.INTL(0, 1, TRUE())'],
       ['=WORKDAY.INTL(0, 1, "1")'],
       ['=WORKDAY.INTL(0, 1, "1010102")'],
@@ -28,7 +28,7 @@ describe('Function WORKDAY.INTL', () => {
   })
 
   it('works correctly for first two arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WORKDAY.INTL(1000, 1)'],
       ['=WORKDAY.INTL(1000.9, 1.9)'],
       ['=WORKDAY.INTL(1000.9, -1)'],
@@ -47,7 +47,7 @@ describe('Function WORKDAY.INTL', () => {
   })
 
   it('today plus 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WORKDAY.INTL("29/09/2020", 1)'],
       ['=WORKDAY.INTL("29/09/2020", 1, 3)'],
       ['=WORKDAY.INTL("29/09/2020", 1, 4)'],
@@ -70,7 +70,7 @@ describe('Function WORKDAY.INTL', () => {
   })
 
   it('today minus 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WORKDAY.INTL("29/09/2020", -1)'],
       ['=WORKDAY.INTL("29/09/2020", -1, 2)'],
       ['=WORKDAY.INTL("29/09/2020", -1, 3)'],
@@ -93,7 +93,7 @@ describe('Function WORKDAY.INTL', () => {
   })
 
   it('this year', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['29/09/2020', '=A1+0.1', '31/12/2019', '01/01/2021', '27/09/2020'],
       ['=WORKDAY.INTL("01/01/2020", 262, 1)'],
       ['=WORKDAY.INTL("01/01/2020", 262, 1, A1:A1)'],
@@ -109,7 +109,7 @@ describe('Function WORKDAY.INTL', () => {
   })
 
   it('should output correct values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['01/01/2020', '=A1+5', '=A1+8', '=A1+9', '=A1+15', '=A1+18', '=A1+19', '=A1+32', '=A1+54', '=A1+55'],
       ['=WORKDAY.INTL(A1, 91, "0000000", A1:J1)'],
       ['=WORKDAY.INTL(A1+7, 9, "0000000", A1:J1)'],
@@ -125,7 +125,7 @@ describe('Function WORKDAY.INTL', () => {
   })
 
   it('checks types in last argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [true, '\'1', null, '=NA()'],
       ['=WORKDAY.INTL(1000, 1, 1, A1:A1)'],
       ['=WORKDAY.INTL(1000, 1, 1, B1:B1)'],

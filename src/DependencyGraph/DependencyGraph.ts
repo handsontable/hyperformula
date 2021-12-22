@@ -14,6 +14,7 @@ import {ContentChanges} from '../ContentChanges'
 import {ErrorMessage} from '../error-message'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {
+  AsyncPromiseVertex,
   EmptyValue,
   getRawValue,
   InternalScalarValue,
@@ -81,17 +82,24 @@ export class DependencyGraph {
     )
   }
 
-  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: ArraySize, hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean): ContentChanges {
+  public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: ArraySize, hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean, hasAsyncFunction: boolean): ContentChanges {
     const newVertex = FormulaVertex.fromAst(ast, address, size, this.lazilyTransformingAstService.version())
+    
+    if (hasAsyncFunction) {
+      this.markAsAsync(newVertex)
+    }
+
     this.exchangeOrAddFormulaVertex(newVertex)
     this.processCellDependencies(dependencies, newVertex)
     this.graph.markNodeAsSpecialRecentlyChanged(newVertex)
+
     if (hasVolatileFunction) {
       this.markAsVolatile(newVertex)
     }
     if (hasStructuralChangeFunction) {
       this.markAsDependentOnStructureChange(newVertex)
     }
+
     this.correctInfiniteRangesDependency(address)
     return this.getAndClearContentChanges()
   }
@@ -167,6 +175,26 @@ export class DependencyGraph {
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
+    const asyncVertices = this.asyncVertices()
+
+    const setVertexDependencyIndex = (depVertex: Vertex) => {
+      const asyncVertex = asyncVertices.get(endVertex)
+      const depIndex = this.graph.dependencyIndexes.get(depVertex) ?? -1
+      // If vertex is async then increment it to the next index
+      // so that Promise.all() can work later
+      const newIndex = asyncVertex ? depIndex + 1 : depIndex
+
+      this.graph.dependencyIndexes.set(endVertex, newIndex)
+
+      if (endVertex instanceof FormulaVertex) {
+        endVertex.asyncResolveIndex = newIndex
+      }
+    }
+
+    if (cellDependencies.length === 0) {
+      setVertexDependencyIndex(endVertex)
+    }
+
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
         const range = dep
@@ -208,12 +236,20 @@ export class DependencyGraph {
         if (range.isFinite()) {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
+        setVertexDependencyIndex(rangeVertex)
       } else if (dep instanceof NamedExpressionDependency) {
         const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
         const namedExpressionVertex = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
+      
         this.graph.addEdge(namedExpressionVertex, endVertex)
+
+        setVertexDependencyIndex(namedExpressionVertex)
       } else {
-        this.graph.addEdge(this.fetchCellOrCreateEmpty(dep), endVertex)
+        const depVertex = this.fetchCellOrCreateEmpty(dep)
+
+        this.graph.addEdge(depVertex, endVertex)
+
+        setVertexDependencyIndex(depVertex)
       }
     })
   }
@@ -620,6 +656,10 @@ export class DependencyGraph {
     this.graph.markNodeAsSpecial(vertex)
   }
 
+  public markAsAsync(vertex: Vertex) {
+    this.graph.markNodeAsSpecialAsync(vertex)
+  }
+
   public markAsDependentOnStructureChange(vertex: Vertex) {
     this.graph.markNodeAsChangingWithStructure(vertex)
   }
@@ -630,6 +670,26 @@ export class DependencyGraph {
         vertex.ensureRecentData(this.lazilyTransformingAstService)
       }
     }
+  }
+
+  public getAsyncGroupedVertices(vertices: AsyncPromiseVertex[]) {
+    const asyncGroupedVertices: AsyncPromiseVertex[][] = []
+
+    for (const vertex of vertices) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const index = vertex.asyncVertex.asyncResolveIndex!
+
+      asyncGroupedVertices[index] = asyncGroupedVertices[index] ? [
+        ...asyncGroupedVertices[index],
+        vertex
+      ] : [vertex]
+    }
+
+    return asyncGroupedVertices
+  }
+
+  public asyncVertices() {
+    return this.graph.specialNodesAsync
   }
 
   public volatileVertices() {

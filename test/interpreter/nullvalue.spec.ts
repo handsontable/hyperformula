@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('EmptyValue tests', () => {
   it('EmptyValue vs EmptyValue tests', () => {
-    const engine = HyperFormula.buildFromArray(
+    const [engine] = HyperFormula.buildFromArray(
       [
         [null, null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
       ])
@@ -27,7 +27,7 @@ describe('EmptyValue tests', () => {
   })
 
   it('Boolean vs EmptyValue tests', () => {
-    const engine = HyperFormula.buildFromArray(
+    const [engine] = HyperFormula.buildFromArray(
       [
         ['=TRUE()', null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
       ])

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function BITXOR', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITXOR(101)'],
       ['=BITXOR(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('function BITXOR', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITXOR(1, "foo")'],
       ['=BITXOR("bar", 4)'],
       ['=BITXOR("foo", "baz")'],
@@ -27,7 +27,7 @@ describe('function BITXOR', () => {
   })
 
   it('should not work for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITXOR(1, -2)'],
       ['=BITXOR(-1, 2)'],
     ])
@@ -37,7 +37,7 @@ describe('function BITXOR', () => {
   })
 
   it('should not work for non-integers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITXOR(1.2, 2)'],
       ['=BITXOR(3.14, 5)'],
     ])
@@ -47,7 +47,7 @@ describe('function BITXOR', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITXOR(1, 5)'],
       ['=BITXOR(457, 111)'],
       ['=BITXOR(BIN2DEC(101), BIN2DEC(1))'],
@@ -63,7 +63,7 @@ describe('function BITXOR', () => {
   })
 
   it('should return numeric type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BITXOR(1, 5)'],
     ])
 

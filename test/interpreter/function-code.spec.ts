@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CODE', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CODE()'],
       ['=CODE("foo", "bar")'],
     ])
@@ -14,7 +14,7 @@ describe('Function CODE', () => {
   })
 
   it('should not work for empty strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CODE("")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function CODE', () => {
   })
 
   it('should work for single chars', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CODE("")'],
       ['=CODE("!")'],
       ['=CODE("A")'],
@@ -44,7 +44,7 @@ describe('Function CODE', () => {
   })
 
   it('should return code of first character', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CODE("Abar")'],
       ['=CODE("Ñbaz")'],
     ])
@@ -54,7 +54,7 @@ describe('Function CODE', () => {
   })
 
   it('should return number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CODE("foo")']
     ])
 
@@ -62,7 +62,7 @@ describe('Function CODE', () => {
   })
 
   it('should be identity when composed with CHAR', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CODE(CHAR(1))'],
       ['=CODE(CHAR(128))'],
       ['=CODE(CHAR(255))']

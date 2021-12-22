@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FORMULATEXT', () => {
   it('should return N/A when number of arguments is incorrect', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FORMULATEXT()'],
       ['=FORMULATEXT(B2, B3)']
     ])
@@ -14,7 +14,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should return N/A for wrong types of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FORMULATEXT(1)'],
       ['=FORMULATEXT("foo")'],
       ['=FORMULATEXT(SUM(1))'],
@@ -26,7 +26,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should propagate expression error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FORMULATEXT(1/0)']
     ])
 
@@ -34,7 +34,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should return text of a formula evaluating to error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1/0', '=FORMULATEXT(A1)']
     ])
 
@@ -42,7 +42,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, 2)', '=FORMULATEXT(A1)']
     ])
 
@@ -50,7 +50,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should return formula of a left corner cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, 2)', '=FORMULATEXT(A1:A2)']
     ])
 
@@ -58,7 +58,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should return REF when ', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1, 2)']
     ])
     engine.addSheet('Sheet2')
@@ -68,7 +68,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should work for unparsed formula', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1,', '=FORMULATEXT(A1)']
     ])
 
@@ -76,7 +76,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should return itself', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FORMULATEXT(A1)']
     ])
 
@@ -84,7 +84,7 @@ describe('Function FORMULATEXT', () => {
   })
 
   it('should be dependent on sheet structure changes', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(A2)', '=FORMULATEXT(A1)'],
       [1]
     ])

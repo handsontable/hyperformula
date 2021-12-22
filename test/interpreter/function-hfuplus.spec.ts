@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.UPLUS', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UPLUS()', '=HF.UPLUS(1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function HF.UPLUS', () => {
   })
 
   it('should calculate the correct value with correct defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UPLUS(2)'],
       ['=HF.UPLUS(-3)'],
     ])
@@ -23,7 +23,7 @@ describe('Function HF.UPLUS', () => {
   })
 
   it('should coerce to correct types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UPLUS(TRUE())'],
       ['=HF.UPLUS(B2)'],
       ['=HF.UPLUS("1")'],
@@ -35,7 +35,7 @@ describe('Function HF.UPLUS', () => {
   })
 
   it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.UPLUS("abcd")'],
       ['=HF.UPLUS(NA())'],
       ['=HF.UPLUS(B3:C3)'],

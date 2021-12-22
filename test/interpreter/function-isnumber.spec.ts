@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ISNUMBER', () => {
   it('should return true for numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNUMBER(1)', '=ISNUMBER(-0)', '=ISNUMBER(1+1)'],
     ])
 
@@ -15,7 +15,7 @@ describe('Function ISNUMBER', () => {
   })
 
   it('should return false for nonnumbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNUMBER(1<1)', '=ISNUMBER(A2)', '=ISNUMBER("foo")'],
       [null],
     ])
@@ -25,7 +25,7 @@ describe('Function ISNUMBER', () => {
   })
 
   it('takes exactly one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNUMBER(1, 2)', '=ISNUMBER()'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))

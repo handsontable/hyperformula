@@ -47,26 +47,26 @@ export type EngineState = {
 }
 
 export class BuildEngineFactory {
-  public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
+  public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): [EngineState, Promise<void>] {
     const config = new Config(configInput)
     return this.buildEngine(config, sheets, namedExpressions)
   }
 
-  public static buildFromSheet(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
+  public static buildFromSheet(sheet: Sheet, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): [EngineState, Promise<void>] {
     const config = new Config(configInput)
     const newsheetprefix = config.translationPackage.getUITranslation(UIElement.NEW_SHEET_PREFIX) + '1'
     return this.buildEngine(config, {[newsheetprefix]: sheet}, namedExpressions)
   }
 
-  public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
+  public static buildEmpty(configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): [EngineState, Promise<void>] {
     return this.buildEngine(new Config(configInput), {}, namedExpressions)
   }
 
-  public static rebuildWithConfig(config: Config, sheets: Sheets, namedExpressions: SerializedNamedExpression[], stats: Statistics): EngineState {
+  public static rebuildWithConfig(config: Config, sheets: Sheets, namedExpressions: SerializedNamedExpression[], stats: Statistics): [EngineState, Promise<void>] {
     return this.buildEngine(config, sheets, namedExpressions, stats)
   }
 
-  private static buildEngine(config: Config, sheets: Sheets = {}, inputNamedExpressions: SerializedNamedExpression[] = [], stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
+  private static buildEngine(config: Config, sheets: Sheets = {}, inputNamedExpressions: SerializedNamedExpression[] = [], stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): [EngineState, Promise<void>] {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 
     const namedExpressions = new NamedExpressions()
@@ -119,12 +119,13 @@ export class BuildEngineFactory {
       graphBuilder.buildGraph(sheets, stats)
     })
 
-    const evaluator = new Evaluator(config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
-    evaluator.run()
+    const evaluator = new Evaluator(config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch, operations)
+
+    const evaluatorPromise = evaluator.run()
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
 
-    return {
+    return [{
       config,
       stats,
       dependencyGraph,
@@ -139,6 +140,6 @@ export class BuildEngineFactory {
       namedExpressions,
       serialization,
       functionRegistry,
-    }
+    }, evaluatorPromise]
   }
 }

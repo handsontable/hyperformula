@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function MULTINOMIAL', () => {
   it('checks required number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL()'],
     ])
 
@@ -12,7 +12,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('computes correct answer for two args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL(6,8)', '=MULTINOMIAL(0,0)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('computes correct answer for more than two args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL(2,3,5,7)', '=MULTINOMIAL(10,11,12,13,14)'],
     ])
 
@@ -30,7 +30,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('accepts single arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL(1000)', '=MULTINOMIAL(0)'],
     ])
 
@@ -39,7 +39,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('coerces to number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL("2",4)'],
       ['=MULTINOMIAL(B2:C2)', '\'2', 4],
       ['=MULTINOMIAL(TRUE(),4)'],
@@ -57,7 +57,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('throws error for non-coercible values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL(B1:C1)', 'abcd', 4],
       ['=MULTINOMIAL("abcd",4)'],
     ])
@@ -67,7 +67,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL(-1,5)'],
     ])
 
@@ -75,7 +75,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('truncates numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL(B1:C1)', 5.5, 10.9],
     ])
 
@@ -83,7 +83,7 @@ describe('Function MULTINOMIAL', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MULTINOMIAL(NA(),4)'],
       ['=MULTINOMIAL(B2:C2)', '=NA()', 4],
     ])

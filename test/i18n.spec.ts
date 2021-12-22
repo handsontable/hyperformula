@@ -17,10 +17,10 @@ describe('i18n', () => {
   })
 
   it('using functions in different languages', () => {
-    const enginePL = HyperFormula.buildFromArray([
+    const [enginePL] = HyperFormula.buildFromArray([
       ['=SUMA(42)'],
     ], {language: 'plPL'})
-    const engineEN = HyperFormula.buildFromArray([
+    const [engineEN] = HyperFormula.buildFromArray([
       ['=SUM(42)'],
     ], {language: 'enGB'})
 
@@ -29,13 +29,13 @@ describe('i18n', () => {
   })
 
   it('using functions in different languages with not standard characters', () => {
-    const enginePL = HyperFormula.buildFromArray([
+    const [enginePL] = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
       ['=LICZ.JEŻELI(A1:A3, ">=1")'],
     ], {language: 'plPL'})
-    const engineEN = HyperFormula.buildFromArray([
+    const [engineEN] = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
@@ -47,10 +47,10 @@ describe('i18n', () => {
   })
 
   it('translation works for parser hardcoded offset procedure', () => {
-    const enginePL = HyperFormula.buildFromArray([
+    const [enginePL] = HyperFormula.buildFromArray([
       ['=PRZESUNIĘCIE(A1, 1, 1)'],
     ], {language: 'plPL'})
-    const engineEN = HyperFormula.buildFromArray([
+    const [engineEN] = HyperFormula.buildFromArray([
       ['=OFFSET(A1, 1, 1)'],
     ])
 

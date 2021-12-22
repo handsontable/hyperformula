@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function T.INV', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.INV(1)'],
       ['=T.INV(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function T.INV', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.INV("foo", 2)'],
       ['=T.INV(0.5, "baz")'],
     ])
@@ -25,7 +25,7 @@ describe('Function T.INV', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.INV(0.1, 1)'],
       ['=T.INV(0.9, 2)'],
     ])
@@ -35,7 +35,7 @@ describe('Function T.INV', () => {
   })
 
   it('should truncate input', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.INV(0.1, 1.9)'],
       ['=T.INV(0.9, 2.9)'],
     ])
@@ -45,7 +45,7 @@ describe('Function T.INV', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.INV(0.01, 1)'],
       ['=T.INV(0, 1)'],
       ['=T.INV(0.99, 1)'],

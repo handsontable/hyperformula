@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function INT', () => {
   it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=INT()', '=INT(1, 2)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function INT', () => {
   })
 
   it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=INT(1.3)', '=INT(1.7)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function INT', () => {
   })
 
   it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=INT(-1.3)', '=INT(-1.7)'],
     ])
 
@@ -32,7 +32,7 @@ describe('Function INT', () => {
   })
 
   it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=INT("42.3")'],
     ])
 
@@ -40,7 +40,7 @@ describe('Function INT', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=INT(A1)'],
     ])

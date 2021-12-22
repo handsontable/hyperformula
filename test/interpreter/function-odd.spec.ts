@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ODD', () => {
   it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ODD()', '=ODD(1, 2)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function ODD', () => {
   })
 
   it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ODD(1.3)', '=ODD(2.7)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function ODD', () => {
   })
 
   it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ODD(-1.3)', '=ODD(-2.7)'],
     ])
 
@@ -32,7 +32,7 @@ describe('Function ODD', () => {
   })
 
   it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ODD("42.3")'],
     ])
 
@@ -40,7 +40,7 @@ describe('Function ODD', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=ODD(A1)'],
     ])

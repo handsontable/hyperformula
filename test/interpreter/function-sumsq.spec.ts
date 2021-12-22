@@ -5,13 +5,13 @@ import {adr, detailedError} from '../testUtils'
 
 describe('SUMSQ', () => {
   it('SUMSQ without args', () => {
-    const engine = HyperFormula.buildFromArray([['=SUMSQ()']])
+    const [engine] = HyperFormula.buildFromArray([['=SUMSQ()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('SUMSQ with args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUMSQ(1, B1)', '2'],
     ])
 
@@ -19,7 +19,7 @@ describe('SUMSQ', () => {
   })
 
   it('SUMSQ with range args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '5'],
       ['3', '4', '=SUMSQ(A1:B2)'],
     ])
@@ -27,7 +27,7 @@ describe('SUMSQ', () => {
   })
 
   it('SUMSQ with using previously cached value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['3', '=SUMSQ(A1:A1)'],
       ['4', '=SUMSQ(A1:A2)'],
     ])
@@ -35,7 +35,7 @@ describe('SUMSQ', () => {
   })
 
   it('doesnt do coercions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['foo'],
@@ -48,7 +48,7 @@ describe('SUMSQ', () => {
   })
 
   it('range only with empty value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['', '=SUMSQ(A1:A1)'],
     ])
 
@@ -56,7 +56,7 @@ describe('SUMSQ', () => {
   })
 
   it('range only with some empty values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['42', '', '13', '=SUMSQ(A1:C1)'],
     ])
 
@@ -64,7 +64,7 @@ describe('SUMSQ', () => {
   })
 
   it('over a range value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=SUMSQ(MMULT(A1:B2, A1:B2))'],
@@ -74,7 +74,7 @@ describe('SUMSQ', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '4'],
       ['=SUMSQ(A1:B2)'],

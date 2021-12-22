@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function DOLLARDE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DOLLARDE(1)', '=DOLLARDE(1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function DOLLARDE', () => {
   })
 
   it('div/0 when second argument too small', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DOLLARDE(1,0)', '=DOLLARDE(1, 0.9)'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function DOLLARDE', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [
         '=DOLLARDE(1.01, 8)',
         '=DOLLARDE(1.0000001, 8.9)',

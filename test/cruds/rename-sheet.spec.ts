@@ -2,26 +2,26 @@ import {HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../.
 
 describe('Is it possible to rename sheet', () => {
   it('true if possible', () => {
-    const engine = HyperFormula.buildFromSheets({'Sheet1': []})
+    const [engine] = HyperFormula.buildFromSheets({'Sheet1': []})
 
     expect(engine.isItPossibleToRenameSheet(0, 'Foo')).toEqual(true)
     expect(engine.isItPossibleToRenameSheet(0, '~`!@#$%^&*()_-+_=/|?{}[]\"')).toEqual(true)
   })
 
   it('true if same name', () => {
-    const engine = HyperFormula.buildFromSheets({'Sheet1': []})
+    const [engine] = HyperFormula.buildFromSheets({'Sheet1': []})
 
     expect(engine.isItPossibleToRenameSheet(0, 'Sheet1')).toEqual(true)
   })
 
   it('false if sheet does not exists', () => {
-    const engine = HyperFormula.buildFromSheets({'Sheet1': []})
+    const [engine] = HyperFormula.buildFromSheets({'Sheet1': []})
 
     expect(engine.isItPossibleToRenameSheet(1, 'Foo')).toEqual(false)
   })
 
   it('false if given name is taken', () => {
-    const engine = HyperFormula.buildFromSheets({'Sheet1': [], 'Sheet2': []})
+    const [engine] = HyperFormula.buildFromSheets({'Sheet1': [], 'Sheet2': []})
 
     expect(engine.isItPossibleToRenameSheet(0, 'Sheet2')).toEqual(false)
   })
@@ -29,7 +29,7 @@ describe('Is it possible to rename sheet', () => {
 
 describe('Rename sheet', () => {
   it('works', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     engine.addSheet('foo')
 
     engine.renameSheet(0, 'bar')
@@ -40,7 +40,7 @@ describe('Rename sheet', () => {
   })
 
   it('error when there is no sheet with given ID', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
 
     expect(() => {
       engine.renameSheet(0, 'bar')
@@ -48,7 +48,7 @@ describe('Rename sheet', () => {
   })
 
   it('error when new sheet name is already taken', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     engine.addSheet()
     engine.addSheet('bar')
 
@@ -58,7 +58,7 @@ describe('Rename sheet', () => {
   })
 
   it('change for the same name', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     engine.addSheet('foo')
 
     engine.renameSheet(0, 'foo')
@@ -68,7 +68,7 @@ describe('Rename sheet', () => {
   })
 
   it('change for the same canonical name', () => {
-    const engine = HyperFormula.buildEmpty()
+    const [engine] = HyperFormula.buildEmpty()
     engine.addSheet('Foo')
 
     engine.renameSheet(0, 'FOO')

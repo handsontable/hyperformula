@@ -3,7 +3,7 @@ import {adr} from './testUtils'
 
 describe('integration test', () => {
   it('should work', () => {
-    const engine = HyperFormula.buildFromSheets({
+    const [engine] = HyperFormula.buildFromSheets({
       'Output': [['=INDEX(LookupRange,MATCH(1,(Lookup!A1:A8<=Inputs!A1)*(Lookup!B1:B8>=Inputs!A1)*(Lookup!C1:C8=Inputs!B1), 0), 4)']],
       'Inputs': [[23, 'B']],
       'Lookup': [

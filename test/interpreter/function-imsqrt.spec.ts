@@ -4,7 +4,7 @@ import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMSQRT', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSQRT()'],
       ['=IMSQRT(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMSQRT', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSQRT("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMSQRT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMSQRT(0)'],
       ['=IMSQRT("-4")'],
       ['=IMSQRT("-3+4i")'],

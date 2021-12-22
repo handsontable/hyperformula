@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('RSQ', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=RSQ(B1:B5)'],
       ['=RSQ(B1:B5, C1:C5, D1:D5)'],
     ])
@@ -15,7 +15,7 @@ describe('RSQ', () => {
   })
 
   it('ranges need to have same amount of elements', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=RSQ(B1:B5, C1:C6)'],
     ])
 
@@ -23,7 +23,7 @@ describe('RSQ', () => {
   })
 
   it('works (simple)', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['2', '20'],
       ['=RSQ(A1:A2, B1:B2)']
@@ -33,7 +33,7 @@ describe('RSQ', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['2', '4'],
       ['5', '3'],
       ['7', '6'],
@@ -46,7 +46,7 @@ describe('RSQ', () => {
   })
 
   it('error when not enough data', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=RSQ(A1:A1, B1:B1)'],
       ['=RSQ(42, 43)'],
@@ -59,7 +59,7 @@ describe('RSQ', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['="2"', '50'],
       ['3', '30'],
@@ -70,7 +70,7 @@ describe('RSQ', () => {
   })
 
   it('over a range value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '3'],
       ['4', '5', '6'],
       ['=RSQ(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
@@ -80,7 +80,7 @@ describe('RSQ', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=4/0', '50'],
       ['3', '30'],

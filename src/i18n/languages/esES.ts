@@ -17,6 +17,8 @@ export const dictionary: RawTranslationPackage = {
     REF: '#¡REF!',
     SPILL: '#¡DESBORDAMIENTO!',
     VALUE: '#¡VALOR!',
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',

@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FACT', () => {
   it('checks number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACT()', '=FACT(1, 2)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function FACT', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACT(0)'],
       ['=FACT(1)'],
       ['=FACT(10)'],
@@ -27,7 +27,7 @@ describe('Function FACT', () => {
   })
 
   it('rounds argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACT(0.9)'],
       ['=FACT(1.1)'],
       ['=FACT(10.42)'],
@@ -41,7 +41,7 @@ describe('Function FACT', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACT(-1)'],
       ['=FACT(171)'],
     ])
@@ -51,7 +51,7 @@ describe('Function FACT', () => {
   })
 
   it('uses coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACT("0")'],
     ])
 
@@ -59,7 +59,7 @@ describe('Function FACT', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACT(NA())'],
     ])
 

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ISNA', () => {
   it('should return true for #NA! error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRUE(1)', '=ISNA(A1)', '=ISNA(TRUE(1))'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function ISNA', () => {
   })
 
   it('should return false for other values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNA(1)', '=ISNA(TRUE())', '=ISNA("foo")', '=ISNA(A1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
@@ -24,7 +24,7 @@ describe('Function ISNA', () => {
   })
 
   it('takes exactly one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNA(1, 2)', '=ISNA()'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -32,7 +32,7 @@ describe('Function ISNA', () => {
   })
 
   it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRUE(1)'],
       ['=TRUE(1)'],
       ['=ISNA(A1:A2)'],

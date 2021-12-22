@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - Boolean operators', () => {
   it('Equals operator - numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1=2', '=1=1', '=1+2=3'],
     ])
 
@@ -15,7 +15,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Equals operator - strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="abc"="abc"', '="foo"="bar"', '="a"="foo"'],
     ])
 
@@ -25,7 +25,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Equals operator - booleans', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRUE()=TRUE()', '=FALSE()=FALSE()', '=TRUE()=FALSE()'],
     ])
 
@@ -35,7 +35,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Equal operator with different types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo"=1', '="foo"=TRUE()', '=1="foo"', '=TRUE()="foo"'],
     ])
 
@@ -46,7 +46,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Equals operator with error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1/0', '=A1=2', '=2=A1'],
     ])
 
@@ -55,7 +55,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Not equals operator - numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1<>2', '=1<>1', '=1+2<>3'],
     ])
 
@@ -65,7 +65,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Not equals operator - strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="abc"<>"abc"', '="foo"<>"bar"', '="a"<>"foo"'],
     ])
 
@@ -75,7 +75,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Not equals operator - booleans', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRUE()<>TRUE()', '=FALSE()<>FALSE()', '=TRUE()<>FALSE()'],
     ])
 
@@ -85,7 +85,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Not equals operator with error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1/0', '=A1<>2', '=2<>A1'],
     ])
 
@@ -94,7 +94,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Not Equal operator with different types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo"<>1', '="foo"<>TRUE()', '=1<>"foo"', '=TRUE()<>"foo"'],
     ])
 
@@ -105,7 +105,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than operator with number arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1<2', '=2<2', '=-3<4', '=-4<-3'],
     ])
 
@@ -116,7 +116,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than operator with different types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo"<1', '="foo"<TRUE()', '=1<"0"', '=2 < TRUE()', '="02/02/2020"<"000"'],
     ])
 
@@ -128,7 +128,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than operator with strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="abcd"<"abc"', '="11"<"2"', '="02/02/2020"<"true"'],
     ])
 
@@ -138,7 +138,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than operator with coercions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FALSE()<"2"', '="1"<"2"', '=TRUE()<FALSE()'],
     ])
 
@@ -148,7 +148,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than operator with number arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=2>1', '=2>2', '=4>-3', '=-3>-4'],
     ])
 
@@ -159,7 +159,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than operator with different types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo">1', '="foo">TRUE()', '=1>"0"', '=2 > TRUE()', '="02/02/2020">"000"'],
     ])
 
@@ -171,7 +171,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than operator with strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="abcd">"abc"', '="11">"2"', '="02/02/2020">"true"'],
     ])
 
@@ -181,7 +181,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than operator with coercions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FALSE()>"2"', '="1">"2"', '=TRUE()>FALSE()'],
     ])
 
@@ -191,7 +191,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than or equal operator with number arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=1<=2', '=2<=2', '=-3<=4', '=-4<=-3', '=5<=4'],
     ])
 
@@ -203,7 +203,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than or equal operator with strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="abcd"<="abc"', '="11"<="2"', '="02/02/2020"<="true"'],
     ])
 
@@ -212,7 +212,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
   it('Less than or equal operator with coercions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FALSE()<="2"', '="1"<="2"', '=TRUE()<=FALSE()'],
     ])
 
@@ -222,7 +222,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than or equal operator with different types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo"<=1', '="foo"<=TRUE()', '=1<="0"', '=2 <= TRUE()', '="02/02/2020"<="000"'],
     ])
 
@@ -234,7 +234,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than or equal operator with number arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=2>=1', '=2>=2', '=4>=-3', '=-3>=-4', '=4>=5'],
     ])
 
@@ -246,7 +246,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than or equal operator with different types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="foo">=1', '="foo">=TRUE()', '=1>="0"', '=2 >= TRUE()', '="02/02/2020">="000"'],
     ])
 
@@ -258,7 +258,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than or equal operator with strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="abcd">="abc"', '="11">="2"', '="02/02/2020">="true"'],
     ])
 
@@ -268,7 +268,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Greater than or equal operator with coercions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FALSE()>="2"', '="1">="2"', '=TRUE()>=FALSE()'],
     ])
 
@@ -278,7 +278,7 @@ describe('Interpreter - Boolean operators', () => {
   })
 
   it('Less than propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)<2', '=2<(1/0)', '=(A1:B1)<(1/0)', '=(1/0)<(A1:B1)'],
     ])
 
@@ -288,7 +288,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
   it('Greater than propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)>2', '=2>(1/0)', '=(A1:B1)>(1/0)', '=(1/0)>(A1:B1)'],
     ])
 
@@ -298,7 +298,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
   it('Less than or equal propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)<=2', '=2<=(1/0)', '=(A1:B1)<=(1/0)', '=(1/0)<=(A1:B1)'],
     ])
 
@@ -308,7 +308,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
   it('Greater than or equal propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)>=2', '=2>=(1/0)', '=(A1:B1)>=(1/0)', '=(1/0)>=(A1:B1)'],
     ])
 
@@ -318,7 +318,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
   it('Equal propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)=2', '=2=(1/0)', '=(A1:B1)=(1/0)', '=(1/0)=(A1:B1)'],
     ])
 
@@ -328,7 +328,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
   it('Not equal propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)<>2', '=2<>(1/0)', '=(A1:B1)<>(1/0)', '=(1/0)<>(A1:B1)'],
     ])
 

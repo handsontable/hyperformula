@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function WEIBULL.DIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEIBULL.DIST(1, 2, 3)'],
       ['=WEIBULL.DIST(1, 2, 3, 4, 5)'],
     ])
@@ -15,7 +15,7 @@ describe('Function WEIBULL.DIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEIBULL.DIST("foo", 2, 3, TRUE())'],
       ['=WEIBULL.DIST(1, "baz", 3, TRUE())'],
       ['=WEIBULL.DIST(1, 2, "baz", TRUE())'],
@@ -29,7 +29,7 @@ describe('Function WEIBULL.DIST', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEIBULL.DIST(0.1, 1, 2, TRUE())'],
       ['=WEIBULL.DIST(0.5, 2, 4, TRUE())'],
     ])
@@ -39,7 +39,7 @@ describe('Function WEIBULL.DIST', () => {
   })
 
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEIBULL.DIST(0.1, 1, 2, FALSE())'],
       ['=WEIBULL.DIST(0.5, 2, 4, FALSE())'],
     ])
@@ -49,7 +49,7 @@ describe('Function WEIBULL.DIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEIBULL.DIST(0, 1, 1, FALSE())'],
       ['=WEIBULL.DIST(-0.01, 0.01, 0.01, FALSE())'],
       ['=WEIBULL.DIST(0, 0, 0.01, FALSE())'],

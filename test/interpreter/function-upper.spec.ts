@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function UPPER', () => {
   it('should take one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UPPER()'],
       ['=UPPER("foo", "bar")'],
     ])
@@ -14,7 +14,7 @@ describe('Function UPPER', () => {
   })
 
   it('should convert text to uppercase', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UPPER("")'],
       ['=UPPER(B1)'],
       ['=UPPER("FOO")'],
@@ -30,7 +30,7 @@ describe('Function UPPER', () => {
   })
 
   it('should coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=UPPER(TRUE())'],
       ['=UPPER(0)'],
     ])

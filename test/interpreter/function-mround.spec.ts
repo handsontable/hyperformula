@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function MROUND', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MROUND(101)'],
       ['=MROUND(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function MROUND', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MROUND(1, "foo")'],
       ['=MROUND("bar", 4)'],
       ['=MROUND("foo", "baz")'],
@@ -27,7 +27,7 @@ describe('Function MROUND', () => {
   })
 
   it('should return 0 when dividing by 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MROUND(42, 0)'],
     ])
 
@@ -35,7 +35,7 @@ describe('Function MROUND', () => {
   })
 
   it('should return error for args of different signs', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MROUND(42, -1)'],
       ['=MROUND(-42, 1)'],
     ])
@@ -45,7 +45,7 @@ describe('Function MROUND', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MROUND(5, 2)'],
       ['=MROUND(36, 6.5)'],
       ['=MROUND(10.5, 3)'],
@@ -68,7 +68,7 @@ describe('Function MROUND', () => {
    * If this test starts throwing errors, it should be disabled.
    */
   it('known limitations', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MROUND(6.05, 0.1)'],
       ['=MROUND(7.05, 0.1)'],
     ])

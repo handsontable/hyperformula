@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function MOD', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MOD(101)'],
       ['=MOD(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function MOD', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MOD(1, "foo")'],
       ['=MOD("bar", 4)'],
       ['=MOD("foo", "baz")'],
@@ -27,7 +27,7 @@ describe('Function MOD', () => {
   })
 
   it('should return error when dividing by 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MOD(42, 0)'],
     ])
 
@@ -35,7 +35,7 @@ describe('Function MOD', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MOD(5, 2)'],
       ['=MOD(36, 6)'],
       ['=MOD(10.5, 3)'],

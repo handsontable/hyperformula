@@ -5,25 +5,25 @@ import {adr, detailedError} from '../testUtils'
 
 describe('MAXA', () => {
   it('MAXA with empty args', () => {
-    const engine = HyperFormula.buildFromArray([['=MAXA()']])
+    const [engine] = HyperFormula.buildFromArray([['=MAXA()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('MAXA with args', () => {
-    const engine = HyperFormula.buildFromArray([['=MAXA(1, B1)', '3.14']])
+    const [engine] = HyperFormula.buildFromArray([['=MAXA(1, B1)', '3.14']])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(3.14)
   })
 
   it('MAXA with range', () => {
-    const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MAXA(A1:A3)']])
+    const [engine] = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MAXA(A1:A3)']])
 
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
   })
 
   it('does only boolean coercions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="42"', '=MAXA(A1)'],
       ['=TRUE()', '=MAXA(A2)'],
       ['=FALSE()', '=MAXA(A3)'],
@@ -37,17 +37,17 @@ describe('MAXA', () => {
   })
 
   it('MAXA of strings and -1', () => {
-    const engine = HyperFormula.buildFromArray([['foo'], ['bar'], ['-1'], ['=MAXA(A1:A3)']])
+    const [engine] = HyperFormula.buildFromArray([['foo'], ['bar'], ['-1'], ['=MAXA(A1:A3)']])
     expect(engine.getCellValue(adr('A4'))).toEqual(0)
   })
 
   it('MAXA of empty value', () => {
-    const engine = HyperFormula.buildFromArray([['', '=MAXA(A1)']])
+    const [engine] = HyperFormula.buildFromArray([['', '=MAXA(A1)']])
     expect(engine.getCellValue(adr('B1'))).toEqual(0)
   })
 
   it('MAXA of empty value and some negative number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['', '-1', '=MAXA(A1,B1)'],
       [null, '-1', '=MAXA(A2,B2)'],
     ])
@@ -56,7 +56,7 @@ describe('MAXA', () => {
   })
 
   it('over a range value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=MAXA(MMULT(A1:B2, A1:B2))'],
@@ -66,7 +66,7 @@ describe('MAXA', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '4'],
       ['=MAXA(A1:B2)'],

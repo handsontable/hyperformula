@@ -6,7 +6,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COUNTIF', () => {
   it('requires 2 arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTIF(B1:B3)'],
       ['=COUNTIF(B1:B3, ">0", B1)'],
     ])
@@ -16,7 +16,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2'],
@@ -27,7 +27,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('works with mixed types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0'],
       ['"1"'],
       ['2'],
@@ -38,7 +38,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('use partial cache', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0'],
       ['1'],
       ['2', '=COUNTIF(A1:A3, ">=1")'],
@@ -51,7 +51,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('use full cache', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '=COUNTIF(A1:A3, ">=1")'],
       ['1', '=COUNTIF(A1:A3, ">=1")'],
       ['2'],
@@ -63,7 +63,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('works for only one cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=COUNTIF(A1, ">=1")'],
       ['0', '=COUNTIF(A2, ">=1")'],
     ])
@@ -73,7 +73,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('error when criterion unparsable', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTIF(B1:B2, "><foo")'],
     ])
 
@@ -81,7 +81,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('scalars are treated like singular arrays', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTIF(10, ">1")'],
       ['=COUNTIF(0, ">1")'],
     ])
@@ -91,7 +91,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('error propagation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COUNTIF(4/0, ">1")'],
       ['=COUNTIF(0, 4/0)'],
       ['=COUNTIF(4/0, FOOBAR())'],
@@ -103,7 +103,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('works with range values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['3', '5'],
       ['7', '9'],
       ['=COUNTIF(A1:B2, ">4")'],
@@ -115,7 +115,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('works for matrices', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=TRANSPOSE(A1:B1)'],
       [],
@@ -126,7 +126,7 @@ describe('Function COUNTIF', () => {
   })
 
   it('ignore errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['=4/0'],
       ['1'],

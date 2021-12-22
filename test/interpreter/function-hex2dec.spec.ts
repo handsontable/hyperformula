@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function HEX2DEC', () => {
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HEX2DEC("foo", 2, 3)'],
     ])
 
@@ -13,7 +13,7 @@ describe('function HEX2DEC', () => {
   })
 
   it('should not work for non-hex arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HEX2DEC("foo")'],
       ['=HEX2DEC("23G")'],
       ['=HEX2DEC(TRUE())'],
@@ -25,7 +25,7 @@ describe('function HEX2DEC', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HEX2DEC("1")'],
       ['=HEX2DEC("10")'],
       ['=HEX2DEC("AD")'],
@@ -53,7 +53,7 @@ describe('function HEX2DEC', () => {
   })
 
   it('should work for numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HEX2DEC(456)'],
     ])
 
@@ -61,7 +61,7 @@ describe('function HEX2DEC', () => {
   })
 
   it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="1A3"'],
       ['=HEX2DEC(A1)'],
     ])
@@ -70,7 +70,7 @@ describe('function HEX2DEC', () => {
   })
 
   it('should return a number', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HEX2DEC("11")'],
     ])
 
@@ -78,7 +78,7 @@ describe('function HEX2DEC', () => {
   })
 
   it('should work only for 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HEX2DEC("1010B040205")'],
       ['=HEX2DEC("7777EE70D2")'],
     ])

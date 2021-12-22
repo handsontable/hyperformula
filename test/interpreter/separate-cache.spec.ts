@@ -3,7 +3,7 @@ import {adr} from '../testUtils'
 
 describe('numeric aggreagtion functions', () => {
   it('should use separate caches', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 2, 5, 10, 20],
       ['=MIN(A1:E1)', '=MAX(A1:E1)', '=SUM(A1:E1)', '=SUMSQ(A1:E1)', '=AVERAGE(A1:E1)'],
       ['=MIN(A1:E1)', '=MAX(A1:E1)', '=SUM(A1:E1)', '=SUMSQ(A1:E1)', '=AVERAGE(A1:E1)'],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function WEEKDAY', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY(1, 2, 3)'],
       ['=WEEKDAY()'],
     ])
@@ -15,7 +15,7 @@ describe('Function WEEKDAY', () => {
   })
 
   it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY("foo", 1)'],
       ['=WEEKDAY(2, "bar")'],
     ])
@@ -25,7 +25,7 @@ describe('Function WEEKDAY', () => {
   })
 
   it('should not work for wrong value of args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY(-1, 1)'],
       ['=WEEKDAY(2, 9)'],
     ])
@@ -35,7 +35,7 @@ describe('Function WEEKDAY', () => {
   })
 
   it('should work for strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY("31/07/2020")'],
       ['=WEEKDAY("31/07/2020", "1")'],
       ['=WEEKDAY("31/07/2020", "2")'],
@@ -49,7 +49,7 @@ describe('Function WEEKDAY', () => {
   })
 
   it('should work for numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY(0)'],
       ['=WEEKDAY(0, 1)'],
       ['=WEEKDAY(0, 2)'],
@@ -63,7 +63,7 @@ describe('Function WEEKDAY', () => {
   })
 
   it('should work for strings with different nullDate', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY("31/07/2020")'],
       ['=WEEKDAY("31/07/2020", "1")'],
       ['=WEEKDAY("31/07/2020", "2")'],
@@ -77,7 +77,7 @@ describe('Function WEEKDAY', () => {
   })
 
   it('should work for strings with compatibility mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY("31/07/2020")'],
       ['=WEEKDAY("31/07/2020", "1")'],
       ['=WEEKDAY("31/07/2020", "2")'],
@@ -91,7 +91,7 @@ describe('Function WEEKDAY', () => {
   })
 
   it('should work for strings with compatibility mode and different nullDate', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=WEEKDAY("31/07/2020")'],
       ['=WEEKDAY("31/07/2020", "1")'],
       ['=WEEKDAY("31/07/2020", "2")'],
@@ -115,7 +115,7 @@ describe('Function WEEKDAY', () => {
       }
       arrs.push(arr)
     }
-    const engine = HyperFormula.buildFromArray(arrs)
+    const [engine] = HyperFormula.buildFromArray(arrs)
     expect(engine.getSheetValues(0)).toEqual(
       [[5, 6, 7, 1, 2, 3, 4],
         [4, 5, 6, 7, 1, 2, 3],

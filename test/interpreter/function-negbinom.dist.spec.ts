@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function NEGBINOM.DIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NEGBINOM.DIST(1, 2, 3)'],
       ['=NEGBINOM.DIST(1, 2, 3, 4, 5)'],
     ])
@@ -15,7 +15,7 @@ describe('Function NEGBINOM.DIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NEGBINOM.DIST("foo", 2, 1, TRUE())'],
       ['=NEGBINOM.DIST(1, "baz", 1, TRUE())'],
       ['=NEGBINOM.DIST(1, 2, "baz", TRUE())'],
@@ -29,7 +29,7 @@ describe('Function NEGBINOM.DIST', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NEGBINOM.DIST(10, 20, 0.5, TRUE())'],
       ['=NEGBINOM.DIST(2, 3, 0.1, TRUE())'],
     ])
@@ -39,7 +39,7 @@ describe('Function NEGBINOM.DIST', () => {
   })
 
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NEGBINOM.DIST(10, 20, 0.5, FALSE())'],
       ['=NEGBINOM.DIST(2, 3, 0.1, FALSE())'],
     ])
@@ -49,7 +49,7 @@ describe('Function NEGBINOM.DIST', () => {
   })
 
   it('truncates first and second arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NEGBINOM.DIST(10.9, 20, 0.5, FALSE())'],
       ['=NEGBINOM.DIST(2, 3.9, 0.1, FALSE())'],
     ])
@@ -59,7 +59,7 @@ describe('Function NEGBINOM.DIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NEGBINOM.DIST(0, 1, 0.5, FALSE())'],
       ['=NEGBINOM.DIST(-0.001, 1, 0.5, FALSE())'],
       ['=NEGBINOM.DIST(0, 0.999, 0.5, FALSE())'],

@@ -4,7 +4,7 @@ import {adr} from './testUtils'
 
 describe('arithmetic operations', () => {
   it('addition should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1+A1', '=A1+B1', '=A1+C1', '=A1+D1', '=A1+E1', '=A1+F1'],
       ['=B1+A1', '=B1+B1', '=B1+C1', '=B1+D1', '=B1+E1', '=B1+F1'],
@@ -52,7 +52,7 @@ describe('arithmetic operations', () => {
   })
 
   it('subtraction should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1-A1', '=A1-B1', '=A1-C1', '=A1-D1', '=A1-E1', '=A1-F1'],
       ['=B1-A1', '=B1-B1', '=B1-C1', '=B1-D1', '=B1-E1', '=B1-F1'],
@@ -100,7 +100,7 @@ describe('arithmetic operations', () => {
   })
 
   it('multiplication should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1*A1', '=A1*B1', '=A1*C1', '=A1*D1', '=A1*E1', '=A1*F1'],
       ['=B1*A1', '=B1*B1', '=B1*C1', '=B1*D1', '=B1*E1', '=B1*F1'],
@@ -148,7 +148,7 @@ describe('arithmetic operations', () => {
   })
 
   it('division should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1/A1', '=A1/B1', '=A1/C1', '=A1/D1', '=A1/E1', '=A1/F1'],
       ['=B1/A1', '=B1/B1', '=B1/C1', '=B1/D1', '=B1/E1', '=B1/F1'],
@@ -196,7 +196,7 @@ describe('arithmetic operations', () => {
   })
 
   it('percent should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1%', '=B1%', '=C1%', '=D1%', '=E1%', '=F1%'],
     ])
@@ -209,7 +209,7 @@ describe('arithmetic operations', () => {
   })
 
   it('unary minus should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=-A1', '=-B1', '=-C1', '=-D1', '=-E1', '=-F1'],
     ])
@@ -222,7 +222,7 @@ describe('arithmetic operations', () => {
   })
 
   it('unary plus should correctly infer types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=+A1', '=+B1', '=+C1', '=+D1', '=+E1', '=+F1'],
     ])
@@ -237,7 +237,7 @@ describe('arithmetic operations', () => {
 
 describe('formatting info', () => {
   it('should be preserved by unary minus', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=-A1', '=-B1', '=C1'],
     ], {currencySymbol: ['$', 'PLN']})
@@ -247,7 +247,7 @@ describe('formatting info', () => {
   })
 
   it('should be preserved by unary plus', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=+A1', '=+B1', '=+C1'],
     ], {currencySymbol: ['$', 'PLN']})
@@ -257,7 +257,7 @@ describe('formatting info', () => {
   })
 
   it('should be preserved by addition', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1+A1', '=A1+B1', '=A1+C1'],
       ['=B1+A1', '=B1+B1', '=B1+C1'],
@@ -275,7 +275,7 @@ describe('formatting info', () => {
   })
 
   it('should be preserved by subtraction', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1-A1', '=A1-B1', '=A1-C1'],
       ['=B1-A1', '=B1-B1', '=B1-C1'],
@@ -293,7 +293,7 @@ describe('formatting info', () => {
   })
 
   it('should be preserved by multiplication', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1*A1', '=A1*B1', '=A1*C1'],
       ['=B1*A1', '=B1*B1', '=B1*C1'],
@@ -311,7 +311,7 @@ describe('formatting info', () => {
   })
 
   it('should be preserved by division', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1$', '1', '1PLN'],
       ['=A1/A1', '=A1/B1', '=A1/C1'],
       ['=B1/A1', '=B1/B1', '=B1/C1'],
@@ -331,7 +331,7 @@ describe('formatting info', () => {
 
 describe('Datetime formatting', () => {
   it('should be correctly inferred by addition', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1+A1', '=A1+B1', '=A1+C1'],
       ['=B1+A1', '=B1+B1', '=B1+C1'],

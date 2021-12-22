@@ -449,6 +449,13 @@ export interface ConfigParams {
    * @category String
    */
   useWildcards: boolean,
+  /**
+   * Number of milliseconds until the cell throws a timeout error for async functions.
+   *
+   * @default 5000
+   * @category Engine
+   */
+   timeoutTime: number,
 }
 
 export type ConfigParamsList = keyof ConfigParams
@@ -495,6 +502,7 @@ export class Config implements ConfigParams, ParserConfig {
     useColumnIndex: false,
     useStats: false,
     useArrayArithmetic: false,
+    timeoutTime: 5000
   }
 
   /** @inheritDoc */
@@ -566,6 +574,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
+  /** @inheritDoc */
+  public readonly timeoutTime: number
   /**
    * Built automatically based on translation package.
    *
@@ -627,6 +637,7 @@ export class Config implements ConfigParams, ParserConfig {
       useColumnIndex,
       useRegularExpressions,
       useWildcards,
+      timeoutTime
     }: Partial<ConfigParams> = {},
   ) {
     this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
@@ -672,8 +683,10 @@ export class Config implements ConfigParams, ParserConfig {
     this.undoLimit = configValueFromParam(undoLimit, 'number', 'undoLimit')
     this.useRegularExpressions = configValueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
     this.useWildcards = configValueFromParam(useWildcards, 'boolean', 'useWildcards')
+    this.timeoutTime = configValueFromParam(timeoutTime, 'number', 'timeoutTime')
     this.matchWholeCell = configValueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
+    validateNumberToBeAtLeast(this.timeoutTime, 'timeoutTime', 0)
     this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
     validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')

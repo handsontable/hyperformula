@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FV', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FV(1,1)', '=FV(1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function FV', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FV(2%, 24, 100)', '=FV(2%, 24, 100, 400)', '=FV(2%, 24, 100, 400, 1)'],
     ])
 

@@ -51,7 +51,7 @@ export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: Hyper
   const config = Object.assign({}, defaultConfig, userConfig)
   const engineConfig = Object.assign({}, config.engineConfig, defaultEngineConfig)
 
-  const engine = HyperFormula.buildFromArray(sheet, engineConfig)
+  const [engine] = HyperFormula.buildFromArray(sheet, engineConfig)
 
   const statistics = measureCruds(engine, name, cruds)
 

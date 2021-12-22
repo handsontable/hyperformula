@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function POWER', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=POWER(101)'],
       ['=POWER(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function POWER', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=POWER(1, "foo")'],
       ['=POWER("bar", 4)'],
       ['=POWER("foo", "baz")'],
@@ -27,7 +27,7 @@ describe('Function POWER', () => {
   })
 
   it('should return 1 for 0^0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=POWER(0, 0)'],
     ])
 
@@ -35,7 +35,7 @@ describe('Function POWER', () => {
   })
 
   it('should return error for 0^N where N<0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=POWER(0, -2)'],
     ])
 
@@ -43,7 +43,7 @@ describe('Function POWER', () => {
   })
 
   it('should return error when result too large or too small', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=POWER(2, 1023)'],
       ['=POWER(2, 1024)'],
       ['=POWER(-2, 1023)'],
@@ -57,7 +57,7 @@ describe('Function POWER', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=POWER(0, 1)'],
       ['=POWER(2, 0)'],
       ['=POWER(2.4, 2.5)'],

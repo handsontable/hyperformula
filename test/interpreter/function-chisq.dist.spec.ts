@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CHISQ.DIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.DIST(1, 2)'],
       ['=CHISQ.DIST(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function CHISQ.DIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.DIST("foo", 2, TRUE())'],
       ['=CHISQ.DIST(1, "baz", TRUE())'],
       ['=CHISQ.DIST(1, 2, "abcd")'],
@@ -27,7 +27,7 @@ describe('Function CHISQ.DIST', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.DIST(1, 1, TRUE())'],
       ['=CHISQ.DIST(3, 2, TRUE())'],
     ])
@@ -37,7 +37,7 @@ describe('Function CHISQ.DIST', () => {
   })
 
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.DIST(1, 1, FALSE())'],
       ['=CHISQ.DIST(3, 2, FALSE())'],
     ])
@@ -47,7 +47,7 @@ describe('Function CHISQ.DIST', () => {
   })
 
   it('truncates second arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.DIST(1, 1.9, FALSE())'],
       ['=CHISQ.DIST(3, 2.9, FALSE())'],
     ])
@@ -57,7 +57,7 @@ describe('Function CHISQ.DIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHISQ.DIST(10, 0.999, FALSE())'],
     ])
 

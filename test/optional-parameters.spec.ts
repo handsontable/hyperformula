@@ -26,7 +26,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
 describe('Nonexistent metadata', () => {
   it('should work for function', () => {
     HyperFormula.getLanguage('enGB').extendFunctions({FOO: 'FOO'})
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=foo(1,2)'],
       ['=foo(,2)'],
       ['=foo( ,2)'],
@@ -46,7 +46,7 @@ describe('Nonexistent metadata', () => {
   })
 
   it('log fails with coerce to 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=LOG(10,)'],
     ])
 
@@ -54,7 +54,7 @@ describe('Nonexistent metadata', () => {
   })
 
   it('other function coerce EmptyValue', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DATE(,1,1900)'],
       ['=SUM(,1)'],
       ['=CONCATENATE(,"abcd")']

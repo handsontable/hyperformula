@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function COMPLEX', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMPLEX(1)'],
       ['=COMPLEX(1, 2, 3, 4)'],
     ])
@@ -14,7 +14,7 @@ describe('Function COMPLEX', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMPLEX("foo", 2)'],
       ['=COMPLEX(1, "bar")'],
     ])
@@ -24,7 +24,7 @@ describe('Function COMPLEX', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMPLEX(0, 0)'],
       ['=COMPLEX(0, 1)'],
       ['=COMPLEX(0, -1)'],
@@ -60,7 +60,7 @@ describe('Function COMPLEX', () => {
   })
 
   it('should work with third argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COMPLEX(1, 1, "i")'],
       ['=COMPLEX(1, 1, "j")'],
       ['=COMPLEX(1, 1, "k")'],

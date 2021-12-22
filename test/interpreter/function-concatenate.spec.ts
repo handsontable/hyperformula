@@ -5,19 +5,19 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function CONCATENATE', () => {
   it('validate arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=CONCATENATE()']])
+    const [engine] = HyperFormula.buildFromArray([['=CONCATENATE()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([['John', 'Smith', '=CONCATENATE(A1, B1)']])
+    const [engine] = HyperFormula.buildFromArray([['John', 'Smith', '=CONCATENATE(A1, B1)']])
 
     expect(engine.getCellValue(adr('C1'))).toEqual('JohnSmith')
   })
 
   it('propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0', '=FOOBAR()'],
       ['=CONCATENATE(4/0)'],
       ['=CONCATENATE(A1)'],
@@ -34,7 +34,7 @@ describe('function CONCATENATE', () => {
   })
 
   it('empty value is empty string', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['foo', '', 'bar', '=CONCATENATE(A1, B1, C1)'],
     ])
 
@@ -42,7 +42,7 @@ describe('function CONCATENATE', () => {
   })
 
   it('supports range values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['Topleft', 'Topright'],
       ['Bottomleft', 'Bottomright'],
       ['=CONCATENATE(A1:B2)'],
@@ -52,7 +52,7 @@ describe('function CONCATENATE', () => {
   })
 
   it('coerce to strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRUE()', '42', '=CONCATENATE(A1:B1)'],
       ['=TRUE()', '=42%', '=CONCATENATE(A2:B2)'],
     ])

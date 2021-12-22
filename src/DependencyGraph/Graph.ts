@@ -28,7 +28,9 @@ export class Graph<T> {
   /** Set with nodes in graph. */
   public nodes: Set<T> = new Set()
 
+  public dependencyIndexes: Map<T, number> = new Map()
   public specialNodes: Set<T> = new Set()
+  public specialNodesAsync: Map<T, T> = new Map()
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
   public infiniteRanges: Set<T> = new Set()
@@ -137,14 +139,21 @@ export class Graph<T> {
     this.edges.delete(node)
     this.nodes.delete(node)
     this.specialNodes.delete(node)
+    this.specialNodesAsync.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
     this.infiniteRanges.delete(node)
+    this.dependencyIndexes.delete(node)
+
     return this.removeDependencies(node)
   }
 
   public markNodeAsSpecial(node: T) {
     this.specialNodes.add(node)
+  }
+
+  public markNodeAsSpecialAsync(node: T) {
+    this.specialNodesAsync.set(node, node)
   }
 
   public markNodeAsSpecialRecentlyChanged(node: T) {
@@ -159,6 +168,10 @@ export class Graph<T> {
 
   public clearSpecialNodesRecentlyChanged() {
     this.specialNodesRecentlyChanged.clear()
+  }
+
+  public clearSpecialNodesAsync() {
+    this.specialNodesAsync.clear()
   }
 
   public markNodeAsInfiniteRange(node: T) {

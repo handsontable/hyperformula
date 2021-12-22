@@ -6,7 +6,7 @@ import {adr, colEnd, colStart} from './testUtils'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['42'],
     ])
 
@@ -16,7 +16,7 @@ describe('GraphBuilder', () => {
   })
 
   it('build sheet with simple string cell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['foo'],
     ])
 
@@ -26,7 +26,7 @@ describe('GraphBuilder', () => {
   })
 
   it('building for cell with null should give empty vertex', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [null, '=A1'],
     ])
 
@@ -35,7 +35,7 @@ describe('GraphBuilder', () => {
   })
 
   it('#buildGraph works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=A1:B1'],
     ])
@@ -50,7 +50,7 @@ describe('GraphBuilder', () => {
   })
 
   it('#buildGraph works with column ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=A:B'],
     ])
 
@@ -64,7 +64,7 @@ describe('GraphBuilder', () => {
   })
 
   it('#loadSheet - it should build graph with only one RangeVertex', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['=A1:B1'],
       ['=A1:B1'],
@@ -87,7 +87,7 @@ describe('GraphBuilder', () => {
   })
 
   it('build with range one row smaller', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '0'],
       ['3', '=A1:A2'],
       ['5', '=A1:A3'],
@@ -107,7 +107,7 @@ describe('GraphBuilder', () => {
   })
 
   it('#buildGraph should work even if range dependencies are empty', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '0', '=SUM(A1:B2)'],
     ])
 
@@ -124,7 +124,7 @@ describe('GraphBuilder', () => {
   })
 
   it("optimization doesn't work if smaller range is after bigger", () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '0'],
       ['3', '=A1:A3'],
       ['5', '=A1:A2'],

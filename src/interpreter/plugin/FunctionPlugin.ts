@@ -25,6 +25,7 @@ import {
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {
+  AsyncInterpreterValue,
   ExtendedNumber,
   FormatInfo,
   getRawValue,
@@ -74,9 +75,15 @@ export interface FunctionMetadata {
   /**
    * Engine.
    *
-   * If set to `true`, the function is volatile.
+   * If set to `true`, the function will be checked for an array size.
    */
   arraySizeMethod?: string,
+  /**
+   * Engine.
+   * 
+   * If set to `true`, the function will be treated as an async method.
+   */
+  isAsyncMethod?: boolean,
   /**
    * Engine.
    */
@@ -212,11 +219,16 @@ export interface FunctionArgument {
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
-
+export type AsyncPluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => AsyncInterpreterValue
 export type PluginArraySizeFunctionType = (ast: ProcedureAst, state: InterpreterState) => ArraySize
 
 export type FunctionPluginTypecheck<T> = {
-  [K in keyof T]: T[K] extends PluginFunctionType | PluginArraySizeFunctionType ? T[K] : never
+  [K in keyof T]: T[K] extends PluginFunctionType | PluginArraySizeFunctionType | AsyncPluginFunctionType ? T[K] : never
+}
+
+interface ArgCoercion {
+  argCoerceFailure: Maybe<CellError>,
+  coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[],
 }
 
 /**
@@ -251,7 +263,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
   }
 
   protected evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
-    return this.interpreter.evaluateAst(ast, state)
+    return this.interpreter.evaluateAst(ast, state)[0]
   }
 
   protected arraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
@@ -349,99 +361,95 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
   }
 
+  protected runAsyncFunction = async(
+    args: Ast[],
+    state: InterpreterState,
+    metadata: FunctionMetadata,
+    fn: (...arg: any) => Promise<InterpreterValue>,
+  ) => {
+    const coercedArgs = this.getValidatedArgs(args, state, metadata)
+
+    if (coercedArgs instanceof CellError) return coercedArgs
+
+    const { maxWidth, maxHeight, retArr } = coercedArgs
+
+    const valuesArray: InternalScalarValue[][] = []
+    const allPromises: Promise<InterpreterValue[]>[] = []
+    
+    retArr.forEach((row) => {
+      const rowPromise = new Promise<InterpreterValue[]>((resolve, reject) => {
+        const promises: Promise<InterpreterValue>[] = []
+
+        row.forEach(({ argCoerceFailure, coercedArguments }) => {
+          if (argCoerceFailure === undefined) {
+            promises.push(fn(...coercedArguments))
+          }
+        })
+
+        Promise.all(promises).then(resolve).catch(reject)
+      })
+
+      allPromises.push(rowPromise)
+    })
+
+    const intepreterValues = await Promise.all(allPromises)
+
+    for (const row of intepreterValues) {
+      const rowArr: InternalScalarValue[] = []
+
+      for (const value of row) {
+        const ret = this.returnNumberWrapper(value, metadata.returnNumberType)
+    
+        if (maxHeight === 1 && maxWidth === 1) {
+          return ret
+        }
+
+        if (ret instanceof SimpleRangeValue) {
+          throw 'Function returning array cannot be vectorized.'
+        }
+
+        rowArr.push(ret)
+      }
+      valuesArray.push(rowArr)
+    }
+
+    return SimpleRangeValue.onlyValues(valuesArray)
+  }
+
   protected runFunction = (
     args: Ast[],
     state: InterpreterState,
     metadata: FunctionMetadata,
     fn: (...arg: any) => InterpreterValue,
   ) => {
-    let argumentDefinitions: FunctionArgument[] = metadata.parameters!
-    let argValues: [InterpreterValue, boolean][]
+    const coercedArgs = this.getValidatedArgs(args, state, metadata)
 
-    if (metadata.expandRanges) {
-      argValues = this.listOfScalarValues(args, state)
-    } else {
-      argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
-    }
+    if (coercedArgs instanceof CellError) return coercedArgs
 
-    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < argValues.length &&
-      (argValues.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    argumentDefinitions = [...argumentDefinitions]
-    while (argumentDefinitions.length < argValues.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
-    }
+    const { maxWidth, maxHeight, retArr } = coercedArgs
 
-    let maxWidth = 1
-    let maxHeight = 1
-    if (!metadata.vectorizationForbidden && state.arraysFlag) {
-      for (let i = 0; i < argValues.length; i++) {
-        const [val] = argValues[i]
-        if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
-          maxHeight = Math.max(maxHeight, val.height())
-          maxWidth = Math.max(maxWidth, val.width())
-        }
-      }
-    }
+    const valuesArray: InternalScalarValue[][] = []
 
-    for (let i = argValues.length; i < argumentDefinitions.length; i++) {
-      if (argumentDefinitions[i]?.defaultValue === undefined) {
-        if (!argumentDefinitions[i]?.optionalArg) {
-          //not enough values passed as arguments, and there was no default value and argument was not optional
-          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-        }
-      }
-    }
-
-    const retArr: InternalScalarValue[][] = []
-    for (let row = 0; row < maxHeight; row++) {
+    for (const row of retArr) {
       const rowArr: InternalScalarValue[] = []
-      for (let col = 0; col < maxWidth; col++) {
-        let argCoerceFailure: Maybe<CellError> = undefined
-        const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
-        for (let i = 0; i < argumentDefinitions.length; i++) {
-          // eslint-disable-next-line prefer-const
-          let [val, ignorable] = argValues[i] ?? [undefined, undefined]
-          if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
-            if (!metadata.vectorizationForbidden && state.arraysFlag) {
-              val = val.data[val.height() !== 1 ? row : 0]?.[val.width() !== 1 ? col : 0]
-            }
-          }
-          const arg = val ?? argumentDefinitions[i]?.defaultValue
-          if (arg === undefined) {
-            coercedArguments.push(undefined) //we verified in previous loop that this arg is optional
-          } else {
-            //we apply coerce only to non-default values
-            const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[i], state) : arg
-            if (coercedArg !== undefined) {
-              if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== ArgumentTypes.SCALAR) {
-                //if this is first error encountered, store it
-                argCoerceFailure = argCoerceFailure ?? coercedArg
-              }
-              coercedArguments.push(coercedArg)
-            } else if (!ignorable) {
-              //if this is first error encountered, store it
-              argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
-            }
-          }
-        }
 
+      for (const { argCoerceFailure, coercedArguments } of row) {
         const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata.returnNumberType)
+    
         if (maxHeight === 1 && maxWidth === 1) {
           return ret
         }
+
         if (ret instanceof SimpleRangeValue) {
           throw 'Function returning array cannot be vectorized.'
         }
+
         rowArr.push(ret)
       }
-      retArr.push(rowArr)
+      valuesArray.push(rowArr)
     }
-    return SimpleRangeValue.onlyValues(retArr)
+
+    return SimpleRangeValue.onlyValues(valuesArray)
   }
 
   protected runFunctionWithReferenceArgument = (
@@ -488,6 +496,97 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       return params
     }
     throw new Error(`No metadata for function ${name}.`)
+  }
+
+  private getValidatedArgs = (
+    args: Ast[],
+    state: InterpreterState,
+    metadata: FunctionMetadata,
+  ) => {
+    let argumentDefinitions: FunctionArgument[] = metadata.parameters!
+    let argValues: [InterpreterValue, boolean][]
+
+    if (metadata.expandRanges) {
+      argValues = this.listOfScalarValues(args, state)
+    } else {
+      argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
+    }
+
+    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < argValues.length &&
+      (argValues.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+    argumentDefinitions = [...argumentDefinitions]
+    while (argumentDefinitions.length < argValues.length) {
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
+    }
+
+    let maxWidth = 1
+    let maxHeight = 1
+    if (!metadata.vectorizationForbidden && state.arraysFlag) {
+      for (let i = 0; i < argValues.length; i++) {
+        const [val] = argValues[i]
+        if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+          maxHeight = Math.max(maxHeight, val.height())
+          maxWidth = Math.max(maxWidth, val.width())
+        }
+      }
+    }
+
+    for (let i = argValues.length; i < argumentDefinitions.length; i++) {
+      if (argumentDefinitions[i]?.defaultValue === undefined) {
+        if (!argumentDefinitions[i]?.optionalArg) {
+          //not enough values passed as arguments, and there was no default value and argument was not optional
+          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+        }
+      }
+    }
+
+    const retArr: ArgCoercion[][] = []
+    for (let row = 0; row < maxHeight; row++) {
+      const rowArr: ArgCoercion[] = []
+      for (let col = 0; col < maxWidth; col++) {
+        let argCoerceFailure: Maybe<CellError> = undefined
+        const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
+        for (let i = 0; i < argumentDefinitions.length; i++) {
+          // eslint-disable-next-line prefer-const
+          let [val, ignorable] = argValues[i] ?? [undefined, undefined]
+          if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+            if (!metadata.vectorizationForbidden && state.arraysFlag) {
+              val = val.data[val.height() !== 1 ? row : 0]?.[val.width() !== 1 ? col : 0]
+            }
+          }
+          const arg = val ?? argumentDefinitions[i]?.defaultValue
+          if (arg === undefined) {
+            coercedArguments.push(undefined) //we verified in previous loop that this arg is optional
+          } else {
+            //we apply coerce only to non-default values
+            const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[i], state) : arg
+            if (coercedArg !== undefined) {
+              if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== ArgumentTypes.SCALAR) {
+                //if this is first error encountered, store it
+                argCoerceFailure = argCoerceFailure ?? coercedArg
+              }
+              coercedArguments.push(coercedArg)
+            } else if (!ignorable) {
+              //if this is first error encountered, store it
+              argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
+            }
+          }
+        }
+
+        rowArr.push({
+          argCoerceFailure,
+          coercedArguments
+        })
+      }
+      retArr.push(rowArr)
+    }
+
+    return { maxWidth, maxHeight, retArr}
   }
 
   private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {

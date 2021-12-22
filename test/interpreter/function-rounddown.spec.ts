@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ROUNDDOWN', () => {
   it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ROUNDDOWN()', '=ROUNDDOWN(1, 2, 3)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function ROUNDDOWN', () => {
   })
 
   it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ROUNDDOWN(1.3)', '=ROUNDDOWN(1.7)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function ROUNDDOWN', () => {
   })
 
   it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ROUNDDOWN(-1.3)', '=ROUNDDOWN(-1.7)'],
     ])
 
@@ -32,7 +32,7 @@ describe('Function ROUNDDOWN', () => {
   })
 
   it('works with positive rounding argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ROUNDDOWN(1.43, 1)', '=ROUNDDOWN(1.47, 1)'],
     ])
 
@@ -41,7 +41,7 @@ describe('Function ROUNDDOWN', () => {
   })
 
   it('works with negative rounding argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ROUNDDOWN(43, -1)', '=ROUNDDOWN(47, -1)'],
     ])
 
@@ -50,7 +50,7 @@ describe('Function ROUNDDOWN', () => {
   })
 
   it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ROUNDDOWN("42.3")'],
     ])
 
@@ -58,7 +58,7 @@ describe('Function ROUNDDOWN', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=ROUNDDOWN(A1)', '=ROUNDDOWN(42, A1)', '=ROUNDDOWN(A1, FOO())'],
     ])

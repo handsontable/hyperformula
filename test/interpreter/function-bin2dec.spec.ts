@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function BIN2DEC', () => {
   it('should work only for one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2DEC(101)'],
     ])
 
@@ -13,7 +13,7 @@ describe('function BIN2DEC', () => {
   })
 
   it('should not work for non-binary arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2DEC("foo")'],
       ['=BIN2DEC(1234)'],
       ['=BIN2DEC(TRUE())'],
@@ -25,7 +25,7 @@ describe('function BIN2DEC', () => {
   })
 
   it('should work only for 10 bits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2DEC(10101010101010)'],
       ['=BIN2DEC(1010101010)'],
     ])
@@ -35,7 +35,7 @@ describe('function BIN2DEC', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2DEC(1111111111)'],
       ['=BIN2DEC(1000000000)'],
       ['=BIN2DEC(111111111)'],
@@ -52,7 +52,7 @@ describe('function BIN2DEC', () => {
   })
 
   it('should work with references', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1101'],
       ['=BIN2DEC(A1)'],
     ])
@@ -61,7 +61,7 @@ describe('function BIN2DEC', () => {
   })
 
   it('should return numeric type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BIN2DEC(101)'],
     ])
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.NUMBER)

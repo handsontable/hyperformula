@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function OCT2HEX', () => {
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX("foo", 2, 3)'],
     ])
 
@@ -13,7 +13,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should not work for non-oct arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX("foo")'],
       ['=OCT2HEX(418)'],
       ['=OCT2HEX(TRUE())'],
@@ -25,7 +25,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX(1)'],
       ['=OCT2HEX(10)'],
       ['=OCT2HEX(71)'],
@@ -49,7 +49,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should work for strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX("456")'],
     ])
 
@@ -57,7 +57,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="123"'],
       ['=OCT2HEX(A1)'],
     ])
@@ -66,7 +66,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX(11)'],
     ])
 
@@ -74,7 +74,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should work only for 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX(31030220101)'],
       ['=OCT2HEX(7777777042)'],
     ])
@@ -84,7 +84,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX(12, 8)'],
       ['=OCT2HEX(3, "4")'],
     ])
@@ -94,7 +94,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should fail if the result is longer than the desired length', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX(12123, 2)'],
       ['=OCT2HEX(34141, "3")'],
     ])
@@ -104,7 +104,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('second argument should not affect negative results', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX(7777777042, 1)'],
       ['=OCT2HEX(7777777022, 10)'],
     ])
@@ -114,7 +114,7 @@ describe('function OCT2HEX', () => {
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2HEX(2, 0)'],
       ['=OCT2HEX(2, 12)'],
     ])

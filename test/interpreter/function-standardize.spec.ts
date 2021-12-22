@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function STANDARDIZE', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=STANDARDIZE(1, 2)'],
       ['=STANDARDIZE(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function STANDARDIZE', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=STANDARDIZE("foo", 1, 2)'],
       ['=STANDARDIZE(1, "foo", 2)'],
       ['=STANDARDIZE(1, 2, "foo")'],
@@ -27,7 +27,7 @@ describe('Function STANDARDIZE', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=STANDARDIZE(1, 2, 4)'],
     ])
 
@@ -35,7 +35,7 @@ describe('Function STANDARDIZE', () => {
   })
 
   it('should check bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=STANDARDIZE(1, 2, 0.001)'],
       ['=STANDARDIZE(1, 2, 0)'],
       ['=STANDARDIZE(1, 2, -0.001)'],

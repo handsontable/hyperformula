@@ -17,6 +17,8 @@ const dictionary: RawTranslationPackage = {
     REF: '#BAŞV!',
     SPILL: '#TAŞMA!',
     VALUE: '#DEĞER!',
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -410,7 +412,7 @@ const dictionary: RawTranslationPackage = {
   },
   langCode: 'trTR',
   ui: {
-    NEW_SHEET_PREFIX: 'Sheet',
+    NEW_SHEET_PREFIX: 'Sheet'
   },
 }
 

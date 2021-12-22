@@ -4,7 +4,7 @@ import {adr} from './testUtils'
 
 describe('vertex counting', () => {
   it('one-time formula', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
@@ -14,7 +14,7 @@ describe('vertex counting', () => {
   })
 
   it('cruds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
@@ -28,7 +28,7 @@ describe('vertex counting', () => {
 
 describe('range mapping', () => {
   it('one-time formula', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
@@ -38,7 +38,7 @@ describe('range mapping', () => {
   })
 
   it('cruds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4']
     ])
@@ -69,7 +69,7 @@ describe('larger tests', () => {
         '=SUM(B2:C3)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
+    const [engine] = HyperFormula.buildFromArray(arr)
     for (let x = 0; x < 3; x++) {
       for (let y = 0; y < 3; y++) {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
@@ -88,7 +88,7 @@ describe('larger tests', () => {
         '=SUM(A1:A2)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
+    const [engine] = HyperFormula.buildFromArray(arr)
     engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
@@ -102,7 +102,7 @@ describe('larger tests', () => {
         '=SUM(A1:B1)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
+    const [engine] = HyperFormula.buildFromArray(arr)
 
     engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
 
@@ -116,7 +116,7 @@ describe('larger tests', () => {
         null, '=SUM(A1:A1)', '=SUM(A1:A2)', '=SUM(A1:A3)', '=SUM(A1:A4)',
       ],
     ]
-    const engine = HyperFormula.buildFromArray(arr)
+    const [engine] = HyperFormula.buildFromArray(arr)
 
     engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
@@ -128,7 +128,7 @@ describe('larger tests', () => {
   })
 
   it('repeat the same crud', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     for (let tmp = 0; tmp < 3; tmp++) {
       for (let x = 0; x < 10; x++) {
         for (let y = 0; y < 10; y++) {
@@ -163,7 +163,7 @@ describe('larger tests', () => {
 
 describe('cruds', () => {
   it('should collect empty vertices when bigger range is no longer bind to smaller range #1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -180,7 +180,7 @@ describe('cruds', () => {
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -197,7 +197,7 @@ describe('cruds', () => {
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #3', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -213,7 +213,7 @@ describe('cruds', () => {
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #4', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -234,7 +234,7 @@ describe('cruds', () => {
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #5', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -255,7 +255,7 @@ describe('cruds', () => {
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #6', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1],
       [2],
       [3],
@@ -274,7 +274,7 @@ describe('cruds', () => {
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #7', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [],
       [],
       [],
@@ -297,7 +297,7 @@ describe('cruds', () => {
   })
 
   it('column adding', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [0, 0],
       [0, 0],
       [0, 0],
@@ -313,7 +313,7 @@ describe('cruds', () => {
   })
 
   it('movecell', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1],
       [2],
       [3],
@@ -334,7 +334,7 @@ describe('cruds', () => {
   })
 
   it('addColumns after addRows', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2', '=SUM($A$1:A1)'],
       ['3', '=SUM($A$1:A2)'],

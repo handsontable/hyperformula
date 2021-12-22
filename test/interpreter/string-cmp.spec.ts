@@ -3,7 +3,7 @@ import {adr} from '../testUtils'
 
 describe('string comparison', () => {
   it('comparison default', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['a', 'A', '=A1>B1'],
       ['aa', 'AA', '=A2>B2'],
       ['aA', 'aa', '=A3>B3'],
@@ -17,7 +17,7 @@ describe('string comparison', () => {
   })
 
   it('accents default', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['a', 'ä', '=A1>B1'],
       ['áá', 'ää', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
@@ -31,7 +31,7 @@ describe('string comparison', () => {
   })
 
   it('accents sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['Ą', 'ą', '=A1>B1'],
       ['ää', 'áá', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
@@ -45,7 +45,7 @@ describe('string comparison', () => {
   })
 
   it('accents+case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['Ą', 'ą', '=A1>B1'],
       ['áá', 'ää', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
@@ -59,7 +59,7 @@ describe('string comparison', () => {
   })
 
   it('accents+case sensitive, reverse order', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['Ą', 'ą', '=A1>B1'],
       ['áá', 'ää', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
@@ -73,7 +73,7 @@ describe('string comparison', () => {
   })
 
   it('accents lang', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['a', 'ä', '=A1>B1'],
       ['aa', 'ää', '=A2>B2'],
       ['ää', 'ĄĄ', '=A3>B3'],
@@ -87,7 +87,7 @@ describe('string comparison', () => {
   })
 
   it('comparison case sensitive', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['ą', 'A', '=A1>B1'],
       ['aa', 'AA', '=A2>B2'],
       ['aA', 'aa', '=A3>B3'],
@@ -101,7 +101,7 @@ describe('string comparison', () => {
   })
 
   it('comparison case sensitive, reverse order', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['ą', 'A', '=A1>B1'],
       ['aa', 'AA', '=A2>B2'],
       ['aA', 'aa', '=A3>B3'],
@@ -115,7 +115,7 @@ describe('string comparison', () => {
   })
 
   it('comparison ignore punctuation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['a', 'A,A,A', '=A1>B1'],
       ['aa', '...AA', '=A2>B2'],
       ['aA', ';;;;aa', '=A3>B3'],

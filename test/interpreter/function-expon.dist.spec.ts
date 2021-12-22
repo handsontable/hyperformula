@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function EXPON.DIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXPON.DIST(1, 2)'],
       ['=EXPON.DIST(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function EXPON.DIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXPON.DIST("foo", 2, TRUE())'],
       ['=EXPON.DIST(1, "baz", TRUE())'],
       ['=EXPON.DIST(1, 2, "abcd")'],
@@ -27,7 +27,7 @@ describe('Function EXPON.DIST', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXPON.DIST(1, 1, TRUE())'],
       ['=EXPON.DIST(3, 2, TRUE())'],
     ])
@@ -37,7 +37,7 @@ describe('Function EXPON.DIST', () => {
   })
 
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXPON.DIST(1, 1, FALSE())'],
       ['=EXPON.DIST(3, 2, FALSE())'],
     ])
@@ -47,7 +47,7 @@ describe('Function EXPON.DIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EXPON.DIST(0, 1, FALSE())'],
       ['=EXPON.DIST(-0.00001, 1, FALSE())'],
       ['=EXPON.DIST(1, 0, FALSE())'],

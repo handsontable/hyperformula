@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SYD', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SYD(1,1,1)', '=SYD(1, 1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function SYD', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SYD(100, 1, 2.1, 2)', '=SYD(100, 1, 2.1, 2.1)', '=SYD(100, 1, 2, 2.1)', '=SYD(100, 1, 2, 2)', ],
     ])
 

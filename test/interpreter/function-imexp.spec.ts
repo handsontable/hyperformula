@@ -4,7 +4,7 @@ import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMEXP', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMEXP()'],
       ['=IMEXP(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMEXP', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMEXP("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMEXP', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMEXP(0)'],
       ['=IMEXP("i")'],
       ['=IMEXP("-3+4i")'],

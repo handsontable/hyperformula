@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function YEAR', () => {
   it('validate arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEAR(1, 2)'],
       ['=YEAR()'],
       ['=YEAR("foo")'],
@@ -17,7 +17,7 @@ describe('Function YEAR', () => {
   })
 
   it('with numerical arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=YEAR(0)', '=YEAR(2)', '=YEAR(43465)']])
+    const [engine] = HyperFormula.buildFromArray([['=YEAR(0)', '=YEAR(2)', '=YEAR(43465)']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1899)
     expect(engine.getCellValue(adr('B1'))).toEqual(1900)
@@ -25,7 +25,7 @@ describe('Function YEAR', () => {
   })
 
   it('with string arguments', () => {
-    const engine = HyperFormula.buildFromArray([['=YEAR("31/12/1899")', '=YEAR("01/01/1900")', '=YEAR("31/12/2018")']])
+    const [engine] = HyperFormula.buildFromArray([['=YEAR("31/12/1899")', '=YEAR("01/01/1900")', '=YEAR("31/12/2018")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1899)
     expect(engine.getCellValue(adr('B1'))).toEqual(1900)
@@ -33,7 +33,7 @@ describe('Function YEAR', () => {
   })
 
   it('use datenumber coercion for 1st argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEAR(TRUE())'],
       ['=YEAR(1)'],
     ])
@@ -43,7 +43,7 @@ describe('Function YEAR', () => {
   })
 
   it('propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEAR(4/0)'],
     ])
 

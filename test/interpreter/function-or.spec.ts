@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function OR', () => {
   it('usage', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OR(TRUE())', '=OR(FALSE())', '=OR(FALSE(), TRUE(), FALSE())', '=OR("asdf")'],
     ])
 
@@ -16,7 +16,7 @@ describe('Function OR', () => {
   })
 
   it('use coercion #1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OR("TRUE", 0)'],
       ['=OR("foo", 0)'],
     ])
@@ -26,7 +26,7 @@ describe('Function OR', () => {
   })
 
   it('use coercion #2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OR(A4:B4)'],
       ['=OR(C4:D4)'],
       ['=OR(C4:D4, "foo")'],
@@ -39,7 +39,7 @@ describe('Function OR', () => {
   })
 
   it('function OR with numerical arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OR(1)', '=OR(0)', '=OR(FALSE(), 42)'],
     ])
 
@@ -49,7 +49,7 @@ describe('Function OR', () => {
   })
 
   it('function OR takes at least one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OR()'],
     ])
 
@@ -57,7 +57,7 @@ describe('Function OR', () => {
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '=4/0'],
       ['=FOOBAR()', '1'],
       ['=OR(A1:B2)'],
@@ -67,7 +67,7 @@ describe('Function OR', () => {
   })
 
   it('works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '0'],
       ['0', '1'],
       ['=OR(A1:B2)'],
@@ -77,7 +77,7 @@ describe('Function OR', () => {
   })
 
   it('is computed eagerly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['0', '1'],
       ['=OR(A1:B2)'],

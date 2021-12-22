@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Interpreter - function RAND', () => {
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=RAND()'],
     ])
 
@@ -14,7 +14,7 @@ describe('Interpreter - function RAND', () => {
   })
 
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=RAND(42)'],
     ])
 

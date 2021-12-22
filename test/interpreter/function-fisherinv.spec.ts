@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FISHERINV', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FISHERINV()'],
       ['=FISHERINV(1, 2)'],
     ])
@@ -15,7 +15,7 @@ describe('Function FISHERINV', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FISHERINV("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function FISHERINV', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FISHERINV(0)'],
       ['=FISHERINV(0.5)'],
       ['=FISHERINV(-5)'],

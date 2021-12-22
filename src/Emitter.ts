@@ -13,6 +13,7 @@ export enum Events {
   NamedExpressionAdded = 'namedExpressionAdded',
   NamedExpressionRemoved = 'namedExpressionRemoved',
   ValuesUpdated = 'valuesUpdated',
+  AsyncValuesUpdated = 'asyncValuesUpdated',
   EvaluationSuspended = 'evaluationSuspended',
   EvaluationResumed = 'evaluationResumed',
 }
@@ -235,6 +236,11 @@ export interface Listeners {
    * @category Values
    */
   valuesUpdated: (changes: ExportedChange[]) => any,
+
+  /**
+   * @category Values
+   */
+  asyncValuesUpdated: (changes: ExportedChange[]) => any,
 
   /**
    * Occurs when evaluation is suspended.

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CONFIDENCE.NORM', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(1, 2)'],
       ['=CONFIDENCE.NORM(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function CONFIDENCE.NORM', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM("foo", 2, 3)'],
       ['=CONFIDENCE.NORM(0.5, "baz", 3)'],
       ['=CONFIDENCE.NORM(0.5, 2, "abcd")'],
@@ -27,7 +27,7 @@ describe('Function CONFIDENCE.NORM', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(0.1, 1, 1)'],
       ['=CONFIDENCE.NORM(0.9, 10, 5)'],
     ])
@@ -37,7 +37,7 @@ describe('Function CONFIDENCE.NORM', () => {
   })
 
   it('should truncate third argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(0.1, 1, 1.9)'],
       ['=CONFIDENCE.NORM(0.9, 10, 5.9)'],
     ])
@@ -47,7 +47,7 @@ describe('Function CONFIDENCE.NORM', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CONFIDENCE.NORM(0.01, 0.01, 1)'],
       ['=CONFIDENCE.NORM(0, 0.01, 1)'],
       ['=CONFIDENCE.NORM(0.01, 0, 1)'],

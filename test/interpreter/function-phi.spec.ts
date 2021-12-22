@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function PHI', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PHI()'],
       ['=PHI(1, 2)'],
     ])
@@ -15,7 +15,7 @@ describe('Function PHI', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PHI("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function PHI', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PHI(-0.5)'],
       ['=PHI(0)'],
       ['=PHI(1)'],

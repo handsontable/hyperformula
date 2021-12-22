@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Unary operator MINUS', () => {
   it('works for obvious case', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=-3'],
     ])
 
@@ -13,7 +13,7 @@ describe('Unary operator MINUS', () => {
   })
 
   it('use number coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=-"3"'],
       ['=-"foobar"'],
     ])
@@ -23,7 +23,7 @@ describe('Unary operator MINUS', () => {
   })
 
   it('pass error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=-B1', '=FOOBAR()'],
       ['=-B2', '=1/0'],
 
@@ -34,7 +34,7 @@ describe('Unary operator MINUS', () => {
   })
 
   it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['9'],
       ['3'],
@@ -44,8 +44,8 @@ describe('Unary operator MINUS', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
-  it('double unary plus', () => {
-    const engine = HyperFormula.buildFromArray([
+  it('double unary minus', () => {
+    const [engine] = HyperFormula.buildFromArray([
       ['=--2'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(2)

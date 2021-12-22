@@ -51,7 +51,7 @@ import {
   NamedExpressions
 } from './NamedExpressions'
 import {NamedExpressionDependency, ParserWithCaching, RelativeDependency} from './parser'
-import {ParsingError} from './parser/Ast'
+import {ParsingError, Ast} from './parser/Ast'
 import {ParsingResult} from './parser/ParserWithCaching'
 import {findBoundaries, Sheet} from './Sheet'
 import {ColumnsSpan, RowsSpan} from './Span'
@@ -155,7 +155,7 @@ export interface MoveCellsResult {
 }
 
 export class Operations {
-  private changes: ContentChanges = ContentChanges.empty()
+  public changes: ContentChanges = ContentChanges.empty()
   private maxRows: number
   private maxColumns: number
 
@@ -556,6 +556,7 @@ export class Operations {
         this.setParsingErrorToCell(parsedCellContent.formula, errors, address)
       } else {
         const size = this.arraySizePredictor.checkArraySize(ast, address)
+
         this.setFormulaToCell(address, size, parserResult)
       }
     } else if (parsedCellContent instanceof CellContent.Empty) {
@@ -587,14 +588,22 @@ export class Operations {
     this.changes.addChange(vertex.getCellValue(), address)
   }
 
+  public setAsyncFormulaToCell(address: SimpleCellAddress, ast: Ast, formulaVertex: FormulaVertex) {
+    const parserResult = this.parser.fetchCachedResultForAst(ast)
+    const size = this.arraySizePredictor.checkArraySize(ast, address, formulaVertex)
+
+    this.setFormulaToCell(address, size, parserResult)
+  }
+
   public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
     ast,
     hasVolatileFunction,
     hasStructuralChangeFunction,
+    hasAsyncFunction,
     dependencies
   }: ParsingResult) {
     const oldValue = this.dependencyGraph.getCellValue(address)
-    const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
+    const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction)
     this.columnSearch.remove(getRawValue(oldValue), address)
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
@@ -626,6 +635,7 @@ export class Operations {
       ast,
       hasVolatileFunction,
       hasStructuralChangeFunction,
+      hasAsyncFunction,
       dependencies
     } = this.parser.fetchCachedResult(formulaHash)
     const absoluteDependencies = absolutizeDependencies(dependencies, address)
@@ -633,7 +643,7 @@ export class Operations {
     this.parser.rememberNewAst(cleanedAst)
     const cleanedDependencies = filterDependenciesOutOfScope(absoluteDependencies)
     const size = this.arraySizePredictor.checkArraySize(ast, address)
-    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction)
+    this.dependencyGraph.setFormulaToCell(address, cleanedAst, cleanedDependencies, size, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction)
   }
 
   /**
@@ -832,8 +842,8 @@ export class Operations {
       if (doesContainRelativeReferences(parsingResult.ast)) {
         throw new NoRelativeAddressesAllowedError()
       }
-      const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
+      const {ast, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction, dependencies} = parsingResult
+      this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction)
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.setCellEmpty(address)
     } else {
@@ -902,8 +912,8 @@ export class Operations {
       addedNamedExpressions.push(expression.normalizeExpressionName())
       if (sourceVertex instanceof FormulaCellVertex) {
         const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
-        const {ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies} = parsingResult
-        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
+        const {ast, hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction, dependencies} = parsingResult
+        this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction, hasAsyncFunction)
       } else if (sourceVertex instanceof EmptyCellVertex) {
         this.setCellEmpty(expression.address)
       } else if (sourceVertex instanceof ValueCellVertex) {

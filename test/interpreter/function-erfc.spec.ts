@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ERFC', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERFC()'],
       ['=ERFC(1, 2)'],
     ])
@@ -15,7 +15,7 @@ describe('Function ERFC', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERFC("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function ERFC', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERFC(0)'],
       ['=ERFC(2)'],
       ['=ERFC(0.5)'],
@@ -35,7 +35,7 @@ describe('Function ERFC', () => {
   })
 
   it('should work for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ERFC(-10.123)'],
       ['=ERFC(-14.8)'],
     ])

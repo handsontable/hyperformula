@@ -8,7 +8,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Text', () => {
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '2',
       '=TEXT(A1, "mm/dd/yyyy")',
     ]])
@@ -17,7 +17,7 @@ describe('Text', () => {
   })
 
   it('wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TEXT(42)'],
     ])
 
@@ -25,7 +25,7 @@ describe('Text', () => {
   })
 
   it('wrong format argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TEXT(2, 42)'],
       ['=TEXT(2, 0)'],
     ])
@@ -35,7 +35,7 @@ describe('Text', () => {
   })
 
   it('wrong date argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TEXT(TRUE(), "mm/dd/yyyy")'],
     ])
 
@@ -43,7 +43,7 @@ describe('Text', () => {
   })
 
   it('day formats', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "d d")',
       '=TEXT(A1, "dd DD")',
@@ -54,7 +54,7 @@ describe('Text', () => {
   })
 
   it('month formats', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "m M")',
       '=TEXT(A1, "mm MM")',
@@ -65,7 +65,7 @@ describe('Text', () => {
   })
 
   it('year formats', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "yy YY")',
       '=TEXT(A1, "yyyy YYYY")',
@@ -76,7 +76,7 @@ describe('Text', () => {
   })
 
   it('12 hours', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [
         '8/8/2018 14:00',
         '=TEXT(A1, "hh:mm A/P")',
@@ -98,7 +98,7 @@ describe('Text', () => {
   })
 
   it('24 hours', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [
         '8/8/2018 13:59',
         '=TEXT(A1, "HH:mm")',
@@ -108,7 +108,7 @@ describe('Text', () => {
   })
 
   it('padding', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [
         '8/8/2018 01:01:01', '=TEXT(A1, "H:m:s")',
       ],
@@ -121,7 +121,7 @@ describe('Text', () => {
   })
 
   it('fractions of seconds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [
         '0.0000011574074074074074', '=TEXT(A1, "hh:mm:ss.ss")',
       ],
@@ -132,7 +132,7 @@ describe('Text', () => {
   })
 
   it('distinguishes between months and minutes - not supported', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '=DATE(2018, 8, 8)',
       '=TEXT(A1, "mm")',
       '=TEXT(A1, "HH:mm")',
@@ -144,7 +144,7 @@ describe('Text', () => {
   })
 
   it('works for number format', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '12.45',
       '=TEXT(A1, "###.###")',
       '=TEXT(A1, "000.000")',
@@ -158,7 +158,7 @@ describe('Text', () => {
 
 describe('time duration', () => {
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0.1', '=TEXT(A1, "[hh]:mm:ss")'],
       ['1.1', '=TEXT(A2, "[hh]:mm:ss")', ],
       ['0.1', '=TEXT(A3, "[mm]:ss")', ],
@@ -186,7 +186,7 @@ describe('Custom date printing', () => {
   }
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '2',
       '=TEXT(A1, "mm/dd/yyyy")',
     ]], {stringifyDateTime: customPrintDate})
@@ -195,7 +195,7 @@ describe('Custom date printing', () => {
   })
 
   it('no effect for number format', () => {
-    const engine = HyperFormula.buildFromArray([[
+    const [engine] = HyperFormula.buildFromArray([[
       '12.45',
       '=TEXT(A1, "###.###")',
       '=TEXT(A1, "000.000")',
@@ -206,9 +206,9 @@ describe('Custom date printing', () => {
   })
 
   it('date printing, month and minutes', () => {
-    const enigne = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")'],
+    const [engine] = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")'],
       ['1.222', '=TEXT(A2, "mm-dd mm:ss.sssss")']])
-    expect(enigne.getCellValue(adr('B1'))).toEqual('12-31 24:00')
-    expect(enigne.getCellValue(adr('B2'))).toEqual('12-31 19:40.8')
+    expect(engine.getCellValue(adr('B1'))).toEqual('12-31 24:00')
+    expect(engine.getCellValue(adr('B2'))).toEqual('12-31 19:40.8')
   })
 })

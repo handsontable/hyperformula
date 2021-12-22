@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function EVEN', () => {
   it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EVEN()', '=EVEN(1, 2)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function EVEN', () => {
   })
 
   it('works for positive numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EVEN(0.3)', '=EVEN(1.7)'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function EVEN', () => {
   })
 
   it('works for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EVEN(-0.3)', '=EVEN(-1.7)'],
     ])
 
@@ -32,7 +32,7 @@ describe('Function EVEN', () => {
   })
 
   it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=EVEN("42.3")'],
     ])
 
@@ -40,7 +40,7 @@ describe('Function EVEN', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=EVEN(A1)'],
     ])

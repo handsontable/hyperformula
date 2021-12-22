@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ISNONTEXT', () => {
   it('should return false for text', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNONTEXT("abcd")', '=ISNONTEXT(A2)'],
       ['abcd'],
     ])
@@ -15,7 +15,7 @@ describe('Function ISNONTEXT', () => {
   })
 
   it('should return true for nontext', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNONTEXT(-0)', '=ISNONTEXT(A2)', '=ISNONTEXT(1<1)'],
       [null],
     ])
@@ -25,7 +25,7 @@ describe('Function ISNONTEXT', () => {
   })
 
   it('takes exactly one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ISNONTEXT(1, 2)', '=ISNONTEXT()'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -33,7 +33,7 @@ describe('Function ISNONTEXT', () => {
   })
 
   it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/1'],
       ['=4/0'],
       ['=4/2'],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ABS', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ABS(-1)', '=ABS(1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function ABS', () => {
   })
 
   it('given wrong argument type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ABS("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function ABS', () => {
   })
 
   it('use number coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="2"', '=ABS(A1)'],
       ['=TRUE()', '=ABS(A2)'],
     ])
@@ -32,7 +32,7 @@ describe('Function ABS', () => {
   })
 
   it('given wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ABS()'],
       ['=ABS(1, 2)'],
     ])
@@ -42,7 +42,7 @@ describe('Function ABS', () => {
   })
 
   it('errors propagation', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=ABS(4/0)'],
     ])
 

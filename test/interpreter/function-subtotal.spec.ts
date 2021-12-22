@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SUBTOTAL', () => {
   it('should calculate AVERAGE', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(1, A2:A4, A5)', '=SUBTOTAL(101, A2:A4, A5)'],
       [2],
       [3],
@@ -17,7 +17,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate COUNT', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(2, A2:A4, A5)', '=SUBTOTAL(102, A2:A4, A5)'],
       [2],
       ['foo'],
@@ -30,7 +30,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate COUNTA', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(3, A2:A4, A5)', '=SUBTOTAL(103, A2:A4, A5)'],
       [2],
       ['foo'],
@@ -43,7 +43,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calcuate MAX', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(4, A2:A4, A5)', '=SUBTOTAL(104, A2:A4, A5)'],
       [3],
       [5],
@@ -56,7 +56,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate MIN', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(5, A2:A4, A5)', '=SUBTOTAL(105, A2:A4, A5)'],
       [3],
       [5],
@@ -69,7 +69,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate PRODUCT', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(6, A2:A4, A5)', '=SUBTOTAL(106, A2:A4, A5)'],
       [3],
       [5],
@@ -82,7 +82,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate STDEV.S', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(7, A2:A4, A5)', '=SUBTOTAL(107, A2:A4, A5)'],
       [3],
       [5],
@@ -95,7 +95,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate STDEV.P', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(8, A2:A4, A5)', '=SUBTOTAL(108, A2:A4, A5)'],
       [3],
       [5],
@@ -108,7 +108,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate SUM', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(9, A2:A4, A5)', '=SUBTOTAL(109, A2:A4, A5)'],
       [3],
       [5],
@@ -121,7 +121,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate VAR.S', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(10, A2:A4, A5)', '=SUBTOTAL(110, A2:A4, A5)'],
       [3],
       [5],
@@ -134,7 +134,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should calculate VAR.P', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(11, A2:A4, A5)', '=SUBTOTAL(111, A2:A4, A5)'],
       [3],
       [5],
@@ -147,7 +147,7 @@ describe('Function SUBTOTAL', () => {
   })
 
   it('should return correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(12345, A2:A4, A5)'],
       [3],
       [5],
@@ -162,7 +162,7 @@ describe('Function SUBTOTAL', () => {
    * Inconsistency with ODFF standard.
    */
   it('does not ignore other SUBTOTALS', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUBTOTAL(9, A2:A4)'],
       ['=SUBTOTAL(9, B2:C2)', 1, 1],
       ['=SUBTOTAL(9, B3:C3)', 1, 1],

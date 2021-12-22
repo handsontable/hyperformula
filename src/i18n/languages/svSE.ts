@@ -17,6 +17,8 @@ const dictionary: RawTranslationPackage = {
     REF: '#REFERENS!',
     SPILL: '#SPILL!',
     VALUE: '#VÄRDEFEL!',
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -410,7 +412,7 @@ const dictionary: RawTranslationPackage = {
   },
   langCode: 'svSE',
   ui: {
-    NEW_SHEET_PREFIX: 'Sheet',
+    NEW_SHEET_PREFIX: 'Sheet'
   },
 }
 

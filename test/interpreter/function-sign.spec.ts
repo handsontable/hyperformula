@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SIGN', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SIGN()'],
       ['=SIGN(1, 2)'],
     ])
@@ -15,7 +15,7 @@ describe('Function SIGN', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SIGN("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function SIGN', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SIGN(5)'],
       ['=SIGN(0)'],
       ['=SIGN(-12.1)'],

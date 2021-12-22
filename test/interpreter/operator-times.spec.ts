@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Operator TIMES', () => {
   it('works for obvious case', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=8*3'],
     ])
 
@@ -13,7 +13,7 @@ describe('Operator TIMES', () => {
   })
 
   it('no -0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=(-12)*0'],
     ])
 
@@ -21,7 +21,7 @@ describe('Operator TIMES', () => {
   })
 
   it('use number coerce', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="8"*"3"'],
       ['="foobar"*1'],
     ])
@@ -31,7 +31,7 @@ describe('Operator TIMES', () => {
   })
 
   it('pass error from left operand', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A2*3'],
       ['=4/0'],
     ])
@@ -40,7 +40,7 @@ describe('Operator TIMES', () => {
   })
 
   it('pass error from right operand', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=3*A2'],
       ['=4/0'],
     ])
@@ -49,7 +49,7 @@ describe('Operator TIMES', () => {
   })
 
   it('pass error from left operand if both operands have error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=A2*B2'],
       ['=FOOBAR()', '=4/0'],
     ])
@@ -58,7 +58,7 @@ describe('Operator TIMES', () => {
   })
 
   it('range value results in VALUE error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=10 * A1:A3'],
       ['8', '=A1:A3 * 10'],
       ['3'],
@@ -71,7 +71,7 @@ describe('Operator TIMES', () => {
   })
 
   it('Times propagates errors correctly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)*2', '=2*(1/0)', '=(A1:B1)*(1/0)', '=(1/0)*(A1:B1)'],
     ])
 

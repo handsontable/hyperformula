@@ -58,7 +58,7 @@
     "compile:tests": "tsc --project tsconfig.test.json",
     "coverage": "npm run test:unit -- --coverage",
     "test": "npm-run-all lint test:unit test:browser",
-    "test:unit": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
+    "test:unit": "cross-env NODE_ICU_DATA=node_modules/full-icu jest async-functions.spec.ts",
     "test:unit.ci": "cross-env NODE_ICU_DATA=node_modules/full-icu node --expose-gc ./node_modules/jest/bin/jest --runInBand --logHeapUsage --forceExit",
     "test:browser": "cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js karma start",
     "test:browser.debug": "cross-env-shell BABEL_ENV=commonjs NODE_ENV=debug env-cmd -f ht.config.js karma start",

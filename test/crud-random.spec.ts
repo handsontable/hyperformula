@@ -209,7 +209,7 @@ function randomCleanup(engine: HyperFormula, rect: Rectangle) {
 
 describe('large psuedo-random test', () => {
   it('growing rectangle + addRows + addColumns + removeRows + removeColumns should produce the same sheet as static sheet', () => {
-    const engine = HyperFormula.buildFromArray([])
+    const [engine] = HyperFormula.buildFromArray([])
     let sideX = 3
     const n = 4
     let sideY = 3

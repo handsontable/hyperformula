@@ -10,6 +10,7 @@ import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
 import {Interpreter} from './Interpreter'
 import {
+  AsyncPluginFunctionType,
   FunctionMetadata,
   FunctionPlugin,
   FunctionPluginDefinition,
@@ -45,6 +46,7 @@ export class FunctionRegistry {
   private readonly instancePlugins: Map<string, FunctionPluginDefinition>
   private readonly functions: Map<string, [string, FunctionPlugin]> = new Map()
   private readonly arraySizeFunctions: Map<string, [string, FunctionPlugin]> = new Map()
+  private readonly asyncFunctions: Map<string, [string, FunctionPlugin]> = new Map()
   private readonly volatileFunctions: Set<string> = new Set()
   private readonly arrayFunctions: Set<string> = new Set()
   private readonly structuralChangeFunctions: Set<string> = new Set()
@@ -200,6 +202,10 @@ export class FunctionRegistry {
       if (arraySizeMethodName !== undefined) {
         this.arraySizeFunctions.set(functionId, [arraySizeMethodName, foundPluginInstance])
       }
+
+      if (metadata.isAsyncMethod) {
+        this.asyncFunctions.set(functionId, [methodName, foundPluginInstance])
+      }
     }
   }
 
@@ -214,7 +220,17 @@ export class FunctionRegistry {
     const pluginEntry = this.functions.get(functionId)
     if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
       const [pluginFunction, pluginInstance] = pluginEntry
-      return (ast, state) => (pluginInstance as any as Record<string, PluginFunctionType>)[pluginFunction](ast, state)
+      return (ast, state) => (pluginInstance as any as (Record<string, PluginFunctionType>))[pluginFunction](ast, state)
+    } else {
+      return undefined
+    }
+  }
+
+  public getAsyncFunction(functionId: string): Maybe<AsyncPluginFunctionType> {
+    const pluginEntry = this.asyncFunctions.get(functionId)
+    if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
+      const [pluginFunction, pluginInstance] = pluginEntry
+      return (ast, state) => (pluginInstance as any as (Record<string, AsyncPluginFunctionType>))[pluginFunction](ast, state)
     } else {
       return undefined
     }
@@ -253,6 +269,8 @@ export class FunctionRegistry {
   public isFunctionVolatile = (functionId: string): boolean => this.volatileFunctions.has(functionId)
 
   public isArrayFunction = (functionId: string): boolean => this.arrayFunctions.has(functionId)
+
+  public isAsyncFunction = (functionId: string): boolean => this.asyncFunctions.has(functionId)
 
   public isFunctionDependentOnSheetStructureChange = (functionId: string): boolean => this.structuralChangeFunctions.has(functionId)
 

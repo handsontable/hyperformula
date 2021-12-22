@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function BASE', () => {
   it('should return error when argument of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE("foo", 2, 3)'],
     ])
 
@@ -13,7 +13,7 @@ describe('function BASE', () => {
   })
 
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE("foo")'],
       ['=BASE("foo", 2, 3, 4)'],
     ])
@@ -23,7 +23,7 @@ describe('function BASE', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE(1, 2, 3)'],
       ['=BASE(2, 5)'],
       ['=BASE(23, "10")'],
@@ -43,7 +43,7 @@ describe('function BASE', () => {
   })
 
   it('should work for numeric strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE("123", 4)'],
       ['=BASE("1234", 16)'],
     ])
@@ -53,7 +53,7 @@ describe('function BASE', () => {
   })
 
   it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE(123, 2)'],
     ])
 
@@ -61,7 +61,7 @@ describe('function BASE', () => {
   })
 
   it('should respect third argument and fill with zeros', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE(2, 8, 3)'],
       ['=BASE(94862, "33", 16)'],
     ])
@@ -71,7 +71,7 @@ describe('function BASE', () => {
   })
 
   it('should return result as is if padding shorter than result', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE(123, 2, 5)'],
     ])
 
@@ -79,7 +79,7 @@ describe('function BASE', () => {
   })
 
   it('should return error for negative values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE(-2, 5)'],
     ])
 
@@ -87,7 +87,7 @@ describe('function BASE', () => {
   })
 
   it('should allow base from 2 to 36', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=BASE(2, 1)'],
       ['=BASE(2, 2)'],
       ['=BASE(2, 36)'],

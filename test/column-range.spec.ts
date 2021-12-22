@@ -4,7 +4,7 @@ import {adr, colEnd, colStart, extractColumnRange} from './testUtils'
 
 describe('Column ranges', () => {
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '=SUM(A:B)']
     ])
 
@@ -12,7 +12,7 @@ describe('Column ranges', () => {
   })
 
   it('should create correct edges for infinite range when building graph', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(C:D)', '=SUM(C5:D6)'],
     ])
 
@@ -30,7 +30,7 @@ describe('Column ranges', () => {
   })
 
   it('should create correct edges for infinite range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(C:E)'],
       ['=SUM(D:G)'],
     ])
@@ -58,7 +58,7 @@ describe('Column ranges', () => {
   })
 
   it('should clear column range set in graph when removing column', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(B:B)']
     ])
 
@@ -68,7 +68,7 @@ describe('Column ranges', () => {
   })
 
   it('should not move infinite range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2', '', '', '=SUM(A:B)']
     ])
     expect(engine.getCellValue(adr('E1'))).toEqual(3)

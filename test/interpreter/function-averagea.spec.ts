@@ -5,13 +5,13 @@ import {adr, detailedError} from '../testUtils'
 
 describe('AVERAGEA', () => {
   it('AVERAGEA with empty args', () => {
-    const engine = HyperFormula.buildFromArray([['=AVERAGEA()']])
+    const [engine] = HyperFormula.buildFromArray([['=AVERAGEA()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('AVERAGEA with args', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=AVERAGEA(1, B1)', '4']
     ])
 
@@ -19,7 +19,7 @@ describe('AVERAGEA', () => {
   })
 
   it('AVERAGEA with range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['4'],
@@ -30,7 +30,7 @@ describe('AVERAGEA', () => {
   })
 
   it('AVERAGEA converts non-blank values to numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['39', '="1"', '=AVERAGEA(A1:B1)'],
       ['39', '=TRUE()', '=AVERAGEA(A2:B2)'],
       ['39', null, '=AVERAGEA(A3:B3)'],
@@ -42,7 +42,7 @@ describe('AVERAGEA', () => {
   })
 
   it('error when no meaningful arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [null, 'foo'],
       [null, null],
       ['=AVERAGEA(A1:A2)', '=AVERAGEA(B1:B2)']
@@ -53,7 +53,7 @@ describe('AVERAGEA', () => {
   })
 
   it('over a range value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
       ['=AVERAGEA(MMULT(A1:B2, A1:B2))'],
@@ -63,7 +63,7 @@ describe('AVERAGEA', () => {
   })
 
   it('does propagate errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['=FOOBAR()', '4'],
       ['=AVERAGEA(A1:B2)'],

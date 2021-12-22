@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function PDURATION', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PDURATION(1,1)', '=PDURATION(1, 1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function PDURATION', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PDURATION(2%, 12, 24)'],
     ])
 
@@ -21,7 +21,7 @@ describe('Function PDURATION', () => {
   })
 
   it('should return proper error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=PDURATION(-1, 12, 24)'],
       ['=PDURATION(2%, -12, -24)'],
       ['=PDURATION(0, 1, 1)'],

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function RATE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=RATE(1,1)', '=RATE(1, 1, 1, 1, 1, 1, 1)'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function RATE', () => {
   })
 
   it('should calculate the correct value with correct arguments and defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=RATE(12, -100, 400)', ],
       ['=RATE(12, -100, 400, 100, 1)', ],
       ['=RATE(12, -100, 400, 1, 1)', ],

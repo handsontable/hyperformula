@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function FACTDOUBLE', () => {
   it('checks number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACTDOUBLE()', '=FACTDOUBLE(1, 2)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function FACTDOUBLE', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACTDOUBLE(0)'],
       ['=FACTDOUBLE(1)'],
       ['=FACTDOUBLE(10)'],
@@ -27,7 +27,7 @@ describe('Function FACTDOUBLE', () => {
   })
 
   it('rounds argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACTDOUBLE(0.9)'],
       ['=FACTDOUBLE(1.1)'],
       ['=FACTDOUBLE(10.42)'],
@@ -41,7 +41,7 @@ describe('Function FACTDOUBLE', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACTDOUBLE(-1)'],
       ['=FACTDOUBLE(289)'],
     ])
@@ -51,7 +51,7 @@ describe('Function FACTDOUBLE', () => {
   })
 
   it('uses coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACTDOUBLE("0")'],
     ])
 
@@ -59,7 +59,7 @@ describe('Function FACTDOUBLE', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FACTDOUBLE(NA())'],
     ])
 

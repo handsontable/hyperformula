@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.CONCAT', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.CONCAT(1)', '=HF.CONCAT(1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function HF.CONCAT', () => {
   })
 
   it('should calculate the correct value with correct defaults', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.CONCAT("hokuspokus","czarymary")'],
       ['=HF.CONCAT(,"a")'],
       ['=HF.CONCAT(,)']
@@ -25,7 +25,7 @@ describe('Function HF.CONCAT', () => {
   })
 
   it('should coerce to correct types', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.CONCAT(TRUE(),B1)'],
       ['=HF.CONCAT(1,)'],
     ])
@@ -35,7 +35,7 @@ describe('Function HF.CONCAT', () => {
   })
 
   it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.CONCAT(NA(),)'],
       ['=HF.CONCAT(B2:C2,)'],
     ])

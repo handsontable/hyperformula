@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function IMAGINARY', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMAGINARY()'],
       ['=IMAGINARY(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMAGINARY', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMAGINARY("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMAGINARY', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMAGINARY(0)'],
       ['=IMAGINARY("i")'],
       ['=IMAGINARY("-3+4i")'],

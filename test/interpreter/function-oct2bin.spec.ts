@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('function OCT2BIN', () => {
   it('should return error when wrong number of argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN("foo", 2, 3)'],
     ])
 
@@ -13,7 +13,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should not work for non-oct arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN("foo")'],
       ['=OCT2BIN(418)'],
       ['=OCT2BIN(TRUE())'],
@@ -25,7 +25,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(1)'],
       ['=OCT2BIN(10)'],
       ['=OCT2BIN(71)'],
@@ -45,7 +45,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should work for strings', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN("456")'],
     ])
 
@@ -53,7 +53,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should work for reference', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['="123"'],
       ['=OCT2BIN(A1)'],
     ])
@@ -62,7 +62,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should return string value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(11)'],
     ])
 
@@ -70,7 +70,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should work only for 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(10101010101010)'],
       ['=OCT2BIN(7777777042)'],
     ])
@@ -80,7 +80,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('result cannot be longer than 10 digits', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(1000)'],
       ['=OCT2BIN(7777776777)'],
     ])
@@ -90,7 +90,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(12, 8)'],
       ['=OCT2BIN(3, "4")'],
     ])
@@ -100,7 +100,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('second argument should not affect negative results', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(7777777042, 1)'],
       ['=OCT2BIN(7777777042, 10)'],
     ])
@@ -110,7 +110,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should fail if the result is longer than the desired length', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(12123, 2)'],
       ['=OCT2BIN(34141, "3")'],
     ])
@@ -120,7 +120,7 @@ describe('function OCT2BIN', () => {
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=OCT2BIN(2, 0)'],
       ['=OCT2BIN(2, 12)'],
     ])

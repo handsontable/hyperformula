@@ -6,7 +6,7 @@ import {adr, detailedError} from './testUtils'
 
 describe('update config', () => {
   it('simple reload preserves all values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']
     ])
@@ -20,7 +20,7 @@ describe('update config', () => {
     expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
   it('simple reload preserves formulas', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
       ['#DIV/0!', '=B2', '=F(']
     ])
@@ -33,7 +33,7 @@ describe('update config', () => {
   })
 
   it('simple reload preserves values', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1.00000000000001', '1', '=A1-B1'],
     ], {smartRounding: false})
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.00000000000001)
@@ -44,7 +44,7 @@ describe('update config', () => {
   })
   it('language reload', () => {
     HyperFormula.registerLanguage('plPL', plPL)
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=FOO()', '=SUM()', '=SUMA()', 'SUM()', '=SUM('],
     ])
     engine.updateConfig({language: 'plPL'})
@@ -57,7 +57,7 @@ describe('update config', () => {
   })
 
   it('simple reload preserves namedexpressions', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=TRUE', '=FALSE'],
     ])
     engine.addNamedExpression('TRUE', true)

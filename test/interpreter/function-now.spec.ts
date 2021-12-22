@@ -16,7 +16,7 @@ describe('Interpreter - function NOW', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NOW()'],
     ])
     const t1 = engine.getCellValue(adr('A1')) as number
@@ -28,42 +28,42 @@ describe('Interpreter - function NOW', () => {
   })
 
   it('works #2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEAR(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(1985)
   })
 
   it('works #3', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MONTH(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(8)
   })
 
   it('works #4', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=DAY(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(16)
   })
 
   it('works #5', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HOUR(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 
   it('works #6', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=MINUTE(NOW())'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(45)
   })
 
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NOW(42)'],
     ])
 

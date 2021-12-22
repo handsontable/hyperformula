@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function YEARFRAC', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEARFRAC(1, 2, 3, 4)'],
       ['=YEARFRAC(1)'],
     ])
@@ -15,7 +15,7 @@ describe('Function YEARFRAC', () => {
   })
 
   it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEARFRAC("foo", 1, TRUE())'],
       ['=YEARFRAC(2, "bar")'],
     ])
@@ -25,7 +25,7 @@ describe('Function YEARFRAC', () => {
   })
 
   it('US mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEARFRAC("30/03/2020", "31/03/2020")'],
       ['=YEARFRAC("28/02/2020", "29/02/2020")'],
       ['=YEARFRAC("29/02/2020", "01/03/2020")'],
@@ -47,7 +47,7 @@ describe('Function YEARFRAC', () => {
   })
 
   it('actual/actual mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEARFRAC("01/01/2020", "02/01/2020", 1)'],
       ['=YEARFRAC("01/01/2021", "02/01/2021", 1)'],
       ['=YEARFRAC("28/02/2020", "01/03/2020", 1)'],
@@ -73,7 +73,7 @@ describe('Function YEARFRAC', () => {
   })
 
   it('actual/360 mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEARFRAC("30/03/2020", "31/03/2020", 2)'],
       ['=YEARFRAC("28/02/2020", "29/02/2020", 2)'],
       ['=YEARFRAC("29/02/2020", "01/03/2020", 2)'],
@@ -91,7 +91,7 @@ describe('Function YEARFRAC', () => {
   })
 
   it('actual/365 mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEARFRAC("30/03/2020", "31/03/2020", 3)'],
       ['=YEARFRAC("28/02/2020", "29/02/2020", 3)'],
       ['=YEARFRAC("29/02/2020", "01/03/2020", 3)'],
@@ -109,7 +109,7 @@ describe('Function YEARFRAC', () => {
   })
 
   it('EU mode', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=YEARFRAC("30/03/2020", "31/03/2020", 4)'],
       ['=YEARFRAC("28/02/2020", "29/02/2020", 4)'],
       ['=YEARFRAC("29/02/2020", "01/03/2020", 4)'],

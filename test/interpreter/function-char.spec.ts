@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function CHAR', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHAR()'],
       ['=CHAR(1, 2)'],
     ])
@@ -15,7 +15,7 @@ describe('Function CHAR', () => {
   })
 
   it('should not work for wrong type of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHAR("foo")'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function CHAR', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHAR(1)'],
       ['=CHAR(33)'],
       ['=CHAR(65)'],
@@ -41,7 +41,7 @@ describe('Function CHAR', () => {
   })
 
   it('should round down floats', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHAR(42)'],
       ['=CHAR(42.2)'],
       ['=CHAR(42.8)'],
@@ -53,7 +53,7 @@ describe('Function CHAR', () => {
   })
 
   it('should work only for values from 1 to 255 truncating decimal part', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=CHAR(0)'],
       ['=CHAR(1)'],
       ['=CHAR(255)'],

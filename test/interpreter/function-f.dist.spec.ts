@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function F.DIST', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.DIST(1, 2, 3)'],
       ['=F.DIST(1, 2, 3, 4, 5)'],
     ])
@@ -15,7 +15,7 @@ describe('Function F.DIST', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.DIST("foo", 2, 3, TRUE())'],
       ['=F.DIST(1, "baz", 3, TRUE())'],
       ['=F.DIST(1, 2, "abcd", TRUE())'],
@@ -29,7 +29,7 @@ describe('Function F.DIST', () => {
   })
 
   it('should work as cdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.DIST(1, 1, 1, TRUE())'],
       ['=F.DIST(3, 2, 2, TRUE())'],
     ])
@@ -39,7 +39,7 @@ describe('Function F.DIST', () => {
   })
 
   it('should work as pdf', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.DIST(1, 1, 1, FALSE())'],
       ['=F.DIST(3, 2, 2, FALSE())'],
     ])
@@ -49,7 +49,7 @@ describe('Function F.DIST', () => {
   })
 
   it('truncates second and third arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.DIST(1, 1.9, 1, FALSE())'],
       ['=F.DIST(3, 2, 2.9, FALSE())'],
     ])
@@ -59,7 +59,7 @@ describe('Function F.DIST', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.DIST(0, 1, 1, FALSE())'],
       ['=F.DIST(-0.001, 1, 1, FALSE())'],
       ['=F.DIST(0, 0.999, 1, FALSE())'],

@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('T.TEST', () => {
   it('validates number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.TEST(1, 2, 3)'],
       ['=T.TEST(1, 2, 3, 4, 5)'],
     ])
@@ -14,7 +14,7 @@ describe('T.TEST', () => {
   })
 
   it('works for mode 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10],
       [2, 5],
       ['=T.TEST(A1:A2, B1:B2, 1, 1)']
@@ -24,7 +24,7 @@ describe('T.TEST', () => {
   })
 
   it('works for mode 2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10],
       [2, 5],
       ['=T.TEST(A1:A2, B1:B2, 1, 2)']
@@ -34,7 +34,7 @@ describe('T.TEST', () => {
   })
 
   it('works for mode 3', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10],
       [2, 5],
       ['=T.TEST(A1:A2, B1:B2, 1, 3)']
@@ -44,7 +44,7 @@ describe('T.TEST', () => {
   })
 
   it('works for larger ranges for mode 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, 8],
       ['=T.TEST(A1:F1, A2:F2, 2, 1)']
@@ -54,7 +54,7 @@ describe('T.TEST', () => {
   })
 
   it('works for larger ranges for mode 2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, 8],
       ['=T.TEST(A1:F1, A2:F2, 2, 2)']
@@ -64,7 +64,7 @@ describe('T.TEST', () => {
   })
 
   it('works for larger ranges for mode 3', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, 1, 1, 4, 8],
       ['=T.TEST(A1:F1, A2:F2, 2, 3)']
@@ -74,7 +74,7 @@ describe('T.TEST', () => {
   })
 
   it('validates range length for mode 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3],
       [2, 5, 1, 1, 4, 8],
       ['=T.TEST(A1:E1, A2:F2, 1, 1)']
@@ -84,7 +84,7 @@ describe('T.TEST', () => {
   })
 
   it('works for distinct length ranges for mode 2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3],
       [2, 5, 1, 1, 4, 8],
       ['=T.TEST(A1:E1, A2:F2, 1, 2)']
@@ -94,7 +94,7 @@ describe('T.TEST', () => {
   })
 
   it('works for distinct length ranges for mode 3', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3],
       [2, 5, 1, 1, 4, 8],
       ['=T.TEST(A1:E1, A2:F2, 1, 3)']
@@ -104,7 +104,7 @@ describe('T.TEST', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped for mode 1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3],
       [2, 5, null, 1, 4, 8],
       ['=T.TEST(A1:E1, A2:F2, 1, 1)']
@@ -114,7 +114,7 @@ describe('T.TEST', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped for mode 2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, null, 1, 4, 8],
       ['=T.TEST(A1:F1, A2:F2, 1, 2)']
@@ -124,7 +124,7 @@ describe('T.TEST', () => {
   })
 
   it('doesnt do coercions, nonnumeric values are skipped for mode 3', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       [1, 10, 1, 1, 3, 7],
       [2, 5, null, 1, 4, 8],
       ['=T.TEST(A1:F1, A2:F2, 1, 3)']
@@ -134,7 +134,7 @@ describe('T.TEST', () => {
   })
 
   it('propagates errors', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '10'],
       ['=NA()', '50'],
       ['3', '30'],
@@ -145,7 +145,7 @@ describe('T.TEST', () => {
   })
 
   it('error when not enough data', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=T.TEST(1, 2, 1, 1)'],
     ])
 

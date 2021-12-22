@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function QUOTIENT', () => {
   it('should not work for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=QUOTIENT(101)'],
       ['=QUOTIENT(1, 2, 3)'],
     ])
@@ -15,7 +15,7 @@ describe('Function QUOTIENT', () => {
   })
 
   it('should not work for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=QUOTIENT(1, "foo")'],
       ['=QUOTIENT("bar", 4)'],
       ['=QUOTIENT("foo", "baz")'],
@@ -27,7 +27,7 @@ describe('Function QUOTIENT', () => {
   })
 
   it('should return error when dividing by 0', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=QUOTIENT(42, 0)'],
     ])
 
@@ -35,7 +35,7 @@ describe('Function QUOTIENT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=QUOTIENT(5, 2)'],
       ['=QUOTIENT(36, 6.1)'],
       ['=QUOTIENT(10.5, 3)'],
@@ -47,7 +47,7 @@ describe('Function QUOTIENT', () => {
   })
 
   it('should work for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=QUOTIENT(-5, 2)'],
       ['=QUOTIENT(5, -2)'],
       ['=QUOTIENT(-5, -2)'],

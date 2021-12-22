@@ -17,6 +17,8 @@ const dictionary: RawTranslationPackage = {
     REF: '#RIF!',
     SPILL: '#ESPANSIONE!',
     VALUE: '#VALORE!',
+    TIMEOUT: '#TIMEOUT!',
+    LOADING: 'Loading...'
   },
   functions: {
     FILTER: 'FILTER',
@@ -410,7 +412,7 @@ const dictionary: RawTranslationPackage = {
   },
   langCode: 'itIT',
   ui: {
-    NEW_SHEET_PREFIX: 'Sheet',
+    NEW_SHEET_PREFIX: 'Sheet'
   },
 }
 

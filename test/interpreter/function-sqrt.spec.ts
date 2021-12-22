@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SQRT', () => {
   it('should return error for negative numbers', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SQRT(-2)'],
       ['=SQRT(-2)+1']
     ])
@@ -15,7 +15,7 @@ describe('Function SQRT', () => {
   })
 
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SQRT()'],
       ['=SQRT(1, 2)'],
     ])
@@ -25,7 +25,7 @@ describe('Function SQRT', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SQRT("foo")'],
     ])
 
@@ -33,7 +33,7 @@ describe('Function SQRT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SQRT(0)'],
       ['=SQRT(16)'],
       ['=SQRT(2)'],

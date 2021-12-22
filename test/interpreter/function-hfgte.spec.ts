@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function HF.GTE', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.GTE(1)', '=HF.GTE(1, 1, 1)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function HF.GTE', () => {
   })
 
   it('should calculate the correct value', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.GTE(1,0)'],
       ['=HF.GTE(1,1)'],
       ['=HF.GTE("1","0")'],
@@ -45,7 +45,7 @@ describe('Function HF.GTE', () => {
   })
 
   it('should throw correct error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=HF.GTE(NA(),)'],
       ['=HF.GTE(B2:C2,)'],
     ])

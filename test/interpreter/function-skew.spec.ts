@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function SKEW', () => {
   it('simple case', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SKEW(1, 2, 4, 8)'],
     ])
 
@@ -13,7 +13,7 @@ describe('Function SKEW', () => {
   })
 
   it('works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '9', '0', '10'],
       ['=SKEW(A1:D1)'],
     ])
@@ -22,7 +22,7 @@ describe('Function SKEW', () => {
   })
 
   it('propagates error from regular argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NA()', '=SKEW(A1)'],
     ])
 
@@ -30,7 +30,7 @@ describe('Function SKEW', () => {
   })
 
   it('propagates first error from range argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NA()', '=FOO(', '=SKEW(A1:B1)'],
     ])
 
@@ -41,7 +41,7 @@ describe('Function SKEW', () => {
    * product #1 does not coerce the input
    */
   it('does coercions of nonnumeric explicit arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SKEW(TRUE(),FALSE(),)']
     ])
 
@@ -49,7 +49,7 @@ describe('Function SKEW', () => {
   })
 
   it('ignores nonnumeric values in ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SKEW(A2:F2)'],
       [1, 0, 0, false, null, '\'0']
     ])
@@ -58,7 +58,7 @@ describe('Function SKEW', () => {
   })
 
   it('validates range size', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SKEW(0,0)'],
     ])
 

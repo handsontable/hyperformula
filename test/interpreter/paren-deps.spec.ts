@@ -3,7 +3,7 @@ import {adr} from '../testUtils'
 
 describe('dependencies with parenthesis', () => {
   it('should be collected when required', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(1)'],
       ['=(A1)+((A3))'],
       ['=SUM(1)'],
@@ -12,7 +12,7 @@ describe('dependencies with parenthesis', () => {
   })
 
   it('should not build ref for special function', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=COLUMN((((A1))))']
     ])
 

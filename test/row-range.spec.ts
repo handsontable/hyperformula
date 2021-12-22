@@ -3,7 +3,7 @@ import {adr, rowEnd, rowStart} from './testUtils'
 
 describe('Row ranges', () => {
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=SUM(1:2)']
@@ -13,7 +13,7 @@ describe('Row ranges', () => {
   })
 
   it('should create correct edges for infinite range when building graph', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(3:4)'],
       ['=SUM(C3:D4)'],
     ])
@@ -32,7 +32,7 @@ describe('Row ranges', () => {
   })
 
   it('should create correct edges for infinite range', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=SUM(3:5)'],
       ['=SUM(4:7)'],
     ])

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function NOT', () => {
   it('number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NOT()', '=NOT(TRUE(), TRUE())'],
     ])
 
@@ -14,7 +14,7 @@ describe('Function NOT', () => {
   })
 
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NOT(TRUE())', '=NOT(FALSE())'],
     ])
 
@@ -23,7 +23,7 @@ describe('Function NOT', () => {
   })
 
   it('use coercion', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=NOT("FALSE")'],
     ])
 
@@ -31,7 +31,7 @@ describe('Function NOT', () => {
   })
 
   it('propagates error', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=4/0'],
       ['=NOT(A1)'],
     ])

@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function F.INV.RT', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.INV.RT(1, 2)'],
       ['=F.INV.RT(1, 2, 3, 4)'],
     ])
@@ -15,7 +15,7 @@ describe('Function F.INV.RT', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.INV.RT("foo", 2, 3)'],
       ['=F.INV.RT(1, "baz", 3)'],
       ['=F.INV.RT(1, 2, "bar")'],
@@ -27,7 +27,7 @@ describe('Function F.INV.RT', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.INV.RT(0.1, 1, 1)'],
       ['=F.INV.RT(0.9, 2, 2)'],
     ])
@@ -37,7 +37,7 @@ describe('Function F.INV.RT', () => {
   })
 
   it('truncates second and third arg', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.INV.RT(0.1, 1.9, 1)'],
       ['=F.INV.RT(0.9, 2, 2.9)'],
     ])
@@ -47,7 +47,7 @@ describe('Function F.INV.RT', () => {
   })
 
   it('checks bounds', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=F.INV.RT(0.5, 0.999, 1)'],
       ['=F.INV.RT(0.5, 1, 0.999)'],
       ['=F.INV.RT(-0.0001, 2, 1)'],

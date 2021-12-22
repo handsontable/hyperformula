@@ -4,7 +4,7 @@ import {adr, detailedError, expectToBeCloseForComplex} from '../testUtils'
 
 describe('Function IMLOG10', () => {
   it('should return error for wrong number of arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMLOG10()'],
       ['=IMLOG10(1, 2)'],
     ])
@@ -14,7 +14,7 @@ describe('Function IMLOG10', () => {
   })
 
   it('should return error for arguments of wrong type', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMLOG10("foo")'],
     ])
 
@@ -22,7 +22,7 @@ describe('Function IMLOG10', () => {
   })
 
   it('should work', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=IMLOG10(0)'],
       ['=IMLOG10("i")'],
       ['=IMLOG10("-3+4i")'],

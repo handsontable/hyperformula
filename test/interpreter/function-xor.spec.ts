@@ -5,7 +5,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function XOR', () => {
   it('works', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=XOR(TRUE(), TRUE())'],
       ['=XOR(TRUE(), FALSE())'],
       ['=XOR(FALSE(), TRUE())'],
@@ -19,7 +19,7 @@ describe('Function XOR', () => {
   })
 
   it('at least one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=XOR()'],
     ])
 
@@ -27,7 +27,7 @@ describe('Function XOR', () => {
   })
 
   it('for one argument', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=XOR(TRUE())'],
       ['=XOR(FALSE())'],
     ])
@@ -37,7 +37,7 @@ describe('Function XOR', () => {
   })
 
   it('use coercion #1', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=XOR("TRUE")'],
       ['=XOR(1)'],
       ['=XOR(1, "foo")'],
@@ -49,7 +49,7 @@ describe('Function XOR', () => {
   })
 
   it('use coercion #2', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=XOR(A4:B4)'],
       ['=XOR(C4:D4)'],
       ['=XOR(C4:D4, "foo")'],
@@ -62,7 +62,7 @@ describe('Function XOR', () => {
   })
 
   it('when no coercible to number arguments', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=XOR("foo")'],
     ])
 
@@ -70,7 +70,7 @@ describe('Function XOR', () => {
   })
 
   it('returns TRUE iff odd number of TRUEs present', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['=XOR(TRUE(), TRUE(), TRUE())'],
       ['=XOR(TRUE(), TRUE(), TRUE(), TRUE())'],
       ['=XOR(TRUE(), TRUE(), TRUE(), TRUE(), TRUE())'],
@@ -82,7 +82,7 @@ describe('Function XOR', () => {
   })
 
   it('if error in range found, returns first one in row-by-row order', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '=4/0'],
       ['=FOOBAR()', '1'],
       ['=XOR(A1:B2)'],
@@ -92,7 +92,7 @@ describe('Function XOR', () => {
   })
 
   it('works with ranges', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['0', '0'],
       ['0', '1'],
       ['=XOR(A1:B2)'],
@@ -102,7 +102,7 @@ describe('Function XOR', () => {
   })
 
   it('is computed eagerly', () => {
-    const engine = HyperFormula.buildFromArray([
+    const [engine] = HyperFormula.buildFromArray([
       ['1', '=4/0'],
       ['0', '1'],
       ['=XOR(A1:B2)'],
