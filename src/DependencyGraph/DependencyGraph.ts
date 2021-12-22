@@ -241,14 +241,11 @@ export class DependencyGraph {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
         return rangeVertex
-       // setVertexDependencyIndex(rangeVertex)
       } else if (dep instanceof NamedExpressionDependency) {
         const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
         const namedExpressionVertex = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
       
         this.graph.addEdge(namedExpressionVertex, endVertex)
-
-       // setVertexDependencyIndex(namedExpressionVertex)
        return namedExpressionVertex
       } else {
         const depVertex = this.fetchCellOrCreateEmpty(dep)
@@ -256,7 +253,6 @@ export class DependencyGraph {
         this.graph.addEdge(depVertex, endVertex)
 
         return depVertex
-      //  setVertexDependencyIndex(depVertex)
       }
     })
 
