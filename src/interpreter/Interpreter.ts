@@ -7,6 +7,7 @@ import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../Absol
 import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
 import {CellError, ErrorType, invalidSimpleCellAddress, withTimeout} from '../Cell'
+import { CellContentParser } from '../CellContentParser'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
@@ -58,9 +59,10 @@ export class Interpreter {
     private readonly namedExpressions: NamedExpressions,
     public readonly serialization: Serialization,
     public readonly arraySizePredictor: ArraySizePredictor,
-    public readonly dateTimeHelper: DateTimeHelper
+    public readonly dateTimeHelper: DateTimeHelper,
+    public readonly cellContentParser: CellContentParser
   ) {
-    this.functionRegistry.initializePlugins(this)
+    this.functionRegistry.initializePlugins(this, cellContentParser)
     this.criterionBuilder = new CriterionBuilder(config)
   }
 
