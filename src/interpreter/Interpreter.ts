@@ -126,10 +126,9 @@ export class Interpreter {
         const cell = this.dependencyGraph.getCell(address)
         const cellValue = this.dependencyGraph.getCellValue(address)
 
-        if (cell instanceof FormulaVertex && cell.getPromise) {
+        if (cell instanceof FormulaVertex ) {
           const asyncPromiseVertex = {
             asyncVertex: cell,
-            getPromise: cell.getPromise
           }
 
           return [cellValue, asyncPromiseVertex]
@@ -229,6 +228,11 @@ export class Interpreter {
           if (pluginFunction === undefined) {
             return [cellError]
           }
+
+          // if (state.formulaVertex?.isComputed()) {
+          //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          //   return [interpreterState.formulaVertex!.getCellValue()]
+          // }
 
           const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
             const pluginFunctionValue = pluginFunction(ast, interpreterState)
@@ -580,7 +584,10 @@ export class Interpreter {
       const promise2 = getPromise2()
 
       Promise.all([promise1, promise2]).then(([leftValue, rightValue]) => {
-        const interpreterValue = getValue(leftValue ?? arg1[0], rightValue ?? arg2[0])
+        const arg1AsyncVertex = arg1[1]?.asyncVertex as FormulaVertex | undefined
+        const arg2AsyncVertex = arg2[1]?.asyncVertex as FormulaVertex | undefined
+
+        const interpreterValue = getValue(leftValue ?? arg1AsyncVertex?.getCellValue() ?? arg1[0], rightValue ?? arg2AsyncVertex?.getCellValue() ?? arg2[0])
 
         resolve(interpreterValue)
       }).catch(reject)

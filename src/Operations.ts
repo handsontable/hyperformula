@@ -592,7 +592,7 @@ export class Operations {
     const parserResult = this.parser.fetchCachedResultForAst(ast)
     const size = this.arraySizePredictor.checkArraySize(ast, address, formulaVertex)
 
-    this.setFormulaToCell(address, size, false, parserResult)
+    this.setFormulaToCell(address, size, true, parserResult)
   }
 
   public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, markNodeAsSpecialRecentlyChanged: boolean, {

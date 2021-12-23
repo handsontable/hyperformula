@@ -161,6 +161,29 @@ describe('async functions', () => {
       expect(engine.getSheetValues(0)).toEqual([[1, 7]])
     })
 
+    it('nested cell reference op', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([
+        ['=ASYNC_FOO() / 10'],
+        ['=A1+1']
+      ])
+    
+      await promise
+  
+      expect(engine.getSheetValues(0)).toEqual([[.1], [1.1]])
+    })
+
+    it('async functions operations on dependent async value', async() => {
+      const [engine, promise] = HyperFormula.buildFromArray([[
+        '=ASYNC_FOO()', '=ASYNC_FOO()+A1'
+      ]])
+  
+      await promise
+  
+      expect(engine.getSheetValues(0)).toEqual([[
+        1, 2
+      ]])
+    })  
+
     it('unary minus op', async() => {
       const [engine, promise] = HyperFormula.buildFromArray([
         [1, '=-ASYNC_FOO()'],
@@ -273,18 +296,6 @@ describe('async functions', () => {
     ])
 
     expect(engine.getSheetValues(0)).toEqual([[1, '1 longAsyncFoo']])
-  })
-
-   it('works with async value operations on dependent async value', async() => {
-    const [engine, promise] = HyperFormula.buildFromArray([[
-      '=ASYNC_FOO()', '=ASYNC_FOO()+A1'
-    ]])
-
-    await promise
-
-    expect(engine.getSheetValues(0)).toEqual([[
-      1, 2
-    ]])
   })
 
   it('works with multiple async functions one after another', async() => {
