@@ -126,7 +126,7 @@ export class Interpreter {
         const cell = this.dependencyGraph.getCell(address)
         const cellValue = this.dependencyGraph.getCellValue(address)
 
-        if (cell instanceof FormulaVertex && cell.asyncResolveIndex !== -1) {
+        if (cell instanceof FormulaVertex && cell.getPromise) {
           const asyncPromiseVertex = {
             asyncVertex: cell,
             getPromise: cell.getPromise
