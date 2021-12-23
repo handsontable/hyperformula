@@ -141,7 +141,7 @@ export const buildNumberAst = (
 ): NumberAst => ({
   type: AstNodeType.NUMBER,
   value: value,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -155,7 +155,7 @@ export const buildStringAst = (token: IExtendedToken): StringAst => ({
   type: AstNodeType.STRING,
   value: token.image.slice(1, -1),
   leadingWhitespace: token.leadingWhitespace?.image,
-  startOffset: token.startOffset,
+  startOffset: token.leadingWhitespace?.startOffset ?? token.startOffset,
   endOffset: token.endOffset,
 })
 
@@ -170,7 +170,6 @@ export const buildCellReferenceAst = (
 ): CellReferenceAst => ({
   type: AstNodeType.CELL_REFERENCE,
   reference,
-
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -262,7 +261,7 @@ export const buildConcatenateOpAst = (
   type: AstNodeType.CONCATENATE_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -281,7 +280,7 @@ export const buildEqualsOpAst = (
   type: AstNodeType.EQUALS_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -300,7 +299,7 @@ export const buildNotEqualOpAst = (
   type: AstNodeType.NOT_EQUAL_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -319,7 +318,7 @@ export const buildGreaterThanOpAst = (
   type: AstNodeType.GREATER_THAN_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -338,7 +337,7 @@ export const buildLessThanOpAst = (
   type: AstNodeType.LESS_THAN_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -357,7 +356,7 @@ export const buildGreaterThanOrEqualOpAst = (
   type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -376,7 +375,7 @@ export const buildLessThanOrEqualOpAst = (
   type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -395,7 +394,7 @@ export const buildPlusOpAst = (
   type: AstNodeType.PLUS_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -414,7 +413,7 @@ export const buildMinusOpAst = (
   type: AstNodeType.MINUS_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -433,7 +432,7 @@ export const buildTimesOpAst = (
   type: AstNodeType.TIMES_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -452,7 +451,7 @@ export const buildDivOpAst = (
   type: AstNodeType.DIV_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -471,7 +470,7 @@ export const buildPowerOpAst = (
   type: AstNodeType.POWER_OP,
   left,
   right,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -489,7 +488,7 @@ export const buildMinusUnaryOpAst = (
 ): MinusUnaryOpAst => ({
   type: AstNodeType.MINUS_UNARY_OP,
   value,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -507,7 +506,7 @@ export const buildPlusUnaryOpAst = (
 ): PlusUnaryOpAst => ({
   type: AstNodeType.PLUS_UNARY_OP,
   value,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -525,7 +524,7 @@ export const buildPercentOpAst = (
 ): PercentOpAst => ({
   type: AstNodeType.PERCENT_OP,
   value,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -547,7 +546,7 @@ export const buildProcedureAst = (
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
   args,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
   internalWhitespace: internalWhitespace?.image,
@@ -582,7 +581,7 @@ export const buildNamedExpressionAst = (
 ): NamedExpressionAst => ({
   type: AstNodeType.NAMED_EXPRESSION,
   expressionName,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
@@ -601,7 +600,7 @@ export const buildParenthesisAst = (
 ): ParenthesisAst => ({
   type: AstNodeType.PARENTHESIS,
   expression,
-  startOffset,
+  startOffset: leadingWhitespace?.startOffset ?? startOffset,
   endOffset,
   leadingWhitespace: leadingWhitespace?.image,
   internalWhitespace: internalWhitespace?.image,

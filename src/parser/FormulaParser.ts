@@ -13,6 +13,7 @@ import {
   OrMethodOpts,
   tokenMatcher,
 } from 'chevrotain'
+import { ProcedureAst } from '.'
 
 import {
   CellError,
@@ -703,6 +704,17 @@ export class FormulaParser extends EmbeddedActionsParser {
       ast = buildParsingErrorAst()
     }
 
+    const procedureAst = (ast as ProcedureAst)
+    if (!errors.length && procedureAst.args) {
+      procedureAst.args.forEach((arg, i) => {
+        if (arg.type === AstNodeType.EMPTY) {
+          const startOffset = (procedureAst.args[i - 1]?.endOffset ?? -1) + 1 
+          arg.startOffset = startOffset
+          arg.endOffset = startOffset + (arg.leadingWhitespace?.length ?? 0)
+        }
+      })
+    }
+    console.log({procedureAst, tokens})
     return {
       ast,
       errors,
