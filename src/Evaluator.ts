@@ -215,14 +215,19 @@ export class Evaluator {
   }
 
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): OptionalInterpreterTuple {
-    const [interpreterValue, promise] = this.interpreter.evaluateAst(ast, state)
+    const [interpreterValue, asyncPromiseVertex] = this.interpreter.evaluateAst(ast, state)
+    let newAsyncPromiseVertex = asyncPromiseVertex
+
+    if (!asyncPromiseVertex?.getPromise) {
+      newAsyncPromiseVertex = undefined
+    }
 
     if (interpreterValue instanceof SimpleRangeValue) {
-      return [interpreterValue, promise]
+      return [interpreterValue, newAsyncPromiseVertex]
     } else if (interpreterValue === EmptyValue && this.config.evaluateNullToZero) {
-      return [0, promise]
+      return [0, newAsyncPromiseVertex]
     } else {
-      return [interpreterValue, promise]
+      return [interpreterValue, newAsyncPromiseVertex]
     }
   }
 }

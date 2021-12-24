@@ -172,7 +172,7 @@ describe('async functions', () => {
       expect(engine.getSheetValues(0)).toEqual([[.1], [1.1]])
     })
 
-    it('async functions operations on dependent async value', async() => {
+    it.only('async functions operations on dependent async value', async() => {
       const [engine, promise] = HyperFormula.buildFromArray([[
         '=ASYNC_FOO()', '=ASYNC_FOO()+A1'
       ]])

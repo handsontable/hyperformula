@@ -229,11 +229,6 @@ export class Interpreter {
             return [cellError]
           }
 
-          // if (state.formulaVertex?.isComputed()) {
-          //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          //   return [interpreterState.formulaVertex!.getCellValue()]
-          // }
-
           const getPromise = () => new Promise<InterpreterValue>((resolve, reject) => {
             const pluginFunctionValue = pluginFunction(ast, interpreterState)
             const functionPromise = withTimeout(pluginFunctionValue, this.config.timeoutTime)
