@@ -193,16 +193,4 @@ describe('computeHashFromTokens', () => {
     const hash = computeFunc(formula, adr('A1'))
     expect(hash).toEqual('=1')
   })
-
-  it('should skip whitespaces before function args separators', () => {
-    const formula = '=SUM(A1 , A2)'
-    const hash = computeFunc(formula, adr('A1'))
-    expect(hash).toEqual('=SUM(#0R0, #1R0)')
-  })
-
-  it('should not skip whitespaces when there is empty arg', () => {
-    const formula = '=PV(A1 ,2,3,   ,A2)'
-    const hash = computeFunc(formula, adr('A1'))
-    expect(hash).toEqual('=PV(#0R0,2,3,   ,#1R0)')
-  })
 })
