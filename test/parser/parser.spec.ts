@@ -676,7 +676,9 @@ describe('Column ranges', () => {
       buildColumnRangeAst(
         ColumnAddress.relative(2),
         ColumnAddress.relative(3),
-        RangeSheetReferenceType.RELATIVE
+        RangeSheetReferenceType.RELATIVE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -687,7 +689,9 @@ describe('Column ranges', () => {
       buildColumnRangeAst(
         ColumnAddress.relative(2, 0),
         ColumnAddress.relative(3, 0),
-        RangeSheetReferenceType.START_ABSOLUTE
+        RangeSheetReferenceType.START_ABSOLUTE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -698,7 +702,9 @@ describe('Column ranges', () => {
       buildColumnRangeAst(
         ColumnAddress.relative(2, 0),
         ColumnAddress.relative(3, 0),
-        RangeSheetReferenceType.BOTH_ABSOLUTE
+        RangeSheetReferenceType.BOTH_ABSOLUTE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -709,7 +715,9 @@ describe('Column ranges', () => {
       buildColumnRangeAst(
         ColumnAddress.relative(2, 0),
         ColumnAddress.relative(3, 1),
-        RangeSheetReferenceType.BOTH_ABSOLUTE
+        RangeSheetReferenceType.BOTH_ABSOLUTE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -720,7 +728,9 @@ describe('Column ranges', () => {
       buildColumnRangeAst(
         ColumnAddress.absolute(2),
         ColumnAddress.relative(3),
-        RangeSheetReferenceType.RELATIVE
+        RangeSheetReferenceType.RELATIVE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -769,7 +779,9 @@ describe('Row ranges', () => {
       buildRowRangeAst(
         RowAddress.relative(2),
         RowAddress.relative(3),
-        RangeSheetReferenceType.RELATIVE
+        RangeSheetReferenceType.RELATIVE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -780,7 +792,9 @@ describe('Row ranges', () => {
       buildRowRangeAst(
         RowAddress.relative(2, 0),
         RowAddress.relative(3, 0),
-        RangeSheetReferenceType.START_ABSOLUTE
+        RangeSheetReferenceType.START_ABSOLUTE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -791,7 +805,9 @@ describe('Row ranges', () => {
       buildRowRangeAst(
         RowAddress.relative(2, 0),
         RowAddress.relative(3, 0),
-        RangeSheetReferenceType.BOTH_ABSOLUTE
+        RangeSheetReferenceType.BOTH_ABSOLUTE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -802,7 +818,9 @@ describe('Row ranges', () => {
       buildRowRangeAst(
         RowAddress.relative(2, 0),
         RowAddress.relative(3, 1),
-        RangeSheetReferenceType.BOTH_ABSOLUTE
+        RangeSheetReferenceType.BOTH_ABSOLUTE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })
@@ -813,7 +831,9 @@ describe('Row ranges', () => {
       buildRowRangeAst(
         RowAddress.absolute(2),
         RowAddress.relative(3),
-        RangeSheetReferenceType.RELATIVE
+        RangeSheetReferenceType.RELATIVE,
+        ast.startOffset,
+        ast.endOffset
       )
     )
   })

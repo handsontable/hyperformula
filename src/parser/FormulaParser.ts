@@ -13,7 +13,6 @@ import {
   OrMethodOpts,
   tokenMatcher,
 } from 'chevrotain'
-import { ProcedureAst } from '.'
 
 import {
   CellError,
@@ -168,13 +167,19 @@ export class FormulaParser extends EmbeddedActionsParser {
         const separator = this.CONSUME(
           this.lexerConfig.ArgSeparator
         ) as IExtendedToken
+        if (separator.leadingWhitespace) {
+          if (argument.type === AstNodeType.EMPTY) {
+            argument.startOffset = separator.leadingWhitespace.startOffset
+          }
+          argument.endOffset = separator.leadingWhitespace.endOffset
+        }
         if (argument.type === AstNodeType.EMPTY) {
           argument.leadingWhitespace = separator.leadingWhitespace?.image
         }
         args.push(argument)
         argument = this.SUBRULE2(this.booleanExpressionOrEmpty)
       })
-
+      const previousArg = args[args.length - 1]
       args.push(argument)
 
       if (args.length === 1 && args[0].type === AstNodeType.EMPTY) {
@@ -182,6 +187,17 @@ export class FormulaParser extends EmbeddedActionsParser {
       }
 
       const rParenToken = this.CONSUME(RParen) as IExtendedToken
+      if (rParenToken.leadingWhitespace) {
+        if (argument.type === AstNodeType.EMPTY) {
+          argument.startOffset = rParenToken.leadingWhitespace.startOffset
+        }
+        argument.endOffset = rParenToken.leadingWhitespace.endOffset
+      }
+      if (previousArg?.endOffset && argument.type === AstNodeType.EMPTY && argument.startOffset === undefined) {
+        argument.startOffset = previousArg.endOffset + 2 // + 2 because of separator 
+        argument.endOffset = previousArg.endOffset + 2
+      }
+
       return buildProcedureAst(
         canonicalProcedureName,
         args,
@@ -280,7 +296,9 @@ export class FormulaParser extends EmbeddedActionsParser {
         start,
         end,
         sheetReferenceType,
-        range.leadingWhitespace
+        range.startOffset,
+        range.endOffset,
+        range.leadingWhitespace,
       )
     }
   )
@@ -339,6 +357,8 @@ export class FormulaParser extends EmbeddedActionsParser {
       start,
       end,
       sheetReferenceType,
+      range.startOffset,
+      range.endOffset,
       range.leadingWhitespace
     )
   })
@@ -428,7 +448,9 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.buildCellRange(
         startAddress,
         endAddress,
-        start.leadingWhitespace?.image
+        start.startOffset,
+        end.endOffset,
+        start.leadingWhitespace?.image,
       )
     }
   )
@@ -472,6 +494,8 @@ export class FormulaParser extends EmbeddedActionsParser {
                 startAddress,
                 end,
                 sheetReferenceType,
+                start.startOffset,
+                offsetProcedure.endOffset,
                 start.leadingWhitespace?.image
               )
             } else {
@@ -521,6 +545,8 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.buildCellRange(
         start.reference,
         endAddress,
+        start.startOffset,
+        end.endOffset,
         start.leadingWhitespace
       )
     }
@@ -553,10 +579,13 @@ export class FormulaParser extends EmbeddedActionsParser {
                 sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
                 end = end.withAbsoluteSheet(start.reference.sheet)
               }
+             
               return buildCellRangeAst(
                 start.reference,
                 end,
                 sheetReferenceType,
+                start.startOffset,
+                offsetProcedure.endOffset,
                 start.leadingWhitespace
               )
             } else {
@@ -704,17 +733,6 @@ export class FormulaParser extends EmbeddedActionsParser {
       ast = buildParsingErrorAst()
     }
 
-    const procedureAst = (ast as ProcedureAst)
-    if (!errors.length && procedureAst.args) {
-      procedureAst.args.forEach((arg, i) => {
-        if (arg.type === AstNodeType.EMPTY) {
-          const startOffset = (procedureAst.args[i - 1]?.endOffset ?? -1) + 1 
-          arg.startOffset = startOffset
-          arg.endOffset = startOffset + (arg.leadingWhitespace?.length ?? 0)
-        }
-      })
-    }
-    console.log({procedureAst, tokens})
     return {
       ast,
       errors,
@@ -773,7 +791,7 @@ export class FormulaParser extends EmbeddedActionsParser {
                   this.numericStringToNumber(number.image),
                   number.startOffset,
                   number.endOffset,
-                  number.leadingWhitespace
+                  number.leadingWhitespace,
                 )
               },
             },
@@ -1076,7 +1094,9 @@ export class FormulaParser extends EmbeddedActionsParser {
   private buildCellRange(
     startAddress: CellAddress,
     endAddress: CellAddress,
-    leadingWhitespace?: string
+    startOffset?: number,
+    endOffset?: number,
+    leadingWhitespace?: string,
   ): Ast {
     if (startAddress.sheet === undefined && endAddress.sheet !== undefined) {
       return this.parsingError(
@@ -1098,7 +1118,9 @@ export class FormulaParser extends EmbeddedActionsParser {
       startAddress,
       endAddress,
       sheetReferenceType,
-      leadingWhitespace
+      startOffset,
+      endOffset,
+      leadingWhitespace,
     )
   }
 
@@ -1301,7 +1323,6 @@ export class FormulaLexer {
     let tokens = lexingResult.tokens
     tokens = this.trimTrailingWhitespaces(tokens)
     tokens = this.skipWhitespacesInsideRanges(tokens)
-    tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
     lexingResult.tokens = tokens
 
     return lexingResult

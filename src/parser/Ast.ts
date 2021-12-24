@@ -184,7 +184,9 @@ export const buildCellRangeAst = (
   start: CellAddress,
   end: CellAddress,
   sheetReferenceType: RangeSheetReferenceType,
-  leadingWhitespace?: string
+  startOffset?: number,
+  endOffset?: number,
+  leadingWhitespace?: string,
 ): CellRangeAst => {
   assertRangeConsistency(start, end, sheetReferenceType)
   return {
@@ -192,7 +194,9 @@ export const buildCellRangeAst = (
     start,
     end,
     sheetReferenceType,
-    leadingWhitespace,
+    leadingWhitespace: leadingWhitespace,
+    startOffset: leadingWhitespace && startOffset ? startOffset - leadingWhitespace.length : startOffset,
+    endOffset: endOffset,
   }
 }
 
@@ -207,6 +211,8 @@ export const buildColumnRangeAst = (
   start: ColumnAddress,
   end: ColumnAddress,
   sheetReferenceType: RangeSheetReferenceType,
+  startOffset?: number,
+  endOffset?: number,
   leadingWhitespace?: IToken
 ): ColumnRangeAst => {
   assertRangeConsistency(start, end, sheetReferenceType)
@@ -215,6 +221,8 @@ export const buildColumnRangeAst = (
     start,
     end,
     sheetReferenceType,
+    startOffset: leadingWhitespace?.startOffset ?? startOffset,
+    endOffset,
     leadingWhitespace: leadingWhitespace?.image,
   }
 }
@@ -230,6 +238,8 @@ export const buildRowRangeAst = (
   start: RowAddress,
   end: RowAddress,
   sheetReferenceType: RangeSheetReferenceType,
+  startOffset?: number,
+  endOffset?: number,
   leadingWhitespace?: IToken
 ): RowRangeAst => {
   assertRangeConsistency(start, end, sheetReferenceType)
@@ -237,6 +247,8 @@ export const buildRowRangeAst = (
     type: AstNodeType.ROW_RANGE,
     start,
     end,
+    startOffset: leadingWhitespace?.startOffset ?? startOffset,
+    endOffset,
     sheetReferenceType,
     leadingWhitespace: leadingWhitespace?.image,
   }
