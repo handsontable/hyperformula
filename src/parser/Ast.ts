@@ -263,15 +263,13 @@ export interface ConcatenateOpAst extends BinaryOpAst {
 export const buildConcatenateOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): ConcatenateOpAst => ({
   type: AstNodeType.CONCATENATE_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -282,15 +280,13 @@ export interface EqualsOpAst extends BinaryOpAst {
 export const buildEqualsOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): EqualsOpAst => ({
   type: AstNodeType.EQUALS_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -301,15 +297,13 @@ export interface NotEqualOpAst extends BinaryOpAst {
 export const buildNotEqualOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): NotEqualOpAst => ({
   type: AstNodeType.NOT_EQUAL_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -320,15 +314,13 @@ export interface GreaterThanOpAst extends BinaryOpAst {
 export const buildGreaterThanOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): GreaterThanOpAst => ({
   type: AstNodeType.GREATER_THAN_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -339,15 +331,13 @@ export interface LessThanOpAst extends BinaryOpAst {
 export const buildLessThanOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): LessThanOpAst => ({
   type: AstNodeType.LESS_THAN_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -358,15 +348,13 @@ export interface GreaterThanOrEqualOpAst extends BinaryOpAst {
 export const buildGreaterThanOrEqualOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): GreaterThanOrEqualOpAst => ({
   type: AstNodeType.GREATER_THAN_OR_EQUAL_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -377,15 +365,13 @@ export interface LessThanOrEqualOpAst extends BinaryOpAst {
 export const buildLessThanOrEqualOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): LessThanOrEqualOpAst => ({
   type: AstNodeType.LESS_THAN_OR_EQUAL_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -396,15 +382,13 @@ export interface PlusOpAst extends BinaryOpAst {
 export const buildPlusOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): PlusOpAst => ({
   type: AstNodeType.PLUS_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -415,15 +399,13 @@ export interface MinusOpAst extends BinaryOpAst {
 export const buildMinusOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): MinusOpAst => ({
   type: AstNodeType.MINUS_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -434,15 +416,13 @@ export interface TimesOpAst extends BinaryOpAst {
 export const buildTimesOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): TimesOpAst => ({
   type: AstNodeType.TIMES_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -453,15 +433,13 @@ export interface DivOpAst extends BinaryOpAst {
 export const buildDivOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): DivOpAst => ({
   type: AstNodeType.DIV_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -472,15 +450,13 @@ export interface PowerOpAst extends BinaryOpAst {
 export const buildPowerOpAst = (
   left: Ast,
   right: Ast,
-  startOffset?: number,
-  endOffset?: number,
   leadingWhitespace?: IToken
 ): PowerOpAst => ({
   type: AstNodeType.POWER_OP,
   left,
   right,
-  startOffset: leadingWhitespace?.startOffset ?? startOffset,
-  endOffset,
+  startOffset: leadingWhitespace?.startOffset ?? left.startOffset,
+  endOffset: right.endOffset,
   leadingWhitespace: leadingWhitespace?.image,
 })
 

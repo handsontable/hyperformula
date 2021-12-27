@@ -715,8 +715,6 @@ export class FormulaParser extends EmbeddedActionsParser {
         lhs = buildPowerOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else {
@@ -742,16 +740,12 @@ export class FormulaParser extends EmbeddedActionsParser {
         lhs = buildTimesOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else if (tokenMatcher(op, DivOp)) {
         lhs = buildDivOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else {
@@ -777,16 +771,12 @@ export class FormulaParser extends EmbeddedActionsParser {
         lhs = buildPlusOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else if (tokenMatcher(op, MinusOp)) {
         lhs = buildMinusOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else {
@@ -810,8 +800,6 @@ export class FormulaParser extends EmbeddedActionsParser {
       lhs = buildConcatenateOpAst(
         lhs,
         rhs,
-        lhs.startOffset,
-        rhs.endOffset,
         op.leadingWhitespace
       )
     })
@@ -832,48 +820,36 @@ export class FormulaParser extends EmbeddedActionsParser {
         lhs = buildEqualsOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else if (tokenMatcher(op, NotEqualOp)) {
         lhs = buildNotEqualOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else if (tokenMatcher(op, GreaterThanOp)) {
         lhs = buildGreaterThanOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else if (tokenMatcher(op, LessThanOp)) {
         lhs = buildLessThanOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else if (tokenMatcher(op, GreaterThanOrEqualOp)) {
         lhs = buildGreaterThanOrEqualOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else if (tokenMatcher(op, LessThanOrEqualOp)) {
         lhs = buildLessThanOrEqualOpAst(
           lhs,
           rhs,
-          lhs.startOffset,
-          rhs.endOffset,
           op.leadingWhitespace
         )
       } else {
