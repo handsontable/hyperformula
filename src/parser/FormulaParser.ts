@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {
+ import {
   EmbeddedActionsParser,
   EMPTY_ALT,
   ILexingResult,
@@ -154,13 +154,19 @@ export class FormulaParser extends EmbeddedActionsParser {
     let argument = this.SUBRULE(this.booleanExpressionOrEmpty)
     this.MANY(() => {
       const separator = this.CONSUME(this.lexerConfig.ArgSeparator) as IExtendedToken
+      if (separator.leadingWhitespace) {
+        if (argument.type === AstNodeType.EMPTY) {
+          argument.startOffset = separator.leadingWhitespace.startOffset
+        }
+        argument.endOffset = separator.leadingWhitespace.endOffset
+      }
       if (argument.type === AstNodeType.EMPTY) {
         argument.leadingWhitespace = separator.leadingWhitespace?.image
       }
       args.push(argument)
       argument = this.SUBRULE2(this.booleanExpressionOrEmpty)
     })
-
+    const previousArg = args[args.length - 1]
     args.push(argument)
 
     if (args.length === 1 && args[0].type === AstNodeType.EMPTY) {
@@ -168,11 +174,34 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
-    return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
+    if (rParenToken.leadingWhitespace) {
+      if (argument.type === AstNodeType.EMPTY) {
+        argument.startOffset = rParenToken.leadingWhitespace.startOffset
+      }
+      argument.endOffset = rParenToken.leadingWhitespace.endOffset
+    }
+    if (previousArg?.endOffset && argument.type === AstNodeType.EMPTY && argument.startOffset === undefined) {
+      argument.startOffset = previousArg.endOffset + 2 // + 2 because of separator 
+      argument.endOffset = previousArg.endOffset + 2
+    }
+
+    return buildProcedureAst(
+      canonicalProcedureName,
+      args,
+      procedureNameToken.startOffset,
+      rParenToken.endOffset,
+      procedureNameToken.leadingWhitespace,
+      rParenToken.leadingWhitespace
+    )
   })
   private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
     const name = this.CONSUME(NamedExpression) as IExtendedToken
-    return buildNamedExpressionAst(name.image, name.leadingWhitespace)
+    return buildNamedExpressionAst(
+      name.image,
+      name.startOffset,
+      name.endOffset,
+      name.leadingWhitespace
+    )
   })
   /**
    * Rule for OFFSET() function expression
@@ -220,7 +249,14 @@ export class FormulaParser extends EmbeddedActionsParser {
       end = end.withAbsoluteSheet(start.sheet)
     }
 
-    return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+    return buildColumnRangeAst(
+      start,
+      end,
+      sheetReferenceType,
+      range.startOffset,
+      range.endOffset,
+      range.leadingWhitespace,
+    )
   })
   /**
    * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
@@ -252,7 +288,14 @@ export class FormulaParser extends EmbeddedActionsParser {
       end = end.withAbsoluteSheet(start.sheet)
     }
 
-    return buildRowRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+    return buildRowRangeAst(
+      start,
+      end,
+      sheetReferenceType,
+      range.startOffset,
+      range.endOffset,
+      range.leadingWhitespace
+    )
   })
   /**
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
@@ -294,7 +337,13 @@ export class FormulaParser extends EmbeddedActionsParser {
       })
     }
 
-    return this.buildCellRange(startAddress, endAddress, start.leadingWhitespace?.image)
+    return this.buildCellRange(
+      startAddress,
+      endAddress,
+      start.startOffset,
+      end.endOffset,
+      start.leadingWhitespace?.image,
+    )
   })
   /**
    * Rule for end of range expression
@@ -324,7 +373,14 @@ export class FormulaParser extends EmbeddedActionsParser {
               sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
               end = end.withAbsoluteSheet(startAddress.sheet)
             }
-            return buildCellRangeAst(startAddress, end, sheetReferenceType, start.leadingWhitespace?.image)
+            return buildCellRangeAst(
+              startAddress,
+              end,
+              sheetReferenceType,
+              start.startOffset,
+              offsetProcedure.endOffset,
+              start.leadingWhitespace?.image
+            )
           } else {
             return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
           }
@@ -356,7 +412,13 @@ export class FormulaParser extends EmbeddedActionsParser {
       })
     }
 
-    return this.buildCellRange(start.reference, endAddress, start.leadingWhitespace)
+    return this.buildCellRange(
+      start.reference,
+      endAddress,
+      start.startOffset,
+      end.endOffset,
+      start.leadingWhitespace
+    )
   })
   /**
    * Rule for end of range expression
@@ -380,7 +442,14 @@ export class FormulaParser extends EmbeddedActionsParser {
               sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
               end = end.withAbsoluteSheet(start.reference.sheet)
             }
-            return buildCellRangeAst(start.reference, end, sheetReferenceType, start.leadingWhitespace)
+            return buildCellRangeAst(
+              start.reference,
+              end,
+              sheetReferenceType,
+              start.startOffset,
+              offsetProcedure.endOffset,
+              start.leadingWhitespace
+            )
           } else {
             return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
           }
@@ -444,7 +513,13 @@ export class FormulaParser extends EmbeddedActionsParser {
     const lParenToken = this.CONSUME(LParen) as IExtendedToken
     const expression = this.SUBRULE(this.booleanExpression)
     const rParenToken = this.CONSUME(RParen) as IExtendedToken
-    return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
+    return buildParenthesisAst(
+      expression,
+      lParenToken.startOffset,
+      rParenToken.endOffset,
+      lParenToken.leadingWhitespace,
+      rParenToken.leadingWhitespace
+    )
   })
   private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
     return this.OR([
@@ -546,7 +621,12 @@ export class FormulaParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
-          return buildNumberAst(this.numericStringToNumber(number.image), number.leadingWhitespace)
+          return buildNumberAst(
+            this.numericStringToNumber(number.image),
+            number.startOffset,
+            number.endOffset,
+            number.leadingWhitespace,
+          )
         },
       },
       {
@@ -577,7 +657,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     }) as Maybe<IExtendedToken>
 
     if (percentage) {
-      return buildPercentOpAst(positiveAtomicExpression, percentage.leadingWhitespace)
+      return buildPercentOpAst(
+        positiveAtomicExpression,
+        percentage.startOffset,
+        percentage.endOffset,
+        percentage.leadingWhitespace
+      )
     }
 
     return positiveAtomicExpression
@@ -592,9 +677,19 @@ export class FormulaParser extends EmbeddedActionsParser {
           const op = this.CONSUME(AdditionOp) as IExtendedToken
           const value = this.SUBRULE(this.atomicExpression)
           if (tokenMatcher(op, PlusOp)) {
-            return buildPlusUnaryOpAst(value, op.leadingWhitespace)
+            return buildPlusUnaryOpAst(
+              value,
+              value.startOffset,
+              value.endOffset,
+              op.leadingWhitespace
+            )
           } else if (tokenMatcher(op, MinusOp)) {
-            return buildMinusUnaryOpAst(value, op.leadingWhitespace)
+            return buildMinusUnaryOpAst(
+              value,
+              value.startOffset,
+              value.endOffset,
+              op.leadingWhitespace
+            )
           } else {
             this.customParsingError = parsingError(ParsingErrorType.ParserError, 'Mismatched token type')
             return this.customParsingError
@@ -617,7 +712,11 @@ export class FormulaParser extends EmbeddedActionsParser {
       const rhs = this.SUBRULE2(this.atomicExpression)
 
       if (tokenMatcher(op, PowerOp)) {
-        lhs = buildPowerOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildPowerOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else {
         this.ACTION(() => {
           throw Error('Operator not supported')
@@ -638,9 +737,17 @@ export class FormulaParser extends EmbeddedActionsParser {
       const rhs = this.SUBRULE2(this.powerExpression)
 
       if (tokenMatcher(op, TimesOp)) {
-        lhs = buildTimesOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildTimesOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else if (tokenMatcher(op, DivOp)) {
-        lhs = buildDivOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildDivOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else {
         this.ACTION(() => {
           throw Error('Operator not supported')
@@ -661,9 +768,17 @@ export class FormulaParser extends EmbeddedActionsParser {
       const rhs = this.SUBRULE2(this.multiplicationExpression)
 
       if (tokenMatcher(op, PlusOp)) {
-        lhs = buildPlusOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildPlusOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else if (tokenMatcher(op, MinusOp)) {
-        lhs = buildMinusOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildMinusOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else {
         this.ACTION(() => {
           throw Error('Operator not supported')
@@ -682,7 +797,11 @@ export class FormulaParser extends EmbeddedActionsParser {
     this.MANY(() => {
       const op = this.CONSUME(ConcatenateOp) as IExtendedToken
       const rhs = this.SUBRULE2(this.additionExpression)
-      lhs = buildConcatenateOpAst(lhs, rhs, op.leadingWhitespace)
+      lhs = buildConcatenateOpAst(
+        lhs,
+        rhs,
+        op.leadingWhitespace
+      )
     })
 
     return lhs
@@ -698,17 +817,41 @@ export class FormulaParser extends EmbeddedActionsParser {
       const rhs = this.SUBRULE2(this.concatenateExpression)
 
       if (tokenMatcher(op, EqualsOp)) {
-        lhs = buildEqualsOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildEqualsOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else if (tokenMatcher(op, NotEqualOp)) {
-        lhs = buildNotEqualOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildNotEqualOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else if (tokenMatcher(op, GreaterThanOp)) {
-        lhs = buildGreaterThanOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildGreaterThanOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else if (tokenMatcher(op, LessThanOp)) {
-        lhs = buildLessThanOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildLessThanOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else if (tokenMatcher(op, GreaterThanOrEqualOp)) {
-        lhs = buildGreaterThanOrEqualOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildGreaterThanOrEqualOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else if (tokenMatcher(op, LessThanOrEqualOp)) {
-        lhs = buildLessThanOrEqualOpAst(lhs, rhs, op.leadingWhitespace)
+        lhs = buildLessThanOrEqualOpAst(
+          lhs,
+          rhs,
+          op.leadingWhitespace
+        )
       } else {
         this.ACTION(() => {
           throw Error('Operator not supported')
@@ -736,7 +879,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.formula()
   }
 
-  private buildCellRange(startAddress: CellAddress, endAddress: CellAddress, leadingWhitespace?: string): Ast {
+  private buildCellRange(startAddress: CellAddress,
+    endAddress: CellAddress,
+    startOffset?: number,
+    endOffset?: number,
+    leadingWhitespace?: string
+  ): Ast {
     if (startAddress.sheet === undefined && endAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
@@ -747,7 +895,14 @@ export class FormulaParser extends EmbeddedActionsParser {
       endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
     }
 
-    return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
+    return buildCellRangeAst(
+      startAddress,
+      endAddress,
+      sheetReferenceType,
+      startOffset,
+      endOffset,
+      leadingWhitespace,
+    )
   }
 
   /**
@@ -880,12 +1035,14 @@ export class FormulaLexer {
    *
    * @param text - string representation of a formula
    */
-  public tokenizeFormula(text: string): ILexingResult {
+  public tokenizeFormula(text: string, stripWhitespaces = true): ILexingResult {
     const lexingResult = this.lexer.tokenize(text)
     let tokens = lexingResult.tokens
-    tokens = this.trimTrailingWhitespaces(tokens)
-    tokens = this.skipWhitespacesInsideRanges(tokens)
-    tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
+    if (stripWhitespaces) {
+      tokens = this.trimTrailingWhitespaces(tokens)
+      tokens = this.skipWhitespacesInsideRanges(tokens)
+      tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
+    }
     lexingResult.tokens = tokens
 
     return lexingResult

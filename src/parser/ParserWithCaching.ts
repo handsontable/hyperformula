@@ -65,8 +65,8 @@ export class ParserWithCaching {
    * @param text - formula to parse
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
-  public parse(text: string, formulaAddress: SimpleCellAddress): ParsingResult {
-    const lexerResult = this.lexer.tokenizeFormula(text)
+  public parse(text: string, formulaAddress: SimpleCellAddress, stripWhitespaces = true): ParsingResult {
+    const lexerResult = this.lexer.tokenizeFormula(text, stripWhitespaces)
 
     if (lexerResult.errors.length > 0) {
       const errors = lexerResult.errors.map((e) =>
