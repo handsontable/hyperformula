@@ -1035,12 +1035,14 @@ export class FormulaLexer {
    *
    * @param text - string representation of a formula
    */
-  public tokenizeFormula(text: string): ILexingResult {
+  public tokenizeFormula(text: string, stripWhitespaces = true): ILexingResult {
     const lexingResult = this.lexer.tokenize(text)
     let tokens = lexingResult.tokens
-    tokens = this.trimTrailingWhitespaces(tokens)
-    tokens = this.skipWhitespacesInsideRanges(tokens)
-
+    if (stripWhitespaces) {
+      tokens = this.trimTrailingWhitespaces(tokens)
+      tokens = this.skipWhitespacesInsideRanges(tokens)
+      tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
+    }
     lexingResult.tokens = tokens
 
     return lexingResult
