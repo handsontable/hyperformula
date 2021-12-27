@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {
+ import {
   EmbeddedActionsParser,
   EMPTY_ALT,
   ILexingResult,
@@ -11,17 +11,12 @@ import {
   IToken,
   Lexer,
   OrMethodOpts,
-  tokenMatcher,
+  tokenMatcher
 } from 'chevrotain'
 
-import {
-  CellError,
-  ErrorType,
-  simpleCellAddress,
-  SimpleCellAddress,
-} from '../Cell'
-import { ErrorMessage } from '../error-message'
-import { Maybe } from '../Maybe'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
+import {ErrorMessage} from '../error-message'
+import {Maybe} from '../Maybe'
 import {
   cellAddressFromString,
   columnAddressFromString,
@@ -68,7 +63,7 @@ import {
   ParsingErrorType,
   RangeSheetReferenceType,
 } from './Ast'
-import { CellAddress, CellReferenceType } from './CellAddress'
+import {CellAddress, CellReferenceType} from './CellAddress'
 import {
   AdditionOp,
   ArrayLParen,
@@ -141,167 +136,128 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Cache for positiveAtomicExpression alternatives
    */
   private atomicExpCache: Maybe<OrArg>
-  private booleanExpressionOrEmpty: AstRule = this.RULE(
-    'booleanExpressionOrEmpty',
-    () => {
-      return this.OR([
-        { ALT: () => this.SUBRULE(this.booleanExpression) },
-        { ALT: EMPTY_ALT(buildEmptyArgAst()) },
-      ])
-    }
-  )
+  private booleanExpressionOrEmpty: AstRule = this.RULE('booleanExpressionOrEmpty', () => {
+    return this.OR([
+      {ALT: () => this.SUBRULE(this.booleanExpression)},
+      {ALT: EMPTY_ALT(buildEmptyArgAst())}
+    ])
+  })
   /**
    * Rule for procedure expressions: SUM(1,A1)
    */
-  private procedureExpression: AstRule = this.RULE(
-    'procedureExpression',
-    () => {
-      const procedureNameToken = this.CONSUME(ProcedureName) as IExtendedToken
-      const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
-      const canonicalProcedureName =
-        this.lexerConfig.functionMapping[procedureName] ?? procedureName
-      const args: Ast[] = []
+  private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
+    const procedureNameToken = this.CONSUME(ProcedureName) as IExtendedToken
+    const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
+    const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
+    const args: Ast[] = []
 
-      let argument = this.SUBRULE(this.booleanExpressionOrEmpty)
-      this.MANY(() => {
-        const separator = this.CONSUME(
-          this.lexerConfig.ArgSeparator
-        ) as IExtendedToken
-        if (separator.leadingWhitespace) {
-          if (argument.type === AstNodeType.EMPTY) {
-            argument.startOffset = separator.leadingWhitespace.startOffset
-          }
-          argument.endOffset = separator.leadingWhitespace.endOffset
-        }
+    let argument = this.SUBRULE(this.booleanExpressionOrEmpty)
+    this.MANY(() => {
+      const separator = this.CONSUME(this.lexerConfig.ArgSeparator) as IExtendedToken
+      if (separator.leadingWhitespace) {
         if (argument.type === AstNodeType.EMPTY) {
-          argument.leadingWhitespace = separator.leadingWhitespace?.image
+          argument.startOffset = separator.leadingWhitespace.startOffset
         }
-        args.push(argument)
-        argument = this.SUBRULE2(this.booleanExpressionOrEmpty)
-      })
-      const previousArg = args[args.length - 1]
+        argument.endOffset = separator.leadingWhitespace.endOffset
+      }
+      if (argument.type === AstNodeType.EMPTY) {
+        argument.leadingWhitespace = separator.leadingWhitespace?.image
+      }
       args.push(argument)
+      argument = this.SUBRULE2(this.booleanExpressionOrEmpty)
+    })
+    const previousArg = args[args.length - 1]
+    args.push(argument)
 
-      if (args.length === 1 && args[0].type === AstNodeType.EMPTY) {
-        args.length = 0
-      }
-
-      const rParenToken = this.CONSUME(RParen) as IExtendedToken
-      if (rParenToken.leadingWhitespace) {
-        if (argument.type === AstNodeType.EMPTY) {
-          argument.startOffset = rParenToken.leadingWhitespace.startOffset
-        }
-        argument.endOffset = rParenToken.leadingWhitespace.endOffset
-      }
-      if (previousArg?.endOffset && argument.type === AstNodeType.EMPTY && argument.startOffset === undefined) {
-        argument.startOffset = previousArg.endOffset + 2 // + 2 because of separator 
-        argument.endOffset = previousArg.endOffset + 2
-      }
-
-      return buildProcedureAst(
-        canonicalProcedureName,
-        args,
-        procedureNameToken.startOffset,
-        rParenToken.endOffset,
-        procedureNameToken.leadingWhitespace,
-        rParenToken.leadingWhitespace
-      )
+    if (args.length === 1 && args[0].type === AstNodeType.EMPTY) {
+      args.length = 0
     }
-  )
-  private namedExpressionExpression: AstRule = this.RULE(
-    'namedExpressionExpression',
-    () => {
-      const name = this.CONSUME(NamedExpression) as IExtendedToken
-      return buildNamedExpressionAst(
-        name.image,
-        name.startOffset,
-        name.endOffset,
-        name.leadingWhitespace
-      )
+
+    const rParenToken = this.CONSUME(RParen) as IExtendedToken
+    if (rParenToken.leadingWhitespace) {
+      if (argument.type === AstNodeType.EMPTY) {
+        argument.startOffset = rParenToken.leadingWhitespace.startOffset
+      }
+      argument.endOffset = rParenToken.leadingWhitespace.endOffset
     }
-  )
+    if (previousArg?.endOffset && argument.type === AstNodeType.EMPTY && argument.startOffset === undefined) {
+      argument.startOffset = previousArg.endOffset + 2 // + 2 because of separator 
+      argument.endOffset = previousArg.endOffset + 2
+    }
+
+    return buildProcedureAst(
+      canonicalProcedureName,
+      args,
+      procedureNameToken.startOffset,
+      rParenToken.endOffset,
+      procedureNameToken.leadingWhitespace,
+      rParenToken.leadingWhitespace
+    )
+  })
+  private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
+    const name = this.CONSUME(NamedExpression) as IExtendedToken
+    return buildNamedExpressionAst(
+      name.image,
+      name.startOffset,
+      name.endOffset,
+      name.leadingWhitespace
+    )
+  })
   /**
    * Rule for OFFSET() function expression
    */
-  private offsetProcedureExpression: AstRule = this.RULE(
-    'offsetProcedureExpression',
-    () => {
-      const args: Ast[] = []
-      this.CONSUME(this.lexerConfig.OffsetProcedureName)
-      this.CONSUME(LParen)
-      this.MANY_SEP({
-        SEP: this.lexerConfig.ArgSeparator,
-        DEF: () => {
-          args.push(this.SUBRULE(this.booleanExpression))
-        },
-      })
-      this.CONSUME(RParen)
-      return this.handleOffsetHeuristic(args)
-    }
-  )
+  private offsetProcedureExpression: AstRule = this.RULE('offsetProcedureExpression', () => {
+    const args: Ast[] = []
+    this.CONSUME(this.lexerConfig.OffsetProcedureName)
+    this.CONSUME(LParen)
+    this.MANY_SEP({
+      SEP: this.lexerConfig.ArgSeparator,
+      DEF: () => {
+        args.push(this.SUBRULE(this.booleanExpression))
+      },
+    })
+    this.CONSUME(RParen)
+    return this.handleOffsetHeuristic(args)
+  })
   /**
    * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
    */
-  private columnRangeExpression: AstRule = this.RULE(
-    'columnRangeExpression',
-    () => {
-      const range = this.CONSUME(ColumnRange) as IExtendedToken
-      const [startImage, endImage] = range.image.split(':')
+  private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
+    const range = this.CONSUME(ColumnRange) as IExtendedToken
+    const [startImage, endImage] = range.image.split(':')
 
-      const start = this.ACTION(() => {
-        return columnAddressFromString(
-          this.sheetMapping,
-          startImage,
-          this.formulaAddress
-        )
-      })
-      let end = this.ACTION(() => {
-        return columnAddressFromString(
-          this.sheetMapping,
-          endImage,
-          this.formulaAddress
-        )
-      })
+    const start = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
+    })
+    let end = this.ACTION(() => {
+      return columnAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
+    })
 
-      if (start === undefined || end === undefined) {
-        return buildCellErrorAst(new CellError(ErrorType.REF))
-      }
-      if (
-        start.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) ||
-        end.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)
-      ) {
-        return buildErrorWithRawInputAst(
-          range.image,
-          new CellError(ErrorType.NAME),
-          range.leadingWhitespace
-        )
-      }
-      if (start.sheet === undefined && end.sheet !== undefined) {
-        return this.parsingError(
-          ParsingErrorType.ParserError,
-          'Malformed range expression'
-        )
-      }
-
-      const sheetReferenceType = this.rangeSheetReferenceType(
-        start.sheet,
-        end.sheet
-      )
-
-      if (start.sheet !== undefined && end.sheet === undefined) {
-        end = end.withAbsoluteSheet(start.sheet)
-      }
-
-      return buildColumnRangeAst(
-        start,
-        end,
-        sheetReferenceType,
-        range.startOffset,
-        range.endOffset,
-        range.leadingWhitespace,
-      )
+    if (start === undefined || end === undefined) {
+      return buildCellErrorAst(new CellError(ErrorType.REF))
     }
-  )
+    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || end.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
+    }
+    if (start.sheet === undefined && end.sheet !== undefined) {
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
+    }
+
+    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
+
+    if (start.sheet !== undefined && end.sheet === undefined) {
+      end = end.withAbsoluteSheet(start.sheet)
+    }
+
+    return buildColumnRangeAst(
+      start,
+      end,
+      sheetReferenceType,
+      range.startOffset,
+      range.endOffset,
+      range.leadingWhitespace,
+    )
+  })
   /**
    * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
    */
@@ -310,44 +266,23 @@ export class FormulaParser extends EmbeddedActionsParser {
     const [startImage, endImage] = range.image.split(':')
 
     const start = this.ACTION(() => {
-      return rowAddressFromString(
-        this.sheetMapping,
-        startImage,
-        this.formulaAddress
-      )
+      return rowAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
     })
     let end = this.ACTION(() => {
-      return rowAddressFromString(
-        this.sheetMapping,
-        endImage,
-        this.formulaAddress
-      )
+      return rowAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
     })
 
     if (start === undefined || end === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
-    if (
-      start.exceedsSheetSizeLimits(this.lexerConfig.maxRows) ||
-      end.exceedsSheetSizeLimits(this.lexerConfig.maxRows)
-    ) {
-      return buildErrorWithRawInputAst(
-        range.image,
-        new CellError(ErrorType.NAME),
-        range.leadingWhitespace
-      )
+    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || end.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
+      return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
     if (start.sheet === undefined && end.sheet !== undefined) {
-      return this.parsingError(
-        ParsingErrorType.ParserError,
-        'Malformed range expression'
-      )
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = this.rangeSheetReferenceType(
-      start.sheet,
-      end.sheet
-    )
+    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
 
     if (start.sheet !== undefined && end.sheet === undefined) {
       end = end.withAbsoluteSheet(start.sheet)
@@ -368,29 +303,12 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference) as IExtendedToken
     const address = this.ACTION(() => {
-      return cellAddressFromString(
-        this.sheetMapping,
-        cell.image,
-        this.formulaAddress
-      )
+      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress)
     })
     if (address === undefined) {
-      return buildErrorWithRawInputAst(
-        cell.image,
-        new CellError(ErrorType.REF),
-        cell.leadingWhitespace
-      )
-    } else if (
-      address.exceedsSheetSizeLimits(
-        this.lexerConfig.maxColumns,
-        this.lexerConfig.maxRows
-      )
-    ) {
-      return buildErrorWithRawInputAst(
-        cell.image,
-        new CellError(ErrorType.NAME),
-        cell.leadingWhitespace
-      )
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
+    } else if (address.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+      return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.NAME), cell.leadingWhitespace)
     } else {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
@@ -398,207 +316,147 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for end range reference expression with additional checks considering range start
    */
-  private endRangeReference: AstRule = this.RULE(
-    'endRangeReference',
-    (start: IExtendedToken) => {
-      const end = this.CONSUME(CellReference) as IExtendedToken
+  private endRangeReference: AstRule = this.RULE('endRangeReference', (start: IExtendedToken) => {
+    const end = this.CONSUME(CellReference) as IExtendedToken
 
-      const startAddress = this.ACTION(() => {
-        return cellAddressFromString(
-          this.sheetMapping,
-          start.image,
-          this.formulaAddress
-        )
+    const startAddress = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+    })
+    const endAddress = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
+    })
+
+    if (startAddress === undefined || endAddress === undefined) {
+      return this.ACTION(() => {
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.REF), start.leadingWhitespace)
       })
-      const endAddress = this.ACTION(() => {
-        return cellAddressFromString(
-          this.sheetMapping,
-          end.image,
-          this.formulaAddress
-        )
+    } else if (startAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)
+      || endAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
+      return this.ACTION(() => {
+        return buildErrorWithRawInputAst(`${start.image}:${end.image}`, new CellError(ErrorType.NAME), start.leadingWhitespace)
       })
-
-      if (startAddress === undefined || endAddress === undefined) {
-        return this.ACTION(() => {
-          return buildErrorWithRawInputAst(
-            `${start.image}:${end.image}`,
-            new CellError(ErrorType.REF),
-            start.leadingWhitespace
-          )
-        })
-      } else if (
-        startAddress.exceedsSheetSizeLimits(
-          this.lexerConfig.maxColumns,
-          this.lexerConfig.maxRows
-        ) ||
-        endAddress.exceedsSheetSizeLimits(
-          this.lexerConfig.maxColumns,
-          this.lexerConfig.maxRows
-        )
-      ) {
-        return this.ACTION(() => {
-          return buildErrorWithRawInputAst(
-            `${start.image}:${end.image}`,
-            new CellError(ErrorType.NAME),
-            start.leadingWhitespace
-          )
-        })
-      }
-
-      return this.buildCellRange(
-        startAddress,
-        endAddress,
-        start.startOffset,
-        end.endOffset,
-        start.leadingWhitespace?.image,
-      )
     }
-  )
+
+    return this.buildCellRange(
+      startAddress,
+      endAddress,
+      start.startOffset,
+      end.endOffset,
+      start.leadingWhitespace?.image,
+    )
+  })
   /**
    * Rule for end of range expression
    *
    * End of range may be a cell reference or OFFSET() function call
    */
-  private endOfRangeExpression: AstRule = this.RULE(
-    'endOfRangeExpression',
-    (start: IExtendedToken) => {
-      return this.OR([
-        {
-          ALT: () => {
-            return this.SUBRULE(this.endRangeReference, { ARGS: [start] })
-          },
+  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (start: IExtendedToken) => {
+    return this.OR([
+      {
+        ALT: () => {
+          return this.SUBRULE(this.endRangeReference, {ARGS: [start]})
         },
-        {
-          ALT: () => {
-            const offsetProcedure = this.SUBRULE(
-              this.offsetProcedureExpression
+      },
+      {
+        ALT: () => {
+          const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+          const startAddress = this.ACTION(() => {
+            return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+          })
+          if (startAddress === undefined) {
+            return buildCellErrorAst(new CellError(ErrorType.REF))
+          }
+          if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
+            let end = offsetProcedure.reference
+            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
+            if (startAddress.sheet !== undefined) {
+              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
+              end = end.withAbsoluteSheet(startAddress.sheet)
+            }
+            return buildCellRangeAst(
+              startAddress,
+              end,
+              sheetReferenceType,
+              start.startOffset,
+              offsetProcedure.endOffset,
+              start.leadingWhitespace?.image
             )
-            const startAddress = this.ACTION(() => {
-              return cellAddressFromString(
-                this.sheetMapping,
-                start.image,
-                this.formulaAddress
-              )
-            })
-            if (startAddress === undefined) {
-              return buildCellErrorAst(new CellError(ErrorType.REF))
-            }
-            if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
-              let end = offsetProcedure.reference
-              let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-              if (startAddress.sheet !== undefined) {
-                sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-                end = end.withAbsoluteSheet(startAddress.sheet)
-              }
-              return buildCellRangeAst(
-                startAddress,
-                end,
-                sheetReferenceType,
-                start.startOffset,
-                offsetProcedure.endOffset,
-                start.leadingWhitespace?.image
-              )
-            } else {
-              return this.parsingError(
-                ParsingErrorType.RangeOffsetNotAllowed,
-                'Range offset not allowed here'
-              )
-            }
-          },
+          } else {
+            return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
+          }
         },
-      ])
-    }
-  )
+      },
+    ])
+  })
   /**
    * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
    */
-  private cellRangeExpression: AstRule = this.RULE(
-    'cellRangeExpression',
-    () => {
-      const start = this.CONSUME(CellReference)
-      this.CONSUME2(RangeSeparator)
-      return this.SUBRULE(this.endOfRangeExpression, { ARGS: [start] })
-    }
-  )
+  private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
+    const start = this.CONSUME(CellReference)
+    this.CONSUME2(RangeSeparator)
+    return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
+  })
   /**
    * Rule for end range reference expression starting with offset procedure with additional checks considering range start
    */
-  private endRangeWithOffsetStartReference: AstRule = this.RULE(
-    'endRangeWithOffsetStartReference',
-    (start: CellReferenceAst) => {
-      const end = this.CONSUME(CellReference) as IExtendedToken
+  private endRangeWithOffsetStartReference: AstRule = this.RULE('endRangeWithOffsetStartReference', (start: CellReferenceAst) => {
+    const end = this.CONSUME(CellReference) as IExtendedToken
 
-      const endAddress = this.ACTION(() => {
-        return cellAddressFromString(
-          this.sheetMapping,
-          end.image,
-          this.formulaAddress
-        )
+    const endAddress = this.ACTION(() => {
+      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
+    })
+
+    if (endAddress === undefined) {
+      return this.ACTION(() => {
+        return buildCellErrorAst(new CellError(ErrorType.REF))
       })
-
-      if (endAddress === undefined) {
-        return this.ACTION(() => {
-          return buildCellErrorAst(new CellError(ErrorType.REF))
-        })
-      }
-
-      return this.buildCellRange(
-        start.reference,
-        endAddress,
-        start.startOffset,
-        end.endOffset,
-        start.leadingWhitespace
-      )
     }
-  )
+
+    return this.buildCellRange(
+      start.reference,
+      endAddress,
+      start.startOffset,
+      end.endOffset,
+      start.leadingWhitespace
+    )
+  })
   /**
    * Rule for end of range expression
    *
    * End of range may be a cell reference or OFFSET() function call
    */
-  private endOfRangeWithOffsetStartExpression: AstRule = this.RULE(
-    'endOfRangeWithOffsetStartExpression',
-    (start: CellReferenceAst) => {
-      return this.OR([
-        {
-          ALT: () => {
-            return this.SUBRULE(this.endRangeWithOffsetStartReference, {
-              ARGS: [start],
-            })
-          },
+  private endOfRangeWithOffsetStartExpression: AstRule = this.RULE('endOfRangeWithOffsetStartExpression', (start: CellReferenceAst) => {
+    return this.OR([
+      {
+        ALT: () => {
+          return this.SUBRULE(this.endRangeWithOffsetStartReference, {ARGS: [start]})
         },
-        {
-          ALT: () => {
-            const offsetProcedure = this.SUBRULE(
-              this.offsetProcedureExpression
-            )
-            if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
-              let end = offsetProcedure.reference
-              let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-              if (start.reference.sheet !== undefined) {
-                sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-                end = end.withAbsoluteSheet(start.reference.sheet)
-              }
-             
-              return buildCellRangeAst(
-                start.reference,
-                end,
-                sheetReferenceType,
-                start.startOffset,
-                offsetProcedure.endOffset,
-                start.leadingWhitespace
-              )
-            } else {
-              return this.parsingError(
-                ParsingErrorType.RangeOffsetNotAllowed,
-                'Range offset not allowed here'
-              )
+      },
+      {
+        ALT: () => {
+          const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
+          if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
+            let end = offsetProcedure.reference
+            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
+            if (start.reference.sheet !== undefined) {
+              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
+              end = end.withAbsoluteSheet(start.reference.sheet)
             }
-          },
+            return buildCellRangeAst(
+              start.reference,
+              end,
+              sheetReferenceType,
+              start.startOffset,
+              offsetProcedure.endOffset,
+              start.leadingWhitespace
+            )
+          } else {
+            return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
+          }
         },
-      ])
-    }
-  )
+      },
+    ])
+  })
   /**
    * Rule for expressions that start with OFFSET() function
    *
@@ -614,14 +472,9 @@ export class FormulaParser extends EmbeddedActionsParser {
     this.OPTION(() => {
       this.CONSUME(RangeSeparator)
       if (offsetProcedure.type === AstNodeType.CELL_RANGE) {
-        end = this.parsingError(
-          ParsingErrorType.RangeOffsetNotAllowed,
-          'Range offset not allowed here'
-        )
+        end = this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
       } else {
-        end = this.SUBRULE(this.endOfRangeWithOffsetStartExpression, {
-          ARGS: [offsetProcedure],
-        })
+        end = this.SUBRULE(this.endOfRangeWithOffsetStartExpression, {ARGS: [offsetProcedure]})
       }
     })
 
@@ -631,49 +484,43 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return offsetProcedure
   })
-  private insideArrayExpression: AstRule = this.RULE(
-    'insideArrayExpression',
-    () => {
-      const ret: Ast[][] = [[]]
-      ret[ret.length - 1].push(this.SUBRULE(this.booleanExpression))
-      this.MANY(() => {
-        this.OR([
-          {
-            ALT: () => {
-              this.CONSUME(this.lexerConfig.ArrayColSeparator)
-              ret[ret.length - 1].push(this.SUBRULE2(this.booleanExpression))
-            },
-          },
-          {
-            ALT: () => {
-              this.CONSUME(this.lexerConfig.ArrayRowSeparator)
-              ret.push([])
-              ret[ret.length - 1].push(this.SUBRULE3(this.booleanExpression))
-            },
-          },
-        ])
-      })
-      return buildArrayAst(ret)
-    }
-  )
+  private insideArrayExpression: AstRule = this.RULE('insideArrayExpression', () => {
+    const ret: Ast[][] = [[]]
+    ret[ret.length - 1].push(this.SUBRULE(this.booleanExpression))
+    this.MANY(() => {
+      this.OR([
+        {
+          ALT: () => {
+            this.CONSUME(this.lexerConfig.ArrayColSeparator)
+            ret[ret.length - 1].push(this.SUBRULE2(this.booleanExpression))
+          }
+        },
+        {
+          ALT: () => {
+            this.CONSUME(this.lexerConfig.ArrayRowSeparator)
+            ret.push([])
+            ret[ret.length - 1].push(this.SUBRULE3(this.booleanExpression))
+          }
+        }
+      ])
+    })
+    return buildArrayAst(ret)
+  })
   /**
    * Rule for parenthesis expression
    */
-  private parenthesisExpression: AstRule = this.RULE(
-    'parenthesisExpression',
-    () => {
-      const lParenToken = this.CONSUME(LParen) as IExtendedToken
-      const expression = this.SUBRULE(this.booleanExpression)
-      const rParenToken = this.CONSUME(RParen) as IExtendedToken
-      return buildParenthesisAst(
-        expression,
-        lParenToken.startOffset,
-        rParenToken.endOffset,
-        lParenToken.leadingWhitespace,
-        rParenToken.leadingWhitespace
-      )
-    }
-  )
+  private parenthesisExpression: AstRule = this.RULE('parenthesisExpression', () => {
+    const lParenToken = this.CONSUME(LParen) as IExtendedToken
+    const expression = this.SUBRULE(this.booleanExpression)
+    const rParenToken = this.CONSUME(RParen) as IExtendedToken
+    return buildParenthesisAst(
+      expression,
+      lParenToken.startOffset,
+      rParenToken.endOffset,
+      lParenToken.leadingWhitespace,
+      rParenToken.leadingWhitespace
+    )
+  })
   private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
     return this.OR([
       {
@@ -681,21 +528,17 @@ export class FormulaParser extends EmbeddedActionsParser {
           const ltoken = this.CONSUME(ArrayLParen) as IExtendedToken
           const ret = this.SUBRULE(this.insideArrayExpression) as ArrayAst
           const rtoken = this.CONSUME(ArrayRParen) as IExtendedToken
-          return buildArrayAst(
-            ret.args,
-            ltoken.leadingWhitespace,
-            rtoken.leadingWhitespace
-          )
-        },
+          return buildArrayAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
+        }
       },
       {
-        ALT: () => this.SUBRULE(this.parenthesisExpression),
-      },
+        ALT: () => this.SUBRULE(this.parenthesisExpression)
+      }
     ])
   })
 
   constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
-    super(lexerConfig.allTokens, { outputCst: false, maxLookahead: 7 })
+    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
     this.lexerConfig = lexerConfig
     this.sheetMapping = sheetMapping
     this.formulaAddress = simpleCellAddress(0, 0, 0)
@@ -708,10 +551,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * @param tokens - tokenized formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public parseFromTokens(
-    tokens: IExtendedToken[],
-    formulaAddress: SimpleCellAddress
-  ): FormulaParserResult {
+  public parseFromTokens(tokens: IExtendedToken[], formulaAddress: SimpleCellAddress): FormulaParserResult {
     this.input = tokens
 
     let ast = this.formulaWithContext(formulaAddress)
@@ -735,7 +575,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return {
       ast,
-      errors,
+      errors
     }
   }
 
@@ -752,100 +592,81 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for positive atomic expressions
    */
-  private positiveAtomicExpression: AstRule = this.RULE(
-    'positiveAtomicExpression',
-    () => {
-      return this.OR(
-        this.atomicExpCache ??
-          (this.atomicExpCache = [
-            {
-              ALT: () => this.SUBRULE(this.arrayExpression),
-            },
-            {
-              ALT: () => this.SUBRULE(this.cellRangeExpression),
-            },
-            {
-              ALT: () => this.SUBRULE(this.columnRangeExpression),
-            },
-            {
-              ALT: () => this.SUBRULE(this.rowRangeExpression),
-            },
-            {
-              ALT: () => this.SUBRULE(this.offsetExpression),
-            },
-            {
-              ALT: () => this.SUBRULE(this.cellReference),
-            },
-            {
-              ALT: () => this.SUBRULE(this.procedureExpression),
-            },
-            {
-              ALT: () => this.SUBRULE(this.namedExpressionExpression),
-            },
-            {
-              ALT: () => {
-                const number = this.CONSUME(
-                  this.lexerConfig.NumberLiteral
-                ) as IExtendedToken
-                return buildNumberAst(
-                  this.numericStringToNumber(number.image),
-                  number.startOffset,
-                  number.endOffset,
-                  number.leadingWhitespace,
-                )
-              },
-            },
-            {
-              ALT: () => {
-                const str = this.CONSUME(StringLiteral) as IExtendedToken
-                return buildStringAst(str)
-              },
-            },
-            {
-              ALT: () => {
-                const token = this.CONSUME(ErrorLiteral) as IExtendedToken
-                const errString = token.image.toUpperCase()
-                const errorType = this.lexerConfig.errorMapping[errString]
-                if (errorType) {
-                  return buildCellErrorAst(
-                    new CellError(errorType),
-                    token.leadingWhitespace
-                  )
-                } else {
-                  return this.parsingError(
-                    ParsingErrorType.ParserError,
-                    'Unknown error literal'
-                  )
-                }
-              },
-            },
-          ])
+  private positiveAtomicExpression: AstRule = this.RULE('positiveAtomicExpression', () => {
+    return this.OR(this.atomicExpCache ?? (this.atomicExpCache = [
+      {
+        ALT: () => this.SUBRULE(this.arrayExpression),
+      },
+      {
+        ALT: () => this.SUBRULE(this.cellRangeExpression),
+      },
+      {
+        ALT: () => this.SUBRULE(this.columnRangeExpression),
+      },
+      {
+        ALT: () => this.SUBRULE(this.rowRangeExpression),
+      },
+      {
+        ALT: () => this.SUBRULE(this.offsetExpression),
+      },
+      {
+        ALT: () => this.SUBRULE(this.cellReference),
+      },
+      {
+        ALT: () => this.SUBRULE(this.procedureExpression),
+      },
+      {
+        ALT: () => this.SUBRULE(this.namedExpressionExpression),
+      },
+      {
+        ALT: () => {
+          const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
+          return buildNumberAst(
+            this.numericStringToNumber(number.image),
+            number.startOffset,
+            number.endOffset,
+            number.leadingWhitespace,
+          )
+        },
+      },
+      {
+        ALT: () => {
+          const str = this.CONSUME(StringLiteral) as IExtendedToken
+          return buildStringAst(str)
+        },
+      },
+      {
+        ALT: () => {
+          const token = this.CONSUME(ErrorLiteral) as IExtendedToken
+          const errString = token.image.toUpperCase()
+          const errorType = this.lexerConfig.errorMapping[errString]
+          if (errorType) {
+            return buildCellErrorAst(new CellError(errorType), token.leadingWhitespace)
+          } else {
+            return this.parsingError(ParsingErrorType.ParserError, 'Unknown error literal')
+          }
+        },
+      },
+    ]))
+  })
+  private rightUnaryOpAtomicExpression: AstRule = this.RULE('rightUnaryOpAtomicExpression', () => {
+    const positiveAtomicExpression = this.SUBRULE(this.positiveAtomicExpression)
+
+    const percentage = this.OPTION(() => {
+      return this.CONSUME(PercentOp)
+    }) as Maybe<IExtendedToken>
+
+    if (percentage) {
+      return buildPercentOpAst(
+        positiveAtomicExpression,
+        percentage.startOffset,
+        percentage.endOffset,
+        percentage.leadingWhitespace
       )
     }
-  )
-  private rightUnaryOpAtomicExpression: AstRule = this.RULE(
-    'rightUnaryOpAtomicExpression',
-    () => {
-      const positiveAtomicExpression = this.SUBRULE(
-        this.positiveAtomicExpression
-      )
 
-      const percentage = this.OPTION(() => {
-        return this.CONSUME(PercentOp)
-      }) as Maybe<IExtendedToken>
-
-      if (percentage) {
-        return buildPercentOpAst(
-          positiveAtomicExpression,
-          percentage.startOffset,
-          percentage.endOffset,
-          percentage.leadingWhitespace
-        )
-      }
-
-      return positiveAtomicExpression
-    }
-  )
+    return positiveAtomicExpression
+  })
   /**
    * Rule for atomic expressions, which is positive atomic expression or negation of it
    */
@@ -870,10 +691,7 @@ export class FormulaParser extends EmbeddedActionsParser {
               op.leadingWhitespace
             )
           } else {
-            this.customParsingError = parsingError(
-              ParsingErrorType.ParserError,
-              'Mismatched token type'
-            )
+            this.customParsingError = parsingError(ParsingErrorType.ParserError, 'Mismatched token type')
             return this.customParsingError
           }
         },
@@ -913,41 +731,38 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for multiplication category operators (e.g. 1 * A1, 1 / A1)
    */
-  private multiplicationExpression: AstRule = this.RULE(
-    'multiplicationExpression',
-    () => {
-      let lhs: Ast = this.SUBRULE(this.powerExpression)
+  private multiplicationExpression: AstRule = this.RULE('multiplicationExpression', () => {
+    let lhs: Ast = this.SUBRULE(this.powerExpression)
 
-      this.MANY(() => {
-        const op = this.CONSUME(MultiplicationOp) as IExtendedToken
-        const rhs = this.SUBRULE2(this.powerExpression)
+    this.MANY(() => {
+      const op = this.CONSUME(MultiplicationOp) as IExtendedToken
+      const rhs = this.SUBRULE2(this.powerExpression)
 
-        if (tokenMatcher(op, TimesOp)) {
-          lhs = buildTimesOpAst(
-            lhs,
-            rhs,
-            lhs.startOffset,
-            rhs.endOffset,
-            op.leadingWhitespace
-          )
-        } else if (tokenMatcher(op, DivOp)) {
-          lhs = buildDivOpAst(
-            lhs,
-            rhs,
-            lhs.startOffset,
-            rhs.endOffset,
-            op.leadingWhitespace
-          )
-        } else {
-          this.ACTION(() => {
-            throw Error('Operator not supported')
-          })
-        }
-      })
+      if (tokenMatcher(op, TimesOp)) {
+        lhs = buildTimesOpAst(
+          lhs,
+          rhs,
+          lhs.startOffset,
+          rhs.endOffset,
+          op.leadingWhitespace
+        )
+      } else if (tokenMatcher(op, DivOp)) {
+        lhs = buildDivOpAst(
+          lhs,
+          rhs,
+          lhs.startOffset,
+          rhs.endOffset,
+          op.leadingWhitespace
+        )
+      } else {
+        this.ACTION(() => {
+          throw Error('Operator not supported')
+        })
+      }
+    })
 
-      return lhs
-    }
-  )
+    return lhs
+  })
   /**
    * Rule for addition category operators (e.g. 1 + A1, 1 - A1)
    */
@@ -986,26 +801,23 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for concatenation operator expression (e.g. "=" & A1)
    */
-  private concatenateExpression: AstRule = this.RULE(
-    'concatenateExpression',
-    () => {
-      let lhs: Ast = this.SUBRULE(this.additionExpression)
+  private concatenateExpression: AstRule = this.RULE('concatenateExpression', () => {
+    let lhs: Ast = this.SUBRULE(this.additionExpression)
 
-      this.MANY(() => {
-        const op = this.CONSUME(ConcatenateOp) as IExtendedToken
-        const rhs = this.SUBRULE2(this.additionExpression)
-        lhs = buildConcatenateOpAst(
-          lhs,
-          rhs,
-          lhs.startOffset,
-          rhs.endOffset,
-          op.leadingWhitespace
-        )
-      })
+    this.MANY(() => {
+      const op = this.CONSUME(ConcatenateOp) as IExtendedToken
+      const rhs = this.SUBRULE2(this.additionExpression)
+      lhs = buildConcatenateOpAst(
+        lhs,
+        rhs,
+        lhs.startOffset,
+        rhs.endOffset,
+        op.leadingWhitespace
+      )
+    })
 
-      return lhs
-    }
-  )
+    return lhs
+  })
   /**
    * Rule for boolean expression (e.g. 1 <= A1)
    */
@@ -1091,24 +903,17 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.formula()
   }
 
-  private buildCellRange(
-    startAddress: CellAddress,
+  private buildCellRange(startAddress: CellAddress,
     endAddress: CellAddress,
     startOffset?: number,
     endOffset?: number,
-    leadingWhitespace?: string,
+    leadingWhitespace?: string
   ): Ast {
     if (startAddress.sheet === undefined && endAddress.sheet !== undefined) {
-      return this.parsingError(
-        ParsingErrorType.ParserError,
-        'Malformed range expression'
-      )
+      return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = this.rangeSheetReferenceType(
-      startAddress.sheet,
-      endAddress.sheet
-    )
+    const sheetReferenceType = this.rangeSheetReferenceType(startAddress.sheet, endAddress.sheet)
 
     if (startAddress.sheet !== undefined && endAddress.sheet === undefined) {
       endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
@@ -1132,60 +937,29 @@ export class FormulaParser extends EmbeddedActionsParser {
   private handleOffsetHeuristic(args: Ast[]): Ast {
     const cellArg = args[0]
     if (cellArg.type !== AstNodeType.CELL_REFERENCE) {
-      return this.parsingError(
-        ParsingErrorType.StaticOffsetError,
-        'First argument to OFFSET is not a reference'
-      )
+      return this.parsingError(ParsingErrorType.StaticOffsetError, 'First argument to OFFSET is not a reference')
     }
     const rowsArg = args[1]
     let rowShift
-    if (
-      rowsArg.type === AstNodeType.NUMBER &&
-      Number.isInteger(rowsArg.value)
-    ) {
+    if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
       rowShift = rowsArg.value
-    } else if (
-      rowsArg.type === AstNodeType.PLUS_UNARY_OP &&
-      rowsArg.value.type === AstNodeType.NUMBER &&
-      Number.isInteger(rowsArg.value.value)
-    ) {
+    } else if (rowsArg.type === AstNodeType.PLUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
       rowShift = rowsArg.value.value
-    } else if (
-      rowsArg.type === AstNodeType.MINUS_UNARY_OP &&
-      rowsArg.value.type === AstNodeType.NUMBER &&
-      Number.isInteger(rowsArg.value.value)
-    ) {
+    } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
       rowShift = -rowsArg.value.value
     } else {
-      return this.parsingError(
-        ParsingErrorType.StaticOffsetError,
-        'Second argument to OFFSET is not a static number'
-      )
+      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Second argument to OFFSET is not a static number')
     }
     const columnsArg = args[2]
     let colShift
-    if (
-      columnsArg.type === AstNodeType.NUMBER &&
-      Number.isInteger(columnsArg.value)
-    ) {
+    if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
       colShift = columnsArg.value
-    } else if (
-      columnsArg.type === AstNodeType.PLUS_UNARY_OP &&
-      columnsArg.value.type === AstNodeType.NUMBER &&
-      Number.isInteger(columnsArg.value.value)
-    ) {
+    } else if (columnsArg.type === AstNodeType.PLUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
       colShift = columnsArg.value.value
-    } else if (
-      columnsArg.type === AstNodeType.MINUS_UNARY_OP &&
-      columnsArg.value.type === AstNodeType.NUMBER &&
-      Number.isInteger(columnsArg.value.value)
-    ) {
+    } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
       colShift = -columnsArg.value.value
     } else {
-      return this.parsingError(
-        ParsingErrorType.StaticOffsetError,
-        'Third argument to OFFSET is not a static number'
-      )
+      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Third argument to OFFSET is not a static number')
     }
     const heightArg = args[3]
     let height
@@ -1194,21 +968,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     } else if (heightArg.type === AstNodeType.NUMBER) {
       height = heightArg.value
       if (height < 1) {
-        return this.parsingError(
-          ParsingErrorType.StaticOffsetError,
-          'Fourth argument to OFFSET is too small number'
-        )
+        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is too small number')
       } else if (!Number.isInteger(height)) {
-        return this.parsingError(
-          ParsingErrorType.StaticOffsetError,
-          'Fourth argument to OFFSET is not integer'
-        )
+        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not integer')
       }
     } else {
-      return this.parsingError(
-        ParsingErrorType.StaticOffsetError,
-        'Fourth argument to OFFSET is not a static number'
-      )
+      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not a static number')
     }
     const widthArg = args[4]
     let width
@@ -1217,50 +982,35 @@ export class FormulaParser extends EmbeddedActionsParser {
     } else if (widthArg.type === AstNodeType.NUMBER) {
       width = widthArg.value
       if (width < 1) {
-        return this.parsingError(
-          ParsingErrorType.StaticOffsetError,
-          'Fifth argument to OFFSET is too small number'
-        )
+        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is too small number')
       } else if (!Number.isInteger(width)) {
-        return this.parsingError(
-          ParsingErrorType.StaticOffsetError,
-          'Fifth argument to OFFSET is not integer'
-        )
+        return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not integer')
       }
     } else {
-      return this.parsingError(
-        ParsingErrorType.StaticOffsetError,
-        'Fifth argument to OFFSET is not a static number'
-      )
+      return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not a static number')
     }
 
     const topLeftCorner = new CellAddress(
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
-      cellArg.reference.type
+      cellArg.reference.type,
     )
 
     let absoluteCol = topLeftCorner.col
     let absoluteRow = topLeftCorner.row
 
-    if (
-      cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE ||
-      cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL
-    ) {
+    if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
+      || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL) {
       absoluteRow = absoluteRow + this.formulaAddress.row
     }
-    if (
-      cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE ||
-      cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW
-    ) {
+    if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
+      || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       absoluteCol = absoluteCol + this.formulaAddress.col
     }
 
     if (absoluteCol < 0 || absoluteRow < 0) {
-      return buildCellErrorAst(
-        new CellError(ErrorType.REF, ErrorMessage.OutOfSheet)
-      )
+      return buildCellErrorAst(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
     }
     if (width === 1 && height === 1) {
       return buildCellReferenceAst(topLeftCorner)
@@ -1268,13 +1018,9 @@ export class FormulaParser extends EmbeddedActionsParser {
       const bottomRightCorner = new CellAddress(
         topLeftCorner.col + width - 1,
         topLeftCorner.row + height - 1,
-        topLeftCorner.type
+        topLeftCorner.type,
       )
-      return buildCellRangeAst(
-        topLeftCorner,
-        bottomRightCorner,
-        RangeSheetReferenceType.RELATIVE
-      )
+      return buildCellRangeAst(topLeftCorner, bottomRightCorner, RangeSheetReferenceType.RELATIVE)
     }
   }
 
@@ -1283,10 +1029,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildParsingErrorAst()
   }
 
-  private rangeSheetReferenceType(
-    start?: number,
-    end?: number
-  ): RangeSheetReferenceType {
+  private rangeSheetReferenceType(start?: number, end?: number): RangeSheetReferenceType {
     if (start === undefined) {
       return RangeSheetReferenceType.RELATIVE
     } else if (end === undefined) {
@@ -1297,7 +1040,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   }
 }
 
-type AstRule = (idxInCallingRule?: number, ...args: any[]) => Ast
+type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = IOrAlt[] | OrMethodOpts
 
 export interface IExtendedToken extends IToken {
@@ -1308,9 +1051,7 @@ export class FormulaLexer {
   private readonly lexer: Lexer
 
   constructor(private lexerConfig: ILexerConfig) {
-    this.lexer = new Lexer(lexerConfig.allTokens, {
-      ensureOptimizations: true,
-    })
+    this.lexer = new Lexer(lexerConfig.allTokens, {ensureOptimizations: true})
   }
 
   /**
@@ -1323,47 +1064,29 @@ export class FormulaLexer {
     let tokens = lexingResult.tokens
     tokens = this.trimTrailingWhitespaces(tokens)
     tokens = this.skipWhitespacesInsideRanges(tokens)
+
     lexingResult.tokens = tokens
 
     return lexingResult
   }
 
   private skipWhitespacesInsideRanges(tokens: IToken[]): IToken[] {
-    return this.filterTokensByNeighbors(
-      tokens,
-      (previous: IToken, current: IToken, next: IToken) => {
-        return (
-          (tokenMatcher(previous, CellReference) ||
-            tokenMatcher(previous, RangeSeparator)) &&
-          tokenMatcher(current, WhiteSpace) &&
-          (tokenMatcher(next, CellReference) ||
-            tokenMatcher(next, RangeSeparator))
-        )
-      }
-    )
+    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+      return (tokenMatcher(previous, CellReference) || tokenMatcher(previous, RangeSeparator))
+        && tokenMatcher(current, WhiteSpace)
+        && (tokenMatcher(next, CellReference) || tokenMatcher(next, RangeSeparator))
+    })
   }
 
   private skipWhitespacesBeforeArgSeparators(tokens: IToken[]): IToken[] {
-    return this.filterTokensByNeighbors(
-      tokens,
-      (previous: IToken, current: IToken, next: IToken) => {
-        return (
-          !tokenMatcher(previous, this.lexerConfig.ArgSeparator) &&
-          tokenMatcher(current, WhiteSpace) &&
-          tokenMatcher(next, this.lexerConfig.ArgSeparator)
-        )
-      }
-    )
+    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+      return !tokenMatcher(previous, this.lexerConfig.ArgSeparator)
+        && tokenMatcher(current, WhiteSpace)
+        && tokenMatcher(next, this.lexerConfig.ArgSeparator)
+    })
   }
 
-  private filterTokensByNeighbors(
-    tokens: IToken[],
-    shouldBeSkipped: (
-      previous: IToken,
-      current: IToken,
-      next: IToken
-    ) => boolean
-  ): IToken[] {
+  private filterTokensByNeighbors(tokens: IToken[], shouldBeSkipped: (previous: IToken, current: IToken, next: IToken) => boolean): IToken[] {
     if (tokens.length < 3) {
       return tokens
     }
@@ -1384,10 +1107,7 @@ export class FormulaLexer {
   }
 
   private trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
-    if (
-      tokens.length > 0 &&
-      tokenMatcher(tokens[tokens.length - 1], WhiteSpace)
-    ) {
+    if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
       tokens.pop()
     }
     return tokens
