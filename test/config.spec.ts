@@ -30,7 +30,7 @@ describe('Config', () => {
   })
 
   it('should log usage of deprecated options when they are passed while engine initialization', () => {
-    jest.spyOn(console, 'warn')
+    spyOn(console, 'warn')
 
     new Config({
       binarySearchThreshold: 20,
@@ -42,16 +42,13 @@ describe('Config', () => {
     expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
     expect(console.warn).toHaveBeenCalledWith('gpuMode option is deprecated since 1.2')
     expect(console.warn).toHaveBeenCalledTimes(3)
-
-    jest.clearAllMocks()
   })
 
   it('should log usage of deprecated options when they are passed while merging the Config object', () => {
-    jest.spyOn(console, 'warn')
+    spyOn(console, 'warn')
 
     const config = new Config()
 
-    jest.clearAllMocks()
     config.mergeConfig({
       binarySearchThreshold: 20,
       gpujs: true,
@@ -60,25 +57,19 @@ describe('Config', () => {
     expect(console.warn).toHaveBeenCalledTimes(2)
     expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
     expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
-
-    jest.clearAllMocks()
   })
 
   it('should not log usage of deprecated options when they are not passed while merging the Config object', () => {
-    jest.spyOn(console, 'warn')
-
     const config = new Config({
       binarySearchThreshold: 20,
       gpujs: true,
       gpuMode: 'gpu',
     })
 
-    jest.clearAllMocks()
+    spyOn(console, 'warn')
     config.mergeConfig({})
 
     expect(console.warn).toHaveBeenCalledTimes(0)
-
-    jest.clearAllMocks()
   })
 
   it('validation: boolean params', () => {
