@@ -663,7 +663,7 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
-    this.binarySearchThreshold = binarySearchThreshold
+    this.binarySearchThreshold = binarySearchThreshold ?? Config.defaultConfig.binarySearchThreshold
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
