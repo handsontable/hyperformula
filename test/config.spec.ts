@@ -211,11 +211,13 @@ describe('Config', () => {
 
     afterEach(() => {
       try {
+        // eslint-disable-next-line
         // @ts-ignore
-        console.warn.mockClear(); // clears mock in Jest env
+        console.warn.mockClear() // clears mock in Jest env
       } catch {
+        // eslint-disable-next-line
         // @ts-ignore
-        console.warn.calls.reset(); // clears mock in Jasmine env
+        console.warn.calls.reset() // clears mock in Jasmine env
       }
     })
 
@@ -253,18 +255,20 @@ describe('Config', () => {
       })
 
       try {
+        // eslint-disable-next-line
         // @ts-ignore
-        console.warn.mockClear(); // clears mock in Jest env
+        console.warn.mockClear() // clears mock in Jest env
       } catch {
+        // eslint-disable-next-line
         // @ts-ignore
-        console.warn.calls.reset(); // clears mock in Jasmine env
+        console.warn.calls.reset() // clears mock in Jasmine env
       }
 
       config.mergeConfig({})
 
       expect(console.warn).toHaveBeenCalledTimes(0)
     })
-  });
+  })
 })
 
 describe('getConfig', () => {
