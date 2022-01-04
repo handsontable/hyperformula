@@ -586,7 +586,7 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
 
-  constructor(options: Partial<ConfigParams> = {}, mergeMode = false) {
+  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
     const {
       accentSensitive,
       binarySearchThreshold,
@@ -629,7 +629,7 @@ export class Config implements ConfigParams, ParserConfig {
       useWildcards,
     } = options
 
-    if (!mergeMode) {
+    if (showDeprecatedWarns) {
       this.warnDeprecatedOptions(options)
     }
 
@@ -725,7 +725,7 @@ export class Config implements ConfigParams, ParserConfig {
 
     this.warnDeprecatedOptions(init)
 
-    return new Config(mergedConfig, true)
+    return new Config(mergedConfig, false)
   }
 
   private warnDeprecatedOptions(options: Partial<ConfigParams>) {
