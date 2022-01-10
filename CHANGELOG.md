@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed double warnings about deprecated configuration options. (#882)
+
 ## [1.3.0] - 2021-10-20
 
 ### Added
