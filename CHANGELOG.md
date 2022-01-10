@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.1] - 2022-01-11
 
 ### Fixed
-- Fixed duplicated warnings about deprecated configuration options. (#882)
+- Fixed an issue where warnings about deprecated configuration options were getting duplicated. (#882)
 
 ## [1.3.0] - 2021-10-20
 

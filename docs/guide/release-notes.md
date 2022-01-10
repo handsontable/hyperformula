@@ -8,7 +8,7 @@ HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 **Release date: January 11, 2022**
 
 ### Fixed
-- Fixed duplicated warnings about deprecated configuration options. [#882](https://github.com/handsontable/hyperformula/pull/882)
+- Fixed an issue where warnings about deprecated configuration options were getting duplicated. [#882](https://github.com/handsontable/hyperformula/pull/882)
 
 ## 1.3.0
 **Release date: October 20, 2021**
