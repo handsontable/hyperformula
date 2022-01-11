@@ -17,7 +17,7 @@ describe('Function ISLOGICAL', () => {
 
   it('should return false for non-boolean', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISLOGICAL(-0)', '=ISLOGICAL(A2)',  '=ISLOGICAL("foo")'],
+      ['=ISLOGICAL(-0)', '=ISLOGICAL(A2)', '=ISLOGICAL("foo")'],
       [null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)

@@ -4,7 +4,7 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('SUMSQ', () => {
-  it('SUMSQ without args',  () => {
+  it('SUMSQ without args', () => {
     const engine = HyperFormula.buildFromArray([['=SUMSQ()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -18,7 +18,7 @@ describe('SUMSQ', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5)
   })
 
-  it('SUMSQ with range args',  () => {
+  it('SUMSQ with range args', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '5'],
       ['3', '4', '=SUMSQ(A1:B2)'],
@@ -26,7 +26,7 @@ describe('SUMSQ', () => {
     expect(engine.getCellValue(adr('C2'))).toEqual(30)
   })
 
-  it('SUMSQ with using previously cached value',  () => {
+  it('SUMSQ with using previously cached value', () => {
     const engine = HyperFormula.buildFromArray([
       ['3', '=SUMSQ(A1:A1)'],
       ['4', '=SUMSQ(A1:A2)'],

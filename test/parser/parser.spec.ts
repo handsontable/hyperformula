@@ -129,7 +129,10 @@ describe('ParserWithCaching', () => {
   })
 
   it('float literal with different decimal separator', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ decimalSeparator: ',', functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)))
+    const parser = buildEmptyParserWithCaching(new Config({
+      decimalSeparator: ',',
+      functionArgSeparator: ';'
+    }), new SheetMapping(buildTranslationPackage(enGB)))
     const ast1 = parser.parse('=3,14', adr('A1')).ast
     const ast2 = parser.parse('=03,14', adr('A1')).ast
     const ast3 = parser.parse('=,14', adr('A1')).ast
@@ -151,7 +154,7 @@ describe('ParserWithCaching', () => {
 
   it('allow to accept different lexer configs', () => {
     const parser1 = buildEmptyParserWithCaching(new Config())
-    const parser2 = buildEmptyParserWithCaching(new Config({ functionArgSeparator: ';' }), new SheetMapping(buildTranslationPackage(enGB)))
+    const parser2 = buildEmptyParserWithCaching(new Config({functionArgSeparator: ';'}), new SheetMapping(buildTranslationPackage(enGB)))
 
     const ast1 = parser1.parse('=SUM(1, 2)', adr('A1')).ast as ProcedureAst
     const ast2 = parser2.parse('=SUM(1; 2)', adr('A1')).ast as ProcedureAst
@@ -231,7 +234,7 @@ describe('Functions', () => {
   })
 
   it('function with dot separator', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
+    const parser = buildEmptyParserWithCaching(new Config({language: 'plPL'}), new SheetMapping(buildTranslationPackage(plPL)))
     const ast = parser.parse('=NR.SER.OST.DN.MIEŚ()', adr('A1')).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('EOMONTH')
@@ -239,7 +242,7 @@ describe('Functions', () => {
   })
 
   it('function name should be translated during parsing', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
+    const parser = buildEmptyParserWithCaching(new Config({language: 'plPL'}), new SheetMapping(buildTranslationPackage(plPL)))
     const ast = parser.parse('=SUMA()', adr('A1')).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
@@ -254,7 +257,7 @@ describe('Functions', () => {
   })
 
   it('should leave original name if procedure translation not known', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ language: 'plPL' }), new SheetMapping(buildTranslationPackage(plPL)))
+    const parser = buildEmptyParserWithCaching(new Config({language: 'plPL'}), new SheetMapping(buildTranslationPackage(plPL)))
     const ast = parser.parse('=FOOBAR()', adr('A1')).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('FOOBAR')
@@ -286,7 +289,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=$B$3', adr('B2')).ast
 
-    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absolute( 1, 2)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absolute(1, 2)))
   })
 
   it('relative cell reference', () => {
@@ -302,7 +305,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=$B3', adr('B2')).ast
 
-    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteCol( 1, 1)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteCol(1, 1)))
   })
 
   it('absolute row cell reference', () => {
@@ -310,7 +313,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=B$3', adr('B2')).ast
 
-    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteRow( 0, 2)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.absoluteRow(0, 2)))
   })
 
   it('cell references should not be case sensitive', () => {
@@ -456,7 +459,7 @@ describe('cell references and ranges', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const { errors } = parser.parse('=A1:Sheet2!B2', adr('A1'))
+    const {errors} = parser.parse('=A1:Sheet2!B2', adr('A1'))
 
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
@@ -594,7 +597,7 @@ describe('Column ranges', () => {
   })
 
   it('column range with absolute sheet only on end side is a parsing error', () => {
-    const { errors } = parser.parse('=A:Sheet2!B', adr('A1'))
+    const {errors} = parser.parse('=A:Sheet2!B', adr('A1'))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 
@@ -642,7 +645,7 @@ describe('Row ranges', () => {
   })
 
   it('row range with absolute sheet only on end side is a parsing error', () => {
-    const { errors } = parser.parse('=1:Sheet2!2', adr('A1'))
+    const {errors} = parser.parse('=1:Sheet2!2', adr('A1'))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 })
@@ -754,7 +757,7 @@ describe('Parsing errors', () => {
     const input = ["='foo'", "=foo'bar", "=''''''", '=@']
 
     input.forEach((formula) => {
-      const { ast, errors } = parser.parse(formula, adr('A1'))
+      const {ast, errors} = parser.parse(formula, adr('A1'))
       expect(ast.type).toBe(AstNodeType.ERROR)
       expect(errors[0].type).toBe(ParsingErrorType.LexingError)
     })
@@ -763,14 +766,14 @@ describe('Parsing errors', () => {
   it('parsing error - not all input parsed', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const { errors } = parser.parse('=A1B1', adr('A1'))
+    const {errors} = parser.parse('=A1B1', adr('A1'))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 
   it('unknown error literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const { ast, errors } = parser.parse('=#FOO!', adr('A1'))
+    const {ast, errors} = parser.parse('=#FOO!', adr('A1'))
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })

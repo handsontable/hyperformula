@@ -119,7 +119,7 @@ export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
 }
 
 export function parse(str: string): FormatExpression {
-  return parseForDateTimeFormat(str) ?? parseForNumberFormat(str) ??  {
+  return parseForDateTimeFormat(str) ?? parseForNumberFormat(str) ?? {
     type: FormatExpressionType.STRING,
     tokens: [{
       type: TokenType.FREE_TEXT,

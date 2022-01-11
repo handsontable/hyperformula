@@ -35,7 +35,7 @@ describe('function OCT2HEX', () => {
       ['=OCT2HEX(7777777000)'],
       ['=OCT2HEX(7777777042)'],
       ['=OCT2HEX(7777777777)'],
-    ])      
+    ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('1')
     expect(engine.getCellValue(adr('A2'))).toEqual('8')

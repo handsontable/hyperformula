@@ -58,13 +58,13 @@ describe('Function VERSION', () => {
   })
 
   describe('registering', () => {
-    class VersionExtra extends FunctionPlugin implements FunctionPluginTypecheck<VersionExtra>{
+    class VersionExtra extends FunctionPlugin implements FunctionPluginTypecheck<VersionExtra> {
       public static implementedFunctions = {
         'VERSION': {
           method: 'version',
         }
       }
-    
+
       public version(): InterpreterValue {
         return 'version'
       }

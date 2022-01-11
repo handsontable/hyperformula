@@ -23,7 +23,7 @@ export type SheetDimensions = {
 
 /**
  * Represents size and fill ratio of a sheet
-*/
+ */
 export interface SheetBoundaries {
   width: number,
   height: number,
@@ -31,11 +31,11 @@ export interface SheetBoundaries {
 }
 
 export function validateAsSheet(sheet: Sheet): void {
-  if(!Array.isArray(sheet)) {
+  if (!Array.isArray(sheet)) {
     throw new InvalidArgumentsError('an array of arrays.')
   }
-  for(let i=0; i<sheet.length; i++) {
-    if(!Array.isArray(sheet[i])) {
+  for (let i = 0; i < sheet.length; i++) {
+    if (!Array.isArray(sheet[i])) {
       throw new InvalidArgumentsError('an array of arrays.')
     }
   }

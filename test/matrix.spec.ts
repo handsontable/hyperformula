@@ -3,7 +3,7 @@ import {EmptyValue} from '../src/interpreter/InterpreterValue'
 
 describe('Matrix', () => {
   it('fill', () => {
-    const matrix  = new ArrayValue([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+    const matrix = new ArrayValue([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     expect(matrix.raw()).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
   })
 

@@ -37,7 +37,7 @@ describe('Function TIMEVALUE', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=TIMEVALUE(4/0)'],
     ])
 

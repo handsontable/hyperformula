@@ -16,7 +16,7 @@ describe('Function ISNONTEXT', () => {
 
   it('should return true for nontext', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISNONTEXT(-0)', '=ISNONTEXT(A2)',  '=ISNONTEXT(1<1)'],
+      ['=ISNONTEXT(-0)', '=ISNONTEXT(A2)', '=ISNONTEXT(1<1)'],
       [null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(true)

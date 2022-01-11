@@ -81,7 +81,7 @@ export class AddressMapping {
 
   public getRawValue(address: SimpleCellAddress): RawCellContent {
     const vertex = this.getCell(address)
-    if(vertex instanceof ValueCellVertex) {
+    if (vertex instanceof ValueCellVertex) {
       return vertex.getValues().rawValue
     } else if (vertex instanceof ArrayVertex) {
       return vertex.getArrayCellRawValue(address)

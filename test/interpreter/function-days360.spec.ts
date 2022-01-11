@@ -24,7 +24,6 @@ describe('Function DAYS360', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-
   it('US mode', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DAYS360("30/03/2020", "31/03/2020")'],

@@ -54,7 +54,7 @@ describe('Parsing error literals', () => {
 
   it('should return parser error', () => {
     const parser = buildEmptyParserWithCaching(new Config({language: 'enGB'}), new SheetMapping(buildTranslationPackage(enGB)))
-    const { ast, errors } = parser.parse('=#UNKNOWN!', adr('A1'))
+    const {ast, errors} = parser.parse('=#UNKNOWN!', adr('A1'))
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
     expect(errors[0].message).toBe('Unknown error literal')

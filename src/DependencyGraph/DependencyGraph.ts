@@ -47,6 +47,22 @@ import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
 
 export class DependencyGraph {
+  public readonly graph: Graph<Vertex>
+  private changes: ContentChanges = ContentChanges.empty()
+
+  constructor(
+    public readonly addressMapping: AddressMapping,
+    public readonly rangeMapping: RangeMapping,
+    public readonly sheetMapping: SheetMapping,
+    public readonly arrayMapping: ArrayMapping,
+    public readonly stats: Statistics,
+    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
+    public readonly functionRegistry: FunctionRegistry,
+    public readonly namedExpressions: NamedExpressions,
+  ) {
+    this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
+  }
+
   /**
    * Invariants:
    * - empty cell has associated EmptyCellVertex if and only if it is a dependency (possibly indirect, through range) to some formula
@@ -63,23 +79,6 @@ export class DependencyGraph {
       functionRegistry,
       namedExpressions
     )
-  }
-
-  private changes: ContentChanges = ContentChanges.empty()
-
-  public readonly graph: Graph<Vertex>
-
-  constructor(
-    public readonly addressMapping: AddressMapping,
-    public readonly rangeMapping: RangeMapping,
-    public readonly sheetMapping: SheetMapping,
-    public readonly arrayMapping: ArrayMapping,
-    public readonly stats: Statistics,
-    public readonly lazilyTransformingAstService: LazilyTransformingAstService,
-    public readonly functionRegistry: FunctionRegistry,
-    public readonly namedExpressions: NamedExpressions,
-  ) {
-    this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
   }
 
   public setFormulaToCell(address: SimpleCellAddress, ast: Ast, dependencies: CellDependency[], size: ArraySize, hasVolatileFunction: boolean, hasStructuralChangeFunction: boolean): ContentChanges {
@@ -314,7 +313,6 @@ export class DependencyGraph {
       }
     })
 
-
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
       for (const range of rangesToRemove) {
@@ -406,7 +404,7 @@ export class DependencyGraph {
 
     this.addStructuralNodesToChangeSet()
 
-    return { affectedArrays }
+    return {affectedArrays}
   }
 
   public addColumns(addedColumns: ColumnsSpan): EagerChangesGraphChangeResult {
@@ -441,7 +439,7 @@ export class DependencyGraph {
 
   public isThereSpaceForArray(arrayVertex: ArrayVertex): boolean {
     const range = arrayVertex.getRangeOrUndef()
-    if(range===undefined) {
+    if (range === undefined) {
       return false
     }
     for (const address of range.addresses(this)) {
@@ -983,7 +981,7 @@ export class DependencyGraph {
     }
 
     const range = AbsoluteCellRange.spanFromOrUndef(formulaAddress, vertex.width, vertex.height)
-    if(range === undefined) {
+    if (range === undefined) {
       return
     }
     this.setArray(range, vertex)
@@ -1046,7 +1044,6 @@ export class DependencyGraph {
       }
     }
   }
-
 
   private fixArraysAfterAddingColumn(sheet: number, columnStart: number, numberOfColumns: number) {
     this.arrayMapping.moveArrayVerticesAfterColumnByColumns(sheet, columnStart, numberOfColumns)

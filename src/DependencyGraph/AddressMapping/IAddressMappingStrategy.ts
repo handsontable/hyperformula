@@ -9,6 +9,7 @@ import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 
 export type AddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
+
 /**
  * Interface for mapping from sheet addresses to vertices.
  */
@@ -66,7 +67,7 @@ export interface IAddressMappingStrategy {
   verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex>,
 
   entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]>,
-  
+
   entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]>,
 
   vertices(): IterableIterator<CellVertex>,

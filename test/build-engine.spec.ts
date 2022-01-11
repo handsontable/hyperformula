@@ -102,7 +102,11 @@ describe('named expressions', () => {
   })
 
   it('buildFromSheets + scope', () => {
-    const engine = HyperFormula.buildFromSheets({sheet: [['=FALSE']]}, {}, [{name: 'FALSE', expression: false, scope: 0}])
+    const engine = HyperFormula.buildFromSheets({sheet: [['=FALSE']]}, {}, [{
+      name: 'FALSE',
+      expression: false,
+      scope: 0
+    }])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
   })
 })

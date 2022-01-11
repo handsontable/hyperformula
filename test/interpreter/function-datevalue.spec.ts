@@ -36,10 +36,8 @@ describe('Function DATEVALUE', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(43466)
   })
 
-
-
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=DATEVALUE(4/0)'],
     ])
 

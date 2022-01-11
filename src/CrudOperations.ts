@@ -66,7 +66,6 @@ export type ColumnRowIndex = [number, number]
 
 export class CrudOperations {
 
-
   private readonly maxRows: number
   private readonly maxColumns: number
 
@@ -84,6 +83,10 @@ export class CrudOperations {
   ) {
     this.maxRows = config.maxRows
     this.maxColumns = config.maxColumns
+  }
+
+  private get sheetMapping(): SheetMapping {
+    return this.dependencyGraph.sheetMapping
   }
 
   public addRows(sheet: number, ...indexes: ColumnRowIndex[]): void {
@@ -310,7 +313,6 @@ export class CrudOperations {
     }
   }
 
-
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): void {
     this.validateSwapColumnIndexes(sheetId, columnMapping)
     this.testColumnOrderForArrays(sheetId, columnMapping)
@@ -338,7 +340,6 @@ export class CrudOperations {
     }
   }
 
-
   public mappingFromOrder(sheetId: number, newOrder: number[], rowOrColumn: 'row' | 'column'): [number, number][] {
     if (!this.sheetMapping.hasSheetWithId(sheetId)) {
       throw new NoSheetWithIdError(sheetId)
@@ -354,24 +355,6 @@ export class CrudOperations {
       }
     }
     return ret
-  }
-
-  private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
-    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
-    const sources = rowMapping.map(([a, _]) => a).sort((a, b) => a - b)
-    const targets = rowMapping.map(([_, b]) => b).sort((a, b) => a - b)
-
-    for (let i = 0; i < sources.length; i++) {
-      if (!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
-        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn === 'row' ? 'height' : 'width'}.`)
-      }
-      if (sources[i] === sources[i + 1]) {
-        throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
-      }
-      if (sources[i] !== targets[i]) {
-        throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
-      }
-    }
   }
 
   public undo() {
@@ -623,8 +606,22 @@ export class CrudOperations {
     }
   }
 
-  private get sheetMapping(): SheetMapping {
-    return this.dependencyGraph.sheetMapping
+  private validateRowOrColumnMapping(sheetId: number, rowMapping: [number, number][], rowOrColumn: 'row' | 'column'): void {
+    const limit = rowOrColumn === 'row' ? this.dependencyGraph.getSheetHeight(sheetId) : this.dependencyGraph.getSheetWidth(sheetId)
+    const sources = rowMapping.map(([a, _]) => a).sort((a, b) => a - b)
+    const targets = rowMapping.map(([_, b]) => b).sort((a, b) => a - b)
+
+    for (let i = 0; i < sources.length; i++) {
+      if (!isNonnegativeInteger(sources[i]) || sources[i] >= limit) {
+        throw new InvalidArgumentsError(`${rowOrColumn} numbers to be nonnegative integers and less than sheet ${rowOrColumn === 'row' ? 'height' : 'width'}.`)
+      }
+      if (sources[i] === sources[i + 1]) {
+        throw new InvalidArgumentsError(`source ${rowOrColumn} numbers to be unique.`)
+      }
+      if (sources[i] !== targets[i]) {
+        throw new InvalidArgumentsError(`target ${rowOrColumn} numbers to be permutation of source ${rowOrColumn} numbers.`)
+      }
+    }
   }
 
   private ensureNamedExpressionNameIsValid(expressionName: string, sheetId?: number) {

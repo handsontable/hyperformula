@@ -107,7 +107,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
   public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
     const range = rangeValue.range
-    if(range === undefined) {
+    if (range === undefined) {
       return this.binarySearchStrategy.find(key, rangeValue, sorted)
     }
     this.ensureRecentData(range.sheet, range.start.col, key)
@@ -117,7 +117,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return -1
     }
 
-    if(typeof key === 'string') {
+    if (typeof key === 'string') {
       key = forceNormalizeString(key)
     }
 
@@ -192,7 +192,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return
     }
     const relevantTransformations = this.transformingService.getTransformationsFrom(valueIndex.version, (transformation: FormulaTransformer) => {
-      return transformation.sheet === sheet && (transformation instanceof AddRowsTransformer || transformation instanceof  RemoveRowsTransformer)
+      return transformation.sheet === sheet && (transformation instanceof AddRowsTransformer || transformation instanceof RemoveRowsTransformer)
     })
     for (const transformation of relevantTransformations) {
       if (transformation instanceof AddRowsTransformer) {
@@ -207,7 +207,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
   private addSingleCellValue(value: RawInterpreterValue, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
       this.ensureRecentData(address.sheet, address.col, value)
-      if(typeof value === 'string') {
+      if (typeof value === 'string') {
         value = forceNormalizeString(value)
       }
       const valueIndex = this.getValueIndex(address.sheet, address.col, value)
@@ -220,7 +220,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
       this.ensureRecentData(address.sheet, address.col, value)
 
       const columnMap = this.getColumnMap(address.sheet, address.col)
-      if(typeof value === 'string') {
+      if (typeof value === 'string') {
         value = forceNormalizeString(value)
       }
       const valueIndex = columnMap.get(value)

@@ -30,7 +30,7 @@ describe('Function MONTH', () => {
   })
 
   it('use datenumber coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(TRUE())'],
       ['=MONTH(1)'],
     ])
@@ -40,7 +40,7 @@ describe('Function MONTH', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(4/0)'],
     ])
 
@@ -48,7 +48,7 @@ describe('Function MONTH', () => {
   })
 
   it('test for days in month, start of month', () => {
-    const engine = HyperFormula.buildFromArray( [
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(DATE(2021,1,1))'],
       ['=MONTH(DATE(2021,2,1))'],
       ['=MONTH(DATE(2021,3,1))'],
@@ -78,7 +78,7 @@ describe('Function MONTH', () => {
   })
 
   it('test for days in month, end of month', () => {
-    const engine = HyperFormula.buildFromArray( [
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(DATE(2021,1,31))'],
       ['=MONTH(DATE(2021,2,28))'],
       ['=MONTH(DATE(2021,3,31))'],
@@ -108,7 +108,7 @@ describe('Function MONTH', () => {
   })
 
   it('test for days in month, end of month+1', () => {
-    const engine = HyperFormula.buildFromArray( [
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(DATE(2021,1,31)+1)'],
       ['=MONTH(DATE(2021,2,28)+1)'],
       ['=MONTH(DATE(2021,3,31)+1)'],
@@ -138,7 +138,7 @@ describe('Function MONTH', () => {
   })
 
   it('test for days in month, start of month, leap year', () => {
-    const engine = HyperFormula.buildFromArray( [
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(DATE(2020,1,1))'],
       ['=MONTH(DATE(2020,2,1))'],
       ['=MONTH(DATE(2020,3,1))'],
@@ -168,7 +168,7 @@ describe('Function MONTH', () => {
   })
 
   it('test for days in month, end of month, leap year', () => {
-    const engine = HyperFormula.buildFromArray( [
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(DATE(2020,1,31))'],
       ['=MONTH(DATE(2020,2,29))'],
       ['=MONTH(DATE(2020,3,31))'],
@@ -198,7 +198,7 @@ describe('Function MONTH', () => {
   })
 
   it('test for days in month, end of month+1, leap year', () => {
-    const engine = HyperFormula.buildFromArray( [
+    const engine = HyperFormula.buildFromArray([
       ['=MONTH(DATE(2020,1,31)+1)'],
       ['=MONTH(DATE(2020,2,29)+1)'],
       ['=MONTH(DATE(2020,3,31)+1)'],

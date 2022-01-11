@@ -4,8 +4,8 @@
  */
 
 export function objectDestroy(object: any) {
-  for(const [key, value] of Object.entries(object)) {
-    if(value instanceof Function) {
+  for (const [key, value] of Object.entries(object)) {
+    if (value instanceof Function) {
       (object as Record<string, any>)[key] = postMortem(value)
     } else {
       delete (object as Record<string, any>)[key]

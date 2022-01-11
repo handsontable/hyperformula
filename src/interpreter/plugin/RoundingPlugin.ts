@@ -20,89 +20,89 @@ export function findNextEvenNumber(arg: number): number {
   return (ceiled % 2 === 0) ? ceiled : ceiled + 1
 }
 
-export class RoundingPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RoundingPlugin>{
+export class RoundingPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RoundingPlugin> {
   public static implementedFunctions = {
     'ROUNDUP': {
       method: 'roundup',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ],
     },
     'ROUNDDOWN': {
       method: 'rounddown',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ],
     },
     'ROUND': {
       method: 'round',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ],
     },
     'INT': {
       method: 'intFunc',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ],
     },
     'EVEN': {
       method: 'even',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ],
     },
     'ODD': {
       method: 'odd',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ],
     },
     'CEILING.MATH': {
       method: 'ceilingmath',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0 },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ],
     },
     'CEILING': {
       method: 'ceiling',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
       ],
     },
     'CEILING.PRECISE': {
       method: 'ceilingprecise',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ],
     },
     'FLOOR.MATH': {
       method: 'floormath',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 0 },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
       ],
     },
     'FLOOR': {
       method: 'floor',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
       ],
     },
     'FLOOR.PRECISE': {
       method: 'floorprecise',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER, defaultValue: 1 },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
       ],
     },
   }
@@ -178,35 +178,35 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
   public ceilingmath(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING.MATH'),
       (value: number, significance: number, mode: number) => {
-      if (significance === 0 || value === 0) {
-        return 0
-      }
+        if (significance === 0 || value === 0) {
+          return 0
+        }
 
-      significance = Math.abs(significance)
-      if (mode === 1 && value < 0) {
-        significance = -significance
-      }
+        significance = Math.abs(significance)
+        if (mode === 1 && value < 0) {
+          significance = -significance
+        }
 
-      return Math.ceil(value / significance) * significance
-    })
+        return Math.ceil(value / significance) * significance
+      })
   }
 
   public ceiling(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING'),
       (value: number, significance: number) => {
-        if(value === 0) {
+        if (value === 0) {
           return 0
         }
         if (significance === 0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
 
-      if ((value > 0) && (significance < 0)) {
-        return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
-      }
+        if ((value > 0) && (significance < 0)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.DistinctSigns)
+        }
 
-      return Math.ceil(value / significance) * significance
-    })
+        return Math.ceil(value / significance) * significance
+      })
   }
 
   public ceilingprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -239,7 +239,7 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
   public floor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FLOOR'),
       (value: number, significance: number) => {
-        if(value === 0) {
+        if (value === 0) {
           return 0
         }
         if (significance === 0) {

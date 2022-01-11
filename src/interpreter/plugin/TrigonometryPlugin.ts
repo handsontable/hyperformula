@@ -14,134 +14,134 @@ import {PI} from './MathConstantsPlugin'
 /**
  * Interpreter plugin containing trigonometric functions
  */
-export class TrigonometryPlugin extends FunctionPlugin implements FunctionPluginTypecheck<TrigonometryPlugin>{
+export class TrigonometryPlugin extends FunctionPlugin implements FunctionPluginTypecheck<TrigonometryPlugin> {
 
   public static implementedFunctions = {
     'ACOS': {
       method: 'acos',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ASIN': {
       method: 'asin',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'COS': {
       method: 'cos',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'SIN': {
       method: 'sin',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'TAN': {
       method: 'tan',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ATAN': {
       method: 'atan',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ATAN2': {
       method: 'atan2',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
       ]
     },
     'COT': {
       method: 'cot',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'SEC': {
       method: 'sec',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'CSC': {
       method: 'csc',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'SINH': {
       method: 'sinh',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'COSH': {
       method: 'cosh',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'TANH': {
       method: 'tanh',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'COTH': {
       method: 'coth',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'SECH': {
       method: 'sech',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'CSCH': {
       method: 'csch',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ACOT': {
       method: 'acot',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ASINH': {
       method: 'asinh',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ACOSH': {
       method: 'acosh',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ATANH': {
       method: 'atanh',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
     'ACOTH': {
       method: 'acoth',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER }
+        {argumentType: ArgumentTypes.NUMBER}
       ]
     },
   }
@@ -181,7 +181,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
   public atan2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ATAN2'),
       (x: number, y: number) => {
-        if(x===0 && y===0) {
+        if (x === 0 && y === 0) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
         return Math.atan2(y, x)
@@ -197,7 +197,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
 
   public acot(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ACOT'),
-      (arg) => (arg === 0) ? PI/2 : Math.atan(1/arg)
+      (arg) => (arg === 0) ? PI / 2 : Math.atan(1 / arg)
     )
   }
 
@@ -245,7 +245,7 @@ export class TrigonometryPlugin extends FunctionPlugin implements FunctionPlugin
 
   public acoth(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ACOTH'),
-      (arg) => (arg === 0) ? new CellError(ErrorType.NUM, ErrorMessage.NonZero) : Math.atanh(1/arg)
+      (arg) => (arg === 0) ? new CellError(ErrorType.NUM, ErrorMessage.NonZero) : Math.atanh(1 / arg)
     )
   }
 

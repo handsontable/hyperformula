@@ -8,13 +8,13 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class PowerPlugin extends FunctionPlugin implements FunctionPluginTypecheck<PowerPlugin>{
+export class PowerPlugin extends FunctionPlugin implements FunctionPluginTypecheck<PowerPlugin> {
   public static implementedFunctions = {
     'POWER': {
       method: 'power',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
       ],
     },
   }

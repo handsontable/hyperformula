@@ -92,8 +92,8 @@ describe('i18n', () => {
     allLanguages.forEach(lang => {
       const names = Object.values(lang.functions)
       names.sort()
-      for(let i=0;i<names.length-1;i++) {
-        expect(names[i]).not.toEqual(names[i+1])
+      for (let i = 0; i < names.length - 1; i++) {
+        expect(names[i]).not.toEqual(names[i + 1])
       }
     })
   })

@@ -29,7 +29,7 @@ describe('Function MIRR', () => {
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.261451054124004, 6) // different value without 0
     expect(engine.getCellValue(adr('A5'))).toBeCloseTo(1.58198889747161, 6)
   })
-  
+
   it('should return #DIV/0! if "contains at least one positive and one negative value" condition is not met', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MIRR(B1:E1,0.2,0.1)', -1, 0, -1, -1],

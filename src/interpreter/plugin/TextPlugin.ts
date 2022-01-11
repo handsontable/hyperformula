@@ -13,7 +13,7 @@ import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './Function
 /**
  * Interpreter plugin containing text-specific functions
  */
-export class TextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<TextPlugin>{
+export class TextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<TextPlugin> {
   public static implementedFunctions = {
     'CONCATENATE': {
       method: 'concatenate',

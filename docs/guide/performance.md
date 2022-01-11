@@ -67,10 +67,11 @@ performance.
 
 ## GPU acceleration
 
-Some formulas, e.g. MMULT, MAXPOOL, MEDIANPOOL, or TRANSPOSE, benefit from
-GPU acceleration. Thanks to the cores running thousands of threads
-at once, they calculate the input data sets up to 9x faster than
-when using the CPU. According to our observations the bigger the data set is,
+You can speed up HyperFormula's [matrix functions](built-in-functions.md#matrix-functions) ([MMULT](built-in-functions.md#matrix-functions), [MAXPOOL](built-in-functions.md#matrix-functions), [MEDIANPOOL](built-in-functions.md#matrix-functions), and [TRANSPOSE](built-in-functions.md#matrix-functions)) with GPU acceleration.
+
+With GPU acceleration (thanks to cores running thousands of threads
+at once) the matrix functions calculate input data sets up to 9x faster than
+when using the CPU. From our observation, the bigger the data set,
 the bigger the performance gain.
 
 **For small data sets, the difference between the CPU and GPU is

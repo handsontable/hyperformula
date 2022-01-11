@@ -1,16 +1,15 @@
 import {DetailedCellError} from '../src'
 import {ArraySize} from '../src/ArraySize'
 import {CellError, ErrorType} from '../src/Cell'
-import {adr} from './testUtils'
 import {FormulaVertex} from '../src/DependencyGraph/FormulaCellVertex'
 import {buildNumberAst} from '../src/parser/Ast'
+import {adr} from './testUtils'
 
 describe('Matchers', () => {
   it('should compare two simple values', () => {
     expect(1).toEqualError(1)
     expect(1).not.toEqualError(2)
   })
-
 
   it('should compare two cell errors ignoring vertices', () => {
     function dummyFormulaVertex(): FormulaVertex {

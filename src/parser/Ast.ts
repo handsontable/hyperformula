@@ -176,7 +176,7 @@ export const buildCellRangeAst = (start: CellAddress, end: CellAddress, sheetRef
   }
 }
 
-export interface ColumnRangeAst extends AstWithWhitespace{
+export interface ColumnRangeAst extends AstWithWhitespace {
   type: AstNodeType.COLUMN_RANGE,
   start: ColumnAddress,
   end: ColumnAddress,
@@ -194,7 +194,7 @@ export const buildColumnRangeAst = (start: ColumnAddress, end: ColumnAddress, sh
   }
 }
 
-export interface RowRangeAst extends AstWithWhitespace{
+export interface RowRangeAst extends AstWithWhitespace {
   type: AstNodeType.ROW_RANGE,
   start: RowAddress,
   end: RowAddress,

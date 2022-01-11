@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ATANH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ATANH(0)', '=ATANH(0.5)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ATANH(0)', '=ATANH(0.5)']], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(0)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.5493061443340548)
@@ -35,8 +35,8 @@ describe('Function ATANH', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="0"', '=ATANH(A1)'],
     ])
 
@@ -44,7 +44,7 @@ describe('Function ATANH', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=ATANH(4/0)'],
     ])
 

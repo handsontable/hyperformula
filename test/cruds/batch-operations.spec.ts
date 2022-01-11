@@ -43,7 +43,7 @@ describe('batch cruds', () => {
         engine.addRows(1, [0, 1]) // fail
         engine.addRows(0, [0, 1])
       })
-    } catch(e) {
+    } catch (e) {
       // empty line
     }
 

@@ -35,7 +35,7 @@ describe('Function COMBINA', () => {
     expect(engine.getCellValue(adr('A7'))).toBe(635745396)
     expect(engine.getCellValue(adr('A8')) as number / 1.8523520317769801e+115).toBeCloseTo(1, 6)
     expect(engine.getCellValue(adr('A9'))).toBe(325949656825)
-    expect(engine.getCellValue(adr('A10')) as number/1.41325918108873e+308).toBeCloseTo(1, 6)
+    expect(engine.getCellValue(adr('A10')) as number / 1.41325918108873e+308).toBeCloseTo(1, 6)
   })
 
   it('truncates argument', () => {
@@ -45,7 +45,7 @@ describe('Function COMBINA', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(3003)
-    expect(engine.getCellValue(adr('A2')) as number/1.41325918108873e+308).toBeCloseTo(1)
+    expect(engine.getCellValue(adr('A2')) as number / 1.41325918108873e+308).toBeCloseTo(1)
   })
 
   it('checks bounds', () => {

@@ -30,7 +30,7 @@ describe('Function MINUTE', () => {
   })
 
   it('use datenumber coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MINUTE(TRUE())'],
     ])
 
@@ -38,7 +38,7 @@ describe('Function MINUTE', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=MINUTE(4/0)'],
     ])
 

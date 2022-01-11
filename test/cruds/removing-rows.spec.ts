@@ -93,7 +93,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [2, 1])
 
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow( 0, 1))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteRow(0, 1))
   })
 
   it('case Ab: absolute dependency below removed row should be shifted', () => {
@@ -105,7 +105,7 @@ describe('Address dependencies, Case 1: same sheet', () => {
 
     engine.removeRows(0, [1, 1])
 
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow( 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 1))
   })
 
   it('case Ac: absolute dependency in removed row range should be replaced by #REF', () => {
@@ -216,9 +216,9 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
       ],
     })
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
     engine.removeRows(0, [0, 1])
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
   })
 
   it('case Ra: removing row above formula should shift dependency', () => {
@@ -275,7 +275,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 1))
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(0, 0, 1))
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(-1, 0, 1))
-    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow( 0, 1, 1))
+    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(0, 1, 1))
   })
 
   it('case ARb: relative/absolute dependency above removed row should not be affected', () => {
@@ -293,7 +293,7 @@ describe('Address dependencies, Case 3: formula in different sheet', () => {
     engine.removeRows(1, [1, 1])
 
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 0, 1))
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow( 0, 0, 1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absoluteRow(0, 0, 1))
   })
 
   it('case ARc: relative/absolute dependency in removed range should be replaced by #REF', () => {

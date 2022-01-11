@@ -16,7 +16,7 @@ export abstract class AdvancedFind {
   public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue): number {
     let values: InternalScalarValue[]
     const range = rangeValue.range
-    if(range === undefined) {
+    if (range === undefined) {
       values = rangeValue.valuesFromTopLeftCorner()
     } else {
       values = this.dependencyGraph.computeListOfValuesInRange(range)
