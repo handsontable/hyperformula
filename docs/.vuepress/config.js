@@ -196,7 +196,7 @@ module.exports = {
             ['/guide/order-of-precendece', 'Order of precedence'],
             ['/guide/built-in-functions', 'Built-in functions'],
             ['/guide/volatile-functions', 'Volatile functions'],
-            ['/guide/named-ranges', 'Named ranges'],
+            ['/guide/named-expressions', 'Named expressions'],
             ['/guide/arrays', 'Array formulas'],
           ]
         },
