@@ -55,7 +55,8 @@ by this operation together with their absolute addresses and new values.
 
 ```javascript
 // track the changes triggered by removing the sheet named 'SheetName'
-const changes = hfInstance.removeSheet('SheetName');
+const sheetId = hfInstance.getSheetId('Sheetname');
+const changes = hfInstance.removeSheet(sheetId);
 ```
 
 ### Renaming a sheet
