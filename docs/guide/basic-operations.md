@@ -48,8 +48,9 @@ const sheetsCount = hfInstance.countSheets();
 ### Removing a sheet
 
 A sheet can be removed by using the `removeSheet` method. To do that
-you need to pass a mandatory parameter: the name of a sheet to be
-removed. This method returns a list of cells whose values were affected
+you need to pass a mandatory parameter: the numerical sheet id of the sheet to be
+removed. You can obtain the sheet id by using the `getSheetId` method on the sheet instance.
+The removeSheet method returns a list of cells whose values were affected
 by this operation together with their absolute addresses and new values.
 
 ```javascript
