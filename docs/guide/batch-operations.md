@@ -58,7 +58,7 @@ hfInstance.suspendEvaluation();
 
 // perform operations
 hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
-hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
+hfInstance.setSheetContent(1, [['50'], ['60']]);
 
 // resume the evaluation
 const changes = hfInstance.resumeEvaluation();
