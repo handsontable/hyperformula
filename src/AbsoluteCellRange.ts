@@ -47,8 +47,12 @@ export class AbsoluteCellRange implements SimpleCellRange {
     if (start.sheet !== end.sheet) {
       throw new SheetsNotEqual(start.sheet, end.sheet)
     }
-    this.start = simpleCellAddress(start.sheet, start.col, start.row)
-    this.end = simpleCellAddress(end.sheet, end.col, end.row)
+
+    const [startCol, endCol] = [start.col, end.col].sort((x,y) => x-y)
+    const [startRow, endRow] = [start.row, end.row].sort((x,y) => x-y)
+
+    this.start = simpleCellAddress(start.sheet, startCol, startRow)
+    this.end = simpleCellAddress(end.sheet, endCol, endRow)
   }
 
   public get sheet() {

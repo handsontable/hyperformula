@@ -569,10 +569,11 @@ export class CrudOperations {
 
   public ensureItIsPossibleToChangeCellContents(inputAddress: SimpleCellAddress, content: RawCellContent[][]) {
     const boundaries = findBoundaries(content)
+    // empty range representation is broken by my changes
     const targetRange = AbsoluteCellRange.spanFrom(inputAddress, boundaries.width, boundaries.height)
-    this.ensureRangeInSizeLimits(targetRange)
+    this.ensureRangeInSizeLimits(targetRange) // this fails for non-empty range
     for (const address of targetRange.addresses(this.dependencyGraph)) {
-      this.ensureItIsPossibleToChangeContent(address)
+      this.ensureItIsPossibleToChangeContent(address) // this fails -> invalid address: -1
     }
   }
 

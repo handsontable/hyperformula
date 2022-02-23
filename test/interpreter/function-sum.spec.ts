@@ -119,4 +119,31 @@ describe('SUM', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
+  it('works with ranges 2', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '5'],
+      ['3', '4', '=SUM(B2:A1)']
+    ])
+    
+    expect(engine.getCellValue(adr('C2'))).toEqual(10)
+  })
+
+  it('works with ranges 3', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '5'],
+      ['3', '4', '=SUM(B1:A2)']
+    ])
+    
+    expect(engine.getCellValue(adr('C2'))).toEqual(10)
+  })
+
+  it('works with ranges 4', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '5'],
+      ['3', '4', '=SUM(A2:B1)']
+    ])
+    
+    expect(engine.getCellValue(adr('C2'))).toEqual(10)
+  })
 })
