@@ -48,15 +48,13 @@ const sheetsCount = hfInstance.countSheets();
 ### Removing a sheet
 
 A sheet can be removed by using the `removeSheet` method. To do that
-you need to pass a mandatory parameter: the numerical sheet id of the sheet to be
-removed. You can obtain the sheet id by using the `getSheetId` method on the sheet instance.
-The removeSheet method returns a list of cells whose values were affected
+you need to pass a mandatory parameter: the ID of a sheet to be
+removed. This method returns a list of cells whose values were affected
 by this operation together with their absolute addresses and new values.
 
 ```javascript
-// track the changes triggered by removing the sheet named 'SheetName'
-const sheetId = hfInstance.getSheetId('Sheetname');
-const changes = hfInstance.removeSheet(sheetId);
+// track the changes triggered by removing the sheet 0
+const changes = hfInstance.removeSheet(0);
 ```
 
 ### Renaming a sheet
@@ -80,26 +78,26 @@ hfInstance.renameSheet(sheetID, 'AnotherNewName');
 ### Clearing a sheet
 
 A sheet's content can be cleared with the `clearSheet` method. You need
-to provide the name of the sheet whose content you want to clear. This
+to provide the ID of a sheet whose content you want to clear. This
 method returns a list of cells whose values were affected by this
 operation together with their absolute addresses and new values.
 
 ```javascript
-// clear the content of 'MySheet2'
-const changes = hfInstance.clearSheet('MySheet2');
+// clear the content of sheet 0
+const changes = hfInstance.clearSheet(0);
 ```
 
 ### Replacing sheet content
 
 Instead of removing and adding the content of a sheet you can replace
 it right away. To do so use `setSheetContent`, in which you can pass
-the sheet name and its new values. This method returns a list of cells
+the sheet ID and its new values. This method returns a list of cells
 whose values were affected by this operation together with their
 absolute addresses and new values.
 
 ```javascript
-// set new values for 'MySheet1'
-const changes = hfInstance.setSheetContent('MySheet1', [['50'], ['60']]);
+// set new values for sheet 0
+const changes = hfInstance.setSheetContent(0, [['50'], ['60']]);
 ```
 
 ## Rows
