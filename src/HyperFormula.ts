@@ -2668,7 +2668,7 @@ export class HyperFormula implements TypedEmitter {
    *  MySheet2: [ ['10'] ],
    * });
    *
-   * // should return 'true' because sheet of id 0 exists
+   * // should return 'true' because sheet of ID 0 exists
    * // and the provided content can be placed in this sheet
    * const isReplaceable = hfInstance.isItPossibleToReplaceSheetContent(0, [['50'], ['60']]);
    * ```
@@ -3313,7 +3313,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Renames a specified sheet.
    *
-   * @param {number} sheetId - a sheet id
+   * @param {number} sheetId - a sheet ID
    * @param {string} newName - a name of the sheet to be given, if is the same as the old one the method does nothing
    *
    * @fires [[sheetRenamed]] after the sheet was renamed
