@@ -1,6 +1,16 @@
 name: Test
 
-on: [push]
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize # the head branch is updated from the base branch, new commits are pushed to the head branch, or the base branch is changed
+  push:
+    branches:
+      - 'master'
+      - 'develop'
+      - 'release/**'
 
 jobs:
   build:
