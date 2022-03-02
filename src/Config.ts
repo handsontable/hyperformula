@@ -687,11 +687,6 @@ export class Config implements ConfigParams, ParserConfig {
 
   private warnDeprecatedOptions(options: Partial<ConfigParams>) {
     this.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
-    this.warnDeprecatedIfUsed(options.gpujs, 'gpujs', '1.2')
-
-    if (options.gpuMode !== Config.defaultConfig.gpuMode) {
-      this.warnDeprecatedIfUsed(options.gpuMode, 'gpuMode', '1.2')
-    }
   }
 
   private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
