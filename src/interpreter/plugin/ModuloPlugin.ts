@@ -9,13 +9,13 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ModuloPlugin>{
+export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ModuloPlugin> {
   public static implementedFunctions = {
     'MOD': {
       method: 'mod',
       parameters: [
-        { argumentType: ArgumentTypes.NUMBER },
-        { argumentType: ArgumentTypes.NUMBER },
+        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: ArgumentTypes.NUMBER},
       ],
     },
   }

@@ -12,15 +12,15 @@ import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './Function
 /**
  * Interpreter plugin containing COUNTUNIQUE function
  */
-export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountUniquePlugin>{
+export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountUniquePlugin> {
   public static implementedFunctions = {
     'COUNTUNIQUE': {
       method: 'countunique',
       parameters: [
-          {argumentType: ArgumentTypes.SCALAR},
-        ],
-        repeatLastArgs: 1,
-        expandRanges: true,
+        {argumentType: ArgumentTypes.SCALAR},
+      ],
+      repeatLastArgs: 1,
+      expandRanges: true,
     },
   }
 

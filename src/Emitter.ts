@@ -20,11 +20,11 @@ export enum Events {
 export interface Listeners {
   /**
    * Occurs when a sheet is added anywhere inside the workbook.
-   * 
+   *
    * @event
-   * 
+   *
    * @param {string} addedSheetDisplayName the name of added sheet
-   * 
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -53,12 +53,12 @@ export interface Listeners {
 
   /**
    * Occurs when a sheet is removed from anywhere inside the workbook.
-   * 
+   *
    * @event
-   * 
+   *
    * @param {string} removedSheetDisplayName the name of removed sheet
    * @param {ExportedChange[]} changes the values and location of applied changes
-   * 
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -74,16 +74,16 @@ export interface Listeners {
    *
    * // remove a sheet to trigger the 'sheetRemoved' event,
    * // the console prints 'baz' each time a sheet is removed
-   * hfInstance.removeSheet('0');
+   * hfInstance.removeSheet(0);
    *
    * // unsubscribe from the 'sheetRemoved' event
    * hfInstance.off('sheetRemoved', handler);
    *
    * // remove a sheet
    * // this time, the console doesn't print anything
-   * hfInstance.removeSheet('1');
+   * hfInstance.removeSheet(1);
    * ```
-   * 
+   *
    * @category Sheet
    */
   sheetRemoved: (removedSheetDisplayName: string, changes: ExportedChange[]) => any,
@@ -95,7 +95,7 @@ export interface Listeners {
    *
    * @param {string} oldDisplayName the old name of a sheet before renaming
    * @param {string} newDisplayName the new name of the sheet after renaming
-   * 
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -120,16 +120,16 @@ export interface Listeners {
    * // this time, the console doesn't print anything
    * hfInstance.renameSheet(1, 'MySheet1');
    * ```
-   * 
+   *
    * @category Sheet
    */
   sheetRenamed: (oldDisplayName: string, newDisplayName: string) => any,
 
   /**
    * Occurs when a named expression with specified values and location is added.
-   * 
+   *
    * @event
-   * 
+   *
    * @param {string} namedExpressionName the name of added expression
    * @param {ExportedChange[]} changes the values and location of applied changes
    *
@@ -156,19 +156,19 @@ export interface Listeners {
    * // this time, the console doesn't print anything
    * const changes = hfInstance.addNamedExpression('uglyName', '=Sheet1!$A$1+100', 0);
    * ```
-   * 
+   *
    * @category Named Expression
    */
   namedExpressionAdded: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
   /**
    * Occurs when a named expression with specified values is removed and from an indicated location.
-   * 
+   *
    * @event
-   * 
+   *
    * @param {string} namedExpressionName the name of removed expression
    * @param {ExportedChange[]} changes the values and location of applied changes
-   * 
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
@@ -177,14 +177,14 @@ export interface Listeners {
    *
    * // define a function to be called when the event occurs
    * const handler = (namedExpressionName, changes) => { console.log('baz') }
-   * 
+   *
    * // subscribe to the 'namedExpressionRemoved' event, pass the handler
    * hfInstance.on('namedExpressionRemoved', handler);
    *
    * // add some named expressions
    * hfInstance.addNamedExpression('prettyName', '=Sheet1!$A$1+100', 0);
    * hfInstance.addNamedExpression('uglyName', '=Sheet1!$A$1+100', 0);
-   * 
+   *
    * // remove a named expression
    * // the console prints 'baz' each time a named expression is removed
    * const changes = hfInstance.removeNamedExpression('prettyName', 0);
@@ -196,16 +196,16 @@ export interface Listeners {
    * // this time, the console doesn't print anything
    * const changes = hfInstance.removeNamedExpression('uglyName', 0);
    * ```
-   * 
+   *
    * @category Named Expression
    */
   namedExpressionRemoved: (namedExpressionName: string, changes: ExportedChange[]) => any,
 
   /**
    * Occurs when values in a specified location are changed and cause recalculation.
-   * 
+   *
    * @event
-   * 
+   *
    * @param {ExportedChange[]} changes the values and location of applied changes
    *
    * @example
@@ -216,10 +216,10 @@ export interface Listeners {
    *
    * // define a function to be called when the event occurs
    * const handler = (changes) => { console.log('baz') }
-   * 
+   *
    * // subscribe to the 'valuesUpdated' event, pass the handler
    * hfInstance.on('valuesUpdated', handler);
-   * 
+   *
    * // trigger recalculation, for example, with the 'setCellContents' method
    * // the console prints 'baz' each time a value change triggers recalculation
    * const changes = hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
@@ -231,7 +231,7 @@ export interface Listeners {
    * // this time, the console doesn't print anything
    * const changes = hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=A1']]);
    * ```
-   * 
+   *
    * @category Values
    */
   valuesUpdated: (changes: ExportedChange[]) => any,
@@ -240,7 +240,7 @@ export interface Listeners {
    * Occurs when evaluation is suspended.
    *
    * @event
-   * 
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -250,17 +250,17 @@ export interface Listeners {
    *
    * // define a function to be called when the event occurs
    * const handler = ( ) => { console.log('baz') }
-   * 
+   *
    * // subscribe to the 'evaluationSuspended' event, pass the handler
    * hfInstance.on('evaluationSuspended', handler);
-   * 
+   *
    * // suspend evaluation
    * // the console prints 'baz' each time evaluation is suspended
    * hfInstance.suspendEvaluation();
    *
    * // resume evaluation
    * hfInstance.resumeEvaluation();
-   * 
+   *
    * // unsubscribe from the 'evaluationSuspended' event
    * hfInstance.off('evaluationSuspended', handler);
    *
@@ -289,20 +289,20 @@ export interface Listeners {
    *
    * // define a function to be called when the event occurs
    * const handler = (changes) => { console.log('baz') }
-   * 
+   *
    * // subscribe to the 'evaluationResumed' event, pass the handler
    * hfInstance.on('evaluationResumed', handler);
-   * 
+   *
    * // first, suspend evaluation
    * hfInstance.suspendEvaluation();
    *
    * // now, resume evaluation
    * // the console prints 'baz' each time evaluation is resumed
    * hfInstance.resumeEvaluation();
-   * 
+   *
    * // unsubscribe from the 'evaluationResumed' event
    * hfInstance.off('evaluationResumed', handler);
-   * 
+   *
    * // suspend evaluation again
    * hfInstance.suspendEvaluation();
    *
@@ -310,7 +310,7 @@ export interface Listeners {
    * // this time, the console doesn't print anything
    * hfInstance.resumeEvaluation();;
    * ```
-   * 
+   *
    * @category Batch
    */
   evaluationResumed: (changes: ExportedChange[]) => any,
@@ -318,7 +318,9 @@ export interface Listeners {
 
 export interface TypedEmitter {
   on<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
+
   off<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
+
   once<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
 }
 

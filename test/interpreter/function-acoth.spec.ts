@@ -4,7 +4,7 @@ import {adr, detailedError} from '../testUtils'
 
 describe('Function ACOTH', () => {
   it('happy path', () => {
-    const engine = HyperFormula.buildFromArray([['=ACOTH(2)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ACOTH(2)']], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.5493061443340548)
   })
@@ -34,8 +34,8 @@ describe('Function ACOTH', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="2"', '=ACOTH(A1)'],
     ])
 
@@ -43,7 +43,7 @@ describe('Function ACOTH', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=ACOTH(4/0)'],
     ])
 

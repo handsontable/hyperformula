@@ -10,13 +10,13 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class CharPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CharPlugin>{
+export class CharPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CharPlugin> {
   public static implementedFunctions = {
     'CHAR': {
       method: 'char',
       parameters: [
-          {argumentType: ArgumentTypes.NUMBER}
-        ],
+        {argumentType: ArgumentTypes.NUMBER}
+      ],
     },
     'UNICHAR': {
       method: 'unichar',

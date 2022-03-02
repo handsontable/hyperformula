@@ -19,7 +19,8 @@ export class RowAddress implements AddressWithRow {
     public readonly type: ReferenceType,
     public readonly row: number,
     public readonly sheet?: number,
-  ) {}
+  ) {
+  }
 
   public static absolute(row: number, sheet?: number) {
     return new RowAddress(ReferenceType.ABSOLUTE, row, sheet)
@@ -91,7 +92,7 @@ export class RowAddress implements AddressWithRow {
 
   public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleRowAddress(baseAddress)
-    if(invalidSimpleRowAddress(simpleAddress)) {
+    if (invalidSimpleRowAddress(simpleAddress)) {
       return undefined
     }
     const dollar = this.type === ReferenceType.ABSOLUTE ? '$' : ''

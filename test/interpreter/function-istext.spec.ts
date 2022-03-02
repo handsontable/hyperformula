@@ -16,7 +16,7 @@ describe('Function ISTEXT', () => {
 
   it('should return false for nontext', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISTEXT(-0)', '=ISTEXT(A2)',  '=ISTEXT(1<1)'],
+      ['=ISTEXT(-0)', '=ISTEXT(A2)', '=ISTEXT(1<1)'],
       [null],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)

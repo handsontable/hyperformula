@@ -31,8 +31,8 @@ describe('Function COT', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="-1"', '=COT(A1)'],
       ['', '=COT(A2)'],
     ])
@@ -42,7 +42,7 @@ describe('Function COT', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=COT(4/0)'],
     ])
 

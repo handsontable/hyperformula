@@ -16,7 +16,7 @@ describe('Function LCM', () => {
       ['=LCM(2*3*5,3*5*7)', '=LCM(0,1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(2*3*5*7)
+    expect(engine.getCellValue(adr('A1'))).toBe(2 * 3 * 5 * 7)
     expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
@@ -25,7 +25,7 @@ describe('Function LCM', () => {
       ['=LCM(2*3*5,3*5*7, 2*5*7)', '=LCM(100,101,102,103, 104)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(2*3*5*7)
+    expect(engine.getCellValue(adr('A1'))).toBe(2 * 3 * 5 * 7)
     expect(engine.getCellValue(adr('B1'))).toBe(1379437800)
   })
 

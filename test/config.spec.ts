@@ -24,15 +24,15 @@ describe('Config', () => {
   })
 
   it('can translate functions', () => {
-    const config = new Config({ language: 'plPL' })
+    const config = new Config({language: 'plPL'})
 
     expect(config.translationPackage.getFunctionTranslation('SUM')).toEqual('SUMA')
   })
 
-  it( 'validation: boolean params', () => {
+  it('validation: boolean params', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({ignorePunctuation: 1})).toThrowError('Expected value of type: boolean for config parameter: ignorePunctuation')
+    expect(() => new Config({ignorePunctuation: 1})).toThrowError('Expected value of type: boolean for config parameter: ignorePunctuation')
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({accentSensitive: 'abcd'})).toThrowError('Expected value of type: boolean for config parameter: accentSensitive')
@@ -41,16 +41,16 @@ describe('Config', () => {
     expect(() => new Config({caseSensitive: 'abcd'})).toThrowError('Expected value of type: boolean for config parameter: caseSensitive')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({smartRounding: []})).toThrowError('Expected value of type: boolean for config parameter: smartRounding')
+    expect(() => new Config({smartRounding: []})).toThrowError('Expected value of type: boolean for config parameter: smartRounding')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({useColumnIndex: Symbol()})).toThrowError('Expected value of type: boolean for config parameter: useColumnIndex')
+    expect(() => new Config({useColumnIndex: Symbol()})).toThrowError('Expected value of type: boolean for config parameter: useColumnIndex')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => new Config({leapYear1900: () => 1})).toThrowError('Expected value of type: boolean for config parameter: leapYear1900')
+    expect(() => new Config({leapYear1900: () => 1})).toThrowError('Expected value of type: boolean for config parameter: leapYear1900')
   })
 
-  it( 'validation: number params', () => {
+  it('validation: number params', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({nullYear: true})).toThrowError('Expected value of type: number for config parameter: nullYear')
@@ -62,7 +62,7 @@ describe('Config', () => {
     expect(() => new Config({precisionEpsilon: {}})).toThrowError('Expected value of type: number for config parameter: precisionEpsilon')
   })
 
-  it( 'validation: string params', () => {
+  it('validation: string params', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({functionArgSeparator: 123})).toThrowError('Expected value of type: string for config parameter: functionArgSeparator')
@@ -71,7 +71,7 @@ describe('Config', () => {
     expect(() => new Config({localeLang: EmptyValue})).toThrowError('Expected value of type: string for config parameter: localeLang')
   })
 
-  it( 'validation: function params', () => {
+  it('validation: function params', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({parseDateTime: true})).toThrowError('Expected value of type: function for config parameter: parseDateTime')
@@ -80,10 +80,11 @@ describe('Config', () => {
     expect(() => new Config({stringifyDateTime: 1})).toThrowError('Expected value of type: function for config parameter: stringifyDateTime')
   })
 
-  it( 'validation: other params', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    expect(() => new Config({nullDate: { year: 123, month: 123, day: true }
+  it('validation: other params', () => {
+    expect(() => new Config({
+      // eslint-disable-next-line
+      // @ts-ignore
+      nullDate: {year: 123, month: 123, day: true}
     })).toThrowError('Expected value of type: IDate for config parameter: nullDate')
     // eslint-disable-next-line
     // @ts-ignore
@@ -95,25 +96,25 @@ describe('Config', () => {
 
   it('should throw error when there is a conflict between separators', () => {
     expect(() => {
-      new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ' ' })
+      new Config({decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ' '})
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator]')
     expect(() => {
-      new Config({ decimalSeparator: ',', functionArgSeparator: ';', thousandSeparator: ',' })
+      new Config({decimalSeparator: ',', functionArgSeparator: ';', thousandSeparator: ','})
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,thousandSeparator]')
     expect(() => {
-      new Config({ decimalSeparator: '.', functionArgSeparator: ',', thousandSeparator: ',' })
+      new Config({decimalSeparator: '.', functionArgSeparator: ',', thousandSeparator: ','})
     }).toThrowError('Config initialization failed. Parameters in conflict: [functionArgSeparator,thousandSeparator]')
     expect(() => {
-      new Config({ decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ',' })
+      new Config({decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ','})
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
     expect(() => {
-      new Config({ arrayColumnSeparator: ';', arrayRowSeparator: ';'})
+      new Config({arrayColumnSeparator: ';', arrayRowSeparator: ';'})
     }).toThrowError('Config initialization failed. Parameters in conflict: [arrayColumnSeparator,arrayRowSeparator]')
   })
 
   it('should throw error when currency symbol is empty', () => {
     expect(() => {
-      new Config({ currencySymbol: [''] })
+      new Config({currencySymbol: ['']})
     }).toThrowError('Config parameter currencySymbol cannot be empty.')
   })
 
@@ -121,7 +122,7 @@ describe('Config', () => {
     expect(() => {
       // eslint-disable-next-line
       // @ts-ignore
-      new Config({ currencySymbol: '$' })
+      new Config({currencySymbol: '$'})
     }).toThrowError('Expected value of type: array for config parameter: currencySymbol')
   })
 
@@ -129,7 +130,7 @@ describe('Config', () => {
     expect(() => {
       // eslint-disable-next-line
       // @ts-ignore
-      new Config({ decimalSeparator: ';' })
+      new Config({decimalSeparator: ';'})
     }).toThrowError('Expected one of \'.\' \',\' for config parameter: decimalSeparator')
   })
 
@@ -137,7 +138,7 @@ describe('Config', () => {
     expect(() => {
       // eslint-disable-next-line
       // @ts-ignore
-      new Config({ thousandSeparator: ';' })
+      new Config({thousandSeparator: ';'})
     }).toThrowError('Expected one of \'\' \',\' \' \' \'.\' for config parameter: thousandSeparator')
   })
 
@@ -145,7 +146,7 @@ describe('Config', () => {
     expect(() => {
       // eslint-disable-next-line
       // @ts-ignore
-      new Config({ arrayRowSeparator: ',' })
+      new Config({arrayRowSeparator: ','})
     }).toThrowError('Expected one of \';\' \'|\' for config parameter: arrayRowSeparator')
   })
 
@@ -153,51 +154,117 @@ describe('Config', () => {
     expect(() => {
       // eslint-disable-next-line
       // @ts-ignore
-      new Config({ arrayColumnSeparator: '|' })
+      new Config({arrayColumnSeparator: '|'})
     }).toThrowError('Expected one of \',\' \';\' for config parameter: arrayColumnSeparator')
   })
 
   it('#undoLimit validation', () => {
-    expect(() => new Config({ undoLimit: 0 })).not.toThrowError()
-    expect(() => new Config({ undoLimit: 42 })).not.toThrowError()
-    expect(() => new Config({ undoLimit: Infinity })).not.toThrowError()
-    expect(() => new Config({ undoLimit: -1 })).toThrowError('Config parameter undoLimit should be at least 0')
+    expect(() => new Config({undoLimit: 0})).not.toThrowError()
+    expect(() => new Config({undoLimit: 42})).not.toThrowError()
+    expect(() => new Config({undoLimit: Infinity})).not.toThrowError()
+    expect(() => new Config({undoLimit: -1})).toThrowError('Config parameter undoLimit should be at least 0')
   })
 
   it('#precisionEpsilon', () => {
-    expect(() => new Config({ precisionEpsilon: 0 })).not.toThrowError()
-    expect(() => new Config({ precisionEpsilon: 42 })).not.toThrowError()
-    expect(() => new Config({ precisionEpsilon: Infinity })).not.toThrowError()
-    expect(() => new Config({ precisionEpsilon: -1 })).toThrowError('Config parameter precisionEpsilon should be at least 0')
+    expect(() => new Config({precisionEpsilon: 0})).not.toThrowError()
+    expect(() => new Config({precisionEpsilon: 42})).not.toThrowError()
+    expect(() => new Config({precisionEpsilon: Infinity})).not.toThrowError()
+    expect(() => new Config({precisionEpsilon: -1})).toThrowError('Config parameter precisionEpsilon should be at least 0')
   })
 
   it('#precisionRounding', () => {
-    expect(() => new Config({ precisionRounding: 0 })).not.toThrowError()
-    expect(() => new Config({ precisionRounding: 42 })).not.toThrowError()
-    expect(() => new Config({ precisionRounding: Infinity })).not.toThrowError()
-    expect(() => new Config({ precisionRounding: -1 })).toThrowError('Config parameter precisionRounding should be at least 0')
+    expect(() => new Config({precisionRounding: 0})).not.toThrowError()
+    expect(() => new Config({precisionRounding: 42})).not.toThrowError()
+    expect(() => new Config({precisionRounding: Infinity})).not.toThrowError()
+    expect(() => new Config({precisionRounding: -1})).toThrowError('Config parameter precisionRounding should be at least 0')
   })
 
   it('#maxRows', () => {
-    expect(() => new Config({ maxRows: 1 })).not.toThrowError()
-    expect(() => new Config({ maxRows: 42 })).not.toThrowError()
-    expect(() => new Config({ maxRows: Infinity })).not.toThrowError()
-    expect(() => new Config({ maxRows: 0 })).toThrowError('Config parameter maxRows should be at least 1')
+    expect(() => new Config({maxRows: 1})).not.toThrowError()
+    expect(() => new Config({maxRows: 42})).not.toThrowError()
+    expect(() => new Config({maxRows: Infinity})).not.toThrowError()
+    expect(() => new Config({maxRows: 0})).toThrowError('Config parameter maxRows should be at least 1')
   })
 
   it('#maxColumns', () => {
-    expect(() => new Config({ maxColumns: 1 })).not.toThrowError()
-    expect(() => new Config({ maxColumns: 42 })).not.toThrowError()
-    expect(() => new Config({ maxColumns: Infinity })).not.toThrowError()
-    expect(() => new Config({ maxColumns: 0 })).toThrowError('Config parameter maxColumns should be at least 1')
+    expect(() => new Config({maxColumns: 1})).not.toThrowError()
+    expect(() => new Config({maxColumns: 42})).not.toThrowError()
+    expect(() => new Config({maxColumns: Infinity})).not.toThrowError()
+    expect(() => new Config({maxColumns: 0})).toThrowError('Config parameter maxColumns should be at least 1')
   })
 
   it('#nullYear', () => {
-    expect(() => new Config({ nullYear: -1 })).toThrowError('Config parameter nullYear should be at least 0')
-    expect(() => new Config({ nullYear: 0 })).not.toThrowError()
-    expect(() => new Config({ nullYear: 42 })).not.toThrowError()
-    expect(() => new Config({ nullYear: 100 })).not.toThrowError()
-    expect(() => new Config({ nullYear: 101 })).toThrowError('Config parameter nullYear should be at most 100')
+    expect(() => new Config({nullYear: -1})).toThrowError('Config parameter nullYear should be at least 0')
+    expect(() => new Config({nullYear: 0})).not.toThrowError()
+    expect(() => new Config({nullYear: 42})).not.toThrowError()
+    expect(() => new Config({nullYear: 100})).not.toThrowError()
+    expect(() => new Config({nullYear: 101})).toThrowError('Config parameter nullYear should be at most 100')
+  })
+
+  describe('deprecated option warning messages', () => {
+    beforeEach(() => {
+      spyOn(console, 'warn')
+    })
+
+    afterEach(() => {
+      try {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.mockClear() // clears mock in Jest env
+      } catch {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.calls.reset() // clears mock in Jasmine env
+      }
+    })
+
+    it('should log usage of deprecated options when they are passed while engine initialization', () => {
+      new Config({
+        binarySearchThreshold: 20,
+        gpujs: true,
+        gpuMode: 'gpu',
+      })
+
+      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
+      expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
+      expect(console.warn).toHaveBeenCalledWith('gpuMode option is deprecated since 1.2')
+      expect(console.warn).toHaveBeenCalledTimes(3)
+    })
+
+    it('should log usage of deprecated options when they are passed while merging the Config object', () => {
+      const config = new Config()
+
+      config.mergeConfig({
+        binarySearchThreshold: 20,
+        gpujs: true,
+      })
+
+      expect(console.warn).toHaveBeenCalledTimes(2)
+      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
+      expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
+    })
+
+    it('should not log usage of deprecated options when they are not passed while merging the Config object', () => {
+      const config = new Config({
+        binarySearchThreshold: 20,
+        gpujs: true,
+        gpuMode: 'gpu',
+      })
+
+      try {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.mockClear() // clears mock in Jest env
+      } catch {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.calls.reset() // clears mock in Jasmine env
+      }
+
+      config.mergeConfig({})
+
+      expect(console.warn).toHaveBeenCalledTimes(0)
+    })
   })
 })
 
@@ -213,5 +280,18 @@ describe('getConfig', () => {
     const arr2 = engine.getConfig().dateFormats
     expect(arr).toEqual(arr2)
     expect(arr).not.toBe(arr2)
+  })
+})
+
+describe('getDefaultConfig', () => {
+  it('should not be an instance of Config', () => {
+    expect(HyperFormula.defaultConfig).not.toBeInstanceOf(Config)
+  })
+
+  it('should copy returned values', () => {
+    const defaultConfig = HyperFormula.defaultConfig
+    defaultConfig.dateFormats.push('mm')
+    const defaultDateFormats = HyperFormula.defaultConfig.dateFormats
+    expect(defaultDateFormats).toEqual(['DD/MM/YYYY', 'DD/MM/YY'])
   })
 })

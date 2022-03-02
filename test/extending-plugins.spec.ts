@@ -5,7 +5,7 @@ import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
-class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin>{
+class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin> {
   public static implementedFunctions = {
     'FOO': {
       method: 'foo',
@@ -16,7 +16,6 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     return 42
   }
 }
-
 
 describe('Plugins', () => {
   it('Extending with a plugin', () => {

@@ -106,9 +106,9 @@ describe('Address dependencies, moved formulas', () => {
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 1, 4), adr('B1'))
 
     expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol( 0, -1))
-    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow( -1, 0))
-    expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute( 0, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol(0, -1))
+    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(-1, 0))
+    expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(0, 0))
   })
 
   it('should return #CYCLE when overriding referred dependency to external cell', () => {
@@ -151,7 +151,7 @@ describe('Address dependencies, moved formulas', () => {
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2), adr('B2'))
 
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow( 1, 2))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteRow(1, 2))
   })
 
   it('should update coordinates to internal dependency', () => {
@@ -162,14 +162,14 @@ describe('Address dependencies, moved formulas', () => {
       ['4', '=$A$4'],
     ])
 
-    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow( -1, 2))
+    expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(-1, 2))
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 4), adr('B2'))
 
     expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(0, -1))
-    expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol( 1, 0))
-    expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow( -1, 3))
-    expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute( 1, 4))
+    expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(1, 0))
+    expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(-1, 3))
+    expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(1, 4))
   })
 
   it('should evaluate formula when overriding external formula dependency', () => {
@@ -245,9 +245,9 @@ describe('Move cells', () => {
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('B1'))
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(-1, 1))
-    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteCol( 1, -2))
-    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow( 1, 0))
-    expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute( 1, 0))
+    expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteCol(1, -2))
+    expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(1, 0))
+    expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute(1, 0))
   })
 
   it('value moved has appropriate edges', () => {
@@ -345,7 +345,7 @@ describe('Move cells', () => {
     )
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas
-        + 1, // A2
+      + 1, // A2
     )
 
     expect(source).toBe(undefined)
@@ -463,14 +463,14 @@ describe('moving ranges', () => {
     expect(source.getCellValue()).toBe(EmptyValue)
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas
-        + 1 // A2
-        + 1 // A1 (Empty)
-        + 1, // A1:A2 range
+      + 1 // A2
+      + 1 // A1 (Empty)
+      + 1, // A1:A2 range
     )
     expect(engine.graph.edgesCount()).toBe(
       +2 // A1 (Empty) -> A1:A2, A2 -> A1:A2
-        + 1 // A1:A2 -> B1
-        + 1, // A2 -> B2
+      + 1 // A1:A2 -> B1
+      + 1, // A2 -> B2
     )
     expect(engine.graph.existsEdge(target, b2)).toBe(true)
     expect(engine.graph.existsEdge(source, range)).toBe(true)
@@ -504,13 +504,13 @@ describe('moving ranges', () => {
 
     expect(engine.graph.nodesCount()).toBe(
       +2 // formulas
-        + 2 // C1, C2
-        + 1, // C1:C2 range
+      + 2 // C1, C2
+      + 1, // C1:C2 range
     )
     expect(engine.graph.edgesCount()).toBe(
       +2 // C1 -> C1:C2, C2 -> C1:C2
-        + 1 // C1:C2 -> B1
-        + 1, // C2 -> B2
+      + 1 // C1:C2 -> B1
+      + 1, // C2 -> B2
     )
 
     expect(engine.graph.existsEdge(c1, range)).toBe(true)
@@ -849,7 +849,7 @@ describe('column index', () => {
       ['1'],
       ['1'],
       ['=VLOOKUP(1, A1:A2, 1, TRUE())'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('B1'))
 
@@ -862,7 +862,7 @@ describe('column index', () => {
     const engine = HyperFormula.buildFromArray([
       ['=B1', '1'],
       ['3', '2'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), adr('B1'))
 
@@ -879,7 +879,7 @@ describe('column index', () => {
       ['1', '2'],
       ['3', '4', '5'],
       [null, '6', '7'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2), adr('B2'))
 
@@ -898,7 +898,7 @@ describe('column index', () => {
       ['1', '2'],
       ['3', '4', '5'],
       [null, '6', '7'],
-    ], { useColumnIndex: true })
+    ], {useColumnIndex: true})
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('B2'), 2, 2), adr('A1'))
 

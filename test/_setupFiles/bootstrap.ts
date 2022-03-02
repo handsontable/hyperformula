@@ -19,7 +19,7 @@ Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
 
 const jestPresent = (() => {
   try {
-    expect([{a: 0}]).toContainEqual({a:0})
+    expect([{a: 0}]).toContainEqual({a: 0})
     return true
   } catch (e) {
     return false
@@ -27,7 +27,7 @@ const jestPresent = (() => {
 })()
 
 beforeEach(() => {
-  if(!jestPresent) {
+  if (!jestPresent) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
@@ -51,7 +51,7 @@ beforeEach(() => {
 })
 
 beforeAll(() => {
-  if(!jestPresent) {
+  if (!jestPresent) {
     jasmine.addMatchers({
       ...toContainEqualMatcher,
       ...toMatchObjectMatcher,

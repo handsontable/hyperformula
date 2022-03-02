@@ -18,13 +18,13 @@ describe('Function ASIN', () => {
   })
 
   it('for 1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([['=ASIN(1)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ASIN(1)']], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toBe(Math.PI / 2)
   })
 
   it('for -1 (edge)', () => {
-    const engine = HyperFormula.buildFromArray([['=ASIN(-1)']], { smartRounding : false})
+    const engine = HyperFormula.buildFromArray([['=ASIN(-1)']], {smartRounding: false})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(-Math.PI / 2)
   })
@@ -48,8 +48,8 @@ describe('Function ASIN', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="-1"', '=ASIN(A1)'],
     ])
 
@@ -57,7 +57,7 @@ describe('Function ASIN', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=ASIN(4/0)'],
     ])
 

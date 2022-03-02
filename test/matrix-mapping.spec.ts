@@ -40,7 +40,6 @@ describe('MatrixMapping', () => {
     expect(matrixMapping.isFormulaArrayInRow(0, 1)).toEqual(true)
   })
 
-
   it('should move matrices below row', () => {
     const matrixMapping = new ArrayMapping()
     const vertex1 = new ArrayVertex(buildNumberAst(1), adr('B1'), new ArraySize(2, 2))

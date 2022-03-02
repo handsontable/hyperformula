@@ -10,6 +10,7 @@ import {CellError, ErrorType, invalidSimpleCellAddress} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
+import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
@@ -39,10 +40,10 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
-import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
+  private gpu?: any
 
   constructor(
     public readonly config: Config,
@@ -69,10 +70,29 @@ export class Interpreter {
         val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
       }
     }
-    if(val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
+    if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
       [[val]] = val.data
     }
     return wrapperForRootVertex(val, state.formulaVertex)
+  }
+
+  public getGpuInstance(): any {
+    const mode = this.config.gpuMode
+    const gpujs = this.config.gpujs
+
+    if (gpujs === undefined) {
+      throw Error('Cannot instantiate GPU.js. Constructor not provided.')
+    }
+
+    if (!this.gpu) {
+      this.gpu = new gpujs({mode})
+    }
+
+    return this.gpu
+  }
+
+  public destroyGpu() {
+    this.gpu?.destroy()
   }
 
   /**
@@ -174,7 +194,7 @@ export class Interpreter {
           return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
-        if(pluginFunction!==undefined) {
+        if (pluginFunction !== undefined) {
           return pluginFunction(ast, new InterpreterState(state.formulaAddress, state.arraysFlag || this.functionRegistry.isArrayFunction(ast.procedureName), state.formulaVertex))
         } else {
           return new CellError(ErrorType.NAME, ErrorMessage.FunctionName(ast.procedureName))
@@ -229,17 +249,17 @@ export class Interpreter {
       case AstNodeType.ARRAY: {
         let totalWidth: Maybe<number> = undefined
         const ret: InternalScalarValue[][] = []
-        for(const astRow of ast.args) {
+        for (const astRow of ast.args) {
           let rowHeight: Maybe<number> = undefined
           const rowRet: InternalScalarValue[][] = []
-          for(const astIt of astRow) {
+          for (const astIt of astRow) {
             const arr = coerceToRange(this.evaluateAst(astIt, state))
             const height = arr.height()
-            if(rowHeight===undefined) {
+            if (rowHeight === undefined) {
               rowHeight = height
               rowRet.push(...arr.data)
-            } else if(rowHeight === height) {
-              for(let i=0;i<height;i++) {
+            } else if (rowHeight === height) {
+              for (let i = 0; i < height; i++) {
                 rowRet[i].push(...arr.data[i])
               }
             } else {
@@ -247,10 +267,10 @@ export class Interpreter {
             }
           }
           const width = rowRet[0].length
-          if(totalWidth===undefined) {
+          if (totalWidth === undefined) {
             totalWidth = width
             ret.push(...rowRet)
-          } else if(totalWidth === width) {
+          } else if (totalWidth === width) {
             ret.push(...rowRet)
           } else {
             return new CellError(ErrorType.REF, ErrorMessage.SizeMismatch)
@@ -288,43 +308,43 @@ export class Interpreter {
     binaryErrorWrapper(this.arithmeticHelper.leq, arg1, arg2)
 
   private concatOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-       binaryErrorWrapper(this.arithmeticHelper.concat,
-        coerceScalarToString(arg1),
-        coerceScalarToString(arg2)
-      )
+    binaryErrorWrapper(this.arithmeticHelper.concat,
+      coerceScalarToString(arg1),
+      coerceScalarToString(arg2)
+    )
 
   private plusOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-      binaryErrorWrapper(this.arithmeticHelper.addWithEpsilon,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-      )
+    binaryErrorWrapper(this.arithmeticHelper.addWithEpsilon,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
   private minusOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-      binaryErrorWrapper(this.arithmeticHelper.subtract,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-      )
+    binaryErrorWrapper(this.arithmeticHelper.subtract,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
   private timesOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-      binaryErrorWrapper(
-        this.arithmeticHelper.multiply,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-      )
+    binaryErrorWrapper(
+      this.arithmeticHelper.multiply,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
   private powerOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-      binaryErrorWrapper(
-        this.arithmeticHelper.pow,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-      )
+    binaryErrorWrapper(
+      this.arithmeticHelper.pow,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
   private divOp = (arg1: InternalScalarValue, arg2: InternalScalarValue): InternalScalarValue =>
-      binaryErrorWrapper(
-        this.arithmeticHelper.divide,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
-      )
+    binaryErrorWrapper(
+      this.arithmeticHelper.divide,
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg1),
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg2)
+    )
 
   private unaryMinusOp = (arg: InternalScalarValue): InternalScalarValue =>
     unaryErrorWrapper(this.arithmeticHelper.unaryMinus,
@@ -332,18 +352,18 @@ export class Interpreter {
 
   private percentOp = (arg: InternalScalarValue): InternalScalarValue =>
     unaryErrorWrapper(this.arithmeticHelper.unaryPercent,
-        this.arithmeticHelper.coerceScalarToNumberOrError(arg))
+      this.arithmeticHelper.coerceScalarToNumberOrError(arg))
 
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
   private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
-    if(arg instanceof SimpleRangeValue && !state.arraysFlag) {
+    if (arg instanceof SimpleRangeValue && !state.arraysFlag) {
       arg = coerceRangeToScalar(arg, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     if (arg instanceof CellError) {
       return arg
     }
-    if(arg instanceof SimpleRangeValue) {
+    if (arg instanceof SimpleRangeValue) {
       const newRaw = arg.data.map(
         (row) => row.map(op)
       )
@@ -354,24 +374,24 @@ export class Interpreter {
   }
 
   private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {
-    if(arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
+    if (arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
       arg1 = coerceRangeToScalar(arg1, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     if (arg1 instanceof CellError) {
       return arg1
     }
-    if(arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
+    if (arg2 instanceof SimpleRangeValue && !state.arraysFlag) {
       arg2 = coerceRangeToScalar(arg2, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
     }
     if (arg2 instanceof CellError) {
       return arg2
     }
-    if(arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
-      if(!(arg1 instanceof SimpleRangeValue)) {
-        if((arg2 as SimpleRangeValue).isAdHoc()) {
+    if (arg1 instanceof SimpleRangeValue || arg2 instanceof SimpleRangeValue) {
+      if (!(arg1 instanceof SimpleRangeValue)) {
+        if ((arg2 as SimpleRangeValue).isAdHoc()) {
           const raw2 = (arg2 as SimpleRangeValue).data
-          for(let i=0;i<raw2.length;i++) {
-            for(let j=0;j<raw2[0].length;j++) {
+          for (let i = 0; i < raw2.length; i++) {
+            for (let j = 0; j < raw2[0].length; j++) {
               raw2[i][j] = op(arg1, raw2[i][j])
             }
           }
@@ -380,11 +400,11 @@ export class Interpreter {
           arg1 = SimpleRangeValue.fromScalar(arg1)
         }
       }
-      if(!(arg2 instanceof SimpleRangeValue)) {
-        if(arg1.isAdHoc()) {
+      if (!(arg2 instanceof SimpleRangeValue)) {
+        if (arg1.isAdHoc()) {
           const raw1 = arg1.data
-          for(let i=0;i<raw1.length;i++) {
-            for(let j=0;j<raw1[0].length;j++) {
+          for (let i = 0; i < raw1.length; i++) {
+            for (let j = 0; j < raw1[0].length; j++) {
               raw1[i][j] = op(raw1[i][j], arg2)
             }
           }
@@ -393,22 +413,22 @@ export class Interpreter {
           arg2 = SimpleRangeValue.fromScalar(arg2)
         }
       }
-      if(arg1.width()===arg2.width() && arg1.height()===arg2.height()) {
-        if(arg1.isAdHoc()) {
+      if (arg1.width() === arg2.width() && arg1.height() === arg2.height()) {
+        if (arg1.isAdHoc()) {
           const raw1 = arg1.data
           const raw2 = arg2.data
-          for(let i=0;i<raw1.length;i++) {
-            for(let j=0;j<raw1[0].length;j++) {
+          for (let i = 0; i < raw1.length; i++) {
+            for (let j = 0; j < raw1[0].length; j++) {
               raw1[i][j] = op(raw1[i][j], raw2[i][j])
             }
           }
           return SimpleRangeValue.onlyValues(raw1)
         }
-        if(arg2.isAdHoc()) {
+        if (arg2.isAdHoc()) {
           const raw1 = arg1.data
           const raw2 = arg2.data
-          for(let i=0;i<raw1.length;i++) {
-            for(let j=0;j<raw1[0].length;j++) {
+          for (let i = 0; i < raw1.length; i++) {
+            for (let j = 0; j < raw1[0].length; j++) {
               raw2[i][j] = op(raw1[i][j], raw2[i][j])
             }
           }
@@ -418,19 +438,19 @@ export class Interpreter {
       const width = Math.max(arg1.width(), arg2.width())
       const height = Math.max(arg1.height(), arg2.height())
       const ret: InternalScalarValue[][] = Array(height)
-      for(let i=0;i<height;i++) {
+      for (let i = 0; i < height; i++) {
         ret[i] = Array(width)
       }
-      for(let i=0;i<height;i++) {
+      for (let i = 0; i < height; i++) {
         const i1 = (arg1.height() !== 1) ? i : 0
         const i2 = (arg2.height() !== 1) ? i : 0
-        for(let j=0;j<width;j++) {
+        for (let j = 0; j < width; j++) {
           const j1 = (arg1.width() !== 1) ? j : 0
           const j2 = (arg2.width() !== 1) ? j : 0
-          if(i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
+          if (i1 < arg1.height() && i2 < arg2.height() && j1 < arg1.width() && j2 < arg2.width()) {
             ret[i][j] = op(arg1.data[i1][j1], arg2.data[i2][j2])
           } else {
-            ret[i][j] =  new CellError(ErrorType.NA)
+            ret[i][j] = new CellError(ErrorType.NA)
           }
         }
       }

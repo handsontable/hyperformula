@@ -96,7 +96,7 @@ describe('Function HYPGEOM.DIST', () => {
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A9'))).toEqual(1)
     expect(engine.getCellValue(adr('A10'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A11'))).toBeCloseTo( 0.00614930629923134, 6)
+    expect(engine.getCellValue(adr('A11'))).toBeCloseTo(0.00614930629923134, 6)
     //product #2 returns value here
     expect(engine.getCellValue(adr('A12'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A13'))).toEqual(1)

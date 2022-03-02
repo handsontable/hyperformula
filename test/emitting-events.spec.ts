@@ -9,7 +9,7 @@ describe('Events', () => {
   it('sheetAdded works', function() {
     const engine = HyperFormula.buildEmpty()
     const handler = jasmine.createSpy()
-    
+
     engine.on(Events.SheetAdded, handler)
     engine.addSheet('FooBar')
 

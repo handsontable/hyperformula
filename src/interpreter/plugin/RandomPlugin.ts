@@ -10,7 +10,7 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
-export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RandomPlugin>{
+export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RandomPlugin> {
   public static implementedFunctions = {
     'RAND': {
       method: 'rand',
@@ -43,15 +43,15 @@ export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypech
   public randbetween(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RANDBETWEEN'),
       (lower: number, upper: number) => {
-        if(upper<lower) {
+        if (upper < lower) {
           return new CellError(ErrorType.NUM, ErrorMessage.WrongOrder)
         }
         lower = Math.ceil(lower)
-        upper = Math.floor(upper)+1
-        if(lower === upper) {
+        upper = Math.floor(upper) + 1
+        if (lower === upper) {
           upper += 1
         }
-        return lower + Math.floor(Math.random()*(upper-lower))
+        return lower + Math.floor(Math.random() * (upper - lower))
       }
     )
   }

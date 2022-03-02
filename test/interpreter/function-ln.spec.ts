@@ -35,8 +35,8 @@ describe('Function LN', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="2.718281828459045"', '=LN(A1)'],
       ['', '=LN(A2)'],
     ])
@@ -46,7 +46,7 @@ describe('Function LN', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=LN(4/0)'],
     ])
 

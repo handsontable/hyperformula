@@ -17,7 +17,6 @@ describe('Function ASINH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
-
   it('wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([['=ASINH()', '=ASINH(1,-1)']])
 
@@ -25,8 +24,8 @@ describe('Function ASINH', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('use number coercion',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('use number coercion', () => {
+    const engine = HyperFormula.buildFromArray([
       ['="-1"', '=ASINH(A1)'],
     ])
 
@@ -34,7 +33,7 @@ describe('Function ASINH', () => {
   })
 
   it('errors propagation', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=ASINH(4/0)'],
     ])
 

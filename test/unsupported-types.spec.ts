@@ -10,7 +10,7 @@ const BigIntSupported = (function(): boolean {
   }
 })()
 
-describe( 'unsupported types should result in error', () => {
+describe('unsupported types should result in error', () => {
   it('should give parsing error #1', () => {
     // eslint-disable-next-line
     // @ts-ignore
@@ -20,37 +20,42 @@ describe( 'unsupported types should result in error', () => {
   it('should give parsing error #2', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[{}]])
+    expect(() => HyperFormula.buildFromArray([[{}]])
     ).toThrowError('Unable to parse value: {}')
   })
   it('should give parsing error #3', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[() => {}]]))
+    expect(() => HyperFormula.buildFromArray([[() => {}]]))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
   it('should give parsing error #4', () => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    expect( () => HyperFormula.buildFromSheets({Sheet1: [[ () => {}]], Sheet2: [[ () => {}]]}))
+    expect(() => HyperFormula.buildFromSheets({
+      // eslint-disable-next-line
+      // @ts-ignore
+      Sheet1: [[() => {}]],
+      // eslint-disable-next-line
+      // @ts-ignore
+      Sheet2: [[() => {}]]
+    }))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
   it('should give parsing error #5', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[Symbol()]])
+    expect(() => HyperFormula.buildFromArray([[Symbol()]])
     ).toThrowError('Unable to parse value: \"Symbol()\"')
   })
   it('should give parsing error #6', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[/abcd/]])
+    expect(() => HyperFormula.buildFromArray([[/abcd/]])
     ).toThrowError('Unable to parse value: \"RegExp(/abcd/)\"')
   })
   it('should give parsing error #7', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[{sym: Symbol()}]])
+    expect(() => HyperFormula.buildFromArray([[{sym: Symbol()}]])
     ).toThrowError('Unable to parse value: {\n' +
       '    \"sym\": \"Symbol()\"\n' +
       '}')
@@ -58,19 +63,19 @@ describe( 'unsupported types should result in error', () => {
   it('should give parsing error #9', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[Symbol('a')]])
+    expect(() => HyperFormula.buildFromArray([[Symbol('a')]])
     ).toThrowError('Unable to parse value: \"Symbol(a)\"')
   })
   it('should give parsing error #10', () => {
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => HyperFormula.buildFromArray([[[Symbol(/abcd/)]]])
+    expect(() => HyperFormula.buildFromArray([[[Symbol(/abcd/)]]])
     ).toThrowError('Unable to parse value: [\n' +
       '    \"Symbol(/abcd/)\"\n' +
       ']')
   })
   it('should give parsing error #11', () => {
-    if(BigIntSupported) {
+    if (BigIntSupported) {
       // eslint-disable-next-line
       // @ts-ignore
       expect(() => HyperFormula.buildFromArray([[BigInt(9007199254740991)]])
@@ -84,11 +89,11 @@ describe( 'unsupported types should result in error', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setCellContents(adr('A1'), ()=>{}))
+    expect(() => engine.setCellContents(adr('A1'), () => {}))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => engine.setSheetContent(0, [[ () => {} ]]))
+    expect(() => engine.setSheetContent(0, [[() => {}]]))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
   })
 
@@ -99,11 +104,11 @@ describe( 'unsupported types should result in error', () => {
     const engine = HyperFormula.buildFromArray(sheet)
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => engine.setSheetContent(0, 1)
+    expect(() => engine.setSheetContent(0, 1)
     ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore
-    expect( () => engine.setSheetContent(0, [1])
+    expect(() => engine.setSheetContent(0, [1])
     ).toThrowError('Invalid arguments, expected an array of arrays.')
     // eslint-disable-next-line
     // @ts-ignore

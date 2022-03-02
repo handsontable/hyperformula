@@ -20,7 +20,6 @@ describe('Function VAR.S', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
   })
 
-
   it('should coerce explicit argument to numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VAR.S(2, 3, 4, TRUE(), FALSE(), "1",)'],

@@ -116,7 +116,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('use number coercion for 1st argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=EOMONTH(TRUE(), 1)'],
       ['=EOMONTH(1, 1)'],
     ])
@@ -126,7 +126,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('use number coercion for 2nd argument', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 31)'],
       ['="1"', '=EOMONTH(A1, A2)'],
       ['=TRUE()', '=EOMONTH(A1, A3)'],
@@ -137,7 +137,7 @@ describe('Function EOMONTH', () => {
   })
 
   it('propagate errors', () => {
-    const engine =  HyperFormula.buildFromArray([
+    const engine = HyperFormula.buildFromArray([
       ['=EOMONTH(4/0, 0)'],
       ['=EOMONTH(0, 4/0)'],
       ['=EOMONTH(4/0, FOOBAR())'],

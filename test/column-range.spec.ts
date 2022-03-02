@@ -16,7 +16,6 @@ describe('Column ranges', () => {
       ['=SUM(C:D)', '=SUM(C5:D6)'],
     ])
 
-
     const cd = engine.rangeMapping.getRange(colStart('C'), colEnd('D'))!
 
     const c5 = engine.dependencyGraph.fetchCell(adr('C5'))

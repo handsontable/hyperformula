@@ -2,7 +2,6 @@ import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {verifyValues} from './testUtils'
 
-
 /**
  * random int from global variable 'state'
  */
@@ -22,7 +21,7 @@ const getInt = (function() {
  * random float from global variable 'state'
  */
 function getFloat(): number {
-  return getInt()/0x80000000
+  return getInt() / 0x80000000
 }
 
 /**
@@ -69,11 +68,11 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
 }
 
 function undoRedo(engine: HyperFormula) {
-  if(outputLog) {
+  if (outputLog) {
     console.log('engine.undo()')
   }
   engine.undo()
-  if(outputLog) {
+  if (outputLog) {
     console.log('engine.redo()')
   }
   engine.redo()
@@ -88,7 +87,7 @@ function undoRedo(engine: HyperFormula) {
 function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: Rectangle) {
   allPts(rectFormulas).forEach((pts) => {
     const formula = randomRange(engine, rectValues)
-    if(outputLog) {
+    if (outputLog) {
       console.log(`engine.setCellContents({sheet: 0, col: ${pts.x}, row: ${pts.y}}, '${formula}')`)
     }
     engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, formula)
@@ -104,7 +103,7 @@ function randomSums(engine: HyperFormula, rectFormulas: Rectangle, rectValues: R
 function randomVals(engine: HyperFormula, rectValues: Rectangle) {
   allPts(rectValues).forEach((pts) => {
     const val = randomInteger(-10, 10)
-    if(outputLog) {
+    if (outputLog) {
       console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, ${val})`)
     }
     engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, val)
@@ -159,20 +158,32 @@ function shuffleArray<T>(array: T[]): T[] {
  * @param sideY
  */
 function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: number, sideY: number) {
-  if(outputLog) {
+  if (outputLog) {
     console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts1.x}, row: ${pts1.y}}, ${sideX}, ${sideY}), {sheet: 0, col: 1000, row: 1000})`)
   }
-  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY), {sheet: 0, col: 1000, row: 1000})
+  engine.moveCells(AbsoluteCellRange.spanFrom({sheet: 0, col: pts1.x, row: pts1.y}, sideX, sideY), {
+    sheet: 0,
+    col: 1000,
+    row: 1000
+  })
   undoRedo(engine)
-  if(outputLog) {
+  if (outputLog) {
     console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: ${pts2.x}, row: ${pts2.y}}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts1.x}, row: ${pts1.y}})`)
   }
-  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY), {sheet: 0, col: pts1.x, row: pts1.y})
+  engine.moveCells(AbsoluteCellRange.spanFrom({sheet: 0, col: pts2.x, row: pts2.y}, sideX, sideY), {
+    sheet: 0,
+    col: pts1.x,
+    row: pts1.y
+  })
   undoRedo(engine)
-  if(outputLog) {
+  if (outputLog) {
     console.log(`engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, ${sideX}, ${sideY}), {sheet: 0, col: ${pts2.x}, row: ${pts2.y}})`)
   }
-  engine.moveCells( AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, sideX, sideY), {sheet: 0, col: pts2.x, row: pts2.y})
+  engine.moveCells(AbsoluteCellRange.spanFrom({sheet: 0, col: 1000, row: 1000}, sideX, sideY), {
+    sheet: 0,
+    col: pts2.x,
+    row: pts2.y
+  })
   undoRedo(engine)
 }
 
@@ -187,7 +198,7 @@ function swapTwoRectangles(engine: HyperFormula, pts1: Pts, pts2: Pts, sideX: nu
  */
 function randomCleanup(engine: HyperFormula, rect: Rectangle) {
   shuffleArray(allPts(rect)).forEach((pts) => {
-      if(outputLog) {
+      if (outputLog) {
         console.log(`engine.setCellContents({sheet: 0, col:${pts.x}, row:${pts.y}}, null)`)
       }
       engine.setCellContents({sheet: 0, col: pts.x, row: pts.y}, null)
@@ -202,7 +213,7 @@ describe('large psuedo-random test', () => {
     let sideX = 3
     const n = 4
     let sideY = 3
-    for(let rep=0;rep<3;rep++) {
+    for (let rep = 0; rep < 3; rep++) {
       randomVals(engine, rectangleFromCorner({x: 0, y: 0}, sideX, sideY))
       verifyValues(engine)
       for (let i = 0; i < n; i++) {
@@ -215,20 +226,20 @@ describe('large psuedo-random test', () => {
       for (let i = 0; i < n; i++) {
         randomSums(engine,
           rectangleFromCorner({x: sideX * (i + 1), y: 0}, sideX, sideY),
-          rectangleFromCorner({x: 0, y: 0}, sideX * (i+1), sideY)
+          rectangleFromCorner({x: 0, y: 0}, sideX * (i + 1), sideY)
         )
         verifyValues(engine)
       }
-      for (let i=0; i<n; i++) {
-        const columnPositionToAdd = randomInteger(0, sideX*(n+1)+1)
-        if(outputLog) {
+      for (let i = 0; i < n; i++) {
+        const columnPositionToAdd = randomInteger(0, sideX * (n + 1) + 1)
+        if (outputLog) {
           console.log(`engine.addColumns(0, [${columnPositionToAdd},2])`)
         }
         engine.addColumns(0, [columnPositionToAdd, 2])
         undoRedo(engine)
         verifyValues(engine)
-        const columnPositionToRemove = randomInteger(0, sideX*(n+1))
-        if(outputLog) {
+        const columnPositionToRemove = randomInteger(0, sideX * (n + 1))
+        if (outputLog) {
           console.log(`engine.removeColumns(0, [${columnPositionToRemove},1])`)
         }
         engine.removeColumns(0, [columnPositionToRemove, 1])
@@ -237,7 +248,7 @@ describe('large psuedo-random test', () => {
       sideX += 1
 
       const rowPositionToAdd = randomInteger(0, sideY + 1)
-      if(outputLog) {
+      if (outputLog) {
         console.log(`engine.addRows(0, [${rowPositionToAdd},2])`)
       }
       engine.addRows(0, [rowPositionToAdd, 2])
@@ -245,15 +256,15 @@ describe('large psuedo-random test', () => {
       sideY += 2
       verifyValues(engine)
       const rowPositionToRemove = randomInteger(0, sideY)
-      if(outputLog) {
+      if (outputLog) {
         console.log(`engine.removeRows(0, [${rowPositionToRemove},1])`)
       }
       engine.removeRows(0, [rowPositionToRemove, 1])
       undoRedo(engine)
       sideY -= 1
       verifyValues(engine)
-      const x1 = randomInteger(0, n*sideX)
-      const x2 = randomInteger(0, n*sideX)
+      const x1 = randomInteger(0, n * sideX)
+      const x2 = randomInteger(0, n * sideX)
       const y1 = randomInteger(0, sideY)
       const y2 = randomInteger(0, sideY)
       swapTwoRectangles(engine, {x: x1, y: y1}, {x: x2, y: y2}, sideX, sideY)

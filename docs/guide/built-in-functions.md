@@ -51,7 +51,7 @@ lets you design your own [custom functions](custom-functions).
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/1.1.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/1.3.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: built-in-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -142,14 +142,14 @@ Total number of functions: **{{ $page.functionsCount }}**
 | IMPOWER | Returns a complex number raised to a given power. | IMPOWER(Complex; Number) |
 | IMPRODUCT | Multiplies complex numbers. | IMPRODUCT(Complex1 ...Complex30) |
 | IMREAL | Returns real part of a complex number. | IMREAL(Complex) |
-| IMSEC | Returns secans of a complex number. | IMSEC(Complex) |
-| IMSECH | Returns hyperbolic secans of a complex number. | IMSECH(Complex) |
+| IMSEC | Returns the secant of a complex number. | IMSEC(Complex) |
+| IMSECH | Returns the hyperbolic secant of a complex number. | IMSECH(Complex) |
 | IMSIN | Returns sine of a complex number. | IMSIN(Complex) |
 | IMSINH | Returns hyperbolic sine of a complex number. | IMSINH(Complex) |
 | IMSQRT | Returns a square root of a complex number. | IMSQRT(Complex) |
 | IMSUB | Subtracts two complex numbers. | IMSUB(Complex1; Complex2) |
 | IMSUM | Adds complex numbers. | IMSUM(Complex1 ...Complex30) |
-| IMTAN | Returns tangens of a complex number. | IMTAN(Complex) |
+| IMTAN | Returns the tangent of a complex number. | IMTAN(Complex) |
 | OCT2BIN | The result is the binary number for the octal number entered. | OCT2BIN(Number; Places) |
 | OCT2DEC | The result is the decimal number for the octal number entered. | OCT2DEC(Number) |
 | OCT2HEX | The result is the hexadecimal number for the octal number entered. | OCT2HEX(Number; Places) |
@@ -244,15 +244,15 @@ Total number of functions: **{{ $page.functionsCount }}**
 | :--- | :--- | :--- |
 | ABS | Returns the absolute value of a number. | ABS(Number) |
 | ACOS | Returns the inverse trigonometric cosine of a number. | ACOS(Number) |
-| ACOSH | Returns the inverse harmonic cosine of a number. | ACOSH(Number) |
+| ACOSH | Returns the inverse hyperbolic cosine of a number. | ACOSH(Number) |
 | ACOT | Returns the inverse trigonometric cotangent of a number. | ACOT(Number) |
-| ACOTH | Returns the inverse harmonic cotangent of a number. | ACOTH(Number) |
+| ACOTH | Returns the inverse hyperbolic cotangent of a number. | ACOTH(Number) |
 | ARABIC | Converts number from roman form. | ARABIC(String) |
 | ASIN | Returns the inverse trigonometric sine of a number. | ASIN(Number) |
-| ASINH | Returns the inverse harmonic sine of a number. | ASINH(Number) |
+| ASINH | Returns the inverse hyperbolic sine of a number. | ASINH(Number) |
 | ATAN | Returns the inverse trigonometric tangent of a number. | ATAN(Number) |
 | ATAN2 | Returns the inverse trigonometric tangent of the specified x and y coordinates. | ATAN2(Numberx; Numbery) |
-| ATANH | Returns the inverse harmonic tangent of a number. | ATANH(Number) |
+| ATANH | Returns the inverse hyperbolic tangent of a number. | ATANH(Number) |
 | BASE | Converts a positive integer to a specified base into a text from the numbering system. | BASE(Number; Radix; [Minimumlength]) |
 | CEILING | Rounds a number up to the nearest multiple of Significance. | CEILING(Number; Significance) |
 | CEILING.MATH | Rounds a number up to the nearest multiple of Significance. | CEILING.MATH(Number[; Significance[; Mode]]) |
@@ -265,7 +265,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | COTH | Returns the hyperbolic cotangent of the given value. | COTH(Number) |
 | COUNTUNIQUE | Counts the number of unique values in a list of specified values and ranges. | COUNTUNIQUE(Value1, [Value2, ...]) |
 | CSC | Returns the cosecans of the given angle (in radians). | CSC(Number) |
-| CSCH | Returns the hyperbolic cosecans of the given value. | CSCH(Number) |
+| CSCH | Returns the hyperbolic cosecant of the given value. | CSCH(Number) |
 | DECIMAL | Converts text with characters from a number system to a positive integer in the base radix given. | DECIMAL("Text"; Radix) |
 | DEGREES | Converts radians into degrees. | DEGREES(Number) |
 | EVEN | Rounds a positive number up to the next even integer and a negative number down to the next even integer. | EVEN(Number) |
@@ -289,7 +289,6 @@ Total number of functions: **{{ $page.functionsCount }}**
 | PI | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places. | PI() |
 | POWER | Returns a number raised to another number. | POWER(Base; Exponent) |
 | PRODUCT | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
-| PRODUCT | Returns product of numbers. | PRODUCT(Number1; Number2; ...; Number30) |
 | QUOTIENT | Returns integer part of a division. | QUOTIENT(Dividend; Divisor) |
 | RADIANS | Converts degrees to radians. | RADIANS(Number) |
 | RAND | Returns a random number between 0 and 1. | RAND() |
@@ -298,8 +297,8 @@ Total number of functions: **{{ $page.functionsCount }}**
 | ROUND | Rounds a number to a certain number of decimal places. | ROUND(Number; Count) |
 | ROUNDDOWN | Rounds a number down, toward zero, to a certain precision. | ROUNDDOWN(Number; Count) |
 | ROUNDUP | Rounds a number up, away from zero, to a certain precision. | ROUNDUP(Number; Count) |
-| SEC | Returns the secans of the given angle (in radians). | SEC(Number) |
-| SECH | Returns the hyperbolic secans of the given value. | SEC(Number) |
+| SEC | Returns the secant of the given angle (in radians). | SEC(Number) |
+| SECH | Returns the hyperbolic secant of the given angle (in radians). | SEC(Number) |
 | SERIESSUM | Evaluates series at a point. | SERIESSUM(Number; Number; Number; Coefficients)
 | SIN | Returns the sine of the given angle (in radians). | SIN(Number) |
 | SINH | Returns the hyperbolic sine of the given value. | SINH(Number) |

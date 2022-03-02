@@ -37,7 +37,7 @@ function arraySizeForPoolFunction(inputArray: ArraySize, windowSize: number, str
   )
 }
 
-export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin>{
+export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin> {
   public static implementedFunctions = {
     'MMULT': {
       method: 'mmult',
@@ -83,7 +83,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (!leftMatrix.hasOnlyNumbers() || !rightMatrix.hasOnlyNumbers()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
       }
-      if( rightMatrix.height() !== leftMatrix.width()) {
+      if (rightMatrix.height() !== leftMatrix.width()) {
         return new CellError(ErrorType.VALUE, ErrorMessage.ArrayDimensions)
       }
       const outputSize = arraySizeForMultiplication(leftMatrix.size, rightMatrix.size)
@@ -274,7 +274,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       for (let y = 0; y < outputSize.height; ++y) {
         result.push([])
         for (let x = 0; x < outputSize.width; ++x) {
-          result[y][x] = kernel.apply({ thread: { x, y }}, args)
+          result[y][x] = kernel.apply({thread: {x, y}}, args)
         }
       }
       return result

@@ -4,6 +4,7 @@
  */
 
 import {ArrayVertex, CellVertex, FormulaCellVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,
@@ -17,7 +18,6 @@ import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
 import {Maybe} from './Maybe'
 import {CellAddress} from './parser'
 import {AddressWithSheet} from './parser/Address'
-import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
 
 /**
  * Possible errors returned by our interpreter.
@@ -60,7 +60,7 @@ export enum CellType {
 
 export const getCellType = (vertex: Maybe<CellVertex>, address: SimpleCellAddress): CellType => {
   if (vertex instanceof ArrayVertex) {
-    if(vertex.isLeftCorner(address)) {
+    if (vertex.isLeftCorner(address)) {
       return CellType.ARRAYFORMULA
     } else {
       return CellType.ARRAY
@@ -154,16 +154,16 @@ export class CellError {
   ) {
   }
 
+  public static parsingError() {
+    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
+  }
+
   public attachRootVertex(vertex: FormulaVertex): CellError {
-    if(this.root === undefined) {
+    if (this.root === undefined) {
       return new CellError(this.type, this.message, vertex)
     } else {
       return this
     }
-  }
-
-  public static parsingError() {
-    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
   }
 }
 

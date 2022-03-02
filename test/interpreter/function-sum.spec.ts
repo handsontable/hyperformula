@@ -3,44 +3,44 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('SUM', () => {
-  it('SUM without args',  () => {
-    const engine =  HyperFormula.buildFromArray([['=SUM()']])
+  it('SUM without args', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM()']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
-  it('SUM with args',  () => {
-    const engine =  HyperFormula.buildFromArray([['=SUM(1, B1)', '3.14']])
+  it('SUM with args', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM(1, B1)', '3.14']])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(4.14)
   })
 
-  it('SUM with range args',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('SUM with range args', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '5'],
       ['3', '4', '=SUM(A1:B2)']
     ])
     expect(engine.getCellValue(adr('C2'))).toEqual(10)
   })
 
-  it('SUM with column range args',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('SUM with column range args', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1', '2', '5'],
       ['3', '4', '=SUM(A:B)']
     ])
     expect(engine.getCellValue(adr('C2'))).toEqual(10)
   })
 
-  it('SUM with using previously cached value',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('SUM with using previously cached value', () => {
+    const engine = HyperFormula.buildFromArray([
       ['3', '=SUM(A1:A1)'],
       ['4', '=SUM(A1:A2)'],
     ])
     expect(engine.getCellValue(adr('B2'))).toEqual(7)
   })
 
-  it('doesnt do coercions',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('doesnt do coercions', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['foo'],
@@ -58,8 +58,8 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A9'))).toEqual(0)
   })
 
-  it( 'works when precision (default setting)', () => {
-    const engine = HyperFormula.buildFromArray( [
+  it('works when precision (default setting)', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1.00000000000005', '-1'],
       ['=SUM(A1:B1)']
     ])
@@ -67,8 +67,8 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(0)
   })
 
-  it('explicitly called does coercions',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('explicitly called does coercions', () => {
+    const engine = HyperFormula.buildFromArray([
       ['=SUM(2,TRUE())'],
       ['=SUM(2,"foo",TRUE())'],
       ['=SUM(TRUE())'],
@@ -80,8 +80,8 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(10)
   })
 
-  it('doesnt take value from range if it does not store cached value for that function',  () => {
-    const engine =  HyperFormula.buildFromArray([
+  it('doesnt take value from range if it does not store cached value for that function', () => {
+    const engine = HyperFormula.buildFromArray([
       ['1'],
       ['2'],
       ['=MAX(A1:A2)'],

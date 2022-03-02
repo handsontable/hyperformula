@@ -6,7 +6,8 @@
 export type DependencyQuery<T> = (vertex: T) => T[]
 
 export interface TopSortResult<T> {
-  sorted: T[], cycled: T[], 
+  sorted: T[],
+  cycled: T[],
 }
 
 enum NodeVisitStatus {
@@ -178,7 +179,8 @@ export class Graph<T> {
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {})
+    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {
+    })
   }
 
   /**
@@ -207,24 +209,24 @@ export class Graph<T> {
     const sccNonSingletons: Set<T> = new Set()
 
     modifiedNodes.reverse()
-    modifiedNodes.forEach( (v: T) => {
+    modifiedNodes.forEach((v: T) => {
       if (nodeStatus.get(v) !== undefined) {
         return
       }
       const DFSstack: T[] = [v]
       const SCCstack: T[] = []
       nodeStatus.set(v, NodeVisitStatus.ON_STACK)
-      while ( DFSstack.length > 0 ) {
-        const u = DFSstack[ DFSstack.length - 1 ]
+      while (DFSstack.length > 0) {
+        const u = DFSstack[DFSstack.length - 1]
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        switch(nodeStatus.get(u)!) {
+        switch (nodeStatus.get(u)!) {
           case NodeVisitStatus.ON_STACK: {
             entranceTime.set(u, time)
             low.set(u, time)
             SCCstack.push(u)
             time++
-            this.adjacentNodes(u).forEach( (t: T) => {
-              if(entranceTime.get(t) === undefined) {
+            this.adjacentNodes(u).forEach((t: T) => {
+              if (entranceTime.get(t) === undefined) {
                 DFSstack.push(t)
                 parent.set(t, u)
                 nodeStatus.set(t, NodeVisitStatus.ON_STACK)
@@ -259,7 +261,7 @@ export class Graph<T> {
                 inSCC.add(t)
               })
               order.push(...currentSCC)
-              if(currentSCC.length>1) {
+              if (currentSCC.length > 1) {
                 currentSCC.forEach((t) => {
                   sccNonSingletons.add(t)
                 })
@@ -282,20 +284,20 @@ export class Graph<T> {
     const sorted: T[] = []
     const cycled: T[] = []
     order.reverse()
-    order.forEach( (t: T) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
-          cycled.push(t)
-          onCycle(t)
-          this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
-        } else {
-          sorted.push(t)
-          if ( shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
-            this.adjacentNodes(t).forEach( (s: T) => shouldBeUpdatedMapping.add(s) )
-          }
+    order.forEach((t: T) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
+        cycled.push(t)
+        onCycle(t)
+        this.adjacentNodes(t).forEach((s: T) => shouldBeUpdatedMapping.add(s))
+      } else {
+        sorted.push(t)
+        if (shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
+          this.adjacentNodes(t).forEach((s: T) => shouldBeUpdatedMapping.add(s))
         }
-      })
-    return { sorted, cycled }
+      }
+    })
+    return {sorted, cycled}
   }
 
   public getDependencies(vertex: T): T[] {

@@ -22,7 +22,7 @@ describe('Function ISREF', () => {
 
   it('should return false for other values', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=ISREF(1)', '=ISREF(TRUE())',  '=ISREF("foo")', '=ISREF(A1)'],
+      ['=ISREF(1)', '=ISREF(TRUE())', '=ISREF("foo")', '=ISREF(A1)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqual(false)
     expect(engine.getCellValue(adr('B1'))).toEqual(false)

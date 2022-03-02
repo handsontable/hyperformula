@@ -5,19 +5,19 @@ import {ErrorMessage} from '../src/error-message'
 import {Exporter} from '../src/Exporter'
 import {plPL} from '../src/i18n/languages'
 import {EmptyValue} from '../src/interpreter/InterpreterValue'
+import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {NamedExpressions} from '../src/NamedExpressions'
 import {SheetIndexMappingFn} from '../src/parser/addressRepresentationConverters'
-import {detailedError} from './testUtils'
-import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {EmptyStatistics} from '../src/statistics'
+import {detailedError} from './testUtils'
 
 const namedExpressionsMock = {} as NamedExpressions
 const sheetIndexMock = {} as SheetIndexMappingFn
 const lazilyTransforminService = new LazilyTransformingAstService(new EmptyStatistics())
 
-describe( 'rounding', () => {
-  it( 'no rounding', () =>{
-    const config = new Config({ smartRounding : false })
+describe('rounding', () => {
+  it('no rounding', () => {
+    const config = new Config({smartRounding: false})
     const cellValueExporter = new Exporter(config, namedExpressionsMock, sheetIndexMock, lazilyTransforminService)
     expect(cellValueExporter.exportValue(1.000000000000001)).toBe(1.000000000000001)
     expect(cellValueExporter.exportValue(-1.000000000000001)).toBe(-1.000000000000001)
@@ -30,7 +30,7 @@ describe( 'rounding', () => {
     expect(cellValueExporter.exportValue('abcd')).toBe('abcd')
   })
 
-  it( 'with rounding', () =>{
+  it('with rounding', () => {
     const config = new Config()
     const cellValueExporter = new Exporter(config, namedExpressionsMock, sheetIndexMock, lazilyTransforminService)
     expect(cellValueExporter.exportValue(1.0000000000001)).toBe(1.0000000000001)
@@ -49,7 +49,7 @@ describe( 'rounding', () => {
 
 describe('detailed error', () => {
   it('should return detailed errors', () => {
-    const config = new Config({ language: 'enGB' })
+    const config = new Config({language: 'enGB'})
     const cellValueExporter = new Exporter(config, namedExpressionsMock, sheetIndexMock, lazilyTransforminService)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
@@ -59,7 +59,7 @@ describe('detailed error', () => {
 
   it('should return detailed errors with translation', () => {
     HyperFormula.registerLanguage('plPL', plPL)
-    const config = new Config({ language: 'plPL' })
+    const config = new Config({language: 'plPL'})
     const cellValueExporter = new Exporter(config, namedExpressionsMock, sheetIndexMock, lazilyTransforminService)
 
     const error = cellValueExporter.exportValue(new CellError(ErrorType.VALUE)) as DetailedCellError
