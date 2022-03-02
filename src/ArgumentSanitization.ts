@@ -4,7 +4,6 @@
  */
 
 import {Config, ConfigParamsList} from './Config'
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import {
   ConfigValueTooBigError,
   ConfigValueTooSmallError,
@@ -12,6 +11,7 @@ import {
   ExpectedValueOfTypeError
 } from './errors'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function configValueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList) {
   if (typeof inputValue === 'undefined') {
     return Config.defaultConfig[paramName]
@@ -76,6 +76,7 @@ export function configCheckIfParametersNotInConflict(...params: { value: number 
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateArgToType(inputValue: any, expectedType: string, paramName: string) {
   if (typeof inputValue !== expectedType) {
     throw new ExpectedValueOfTypeError(expectedType, paramName)
