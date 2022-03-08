@@ -118,6 +118,12 @@ describe('Config', () => {
     }).toThrowError('Config parameter currencySymbol cannot be empty.')
   })
 
+  it('should throw error when currency symbol is not a string', () => {
+    expect(() => {
+      new Config({currencySymbol: [42 as any]})
+    }).toThrowError('Expected value of type: string[] for config parameter: currencySymbol')
+  })
+
   it('should throw error when currency symbol is not an array', () => {
     expect(() => {
       // eslint-disable-next-line
