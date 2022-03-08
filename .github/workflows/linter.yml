@@ -16,7 +16,7 @@ jobs:
   build:
     strategy:
       matrix:
-        node-version: [ '14' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: ESLINT
     runs-on: ${{ matrix.os }}

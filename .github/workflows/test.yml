@@ -16,7 +16,7 @@ jobs:
   build:
     strategy:
       matrix:
-        node-version: [ '14' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: BUILD
     runs-on: ${{ matrix.os }}
@@ -65,7 +65,7 @@ jobs:
   browsers:
     strategy:
       matrix:
-        node-version: [ '14' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: BROWSERS
     runs-on: ${{ matrix.os }}
