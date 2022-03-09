@@ -8,7 +8,7 @@ module.exports = {
     '!**/node_modules/**',
   ],
 
-  coverageProvider: 'v8',
+  coverageProvider: 'babel',
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
