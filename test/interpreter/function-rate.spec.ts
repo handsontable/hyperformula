@@ -117,13 +117,15 @@ describe('Function RATE', () => {
         ['=RATE(12, -100, 400, 100, 1)', ],
         ['=RATE(12, -100, 400, 1, 1)', ],
         ['=RATE(12, -100, 400, 0, 1)', ],
+        ['=RATE(12, -100, 400, 0, 1, 0.317)', ],
         ['=RATE(12, -100, 400, -100, 1)', ],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.499693, requiredFinancialPrecision)
       expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-0.990099, requiredFinancialPrecision)
       expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-1.000000, requiredFinancialPrecision) // noted in known-limitations
-      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM))
+      expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.3172435, requiredFinancialPrecision)
+      expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM))
     })
 
     it('(12, -100, 600)', () => {
