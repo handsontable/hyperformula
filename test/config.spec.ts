@@ -203,6 +203,72 @@ describe('Config', () => {
     expect(() => new Config({nullYear: 100})).not.toThrowError()
     expect(() => new Config({nullYear: 101})).toThrowError('Config parameter nullYear should be at most 100')
   })
+
+  describe('deprecated option warning messages', () => {
+    beforeEach(() => {
+      spyOn(console, 'warn')
+    })
+
+    afterEach(() => {
+      try {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.mockClear() // clears mock in Jest env
+      } catch {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.calls.reset() // clears mock in Jasmine env
+      }
+    })
+
+    it('should log usage of deprecated options when they are passed while engine initialization', () => {
+      new Config({
+        binarySearchThreshold: 20,
+        gpujs: true,
+        gpuMode: 'gpu',
+      })
+
+      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
+      expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
+      expect(console.warn).toHaveBeenCalledWith('gpuMode option is deprecated since 1.2')
+      expect(console.warn).toHaveBeenCalledTimes(3)
+    })
+
+    it('should log usage of deprecated options when they are passed while merging the Config object', () => {
+      const config = new Config()
+
+      config.mergeConfig({
+        binarySearchThreshold: 20,
+        gpujs: true,
+      })
+
+      expect(console.warn).toHaveBeenCalledTimes(2)
+      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
+      expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
+    })
+
+    it('should not log usage of deprecated options when they are not passed while merging the Config object', () => {
+      const config = new Config({
+        binarySearchThreshold: 20,
+        gpujs: true,
+        gpuMode: 'gpu',
+      })
+
+      try {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.mockClear() // clears mock in Jest env
+      } catch {
+        // eslint-disable-next-line
+        // @ts-ignore
+        console.warn.calls.reset() // clears mock in Jasmine env
+      }
+
+      config.mergeConfig({})
+
+      expect(console.warn).toHaveBeenCalledTimes(0)
+    })
+  })
 })
 
 describe('getConfig', () => {

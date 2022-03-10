@@ -586,8 +586,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
 
-  constructor(
-    {
+  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
+    const {
       accentSensitive,
       binarySearchThreshold,
       caseSensitive,
@@ -627,8 +627,12 @@ export class Config implements ConfigParams, ParserConfig {
       useColumnIndex,
       useRegularExpressions,
       useWildcards,
-    }: Partial<ConfigParams> = {},
-  ) {
+    } = options
+
+    if (showDeprecatedWarns) {
+      this.warnDeprecatedOptions(options)
+    }
+
     this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
     this.accentSensitive = configValueFromParam(accentSensitive, 'boolean', 'accentSensitive')
     this.caseSensitive = configValueFromParam(caseSensitive, 'boolean', 'caseSensitive')
@@ -659,9 +663,7 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    this.binarySearchThreshold = undefined
+    this.binarySearchThreshold = binarySearchThreshold ?? Config.defaultConfig.binarySearchThreshold
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
@@ -687,11 +689,6 @@ export class Config implements ConfigParams, ParserConfig {
       }
     })
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
-    this.warnDeprecatedIfUsed(binarySearchThreshold, 'binarySearchThreshold', '1.1')
-    this.warnDeprecatedIfUsed(gpujs, 'gpujs', '1.2')
-    if (gpuMode !== Config.defaultConfig.gpuMode) {
-      this.warnDeprecatedIfUsed(gpuMode, 'gpuMode', '1.2')
-    }
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
@@ -726,7 +723,18 @@ export class Config implements ConfigParams, ParserConfig {
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
-    return new Config(mergedConfig)
+    this.warnDeprecatedOptions(init)
+
+    return new Config(mergedConfig, false)
+  }
+
+  private warnDeprecatedOptions(options: Partial<ConfigParams>) {
+    this.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
+    this.warnDeprecatedIfUsed(options.gpujs, 'gpujs', '1.2')
+
+    if (options.gpuMode !== Config.defaultConfig.gpuMode) {
+      this.warnDeprecatedIfUsed(options.gpuMode, 'gpuMode', '1.2')
+    }
   }
 
   private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
@@ -756,4 +764,3 @@ function getFullConfigFromPartial(partialConfig: Partial<ConfigParams>): ConfigP
 export function getDefaultConfig(): ConfigParams {
   return getFullConfigFromPartial({})
 }
-

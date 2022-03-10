@@ -6,7 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Fixed lexer whitespace to match all white spaces. (#877)
+### Fixed
+- Fixed lexer whitespace regex to match all white spaces. (#898)
+
+## [1.3.1] - 2022-01-11
+
+### Fixed
+- Fixed an issue where warnings about deprecated configuration options were getting duplicated. (#882)
 
 ## [1.3.0] - 2021-10-20
 
