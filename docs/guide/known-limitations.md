@@ -72,7 +72,7 @@ To remove the differences, you can create custom implementations of those functi
 | DAYS          | =DAYS(-1, 0)                                               |          NUM |      -1,0000 |        NUM |
 | DAYS          | =DAYS(0, -1)                                               |          NUM |       1,0000 |        NUM |
 | DATEDIF       | =DATEDIF(-1, 0, "Y")                                       |          NUM |       0,0000 |        NUM |
-| RATE          | =RATE(12, -100, 400, 0, 1)                                 |      -1,0000 |       0,3200 |        NUM |
+| RATE          | =RATE(12, -100, 400, 0, 1)                                 |      -1,0000 |          NUM |        NUM |
 | LCMP          | =LCM(1000000, 1000001, 1000002, 1000003)                   |          NUM |  5,00003E+23 |        NUM |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 1.9)                                   |       5,0000 |          NUM |     5,0000 |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 2)                                     |       0,0000 |          NUM |     0,0000 |
