@@ -38,6 +38,8 @@ format , builds ES6 version
 * `npm run bundle:typings` - generates TS typing, only emits
 ‘.d.ts’ declaration files
 
+Note: We recommend using `node@16.14.0` for building HF. Other versions are not supported.
+
 ## Verify the build
 
 By using the following commands you can verify the build:
