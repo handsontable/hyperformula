@@ -473,7 +473,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
         const epsMax = 1e-7
 
-        const iterMax = 100
+        const iterMax = 50
 
         let rate = guess
         type = type ? 1 : 0
