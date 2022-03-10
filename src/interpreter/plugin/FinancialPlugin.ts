@@ -464,15 +464,16 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   }
 
   public rate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    // Newton's method: https://en.wikipedia.org/wiki/Newton%27s_method
     return this.runFunction(ast.args, state, this.metadata('RATE'),
       (periods, payment, present, future, type, guess) => {
         if (guess <= -1) {
           return new CellError(ErrorType.VALUE)
         }
 
-        const epsMax = 1e-10
+        const epsMax = 1e-7
 
-        const iterMax = 20
+        const iterMax = 100
 
         let rate = guess
         type = type ? 1 : 0
