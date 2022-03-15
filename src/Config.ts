@@ -657,6 +657,7 @@ export class Config implements ConfigParams, ParserConfig {
 
   private setupCurrencySymbol(currencySymbol: string[] | undefined): string[] {
     const valueAfterCheck = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array', 'currencySymbol')]
+
     valueAfterCheck.forEach((val) => {
       if (typeof val !== 'string') {
         throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
