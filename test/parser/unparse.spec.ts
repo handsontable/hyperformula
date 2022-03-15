@@ -597,4 +597,13 @@ describe('whitespaces', () => {
 
     expect(unparsed).toEqual(formula)
   })
+
+  it('should unparse a non-break space character', () => {
+    const formula = '=\u00A01'
+    const ast = parser.parse(formula, adr('A1')).ast
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual(formula)
+  })
 })
