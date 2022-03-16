@@ -755,7 +755,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     ].sort((nonSimpleColA, nonSimpleColB) => {
       const colA = nonSimpleColA.toSimpleColumnAddress(this.formulaAddress)
       const colB = nonSimpleColB.toSimpleColumnAddress(this.formulaAddress)
-      return colA.sheet !== colB.sheet ? colA.sheet - colB.sheet : colA.col - colB.col
+      return colA.col - colB.col
     })
 
     const [startRow, endRow]: RowAddress[] = [
@@ -764,11 +764,19 @@ export class FormulaParser extends EmbeddedActionsParser {
     ].sort((nonSimpleRowA, nonSimpleRowB) => {
       const rowA = nonSimpleRowA.toSimpleRowAddress(this.formulaAddress)
       const rowB = nonSimpleRowB.toSimpleRowAddress(this.formulaAddress)
-      return rowA.sheet !== rowB.sheet ? rowA.sheet - rowB.sheet : rowA.row - rowB.row
+      return rowA.row - rowB.row
     })
 
-    const startAddress = CellAddress.fromColAndRow(startCol, startRow)
-    const endAddress = CellAddress.fromColAndRow(endCol, endRow)
+    const [startSheet, endSheet]: (number | undefined)[] = [ firstAddress.sheet, secondAddress.sheet ].sort((a, b) => {
+      if (a == null || b == null) {
+        return 0
+      }
+
+      return a - b
+    })
+
+    const startAddress = CellAddress.fromColAndRow(startCol, startRow, startSheet)
+    const endAddress = CellAddress.fromColAndRow(endCol, endRow, endSheet)
 
     return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
   }

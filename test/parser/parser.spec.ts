@@ -563,6 +563,89 @@ describe('cell references and ranges', () => {
     expect(ast1).toEqual(buildErrorWithRawInputAst(`A1:B${maxRow + 1}`, new CellError(ErrorType.NAME)))
     expect(ast2).toEqual(buildErrorWithRawInputAst(`A1:${columnIndexToLabel(maxColumns)}1`, new CellError(ErrorType.NAME)))
   })
+
+  describe('reversed range', () => {
+    it('relative', () => {
+      const parser = buildEmptyParserWithCaching(new Config())
+      const notReversedAst = parser.parse('=A1:B2', adr('A1')).ast as CellRangeAst
+
+      ['=B2:A1', '=B1:A2', '=A2:B1'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+    })
+
+    it('with absolute addressing', () => {
+      const parser = buildEmptyParserWithCaching(new Config())
+
+      let notReversedAst = parser.parse('=$A1:B2', adr('A1')).ast as CellRangeAst
+      ['=$A2:B1', '=B1:$A2', '=B2:$A1'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+
+      notReversedAst = parser.parse('=A$1:B2', adr('A1')).ast as CellRangeAst
+      ['=A2:B$1', '=B$1:A2', '=B2:A$1'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+
+      notReversedAst = parser.parse('=A1:$B2', adr('A1')).ast as CellRangeAst
+      ['=A2:$B1', '=$B1:A2', '=$B2:A1'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+
+      notReversedAst = parser.parse('=A1:B$2', adr('A1')).ast as CellRangeAst
+      ['=A$2:B1', '=B1:A$2', '=B$2:A1'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+
+      notReversedAst = parser.parse('=$A$1:B2', adr('A1')).ast as CellRangeAst
+      ['=$A2:B$1', '=B$1:$A2', '=B2:$A$1'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+
+      notReversedAst = parser.parse('=$A1:B$2', adr('A1')).ast as CellRangeAst
+      ['=$A$2:B1', '=B1:$A$2', '=B$2:$A1'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+    })
+
+    it('with sheets specified', () => {
+      const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+      sheetMapping.addSheet('Sheet0')
+      sheetMapping.addSheet('Sheet1')
+      sheetMapping.addSheet('Sheet2')
+      const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
+
+      let ast = parser.parse('=Sheet1!B2:A1', adr('A1')).ast as CellRangeAst
+      expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+      expect(ast.start.sheet).toEqual(1)
+      expect(ast.end.sheet).toEqual(1)
+
+      const res = parser.parse('=B2:Sheet1!A1', adr('A1'))
+      expect(res.errors[0].type).toBe(ParsingErrorType.ParserError)
+
+      ast = parser.parse('=Sheet1!B2:Sheet1!A1', adr('A1')).ast as CellRangeAst
+      expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+      expect(ast.start.sheet).toEqual(1)
+      expect(ast.end.sheet).toEqual(1)
+
+      ast = parser.parse('=Sheet1!B2:Sheet2!A1', adr('A1')).ast as CellRangeAst
+      expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+      expect(ast.start.sheet).toEqual(1)
+      expect(ast.end.sheet).toEqual(2)
+
+      ast = parser.parse('=Sheet2!B2:Sheet1!A1', adr('A1')).ast as CellRangeAst
+      expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+      expect(ast.start.sheet).toEqual(1)
+      expect(ast.end.sheet).toEqual(2)
+    })
+  })
 })
 
 describe('Column ranges', () => {
@@ -611,6 +694,8 @@ describe('Column ranges', () => {
     expect(ast2).toEqual(buildErrorWithRawInputAst(`A:${columnIndexToLabel(maxColumns)}`, new CellError(ErrorType.NAME)))
     expect(ast3).toEqual(buildErrorWithRawInputAst(`${columnIndexToLabel(maxColumns)}:B`, new CellError(ErrorType.NAME)))
   })
+
+  // reversed
 })
 
 describe('Row ranges', () => {
@@ -648,6 +733,8 @@ describe('Row ranges', () => {
     const {errors} = parser.parse('=1:Sheet2!2', adr('A1'))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
+
+  // reversed
 })
 
 describe('Named expressions', () => {
