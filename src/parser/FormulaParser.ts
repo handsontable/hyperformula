@@ -96,6 +96,8 @@ import {
   TimesOp,
   WhiteSpace,
 } from './LexerConfig'
+import {RowAddress} from './RowAddress'
+import {ColumnAddress} from './ColumnAddress'
 
 export interface FormulaParserResult {
   ast: Ast,
@@ -146,14 +148,14 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for procedure expressions: SUM(1,A1)
    */
   private procedureExpression: AstRule = this.RULE('procedureExpression', () => {
-    const procedureNameToken = this.CONSUME(ProcedureName) as IExtendedToken
+    const procedureNameToken = this.CONSUME(ProcedureName) as ExtendedToken
     const procedureName = procedureNameToken.image.toUpperCase().slice(0, -1)
     const canonicalProcedureName = this.lexerConfig.functionMapping[procedureName] ?? procedureName
     const args: Ast[] = []
 
     let argument = this.SUBRULE(this.booleanExpressionOrEmpty)
     this.MANY(() => {
-      const separator = this.CONSUME(this.lexerConfig.ArgSeparator) as IExtendedToken
+      const separator = this.CONSUME(this.lexerConfig.ArgSeparator) as ExtendedToken
       if (argument.type === AstNodeType.EMPTY) {
         argument.leadingWhitespace = separator.leadingWhitespace?.image
       }
@@ -167,11 +169,11 @@ export class FormulaParser extends EmbeddedActionsParser {
       args.length = 0
     }
 
-    const rParenToken = this.CONSUME(RParen) as IExtendedToken
+    const rParenToken = this.CONSUME(RParen) as ExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
   private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
-    const name = this.CONSUME(NamedExpression) as IExtendedToken
+    const name = this.CONSUME(NamedExpression) as ExtendedToken
     return buildNamedExpressionAst(name.image, name.leadingWhitespace)
   })
   /**
@@ -194,7 +196,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
    */
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
-    const range = this.CONSUME(ColumnRange) as IExtendedToken
+    const range = this.CONSUME(ColumnRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
 
     const start = this.ACTION(() => {
@@ -214,7 +216,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
+    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(start.sheet, end.sheet)
 
     if (start.sheet !== undefined && end.sheet === undefined) {
       end = end.withAbsoluteSheet(start.sheet)
@@ -226,7 +228,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
    */
   private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
-    const range = this.CONSUME(RowRange) as IExtendedToken
+    const range = this.CONSUME(RowRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
 
     const start = this.ACTION(() => {
@@ -246,7 +248,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = this.rangeSheetReferenceType(start.sheet, end.sheet)
+    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(start.sheet, end.sheet)
 
     if (start.sheet !== undefined && end.sheet === undefined) {
       end = end.withAbsoluteSheet(start.sheet)
@@ -258,7 +260,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
    */
   private cellReference: AstRule = this.RULE('cellReference', () => {
-    const cell = this.CONSUME(CellReference) as IExtendedToken
+    const cell = this.CONSUME(CellReference) as ExtendedToken
     const address = this.ACTION(() => {
       return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress)
     })
@@ -273,8 +275,8 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Rule for end range reference expression with additional checks considering range start
    */
-  private endRangeReference: AstRule = this.RULE('endRangeReference', (start: IExtendedToken) => {
-    const end = this.CONSUME(CellReference) as IExtendedToken
+  private endRangeReference: AstRule = this.RULE('endRangeReference', (start: ExtendedToken) => {
+    const end = this.CONSUME(CellReference) as ExtendedToken
 
     const startAddress = this.ACTION(() => {
       return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
@@ -301,7 +303,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    *
    * End of range may be a cell reference or OFFSET() function call
    */
-  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (start: IExtendedToken) => {
+  private endOfRangeExpression: AstRule = this.RULE('endOfRangeExpression', (start: ExtendedToken) => {
     return this.OR([
       {
         ALT: () => {
@@ -344,7 +346,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for end range reference expression starting with offset procedure with additional checks considering range start
    */
   private endRangeWithOffsetStartReference: AstRule = this.RULE('endRangeWithOffsetStartReference', (start: CellReferenceAst) => {
-    const end = this.CONSUME(CellReference) as IExtendedToken
+    const end = this.CONSUME(CellReference) as ExtendedToken
 
     const endAddress = this.ACTION(() => {
       return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
@@ -392,7 +394,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for expressions that start with OFFSET() function
    *
    * OFFSET() function can occur as cell reference or part of cell range.
-   * In order to preserve LL(k) properties, expressions that starts with OFFSET() functions needs to have separate rule.
+   * In order to preserve LL(k) properties, expressions that start with OFFSET() functions needs to have separate rule.
    *
    * Proper {@link Ast} node type is built depending on the presence of {@link RangeSeparator}
    */
@@ -441,18 +443,18 @@ export class FormulaParser extends EmbeddedActionsParser {
    * Rule for parenthesis expression
    */
   private parenthesisExpression: AstRule = this.RULE('parenthesisExpression', () => {
-    const lParenToken = this.CONSUME(LParen) as IExtendedToken
+    const lParenToken = this.CONSUME(LParen) as ExtendedToken
     const expression = this.SUBRULE(this.booleanExpression)
-    const rParenToken = this.CONSUME(RParen) as IExtendedToken
+    const rParenToken = this.CONSUME(RParen) as ExtendedToken
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
   private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
     return this.OR([
       {
         ALT: () => {
-          const ltoken = this.CONSUME(ArrayLParen) as IExtendedToken
+          const ltoken = this.CONSUME(ArrayLParen) as ExtendedToken
           const ret = this.SUBRULE(this.insideArrayExpression) as ArrayAst
-          const rtoken = this.CONSUME(ArrayRParen) as IExtendedToken
+          const rtoken = this.CONSUME(ArrayRParen) as ExtendedToken
           return buildArrayAst(ret.args, ltoken.leadingWhitespace, rtoken.leadingWhitespace)
         }
       },
@@ -476,7 +478,7 @@ export class FormulaParser extends EmbeddedActionsParser {
    * @param tokens - tokenized formula
    * @param formulaAddress - address of the cell in which formula is located
    */
-  public parseFromTokens(tokens: IExtendedToken[], formulaAddress: SimpleCellAddress): FormulaParserResult {
+  public parseFromTokens(tokens: ExtendedToken[], formulaAddress: SimpleCellAddress): FormulaParserResult {
     this.input = tokens
 
     let ast = this.formulaWithContext(formulaAddress)
@@ -523,16 +525,16 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.arrayExpression),
       },
       {
-        ALT: () => this.SUBRULE(this.cellRangeExpression),
+        ALT: () => this.SUBRULE(this.cellRangeExpression), // HERE
       },
       {
-        ALT: () => this.SUBRULE(this.columnRangeExpression),
+        ALT: () => this.SUBRULE(this.columnRangeExpression), // HERE
       },
       {
-        ALT: () => this.SUBRULE(this.rowRangeExpression),
+        ALT: () => this.SUBRULE(this.rowRangeExpression), // HERE
       },
       {
-        ALT: () => this.SUBRULE(this.offsetExpression),
+        ALT: () => this.SUBRULE(this.offsetExpression), // HERE
       },
       {
         ALT: () => this.SUBRULE(this.cellReference),
@@ -545,19 +547,19 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
       {
         ALT: () => {
-          const number = this.CONSUME(this.lexerConfig.NumberLiteral) as IExtendedToken
+          const number = this.CONSUME(this.lexerConfig.NumberLiteral) as ExtendedToken
           return buildNumberAst(this.numericStringToNumber(number.image), number.leadingWhitespace)
         },
       },
       {
         ALT: () => {
-          const str = this.CONSUME(StringLiteral) as IExtendedToken
+          const str = this.CONSUME(StringLiteral) as ExtendedToken
           return buildStringAst(str)
         },
       },
       {
         ALT: () => {
-          const token = this.CONSUME(ErrorLiteral) as IExtendedToken
+          const token = this.CONSUME(ErrorLiteral) as ExtendedToken
           const errString = token.image.toUpperCase()
           const errorType = this.lexerConfig.errorMapping[errString]
           if (errorType) {
@@ -574,7 +576,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     const percentage = this.OPTION(() => {
       return this.CONSUME(PercentOp)
-    }) as Maybe<IExtendedToken>
+    }) as Maybe<ExtendedToken>
 
     if (percentage) {
       return buildPercentOpAst(positiveAtomicExpression, percentage.leadingWhitespace)
@@ -589,7 +591,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {
         ALT: () => {
-          const op = this.CONSUME(AdditionOp) as IExtendedToken
+          const op = this.CONSUME(AdditionOp) as ExtendedToken
           const value = this.SUBRULE(this.atomicExpression)
           if (tokenMatcher(op, PlusOp)) {
             return buildPlusUnaryOpAst(value, op.leadingWhitespace)
@@ -613,7 +615,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     let lhs: Ast = this.SUBRULE(this.atomicExpression)
 
     this.MANY(() => {
-      const op = this.CONSUME(PowerOp) as IExtendedToken
+      const op = this.CONSUME(PowerOp) as ExtendedToken
       const rhs = this.SUBRULE2(this.atomicExpression)
 
       if (tokenMatcher(op, PowerOp)) {
@@ -634,7 +636,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     let lhs: Ast = this.SUBRULE(this.powerExpression)
 
     this.MANY(() => {
-      const op = this.CONSUME(MultiplicationOp) as IExtendedToken
+      const op = this.CONSUME(MultiplicationOp) as ExtendedToken
       const rhs = this.SUBRULE2(this.powerExpression)
 
       if (tokenMatcher(op, TimesOp)) {
@@ -657,7 +659,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     let lhs: Ast = this.SUBRULE(this.multiplicationExpression)
 
     this.MANY(() => {
-      const op = this.CONSUME(AdditionOp) as IExtendedToken
+      const op = this.CONSUME(AdditionOp) as ExtendedToken
       const rhs = this.SUBRULE2(this.multiplicationExpression)
 
       if (tokenMatcher(op, PlusOp)) {
@@ -680,7 +682,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     let lhs: Ast = this.SUBRULE(this.additionExpression)
 
     this.MANY(() => {
-      const op = this.CONSUME(ConcatenateOp) as IExtendedToken
+      const op = this.CONSUME(ConcatenateOp) as ExtendedToken
       const rhs = this.SUBRULE2(this.additionExpression)
       lhs = buildConcatenateOpAst(lhs, rhs, op.leadingWhitespace)
     })
@@ -694,7 +696,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     let lhs: Ast = this.SUBRULE(this.concatenateExpression)
 
     this.MANY(() => {
-      const op = this.CONSUME(BooleanOp) as IExtendedToken
+      const op = this.CONSUME(BooleanOp) as ExtendedToken
       const rhs = this.SUBRULE2(this.concatenateExpression)
 
       if (tokenMatcher(op, EqualsOp)) {
@@ -736,16 +738,37 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.formula()
   }
 
-  private buildCellRange(startAddress: CellAddress, endAddress: CellAddress, leadingWhitespace?: string): Ast {
-    if (startAddress.sheet === undefined && endAddress.sheet !== undefined) {
+  private buildCellRange(firstAddress: CellAddress, secondAddress: CellAddress, leadingWhitespace?: string): Ast {
+    if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = this.rangeSheetReferenceType(startAddress.sheet, endAddress.sheet)
+    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(firstAddress.sheet, secondAddress.sheet)
 
-    if (startAddress.sheet !== undefined && endAddress.sheet === undefined) {
-      endAddress = endAddress.withAbsoluteSheet(startAddress.sheet)
+    if (firstAddress.sheet !== undefined && secondAddress.sheet === undefined) {
+      secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
     }
+
+    const [startCol, endCol]: ColumnAddress[] = [
+      firstAddress.toColumnAddress(),
+      secondAddress.toColumnAddress(),
+    ].sort((nonSimpleColA, nonSimpleColB) => {
+      const colA = nonSimpleColA.toSimpleColumnAddress(this.formulaAddress)
+      const colB = nonSimpleColB.toSimpleColumnAddress(this.formulaAddress)
+      return colA.sheet !== colB.sheet ? colA.sheet - colB.sheet : colA.col - colB.col
+    })
+
+    const [startRow, endRow]: RowAddress[] = [
+      firstAddress.toRowAddress(),
+      secondAddress.toRowAddress(),
+    ].sort((nonSimpleRowA, nonSimpleRowB) => {
+      const rowA = nonSimpleRowA.toSimpleRowAddress(this.formulaAddress)
+      const rowB = nonSimpleRowB.toSimpleRowAddress(this.formulaAddress)
+      return rowA.sheet !== rowB.sheet ? rowA.sheet - rowB.sheet : rowA.row - rowB.row
+    })
+
+    const startAddress = CellAddress.fromColAndRow(startCol, startRow)
+    const endAddress = CellAddress.fromColAndRow(endCol, endRow)
 
     return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
   }
@@ -850,7 +873,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildParsingErrorAst()
   }
 
-  private rangeSheetReferenceType(start?: number, end?: number): RangeSheetReferenceType {
+  private static rangeSheetReferenceType(start?: number, end?: number): RangeSheetReferenceType {
     if (start === undefined) {
       return RangeSheetReferenceType.RELATIVE
     } else if (end === undefined) {
@@ -861,10 +884,11 @@ export class FormulaParser extends EmbeddedActionsParser {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AstRule = (idxInCallingRule?: number, ...args: any[]) => (Ast)
 type OrArg = IOrAlt[] | OrMethodOpts
 
-export interface IExtendedToken extends IToken {
+export interface ExtendedToken extends IToken {
   leadingWhitespace?: IToken,
 }
 
@@ -883,7 +907,7 @@ export class FormulaLexer {
   public tokenizeFormula(text: string): ILexingResult {
     const lexingResult = this.lexer.tokenize(text)
     let tokens = lexingResult.tokens
-    tokens = this.trimTrailingWhitespaces(tokens)
+    tokens = FormulaLexer.trimTrailingWhitespaces(tokens)
     tokens = this.skipWhitespacesInsideRanges(tokens)
     tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
     lexingResult.tokens = tokens
@@ -892,7 +916,7 @@ export class FormulaLexer {
   }
 
   private skipWhitespacesInsideRanges(tokens: IToken[]): IToken[] {
-    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+    return FormulaLexer.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return (tokenMatcher(previous, CellReference) || tokenMatcher(previous, RangeSeparator))
         && tokenMatcher(current, WhiteSpace)
         && (tokenMatcher(next, CellReference) || tokenMatcher(next, RangeSeparator))
@@ -900,14 +924,14 @@ export class FormulaLexer {
   }
 
   private skipWhitespacesBeforeArgSeparators(tokens: IToken[]): IToken[] {
-    return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
+    return FormulaLexer.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return !tokenMatcher(previous, this.lexerConfig.ArgSeparator)
         && tokenMatcher(current, WhiteSpace)
         && tokenMatcher(next, this.lexerConfig.ArgSeparator)
     })
   }
 
-  private filterTokensByNeighbors(tokens: IToken[], shouldBeSkipped: (previous: IToken, current: IToken, next: IToken) => boolean): IToken[] {
+  private static filterTokensByNeighbors(tokens: IToken[], shouldBeSkipped: (previous: IToken, current: IToken, next: IToken) => boolean): IToken[] {
     if (tokens.length < 3) {
       return tokens
     }
@@ -927,7 +951,7 @@ export class FormulaLexer {
     return filteredTokens
   }
 
-  private trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
+  private static trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
     if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
       tokens.pop()
     }

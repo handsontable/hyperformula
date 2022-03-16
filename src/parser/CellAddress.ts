@@ -16,6 +16,9 @@ import {
 import {Maybe} from '../Maybe'
 import {AddressWithColumn, AddressWithRow} from './Address'
 import {columnIndexToLabel} from './addressRepresentationConverters'
+import {ColumnAddress, ReferenceType} from "./ColumnAddress";
+import {RowAddress} from "./RowAddress";
+import {ABSOLUTE_OPERATOR} from "./LexerConfig";
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -33,13 +36,25 @@ export enum CellReferenceType {
 }
 
 export class CellAddress implements AddressWithColumn, AddressWithRow {
-
   constructor(
     public readonly col: number,
     public readonly row: number,
     public readonly type: CellReferenceType,
     public readonly sheet?: number,
   ) {
+  }
+
+  public static fromColAndRow(col: ColumnAddress, row: RowAddress): CellAddress {
+    const factoryMethod = col.isColumnAbsolute() && row.isRowAbsolute()
+      ? CellAddress.absolute.bind(this)
+      : col.isColumnAbsolute()
+        ? CellAddress.absoluteCol.bind(this)
+        : row.isRowAbsolute()
+          ? CellAddress.absoluteRow.bind(this)
+          // this is because CellAddress.relative expects arguments is different order (issue)
+          : (col: number, row: number, sheet?: number) => CellAddress.relative(row, col, sheet)
+
+    return factoryMethod(col.col, row.row, col.sheet || row.sheet)
   }
 
   public static relative(row: number, col: number, sheet?: number) {
@@ -74,6 +89,16 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     } else {
       return simpleCellAddress(sheet, baseAddress.col + this.col, baseAddress.row + this.row)
     }
+  }
+
+  public toColumnAddress(): ColumnAddress {
+    const refType = this.isColumnRelative() ? ReferenceType.RELATIVE : ReferenceType.ABSOLUTE
+    return new ColumnAddress(refType, this.col, this.sheet)
+  }
+
+  public toRowAddress(): RowAddress {
+    const refType = this.isRowRelative() ? ReferenceType.RELATIVE : ReferenceType.ABSOLUTE
+    return new RowAddress(refType, this.row, this.sheet)
   }
 
   public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
