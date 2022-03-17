@@ -30,7 +30,7 @@ import {
   buildRowRangeAst,
   ColumnRangeAst,
   ParenthesisAst,
-  RangeSheetReferenceType,
+  RangeSheetReferenceType, RowRangeAst,
 } from '../../src/parser/Ast'
 import {ColumnAddress} from '../../src/parser/ColumnAddress'
 import {RowAddress} from '../../src/parser/RowAddress'
@@ -705,7 +705,46 @@ describe('Column ranges', () => {
     expect(ast3).toEqual(buildErrorWithRawInputAst(`${columnIndexToLabel(maxColumns)}:B`, new CellError(ErrorType.NAME)))
   })
 
-  // reversed
+  it('reversed column range', () => {
+    let notReversedAst = parser.parse('=A:B', adr('A1')).ast
+    let reversedAst = parser.parse('=B:A', adr('A1')).ast
+    expect(reversedAst).toEqual(notReversedAst)
+
+    notReversedAst = parser.parse('=$A:B', adr('A1')).ast
+    reversedAst = parser.parse('=B:$A', adr('A1')).ast
+    expect(reversedAst).toEqual(notReversedAst)
+
+    notReversedAst = parser.parse('=A:$B', adr('A1')).ast
+    reversedAst = parser.parse('=$B:A', adr('A1')).ast
+    expect(reversedAst).toEqual(notReversedAst)
+
+    reversedAst = parser.parse('=Sheet1!B:A', adr('A1')).ast as ColumnRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(0)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
+
+    const res = parser.parse('=B:Sheet1!A', adr('A1'))
+    expect(res.errors[0].type).toBe(ParsingErrorType.ParserError)
+
+    reversedAst = parser.parse('=Sheet1!B:Sheet2!A', adr('A1')).ast as ColumnRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(1)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+
+    reversedAst = parser.parse('=Sheet1!B:Sheet1!A', adr('A1')).ast as ColumnRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(0)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+
+    reversedAst = parser.parse('=Sheet2!B:Sheet1!A', adr('A1')).ast as ColumnRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.COLUMN_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(1)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+  })
 })
 
 describe('Row ranges', () => {
@@ -744,7 +783,46 @@ describe('Row ranges', () => {
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 
-  // reversed
+  it('reversed row range', () => {
+    let notReversedAst = parser.parse('=1:2', adr('A1')).ast
+    let reversedAst = parser.parse('=2:1', adr('A1')).ast
+    expect(reversedAst).toEqual(notReversedAst)
+
+    notReversedAst = parser.parse('=$1:2', adr('A1')).ast
+    reversedAst = parser.parse('=2:$1', adr('A1')).ast
+    expect(reversedAst).toEqual(notReversedAst)
+
+    notReversedAst = parser.parse('=1:$2', adr('A1')).ast
+    reversedAst = parser.parse('=$2:1', adr('A1')).ast
+    expect(reversedAst).toEqual(notReversedAst)
+
+    reversedAst = parser.parse('=Sheet1!2:1', adr('A1')).ast as RowRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(0)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)
+
+    const res = parser.parse('=2:Sheet1!1', adr('A1'))
+    expect(res.errors[0].type).toBe(ParsingErrorType.ParserError)
+
+    reversedAst = parser.parse('=Sheet1!2:Sheet2!1', adr('A1')).ast as RowRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(1)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+
+    reversedAst = parser.parse('=Sheet1!2:Sheet1!1', adr('A1')).ast as RowRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(0)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+
+    reversedAst = parser.parse('=Sheet2!2:Sheet1!1', adr('A1')).ast as RowRangeAst
+    expect(reversedAst.type).toEqual(AstNodeType.ROW_RANGE)
+    expect(reversedAst.start.sheet).toEqual(0)
+    expect(reversedAst.end.sheet).toEqual(1)
+    expect(reversedAst.sheetReferenceType).toEqual(RangeSheetReferenceType.BOTH_ABSOLUTE)
+  })
 })
 
 describe('Named expressions', () => {

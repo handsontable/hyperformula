@@ -199,30 +199,46 @@ export class FormulaParser extends EmbeddedActionsParser {
     const range = this.CONSUME(ColumnRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
 
-    const start = this.ACTION(() => {
+    const firstAddress = this.ACTION(() => {
       return columnAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
     })
-    let end = this.ACTION(() => {
+    let secondAddress = this.ACTION(() => {
       return columnAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
     })
 
-    if (start === undefined || end === undefined) {
+    if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
-    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || end.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
+    if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
-    if (start.sheet === undefined && end.sheet !== undefined) {
+    if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(start.sheet, end.sheet)
+    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(firstAddress.sheet, secondAddress.sheet)
 
-    if (start.sheet !== undefined && end.sheet === undefined) {
-      end = end.withAbsoluteSheet(start.sheet)
+    if (firstAddress.sheet !== undefined && secondAddress.sheet === undefined) {
+      secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
     }
 
-    return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+    const [ startCol, endCol ]: ColumnAddress[] = [ firstAddress, secondAddress ].sort((nonSimpleColA, nonSimpleColB) => {
+      const colA = nonSimpleColA.toSimpleColumnAddress(this.formulaAddress)
+      const colB = nonSimpleColB.toSimpleColumnAddress(this.formulaAddress)
+      return colA.col - colB.col
+    })
+
+    const [ startSheet, endSheet ]: (number | undefined)[] = [ firstAddress.sheet, secondAddress.sheet ].sort((a, b) => {
+      a = a != null ? a : Infinity
+      b = b != null ? b : Infinity
+
+      return a - b
+    })
+
+    const startAddress = new ColumnAddress(startCol.type, startCol.col, startSheet)
+    const endAddress = new ColumnAddress(endCol.type, endCol.col, endSheet)
+
+    return buildColumnRangeAst(startAddress, endAddress, sheetReferenceType, range.leadingWhitespace)
   })
   /**
    * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
@@ -231,30 +247,46 @@ export class FormulaParser extends EmbeddedActionsParser {
     const range = this.CONSUME(RowRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
 
-    const start = this.ACTION(() => {
+    const firstAddress = this.ACTION(() => {
       return rowAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
     })
-    let end = this.ACTION(() => {
+    let secondAddress = this.ACTION(() => {
       return rowAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
     })
 
-    if (start === undefined || end === undefined) {
+    if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
-    if (start.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || end.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
+    if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
-    if (start.sheet === undefined && end.sheet !== undefined) {
+    if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(start.sheet, end.sheet)
+    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(firstAddress.sheet, secondAddress.sheet)
 
-    if (start.sheet !== undefined && end.sheet === undefined) {
-      end = end.withAbsoluteSheet(start.sheet)
+    if (firstAddress.sheet !== undefined && secondAddress.sheet === undefined) {
+      secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
     }
 
-    return buildRowRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+    const [ startRow, endRow ]: RowAddress[] = [ firstAddress, secondAddress ].sort((nonSimpleRowA, nonSimpleRowB) => {
+      const rowA = nonSimpleRowA.toSimpleRowAddress(this.formulaAddress)
+      const rowB = nonSimpleRowB.toSimpleRowAddress(this.formulaAddress)
+      return rowA.row - rowB.row
+    })
+
+    const [ startSheet, endSheet ]: (number | undefined)[] = [ firstAddress.sheet, secondAddress.sheet ].sort((a, b) => {
+      a = a != null ? a : Infinity
+      b = b != null ? b : Infinity
+
+      return a - b
+    })
+
+    const startAddress = new RowAddress(startRow.type, startRow.row, startSheet)
+    const endAddress = new RowAddress(endRow.type, endRow.row, endSheet)
+
+    return buildRowRangeAst(startAddress, endAddress, sheetReferenceType, range.leadingWhitespace)
   })
   /**
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
@@ -513,16 +545,16 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => this.SUBRULE(this.arrayExpression),
       },
       {
-        ALT: () => this.SUBRULE(this.cellRangeExpression), // HERE
+        ALT: () => this.SUBRULE(this.cellRangeExpression),
       },
       {
-        ALT: () => this.SUBRULE(this.columnRangeExpression), // HERE
+        ALT: () => this.SUBRULE(this.columnRangeExpression),
       },
       {
-        ALT: () => this.SUBRULE(this.rowRangeExpression), // HERE
+        ALT: () => this.SUBRULE(this.rowRangeExpression),
       },
       {
-        ALT: () => this.SUBRULE(this.offsetExpression), // HERE
+        ALT: () => this.SUBRULE(this.offsetExpression),
       },
       {
         ALT: () => this.SUBRULE(this.cellReference),
