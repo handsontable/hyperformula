@@ -30,6 +30,10 @@ export class RowAddress implements AddressWithRow {
     return new RowAddress(ReferenceType.RELATIVE, row, sheet)
   }
 
+  public static compareByAbsoluteAddress(baseAddress: SimpleCellAddress): (rowA: RowAddress, rowB: RowAddress) => number {
+    return (rowA: RowAddress, rowB: RowAddress) =>  rowA.toSimpleRowAddress(baseAddress).row - rowB.toSimpleRowAddress(baseAddress).row
+  }
+
   public isRowAbsolute(): boolean {
     return (this.type === ReferenceType.ABSOLUTE)
   }

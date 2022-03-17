@@ -35,6 +35,10 @@ export class ColumnAddress implements AddressWithColumn {
     return new ColumnAddress(ReferenceType.RELATIVE, column, sheet)
   }
 
+  public static compareByAbsoluteAddress(baseAddress: SimpleCellAddress): (colA: ColumnAddress, colB: ColumnAddress) => number {
+    return (colA: ColumnAddress, colB: ColumnAddress) =>  colA.toSimpleColumnAddress(baseAddress).col - colB.toSimpleColumnAddress(baseAddress).col
+  }
+
   public isColumnAbsolute(): boolean {
     return (this.type === ReferenceType.ABSOLUTE)
   }

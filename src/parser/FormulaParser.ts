@@ -222,23 +222,9 @@ export class FormulaParser extends EmbeddedActionsParser {
       secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
     }
 
-    const [ startCol, endCol ]: ColumnAddress[] = [ firstAddress, secondAddress ].sort((nonSimpleColA, nonSimpleColB) => {
-      const colA = nonSimpleColA.toSimpleColumnAddress(this.formulaAddress)
-      const colB = nonSimpleColB.toSimpleColumnAddress(this.formulaAddress)
-      return colA.col - colB.col
-    })
+    const { start, end } = this.orderColumnRangeEnds(firstAddress, secondAddress)
 
-    const [ startSheet, endSheet ]: (number | undefined)[] = [ firstAddress.sheet, secondAddress.sheet ].sort((a, b) => {
-      a = a != null ? a : Infinity
-      b = b != null ? b : Infinity
-
-      return a - b
-    })
-
-    const startAddress = new ColumnAddress(startCol.type, startCol.col, startSheet)
-    const endAddress = new ColumnAddress(endCol.type, endCol.col, endSheet)
-
-    return buildColumnRangeAst(startAddress, endAddress, sheetReferenceType, range.leadingWhitespace)
+    return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
   })
   /**
    * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
@@ -270,23 +256,9 @@ export class FormulaParser extends EmbeddedActionsParser {
       secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
     }
 
-    const [ startRow, endRow ]: RowAddress[] = [ firstAddress, secondAddress ].sort((nonSimpleRowA, nonSimpleRowB) => {
-      const rowA = nonSimpleRowA.toSimpleRowAddress(this.formulaAddress)
-      const rowB = nonSimpleRowB.toSimpleRowAddress(this.formulaAddress)
-      return rowA.row - rowB.row
-    })
+    const { start, end } = this.orderRowRangeEnds(firstAddress, secondAddress)
 
-    const [ startSheet, endSheet ]: (number | undefined)[] = [ firstAddress.sheet, secondAddress.sheet ].sort((a, b) => {
-      a = a != null ? a : Infinity
-      b = b != null ? b : Infinity
-
-      return a - b
-    })
-
-    const startAddress = new RowAddress(startRow.type, startRow.row, startSheet)
-    const endAddress = new RowAddress(endRow.type, endRow.row, endSheet)
-
-    return buildRowRangeAst(startAddress, endAddress, sheetReferenceType, range.leadingWhitespace)
+    return buildRowRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
   })
   /**
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
@@ -769,35 +741,49 @@ export class FormulaParser extends EmbeddedActionsParser {
       secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
     }
 
-    const [startCol, endCol]: ColumnAddress[] = [
-      firstAddress.toColumnAddress(),
-      secondAddress.toColumnAddress(),
-    ].sort((nonSimpleColA, nonSimpleColB) => {
-      const colA = nonSimpleColA.toSimpleColumnAddress(this.formulaAddress)
-      const colB = nonSimpleColB.toSimpleColumnAddress(this.formulaAddress)
-      return colA.col - colB.col
-    })
+    const { start, end } = this.orderCellRangeEnds(firstAddress, secondAddress)
 
-    const [startRow, endRow]: RowAddress[] = [
-      firstAddress.toRowAddress(),
-      secondAddress.toRowAddress(),
-    ].sort((nonSimpleRowA, nonSimpleRowB) => {
-      const rowA = nonSimpleRowA.toSimpleRowAddress(this.formulaAddress)
-      const rowB = nonSimpleRowB.toSimpleRowAddress(this.formulaAddress)
-      return rowA.row - rowB.row
-    })
+    return buildCellRangeAst(start, end, sheetReferenceType, leadingWhitespace)
+  }
 
-    const [startSheet, endSheet]: (number | undefined)[] = [ firstAddress.sheet, secondAddress.sheet ].sort((a, b) => {
-      a = a != null ? a : Infinity
-      b = b != null ? b : Infinity
+  private orderCellRangeEnds(endA: CellAddress, endB: CellAddress): { start: CellAddress, end: CellAddress } {
+    const ends = [ endA, endB ]
+    const [ startCol, endCol ] = ends.map(e => e.toColumnAddress()).sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress))
+    const [ startRow, endRow ] = ends.map(e => e.toRowAddress()).sort(RowAddress.compareByAbsoluteAddress(this.formulaAddress))
+    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(FormulaParser.compareSheetIds.bind(this))
 
-      return a - b
-    })
+    return {
+      start: CellAddress.fromColAndRow(startCol, startRow, startSheet),
+      end: CellAddress.fromColAndRow(endCol, endRow, endSheet),
+    }
+  }
 
-    const startAddress = CellAddress.fromColAndRow(startCol, startRow, startSheet)
-    const endAddress = CellAddress.fromColAndRow(endCol, endRow, endSheet)
+  private orderColumnRangeEnds(endA: ColumnAddress, endB: ColumnAddress): { start: ColumnAddress, end: ColumnAddress } {
+    const ends = [ endA, endB ]
+    const [ startCol, endCol ] = ends.sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress))
+    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(FormulaParser.compareSheetIds.bind(this))
 
-    return buildCellRangeAst(startAddress, endAddress, sheetReferenceType, leadingWhitespace)
+    return {
+      start: new ColumnAddress(startCol.type, startCol.col, startSheet),
+      end: new ColumnAddress(endCol.type, endCol.col, endSheet),
+    }
+  }
+
+  private orderRowRangeEnds(endA: RowAddress, endB: RowAddress): { start: RowAddress, end: RowAddress } {
+    const ends = [ endA, endB ]
+    const [ startRow, endRow ] = ends.sort(RowAddress.compareByAbsoluteAddress(this.formulaAddress))
+    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(FormulaParser.compareSheetIds.bind(this))
+
+    return {
+      start: new RowAddress(startRow.type, startRow.row, startSheet),
+      end: new RowAddress(endRow.type, endRow.row, endSheet),
+    }
+  }
+  
+  private static  compareSheetIds(sheetA: number | undefined, sheetB: number | undefined): number {
+    sheetA = sheetA != null ? sheetA : Infinity
+    sheetB = sheetB != null ? sheetB : Infinity
+    return sheetA - sheetB
   }
 
   /**
