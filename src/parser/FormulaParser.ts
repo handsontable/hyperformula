@@ -320,13 +320,7 @@ export class FormulaParser extends EmbeddedActionsParser {
             return buildCellErrorAst(new CellError(ErrorType.REF))
           }
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
-            let end = offsetProcedure.reference
-            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (startAddress.sheet !== undefined) {
-              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-              end = end.withAbsoluteSheet(startAddress.sheet)
-            }
-            return buildCellRangeAst(startAddress, end, sheetReferenceType, start.leadingWhitespace?.image)
+            return this.buildCellRange(startAddress, offsetProcedure.reference, start.leadingWhitespace?.image)
           } else {
             return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
           }
@@ -376,13 +370,7 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => {
           const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
           if (offsetProcedure.type === AstNodeType.CELL_REFERENCE) {
-            let end = offsetProcedure.reference
-            let sheetReferenceType = RangeSheetReferenceType.RELATIVE
-            if (start.reference.sheet !== undefined) {
-              sheetReferenceType = RangeSheetReferenceType.START_ABSOLUTE
-              end = end.withAbsoluteSheet(start.reference.sheet)
-            }
-            return buildCellRangeAst(start.reference, end, sheetReferenceType, start.leadingWhitespace)
+            return this.buildCellRange(start.reference, offsetProcedure.reference, start.leadingWhitespace)
           } else {
             return this.parsingError(ParsingErrorType.RangeOffsetNotAllowed, 'Range offset not allowed here')
           }
@@ -768,9 +756,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
 
     const [startSheet, endSheet]: (number | undefined)[] = [ firstAddress.sheet, secondAddress.sheet ].sort((a, b) => {
-      if (a == null || b == null) {
-        return 0
-      }
+      a = a != null ? a : Infinity
+      b = b != null ? b : Infinity
 
       return a - b
     })

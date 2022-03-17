@@ -645,6 +645,16 @@ describe('cell references and ranges', () => {
       expect(ast.start.sheet).toEqual(1)
       expect(ast.end.sheet).toEqual(2)
     })
+
+    it('with OFFSET', () => {
+      const parser = buildEmptyParserWithCaching(new Config())
+      const notReversedAst = parser.parse('=A1:B2', adr('A1')).ast as CellRangeAst
+
+      ['=B2:OFFSET(A1, 0, 0)', '=OFFSET(B2, 0, 0):A1', '=OFFSET(B2, 0, 0):OFFSET(A1, 0, 0)', '=OFFSET(A2, 0, 0):OFFSET(B1, 0, 0)'].forEach(formula => {
+        const ast = parser.parse(formula, adr('A1')).ast as CellRangeAst
+        expect(ast).toEqual(notReversedAst)
+      })
+    })
   })
 })
 
