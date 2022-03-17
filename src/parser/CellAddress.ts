@@ -16,9 +16,8 @@ import {
 import {Maybe} from '../Maybe'
 import {AddressWithColumn, AddressWithRow} from './Address'
 import {columnIndexToLabel} from './addressRepresentationConverters'
-import {ColumnAddress, ReferenceType} from "./ColumnAddress";
-import {RowAddress} from "./RowAddress";
-import {ABSOLUTE_OPERATOR} from "./LexerConfig";
+import {ColumnAddress, ReferenceType} from './ColumnAddress'
+import {RowAddress} from './RowAddress'
 
 /** Possible kinds of cell references */
 export enum CellReferenceType {
@@ -152,7 +151,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return new CellAddress(this.col + toRight, this.row + toBottom, this.type, newSheet)
   }
 
-  public withAbsoluteSheet(sheet: number): CellAddress {
+  public withSheet(sheet: number | undefined): CellAddress {
     return new CellAddress(this.col, this.row, this.type, sheet)
   }
 

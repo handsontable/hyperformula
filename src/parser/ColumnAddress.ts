@@ -79,7 +79,7 @@ export class ColumnAddress implements AddressWithColumn {
     return new ColumnAddress(this.type, col, this.sheet)
   }
 
-  public withAbsoluteSheet(sheet: number): ColumnAddress {
+  public withSheet(sheet: number | undefined): ColumnAddress {
     return new ColumnAddress(this.type, this.col, sheet)
   }
 

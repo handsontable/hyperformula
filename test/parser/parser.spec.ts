@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula} from '../../src'
-import {CellError} from '../../src/Cell'
+import {CellError} from '../../src'
 import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
@@ -209,8 +209,8 @@ describe('Functions', () => {
     const ast = parser.parse('=SUM(1, A1)', adr('A1')).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.procedureName).toBe('SUM')
-    expect(ast.args[0]!.type).toBe(AstNodeType.NUMBER)
-    expect(ast.args[1]!.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.args[0].type).toBe(AstNodeType.NUMBER)
+    expect(ast.args[1].type).toBe(AstNodeType.CELL_REFERENCE)
   })
 
   it('SUM function with expression arg', () => {
@@ -218,7 +218,7 @@ describe('Functions', () => {
     const ast = parser.parse('=SUM(1 / 2 + SUM(1,2))', adr('A1')).ast as ProcedureAst
     expect(ast.type).toBe(AstNodeType.FUNCTION_CALL)
     expect(ast.args.length).toBe(1)
-    expect(ast.args[0]!.type).toBe(AstNodeType.PLUS_OP)
+    expect(ast.args[0].type).toBe(AstNodeType.PLUS_OP)
 
     const arg = ast.args[0] as PlusOpAst
     expect(arg.left.type).toBe(AstNodeType.DIV_OP)

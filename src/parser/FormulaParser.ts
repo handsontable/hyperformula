@@ -98,6 +98,7 @@ import {
 } from './LexerConfig'
 import {RowAddress} from './RowAddress'
 import {ColumnAddress} from './ColumnAddress'
+import {AddressWithSheet} from './Address'
 
 export interface FormulaParserResult {
   ast: Ast,
@@ -192,74 +193,61 @@ export class FormulaParser extends EmbeddedActionsParser {
     this.CONSUME(RParen)
     return this.handleOffsetHeuristic(args)
   })
+
   /**
    * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
    */
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
     const range = this.CONSUME(ColumnRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
-
-    const firstAddress = this.ACTION(() => {
-      return columnAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
-    })
-    let secondAddress = this.ACTION(() => {
-      return columnAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
-    })
+    const firstAddress = this.ACTION(() => columnAddressFromString(this.sheetMapping, startImage, this.formulaAddress))
+    const secondAddress = this.ACTION(() => columnAddressFromString(this.sheetMapping, endImage, this.formulaAddress))
 
     if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
+
     if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxColumns)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
+
     if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(firstAddress.sheet, secondAddress.sheet)
+    const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
+    const { start, end } = this.orderColumnRangeEnds(firstEnd, secondEnd)
 
-    if (firstAddress.sheet !== undefined && secondAddress.sheet === undefined) {
-      secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
-    }
-
-    const { start, end } = this.orderColumnRangeEnds(firstAddress, secondAddress)
-
-    return buildColumnRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+    return buildColumnRangeAst(start, end, sheetRefType, range.leadingWhitespace)
   })
+
   /**
    * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
    */
   private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
     const range = this.CONSUME(RowRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
-
-    const firstAddress = this.ACTION(() => {
-      return rowAddressFromString(this.sheetMapping, startImage, this.formulaAddress)
-    })
-    let secondAddress = this.ACTION(() => {
-      return rowAddressFromString(this.sheetMapping, endImage, this.formulaAddress)
-    })
+    const firstAddress = this.ACTION(() => rowAddressFromString(this.sheetMapping, startImage, this.formulaAddress))
+    const secondAddress = this.ACTION(() => rowAddressFromString(this.sheetMapping, endImage, this.formulaAddress))
 
     if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
     }
+
     if (firstAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows) || secondAddress.exceedsSheetSizeLimits(this.lexerConfig.maxRows)) {
       return buildErrorWithRawInputAst(range.image, new CellError(ErrorType.NAME), range.leadingWhitespace)
     }
+
     if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(firstAddress.sheet, secondAddress.sheet)
+    const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
+    const { start, end } = this.orderRowRangeEnds(firstEnd, secondEnd)
 
-    if (firstAddress.sheet !== undefined && secondAddress.sheet === undefined) {
-      secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
-    }
-
-    const { start, end } = this.orderRowRangeEnds(firstAddress, secondAddress)
-
-    return buildRowRangeAst(start, end, sheetReferenceType, range.leadingWhitespace)
+    return buildRowRangeAst(start, end, sheetRefType, range.leadingWhitespace)
   })
+
   /**
    * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
    */
@@ -735,15 +723,19 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
     }
 
-    const sheetReferenceType = FormulaParser.rangeSheetReferenceType(firstAddress.sheet, secondAddress.sheet)
+    const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
+    const { start, end } = this.orderCellRangeEnds(firstEnd, secondEnd)
 
-    if (firstAddress.sheet !== undefined && secondAddress.sheet === undefined) {
-      secondAddress = secondAddress.withAbsoluteSheet(firstAddress.sheet)
-    }
+    return buildCellRangeAst(start, end, sheetRefType, leadingWhitespace)
+  }
 
-    const { start, end } = this.orderCellRangeEnds(firstAddress, secondAddress)
+  private static fixSheetIdsForRangeEnds<T extends AddressWithSheet>(firstEnd: T, secondEnd: T): { firstEnd: T, secondEnd: T, sheetRefType: RangeSheetReferenceType } {
+    const sheetRefType = FormulaParser.rangeSheetReferenceType(firstEnd.sheet, secondEnd.sheet)
+    const secondEndFixed = (firstEnd.sheet !== undefined && secondEnd.sheet === undefined)
+      ? secondEnd.withSheet(firstEnd.sheet) as T
+      : secondEnd
 
-    return buildCellRangeAst(start, end, sheetReferenceType, leadingWhitespace)
+    return { firstEnd, secondEnd: secondEndFixed, sheetRefType }
   }
 
   private orderCellRangeEnds(endA: CellAddress, endB: CellAddress): { start: CellAddress, end: CellAddress } {

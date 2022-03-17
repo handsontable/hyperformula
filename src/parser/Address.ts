@@ -13,6 +13,8 @@ export interface AddressWithSheet {
   shiftAbsoluteDimensions(toRight: number, toBottom: number): AddressWithSheet,
 
   moved(toSheet: number, toRight: number, toBottom: number): AddressWithSheet,
+
+  withSheet(sheet: number | undefined): AddressWithSheet,
 }
 
 export interface AddressWithColumn extends AddressWithSheet {
