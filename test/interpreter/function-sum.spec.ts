@@ -120,30 +120,19 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('works with ranges 2', () => {
+  it('works with reversed ranges', () => {
     const engine = HyperFormula.buildFromArray([
-      ['1', '2', '5'],
-      ['3', '4', '=SUM(B2:A1)']
+      ['1', '2'],
+      ['3', '4'],
+      ['=SUM(A1:B2)'],
+      ['=SUM(A2:B1)'],
+      ['=SUM(B1:A2)'],
+      ['=SUM(B2:A1)'],
     ])
-    
-    expect(engine.getCellValue(adr('C2'))).toEqual(10)
-  })
 
-  it('works with ranges 3', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '5'],
-      ['3', '4', '=SUM(B1:A2)']
-    ])
-    
-    expect(engine.getCellValue(adr('C2'))).toEqual(10)
-  })
-
-  it('works with ranges 4', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2', '5'],
-      ['3', '4', '=SUM(A2:B1)']
-    ])
-    
-    expect(engine.getCellValue(adr('C2'))).toEqual(10)
+    expect(engine.getCellValue(adr('A3'))).toEqual(10)
+    expect(engine.getCellValue(adr('A4'))).toEqual(10)
+    expect(engine.getCellValue(adr('A5'))).toEqual(10)
+    expect(engine.getCellValue(adr('A6'))).toEqual(10)
   })
 })
