@@ -23,9 +23,6 @@ import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 
-type GPUMode = 'gpu' | 'cpu' | 'dev'
-
-const PossibleGPUModeString: GPUMode[] = ['gpu', 'cpu', 'dev']
 const privatePool: WeakMap<Config, { licenseKeyValidityState: LicenseKeyValidityState }> = new WeakMap()
 
 export interface ConfigParams {
@@ -150,36 +147,6 @@ export interface ConfigParams {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
-  /**
-   * A GPU.js constructor used by array functions.
-   *
-   * When not provided, the plain CPU implementation is used.
-   *
-   * @deprecated since version 1.2.
-   *
-   * @default undefined
-   *
-   * @category Engine
-   */
-  gpujs?: any,
-  /**
-   * Sets array calculations to use either GPU or CPU.
-   *
-   * When set to `gpu`, tries to use GPU for array calculations.
-   *
-   * When set to `cpu`, enforces CPU usage.
-   *
-   * Use other values only for debugging purposes.
-   *
-   * For more information, see the [GPU.js documentation](https://github.com/gpujs/gpu.js/#readme).
-   *
-   * @deprecated since version 1.2
-   *
-   * @default 'gpu'
-   *
-   * @category Engine
-   */
-  gpuMode: GPUMode,
   /**
    * When set to `true`, string comparison ignores punctuation.
    *
@@ -364,7 +331,7 @@ export interface ConfigParams {
    */
   smartRounding: boolean,
   /**
-   * Sets a thousands separator symbol for parsing numerical literals.
+   * Sets a thousand separator symbol for parsing numerical literals.
    *
    * Can be one of the following:
    * - empty
@@ -467,8 +434,6 @@ export class Config implements ConfigParams, ParserConfig {
     evaluateNullToZero: false,
     functionArgSeparator: ',',
     functionPlugins: [],
-    gpujs: undefined,
-    gpuMode: 'gpu',
     ignorePunctuation: false,
     language: 'enGB',
     licenseKey: '',
@@ -528,10 +493,6 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
-  /** @inheritDoc */
-  public readonly gpujs?: any
-  /** @inheritDoc */
-  public readonly gpuMode: GPUMode
   /** @inheritDoc */
   public readonly leapYear1900: boolean
   /** @inheritDoc */
@@ -599,8 +560,6 @@ export class Config implements ConfigParams, ParserConfig {
       evaluateNullToZero,
       functionArgSeparator,
       functionPlugins,
-      gpujs,
-      gpuMode,
       ignorePunctuation,
       leapYear1900,
       localeLang,
@@ -630,7 +589,7 @@ export class Config implements ConfigParams, ParserConfig {
     } = options
 
     if (showDeprecatedWarns) {
-      this.warnDeprecatedOptions(options)
+      Config.warnDeprecatedOptions(options)
     }
 
     this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
@@ -650,8 +609,6 @@ export class Config implements ConfigParams, ParserConfig {
     this.arrayRowSeparator = configValueFromParam(arrayRowSeparator, [';', '|'], 'arrayRowSeparator')
     this.localeLang = configValueFromParam(localeLang, 'string', 'localeLang')
     this.functionPlugins = [...(functionPlugins ?? Config.defaultConfig.functionPlugins)]
-    this.gpujs = gpujs ?? Config.defaultConfig.gpujs
-    this.gpuMode = configValueFromParam(gpuMode, PossibleGPUModeString, 'gpuMode')
     this.smartRounding = configValueFromParam(smartRounding, 'boolean', 'smartRounding')
     this.evaluateNullToZero = configValueFromParam(evaluateNullToZero, 'boolean', 'evaluateNullToZero')
     this.nullYear = configValueFromParam(nullYear, 'number', 'nullYear')
@@ -679,15 +636,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
     validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
-    this.currencySymbol = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array', 'currencySymbol')]
-    this.currencySymbol.forEach((val) => {
-      if (typeof val !== 'string') {
-        throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
-      }
-      if (val === '') {
-        throw new ConfigValueEmpty('currencySymbol')
-      }
-    })
+    this.currencySymbol = this.setupCurrencySymbol(currencySymbol)
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
     privatePool.set(this, {
@@ -704,6 +653,22 @@ export class Config implements ConfigParams, ParserConfig {
       {value: this.arrayRowSeparator, name: 'arrayRowSeparator'},
       {value: this.arrayColumnSeparator, name: 'arrayColumnSeparator'},
     )
+  }
+
+  private setupCurrencySymbol(currencySymbol: string[] | undefined): string[] {
+    const valueAfterCheck = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array', 'currencySymbol')]
+
+    valueAfterCheck.forEach((val) => {
+      if (typeof val !== 'string') {
+        throw new ExpectedValueOfTypeError('string[]', 'currencySymbol')
+      }
+
+      if (val === '') {
+        throw new ConfigValueEmpty('currencySymbol')
+      }
+    })
+
+    return valueAfterCheck as string[]
   }
 
   /**
@@ -723,21 +688,17 @@ export class Config implements ConfigParams, ParserConfig {
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
-    this.warnDeprecatedOptions(init)
+    Config.warnDeprecatedOptions(init)
 
     return new Config(mergedConfig, false)
   }
 
-  private warnDeprecatedOptions(options: Partial<ConfigParams>) {
-    this.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
-    this.warnDeprecatedIfUsed(options.gpujs, 'gpujs', '1.2')
-
-    if (options.gpuMode !== Config.defaultConfig.gpuMode) {
-      this.warnDeprecatedIfUsed(options.gpuMode, 'gpuMode', '1.2')
-    }
+  private static warnDeprecatedOptions(options: Partial<ConfigParams>) {
+    Config.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
   }
 
-  private warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
     if (inputValue !== undefined) {
       if (replacementName === undefined) {
         console.warn(`${paramName} option is deprecated since ${fromVersion}`)
@@ -749,6 +710,7 @@ export class Config implements ConfigParams, ParserConfig {
 }
 
 function getFullConfigFromPartial(partialConfig: Partial<ConfigParams>): ConfigParams {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ret: { [key: string]: any } = {}
   for (const key in Config.defaultConfig) {
     const val = partialConfig[key as ConfigParamsList] ?? Config.defaultConfig[key as ConfigParamsList]

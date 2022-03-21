@@ -43,7 +43,6 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
-  private gpu?: any
 
   constructor(
     public readonly config: Config,
@@ -74,25 +73,6 @@ export class Interpreter {
       [[val]] = val.data
     }
     return wrapperForRootVertex(val, state.formulaVertex)
-  }
-
-  public getGpuInstance(): any {
-    const mode = this.config.gpuMode
-    const gpujs = this.config.gpujs
-
-    if (gpujs === undefined) {
-      throw Error('Cannot instantiate GPU.js. Constructor not provided.')
-    }
-
-    if (!this.gpu) {
-      this.gpu = new gpujs({mode})
-    }
-
-    return this.gpu
-  }
-
-  public destroyGpu() {
-    this.gpu?.destroy()
   }
 
   /**

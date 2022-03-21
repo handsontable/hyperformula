@@ -8,7 +8,7 @@ module.exports = {
     '!**/node_modules/**',
   ],
 
-  coverageProvider: 'v8',
+  coverageProvider: 'babel',
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
@@ -19,7 +19,7 @@ module.exports = {
   // A set of global variables that need to be available in all test environments
   globals: {
     "ts-jest": {
-      "tsConfig": "./test/tsconfig.json"
+      "tsconfig": "./test/tsconfig.json"
     }
   },
 
