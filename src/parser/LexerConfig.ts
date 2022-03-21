@@ -9,6 +9,8 @@ import {ParserConfig} from './ParserConfig'
 
 export const RANGE_OPERATOR = ':'
 export const ABSOLUTE_OPERATOR = '$'
+export const ALL_WHITESPACE_REGEXP = /\s+/
+export const ODFF_WHITESPACE_REGEXP = /[ \t\n\r]+/
 
 /* arithmetic */
 // abstract for + -
@@ -92,12 +94,6 @@ export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"
 /* error literal */
 export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[?!]?/})
 
-/* skipping whitespaces */
-export const WhiteSpace = createToken({
-  name: 'WhiteSpace',
-  pattern: /\s+/,
-})
-
 export interface ILexerConfig {
   ArgSeparator: TokenType,
   NumberLiteral: TokenType,
@@ -108,6 +104,7 @@ export interface ILexerConfig {
   decimalSeparator: '.' | ',',
   ArrayColSeparator: TokenType,
   ArrayRowSeparator: TokenType,
+  WhiteSpace: TokenType,
   maxColumns: number,
   maxRows: number,
 }
@@ -116,7 +113,9 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
+  const whitespaceTokenRegexp = config.allowAllWhitespace ? ALL_WHITESPACE_REGEXP : ODFF_WHITESPACE_REGEXP
 
+  const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: whitespaceTokenRegexp })
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
 
@@ -185,6 +184,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     OffsetProcedureName,
     ArrayRowSeparator,
     ArrayColSeparator,
+    WhiteSpace,
     allTokens,
     errorMapping,
     functionMapping,

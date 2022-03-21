@@ -164,6 +164,24 @@ describe('ParserWithCaching', () => {
     expect(ast1).toEqual(ast2)
   })
 
+  it('with default config should return error for non-breakable space', () => {
+    const parser = buildEmptyParserWithCaching(new Config())
+
+    const { ast, errors } = parser.parse('=\u00A042', adr('A1'))
+
+    expect(ast.type).toBe(AstNodeType.ERROR)
+    expect(errors[0].type).toBe(ParsingErrorType.LexingError)
+  })
+
+  it('when set allowAllWhitespace = true should accept a non-breakable space', () => {
+    const parser = buildEmptyParserWithCaching(new Config({ allowAllWhitespace: true }))
+
+    const { ast } = parser.parse('=\u00A042', adr('A1'))
+    
+    expect(ast.type).toEqual(AstNodeType.NUMBER)
+    expect(ast.leadingWhitespace).toEqual('\u00A0')
+  })
+
   it('error literal', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
