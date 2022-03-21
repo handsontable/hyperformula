@@ -694,8 +694,8 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public get licenseKeyValidityState() {
-    return privatePool.get(this)!.licenseKeyValidityState
+  public get licenseKeyValidityState(): LicenseKeyValidityState {
+    return (privatePool.get(this) as Config).licenseKeyValidityState
   }
 
   public getConfig(): ConfigParams {
