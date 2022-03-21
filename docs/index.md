@@ -82,7 +82,6 @@ to use tool for many types of software.
 * Support for data sorting
 * Works with popular JavaScript frameworks
 * Written in TypeScript and extensively tested
-* Can use GPU acceleration for better performance
 * Function syntax compatible with Excel and Google Sheets
 * Double-licensed: GPL/Commercial
 * Actively maintained and supported by the
