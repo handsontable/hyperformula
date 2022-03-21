@@ -4275,7 +4275,6 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public destroy(): void {
-    this._evaluator.interpreter.destroyGpu()
     objectDestroy(this)
   }
 

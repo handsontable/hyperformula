@@ -6,8 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Fixed lexer whitespace regex to match all white spaces. (#898)
+### Added
+- Add support to parse formulas with all whitespace characters (controlled by config param `allowAllWhitespace`). (#898)
+
+### Changed
+- Removed `gpu.js` dependency and its use. (#812)
 
 ## [1.3.1] - 2022-01-11
 

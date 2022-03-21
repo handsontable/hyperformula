@@ -91,9 +91,6 @@ describe('Config', () => {
     expect(() => new Config({dateFormats: {}})).toThrowError('Expected value of type: array for config parameter: dateFormats')
     // eslint-disable-next-line
     // @ts-ignore
-    expect(() => new Config({gpuMode: 'abcd'})).toThrowError('Expected one of \'gpu\' \'cpu\' \'dev\' for config parameter: gpuMode')
-    // eslint-disable-next-line
-    // @ts-ignore
     expect(() => new Config({caseFirst: 'abcd'})).toThrowError('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
   })
 
@@ -119,6 +116,12 @@ describe('Config', () => {
     expect(() => {
       new Config({currencySymbol: ['']})
     }).toThrowError('Config parameter currencySymbol cannot be empty.')
+  })
+
+  it('should throw error when currency symbol is not a string', () => {
+    expect(() => {
+      new Config({currencySymbol: [42 as any]})
+    }).toThrowError('Expected value of type: string[] for config parameter: currencySymbol')
   })
 
   it('should throw error when currency symbol is not an array', () => {
@@ -224,34 +227,26 @@ describe('Config', () => {
     it('should log usage of deprecated options when they are passed while engine initialization', () => {
       new Config({
         binarySearchThreshold: 20,
-        gpujs: true,
-        gpuMode: 'gpu',
       })
 
       expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
-      expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
-      expect(console.warn).toHaveBeenCalledWith('gpuMode option is deprecated since 1.2')
-      expect(console.warn).toHaveBeenCalledTimes(3)
+      expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
     it('should log usage of deprecated options when they are passed while merging the Config object', () => {
       const config = new Config()
 
       config.mergeConfig({
-        binarySearchThreshold: 20,
-        gpujs: true,
+        binarySearchThreshold: 20
       })
 
-      expect(console.warn).toHaveBeenCalledTimes(2)
+      expect(console.warn).toHaveBeenCalledTimes(1)
       expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
-      expect(console.warn).toHaveBeenCalledWith('gpujs option is deprecated since 1.2')
     })
 
     it('should not log usage of deprecated options when they are not passed while merging the Config object', () => {
       const config = new Config({
         binarySearchThreshold: 20,
-        gpujs: true,
-        gpuMode: 'gpu',
       })
 
       try {
