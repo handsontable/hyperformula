@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support for reversed ranges (#834)
 
+### Changed
+- Removed `gpu.js` dependency and its use. (#812)
+
 ## [1.3.1] - 2022-01-11
 
 ### Fixed

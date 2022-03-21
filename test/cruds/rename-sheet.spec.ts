@@ -76,4 +76,12 @@ describe('Rename sheet', () => {
     expect(engine.getSheetName(0)).toBe('FOO')
     expect(engine.doesSheetExist('FOO')).toBe(true)
   })
+
+  it('should update the sheet dependencies', () => {
+    const engine = HyperFormula.buildFromSheets({'OldSheetName': [[42]], 'DependantSheet': [['=OldSheetName!A1']]})
+
+    engine.renameSheet(0, 'NewSheetName')
+
+    expect(engine.getCellFormula({ sheet: 1, row: 0, col: 0 })).toEqual('=NewSheetName!A1')
+  })
 })

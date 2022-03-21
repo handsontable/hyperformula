@@ -47,7 +47,7 @@ the data and formulas between them.
 HyperFormula covers most user-triggered actions such as
 [CRUD operations](/guide/basic-operations.md), [undo/redo](/guide/undo-redo.md),
 and [clipboard operations](/guide/clipboard-operations.md). It also supports
-the use of cross-sheet references, [named expressions](/guide/named-ranges.md),
+the use of cross-sheet references, [named expressions](/guide/named-expressions.md),
 [different data types](/guide/types-of-values.md),
 and [custom functions](/guide/custom-functions.md).
 
@@ -82,7 +82,6 @@ to use tool for many types of software.
 * Support for data sorting
 * Works with popular JavaScript frameworks
 * Written in TypeScript and extensively tested
-* Can use GPU acceleration for better performance
 * Function syntax compatible with Excel and Google Sheets
 * Double-licensed: GPL/Commercial
 * Actively maintained and supported by the

@@ -76,7 +76,7 @@ HyperFormula is more limited than
 typical spreadsheet software when it comes to referring to named ranges.
 For more information about how
 HyperFormula handles named ranges,
-see [this section](named-ranges.md).
+see [this section](named-expressions.md).
 
 ## Relative references
 

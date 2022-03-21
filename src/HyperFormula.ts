@@ -2513,8 +2513,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to remove sheet for the engine.
-   * Returns `true` if the provided name of a sheet exists and therefore it can be removed, doing [[removeSheet]] operation won't throw any errors.
-   * Returns `false` if there is no sheet with a given name.
+   * Returns `true` if the provided sheet exists and therefore it can be removed, doing [[removeSheet]] operation won't throw any errors.
+   * Returns `false` otherwise
    *
    * @param {number} sheetId - sheet ID.
    *
@@ -2544,7 +2544,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Removes sheet with a specified name.
+   * Removes a sheet
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -2585,8 +2585,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to clear a specified sheet.
-   * If returns `true`, doing [[clearSheet]] operation won't throw any errors, provided name of a sheet exists and then its content can be cleared.
-   * Returns `false` if there is no sheet with a given name.
+   * If returns `true`, doing [[clearSheet]] operation won't throw any errors, provided sheet exists and its content can be cleared.
+   * Returns `false` otherwise
    *
    * @param {number} sheetId - sheet ID.
    *
@@ -2616,8 +2616,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Clears the sheet content. Based on that the method finds the ID of a sheet to be cleared.
-   * Double-checks if the sheet exists.
+   * Clears the sheet content. Double-checks if the sheet exists.
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -2654,8 +2653,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns information whether it is possible to replace the sheet content.
-   * If returns `true`, doing [[setSheetContent]] operation won't throw any errors, the provided name of a sheet exists and then its content can be replaced.
-   * Returns `false` if there is no sheet with a given name.
+   * If returns `true`, doing [[setSheetContent]] operation won't throw any errors, the provided sheet exists and then its content can be replaced.
+   * Returns `false` otherwise
    *
    * @param {number} sheetId - sheet ID.
    * @param {RawCellContent[][]} values - array of new values
@@ -2669,7 +2668,7 @@ export class HyperFormula implements TypedEmitter {
    *  MySheet2: [ ['10'] ],
    * });
    *
-   * // should return 'true' because 'MySheet1' (sheetId=0) exists
+   * // should return 'true' because sheet of ID 0 exists
    * // and the provided content can be placed in this sheet
    * const isReplaceable = hfInstance.isItPossibleToReplaceSheetContent(0, [['50'], ['60']]);
    * ```
@@ -2689,8 +2688,6 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Replaces the sheet content with new values.
-   * The new value is to be provided as an array of arrays of [[RawCellContent]].
-   * The method finds sheet ID based on the provided sheet name.
    *
    * @param {number} sheetId - sheet ID.
    * @param {RawCellContent[][]} values - array of new values
@@ -3316,7 +3313,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Renames a specified sheet.
    *
-   * @param {number} sheetId - a sheet number
+   * @param {number} sheetId - a sheet ID
    * @param {string} newName - a name of the sheet to be given, if is the same as the old one the method does nothing
    *
    * @fires [[sheetRenamed]] after the sheet was renamed
@@ -3415,7 +3412,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // perform operations
    * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
-   * hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
+   * hfInstance.setSheetContent(1, [['50'], ['60']]);
    *
    * // use resumeEvaluation to resume
    * const changes = hfInstance.resumeEvaluation();
@@ -3451,7 +3448,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * // perform operations
    * hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
-   * hfInstance.setSheetContent('MySheet2', [['50'], ['60']]);
+   * hfInstance.setSheetContent(1, [['50'], ['60']]);
    *
    * // resume the evaluation
    * const changes = hfInstance.resumeEvaluation();
@@ -4278,7 +4275,6 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public destroy(): void {
-    this._evaluator.interpreter.destroyGpu()
     objectDestroy(this)
   }
 

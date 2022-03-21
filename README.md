@@ -26,7 +26,7 @@ such as [CRUD operations](https://handsontable.github.io/hyperformula/guide/basi
 [undo/redo](https://handsontable.github.io/hyperformula/guide/undo-redo.html),
 and [clipboard operations](https://handsontable.github.io/hyperformula/guide/clipboard-operations.html).
 It also supports the use of cross-sheet references,
-[named expressions](https://handsontable.github.io/hyperformula/guide/named-ranges.html),
+[named expressions](https://handsontable.github.io/hyperformula/guide/named-expressions.html),
 different [data types](https://handsontable.github.io/hyperformula/guide/types-of-values.html),
 and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html).
 

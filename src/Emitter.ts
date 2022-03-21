@@ -74,14 +74,14 @@ export interface Listeners {
    *
    * // remove a sheet to trigger the 'sheetRemoved' event,
    * // the console prints 'baz' each time a sheet is removed
-   * hfInstance.removeSheet('0');
+   * hfInstance.removeSheet(0);
    *
    * // unsubscribe from the 'sheetRemoved' event
    * hfInstance.off('sheetRemoved', handler);
    *
    * // remove a sheet
    * // this time, the console doesn't print anything
-   * hfInstance.removeSheet('1');
+   * hfInstance.removeSheet(1);
    * ```
    *
    * @category Sheet

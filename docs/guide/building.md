@@ -38,6 +38,8 @@ format , builds ES6 version
 * `npm run bundle:typings` - generates TS typing, only emits
 ‘.d.ts’ declaration files
 
+We use the latest version of Node 16 LTS in the build-chain and recommend this version for building. Note that for using (not building) HyperFormula, a wider range of Node versions is supported.
+
 ## Verify the build
 
 By using the following commands you can verify the build:

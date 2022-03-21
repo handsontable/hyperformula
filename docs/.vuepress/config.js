@@ -196,7 +196,7 @@ module.exports = {
             ['/guide/order-of-precendece', 'Order of precedence'],
             ['/guide/built-in-functions', 'Built-in functions'],
             ['/guide/volatile-functions', 'Volatile functions'],
-            ['/guide/named-ranges', 'Named ranges'],
+            ['/guide/named-expressions', 'Named expressions'],
             ['/guide/arrays', 'Array formulas'],
           ]
         },
@@ -225,6 +225,7 @@ module.exports = {
           children: [
             ['/guide/release-notes', 'Release notes'],
             ['/guide/migration-from-0.6-to-1.0', 'Migrating from 0.6 to 1.0'],
+            ['/guide/migration-from-1.0-to-2.0', 'Migrating from 1.x to 2.0'],
           ]
         },
         {

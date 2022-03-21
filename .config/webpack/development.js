@@ -29,13 +29,6 @@ module.exports.create = function create() {
         commonjs: 'chevrotain',
         amd: 'chevrotain',
       },
-      // the gpu.js dependency was deprecated in HyperFormula 1.2.0
-      'gpu.js': {
-        root: 'GPU',
-        commonjs2: 'gpu.js',
-        commonjs: 'gpu.js',
-        amd: 'gpu.js',
-      },
     };
     c.plugins.push(new WebpackBar({ name: ` ${PACKAGE_FILENAME}.js` }));
   });
