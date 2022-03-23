@@ -32,6 +32,7 @@ you can't compare the arguments in a formula like this:
 * SUBTOTAL function does not ignore nested subtotals.
 * CHISQ.INV, CHISQ.INV.RT, CHISQ.DIST.RT, CHIDIST, CHIINV and CHISQ.DIST (CHISQ.DIST in CDF mode): Running time grows linearly with the value of the second parameter, degrees_of_freedom (slow for values>1e7).
 * GAMMA.DIST, GAMMA.INV, GAMMADIST, GAMMAINV (GAMMA.DIST and GAMMADIST in CDF mode): Running time grows linearly with the value of the second parameter, alpha (slow for values>1e7). 
+* RATE function might have no solutions (depending on the inputs). Sometimes it has multiple solutions. Our implementation uses an iterative algorithm (Newton's Method) for finding an approximation for one of them to within `1e-7`. If it is not found after `50` iterations function returns the `#NUM!` error.
 
 ## Google Sheets and Microsoft Excel
 
