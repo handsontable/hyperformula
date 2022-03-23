@@ -54,7 +54,7 @@ bundle-production: compile ## Transpiles and bundles files to UMD format (with m
 	@npm run bundle:production
 
 bundle-typings: ## Generates TypeScript declaration files
-	@npm run typings:generate
+	@npm run bundle:typings
 
 check-bundle:
 	@npm run verify-bundles
