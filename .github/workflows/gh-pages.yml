@@ -35,3 +35,4 @@ jobs:
           publish_dir: docs/.vuepress/dist
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
+
