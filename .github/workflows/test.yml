@@ -39,7 +39,7 @@ jobs:
   unit:
     strategy:
       matrix:
-        node-version: [ '14' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: UNIT
     runs-on: ${{ matrix.os }}

@@ -11507,7 +11507,7 @@
     "fs-extra" "^9.0.1"
     "handlebars" "^4.7.6"
 
-"typedoc@^0.17.3", "typedoc@>=0.17.0":
+"typedoc@^0.17.8", "typedoc@>=0.17.0":
   "integrity" "sha512-/OyrHCJ8jtzu+QZ+771YaxQ9s4g5Z3XsQE3Ma7q+BL392xxBn4UMvvCdVnqKC2T/dz03/VXSLVKOP3lHmDdc/w=="
   "resolved" "https://registry.npmjs.org/typedoc/-/typedoc-0.17.8.tgz"
   "version" "0.17.8"
