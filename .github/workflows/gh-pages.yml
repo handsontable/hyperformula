@@ -7,16 +7,28 @@ on:
 
 jobs:
   docs:
+    strategy:
+      matrix:
+        node-version: [ '16' ]
+        os: [ 'ubuntu-latest' ]
     name: DOCS
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - name: Install dependencies
         run: |
           npm ci
+
       - name: Build docs
         run: |
           npm run docs
+
       - name: Deploy
         uses: peaceiris/actions-gh-pages@ba0b7df03e25ff29c924be8149041119e9421ea6 # https://github.com/peaceiris/actions-gh-pages/releases/tag/v3.5.6
         with:
