@@ -10,6 +10,7 @@
 - [ ] New feature or improvement (non-breaking change which adds functionality)
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] Additional language file or change to the existing one (translations)
+- [ ] Change to the documentation
 
 ### Related issue(s):
 1.
