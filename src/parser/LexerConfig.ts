@@ -113,7 +113,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
-  const whitespaceTokenRegexp = config.allowAllWhitespace ? ALL_WHITESPACE_REGEXP : ODFF_WHITESPACE_REGEXP
+  const whitespaceTokenRegexp = config.ignoreWhiteSpace === 'standard' ? ODFF_WHITESPACE_REGEXP : ALL_WHITESPACE_REGEXP
 
   const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: whitespaceTokenRegexp })
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})

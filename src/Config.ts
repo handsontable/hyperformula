@@ -166,15 +166,15 @@ export interface ConfigParams {
   /**
    * Controls the set of whitespace characters that are allowed inside a formula.
    *
-   * When set to `false`, allows only SPACE (U+0020), CHARACTER TABULATION (U+0009), LINE FEED (U+000A), and CARRIAGE RETURN (U+000D) (compliant with OpenFormula Standard 1.3)
+   * When set to `'standard'`, allows only SPACE (U+0020), CHARACTER TABULATION (U+0009), LINE FEED (U+000A), and CARRIAGE RETURN (U+000D) (compliant with OpenFormula Standard 1.3)
    *
-   * When set to `true`, allows all whitespace characters that would be captured by the `\s` character class of the JavaScript regular expressions.
+   * When set to `'any'`, allows all whitespace characters that would be captured by the `\s` character class of the JavaScript regular expressions.
    *
-   * @default false
+   * @default 'standard'
    *
    * @category Formula Syntax
    */
-  allowAllWhitespace: boolean,
+  ignoreWhiteSpace: 'standard' | 'any',
   /**
    * Sets year 1900 as a leap year.
    *
@@ -448,7 +448,7 @@ export class Config implements ConfigParams, ParserConfig {
     functionPlugins: [],
     ignorePunctuation: false,
     language: 'enGB',
-    allowAllWhitespace: false,
+    ignoreWhiteSpace: 'standard',
     licenseKey: '',
     leapYear1900: false,
     localeLang: 'en',
@@ -502,7 +502,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly language: string
   /** @inheritDoc */
-  public readonly allowAllWhitespace: boolean
+  public readonly ignoreWhiteSpace: 'standard' | 'any'
   /** @inheritDoc */
   public readonly licenseKey: string
   /** @inheritDoc */
@@ -579,7 +579,7 @@ export class Config implements ConfigParams, ParserConfig {
       leapYear1900,
       localeLang,
       language,
-      allowAllWhitespace,
+      ignoreWhiteSpace,
       licenseKey,
       matchWholeCell,
       arrayColumnSeparator,
@@ -619,7 +619,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.functionArgSeparator = configValueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = configValueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = configValueFromParam(language, 'string', 'language')
-    this.allowAllWhitespace = configValueFromParam(allowAllWhitespace, 'boolean', 'allowAllWhitespace')
+    this.ignoreWhiteSpace = configValueFromParam(ignoreWhiteSpace, ['standard', 'any'], 'ignoreWhiteSpace')
     this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
     this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.arrayColumnSeparator = configValueFromParam(arrayColumnSeparator, [',', ';'], 'arrayColumnSeparator')

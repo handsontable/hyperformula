@@ -598,8 +598,8 @@ describe('whitespaces', () => {
     expect(unparsed).toEqual(formula)
   })
 
-  it('when allowAllWhitespace = true, should unparse a non-breakable space character', () => {
-    const config = new Config({ allowAllWhitespace: true })
+  it('when ignoreWhiteSpace = \'any\', should unparse a non-breakable space character', () => {
+    const config = new Config({ ignoreWhiteSpace: 'any' })
     const lexerConfig = buildLexerConfig(config)
     const parser = buildEmptyParserWithCaching(config, sheetMapping)
     const unparser = new Unparser(config, lexerConfig, sheetMapping.fetchDisplayName, new NamedExpressions())

@@ -173,8 +173,8 @@ describe('ParserWithCaching', () => {
     expect(errors[0].type).toBe(ParsingErrorType.LexingError)
   })
 
-  it('when set allowAllWhitespace = true should accept a non-breakable space', () => {
-    const parser = buildEmptyParserWithCaching(new Config({ allowAllWhitespace: true }))
+  it('when set ignoreWhiteSpace = \'any\' should accept a non-breakable space', () => {
+    const parser = buildEmptyParserWithCaching(new Config({ ignoreWhiteSpace: 'any' }))
 
     const { ast } = parser.parse('=\u00A042', adr('A1'))
     

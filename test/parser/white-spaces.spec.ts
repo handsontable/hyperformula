@@ -89,8 +89,8 @@ describe('tokenizeFormula', () => {
     expect(tokens[1].image).toEqual('\n\t\r ')
   })
 
-  it('when set allowAllWhitespace = true, should treat non-breaking space as a whitespace', () => {
-    const config = new Config({ allowAllWhitespace: true })
+  it('when set ignoreWhiteSpace = \'any\', should treat non-breaking space as a whitespace', () => {
+    const config = new Config({ ignoreWhiteSpace: 'any' })
     const lexer = new FormulaLexer(buildLexerConfig(config))
 
     const tokens = lexer.tokenizeFormula('=\u00A042').tokens

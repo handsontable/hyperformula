@@ -11,7 +11,7 @@ export interface ParserConfig {
   decimalSeparator: '.' | ',',
   arrayColumnSeparator: ',' | ';',
   arrayRowSeparator: ';' | '|',
-  allowAllWhitespace: boolean,
+  ignoreWhiteSpace: 'standard' | 'any',
   translationPackage: TranslationPackage,
   errorMapping: Record<string, TranslatableErrorType>,
   maxColumns: number,
