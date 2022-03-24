@@ -10,7 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add support to parse formulas with all whitespace characters (controlled by config param `ignoreWhiteSpace`). (#898)
 
 ### Changed
-- Removed `gpu.js` dependency and its use. (#812)
+- **Breaking change**: Removed `gpu.js` dependency and its use. (#812)
+
+### Fixed
+- Fixed RATE function not converging for some inputs. (#905)
 
 ## [1.3.1] - 2022-01-11
 
