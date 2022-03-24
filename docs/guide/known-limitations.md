@@ -32,6 +32,7 @@ you can't compare the arguments in a formula like this:
 * SUBTOTAL function does not ignore nested subtotals.
 * CHISQ.INV, CHISQ.INV.RT, CHISQ.DIST.RT, CHIDIST, CHIINV and CHISQ.DIST (CHISQ.DIST in CDF mode): Running time grows linearly with the value of the second parameter, degrees_of_freedom (slow for values>1e7).
 * GAMMA.DIST, GAMMA.INV, GAMMADIST, GAMMAINV (GAMMA.DIST and GAMMADIST in CDF mode): Running time grows linearly with the value of the second parameter, alpha (slow for values>1e7). 
+* RATE function might have no solutions (depending on the inputs). Sometimes it has multiple solutions. Our implementation uses an iterative algorithm (Newton's Method) for finding an approximation for one of them to within `1e-7`. If it is not found after `50` iterations function returns the `#NUM!` error.
 
 ## Google Sheets and Microsoft Excel
 
@@ -71,11 +72,7 @@ To remove the differences, you can create custom implementations of those functi
 | DAYS          | =DAYS(-1, 0)                                               |          NUM |      -1,0000 |        NUM |
 | DAYS          | =DAYS(0, -1)                                               |          NUM |       1,0000 |        NUM |
 | DATEDIF       | =DATEDIF(-1, 0, "Y")                                       |          NUM |       0,0000 |        NUM |
-| RATE          | =RATE(12, -100, 400, 100, 1)                               |      -0,4997 |       0,3100 |    -0,4997 |
-| RATE          | =RATE(12, -100, 400, 1, 1)                                 |      -0,9901 |       0,3200 |    -0,9901 |
-| RATE          | =RATE(12, -100, 400, 0, 1)                                 |          NUM |       0,3200 |        NUM |
-| RATE          | =RATE(12, -100, 400, -100, 1)                              |          NUM |       0,3200 |        NUM |
-| RATE          | =RATE(0.9, -100, 400)                                      |      -0,7962 |          NUM |    -0,7962 |
+| RATE          | =RATE(12, -100, 400, 0, 1)                                 |      -1,0000 |          NUM |        NUM |
 | LCMP          | =LCM(1000000, 1000001, 1000002, 1000003)                   |          NUM |  5,00003E+23 |        NUM |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 1.9)                                   |       5,0000 |          NUM |     5,0000 |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 2)                                     |       0,0000 |          NUM |     0,0000 |

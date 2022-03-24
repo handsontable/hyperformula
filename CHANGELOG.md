@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Removed `gpu.js` dependency and its use. (#812)
+- **Breaking change**: Removed `gpu.js` dependency and its use. (#812)
+
+### Fixed
+- Fixed RATE function not converging for some inputs. (#905)
 
 ## [1.3.1] - 2022-01-11
 
