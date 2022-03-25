@@ -13,7 +13,7 @@ import {FormulaVertex} from './FormulaCellVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 
-export const collectAddressesDependentToRange = (funcitonRegistry: FunctionRegistry, vertex: Vertex, range: AbsoluteCellRange, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
+export const collectAddressesDependentToRange = (functionRegistry: FunctionRegistry, vertex: Vertex, range: AbsoluteCellRange, lazilyTransformingAstService: LazilyTransformingAstService, dependencyGraph: DependencyGraph): SimpleCellAddress[] => {
   if (vertex instanceof RangeVertex) {
     const intersection = vertex.range.intersectionWith(range)
     if (intersection !== undefined) {
@@ -33,7 +33,7 @@ export const collectAddressesDependentToRange = (funcitonRegistry: FunctionRegis
     return []
   }
 
-  return collectDependencies(formula, funcitonRegistry)
+  return collectDependencies(formula, functionRegistry)
     .filter((d): d is AddressDependency => d instanceof AddressDependency)
     .map((d) => d.dependency.toSimpleCellAddress(address))
     .filter((d) => range.addressInRange(d))
