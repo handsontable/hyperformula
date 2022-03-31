@@ -94,7 +94,6 @@ import {
   RParen,
   StringLiteral,
   TimesOp,
-  WhiteSpace,
 } from './LexerConfig'
 
 export interface FormulaParserResult {
@@ -894,7 +893,7 @@ export class FormulaLexer {
   private skipWhitespacesInsideRanges(tokens: IToken[]): IToken[] {
     return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return (tokenMatcher(previous, CellReference) || tokenMatcher(previous, RangeSeparator))
-        && tokenMatcher(current, WhiteSpace)
+        && tokenMatcher(current, this.lexerConfig.WhiteSpace)
         && (tokenMatcher(next, CellReference) || tokenMatcher(next, RangeSeparator))
     })
   }
@@ -902,7 +901,7 @@ export class FormulaLexer {
   private skipWhitespacesBeforeArgSeparators(tokens: IToken[]): IToken[] {
     return this.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return !tokenMatcher(previous, this.lexerConfig.ArgSeparator)
-        && tokenMatcher(current, WhiteSpace)
+        && tokenMatcher(current, this.lexerConfig.WhiteSpace)
         && tokenMatcher(next, this.lexerConfig.ArgSeparator)
     })
   }
@@ -928,7 +927,7 @@ export class FormulaLexer {
   }
 
   private trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
-    if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
+    if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], this.lexerConfig.WhiteSpace)) {
       tokens.pop()
     }
     return tokens

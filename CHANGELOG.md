@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Add support to parse formulas with all whitespace characters (controlled by config param `ignoreWhiteSpace`). (#898)
+
 ### Changed
 - **Breaking change**: Removed `gpu.js` dependency and its use. (#812)
 
