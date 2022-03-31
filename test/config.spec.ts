@@ -1,8 +1,9 @@
-import {HyperFormula} from '../src'
+import {CellType, HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
-import {EmptyValue} from '../src/interpreter/InterpreterValue'
-import {unregisterAllLanguages} from './testUtils'
+import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
+import {adr, unregisterAllLanguages} from './testUtils'
+import {CellValueNoNumber} from '../src/Cell'
 
 describe('Config', () => {
   beforeEach(() => {
@@ -205,6 +206,35 @@ describe('Config', () => {
     expect(() => new Config({nullYear: 42})).not.toThrowError()
     expect(() => new Config({nullYear: 100})).not.toThrowError()
     expect(() => new Config({nullYear: 101})).toThrowError('Config parameter nullYear should be at most 100')
+  })
+
+  describe('#dateFormats', () => {
+    it('should use the data formats provided in config param', () => {
+      const dateFormats = ['DD/MM/YYYY']
+      const engine = HyperFormula.buildFromArray([
+        ['1'],
+        ['01/03/2022'],
+        ['2022/01/01'],
+      ], { dateFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(CellValueNoNumber.STRING)
+    })
+
+    it('should parse the dates with different separators', () => {
+      const dateFormats = ['DD/MM/YYYY'];
+      const engine = HyperFormula.buildFromArray([
+        ['01/03/2022', '01-03-2022', '01 03 2022', '01.03.2022'],
+      ], { dateFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('A1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('B1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('B1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('C1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('C1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('D1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('D1'))).toEqual('DD/MM/YYYY')
+    })
   })
 
   describe('deprecated option warning messages', () => {
