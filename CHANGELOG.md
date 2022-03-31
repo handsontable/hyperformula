@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added support for reversed ranges (#834)
+- Added support for reversed ranges (#834 & #938)
 - Added support for parsing formulas with all whitespace characters (controlled by config param `ignoreWhiteSpace`). (#898)
 
 ### Changed
