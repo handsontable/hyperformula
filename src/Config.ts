@@ -164,6 +164,18 @@ export interface ConfigParams {
    */
   language: string,
   /**
+   * Controls the set of whitespace characters that are allowed inside a formula.
+   *
+   * When set to `'standard'`, allows only SPACE (U+0020), CHARACTER TABULATION (U+0009), LINE FEED (U+000A), and CARRIAGE RETURN (U+000D) (compliant with OpenFormula Standard 1.3)
+   *
+   * When set to `'any'`, allows all whitespace characters that would be captured by the `\s` character class of the JavaScript regular expressions.
+   *
+   * @default 'standard'
+   *
+   * @category Formula Syntax
+   */
+  ignoreWhiteSpace: 'standard' | 'any',
+  /**
    * Sets year 1900 as a leap year.
    *
    * For compatibility with Lotus 1-2-3 and Microsoft Excel, set this option to `true`.
@@ -436,6 +448,7 @@ export class Config implements ConfigParams, ParserConfig {
     functionPlugins: [],
     ignorePunctuation: false,
     language: 'enGB',
+    ignoreWhiteSpace: 'standard',
     licenseKey: '',
     leapYear1900: false,
     localeLang: 'en',
@@ -488,6 +501,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly thousandSeparator: '' | ',' | ' ' | '.'
   /** @inheritDoc */
   public readonly language: string
+  /** @inheritDoc */
+  public readonly ignoreWhiteSpace: 'standard' | 'any'
   /** @inheritDoc */
   public readonly licenseKey: string
   /** @inheritDoc */
@@ -564,6 +579,7 @@ export class Config implements ConfigParams, ParserConfig {
       leapYear1900,
       localeLang,
       language,
+      ignoreWhiteSpace,
       licenseKey,
       matchWholeCell,
       arrayColumnSeparator,
@@ -603,6 +619,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.functionArgSeparator = configValueFromParam(functionArgSeparator, 'string', 'functionArgSeparator')
     this.decimalSeparator = configValueFromParam(decimalSeparator, ['.', ','], 'decimalSeparator')
     this.language = configValueFromParam(language, 'string', 'language')
+    this.ignoreWhiteSpace = configValueFromParam(ignoreWhiteSpace, ['standard', 'any'], 'ignoreWhiteSpace')
     this.licenseKey = configValueFromParam(licenseKey, 'string', 'licenseKey')
     this.thousandSeparator = configValueFromParam(thousandSeparator, ['', ',', ' ', '.'], 'thousandSeparator')
     this.arrayColumnSeparator = configValueFromParam(arrayColumnSeparator, [',', ';'], 'arrayColumnSeparator')
@@ -677,8 +694,8 @@ export class Config implements ConfigParams, ParserConfig {
    *
    * @internal
    */
-  public get licenseKeyValidityState() {
-    return privatePool.get(this)!.licenseKeyValidityState
+  public get licenseKeyValidityState(): LicenseKeyValidityState {
+    return (privatePool.get(this) as Config).licenseKeyValidityState
   }
 
   public getConfig(): ConfigParams {

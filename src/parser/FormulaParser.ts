@@ -94,7 +94,6 @@ import {
   RParen,
   StringLiteral,
   TimesOp,
-  WhiteSpace,
 } from './LexerConfig'
 import {RowAddress} from './RowAddress'
 import {ColumnAddress} from './ColumnAddress'
@@ -912,7 +911,7 @@ export class FormulaLexer {
   public tokenizeFormula(text: string): ILexingResult {
     const lexingResult = this.lexer.tokenize(text)
     let tokens = lexingResult.tokens
-    tokens = FormulaLexer.trimTrailingWhitespaces(tokens)
+    tokens = this.trimTrailingWhitespaces(tokens)
     tokens = this.skipWhitespacesInsideRanges(tokens)
     tokens = this.skipWhitespacesBeforeArgSeparators(tokens)
     lexingResult.tokens = tokens
@@ -923,7 +922,7 @@ export class FormulaLexer {
   private skipWhitespacesInsideRanges(tokens: IToken[]): IToken[] {
     return FormulaLexer.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return (tokenMatcher(previous, CellReference) || tokenMatcher(previous, RangeSeparator))
-        && tokenMatcher(current, WhiteSpace)
+        && tokenMatcher(current, this.lexerConfig.WhiteSpace)
         && (tokenMatcher(next, CellReference) || tokenMatcher(next, RangeSeparator))
     })
   }
@@ -931,7 +930,7 @@ export class FormulaLexer {
   private skipWhitespacesBeforeArgSeparators(tokens: IToken[]): IToken[] {
     return FormulaLexer.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return !tokenMatcher(previous, this.lexerConfig.ArgSeparator)
-        && tokenMatcher(current, WhiteSpace)
+        && tokenMatcher(current, this.lexerConfig.WhiteSpace)
         && tokenMatcher(next, this.lexerConfig.ArgSeparator)
     })
   }
@@ -956,8 +955,8 @@ export class FormulaLexer {
     return filteredTokens
   }
 
-  private static trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
-    if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], WhiteSpace)) {
+  private trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
+    if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], this.lexerConfig.WhiteSpace)) {
       tokens.pop()
     }
     return tokens

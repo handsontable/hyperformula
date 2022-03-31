@@ -9,7 +9,7 @@ src/interpreter/plugin/3rdparty
 karma.*
 doc
 
-# Aut-generated directiories
+# Auto-generated directories
 commonjs
 coverage
 dist

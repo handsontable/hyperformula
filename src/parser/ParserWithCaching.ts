@@ -3,7 +3,7 @@
  * Copyright (c) 2021 Handsoncode. All rights reserved.
  */
 
-import {IToken, tokenMatcher} from 'chevrotain'
+import {IToken, tokenMatcher, ILexingResult} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {AstNodeType, buildParsingErrorAst, RelativeDependency} from './'
@@ -24,7 +24,6 @@ import {
   ILexerConfig,
   ProcedureName,
   RowRange,
-  WhiteSpace,
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
@@ -65,7 +64,7 @@ export class ParserWithCaching {
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
   public parse(text: string, formulaAddress: SimpleCellAddress): ParsingResult {
-    const lexerResult = this.lexer.tokenizeFormula(text)
+    const lexerResult = this.tokenizeFormula(text)
 
     if (lexerResult.errors.length > 0) {
       const errors = lexerResult.errors.map((e) =>
@@ -89,7 +88,7 @@ export class ParserWithCaching {
     if (cacheResult !== undefined) {
       ++this.statsCacheUsed
     } else {
-      const processedTokens = bindWhitespacesToTokens(lexerResult.tokens)
+      const processedTokens = this.bindWhitespacesToTokens(lexerResult.tokens)
       const parsingResult = this.formulaParser.parseFromTokens(processedTokens, formulaAddress)
 
       if (parsingResult.errors.length > 0) {
@@ -230,28 +229,32 @@ export class ParserWithCaching {
       }
     }
   }
-}
 
-export function bindWhitespacesToTokens(tokens: IToken[]): ExtendedToken[] {
-  const processedTokens: ExtendedToken[] = []
+  public bindWhitespacesToTokens(tokens: IToken[]): ExtendedToken[] {
+    const processedTokens: ExtendedToken[] = []
 
-  const first = tokens[0]
-  if (!tokenMatcher(first, WhiteSpace)) {
-    processedTokens.push(first)
-  }
-
-  for (let i = 1; i < tokens.length; ++i) {
-    const current = tokens[i] as ExtendedToken
-    if (tokenMatcher(current, WhiteSpace)) {
-      continue
+    const first = tokens[0]
+    if (!tokenMatcher(first, this.lexerConfig.WhiteSpace)) {
+      processedTokens.push(first)
     }
 
-    const previous = tokens[i - 1]
-    if (tokenMatcher(previous, WhiteSpace)) {
-      current.leadingWhitespace = previous
+    for (let i = 1; i < tokens.length; ++i) {
+      const current = tokens[i] as ExtendedToken
+      if (tokenMatcher(current, this.lexerConfig.WhiteSpace)) {
+        continue
+      }
+
+      const previous = tokens[i - 1]
+      if (tokenMatcher(previous, this.lexerConfig.WhiteSpace)) {
+        current.leadingWhitespace = previous
+      }
+      processedTokens.push(current)
     }
-    processedTokens.push(current)
+
+    return processedTokens
   }
 
-  return processedTokens
+  public tokenizeFormula(text: string): ILexingResult {
+    return this.lexer.tokenizeFormula(text)
+  }
 }
