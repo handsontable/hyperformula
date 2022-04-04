@@ -168,9 +168,9 @@ You can reference ranges in the following ways:
 
 | Range reference type | Example | Reversed example |
 | -------------------- | ------- | ---------------- |
-| Two cell addresses   | A1:D10  | D10:A1           |
-| Two columns          | A:D     | D:A              |
-| Two rows             | 3:5     | 5:3              |
+| Cell addresses       | A1:D10  | D10:A1           |
+| Columns              | A:D     | D:A              |
+| Rows                 | 3:5     | 5:3              |
 
 You can reference ranges:
 - With relative references (A1:D10)
