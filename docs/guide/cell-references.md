@@ -49,8 +49,8 @@ different cells in the workbook.
     </tr>
     <tr>
       <td style="text-align:left">Range</td>
-      <td style="text-align:left">=A1:D10</td>
-      <td style="text-align:left">=Sheet2!A1:D10</td>
+      <td style="text-align:left">=A1:B2</td>
+      <td style="text-align:left">=Sheet2!A1:B2</td>
     </tr>
   </tbody>
 </table>
@@ -166,20 +166,21 @@ In HyperFormula, a range is a group of two or more adjacent cells.
 
 You can reference ranges in the following ways:
 
-| Range reference type | Example | Reversed example |
-| -------------------- | ------- | ---------------- |
-| Cell addresses       | A1:D10  | D10:A1           |
-| Columns              | A:D     | D:A              |
-| Rows                 | 3:5     | 5:3              |
+| Range reference type | Example | Reversed examples       |
+| -------------------- | ------- | ----------------------- |
+| Cell addresses       | A1:B2   | A2:B1<br>B1:A2<br>B2:A1 |
+| Columns              | A:B     | B:A                     |
+| Rows                 | 1:2     | 2:1                     |
 
 You can reference ranges:
-- With relative references (A1:D10)
-- With absolute references (A$1:$D$10)
-- In different sheets (=Sheet2!A1:D10)
+- With relative references (A1:B2)
+- With absolute references (A$1:$B$2)
+- In different sheets (=Sheet2!A1:B2)
 
-You can't mix two different types of range references together (A1:D).
-
-Range expressions can't contain [named expressions](/guide/named-expressions.md).
+The following restraints apply:
+- You can't mix two different types of range references together (A1:B).
+- Range expressions can't contain [named expressions](/guide/named-expressions.md).
+- At the moment, HyperFormula doesn't support multi-cell range references (A1:B2:C3).
 
 ::: tip
 In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat single cells as ranges. Instead, it immediately instantiates references to single cells as their values. Applying a scalar value to a function that takes ranges throws the [`CellRangeExpected`](/api/classes/errormessage.md#cellrangeexpected) error.
