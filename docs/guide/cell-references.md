@@ -49,8 +49,8 @@ different cells in the workbook.
     </tr>
     <tr>
       <td style="text-align:left">Range</td>
-      <td style="text-align:left">=A1:C10</td>
-      <td style="text-align:left">=Sheet2!A1:C10</td>
+      <td style="text-align:left">=A1:D10</td>
+      <td style="text-align:left">=Sheet2!A1:D10</td>
     </tr>
   </tbody>
 </table>
@@ -133,7 +133,7 @@ const changes = hfInstance.moveCells(source, 1, 1, destination);
 console.log(changes);
 ```
 
-## Absolute reference
+## Absolute references
 
 A reference to a column (a letter) or a row (a number) may be
 preceded with a dollar sign `$` to remain intact when the cell is
@@ -160,7 +160,37 @@ copied between different places.
   </tbody>
 </table>
 
-## Circular reference
+## Range references
+
+In HyperFormula, a range is a group of two or more adjacent cells.
+
+You can reference ranges in the following ways:
+
+| Range reference type | Example | Reversed example |
+| -------------------- | ------- | ---------------- |
+| Two cell addresses   | A1:D10  | D10:A1           |
+| Two columns          | A:D     | D:A              |
+| Two rows             | 3:5     | 5:3              |
+
+You can reference ranges:
+- With relative references (A1:D10)
+- With absolute references (A$1:$D$10)
+- In different sheets (=Sheet2!A1:D10)
+
+You can't mix two different types of range references together (A1:D).
+
+Range expressions can't contain [named expressions](/guide/named-expressions.md).
+
+::: tip
+In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat single cells as ranges. Instead, it immediately instantiates references to single cells as their values. Applying a scalar value to a function that takes ranges throws the [`CellRangeExpected`](/api/classes/errormessage.md#cellrangeexpected) error.
+:::
+
+#### More about ranges
+- [Key concepts: Handling ranges](/guide/key-concepts.md#handling-ranges)
+- [Types of operators: Reference operators](/guide/types-of-operators.md#reference-operators)
+- [API reference: Ranges](/api/classes/hyperformula.md#ranges)
+
+## Circular references
 
 Since HyperFormula does not embed any UI, it allows for the input of a circular reference into a cell. Compared to popular spreadsheets,
 HyperFormula does not force any specific interaction with the user
@@ -182,9 +212,9 @@ used in a cell.
 
 Consider the following example:
 
-| Formula in C1 | Action | Result in B1 |
-| :--- | :--- | :--- |
-| =A1+B1+20 | Delete column A | #REF! |
+| Formula in C1 | Action          | Result in B1 |
+| :------------ | :-------------- | :----------- |
+| =A1+B1+20     | Delete column A | #REF!        |
 
 The #REF! error may also occur in other specific situations:
 
