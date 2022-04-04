@@ -173,9 +173,9 @@ You can reference ranges in the following ways:
 | Rows                 | 1:2     | 2:1                     |
 
 You can reference ranges:
-- With relative references (A1:B2)
-- With absolute references (A$1:$B$2)
-- In different sheets (=Sheet2!A1:B2)
+- Through relative references (A1:B2)
+- Through absolute references (A$1:$B$2)
+- Across different sheets (=Sheet2!A1:B2)
 
 The following restraints apply:
 - You can't mix two different types of range references together (A1:B).
