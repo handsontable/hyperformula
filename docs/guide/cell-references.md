@@ -162,25 +162,41 @@ copied between different places.
 
 ## Range references
 
-In HyperFormula, a range is a group of two or more adjacent cells.
+In HyperFormula, a range is a reference to a group of at least two adjacent cells.
 
-You can reference ranges in the following ways:
+### Range definition
 
-| Range reference type | Example | Reversed examples       |
-| -------------------- | ------- | ----------------------- |
-| Cell addresses       | A1:B2   | A2:B1<br>B1:A2<br>B2:A1 |
-| Columns              | A:B     | B:A                     |
-| Rows                 | 1:2     | 2:1                     |
+Range `<Cell address 1>:<Cell address 2>` is a reference to the smallest possible group of adjacent cells that includes:
+
+- The cell at `<Cell address 1>`
+- The cell at `<Cell address 2>`
+- All cells on all sheets between `<Cell address 1>` and `<Cell address 2>`
+
+### Range types
+
+HyperFormula features the following types of ranges:
+
+| Range type   | Description                         | Example                                   |
+| ------------ | ----------------------------------- | ----------------------------------------- |
+| Cell range   | Has the shape of a finite rectangle | =A1:B2<br>or =A2:B1<br>or =B1:A2<br>or =B2:A1 |
+| Column range | Contains whole columns              | =A:B<br>or =B:A                             |
+| Row range    | Contains whole rows                 | =1:2<br>or =2:1                             |
+
+### Referencing ranges
 
 You can reference ranges:
-- Through relative references (A1:B2)
-- Through absolute references (A$1:$B$2)
-- Across different sheets (=Sheet2!A1:B2)
+- Through relative references (=A1:B2)
+- Through absolute references (=A$1:$B$2)
+- Across two different sheets (=Sheet1!A1:Sheet5!B2)
+
+If you don't specify a sheet name for the second cell address, the sheet name of the first cell address is used: `=Sheet5!A1:B2` is equivalent to `=Sheet5!A1:Sheet5!B2`.
+
+### Range restraints
 
 The following restraints apply:
-- You can't mix two different types of range references together (A1:B).
+- You can't mix two different types of range references together (=A1:B).
 - Range expressions can't contain [named expressions](/guide/named-expressions.md).
-- At the moment, HyperFormula doesn't support multi-cell range references (A1:B2:C3).
+- At the moment, HyperFormula doesn't support multi-cell range references (=A1:B2:C3).
 
 ::: tip
 In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat single cells as ranges. Instead, it immediately instantiates references to single cells as their values. Applying a scalar value to a function that takes ranges throws the [`CellRangeExpected`](/api/classes/errormessage.md#cellrangeexpected) error.
