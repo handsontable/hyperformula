@@ -170,7 +170,7 @@ Range `<Cell address 1>:<Cell address 2>` is a reference to the smallest possibl
 
 - The cell at `<Cell address 1>`
 - The cell at `<Cell address 2>`
-- All cells on all sheets between `<Cell address 1>` and `<Cell address 2>`
+- If referencing across different sheets (so-called 3D reference): all cells on all sheets between `<Cell address 1>` and `<Cell address 2>`
 
 ### Range types
 
@@ -187,9 +187,7 @@ HyperFormula features the following types of ranges:
 You can reference ranges:
 - Through relative references (=A1:B2)
 - Through absolute references (=A$1:$B$2)
-- Across two different sheets (=Sheet1!A1:Sheet5!B2)
-
-If you don't specify a sheet name for the second cell address, the sheet name of the first cell address is used: `=Sheet5!A1:B2` is equivalent to `=Sheet5!A1:Sheet5!B2`.
+- Across different sheets (=Sheet1!A1:Sheet5!B2)<br>If you don't specify a sheet name for the second cell address, the sheet name of the first cell address is used: `=Sheet5!A1:B2` is equivalent to `=Sheet5!A1:Sheet5!B2`.
 
 ### Range restraints
 
@@ -202,7 +200,7 @@ The following restraints apply:
 In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat single cells as ranges. Instead, it immediately instantiates references to single cells as their values. Applying a scalar value to a function that takes ranges throws the [`CellRangeExpected`](/api/classes/errormessage.md#cellrangeexpected) error.
 :::
 
-#### More about ranges
+### More about ranges
 - [Key concepts: Handling ranges](/guide/key-concepts.md#handling-ranges)
 - [Types of operators: Reference operators](/guide/types-of-operators.md#reference-operators)
 - [API reference: Ranges](/api/classes/hyperformula.md#ranges)
