@@ -16,7 +16,7 @@ import {
 import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {Cache} from './Cache'
-import {FormulaLexer, FormulaParser, IExtendedToken} from './FormulaParser'
+import {FormulaLexer, FormulaParser, ExtendedToken} from './FormulaParser'
 import {
   buildLexerConfig,
   CellReference,
@@ -230,8 +230,8 @@ export class ParserWithCaching {
     }
   }
 
-  public bindWhitespacesToTokens(tokens: IToken[]): IExtendedToken[] {
-    const processedTokens: IExtendedToken[] = []
+  public bindWhitespacesToTokens(tokens: IToken[]): ExtendedToken[] {
+    const processedTokens: ExtendedToken[] = []
 
     const first = tokens[0]
     if (!tokenMatcher(first, this.lexerConfig.WhiteSpace)) {
@@ -239,7 +239,7 @@ export class ParserWithCaching {
     }
 
     for (let i = 1; i < tokens.length; ++i) {
-      const current = tokens[i] as IExtendedToken
+      const current = tokens[i] as ExtendedToken
       if (tokenMatcher(current, this.lexerConfig.WhiteSpace)) {
         continue
       }

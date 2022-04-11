@@ -49,8 +49,8 @@ different cells in the workbook.
     </tr>
     <tr>
       <td style="text-align:left">Range</td>
-      <td style="text-align:left">=A1:C10</td>
-      <td style="text-align:left">=Sheet2!A1:C10</td>
+      <td style="text-align:left">=A1:B2</td>
+      <td style="text-align:left">=Sheet2!A1:B2</td>
     </tr>
   </tbody>
 </table>
@@ -133,7 +133,7 @@ const changes = hfInstance.moveCells(source, 1, 1, destination);
 console.log(changes);
 ```
 
-## Absolute reference
+## Absolute references
 
 A reference to a column (a letter) or a row (a number) may be
 preceded with a dollar sign `$` to remain intact when the cell is
@@ -160,7 +160,52 @@ copied between different places.
   </tbody>
 </table>
 
-## Circular reference
+## Range references
+
+In HyperFormula, a range is a reference to a group of at least two adjacent cells.
+
+### Range definition
+
+Range `<Cell address 1>:<Cell address 2>` is a reference to the smallest possible group of adjacent cells that includes:
+
+- The cell at `<Cell address 1>`
+- The cell at `<Cell address 2>`
+- If referencing across different sheets (so-called 3D reference): all cells on all sheets between `<Cell address 1>` and `<Cell address 2>`
+
+### Range types
+
+HyperFormula features the following types of ranges:
+
+| Range type   | Description                         | Example                                       |
+| ------------ | ----------------------------------- | --------------------------------------------- |
+| Cell range   | Has the shape of a finite rectangle | =A1:B2<br>or =A2:B1<br>or =B1:A2<br>or =B2:A1 |
+| Column range | Contains whole columns              | =A:B<br>or =B:A                               |
+| Row range    | Contains whole rows                 | =1:2<br>or =2:1                               |
+
+### Referencing ranges
+
+You can reference ranges:
+- Through relative references (=A1:B2)
+- Through absolute references (=A$1:$B$2)
+- Across different sheets (=Sheet1!A1:Sheet5!B2)<br>If you don't specify a sheet name for the second cell address, the sheet name of the first cell address is used: `=Sheet5!A1:B2` is equivalent to `=Sheet5!A1:Sheet5!B2`.
+
+### Range restraints
+
+The following restraints apply:
+- You can't mix two different types of range references together (=A1:B).
+- Range expressions can't contain [named expressions](/guide/named-expressions.md).
+- At the moment, HyperFormula doesn't support multi-cell range references (=A1:B2:C3).
+
+::: tip
+In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat single cells as ranges. Instead, it immediately instantiates references to single cells as their values. Applying a scalar value to a function that takes ranges throws the [`CellRangeExpected`](/api/classes/errormessage.md#cellrangeexpected) error.
+:::
+
+### More about ranges
+- [Key concepts: Handling ranges](/guide/key-concepts.md#handling-ranges)
+- [Types of operators: Reference operators](/guide/types-of-operators.md#reference-operators)
+- [API reference: Ranges](/api/classes/hyperformula.md#ranges)
+
+## Circular references
 
 Since HyperFormula does not embed any UI, it allows for the input of a circular reference into a cell. Compared to popular spreadsheets,
 HyperFormula does not force any specific interaction with the user
@@ -182,9 +227,9 @@ used in a cell.
 
 Consider the following example:
 
-| Formula in C1 | Action | Result in B1 |
-| :--- | :--- | :--- |
-| =A1+B1+20 | Delete column A | #REF! |
+| Formula in C1 | Action          | Result in B1 |
+| :------------ | :-------------- | :----------- |
+| =A1+B1+20     | Delete column A | #REF!        |
 
 The #REF! error may also occur in other specific situations:
 
