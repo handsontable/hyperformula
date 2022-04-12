@@ -192,7 +192,7 @@ You can reference ranges:
 ### Range restraints
 
 The following restraints apply:
-- You can't mix two different types of ranges together (=A1:B).
+- You can't mix two different types of range references together (=A1:B).
 - Range expressions can't contain [named expressions](/guide/named-expressions.md).
 - At the moment, HyperFormula doesn't support multi-cell range references (=A1:B2:C3).
 
