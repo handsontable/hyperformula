@@ -4,17 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2022-04-14
+
+For more information on this release, see:
+- [Release notes](https://handsontable.github.io/hyperformula/guide/release-notes.html)
+- [Blog post](https://handsontable.com/blog/articles/2022/04/whats-new-in-hyperformula-2.0.0)
+- [Migration guide](https://handsontable.github.io/hyperformula/guide/migration-from-1.0-to-2.0.html)
 
 ### Added
-- Added support for reversed ranges (#834 & #938)
-- Added support for parsing formulas with all whitespace characters (controlled by config param `ignoreWhiteSpace`). (#898)
+- Added support for reverse ranges. (#834)
+- Added a new configuration option, `ignoreWhiteSpace`, which allows for parsing formulas that contain whitespace characters of any type. (#898)
 
 ### Changed
-- **Breaking change**: Removed `gpu.js` dependency and its use. (#812)
+- **Breaking change**: Removed the `gpu.js` dependency and its use, to speed up the installation time. (#812)
+- **Breaking change**: Removed the deprecated `gpujs` and `gpuMode` configuration options. (#812)
 
 ### Fixed
-- Fixed RATE function not converging for some inputs. (#905)
+- Fixed an issue where the RATE function didn't converge for some inputs. (#905)
 
 ## [1.3.1] - 2022-01-11
 
