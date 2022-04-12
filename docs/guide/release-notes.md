@@ -8,7 +8,7 @@ HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 **Release date: April 14, 2022**
 
 ### Added
-- Added support for reverse ranges. [#834](https://github.com/handsontable/hyperformula/issues/834)
+- Added support for reversed ranges. [#834](https://github.com/handsontable/hyperformula/issues/834)
 - Added a new configuration option, [`ignoreWhiteSpace`](/api/interfaces/configparams.md#ignorewhitespace), which allows for parsing formulas that contain whitespace characters of any type. [#898](https://github.com/handsontable/hyperformula/issues/898)
 
 ### Changed

@@ -50,7 +50,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
         ? CellAddress.absoluteCol.bind(this)
         : row.isRowAbsolute()
           ? CellAddress.absoluteRow.bind(this)
-          // this is because CellAddress.relative expects arguments in different order
+          // this is because `CellAddress.relative` expects arguments in a different order
           : (col: number, row: number, sheet?: number) => CellAddress.relative(row, col, sheet)
 
     return factoryMethod(col.col, row.row, sheet)

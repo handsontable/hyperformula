@@ -12,7 +12,7 @@ For more information on this release, see:
 - [Migration guide](https://handsontable.github.io/hyperformula/guide/migration-from-1.0-to-2.0.html)
 
 ### Added
-- Added support for reverse ranges. (#834)
+- Added support for reversed ranges. (#834)
 - Added a new configuration option, `ignoreWhiteSpace`, which allows for parsing formulas that contain whitespace characters of any type. (#898)
 
 ### Changed
