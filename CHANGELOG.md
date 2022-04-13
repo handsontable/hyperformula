@@ -13,7 +13,7 @@ For more information on this release, see:
 
 ### Added
 - Added support for reversed ranges. (#834)
-- Added a new configuration option, `ignoreWhiteSpace`, which allows for parsing formulas that contain whitespace characters of any type. (#898)
+- Added a new configuration option, `ignoreWhiteSpace`, which allows for parsing formulas that contain whitespace characters of any kind. (#898)
 
 ### Changed
 - **Breaking change**: Removed the `gpu.js` dependency and its use, to speed up the installation time. (#812)

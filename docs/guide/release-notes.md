@@ -9,7 +9,7 @@ HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Added
 - Added support for reversed ranges. [#834](https://github.com/handsontable/hyperformula/issues/834)
-- Added a new configuration option, [`ignoreWhiteSpace`](/api/interfaces/configparams.md#ignorewhitespace), which allows for parsing formulas that contain whitespace characters of any type. [#898](https://github.com/handsontable/hyperformula/issues/898)
+- Added a new configuration option, [`ignoreWhiteSpace`](/api/interfaces/configparams.md#ignorewhitespace), which allows for parsing formulas that contain whitespace characters of any kind. [#898](https://github.com/handsontable/hyperformula/issues/898)
 
 ### Changed
 - **Breaking change**: Removed the `gpu.js` dependency and its use, to speed up the installation time. [#812](https://github.com/handsontable/hyperformula/issues/812)
