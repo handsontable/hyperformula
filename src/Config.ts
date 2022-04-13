@@ -343,7 +343,7 @@ export interface ConfigParams {
    */
   smartRounding: boolean,
   /**
-   * Sets a thousand separator symbol for parsing numerical literals.
+   * Sets a thousands separator symbol for parsing numerical literals.
    *
    * Can be one of the following:
    * - empty

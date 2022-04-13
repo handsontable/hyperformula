@@ -370,12 +370,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
   /**
-   * Rule for expressions that start with OFFSET() function
+   * Rule for expressions that start with the OFFSET function.
    *
-   * OFFSET() function can occur as cell reference or part of cell range.
-   * In order to preserve LL(k) properties, expressions that start with OFFSET() functions needs to have separate rule.
+   * The OFFSET function can occur as a cell reference, or as a part of a cell range.
+   * To preserve LL(k) properties, expressions that start with the OFFSET function need a separate rule.
    *
-   * Proper {@link Ast} node type is built depending on the presence of {@link RangeSeparator}
+   * Depending on the presence of the {@link RangeSeparator}, a proper {@link Ast} node type is built.
    */
   private offsetExpression: AstRule = this.RULE('offsetExpression', () => {
     const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
