@@ -4,6 +4,20 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.0.0
+**Release date: April 14, 2022**
+
+### Added
+- Added support for reversed ranges. [#834](https://github.com/handsontable/hyperformula/issues/834)
+- Added a new configuration option, [`ignoreWhiteSpace`](/api/interfaces/configparams.md#ignorewhitespace), which allows for parsing formulas that contain whitespace characters of any kind. [#898](https://github.com/handsontable/hyperformula/issues/898)
+
+### Changed
+- **Breaking change**: Removed the `gpu.js` dependency and its use, to speed up the installation time. [#812](https://github.com/handsontable/hyperformula/issues/812)
+- **Breaking change**: Removed the deprecated `gpujs` and `gpuMode` configuration options. [#812](https://github.com/handsontable/hyperformula/issues/812)
+
+### Fixed
+- Fixed an issue where the RATE function didn't converge for some inputs. [#905](https://github.com/handsontable/hyperformula/issues/905)
+
 ## 1.3.1
 **Release date: January 11, 2022**
 

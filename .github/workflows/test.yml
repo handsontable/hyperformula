@@ -1,12 +1,22 @@
 name: Test
 
-on: [push]
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize # the head branch is updated from the base branch, new commits are pushed to the head branch, or the base branch is changed
+  push:
+    branches:
+      - 'master'
+      - 'develop'
+      - 'release/**'
 
 jobs:
   build:
     strategy:
       matrix:
-        node-version: [ '14' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: BUILD
     runs-on: ${{ matrix.os }}
@@ -29,7 +39,7 @@ jobs:
   unit:
     strategy:
       matrix:
-        node-version: [ '14' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: UNIT
     runs-on: ${{ matrix.os }}
@@ -55,7 +65,7 @@ jobs:
   browsers:
     strategy:
       matrix:
-        node-version: [ '14' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: BROWSERS
     runs-on: ${{ matrix.os }}

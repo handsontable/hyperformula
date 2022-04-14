@@ -1,19 +1,14 @@
-# Named ranges
+# Named expressions
 
-You can give a human-friendly name to a range of adjacent cells.
+An expression can be assigned a human-friendly name.
 Thanks to this you can refer to that name anywhere across the workbook.
 Names are especially useful when you use some references repeatedly.
 In this case, names simplify the formulas and reduce the risk of making
 a mistake. Such a worksheet is also easier to maintain.
 
-Named ranges can be understood as a specific subset of named
-expressions in HyperFormula.
+You can name a formula, string, number, or any other type of data.
 
-Named ranges can be used as constants without referring to any
-range of cells. That means you can name a formula, string, number,
-or any other type of data.
-
-By default, references in named ranges are absolute. Most people use
+By default, references in named expressions are absolute. Most people use
 absolute references in spreadsheet software like Excel without even
 knowing about it. Very few know that references can be relative too.
 Unfortunately, HyperFormula doesn't support relative references inside
@@ -29,7 +24,7 @@ the names as follows:
 
 ## Examples
 
-| Type | Custom name | Range or constant |
+| Type | Custom name | Example expression |
 | :--- | :--- | :--- |
 | Named cell | myCell | =A1 |
 | Named range of cells | myRange | =A1:D10 |
@@ -150,7 +145,7 @@ error handling. It is also possible to check the availability of operations usin
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/1.3.x/named-expressions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/named-expressions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: named-expressions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
