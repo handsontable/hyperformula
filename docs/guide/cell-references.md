@@ -179,8 +179,8 @@ HyperFormula features the following types of ranges:
 | Range type   | Description                         | Example                                       |
 | ------------ | ----------------------------------- | --------------------------------------------- |
 | Cell range   | Has the shape of a finite rectangle | =A1:B2<br>or =A2:B1<br>or =B1:A2<br>or =B2:A1 |
-| Column range | Contains whole columns              | =A:B<br>or =B:A                               |
-| Row range    | Contains whole rows                 | =1:2<br>or =2:1                               |
+| Column range | Contains entire columns             | =A:B<br>or =B:A                               |
+| Row range    | Contains entire rows                | =1:2<br>or =2:1                               |
 
 ### Referencing ranges
 
