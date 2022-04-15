@@ -13,7 +13,7 @@
 - [ ] Change to the documentation
 
 ### Related issue(s):
-1.
+1. Fixes #...
 2.
 3.
 
