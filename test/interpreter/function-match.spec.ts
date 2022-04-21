@@ -309,7 +309,7 @@ describe('Function MATCH', () => {
   it('should work with dates', () => {
     const engine = HyperFormula.buildFromArray(
       [
-        ['01/01/2012',         '01/01/2012', '=MATCH(B1, A1:A4, 0)'],
+        ['01/01/2012', '01/01/2012', '=MATCH(B1, A1:A4, 0)'],
         ['=EOMONTH(A1,1)', '29/02/2012', '=MATCH(B2, A1:A4, 0)'],
         ['=EOMONTH(A2,1)'],
         ['=EOMONTH(A3,1)'],
