@@ -68,7 +68,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 | Function ID     | Description                                                     | Syntax                                               |
 |:----------------|:----------------------------------------------------------------|:-----------------------------------------------------|
-| ARRAYFORMULA    | Enables array arithmetic inside.                                | ARRAYFORMULA(Formula)                                |
+| ARRAYFORMULA    | Enables the array arithmetic mode for a single formula.                                | ARRAYFORMULA(Formula)                                |
 | FILTER          | Filters an array, based on multiple conditions (boolean arrays). | FILTER(SourceArray; BoolArray1[; BoolArray2[; ...]]) |
 | ARRAY_CONSTRAIN | Truncates the array to given dimensions.                        | ARRAY_CONSTRAIN(Array; Height; Width)                |
 
