@@ -2,7 +2,7 @@
 <!--- Why is this change required? What problem does it solve? -->
 
 ### How has this been tested?
-<!--- Please describe in detail how you tested your changes (doesn't apply to translations). -->
+<!--- Please describe in detail how you tested your changes (doesn't apply to translations and documentation changes). -->
 
 ### Types of changes
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
@@ -12,7 +12,7 @@
 - [ ] Additional language file or change to the existing one (translations)
 - [ ] Change to the documentation
 
-### Related issue(s):
+### Related issues:
 1. Fixes #...
 2.
 3.
