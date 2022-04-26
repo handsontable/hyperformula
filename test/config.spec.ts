@@ -222,7 +222,7 @@ describe('Config', () => {
     })
 
     it('should parse the dates with different separators', () => {
-      const dateFormats = ['DD/MM/YYYY'];
+      const dateFormats = ['DD/MM/YYYY']
       const engine = HyperFormula.buildFromArray([
         ['01/03/2022', '01-03-2022', '01 03 2022', '01.03.2022'],
       ], { dateFormats })
