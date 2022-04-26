@@ -8,7 +8,6 @@ assignees: ''
 ---
 
 ### Description
-
 <!--- [mandatory] Describe the actual behavior and expected behavior -->
 
 ### Steps to reproduce
