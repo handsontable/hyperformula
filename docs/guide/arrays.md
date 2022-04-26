@@ -18,7 +18,7 @@ An array is inherently a two-dimensional object.
 
 Inline arrays are defined by curly braces. They might contain one or more rows of data separated by `arrayColumnSeparator` (default: `,`) and `arrayRowSeparator` (default: `;`). All the rows of an inline array must be of equal length.
 
-**Important: An inline array is never recomputed after initialization. If it contains a cell reference, the inline array will not be updated when the value of the cell changes.**
+**Important: An inline array is never recomputed after initialization. If it contains a cell reference, an inline array will not be updated when the value of the cell changes.**
 
 ```js
 = {1, 2, 3} // single row
