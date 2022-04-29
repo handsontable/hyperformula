@@ -1,5 +1,6 @@
 const highlight = require('./highlight');
 const regexPlugin = require('markdown-it-regex').default;
+const searchBoxPlugin = require('./plugins/search-box');
 const HyperFormula = require('../../dist/hyperformula.full');
 const fs = require('fs');
 const path = require('path');
@@ -23,6 +24,7 @@ module.exports = {
   ],
   base: '/hyperformula/',
   plugins: [
+    searchBoxPlugin,
     // [
     //   'vuepress-plugin-clean-urls',
     //   {
