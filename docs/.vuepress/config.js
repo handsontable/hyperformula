@@ -93,11 +93,8 @@ module.exports = {
     lastUpdated: false,
     smoothScroll: false,
     searchPlaceholder: 'Search...',
-    searchMaxSuggestions: 20,
-    // algolia: {
-    //   apiKey: '<API_KEY>',
-    //   indexName: '<INDEX_NAME>'
-    // },
+    searchLimitApi: 5,
+    searchLimitGuide: 15,
     nav: [
       { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },

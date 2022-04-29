@@ -22,7 +22,7 @@
         @mouseleave="unfocus"
     >
       <template v-for="(s, i) in suggestions">
-        <li v-if="s.category!==(suggestions[i-1] || {}).category"> {{ 'DUPA' }}: </li>
+        <li v-if="s.category!==(suggestions[i-1] || {}).category"> {{ s.category }}: </li>
         <li
             :key="i"
             class="suggestion"
@@ -72,44 +72,19 @@ export default {
     },
 
     suggestions () {
-      const query = this.query.trim().toLowerCase()
-      if (!query) {
-        return
-      }
+      const categories = [{
+        name: 'API Reference',
+        filterFn: this.isFromApiReference,
+        limit: this.$site.themeConfig.searchLimitApi || SEARCH_MAX_SUGGESTIONS,
+      }, {
+        name: 'Guides',
+        filterFn: page => !this.isFromApiReference(page),
+        limit: this.$site.themeConfig.searchLimitGuide || SEARCH_MAX_SUGGESTIONS,
+      }]
 
-      const { pages } = this.$site
-      const max = this.$site.themeConfig.searchMaxSuggestions || SEARCH_MAX_SUGGESTIONS
-      const localePath = this.$localePath
-      const res = []
-      for (let i = 0; i < pages.length; i++) {
-        if (res.length >= max) break
-        const p = pages[i]
-        // filter out results that do not match current locale
-        if (this.getPageLocalePath(p) !== localePath) {
-          continue
-        }
-
-        // filter out results that do not match searchable paths
-        if (!this.isSearchable(p)) {
-          continue
-        }
-
-        if (matchQuery(query, p)) {
-          res.push(p)
-        } else if (p.headers) {
-          for (let j = 0; j < p.headers.length; j++) {
-            if (res.length >= max) break
-            const h = p.headers[j]
-            if (h.title && matchQuery(query, p, h.title)) {
-              res.push(Object.assign({}, p, {
-                path: p.path + '#' + h.slug,
-                header: h
-              }))
-            }
-          }
-        }
-      }
-      return res
+      return categories
+        .map(cat => this.suggestionsFromCategory(cat.name, cat.filterFn, cat.limit))
+        .reduce((sofar, curr) => sofar.concat(curr), [])
     },
 
     // make suggestions align right when there are not enough items
@@ -130,6 +105,56 @@ export default {
   },
 
   methods: {
+    suggestionsFromCategory (categoryName, filterFn, limit) {
+      const query = this.query.trim().toLowerCase()
+      if (!query) {
+        return []
+      }
+
+      const { pages } = this.$site
+      const localePath = this.$localePath
+      const res = []
+      for (let i = 0; i < pages.length; i++) {
+        if (res.length >= limit) break
+        const p = pages[i]
+        // filter out results that do not match current locale
+        if (this.getPageLocalePath(p) !== localePath) {
+          continue
+        }
+
+        if (!filterFn(p)) {
+          continue
+        }
+
+        // filter out results that do not match searchable paths
+        if (!this.isSearchable(p)) {
+          continue
+        }
+
+        if (matchQuery(query, p)) {
+          res.push({ ...p, category: categoryName })
+        } else if (p.headers) {
+          for (let j = 0; j < p.headers.length; j++) {
+            if (res.length >= limit) break
+            const h = p.headers[j]
+            if (h.title && matchQuery(query, p, h.title)) {
+              res.push({
+                ...p,
+                path: p.path + '#' + h.slug,
+                header: h,
+                category: categoryName,
+              })
+            }
+          }
+        }
+      }
+      return res
+    },
+
+    isFromApiReference (page) {
+      return page.path.startsWith('/api/')
+    },
+
     getPageLocalePath (page) {
       for (const localePath in this.$site.locales || {}) {
         if (localePath !== '/' && page.path.indexOf(localePath) === 0) {
@@ -233,6 +258,12 @@ export default {
     list-style-type none
     &.align-right
       right 0
+    li:not(.suggestion)
+      padding 0.4rem 0.6rem
+      margin-bottom 0.4rem
+      font-weight 600
+      font-size 13px
+      border-bottom 1px solid #e9eef2
   .suggestion
     line-height 1.4
     padding 0.4rem 0.6rem
