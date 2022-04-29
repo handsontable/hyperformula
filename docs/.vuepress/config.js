@@ -80,17 +80,18 @@ module.exports = {
   // ssrTemplate: 'index.ssr.html',
   themeConfig: {
     logo: '/logo.png',
-    nextLinks: true,
-    prevLinks: true,
+    nextLinks: false,
+    prevLinks: false,
     repo: 'handsontable/hyperformula',
     docsRepo: 'handsontable/hyperformula',
     docsDir: 'docs',
-    docsBranch: 'develop',
+    docsBranch: 'master',
     editLinks: true,
     editLinkText: 'Help us improve this page',
     lastUpdated: false,
     smoothScroll: false,
     searchPlaceholder: 'Search...',
+    searchMaxSuggestions: 20,
     // algolia: {
     //   apiKey: '<API_KEY>',
     //   indexName: '<INDEX_NAME>'
