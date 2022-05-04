@@ -2839,7 +2839,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns all the out-neighbours in the dependency graph for a given cell address or range.
    *
-   * [link to guide]
+   * [Learn more about the dependency graph](../../guide/dependency-graph.md)
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
@@ -2875,7 +2875,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns all the in-neighbours in the dependency graph for a given cell address or range.
    *
-   * [link to guide]
+   * [Learn more about the dependency graph](../../guide/dependency-graph.md)
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *

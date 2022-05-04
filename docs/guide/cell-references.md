@@ -201,7 +201,7 @@ In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat sing
 :::
 
 ### More about ranges
-- [Key concepts: Handling ranges](/guide/key-concepts.md#handling-ranges)
+- [Ranges in the dependency graph](/guide/dependency-graph.md#ranges-in-the-dependency-graph)
 - [Types of operators: Reference operators](/guide/types-of-operators.md#reference-operators)
 - [API reference: Ranges](/api/classes/hyperformula.md#ranges)
 
