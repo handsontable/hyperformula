@@ -4,8 +4,8 @@ HyperFormula needs to understand the relationship between cells and
 find the right order of processing them. For example, for a sample
 formula `C1=A1+B1`, `A1` and `B1` need to be processed before `C1`.
 
-To find the order of processing the spreadsheet, HyperFormula builds a directed graph (called **dependency graph**).
-In the basic version of the graph, each node corresponds to a spreadsheet cell.
+To find the order of processing the cells, HyperFormula builds a [directed graph](https://en.wikipedia.org/wiki/Directed_graph) (called **dependency graph**).
+In the basic version of the graph, each node represents a spreadsheet cell.
 Nodes X and Y are connected by a directed edge if and only if formula in the cell X contains the address of the cell Y. 
 
 ## Ranges in the dependency graph
