@@ -6,9 +6,9 @@ Use array formulas to perform an operation (or call a function) on multiple cell
 
 In HyperFormula, an array can be:
 * A range of cell addresses (e.g. `A1:A10`)
-* An **inline array**: an ad-hoc array that doesn't refer to any range of cells (e.g. `{1, 3, 5}`)
 * A result of an arithmetic operation (e.g. `5*A1:B5`)
 * A result of a function (e.g. `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5,2,2))`)
+* An **inline array**: an ad-hoc array that doesn't refer to any range of cells (e.g. `{1, 3, 5}`)
 
 An array is inherently a two-dimensional object.
 
