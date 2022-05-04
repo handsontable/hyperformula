@@ -231,7 +231,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | COLUMNS | Returns the number of columns in the given reference.                                                                  | COLUMNS(Array)                                      |
 | FORMULATEXT | Returns a formula in a given cell as a string.                                                                         | FORMULATEXT(Reference)                              |
 | HLOOKUP | Searches horizontally with reference to adjacent cells to the bottom.                                                  | HLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
-| INDEX | Returns the content of a cell, specified by row and column number. The column parameter is optional and defaults to 1. | INDEX(Range; Row[; Column])                         |
+| INDEX | Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1. | INDEX(Range; Row [; Column])                         |
 | MATCH | Returns the relative position of an item in an array that matches a specified value.                                   | MATCH(Searchcriterion; Lookuparray; Type)           |
 | OFFSET | Returns the value of a cell offset by a certain number of rows and columns from a given reference point.               | OFFSET(Reference; Rows; Columns; Height; Width)     |
 | ROW | Returns row number of a given reference or formula reference if argument not provided.                                 | ROW([Reference])                                    |
