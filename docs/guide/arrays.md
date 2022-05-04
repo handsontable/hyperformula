@@ -6,7 +6,7 @@ Use array formulas to perform an operation (or call a function) on multiple cell
 
 In HyperFormula, an array can be:
 * A range of cell addresses (e.g. `A1:A10`)
-* An **inline array**: an ad-hoc array not referring to any range of cells (e.g. `{1,3,5}`)
+* An **inline array**: an ad-hoc array that doesn't refer to any range of cells (e.g. `{1, 3, 5}`)
 * A result of an arithmetic operation (e.g. `5*A1:B5`)
 * A result of a function (e.g. `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5,2,2))`)
 
@@ -16,17 +16,25 @@ An array is inherently a two-dimensional object.
 
 ### Inline arrays
 
-Inline arrays are defined by curly braces. They might contain one or more rows of data separated by `arrayColumnSeparator` (default: `,`) and `arrayRowSeparator` (default: `;`). All the rows of an inline array must be of equal length.
+An inline array is defined by curly braces: `{ }`. It can contain one or more rows, separated by:
+- The [`arrayColumnSeparator`](../api/classes/config.md#arraycolumnseparator) (default: `,`)
+- The [`arrayRowSeparator`](../api/classes/config.md#arrayrowseparator) (default: `;`)
+  
+Every row must be of equal length.
 
-**Important: An inline array is never recomputed after initialization. If it contains a cell reference, an inline array will not be updated when the value of the cell changes.**
+::: tip
+**Inline arrays are not recomputed after initialization.**
+
+If an inline array contains a cell reference, and the cell's value changes, the array is not updated.
+:::
 
 ```js
-= {1, 2, 3} // single row
-= {1, 2 ; 3, 4} // two rows
-= {1, 2 ; 3 } // INVALID: rows of different length
-= SUM({1, 2, 3}) // inline array as a function argument
-= {A1, A2} // will not be updated when A1 or A2 changes
-```
+= {1, 2, 3} // an inline array with a single row
+= {1, 2 ; 3, 4} // an inline array with two rows
+= SUM({1, 2, 3}) // an inline array as an argument of a function
+= {A1, A2} // when the values of A1 or A2 change, this inline array is not updated
+
+= {1, 2 ; 3} // an invalid inline array: two rows of different lengths
 
 ## Array arithmetic mode
 
