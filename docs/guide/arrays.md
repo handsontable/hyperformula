@@ -35,6 +35,7 @@ If an inline array contains a cell reference, and the cell's value changes, the 
 = {A1, A2} // when the values of A1 or A2 change, this inline array is not updated
 
 = {1, 2 ; 3} // an invalid inline array: two rows of different lengths
+```
 
 ## Array arithmetic mode
 
