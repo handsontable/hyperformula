@@ -102,4 +102,21 @@ hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
 
 ## Getting all precedents / dependents of a cell
 
-// TODO
+Some applications may require processing all the precedents / dependents of a specified cell (not only immediate). In terms of graph theory, this problem can be stated as finding all the nodes reachable from the source node.
+
+Methods `getCellPrecedents` and `getCellDependents` return only the immediate precedents / dependents of a cell, but they can be used to implement the algorithm for the reachability problem applying the [BFS](https://en.wikipedia.org/wiki/Breadth-first_search) -like approach:
+
+```
+ 1      AllCellPrecedents={start}
+ 2      let Q be an empty queue
+ 4      Q.enqueue(start)
+ 5      while Q is not empty do
+ 6          cell := Q.dequeue()
+ 7          S := getCellPrecedents(cell)
+ 9          for all cells c in S do:
+10              if c is not in AllCellPrecedents then:
+11                  insert w to AllCellPrecedents
+12                  Q.enqueue(c)
+```
+
+`AllCellDependents` algorithm can be obtained by changing `getCellPrecedents` usage to `getCellDependents` in the pseudocode above.
