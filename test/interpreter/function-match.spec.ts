@@ -305,4 +305,20 @@ describe('Function MATCH', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
   })
+
+  it('should work with dates', () => {
+    const engine = HyperFormula.buildFromArray(
+      [
+        ['01/01/2012', '01/01/2012', '=MATCH(B1, A1:A4, 0)'],
+        ['=EOMONTH(A1,1)', '29/02/2012', '=MATCH(B2, A1:A4, 0)'],
+        ['=EOMONTH(A2,1)'],
+        ['=EOMONTH(A3,1)'],
+      ],
+      {
+        licenseKey: 'gpl-v3',
+      }
+    )
+    expect(engine.getCellValue({ sheet: 0, row: 0, col: 2 })).toEqual(1)
+    expect(engine.getCellValue({ sheet: 0, row: 1, col: 2 })).toEqual(2)
+  })
 })
