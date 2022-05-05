@@ -23,7 +23,7 @@ To start a local HyperFormula docs server:
    ```bash
    npm run bundle-all
    ```
-4. From the main `hyperformula` directory, start your local docs server:
+4. From the main `hyperformula` directory, create a dev build of the docs and start your local docs server:
    ```bash
    npm run docs:dev
    ```
