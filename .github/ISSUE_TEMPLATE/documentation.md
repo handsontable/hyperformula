@@ -2,7 +2,7 @@
 name: Documentation
 about: A general template for documentation requests and suggestions
 title: ''
-labels: Documentation
+labels: Docs
 
 ---
 ### Description
