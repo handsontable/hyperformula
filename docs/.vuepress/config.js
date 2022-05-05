@@ -213,8 +213,7 @@ module.exports = {
           collapsable: false,
           children: [
             ['/guide/key-concepts', 'Key concepts'],
-            ['/guide/building', 'Building'],
-            ['/guide/testing', 'Testing'],
+            ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
           ]
