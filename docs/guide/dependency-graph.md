@@ -15,7 +15,7 @@ Range nodes may be connected to cell nodes or to other range nodes.
 
 <img :src="$withBase('/ranges.png')">
 
-### Optimisations for large ranges
+### Optimizations for large ranges
 
 In many applications, you may want to use formulas that depend on a
 large range of cells. For example, the formula `SUM(A1:A100)+B5`
@@ -70,13 +70,13 @@ node and avoid duplicating the work during computation.
 
 ## Getting immediate precedents / dependents of a cell
 
-HyperFormula API includes methods that reveal parts of the dependency graph. In particular, they return the graph neighbours of a given cell.
+HyperFormula API includes methods that reveal parts of the dependency graph. In particular, they return the graph neighbors of a given cell.
 
-### [getCellPrecedents](../api/classes/hyperformula.html#getcellprecedents)
+### getCellPrecedents
 
-`getCellPrecedents` method returns all the in-neighbours in the dependency graph for a given cell address or range. In particular:
+[getCellPrecedents](../api/classes/hyperformula.html#getcellprecedents) method returns all the in-neighbors in the dependency graph for a given cell address or range. In particular:
 - If the argument is a single cell, `getCellPrecedents` returns all the cells and ranges contained in that cell's formula.
-- If the argument is a range of cells, `getCellPrecedents` returns some cell addresses and/or smaller ranges contained in that range. The exact result depends on the optimisations applied by the HyperFormula to the dependency graph, some of which are described in [this section](#optimisations-for-large-ranges).
+- If the argument is a range of cells, `getCellPrecedents` returns some cell addresses and/or smaller ranges contained in that range. The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in [this section](#optimisations-for-large-ranges).
 
 ```js
 const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
@@ -85,13 +85,13 @@ hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0 });
 // returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
 ```
 
-### [getCellDependents](../api/classes/hyperformula.html#getcelldependents)
+### getCellDependents
 
-`getCellDependents` method returns all the out-neighbours in the dependency graph for a given cell address or range. Including:
+[getCellDependents](../api/classes/hyperformula.html#getcelldependents) method returns all the out-neighbors in the dependency graph for a given cell address or range. Including:
 - all the cells with formulas that contain the given cell address or range,
 - some of the ranges that contain the given cell address or range.
 
-The exact result depends on the optimisations applied by the HyperFormula to the dependency graph, some of which are described in [this section](#optimisations-for-large-ranges).
+The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in [this section](#optimisations-for-large-ranges).
 
 ```js
 const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
