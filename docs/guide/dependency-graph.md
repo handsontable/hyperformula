@@ -68,7 +68,7 @@ examples of such associative functions: `SUM`, `MAX`, `COUNT`, etc.
 As one range can be used in different formulas, we can reuse its
 node and avoid duplicating the work during computation.
 
-## Getting immediate precedents / dependents of a cell
+## Getting immediate precedents or dependents of a cell
 
 HyperFormula API includes methods that reveal parts of the dependency graph. In particular, they return the graph neighbors of a given cell.
 
@@ -76,7 +76,7 @@ HyperFormula API includes methods that reveal parts of the dependency graph. In 
 
 [getCellPrecedents](../api/classes/hyperformula.html#getcellprecedents) method returns all the in-neighbors in the dependency graph for a given cell address or range. In particular:
 - If the argument is a single cell, `getCellPrecedents` returns all the cells and ranges contained in that cell's formula.
-- If the argument is a range of cells, `getCellPrecedents` returns some cell addresses and/or smaller ranges contained in that range. The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in [this section](#optimisations-for-large-ranges).
+- If the argument is a range of cells, `getCellPrecedents` returns some cell addresses and/or smaller ranges contained in that range. The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](#optimizations-for-large-ranges).
 
 ```js
 const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
@@ -91,7 +91,7 @@ hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0 });
 - all the cells with formulas that contain the given cell address or range,
 - some of the ranges that contain the given cell address or range.
 
-The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in [this section](#optimisations-for-large-ranges).
+The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](#optimizations-for-large-ranges).
 
 ```js
 const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
@@ -100,11 +100,11 @@ hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
 // returns [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
 ```
 
-## Getting all precedents / dependents of a cell
+## Getting all precedents or dependents of a cell
 
-Some applications may require processing all the precedents / dependents of a specified cell (not only immediate). In terms of graph theory, this problem can be stated as finding all the nodes reachable from the source node.
+Some applications may require processing all the precedents or dependents of a specified cell (not only immediate). In terms of graph theory, this problem can be stated as finding all the nodes reachable from the source node.
 
-Methods `getCellPrecedents` and `getCellDependents` return only the immediate precedents / dependents of a cell, but they can be used to implement the algorithm for the reachability problem applying the [BFS](https://en.wikipedia.org/wiki/Breadth-first_search) -like approach:
+Methods `getCellPrecedents` and `getCellDependents` return only the immediate precedents and dependents of a cell respectively, but they can be used to implement the algorithm for the reachability problem applying the [BFS](https://en.wikipedia.org/wiki/Breadth-first_search) -like approach:
 
 ```
  1      AllCellPrecedents={start}
