@@ -2,7 +2,7 @@
 
 HyperFormula needs to understand the relationship between cells and
 find the right order of processing them. For example, for a sample
-formula `C1=A1+B1`, `A1` and `B1` need to be processed before `C1`.
+formula `C1=A1+B1`, `A1` and `B1` need to be evaluated before `C1`.
 
 To find the order of processing the cells, HyperFormula builds a [directed graph](https://en.wikipedia.org/wiki/Directed_graph) (called **dependency graph**).
 In the basic version of the graph, each node represents a spreadsheet cell.
@@ -76,7 +76,7 @@ HyperFormula API includes methods that reveal parts of the dependency graph. In 
 
 [getCellPrecedents](../api/classes/hyperformula.html#getcellprecedents) method returns all the in-neighbors in the dependency graph for a given cell address or range. In particular:
 - If the argument is a single cell, `getCellPrecedents` returns all the cells and ranges contained in that cell's formula.
-- If the argument is a range of cells, `getCellPrecedents` returns some cell addresses and/or smaller ranges contained in that range. The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](#optimizations-for-large-ranges).
+- If the argument is a range of cells, `getCellPrecedents` returns some cell addresses and smaller ranges contained in that range. The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](#optimizations-for-large-ranges).
 
 ```js
 const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
