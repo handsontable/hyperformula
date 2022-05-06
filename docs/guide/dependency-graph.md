@@ -68,7 +68,7 @@ examples of such associative functions: `SUM`, `MAX`, `COUNT`, etc.
 As one range can be used in different formulas, we can reuse its
 node and avoid duplicating the work during computation.
 
-## Getting immediate precedents or dependents of a cell
+## Getting the graph neighbors of a cell
 
 HyperFormula API includes methods that reveal parts of the dependency graph. In particular, they return the graph neighbors of a given cell.
 
