@@ -93,8 +93,8 @@ module.exports = {
     lastUpdated: false,
     smoothScroll: false,
     searchPlaceholder: 'Search...',
-    searchLimitApi: 5,
-    searchLimitGuide: 15,
+    searchLimitApi: 10,
+    searchLimitGuide: 10,
     nav: [
       { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },
