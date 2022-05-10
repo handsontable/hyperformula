@@ -73,13 +73,13 @@ export default {
 
     suggestions () {
       const categories = [{
-        name: 'API Reference',
-        filterFn: this.isFromApiReference,
-        limit: this.$site.themeConfig.searchLimitApi || SEARCH_MAX_SUGGESTIONS,
-      }, {
         name: 'Guides',
         filterFn: page => !this.isFromApiReference(page),
         limit: this.$site.themeConfig.searchLimitGuide || SEARCH_MAX_SUGGESTIONS,
+      }, {
+        name: 'API Reference',
+        filterFn: this.isFromApiReference,
+        limit: this.$site.themeConfig.searchLimitApi || SEARCH_MAX_SUGGESTIONS,
       }]
 
       return categories
