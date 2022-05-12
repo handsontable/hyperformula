@@ -82,8 +82,8 @@ module.exports = {
   // ssrTemplate: 'index.ssr.html',
   themeConfig: {
     logo: '/logo.png',
-    nextLinks: false,
-    prevLinks: false,
+    nextLinks: true,
+    prevLinks: true,
     repo: 'handsontable/hyperformula',
     docsRepo: 'handsontable/hyperformula',
     docsDir: 'docs',
