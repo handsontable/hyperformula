@@ -71,34 +71,8 @@ node and avoid duplicating the work during computation.
 ## Getting the graph neighbors of a cell
 
 HyperFormula API includes methods that reveal parts of the dependency graph. In particular, they return the graph neighbors of a given cell.
-
-### getCellPrecedents
-
-[getCellPrecedents](../api/classes/hyperformula.html#getcellprecedents) method returns all the in-neighbors in the dependency graph for a given cell address or range. In particular:
-- If the argument is a single cell, `getCellPrecedents` returns all the cells and ranges contained in that cell's formula.
-- If the argument is a range of cells, `getCellPrecedents` returns some of the cell addresses and smaller ranges contained in that range (but not all of them). The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](#optimizations-for-large-ranges).
-
-```js
-const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
-
-hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0 });
-// returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
-```
-
-### getCellDependents
-
-[getCellDependents](../api/classes/hyperformula.html#getcelldependents) method returns all the out-neighbors in the dependency graph for a given cell address or range. Including:
-- all the cells with formulas that contain the given cell address or range,
-- some of the ranges that contain the given cell address or range.
-
-The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](#optimizations-for-large-ranges).
-
-```js
-const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
-
-hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0});
-// returns [{ sheet: 0, col: 1, row: 0}, { sheet: 0, col: 2, row: 0}]
-```
+- [getCellPrecedents](../api/classes/hyperformula.html#getcellprecedents) for getting the in-neighbors
+- [getCellDependents](../api/classes/hyperformula.html#getcelldependents) for getting the out-neighbors
 
 ## Getting all precedents or dependents of a cell
 
