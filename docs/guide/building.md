@@ -76,7 +76,7 @@ to be sure that both environments are fine.
 If you want to run a specific `spec` file or a test suite you can add a `-spec` flag. For example:
 * `npm run test:browser.debug -- --spec=matrix.spec.ts` - runs `matrix.spec.ts` only
 
-## Run linter
+## Run the linter
 
 You can use the following commands to lint the code, so it meets the required standards. ESLint is used as the tool of choice in this case.
 
