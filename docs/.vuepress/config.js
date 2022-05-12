@@ -212,18 +212,12 @@ module.exports = {
           title: 'Advanced topics',
           collapsable: false,
           children: [
+            ['/guide/key-concepts', 'Key concepts'],
+            ['/guide/dependency-graph', 'Dependency graph'],
             ['/guide/building', 'Building'],
             ['/guide/testing', 'Testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
-          ]
-        },
-        {
-          title: 'Deep insights',
-          collapsable: false,
-          children: [
-            ['/guide/key-concepts', 'Key concepts'],
-            ['/guide/dependency-graph', 'Dependency graph'],
           ]
         },
         {
