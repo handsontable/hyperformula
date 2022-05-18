@@ -2838,8 +2838,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns all the out-neighbors in the [dependency graph](../../guide/dependency-graph.md) for a given cell address or range. Including:
-   * - all the cells with formulas that contain the given cell address or range,
-   * - some of the ranges that contain the given cell address or range.
+   * - All cells with formulas that contain the given cell address or range
+   * - Some of the ranges that contain the given cell address or range
    *
    * The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
    *
