@@ -19,8 +19,7 @@ Range nodes may be connected to cell nodes or to other range nodes.
 
 In many applications, you may want to use formulas that depend on a
 large range of cells. For example, the formula `SUM(A1:A100)+B5`
-depends on 101 cells, and it needs to be represented in the graph of
-cell dependencies accordingly.
+depends on 101 cells, and it needs to be represented in the dependency graph accordingly.
 
 An interesting optimization challenge arises when there are multiple
 cells that depend on large ranges. For example, consider the following

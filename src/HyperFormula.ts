@@ -151,7 +151,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `graph` method on the dependency graph.
-   * Allows executing `graph` directly without a need to refer to `dependencyGraph`.
+   * Allows for executing `graph` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -161,7 +161,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `rangeMapping` method on the dependency graph.
-   * Allows executing `rangeMapping` directly without a need to refer to `dependencyGraph`.
+   * Allows for executing `rangeMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -171,7 +171,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `arrayMapping` method on the dependency graph.
-   * Allows executing `arrayMapping` directly without a need to refer to `dependencyGraph`.
+   * Allows for executing `arrayMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -181,7 +181,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `sheetMapping` method on the dependency graph.
-   * Allows executing `sheetMapping` directly without a need to refer to `dependencyGraph`.
+   * Allows for executing `sheetMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -2876,8 +2876,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns all the in-neighbors in the [dependency graph](../../guide/dependency-graph.md) for a given cell address or range. In particular:
-   * - If the argument is a single cell, `getCellPrecedents` returns all the cells and ranges contained in that cell's formula.
-   * - If the argument is a range of cells, `getCellPrecedents` returns some of the cell addresses and smaller ranges contained in that range (but not all of them). The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
+   * - If the argument is a single cell, `getCellPrecedents()` returns all cells and ranges contained in that cell's formula.
+   * - If the argument is a range of cells, `getCellPrecedents()` returns some of the cell addresses and smaller ranges contained in that range (but not all of them). The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
