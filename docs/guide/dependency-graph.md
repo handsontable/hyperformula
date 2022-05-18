@@ -5,7 +5,7 @@ For accuracy and performance, HyperFormula needs to process cells in a correct a
 To find the right order of processing cells, HyperFormula builds a [dependency graph](https://en.wikipedia.org/wiki/Dependency_graph) which captures relationships between cells.
 
 ## Cells in the dependency graph
-In a basic version of the dependency graph, each spreadsheet cell is represented by a separate node.
+In the dependency graph, each spreadsheet cell is represented by a separate node.
 
 Nodes `X` and `Y` are connected by a directed edge if and only if the formula in cell `X` includes the address of cell `Y`.
 
