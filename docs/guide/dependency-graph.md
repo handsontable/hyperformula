@@ -68,19 +68,33 @@ examples of such associative functions: `SUM`, `MAX`, `COUNT`, etc.
 As one range can be used in different formulas, we can reuse its
 node and avoid duplicating the work during computation.
 
-## Getting the graph neighbors of a cell
+## Getting the immediate precedents of a cell or a range
 
-HyperFormula API includes methods that reveal parts of the dependency graph. In particular, they return the graph neighbors of a given cell.
-- [getCellPrecedents](../api/classes/hyperformula.html#getcellprecedents) for getting the in-neighbors
-- [getCellDependents](../api/classes/hyperformula.html#getcelldependents) for getting the out-neighbors
+To get the immediate precedents of a cell or a range (the in-neighbors of the cell node or the range node), use the [`getCellPrecedents()`](../api/classes/hyperformula.html#getcellprecedents) method:
 
-## Getting all precedents or dependents of a cell
+\```
+const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
 
-Some applications may require processing all the precedents or dependents of a specified cell (not only immediate). In terms of graph theory, this problem can be stated as finding all the nodes reachable from the source node.
+hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0});
+// returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
+\```
 
-Methods `getCellPrecedents` and `getCellDependents` return only the immediate precedents and dependents of a cell respectively, but they can be used to implement the algorithm for the reachability problem applying the [BFS](https://en.wikipedia.org/wiki/Breadth-first_search) -like approach:
+## Getting the immediate dependents of a cell or a range
 
-```
+To get the immediate dependents of a cell or a range (the out-neighbors of the cell node or the range node), use the [`getCellDependents()`](../api/classes/hyperformula.html#getcelldependents) method:
+
+\```
+const hfInstance = HyperFormula.buildFromArray( [ ['1', '=A1', '=A1+B1'] ] );
+
+hfInstance.getCellDependents({ sheet: 0, col: 2, row: 0});
+// returns [{ sheet: 0, col: 0, row: 0}, { sheet: 0, col: 1, row: 0}]
+\```
+
+## Getting all precedents of a cell or a range
+
+To get all precedents of a cell or a range (all precedent nodes reachable from the cell node or the range node), use the [`getCellPrecedents()`](../api/classes/hyperformula.html#getcellprecedents) method to implement a [Breadth-first search (BFS)](https://en.wikipedia.org/wiki/Breadth-first_search) algorithm:
+
+\```
  1      AllCellPrecedents={start}
  2      let Q be an empty queue
  4      Q.enqueue(start)
@@ -91,6 +105,21 @@ Methods `getCellPrecedents` and `getCellDependents` return only the immediate pr
 10              if c is not in AllCellPrecedents then:
 11                  insert w to AllCellPrecedents
 12                  Q.enqueue(c)
-```
+\```
 
-`AllCellDependents` algorithm can be obtained by changing `getCellPrecedents` usage to `getCellDependents` in the pseudocode above.
+## Getting all dependents of a cell or a range
+
+To get all dependents of a cell or a range (all dependent nodes reachable from the cell node or the range node), use the [`getCellDependents()`](../api/classes/hyperformula.html#getcelldependents) method to implement a [Breadth-first search (BFS)](https://en.wikipedia.org/wiki/Breadth-first_search) algorithm:
+
+\```
+ 1      AllCellDependents={start}
+ 2      let Q be an empty queue
+ 4      Q.enqueue(start)
+ 5      while Q is not empty do
+ 6          cell := Q.dequeue()
+ 7          S := getCellDependents(cell)
+ 9          for all cells c in S do:
+10              if c is not in AllCellDependents then:
+11                  insert w to AllCellDependents
+12                  Q.enqueue(c)
+\```
