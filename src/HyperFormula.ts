@@ -191,7 +191,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `addressMapping` method on the dependency graph.
-   * Allows executing `addressMapping` directly without a need to refer to `dependencyGraph`.
+   * Allows for executing `addressMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
