@@ -1,12 +1,13 @@
 # Dependency graph
 
-HyperFormula needs to understand the relationship between cells and
-find the right order of processing them. For example, for a sample
-formula `C1=A1+B1`, `A1` and `B1` need to be evaluated before `C1`.
+For accuracy and performance, HyperFormula needs to process cells in a correct and optimal order. For example: in formula `C1=A1+B1`, cells `A1` and `B1` need to be evaluated before `C1`.
 
-To find the order of processing the cells, HyperFormula builds a [directed graph](https://en.wikipedia.org/wiki/Directed_graph) (called **dependency graph**).
-In the basic version of the graph, each node represents a spreadsheet cell.
-Nodes X and Y are connected by a directed edge if and only if formula in the cell X contains the address of the cell Y. 
+To find the right order of processing cells, HyperFormula builds a [dependency graph](https://en.wikipedia.org/wiki/Dependency_graph) which captures relationships between cells.
+
+## Cells in the dependency graph
+In a basic version of the dependency graph, each spreadsheet cell is represented by a separate node.
+
+Nodes `X` and `Y` are connected by a directed edge if and only if the formula in cell `X` includes the address of cell `Y`.
 
 ## Ranges in the dependency graph
 
