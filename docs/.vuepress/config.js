@@ -213,6 +213,7 @@ module.exports = {
           collapsable: false,
           children: [
             ['/guide/key-concepts', 'Key concepts'],
+            ['/guide/dependency-graph', 'Dependency graph'],
             ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
