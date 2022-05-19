@@ -21,8 +21,8 @@ library of translations is also a good task to start with.
 [Here](https://docs.google.com/spreadsheets/d/1UUskn4ZDDjLGSpO6kg73DOvabNoeqLbkJYyVfLyYlYw)
 you can find a list of function translations.
 
-Visit the [building](building.md) and [testing](testing.md) sections to
-get more info about these topics and check the list of commands you
+Visit the [building](building.md) section to
+get more info about the development process and check the list of commands you
 can run in this project. Check the `/i18n`
 folder in the project - all translations are kept there.
 For the functions see the `interpreter/plugin` folder. Both of them

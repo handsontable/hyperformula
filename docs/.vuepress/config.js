@@ -1,5 +1,6 @@
 const highlight = require('./highlight');
 const regexPlugin = require('markdown-it-regex').default;
+const searchBoxPlugin = require('./plugins/search-box');
 const HyperFormula = require('../../dist/hyperformula.full');
 const fs = require('fs');
 const path = require('path');
@@ -23,6 +24,7 @@ module.exports = {
   ],
   base: '/hyperformula/',
   plugins: [
+    searchBoxPlugin,
     // [
     //   'vuepress-plugin-clean-urls',
     //   {
@@ -85,16 +87,14 @@ module.exports = {
     repo: 'handsontable/hyperformula',
     docsRepo: 'handsontable/hyperformula',
     docsDir: 'docs',
-    docsBranch: 'develop',
+    docsBranch: 'master',
     editLinks: true,
     editLinkText: 'Help us improve this page',
     lastUpdated: false,
     smoothScroll: false,
     searchPlaceholder: 'Search...',
-    // algolia: {
-    //   apiKey: '<API_KEY>',
-    //   indexName: '<INDEX_NAME>'
-    // },
+    searchLimitApi: 10,
+    searchLimitGuide: 10,
     nav: [
       { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },
@@ -214,8 +214,7 @@ module.exports = {
           children: [
             ['/guide/key-concepts', 'Key concepts'],
             ['/guide/dependency-graph', 'Dependency graph'],
-            ['/guide/building', 'Building'],
-            ['/guide/testing', 'Testing'],
+            ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
           ]

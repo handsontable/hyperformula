@@ -35,8 +35,8 @@ format , builds ES6 version
 * `npm run bundle:cjs` - builds commonJS version
 * `npm run bundle:development` - generates development build
 * `npm run bundle:production` - generates production build
-* `npm run bundle:typings` - generates TS typing, only emits
-‘.d.ts’ declaration files
+* `npm run bundle:languages` - builds the languages
+* `npm run bundle:typings` - generates TS typing, only emits ‘.d.ts’ declaration files
 
 We use the latest version of Node 16 LTS in the build-chain and recommend this version for building. Note that for using (not building) HyperFormula, a wider range of Node versions is supported.
 
@@ -46,20 +46,39 @@ By using the following commands you can verify the build:
 
 * `verify-bundles` - runs all verify commands
 * `verify:umd` - verifies umd version
-* `verify:umd:min` - verifies umd minified version without
-dependencies
+* `verify:umd:min` - verifies umd minified version without dependencies
 * `verify:umd:full` - verifies umd version with dependencies
-* `verify:umd:full.min` - verifies minified umd version with
-dependencies
-* `verify:publish-package` -  checks if npm built the package
-correctly
+* `verify:umd:full.min` - verifies minified umd version with dependencies
+* `verify:cjs` - verifies commonJS version with dependencies
+* `verify:publish-package` -  checks if npm built the package correctly
+* `verify:typings` - verifies TS typings
 
 ## Build the documentation
 
-Most likely, you will want to document the code, so you can use the
-following commands to generate the documentation:
+Most likely, you will want to document the code. You can use the following commands to generate the documentation:
 
-* `npm run docs` - builds HyperFormula, then all of the docs
-* `npm run docs:api` - builds API part of the documentation
-* `npm run docs:dev` - runs development build of docs
-* `npm run docs:build` - builds the docs.
+* `npm run docs:build` - builds the docs
+* `npm run docs:dev` - serves the development version of the docs locally
+
+## Run the tests
+
+The tests are done with Jest and Jasmine. The same test suite should
+pass in both of them because the library might be used
+[server-side](server-side-installation) or in a browser, so you have
+to be sure that both environments are fine.
+
+* `npm run test` - runs the linter and all tests
+* `npm run test:unit` - runs unit tests
+* `npm run test:coverage` - runs unit tests and generates code coverage
+* `npm run test:browser` - runs tests in **karma** once and closes all open browsers
+* `npm run test:browser.debug` - runs test in **karma** only in Chrome until you exit the process. It watches changes in `src` and `test` directories and rebuilds them automatically.
+
+If you want to run a specific `spec` file or a test suite you can add a `-spec` flag. For example:
+* `npm run test:browser.debug -- --spec=matrix.spec.ts` - runs `matrix.spec.ts` only
+
+## Run the linter
+
+You can use the following commands to lint the code, so it meets the required standards. ESLint is used as the tool of choice in this case.
+
+* `npm run lint` - lints the code
+* `npm run lint:fix` - automatically fixes lint problems
