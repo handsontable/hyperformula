@@ -5,14 +5,17 @@ For accuracy and performance, HyperFormula needs to process cells in a correct a
 To find the right order of processing cells, HyperFormula builds a [dependency graph](https://en.wikipedia.org/wiki/Dependency_graph) which captures relationships between cells.
 
 ## Cells in the dependency graph
+
 In the dependency graph, each spreadsheet cell is represented by a separate node.
 
 Nodes `X` and `Y` are connected by a directed edge if and only if the formula in cell `X` includes the address of cell `Y`.
 
 ## Ranges in the dependency graph
 
-In the actual dependency graph, ranges are also included as separate nodes.
-Range nodes may be connected to cell nodes or to other range nodes. 
+If formulas in the spreadsheet include ranges, each range is represented by a separate node.
+The dependency graph may also contain ranges that are not used by any formula, for better optimization.
+
+Range nodes can be connected to cell nodes and to other range nodes.
 
 <img :src="$withBase('/ranges.png')">
 
