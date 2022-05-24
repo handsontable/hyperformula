@@ -1,4 +1,4 @@
-name: Security
+name: Audit dependencies
 
 on:
   pull_request:
@@ -13,17 +13,17 @@ on:
       - 'release/**'
 
 jobs:
-  build:
+  audit_dependencies:
     strategy:
       matrix:
         node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
-    name: AUDIT
+    name: Audit dependencies
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
         with:
           node-version: ${{ matrix.node-version }}
