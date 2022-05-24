@@ -18,6 +18,7 @@ jobs:
       matrix:
         node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
+    name: unit-tests
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
@@ -43,6 +44,7 @@ jobs:
       matrix:
         node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
+    name: browser-tests
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
