@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }} & node ${{ matrix.node-version }}
+    name: Build
     strategy:
       fail-fast: false
       matrix:
