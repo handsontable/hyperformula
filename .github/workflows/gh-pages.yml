@@ -1,4 +1,4 @@
-name: Publish docs
+name: Docs
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
       matrix:
         node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
-    name: Publish docs
+    name: publish-docs
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
