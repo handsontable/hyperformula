@@ -13,12 +13,11 @@ on:
       - 'release/**'
 
 jobs:
-  unit_tests:
+  unit-tests:
     strategy:
       matrix:
         node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
-    name: Unit tests
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
@@ -39,12 +38,11 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@6004246f47ab62d32be025ce173b241cd84ac58e # https://github.com/codecov/codecov-action/releases/tag/v1.0.13
 
-  browser_tests:
+  browser-tests:
     strategy:
       matrix:
         node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
-    name: Browser tests
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
