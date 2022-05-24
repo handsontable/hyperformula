@@ -1,4 +1,4 @@
-name: Docs
+name: Publish
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
         run: |
           npm run docs:build
 
-      - name: Deploy
+      - name: Deploy to GH pages
         uses: peaceiris/actions-gh-pages@ba0b7df03e25ff29c924be8149041119e9421ea6 # https://github.com/peaceiris/actions-gh-pages/releases/tag/v3.5.6
         with:
           publish_dir: docs/.vuepress/dist
