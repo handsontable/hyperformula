@@ -1,4 +1,4 @@
-name: Security
+name: Build on various envs
 
 on:
   pull_request:
@@ -13,12 +13,14 @@ on:
       - 'release/**'
 
 jobs:
-  audit:
+  build:
+    name: build
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [ '16' ]
-        os: [ 'ubuntu-latest' ]
-    name: audit
+        node-version: [ 14, 16 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        install-command: [ i, ci ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
@@ -28,6 +30,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Run audit
+      - name: Install dependencies
         run: |
-          npm audit --omit='dev'
+          npm ${{ matrix.install-command }}
+
+      - name: Build
+        run: |
+          npm run bundle-all
