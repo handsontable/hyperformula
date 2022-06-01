@@ -33,7 +33,7 @@ property that defines functions this plugin contains. This will keep
 a set of function names that call corresponding methods.
 
 The keys are canonical function IDs which are also used to find
-corresponding translations in translation packages. Inside of them,
+corresponding translations in translation packages. Inside,
 there is also an object which contains the corresponding method.
 
 ```javascript
@@ -84,14 +84,14 @@ export class CountHF extends FunctionPlugin {
 
 You can set the following optional parameters:
 
-| Option | Type | Description |
-| --- | --- | --- |
-| `arrayFunction` | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions. |
-| `doesNotNeedArgumentsToBeComputed` | Boolean | If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.<br><br>Other arguments are properly evaluated. |
-| `expandRanges` | Boolean | If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments. |
-| `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change (e.g. when adding/removing rows or columns). |
-| `isVolatile` | Boolean | If set to `true`, the function is [volatile](volatile-functions.md). |
-| `repeatLastArgs` | Number | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely. |
+| Option                              | Type    | Description                                                                                                                                                  |
+|-------------------------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `arrayFunction`                     | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                       |
+| `doesNotNeedArgumentsToBeComputed`  | Boolean | If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.<br><br>Other arguments are properly evaluated. |
+| `expandRanges`                      | Boolean | If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                                    |
+| `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change (e.g. when adding/removing rows or columns).                                   |
+| `isVolatile`                        | Boolean | If set to `true`, the function is [volatile](volatile-functions.md).                                                                                         |
+| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                                |
 
 ### Argument validation options
 
@@ -122,15 +122,15 @@ export class CountHF extends FunctionPlugin {
 
 You can set the following argument validation options:
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `passSubtype` | Boolean | If set to `true`, arguments are passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`) |
-| `defaultValue` | `InternalScalarValue` \| `RawScalarValue` | If set to any value: if an argument is missing, its value defaults to `defaultValue`. |
-| `optionalArg` | Boolean | If set to `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
-| `minValue` | Number | If set, numerical arguments need to be greater than or equal to `minValue`. |
-| `maxValue` | Number | If set, numerical arguments need to be less than or equal to `maxValue`. |
-| `lessThan` | Number | If set, numerical argument need to be less than `lessThan`. |
-| `greaterThan` | Number | If set, numerical argument need to be greater than `greaterThan`. |
+| Parameter      | Type                                     | Description                                                                                                                                                                                                                                |
+|----------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `passSubtype`  | Boolean                                  | If set to `true`, arguments are passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`)                                                                                     |
+| `defaultValue` | `InternalScalarValue` \ `RawScalarValue` | If set to any value: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                      |
+| `optionalArg`  | Boolean                                  | If set to `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
+| `minValue`     | Number                                   | If set, numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                                |
+| `maxValue`     | Number                                   | If set, numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                                   |
+| `lessThan`     | Number                                   | If set, numerical argument need to be less than `lessThan`.                                                                                                                                                                                |
+| `greaterThan`  | Number                                   | If set, numerical argument need to be greater than `greaterThan`.                                                                                                                                                                          |
 
 #### Handling missing arguments
 
@@ -434,4 +434,4 @@ console.log(A1Value);
      title="handsontable/hyperformula-demos: custom-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
      sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+></iframe>
