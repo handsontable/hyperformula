@@ -25,6 +25,17 @@ describe('Function SUMIF - argument validations and combinations', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 
+  it('works with an array as a second argument', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, 2, 1],
+      [null, 3, 2],
+      ['=SUMIF(C1:C2, { 1, 2 }, B1:B2)']
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('B3'))).toEqual(3)
+  })
+
   it('works when 2nd arg is a boolean', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUMIF(C1:C2, TRUE(), B1:B2)', 2, 1],
