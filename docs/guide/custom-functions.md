@@ -1,17 +1,14 @@
 # Custom functions
 
-HyperFormula enables you to create custom functions you may want to
-use in your application.
+HyperFormula enables you to expand the library of functions available in your application by implementing a custom function.
+
+## A simple example
 
 This guide explains step-by-step how to create a custom function that
 returns the number of letters in the word 'HyperFormula'. It will be
-invoked by typing `"=HYPER()"` or `"=HAJPER()"` (localized to Polish).
+invoked by typing `"=HYPER()"`.
 
-HyperFormula doesn't enforce a naming convention of the function.
-However, all names will be normalized to the upper-case, so they
-are not case-sensitive.
-
-## Custom class definition
+### 1. Create a plugin class
 
 First, you need to import `FunctionPlugin` and extend it with your
 own class. Here is how you can do that:
@@ -22,34 +19,105 @@ import { FunctionPlugin } from 'hyperformula';
 
 // start creating a class
 export class CountHF extends FunctionPlugin {
-
 }
 ```
 
-## implementedFunction property
+### 2. Define the custom functions provided by your plugin
 
 Your newly created class should have a static `implementedFunctions`
-property that defines functions this plugin contains. This will keep
-a set of function names that call corresponding methods.
+property that defines functions this plugin contains and maps them to their implementations.
 
 The keys are canonical function IDs which are also used to find
-corresponding translations in translation packages. Inside,
-there is also an object which contains the corresponding method.
+corresponding translations in translation packages.
 
 ```javascript
-import { FunctionPlugin } from 'hyperformula';
+CountHF.implementedFunctions = {
+  HYPER: {
+    // this method's functionality will be defined below
+    method: "hyper"
+  }
+};
+```
 
+### 3. Register the names for your functions
+
+Define a `translations` object with the names for your function in every language you want to support.
+These names will be used to call your function inside formulas.
+
+HyperFormula doesn't enforce a naming convention of the function.
+However, all names will be normalized to the upper-case, so they
+are not case-sensitive.
+
+```javascript
+CountHF.translations = {
+  enGB: {
+    HYPER: "HYPER"
+  }
+};
+```
+
+### 4. Implement your custom function
+
+For the simplicity of a basic example, you will not pass any
+arguments. However, this method imposes a particular structure to
+be used; there are two optional arguments, `ast` and
+`state`, and the function must return the results of
+the calculations.
+
+Optionally, you can wrap your implementation in the built-in `runFunction()` method to make use of the automatic validations:
+- It validates the function parameters according to your [optional parameter](#optional-parameters) setting.
+- It validates the function parameters according to your [argument validation options](#argument-validation-options).
+- It verifies the format of the values returned by your function.
+
+```javascript
 export class CountHF extends FunctionPlugin {
-
-  // define functions inside this plugin
-  public static implementedFunctions = {
-    'HYPER': {
-      // this method's functionality will be defined below
-      method: 'hyper',
-    }
+  // implement your custom function
+  // wrap your custom function in `runFunction()`
+  hyper(ast, state) {
+    return this.runFunction(ast.args, state, this.metadata('HYPER'), 
+      () => 'Hyperformula'.length)
   }
 }
 ```
+
+### 5. Register your plugin with HyperFormula
+
+Before you can use the newly created function, you need to
+register it using `registerFunctionPlugin()` method
+
+```javascript
+HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
+```
+
+### 6. Use your custom function inside a formula
+
+```javascript
+// prepare a spreadsheet data
+const data = [['=HYPER()']];
+
+// build HF instance where you can use the function directly
+const hfInstance = HyperFormula.buildFromArray(data);
+
+// read the value of cell A1
+const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
+
+// open the browser's console to see the results
+console.log(A1Value);
+```
+
+### Complete custom function implementation & demo
+
+<iframe
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: custom-functions"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>
+
+
+
+
 
 ### Optional parameters
 
@@ -67,18 +135,18 @@ import { FunctionPlugin } from 'hyperformula';
 
 export class CountHF extends FunctionPlugin {
 
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
-      // set your optional parameters
-      arrayFunction: false,
-      doesNotNeedArgumentsToBeComputed: false,
-      expandRanges: false,
-      isDependentOnSheetStructureChange: false,
-      isVolatile: true,
-      repeatLastArgs: 4,
+    public static implementedFunctions = {
+        'HYPER': {
+            method: 'hyper',
+            // set your optional parameters
+            arrayFunction: false,
+            doesNotNeedArgumentsToBeComputed: false,
+            expandRanges: false,
+            isDependentOnSheetStructureChange: false,
+            isVolatile: true,
+            repeatLastArgs: 4,
+        }
     }
-  }
 }
 ```
 
@@ -102,21 +170,21 @@ import { FunctionPlugin } from 'hyperformula';
 
 export class CountHF extends FunctionPlugin {
 
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
-      // set your argument validation options
-      parameters: {
-        passSubtype: false,
-        defaultValue: 10,
-        optionalArg: false,
-        minValue: 5,
-        maxValue: 15,
-        lessThan: 15,
-        greaterThan: 5
-      },
+    public static implementedFunctions = {
+        'HYPER': {
+            method: 'hyper',
+            // set your argument validation options
+            parameters: {
+                passSubtype: false,
+                defaultValue: 10,
+                optionalArg: false,
+                minValue: 5,
+                maxValue: 15,
+                lessThan: 15,
+                greaterThan: 5
+            },
+        }
     }
-  }
 }
 ```
 
@@ -144,7 +212,7 @@ If you don't want to set any `defaultValue` (because, for example, your function
 
 ## Aliases
 
-Aliases are available since the <Badge text="v0.4.0"  vertical="middle"/> version.
+Aliases are available since the <Badge text="v0.4.0" vertical="middle"/> version.
 
 If you want to include aliases (multiple names to a single implemented function) inside the plugin,
 you can do this with the static `aliases` property.
@@ -156,20 +224,26 @@ import { FunctionPlugin } from 'hyperformula';
 
 export class CountHF extends FunctionPlugin {
 
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
+    public static implementedFunctions = {
+        'HYPER': {
+            method: 'hyper',
+        }
     }
-  }
-  
-  public static aliases = {
-    'HYPER.ALIAS': 'HYPER'
-    // HYPER.ALIAS is now an alias to HYPER
-  }
+
+    public static aliases = {
+        'HYPERRR': 'HYPER'
+        // HYPERRR is now an alias to HYPER
+    }
 }
 ```
 
 ## Translations
+
+// TODO: this is wrong
+Names can be inside the class or not. // TODO
+Remember to `HyperFormula.registerLanguage('plPL', plPL);`
+
+
 
 There are **two ways** of adding a translation of the custom function.
 
@@ -181,25 +255,25 @@ import { FunctionPlugin } from 'hyperformula';
 
 export class CountHF extends FunctionPlugin {
 
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
+    public static implementedFunctions = {
+        'HYPER': {
+            method: 'hyper',
+        }
     }
-  }
-  
-  public static aliases = {
-    'HYPER.ALIAS': 'HYPER'
-  }
-  
-  // add your translations
-  public static translations = {
-    'enGB': {
-      'HYPER': 'HYPER'
-    },
-    'plPL': {
-      'HYPER': 'HAJPER'
+
+    public static aliases = {
+        'HYPERRR': 'HYPER'
     }
-  }
+
+    // add your translations
+    public static translations = {
+        'enGB': {
+            'HYPER': 'HYPER'
+        },
+        'plPL': {
+            'HYPER': 'HAJPER'
+        }
+    }
 }
 ```
 
@@ -210,12 +284,12 @@ want as a constant and import it upon registering the plugin
 ```javascript
 // inside your translations file
 export const myTranslations = {
-  'enGB': {
-    'HYPER': 'HYPER'
-  },
-  'plPL': {
-    'HYPER': 'HAJPER'
-  }
+    'enGB': {
+        'HYPER': 'HYPER'
+    },
+    'plPL': {
+        'HYPER': 'HAJPER'
+    }
 }
 ```
 
@@ -227,75 +301,18 @@ be used; there are two optional arguments, `ast` and
 `state`, and the function must return the results of
 the calculations.
 
+Wrap your implementation in the built-in `runFunction()` method to make use of the automatic validation:
+- It validates the function parameters according to your [optional parameter](#optional-parameters) setting.
+- It validates the function parameters according to your [argument validation options](#argument-validation-options).
+- It verifies the format of the values returned by your function.
+
 ```javascript
-import { FunctionPlugin } from 'hyperformula';
-
 export class CountHF extends FunctionPlugin {
-
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
-    }
-  }
-  
-  public static aliases = {
-    'HYPER.ALIAS': 'HYPER'
-  }
-  
-  public static translations = {
-    'enGB': {
-      'HYPER': 'HYPER'
-    },
-    'plPL': {
-      'HYPER': 'HAJPER'
-    }
-  }
-  
   // implement your custom function
-  // arguments here are displayed just to show the structure
-  public hyper(ast, state) {
-    return 'Hyperformula'.length;
-  }
-}
-```
-
-### `runFunction()`
-
-Wrap your custom function in the built-in `runFunction()` method.
-
-The `runFunction()` method wraps your function's calculations and:
-- Validates the [optional parameter](#optional-parameters) settings
-- Validates the arguments against your [argument validation options](#argument-validation-options)
-- Checks if values returned by your function are in the right format
-
-```javascript
-import { FunctionPlugin } from 'hyperformula';
-
-export class CountHF extends FunctionPlugin {
-
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
-    }
-  }
-  
-  public static aliases = {
-    'HYPER.ALIAS': 'HYPER'
-  }
-  
-  public static translations = {
-    'enGB': {
-      'HYPER': 'HYPER'
-    },
-    'plPL': {
-      'HYPER': 'HAJPER'
-    }
-  }
-  
   // wrap your custom function in `runFunction()`
-  public hyper(ast, state) {
-    return this.runFunction(ast, state, this.metadata('HYPER'),
-    () => 'Hyperformula'.length)
+  hyper(ast, state) {
+    return this.runFunction(ast.args, state, this.metadata('HYPER'), 
+      () => 'Hyperformula'.length)
   }
 }
 ```
@@ -316,33 +333,34 @@ import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
 
 export class CountHF extends FunctionPlugin {
 
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
+    public static implementedFunctions = {
+        'HYPER': {
+            method: 'hyper',
+        }
     }
-  }
-  
-  public static aliases = {
-    'HYPER.ALIAS': 'HYPER'
-  }
-  
-  public static translations = {
-    'enGB': {
-      'HYPER': 'HYPER'
-    },
-    'plPL': {
-      'HYPER': 'HAJPER'
-    }
-  }
 
-public hyper({ args }) {
-  if (!args.length) {
-    // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
-    // with your custom error message (optional)
-    return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
-  }
-  
-  return this.runFunction(() => 'Hyperformula'.length)
+    public static aliases = {
+        'HYPERRR': 'HYPER'
+    }
+
+    public static translations = {
+        'enGB': {
+            'HYPER': 'HYPER'
+        },
+        'plPL': {
+            'HYPER': 'HAJPER'
+        }
+    }
+
+    public hyper({args}) {
+        if (!args.length) {
+            // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
+            // with your custom error message (optional)
+            return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
+        }
+
+        return this.runFunction(() => 'Hyperformula'.length)
+    }
 }
 ```
 
@@ -353,85 +371,3 @@ The error displays as `#DIV/0`, and gets properly translated.
 Errors returned by methods such as `getCellValue` are wrapped in the [`DetailedCellError` type](../api/classes/detailedcellerror.md).
 
 `DetailedCellError` localizes the error based on your [internationalization settings](localizing-functions.md).
-
-## A complete example of the class definition
-
-To sum up, here is a complete example of a custom `CountHF` class:
-
-```javascript
-import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
-
-export class CountHF extends FunctionPlugin {
-
-  public static implementedFunctions = {
-    'HYPER': {
-      method: 'hyper',
-    }
-  }
-  
-  public static aliases = {
-    'HYPER.ALIAS': 'HYPER'
-  }
-  
-  public static translations = {
-    'enGB': {
-      'HYPER': 'HYPER'
-    },
-    'plPL': {
-      'HYPER': 'HAJPER'
-    }
-  }
-  
-  public hyper({ args }) {
-    if (!args.length) {
-      return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
-    }
-    
-    return this.runFunction(() => 'Hyperformula'.length)
-  }
-}
-```
-
-## Registering a custom function
-
-Before you can use the newly created function, you need to
-register it by using `registerFunctionPlugin` like so:
-
-```javascript
-HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
-```
-
-## Using a custom function
-
-This is a short snippet that sums up how to use the custom function
-along with translations.
-
-```javascript
-import Hyperformula, { plPL } from 'hyperformula';
-import { CountHF } from './file_with_your_custom_function';
-
-// register the language
-HyperFormula.registerLanguage('plPL', plPL);
-
-// register your custom plugin and the translation
-HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
-
-// build HF instance where you can use the function directly
-const hfInstance = HyperFormula.buildFromArray([['=HAJPER()']]);
-
-// read the value of cell A1
-const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
-
-// open the browser's console to see the results
-console.log(A1Value);
-```
-
-## Demo
-
-<iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="handsontable/hyperformula-demos: custom-functions"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-></iframe>
