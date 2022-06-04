@@ -22,7 +22,7 @@ export class CountHF extends FunctionPlugin {
 }
 ```
 
-### 2. Define the custom functions provided by your plugin
+### 2. Define a custom function provided by your plugin
 
 Your newly created class should have a static `implementedFunctions`
 property that defines functions this plugin contains and maps them to their implementations.
@@ -34,18 +34,18 @@ corresponding translations in translation packages.
 CountHF.implementedFunctions = {
   HYPER: {
     // this method's functionality will be defined below
-    method: "hyper"
+    method: 'hyper',
   }
 };
 ```
 
-### 3. Register the names for your functions
+### 3. Register names for your function
 
 Define a `translations` object with the names for your function in every language you want to support.
 These names will be used to call your function inside formulas.
 
 HyperFormula doesn't enforce a naming convention of the function.
-However, all names will be normalized to the upper-case, so they
+However, all names will be normalized to upper-case, so they
 are not case-sensitive.
 
 ```javascript
@@ -58,8 +58,7 @@ CountHF.translations = {
 
 ### 4. Implement your custom function
 
-For the simplicity of a basic example, you will not pass any
-arguments. However, this method imposes a particular structure to
+For the simplicity of a basic example, our custom function takes no arguments. However, this method imposes a particular structure to
 be used; there are two optional arguments, `ast` and
 `state`, and the function must return the results of
 the calculations.
@@ -74,8 +73,7 @@ export class CountHF extends FunctionPlugin {
   // implement your custom function
   // wrap your custom function in `runFunction()`
   hyper(ast, state) {
-    return this.runFunction(ast.args, state, this.metadata('HYPER'), 
-      () => 'Hyperformula'.length)
+    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length)
   }
 }
 ```
@@ -83,7 +81,7 @@ export class CountHF extends FunctionPlugin {
 ### 5. Register your plugin with HyperFormula
 
 Before you can use the newly created function, you need to
-register it using `registerFunctionPlugin()` method
+register it using `registerFunctionPlugin()` method.
 
 ```javascript
 HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
@@ -99,10 +97,10 @@ const data = [['=HYPER()']];
 const hfInstance = HyperFormula.buildFromArray(data);
 
 // read the value of cell A1
-const A1Value = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
+const result = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
 
 // open the browser's console to see the results
-console.log(A1Value);
+console.log(result);
 ```
 
 ### Complete custom function implementation & demo
@@ -115,13 +113,9 @@ console.log(A1Value);
   sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>
 
+## Configure the behavior of a custom function
 
-
-
-
-### Optional parameters
-
-Using optional parameters, you can configure your function to:
+Passing optional parameters to the `implementedFunctions` object, you can configure your function to:
 * Use the [array arithmetic mode](arrays.md)
 * Treat reference or range arguments as arguments that don't create dependency
 * Inline range arguments to scalar arguments
@@ -131,26 +125,21 @@ Using optional parameters, you can configure your function to:
 * Never get vectorized
 
 ```javascript
-import { FunctionPlugin } from 'hyperformula';
-
-export class CountHF extends FunctionPlugin {
-
-    public static implementedFunctions = {
-        'HYPER': {
-            method: 'hyper',
-            // set your optional parameters
-            arrayFunction: false,
-            doesNotNeedArgumentsToBeComputed: false,
-            expandRanges: false,
-            isDependentOnSheetStructureChange: false,
-            isVolatile: true,
-            repeatLastArgs: 4,
-        }
-    }
-}
+CountHF.implementedFunctions = {
+  HYPER: {
+    method: 'hyper',
+    // config parameters
+    arrayFunction: false,
+    doesNotNeedArgumentsToBeComputed: false,
+    expandRanges: false,
+    isDependentOnSheetStructureChange: false,
+    isVolatile: true,
+    repeatLastArgs: 4,
+  }
+};
 ```
 
-You can set the following optional parameters:
+You can set the following config parameters:
 
 | Option                              | Type    | Description                                                                                                                                                  |
 |-------------------------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -161,31 +150,26 @@ You can set the following optional parameters:
 | `isVolatile`                        | Boolean | If set to `true`, the function is [volatile](volatile-functions.md).                                                                                         |
 | `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                                |
 
-### Argument validation options
+## Argument validation options
 
-In an optional `parameters` object, you can set rules for your function's argument validation.
+In an optional `parameters` array, you can set rules for your function's argument validation.
 
 ```javascript
-import { FunctionPlugin } from 'hyperformula';
-
-export class CountHF extends FunctionPlugin {
-
-    public static implementedFunctions = {
-        'HYPER': {
-            method: 'hyper',
-            // set your argument validation options
-            parameters: {
-                passSubtype: false,
-                defaultValue: 10,
-                optionalArg: false,
-                minValue: 5,
-                maxValue: 15,
-                lessThan: 15,
-                greaterThan: 5
-            },
-        }
-    }
-}
+CountHF.implementedFunctions = {
+  HYPER: {
+    method: 'hyper',
+    // set your argument validation options
+    parameters: [{
+      passSubtype: false,
+      defaultValue: 10,
+      optionalArg: false,
+      minValue: 5,
+      maxValue: 15,
+      lessThan: 15,
+      greaterThan: 5
+    }],
+  }
+};
 ```
 
 You can set the following argument validation options:
@@ -200,7 +184,7 @@ You can set the following argument validation options:
 | `lessThan`     | Number                                   | If set, numerical argument need to be less than `lessThan`.                                                                                                                                                                                |
 | `greaterThan`  | Number                                   | If set, numerical argument need to be greater than `greaterThan`.                                                                                                                                                                          |
 
-#### Handling missing arguments
+### Handling missing arguments
 
 The `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
 
@@ -220,104 +204,47 @@ you can do this with the static `aliases` property.
 The property is keyed with aliases IDs, and with values being aliased functions IDs.
 
 ```javascript
-import { FunctionPlugin } from 'hyperformula';
+CountHF.implementedFunctions = {
+  HYPER: {
+    // this method's functionality will be defined below
+    method: 'hyper',
+  }
+};
 
-export class CountHF extends FunctionPlugin {
-
-    public static implementedFunctions = {
-        'HYPER': {
-            method: 'hyper',
-        }
-    }
-
-    public static aliases = {
-        'HYPERRR': 'HYPER'
-        // HYPERRR is now an alias to HYPER
-    }
-}
+CountHF.aliases = {
+  'HYPERRR': 'HYPER'
+  // HYPERRR is now an alias to HYPER
+};
 ```
 
 ## Translations
 
-// TODO: this is wrong
-Names can be inside the class or not. // TODO
-Remember to `HyperFormula.registerLanguage('plPL', plPL);`
+`translations` object can be defined as a static property of a plugin class or as a separate object. It must be passed as a second argument to `registerFunctionPlugin()` function.
 
-
-
-There are **two ways** of adding a translation of the custom function.
-
-In the **first one**, you can define translations in your function
-plugin as a static.
 
 ```javascript
-import { FunctionPlugin } from 'hyperformula';
+// translation as a static property of a plugin class
+CountHF.translations = {
+  enGB: {
+    'HYPER': 'HYPER'
+  },
+  plPL: {
+    'HYPER': 'HAJPER'
+  }
+};
 
-export class CountHF extends FunctionPlugin {
-
-    public static implementedFunctions = {
-        'HYPER': {
-            method: 'hyper',
-        }
-    }
-
-    public static aliases = {
-        'HYPERRR': 'HYPER'
-    }
-
-    // add your translations
-    public static translations = {
-        'enGB': {
-            'HYPER': 'HYPER'
-        },
-        'plPL': {
-            'HYPER': 'HAJPER'
-        }
-    }
-}
-```
-
-In the **second one**, you can keep your translation in any file you
-want as a constant and import it upon registering the plugin
-(or with a whole translation package).
-
-```javascript
-// inside your translations file
-export const myTranslations = {
-    'enGB': {
-        'HYPER': 'HYPER'
-    },
-    'plPL': {
-        'HYPER': 'HAJPER'
-    }
-}
-```
-
-## Implementing your custom function
-
-For the simplicity of a basic example, you will not pass any
-arguments. However, this method imposes a particular structure to
-be used; there are two optional arguments, `ast` and
-`state`, and the function must return the results of
-the calculations.
-
-Wrap your implementation in the built-in `runFunction()` method to make use of the automatic validation:
-- It validates the function parameters according to your [optional parameter](#optional-parameters) setting.
-- It validates the function parameters according to your [argument validation options](#argument-validation-options).
-- It verifies the format of the values returned by your function.
-
-```javascript
-export class CountHF extends FunctionPlugin {
-  // implement your custom function
-  // wrap your custom function in `runFunction()`
-  hyper(ast, state) {
-    return this.runFunction(ast.args, state, this.metadata('HYPER'), 
-      () => 'Hyperformula'.length)
+// translations as a separate object
+export const countHFTranslations = {
+  enGB: {
+    'HYPER': 'HYPER'
+  },
+  plPL: {
+    'HYPER': 'HAJPER'
   }
 }
 ```
 
-### Returning errors
+## Returning errors
 
 If you want your custom function to return an error, check the [API reference](../api) for the HyperFormula [error types](types-of-errors.md).
 
@@ -332,41 +259,21 @@ For example, if you want to return a `#DIV/0!` error with your custom error mess
 import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
 
 export class CountHF extends FunctionPlugin {
-
-    public static implementedFunctions = {
-        'HYPER': {
-            method: 'hyper',
-        }
+  hyper(ast, state) {
+    if (!ast.args.length) {
+      // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
+      // with your custom error message (optional)
+      return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
     }
-
-    public static aliases = {
-        'HYPERRR': 'HYPER'
-    }
-
-    public static translations = {
-        'enGB': {
-            'HYPER': 'HYPER'
-        },
-        'plPL': {
-            'HYPER': 'HAJPER'
-        }
-    }
-
-    public hyper({args}) {
-        if (!args.length) {
-            // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
-            // with your custom error message (optional)
-            return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
-        }
-
-        return this.runFunction(() => 'Hyperformula'.length)
-    }
+  
+    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length)
+  }
 }
 ```
 
 The error displays as `#DIV/0`, and gets properly translated.
 
-#### Error localization
+### Error localization
 
 Errors returned by methods such as `getCellValue` are wrapped in the [`DetailedCellError` type](../api/classes/detailedcellerror.md).
 
