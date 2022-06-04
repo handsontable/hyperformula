@@ -19,6 +19,7 @@ import { FunctionPlugin } from 'hyperformula';
 
 // start creating a class
 export class CountHF extends FunctionPlugin {
+  
 }
 ```
 
@@ -233,6 +234,10 @@ CountHF.translations = {
   }
 };
 
+HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
+```
+
+```js
 // translations as a separate object
 export const countHFTranslations = {
   enGB: {
@@ -241,7 +246,9 @@ export const countHFTranslations = {
   plPL: {
     'HYPER': 'HAJPER'
   }
-}
+};
+
+HyperFormula.registerFunctionPlugin(CountHF, countHFTranslations);
 ```
 
 ## Returning errors
