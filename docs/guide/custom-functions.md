@@ -122,7 +122,7 @@ Passing optional parameters to the `implementedFunctions` object, you can config
 * Inline range arguments to scalar arguments
 * Get recalculated with each sheet shape change
 * Be a [volatile](volatile-functions.md) function
-* Repeat indefinitely a specified number of last arguments
+* Repeat a specified number of last arguments indefinitely
 * Never get vectorized
 
 ```javascript
@@ -200,9 +200,7 @@ If you don't want to set any `defaultValue` (because, for example, your function
 Aliases are available since the <Badge text="v0.4.0" vertical="middle"/> version.
 
 If you want to include aliases (multiple names to a single implemented function) inside the plugin,
-you can do this with the static `aliases` property.
-
-The property is keyed with aliases IDs, and with values being aliased functions IDs.
+you can do this with the static `aliases` property, which maps the aliases' IDs to the functions' IDs.
 
 ```javascript
 CountHF.implementedFunctions = {
@@ -278,7 +276,7 @@ export class CountHF extends FunctionPlugin {
 }
 ```
 
-The error displays as `#DIV/0`, and gets properly translated.
+The error displays as `#DIV/0` and gets translated appropriately.
 
 ### Error localization
 
