@@ -1,53 +1,55 @@
-<a href="https://handsontable.github.io/hyperformula/">
-<img src="./github-hf-logo-blue.svg" width="250" height="51" alt="HyperFormula"/>
-</a>
+<br>
+<p align="center">
+  <a href="https://handsontable.github.io/hyperformula/">
+    <img src="https://raw.githubusercontent.com/handsontable/hyperformula/master/github-hf-logo-blue.svg" width="350" height="71" alt="HyperFormula - An advanced headless evaluator and parser of the Excel formulas"/>
+  </a>
+</p>
 
-### HyperFormula is an open source, spreadsheet-like calculation engine ⚡
+<p align="center">
+  <strong>An advanced headless evaluator and parser of the Excel formulas</strong>
+</p>
 
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/handsontable/hyperformula/Test)](https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield)
-[![codecov](https://codecov.io/gh/handsontable/hyperformula/branch/master/graph/badge.svg?token=5k9ZQv8azO)](https://codecov.io/gh/handsontable/hyperformula)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/handsontable/hyperformula.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/handsontable/hyperformula/context:javascript)
-[![Known Vulnerabilities](https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json)](https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json)
-[![GitHub contributors](https://img.shields.io/github/contributors/handsontable/hyperformula)](https://github.com/handsontable/hyperformula/graphs/contributors)
+<p align="center">
+  <a href="https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster"><img src="https://img.shields.io/github/workflow/status/handsontable/hyperformula/Test" alt="GitHub Workflow Status"></a>
+  <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield" alt="FOSSA Status"></a>
+  <a href="https://lgtm.com/projects/g/handsontable/hyperformula/context:javascript"><img src="https://img.shields.io/lgtm/grade/javascript/g/handsontable/hyperformula.svg?logo=lgtm&amp;logoWidth=18" alt="Language grade: JavaScript"></a>
+  <a href="https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json"><img src="https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json" alt="Known Vulnerabilities"></a>
+  <a href="https://github.com/handsontable/hyperformula/graphs/contributors"><img src="https://img.shields.io/github/contributors/handsontable/hyperformula" alt="GitHub contributors"></a>
+  <a href="https://codecov.io/gh/handsontable/hyperformula"><img src="https://codecov.io/gh/handsontable/hyperformula/branch/master/graph/badge.svg?token=5k9ZQv8azO" alt="codecov"></a>
+</p>
 
+---
 
-## Description
+HyperFormula is a headless spreadsheet built on top of TypeScript. It serves as evaluator and parser for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
 
-HyperFormula allows you to perform spreadsheet-like calculations in your
-web applications. It is written in TypeScript and supports all major
-JavaScript frameworks. You can use it in a browser or as a service with
-Node.js as your back-end technology.
-
-The engine comes with a built-in, localized
-[library of functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html)
-grouped into different categories, and covers most user-triggered actions
-such as [CRUD operations](https://handsontable.github.io/hyperformula/guide/basic-operations.html),
-[undo/redo](https://handsontable.github.io/hyperformula/guide/undo-redo.html),
-and [clipboard operations](https://handsontable.github.io/hyperformula/guide/clipboard-operations.html).
-It also supports the use of cross-sheet references,
-[named expressions](https://handsontable.github.io/hyperformula/guide/named-expressions.html),
-different [data types](https://handsontable.github.io/hyperformula/guide/types-of-values.html),
-and [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html).
+- High-speed Excel formula evaluating and parsing
+- A library of [380+ built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html) available in 16 languages
+- Support for [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html)
+- Function syntax [compatible with Excel and Google Sheets](https://handsontable.github.io/hyperformula/guide/known-limitations.html#google-sheets-and-microsoft-excel)
+- [Support for Node.js](https://handsontable.github.io/hyperformula/guide/server-side-installation.html#install-with-npm-or-yarn)
+- Support for [undo/redo](https://handsontable.github.io/hyperformula/guide/undo-redo.html)
+- Support for [CRUD operations](https://handsontable.github.io/hyperformula/guide/basic-operations.html)
+- Support for [clipboard](https://handsontable.github.io/hyperformula/guide/clipboard-operations.html)
+- Support for [named expressions](https://handsontable.github.io/hyperformula/guide/named-expressions.html)
+- Support for [data sorting](https://handsontable.github.io/hyperformula/guide/sorting-data.html)
+- Support for [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html), [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html), and [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
+- Open-source license
+- Actively maintained by the team at [Handsontable - JavaScript Data Grid](https://handsontable.com/)
 
 ## Documentation
 
-- [Explainer video](https://www.youtube.com/watch?v=JJXUmACTDdk) /
-[Blog post](https://handsontable.com/blog/articles/2020/6/introducing-hyperformula-fast-javascript-calculation-engine)
-- Demos
-  - [JavaScript](https://handsontable.github.io/hyperformula/guide/demo.html)
-  - [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
-  - [Vue](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
-  - [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
+- [Explainer video](https://www.youtube.com/watch?v=JJXUmACTDdk)
 - [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
 - [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
+  - [Demo with React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
+  - [Demo with Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
+  - [Demo with Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
 - [API Reference](https://handsontable.github.io/hyperformula/api/)
 - [Configuration options](https://handsontable.github.io/hyperformula/guide/configuration-options.html)
 - [List of built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html)
 - [Key concepts](https://handsontable.github.io/hyperformula/guide/key-concepts.html)
-- [Contact](https://handsontable.github.io/hyperformula/guide/contact.html)
 
-## Getting started
+## Installation and usage
 
 Install the library from [npm](https://www.npmjs.com/package/hyperformula):
 
@@ -78,65 +80,29 @@ const mySum = hfInstance.getCellValue({ col: 3, row: 0, sheet: 0 });
 console.log(mySum);
 ```
 
-[View this code online](https://codesandbox.io/s/github/handsontable/hyperformula-demos/tree/develop/basic-usage)
+[Run this code in CodeSandbox](https://codesandbox.io/s/github/handsontable/hyperformula-demos/tree/develop/basic-usage)
 
 ## What can it be used for?
 
-HyperFormula doesn't assume any existing user interface, which makes it
-a great general-purpose library that can be used in various business
-applications. Here are some examples:
+HyperFormula doesn't assume any existing user interface, which makes it a great general-purpose library that can be used in various business applications. Here are some examples:
 
-- Smart documents
-- Educational apps
-- Computation notebooks
-- Data grid components
 - Business logic builders
 - Forms and form builders
-- Spreadsheets
+- Computation notebooks
+- Smart documents
+- Educational apps
 - Online calculators
-- Low connectivity apps
 
 ## Contributing
 
 Help us build the fastest and most flexible calculation engine for
-business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before
-making a pull request.
-
-Your help is much appreciated in any of the following topics:
-
-- Making pull requests
-  - Adding new functions
-  - Adding new features
-  - Improving the quality of the existing code
-  - Improving performance
-  - Improving documentation and public API
-- Reporting bugs
-- Suggesting improvements
-- Suggesting new features
+business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before making a pull request.
 
 ## License
 
-HyperFormula is available under the [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt).
+HyperFormula is available under the open source license ([GPLv3](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt)).
 
-If you need a commercial license or support and maintenance services, [contact our Sales Team](https://handsontable.com/get-a-quote).
+To buy a commercial license, please write to us at sales@handsontable.com
 
-## Acknowledgments 
-
-You should know that this project wouldn’t exist without co-financing from European Union funds under the European Regional Development Funds as a part of the Smart Growth Operational Programme. Project implemented as a part of the Polish National Centre for Research and Development: “Fast Track”.
-
-- Name of the programme: Smart Growth Operational Programme 2014-2020
-- Project name: “Development of the high-performance calculation engine for processing tabular data of the significant size on mobile devices and workstations using parallel computing and GPU.”
-- Project number: POIR.01.01.01-00-0223/18-00
-- Beneficiary: Handsoncode sp. z o.o.
-- Total budget: PLN 1 117 275.87 (USD ~295 000)
-- Amount of grant: PLN 771 807.73 (USD ~204 000)
-- Duration: 2018-2019
-
-![eu-funds](docs/.vuepress/public/eu-logos.png)
-
-## Authors
-
-Created by [Handsontable](https://handsontable.com), [NavAlgo](https://www.navalgo.com/en/),
-and [Contributors](https://github.com/handsontable/hyperformula/graphs/contributors).
-
-© 2021 Handsoncode
+## Copyrights
+© 2021 [Handsoncode](https://handsontable.com)
