@@ -1,100 +1,119 @@
 # Custom functions
 
-Expand the library of functions available in your app, by implementing a custom function.
+Expand the library of functions available in your app, by creating custom functions.
 
-## Custom function example
+## Create a custom function
 
-Let's create a custom function that returns the number of letters in the word "HyperFormula".
+As an example, let's create a custom function that returns the number of letters in the word "HyperFormula".
 
-### 1. Create a plugin class
+<iframe
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: custom-functions"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>
 
-Import `FunctionPlugin`, and extend it with your own plugin class:
+### 1. Create a function plugin
+
+Import `FunctionPlugin`, and extend it with a new class. For example:
 
 ```javascript
 import { FunctionPlugin } from 'hyperformula';
 
-export class CountHF extends FunctionPlugin {
+export class MyFunctionPlugin extends FunctionPlugin {
   
-}
+};
 ```
 
-### 2. Define a custom function provided by your plugin
+### 2. Define your function's ID and method
 
-In your newly created class, define a static property called `implementedFunctions`.
+Inside the `implementedFunctions` property of your function plugin, define your custom function.
 
-`implementedFunctions`, defines the IDs of that your plugin's functions (e.g., `HYPER`),
-and maps 
+This is where you define an ID by which [translations](#function-translations), [aliases](#function-aliases), and other elements refer to your function. Make the ID unique among all HyperFormula [functions](built-in-functions.md#list-of-available-functions).
 
-Your newly created class should have a static `implementedFunctions`
-property that defines functions this plugin contains and maps them to their implementations.
-
-The keys are canonical function IDs which are also used to find
-corresponding translations in translation packages.
+Inside your function's object, define a `method` property, which maps your function to an implementation method (we'll define that method later on).
 
 ```javascript
-CountHF.implementedFunctions = {
+MyFunctionPlugin.implementedFunctions = {
+  // let's define the function's ID as `HYPER`
   HYPER: {
-    // we'll define this method's functionality below
+    // we'll define the `hyper` method below
     method: 'hyper',
-  }
+  };
 };
 ```
 
-### 3. Register names for your function
+::: tip
+In `implementedFunctions`, you can define more [custom function options](#custom-function-options).
+:::
 
-Define a `translations` object with the names for your function in every language you want to support.
-These names will be used to call your function inside formulas.
+### 3. Add your function's names
 
-HyperFormula doesn't enforce a naming convention of the function.
-However, all names will be normalized to upper-case, so they
-are not case-sensitive.
+Inside the `translations` property of your function plugin, define your function's names, in every language that you want to support. This is how your end users call your function inside formulas.
+
+Function names are case-insensitive, as they are all normalized to uppercase.
+
+::: tip
+If you support just one language, you still need to define the name of your function in that language.
+:::
 
 ```javascript
-CountHF.translations = {
+MyFunctionPlugin.translations = {
   enGB: {
-    HYPER: "HYPER"
-  }
+    // in English, let's set the function's name to `HYPER`
+    HYPER: 'HYPER',
+  };
 };
 ```
 
-### 4. Implement your custom function
+### 4. Implement your function's logic
 
-For the simplicity of a basic example, our custom function takes no arguments. However, this method imposes a particular structure to
-be used; there are two optional arguments, `ast` and
-`state`, and the function must return the results of
-the calculations.
-
-Optionally, you can wrap your implementation in the built-in `runFunction()` method to make use of the automatic validations:
-- It validates the function parameters according to your [optional parameter](#optional-parameters) setting.
-- It validates the function parameters according to your [argument validation options](#argument-validation-options).
-- It verifies the format of the values returned by your function.
+Inside your function plugin class, add a method that implements your function's calculations. Your method needs to:
+* Take two optional arguments: `ast` and `state`.
+* Return the results of your calculations.
 
 ```javascript
-export class CountHF extends FunctionPlugin {
-  // implement your custom function
-  // wrap your custom function in `runFunction()`
+export class MyFunctionPlugin extends FunctionPlugin {
   hyper(ast, state) {
-    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length)
-  }
-}
+    return 'Hyperformula'.length;
+  };
+};
 ```
 
-### 5. Register your plugin with HyperFormula
-
-Before you can use the newly created function, you need to
-register it using `registerFunctionPlugin()` method.
+To benefit from HyperFormula's automatic validations, wrap your method in the built-in `runFunction()` method, which:
+* Verifies the format of the values returned by your function.
+* Validates your function's parameters against your [custom function options](#custom-function-options).
+* Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
 
 ```javascript
-HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
+export class MyFunctionPlugin extends FunctionPlugin {
+  hyper(ast, state) {
+    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length);
+  };
+};
+```
+
+### 5. Register your plugin
+
+Register your function plugin (and its translations), so that HyperFormula can recognize it. 
+
+Use the `registerFunctionPlugin()` method:
+
+```javascript
+// register `MyFunctionPlugin` and its translations
+HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionPlugin.translations);
 ```
 
 ### 6. Use your custom function inside a formula
 
+Now, you can use your HYPER function inside a `=HYPER()` formula:
+
 ```javascript
-// prepare a spreadsheet data
+// prepare spreadsheet data
 const data = [['=HYPER()']];
 
-// build HF instance where you can use the function directly
+// build a HyperFormula instance where you can use your function directly
 const hfInstance = HyperFormula.buildFromArray(data);
 
 // read the value of cell A1
@@ -104,59 +123,74 @@ const result = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
 console.log(result);
 ```
 
-### Complete custom function implementation & demo
-
-<iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-  title="handsontable/hyperformula-demos: custom-functions"
-  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
-</iframe>
-
-## Configure the behavior of a custom function
-
-Passing optional parameters to the `implementedFunctions` object, you can configure your function to:
-* Use the [array arithmetic mode](arrays.md)
-* Treat reference or range arguments as arguments that don't create dependency
-* Inline range arguments to scalar arguments
-* Get recalculated with each sheet shape change
-* Be a [volatile](volatile-functions.md) function
-* Repeat a specified number of last arguments indefinitely
-* Never get vectorized
+### Full example
 
 ```javascript
-CountHF.implementedFunctions = {
-  HYPER: {
-    method: 'hyper',
-    // config parameters
-    arrayFunction: false,
-    doesNotNeedArgumentsToBeComputed: false,
-    expandRanges: false,
-    isDependentOnSheetStructureChange: false,
-    isVolatile: true,
-    repeatLastArgs: 4,
-  }
+import { FunctionPlugin } from 'hyperformula';
+
+export class MyFunctionPlugin extends FunctionPlugin {
+  implementedFunctions: {
+    HYPER: {
+      method: 'hyper',
+    }
+  };
+
+  translations: {
+    enGB: {
+      HYPER: 'HYPER',
+    }
+  };
+
+  hyper(ast, state) {
+    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length);
+  };
+};
+
+HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionPlugin.translations);
+```
+
+## Custom function options
+
+By passing optional parameters to the `implementedFunctions` object of your function plugin,
+you can configure your function to:
+* Treat reference or range arguments as arguments that don't create dependency.
+* Inline range arguments to scalar arguments.
+* Get recalculated with each sheet shape change.
+* Be a [volatile](volatile-functions.md) function.
+* Repeat a specified number of last arguments indefinitely.
+* Never get vectorized.
+
+```javascript
+MyFunctionPlugin.implementedFunctions = {
+    CUSTOM_FUNCTION: {
+      method: 'myCustomFunctionMethod',
+      arrayFunction: false,
+      doesNotNeedArgumentsToBeComputed: false,
+      expandRanges: false,
+      isDependentOnSheetStructureChange: false,
+      isVolatile: true,
+      repeatLastArgs: 4,
+  };
 };
 ```
 
-You can set the following config parameters:
+You can set the following options:
 
-| Option                              | Type    | Description                                                                                                                                                  |
-|-------------------------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `arrayFunction`                     | Boolean | If set to `true`, the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                       |
-| `doesNotNeedArgumentsToBeComputed`  | Boolean | If set to `true`, the function treats reference or range arguments as arguments that don't create dependency.<br><br>Other arguments are properly evaluated. |
-| `expandRanges`                      | Boolean | If set to `true`, ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                                    |
-| `isDependentOnSheetStructureChange` | Boolean | If set to `true`, the function gets recalculated with each sheet shape change (e.g. when adding/removing rows or columns).                                   |
-| `isVolatile`                        | Boolean | If set to `true`, the function is [volatile](volatile-functions.md).                                                                                         |
-| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                                |
+| Option                              | Type    | Description                                                                                                                                        |
+| ----------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                       |
+| `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency.<br><br>Other arguments are properly evaluated. |
+| `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                                    |
+| `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g. when adding/removing rows or columns).                                   |
+| `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).                                                                                         |
+| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                      |
 
-## Argument validation options
+### Argument validation options
 
 In an optional `parameters` array, you can set rules for your function's argument validation.
 
 ```javascript
-CountHF.implementedFunctions = {
+MyFunctionPlugin.implementedFunctions = {
   HYPER: {
     method: 'hyper',
     // set your argument validation options
@@ -175,15 +209,15 @@ CountHF.implementedFunctions = {
 
 You can set the following argument validation options:
 
-| Parameter      | Type                                     | Description                                                                                                                                                                                                                                |
-|----------------|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `passSubtype`  | Boolean                                  | If set to `true`, arguments are passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`)                                                                                     |
-| `defaultValue` | `InternalScalarValue` \ `RawScalarValue` | If set to any value: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                      |
-| `optionalArg`  | Boolean                                  | If set to `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
-| `minValue`     | Number                                   | If set, numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                                |
-| `maxValue`     | Number                                   | If set, numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                                   |
-| `lessThan`     | Number                                   | If set, numerical argument need to be less than `lessThan`.                                                                                                                                                                                |
-| `greaterThan`  | Number                                   | If set, numerical argument need to be greater than `greaterThan`.                                                                                                                                                                          |
+| Parameter      | Type                                     | Description                                                                                                                                                                                                                      |
+| -------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `passSubtype`  | Boolean                                  | `true`: arguments are passed with full type information.<br>(e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`)                                                                                     |
+| `defaultValue` | `InternalScalarValue` \ `RawScalarValue` | If set to any value: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                            |
+| `optionalArg`  | Boolean                                  | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
+| `minValue`     | Number                                   | If set, numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                      |
+| `maxValue`     | Number                                   | If set, numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                         |
+| `lessThan`     | Number                                   | If set, numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
+| `greaterThan`  | Number                                   | If set, numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
 
 ### Handling missing arguments
 
@@ -195,35 +229,35 @@ But, the `defaultValue` option automatically replaces any missing arguments with
 
 If you don't want to set any `defaultValue` (because, for example, your function's behavior depends on the number of valid arguments passed), you can use the `optionalArg` setting.
 
-## Aliases
+## Function aliases
 
 Aliases are available since the <Badge text="v0.4.0" vertical="middle"/> version.
 
-If you want to include aliases (multiple names to a single implemented function) inside the plugin,
+If you want to include aliases (multiple names to a single implemented function) inside the function plugin,
 you can do this with the static `aliases` property, which maps the aliases' IDs to the functions' IDs.
 
 ```javascript
-CountHF.implementedFunctions = {
+MyFunctionPlugin.implementedFunctions = {
   HYPER: {
     // this method's functionality will be defined below
     method: 'hyper',
   }
 };
 
-CountHF.aliases = {
+MyFunctionPlugin.aliases = {
   'HYPERRR': 'HYPER'
   // HYPERRR is now an alias to HYPER
 };
 ```
 
-## Translations
+## Function translations
 
 `translations` object can be defined as a static property of a plugin class or as a separate object. It must be passed as a second argument to `registerFunctionPlugin()` function.
 
 
 ```javascript
 // translation as a static property of a plugin class
-CountHF.translations = {
+MyFunctionPlugin.translations = {
   enGB: {
     'HYPER': 'HYPER'
   },
@@ -232,12 +266,12 @@ CountHF.translations = {
   }
 };
 
-HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
+HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionPlugin.translations);
 ```
 
 ```js
 // translations as a separate object
-export const countHFTranslations = {
+export const MyFunctionPluginTranslations = {
   enGB: {
     'HYPER': 'HYPER'
   },
@@ -246,7 +280,7 @@ export const countHFTranslations = {
   }
 };
 
-HyperFormula.registerFunctionPlugin(CountHF, countHFTranslations);
+HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionPluginTranslations);
 ```
 
 ## Returning errors
@@ -261,9 +295,9 @@ For example, if you want to return a `#DIV/0!` error with your custom error mess
 
 ```javascript
 // import `CellError` and `ErrorType`
-import { FunctionPlugin, CellError, ErrorType } from "hyperformula";
+import { FunctionPlugin, CellError, ErrorType } from 'hyperformula';
 
-export class CountHF extends FunctionPlugin {
+export class MyFunctionPlugin extends FunctionPlugin {
   hyper(ast, state) {
     if (!ast.args.length) {
       // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
