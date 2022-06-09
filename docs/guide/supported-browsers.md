@@ -7,15 +7,15 @@ users: performance and accuracy of calculations.
 
 ## List of supported browsers
 
-| Desktop Browsers | Mobile Browsers |
-| :--- | :--- |
-| Chrome | Chrome |
-| Firefox | Firefox for Android |
-| Safari | Firefox for iOS |
-| Edge Chromium | Safari iOS |
-| Edge | Samsung Internet |
-| UC Browser | UC Browser * |
-| QQ browser | Opera |
+| Desktop Browsers | Mobile Browsers     |
+| :--------------- | :------------------ |
+| Chrome           | Chrome              |
+| Firefox          | Firefox for Android |
+| Safari           | Firefox for iOS     |
+| Edge             | Safari iOS          |
+| UC Browser       | UC Browser *        |
+| QQ browser       | Opera               |
+|                  | Samsung Internet    |
 
 ## Full ICU support
 
