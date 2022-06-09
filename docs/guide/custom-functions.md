@@ -1,29 +1,29 @@
 # Custom functions
 
-HyperFormula enables you to expand the library of functions available in your application by implementing a custom function.
+Expand the library of functions available in your app, by implementing a custom function.
 
-## A simple example
+## Custom function example
 
-This guide explains step-by-step how to create a custom function that
-returns the number of letters in the word 'HyperFormula'. It will be
-invoked by typing `"=HYPER()"`.
+Let's create a custom function that returns the number of letters in the word "HyperFormula".
 
 ### 1. Create a plugin class
 
-First, you need to import `FunctionPlugin` and extend it with your
-own class. Here is how you can do that:
+Import `FunctionPlugin`, and extend it with your own plugin class:
 
 ```javascript
-// import FunctionPlugin
 import { FunctionPlugin } from 'hyperformula';
 
-// start creating a class
 export class CountHF extends FunctionPlugin {
   
 }
 ```
 
 ### 2. Define a custom function provided by your plugin
+
+In your newly created class, define a static property called `implementedFunctions`.
+
+`implementedFunctions`, defines the IDs of that your plugin's functions (e.g., `HYPER`),
+and maps 
 
 Your newly created class should have a static `implementedFunctions`
 property that defines functions this plugin contains and maps them to their implementations.
@@ -34,7 +34,7 @@ corresponding translations in translation packages.
 ```javascript
 CountHF.implementedFunctions = {
   HYPER: {
-    // this method's functionality will be defined below
+    // we'll define this method's functionality below
     method: 'hyper',
   }
 };
