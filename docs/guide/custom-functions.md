@@ -23,14 +23,15 @@ Import `FunctionPlugin`, and extend it with a new class. For example:
 ```javascript
 import { FunctionPlugin } from 'hyperformula';
 
-export class MyFunctionPlugin extends FunctionPlugin {
+// let's call the function plugin `CountHF`
+export class CountHF extends FunctionPlugin {
   
 };
 ```
 
 ### 2. Define your function's ID and method
 
-In your function plugin, in the `implementedFunctions` property, define an object that contains your custom function.
+In your function plugin, in the static `implementedFunctions` property, define an object that contains your custom function.
 
 The name of that object becomes the ID by which [translations](#function-translations), [aliases](#function-aliases), and other elements refer to your function.
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
@@ -38,7 +39,7 @@ Make the ID unique among all HyperFormula functions ([built-in](built-in-functio
 Inside your function's object, define a `method` property, which maps your function to an implementation method (we'll define that method later on).
 
 ```javascript
-MyFunctionPlugin.implementedFunctions = {
+CountHF.implementedFunctions = {
   // let's define the function's ID as `HYPER`
   HYPER: {
     // we'll define the `hyper` method later on
@@ -53,14 +54,16 @@ In `implementedFunctions`, you can also define your [custom function options](#c
 
 ### 3. Add your function's names
 
-In your function plugin, in the `translations` property, define your function's names, in every language that you want to support. Your end users use these names to call your function inside formulas.
+In your function plugin, in the static `translations` property, define your function's names in every language that you want to support. Your end users use these names to call your function inside formulas.
 
 If you support just one language, you still need to define the name of your function in that language.
 
+::: tip
 Function names are case-insensitive, as they are all normalized to uppercase.
+:::
 
 ```javascript
-MyFunctionPlugin.translations = {
+CountHF.translations = {
   enGB: {
     // in English, let's set the function's name to `HYPER`
     HYPER: 'HYPER',
@@ -75,7 +78,7 @@ In your function plugin, add a method that implements your function's calculatio
 * Return the results of your calculations.
 
 ```javascript
-export class MyFunctionPlugin extends FunctionPlugin {
+export class CountHF extends FunctionPlugin {
   hyper(ast, state) {
     return 'Hyperformula'.length;
   };
@@ -88,7 +91,7 @@ To benefit from HyperFormula's automatic validations, wrap your method in the bu
 * Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
 
 ```javascript
-export class MyFunctionPlugin extends FunctionPlugin {
+export class CountHF extends FunctionPlugin {
   hyper(ast, state) {
     return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length);
   };
@@ -102,13 +105,12 @@ Register your function plugin (and its translations), so that HyperFormula can r
 Use the `registerFunctionPlugin()` method:
 
 ```javascript
-// register `MyFunctionPlugin` and translations
-HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionPlugin.translations);
+HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
 ```
 
 ### 6. Use your custom function inside a formula
 
-Now, you can use your HYPER function inside a `=HYPER()` formula:
+Now, you can use your HYPER function inside a formula:
 
 ```javascript
 // prepare spreadsheet data
@@ -129,7 +131,7 @@ console.log(result);
 ```javascript
 import { FunctionPlugin } from 'hyperformula';
 
-export class MyFunctionPlugin extends FunctionPlugin {
+export class CountHF extends FunctionPlugin {
   implementedFunctions: {
     HYPER: {
       method: 'hyper',
@@ -147,7 +149,7 @@ export class MyFunctionPlugin extends FunctionPlugin {
   };
 };
 
-HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionPlugin.translations);
+HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
 ```
 
 ## Custom function options
@@ -160,12 +162,12 @@ You can configure your custom function to:
 * Repeat a specified number of last arguments indefinitely.
 * Never get vectorized.
 
-In your function plugin, in the `implementedFunctions` property, add your function's options:
+In your function plugin, in the static `implementedFunctions` property, add your function's options:
 
 ```javascript
 MyFunctionPlugin.implementedFunctions = {
   MY_FUNCTION: {
-    method: 'myCustomFunctionMethod',
+    method: 'myFunctionMethod',
     // set options for `MY_FUNCTION`
     arrayFunction: false,
     doesNotNeedArgumentsToBeComputed: false,
@@ -192,12 +194,12 @@ You can set the following options for your function:
 
 You can set rules for your function's argument validation.
 
-In your function plugin, in the `implementedFunctions` property, add an array called `parameters`:
+In your function plugin, in the static `implementedFunctions` property, next to other options add an array called `parameters`:
 
 ```javascript
 MyFunctionPlugin.implementedFunctions = {
   MY_FUNCTION: {
-    method: 'myCustomFunctionMethod',
+    method: 'myFunctionMethod',
     // set argument validation options for `MY_FUNCTION`
     parameters: [{
       passSubtype: false,
@@ -206,7 +208,7 @@ MyFunctionPlugin.implementedFunctions = {
       minValue: 5,
       maxValue: 15,
       lessThan: 15,
-      greaterThan: 5
+      greaterThan: 5,
     }],
   }
 };
@@ -214,15 +216,15 @@ MyFunctionPlugin.implementedFunctions = {
 
 You can set the following argument validation options:
 
-| Option         | Type                                     | Description                                                                                                                                                                                                                      |
-| -------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `passSubtype`  | Boolean                                  | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).                                                                                       |
-| `defaultValue` | `InternalScalarValue` \ `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                         |
-| `optionalArg`  | Boolean                                  | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
-| `minValue`     | Number                                   | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                      |
-| `maxValue`     | Number                                   | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                         |
-| `lessThan`     | Number                                   | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
-| `greaterThan`  | Number                                   | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
+| Option         | Type                                      | Description                                                                                                                                                                                                                      |
+| -------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `passSubtype`  | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).                                                                                       |
+| `defaultValue` | `InternalScalarValue` \| `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                         |
+| `optionalArg`  | Boolean                                   | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
+| `minValue`     | Number                                    | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                      |
+| `maxValue`     | Number                                    | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                         |
+| `lessThan`     | Number                                    | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
+| `greaterThan`  | Number                                    | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
 
 #### Handling missing arguments
 
@@ -236,7 +238,7 @@ If you don't want to set any `defaultValue` (because, for example, your function
 
 You can assign multiple aliases to a single custom function.
 
-In your function plugin, in the `aliases` property, add aliases for your function:
+In your function plugin, in the static `aliases` property, add aliases for your function:
 
 ```javascript
 MyFunctionPlugin.aliases = {
@@ -247,13 +249,15 @@ MyFunctionPlugin.aliases = {
 
 ## Function name translations
 
-You can define translations of your function's name.
-Your end users use the translated name to call your function inside formulas.
+You can configure the name of your function with mulitple translations.
+Your end users call your function by referring to those translations.
 
-In your function plugin, in the `translations` property, define your function's names,
+In your function plugin, in the static `translations` property, define your function's names,
 in every language that you want to support.
 
+::: tip
 Function names are case-insensitive, as they are all normalized to uppercase.
+:::
 
 ```javascript
 MyFunctionPlugin.translations = {
