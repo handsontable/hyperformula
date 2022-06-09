@@ -36,7 +36,7 @@ In your function plugin, in the static `implementedFunctions` property, define a
 The name of that object becomes the ID by which [translations](#function-translations), [aliases](#function-aliases), and other elements refer to your function.
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
 
-Inside your function's object, define a `method` property, which maps your function to an implementation method (we'll define that method later on).
+Then, in your function's object, define a `method` property, which maps your function to an implementation method (we'll define it later on).
 
 ```javascript
 CountHF.implementedFunctions = {
@@ -262,9 +262,11 @@ Function names are case-insensitive, as they are all normalized to uppercase.
 ```javascript
 MyFunctionPlugin.translations = {
   enGB: {
+    // formula in English: `=MY_FUNCTION()`
     'MY_FUNCTION': 'MY_FUNCTION'
   },
   deDE: {
+    // formula in German: `=MEINE_FUNKTION()`
     'MY_FUNCTION': 'MEINE_FUNKTION'
   }
 };
