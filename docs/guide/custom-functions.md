@@ -1,6 +1,6 @@
 # Custom functions
 
-Expand your app's function library, by adding custom functions.
+Expand the function library of your application, by adding custom functions.
 
 [[toc]]
 
