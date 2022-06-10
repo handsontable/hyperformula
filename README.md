@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <strong>A headless spreadsheet, a parser and evaluator of Excel formulas</strong>
+  <strong>A headless spreadsheet • A parser and evaluator of Excel formulas</strong>
 </p>
 
 <p align="center">
