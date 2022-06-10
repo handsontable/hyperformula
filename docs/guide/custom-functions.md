@@ -321,7 +321,7 @@ For example, if you want to return a `#DIV/0!` error with your custom error mess
 import { FunctionPlugin, CellError, ErrorType } from 'hyperformula';
 
 export class MyFunctionPlugin extends FunctionPlugin {
-  hyper(ast, state) {
+  myFunctionMethod(ast, state) {
     if (!ast.args.length) {
       // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
       // with your custom error message (optional)
