@@ -26,7 +26,7 @@ import { FunctionPlugin } from 'hyperformula';
 // let's call the function plugin `CountHF`
 export class CountHF extends FunctionPlugin {
   
-};
+}
 ```
 
 ### 2. Define your function's ID and method
@@ -44,7 +44,7 @@ CountHF.implementedFunctions = {
   HYPER: {
     // we'll define the `hyper` method later on
     method: 'hyper',
-  };
+  },
 };
 ```
 
@@ -81,7 +81,7 @@ CountHF.translations = {
   enGB: {
     // in English, let's set the function's name to `HYPER`
     HYPER: 'HYPER',
-  };
+  },
 };
 ```
 
@@ -95,8 +95,8 @@ In your function plugin, add a method that implements your function's calculatio
 export class CountHF extends FunctionPlugin {
   hyper(ast, state) {
     return 'Hyperformula'.length;
-  };
-};
+  }
+}
 ```
 
 To benefit from HyperFormula's automatic validations, wrap your method in the built-in `runFunction()` method, which:
@@ -108,8 +108,8 @@ To benefit from HyperFormula's automatic validations, wrap your method in the bu
 export class CountHF extends FunctionPlugin {
   hyper(ast, state) {
     return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length);
-  };
-};
+  }
+}
 ```
 
 ### 5. Register your function plugin
@@ -146,21 +146,21 @@ console.log(result);
 import { FunctionPlugin } from 'hyperformula';
 
 export class CountHF extends FunctionPlugin {
-  implementedFunctions: {
-    HYPER: {
-      method: 'hyper',
-    };
-  };
-
-  translations: {
-    enGB: {
-      HYPER: 'HYPER',
-    };
-  };
-
   hyper(ast, state) {
     return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length);
-  };
+  }
+}
+
+CountHF.implementedFunctions = {
+  HYPER: {
+    method: 'hyper',
+  },
+};
+
+CountHF.translations = {
+  enGB: {
+    HYPER: 'HYPER',
+  },
 };
 
 HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
@@ -190,7 +190,7 @@ MyFunctionPlugin.implementedFunctions = {
     isDependentOnSheetStructureChange: false,
     isVolatile: true,
     repeatLastArgs: 4,
-  };
+  },
 };
 ```
 
