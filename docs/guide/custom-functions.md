@@ -1,12 +1,12 @@
 # Custom functions
 
-Expand the function library of your application, by adding custom functions.
+Expand the function library of your application by adding custom functions.
 
 [[toc]]
 
 ## Add a custom function
 
-As an example, let's create a function that returns the number of letters in the word "HyperFormula".
+For example, let's create a function that returns the number of letters in the word "HyperFormula".
 
 <iframe
   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
@@ -68,7 +68,7 @@ CountHF.implementedFunctions = {
 
 ### 3. Add your function's names
 
-In your function plugin, in the static `translations` property, define your function's names in every language that you want to support. Your end users use these names to call your function inside formulas.
+In your function plugin, in the static `translations` property, define your function's names in every language you want to support. Your end users use these names to call your function inside formulas.
 
 If you support just one language, you still need to define the name of your function in that language.
 
@@ -87,7 +87,7 @@ CountHF.translations = {
 
 ### 4. Implement your function's logic
 
-In your function plugin, add a method that implements your function's calculations. Your method needs to:
+Add a method that implements your function's calculations in your function plugin. Your method needs to:
 * Take two optional arguments: `ast` and `state`.
 * Return the results of your calculations.
 
@@ -114,7 +114,7 @@ export class CountHF extends FunctionPlugin {
 
 ### 5. Register your function plugin
 
-Register your function plugin (and its translations), so that HyperFormula can recognize it. 
+Register your function plugin (and its translations) so that HyperFormula can recognize it.
 
 Use the `registerFunctionPlugin()` method:
 
@@ -209,7 +209,7 @@ You can set the following options for your function:
 
 You can set rules for your function's argument validation.
 
-In your function plugin, in the static `implementedFunctions` property, next to other options add an array called `parameters`:
+In your function plugin, in the static `implementedFunctions` property, next to other options, add an array called `parameters`:
 
 ```javascript
 MyFunctionPlugin.implementedFunctions = {
@@ -243,9 +243,9 @@ You can set the following argument validation options:
 
 #### Handling missing arguments
 
-Both the `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
+The `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
 
-Setting a `defaultValue` for an argument always makes that argument optional. But, the `defaultValue` option automatically replaces any missing arguments with `defaultValue`, so your custom function is not aware of the actual number of valid arguments passed.
+Setting a `defaultValue` for an argument always makes that argument optional. But, the `defaultValue` option automatically replaces any missing arguments with `defaultValue`, so your custom function is unaware of the actual number of valid arguments passed.
 
 If you don't want to set any `defaultValue` (because, for example, your function's behavior depends on the number of valid arguments passed), use the `optionalArg` setting instead.
 
@@ -264,7 +264,7 @@ MyFunctionPlugin.aliases = {
 
 ## Function name translations
 
-You can configure the name of your function with mulitple translations.
+You can configure the name of your function with multiple translations.
 Your end users call your function by referring to those translations.
 
 In your function plugin, in the static `translations` property, define your function's names,
