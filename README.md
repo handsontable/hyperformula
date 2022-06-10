@@ -1,12 +1,12 @@
 <br>
 <p align="center">
   <a href="https://handsontable.github.io/hyperformula/">
-    <img src="https://raw.githubusercontent.com/handsontable/hyperformula/master/github-hf-logo-blue.svg" width="350" height="71" alt="HyperFormula - An advanced headless evaluator and parser of the Excel formulas"/>
+    <img src="https://raw.githubusercontent.com/handsontable/hyperformula/master/github-hf-logo-blue.svg" width="350" height="71" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas"/>
   </a>
 </p>
 
 <p align="center">
-  <strong>An advanced headless evaluator and parser of the Excel formulas</strong>
+  <strong>A headless spreadsheet, a parser and evaluator of Excel formulas</strong>
 </p>
 
 <p align="center">
@@ -20,8 +20,7 @@
 
 ---
 
-HyperFormula is a headless spreadsheet built on top of TypeScript. It serves as an evaluator and parser for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
-
+HyperFormula is a headless spreadsheet built on top of TypeScript. It serves as a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
 - High-speed Excel formula evaluating and parsing
 - A library of [380+ built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html) available in 16 languages
 - Support for [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html)
@@ -57,7 +56,7 @@ Install the library from [npm](https://www.npmjs.com/package/hyperformula):
 npm install hyperformula
 ```
 
-Once properly installed, you can use it like this:
+Once installed, you can use it like this:
 
 ```js
 import { HyperFormula } from 'hyperformula';
@@ -105,4 +104,4 @@ HyperFormula is available under the open source license ([GPLv3](https://github.
 To buy a commercial license, please write to us at sales@handsontable.com
 
 ## Copyrights
-© 2021 [Handsoncode](https://handsontable.com)
+© 2022 [Handsoncode](https://handsontable.com)
