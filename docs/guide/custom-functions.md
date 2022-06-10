@@ -1,12 +1,12 @@
 # Custom functions
 
-Expand the function library of your application by adding custom functions.
+Expand the function library of your application, by adding custom functions.
 
 [[toc]]
 
 ## Add a custom function
 
-For example, let's create a function that returns the number of letters in the word "HyperFormula".
+As an example, let's create a function that returns the number of letters in the word "HyperFormula".
 
 <iframe
   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
@@ -87,7 +87,7 @@ CountHF.translations = {
 
 ### 4. Implement your function's logic
 
-Add a method that implements your function's calculations in your function plugin. Your method needs to:
+In your function plugin, add a method that implements your function's calculations. Your method needs to:
 * Take two optional arguments: `ast` and `state`.
 * Return the results of your calculations.
 
@@ -209,7 +209,7 @@ You can set the following options for your function:
 
 You can set rules for your function's argument validation.
 
-In your function plugin, in the static `implementedFunctions` property, next to other options, add an array called `parameters`:
+In your function plugin, in the static `implementedFunctions` property, next to other options add an array called `parameters`:
 
 ```javascript
 MyFunctionPlugin.implementedFunctions = {
@@ -243,7 +243,7 @@ You can set the following argument validation options:
 
 #### Handling missing arguments
 
-The `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
+Both the `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
 
 Setting a `defaultValue` for an argument always makes that argument optional. But, the `defaultValue` option automatically replaces any missing arguments with `defaultValue`, so your custom function is unaware of the actual number of valid arguments passed.
 
