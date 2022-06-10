@@ -355,7 +355,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     metadata: FunctionMetadata,
     fn: (...arg: any) => InterpreterValue,
   ) => {
-    let argumentDefinitions: FunctionArgument[] = metadata.parameters!
+    let argumentDefinitions: FunctionArgument[] = metadata.parameters || []
     let argValues: [InterpreterValue, boolean][]
 
     if (metadata.expandRanges) {
