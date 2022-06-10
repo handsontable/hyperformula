@@ -52,6 +52,20 @@ CountHF.implementedFunctions = {
 In `implementedFunctions`, you can also define your [custom function options](#custom-function-options) and [argument validation options](#argument-validation-options).
 :::
 
+::: tip
+To define multiple functions in a single function plugin, add them all to the `implementedFunctions` object.
+```js
+CountHF.implementedFunctions = {
+  HYPER: {
+    //...
+  },
+  SUPER: {
+    //...
+  },
+};
+```
+:::
+
 ### 3. Add your function's names
 
 In your function plugin, in the static `translations` property, define your function's names in every language that you want to support. Your end users use these names to call your function inside formulas.
@@ -155,6 +169,7 @@ HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
 ## Custom function options
 
 You can configure your custom function to:
+* Use the [array arithmetic mode](arrays.md).
 * Treat reference or range arguments as arguments that don't create dependency.
 * Inline range arguments to scalar arguments.
 * Get recalculated with each sheet shape change.
