@@ -32,11 +32,11 @@ To build the project you can use the following commands:
 builds, verifies the version
 * `npm run bundle:es` - transpiles files into the `import/export`
 format , builds ES6 version
-* `npm run bundle:cjs` - builds commonJS version
+* `npm run bundle:cjs` - builds CommonJS version
 * `npm run bundle:development` - generates development build
 * `npm run bundle:production` - generates production build
 * `npm run bundle:languages` - builds the languages
-* `npm run bundle:typings` - generates TS typing, only emits ‘.d.ts’ declaration files
+* `npm run bundle:typings` - generates TypeScript typing, only emits ‘.d.ts’ declaration files
 
 We use the latest version of Node 16 LTS in the build-chain and recommend this version for building. Note that for using (not building) HyperFormula, a wider range of Node versions is supported.
 
@@ -45,13 +45,13 @@ We use the latest version of Node 16 LTS in the build-chain and recommend this v
 By using the following commands you can verify the build:
 
 * `verify-bundles` - runs all verify commands
-* `verify:umd` - verifies umd version
-* `verify:umd:min` - verifies umd minified version without dependencies
-* `verify:umd:full` - verifies umd version with dependencies
-* `verify:umd:full.min` - verifies minified umd version with dependencies
-* `verify:cjs` - verifies commonJS version with dependencies
+* `verify:umd` - verifies UMD version
+* `verify:umd:min` - verifies UMD minified version without dependencies
+* `verify:umd:full` - verifies UMD version with dependencies
+* `verify:umd:full.min` - verifies minified UMD version with dependencies
+* `verify:cjs` - verifies CommonJS version with dependencies
 * `verify:publish-package` -  checks if npm built the package correctly
-* `verify:typings` - verifies TS typings
+* `verify:typings` - verifies TypeScript typings
 
 ## Build the documentation
 
