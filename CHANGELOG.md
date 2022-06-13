@@ -9,10 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.1] - 2022-06-14
 
 ### Changed
-- Changed internal project tooling by modifying npm scripts. Affected scripts: `docs`, `docs:api`, `docs:dev`, `docs:build`, `coverage`, `typings:check`. [#977](https://github.com/handsontable/hyperformula/issues/977)
+- Changed the following npm scripts (used internally): `docs`, `docs:api`, `docs:dev`, `docs:build`, `coverage`, `typings:check`. [#977](https://github.com/handsontable/hyperformula/issues/977)
 
 ### Fixed
-- Fixed an issue that it is impossible to define a custom function with no `parameters` property in the metadata. [#968](https://github.com/handsontable/hyperformula/issues/968)
+- Fixed an issue where it was impossible to add a custom function with no `parameters`. [#968](https://github.com/handsontable/hyperformula/issues/968)
 
 ## [2.0.0] - 2022-04-14
 
