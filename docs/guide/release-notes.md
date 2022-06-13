@@ -7,12 +7,11 @@ HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## 2.0.1
 **Release date: June 14, 2022**
 
-## Changed
-- Changed internal project tooling by modifying npm scripts. Affected scripts: `docs`, `docs:api`, `docs:dev`, `docs:build`, `coverage`, `typings:check`. [#977](https://github.com/handsontable/hyperformula/issues/977)
+### Changed
+- Changed the following npm scripts (used internally): `docs`, `docs:api`, `docs:dev`, `docs:build`, `coverage`, `typings:check`. [#977](https://github.com/handsontable/hyperformula/issues/977)
 
-## Fixed
-- Fixed an issue that it is impossible to define a custom function with no `parameters` property in the metadata. [#968](https://github.com/handsontable/hyperformula/issues/968)
-
+### Fixed
+- Fixed an issue where it was impossible to add a custom function with no `parameters`. [#968](https://github.com/handsontable/hyperformula/issues/968)
 
 ## 2.0.0
 **Release date: April 14, 2022**
