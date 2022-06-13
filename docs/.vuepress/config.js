@@ -235,7 +235,6 @@ module.exports = {
             ['/guide/contributing', 'Contributing'],
             ['/guide/code-of-conduct.md', 'Code of conduct'],
             ['/guide/branding', 'Branding'],
-            ['/guide/acknowledgements', 'Acknowledgments'],
             ['/guide/contact', 'Contact'],
           ]
         },
