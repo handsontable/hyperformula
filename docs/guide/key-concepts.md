@@ -29,6 +29,8 @@ There can be many such orders, like so:
 
 <img :src="$withBase('/topsort.png')">
 
+Read more about the [dependency graph](/guide/dependency-graph.md).
+
 ## Phase 3. Evaluation
 
 It is crucial to evaluate cells efficiently. For simple expressions,
@@ -104,56 +106,3 @@ require an immediate transformation of all the affected formulas.
 Instead of transforming all of them at once, HyperFormula remembers
 the history of the operations and postpones the transformations
 until the formula needs to be displayed or recalculated.
-
-## Handling ranges
-
-In many applications, you may want to use formulas that depend on a
-large range of cells. For example, the formula `SUM(A1:A100)+B5`
-depends on 101 cells and it needs to be represented in the graph of
-cell dependencies accordingly.
-
-An interesting optimization challenge arises when the are multiple
-cells that depend on large ranges. For example, consider the following
-use-case:
-
-* `B1=SUM(A1:A1)`
-* `B2=SUM(A1:A2)`
-* `B3=SUM(A1:A3)`
-* ...
-* `B100=SUM(A1:A100)`
-
-The problem is that there are `1+2+3+...+100 = 5050` dependencies
-for such a simple situation. In general, for `n` such rows, the
-engine would need to add `n*(n+1)/2 ≈ n²` arcs in the graph. This
-value grows much faster than the size of data, meaning the engine
-would not be able to handle large data sets efficiently.
-
-A solution to this problem comes from the observation that there is
-a way to rewrite the above formulas to equivalent ones, which will
-be more compact to represent. Specifically, the following formulas
-would compute the same values as the ones provided previously:
-
-* `B1=A1`
-* `B2=B1+A2`
-* `B3=B2+A3`
-* ...
-* `B100=B99+A100`
-
-Whereas this example is too specialized to provide a useful rule
-for optimization, it shows the main idea behind efficient handling
-of multiple ranges: **to represent a range as a composition of
-smaller ranges.**
-
-In the adopted implementation, every time the engine encounters a
-range, say `B5:D20`, it checks if it has already considered the
-range which is one row shorter. In this example, it would be `B5:D19`.
-If so, then it represents `B5:D20` as the composition of a range
-`B5:D19` and three cells in the last row: `B20`,`C20` and `D20`.
-
-<img :src="$withBase('/ranges.png')">
-
-More generally, the result of any associative operation is obtained
-as the result of operations for these small rows. There are many
-examples of such associative functions: `SUM`, `MAX`, `COUNT`, etc.
-As one range can be used in different formulas, we can reuse its
-node and avoid duplicating the work during computation.

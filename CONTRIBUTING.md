@@ -21,8 +21,8 @@ library of translations is also a good task to start with.
 [Here](https://docs.google.com/spreadsheets/d/1UUskn4ZDDjLGSpO6kg73DOvabNoeqLbkJYyVfLyYlYw)
 you can find a list of functions' translations.
 
-Visit [building]( https://handsontable.com/docs/hyperformula/guide/building.html) and [testing]( https://handsontable.com/docs/hyperformula/guide/testing.html) sections to
-get more info about these topics and check the list of commands you
+Visit [building]( https://handsontable.com/docs/hyperformula/guide/building.html) section to
+get more info about the development process and check the list of commands you
 can run in this project. Check the `/i18n`
 folder in the project - all translations are kept just right there.
 For the functions see the `interpreter/plugin` folder. Both of them

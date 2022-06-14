@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [2.0.1] - 2022-06-14
+
+### Changed
+- Changed the following npm scripts (used internally): `docs`, `docs:api`, `docs:dev`, `docs:build`, `coverage`, `typings:check`. [#977](https://github.com/handsontable/hyperformula/issues/977)
+
+### Fixed
+- Fixed an issue where it was impossible to add a custom function with no `parameters`. [#968](https://github.com/handsontable/hyperformula/issues/968)
+
 ## [2.0.0] - 2022-04-14
 
 For more information on this release, see:

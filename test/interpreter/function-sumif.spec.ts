@@ -25,6 +25,37 @@ describe('Function SUMIF - argument validations and combinations', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 
+  it('works when 2nd arg is a string', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUMIF(C1:C2, "a", B1:B2)', 2, 'a'],
+      [null, 3, 'b'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+  })
+
+  it('works when 2nd arg is an inline array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [2, 'a'],
+      [3, 'b'],
+      ['=SUMIF(B1:B2, {"a", "b"}, A1:A2)']
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('B3'))).toEqual(3)
+  })
+
+  it('works with an array as a second argument', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, 2, 1],
+      [null, 3, 2],
+      ['=SUMIF(C1:C2, { 1, 2 }, B1:B2)']
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('B3'))).toEqual(3)
+  })
+
   it('works when 2nd arg is a boolean', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUMIF(C1:C2, TRUE(), B1:B2)', 2, 1],
@@ -540,6 +571,17 @@ describe('Function SUMIFS - argument validations and combinations', () => {
       ['=SUMIF(C2:C11,">31/05/2019",D2:D11)']
     ], {dateFormats: ['DD/MM/YYYY']})
     expect(engine.getCellValue(adr('A3'))).toEqual(15000)
+  })
+
+  it('works when criterion arg is an inline array', () => {
+    const engine = HyperFormula.buildFromArray([
+      [2, 'a'],
+      [3, 'b'],
+      ['=SUMIFS(A1:A2, B1:B2, {"a", "b"})']
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('B3'))).toEqual(3)
   })
 })
 
