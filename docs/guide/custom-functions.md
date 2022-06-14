@@ -263,8 +263,7 @@ MyFunctionPlugin.aliases = {
 ```
 
 ::: tip
-Aliases also require translations. Otherwise, they will not work.
-
+For each alias of your function, define a translation, even if you want to support only one language.
 ```js
 MyFunctionPlugin.translations = {
   enGB: {
