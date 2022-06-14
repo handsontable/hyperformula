@@ -262,6 +262,19 @@ MyFunctionPlugin.aliases = {
 };
 ```
 
+::: tip
+Aliases also require translations. Otherwise, they will not work.
+
+```js
+MyFunctionPlugin.translations = {
+  enGB: {
+    'MY_FUNCTION': 'MY_FUNCTION',
+    'MY_ALIAS': 'MY_ALIAS',
+  },
+};
+```
+:::
+
 ## Function name translations
 
 You can configure the name of your function with multiple translations.
@@ -305,6 +318,10 @@ export const MyFunctionNameTranslations = {
 // register your function plugin and translations
 HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionNameTranslations);
 ```
+
+::: tip
+Before using a translated function name, remember to [register and set the language](localizing-functions.md).
+:::
 
 ## Returning errors
 
