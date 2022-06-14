@@ -20,8 +20,8 @@
 
 ---
 
-HyperFormula is a headless spreadsheet built on top of TypeScript. It serves as a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
-- High-speed Excel formula evaluating and parsing
+HyperFormula is a headless spreadsheet built on top of TypeScript. It is a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
+- High-speed Excel formula parsing and evaluating
 - A library of [380+ built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html) available in 16 languages
 - Support for [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html)
 - Function syntax [compatible with Excel and Google Sheets](https://handsontable.github.io/hyperformula/guide/known-limitations.html#google-sheets-and-microsoft-excel)
@@ -33,7 +33,7 @@ HyperFormula is a headless spreadsheet built on top of TypeScript. It serves as 
 - Support for [data sorting](https://handsontable.github.io/hyperformula/guide/sorting-data.html)
 - Support for [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html), [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html), and [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
 - Open-source license
-- Actively maintained by the team at [Handsontable - JavaScript Data Grid](https://handsontable.com/)
+- Actively maintained by the team that stands behind [Handsontable - JavaScript Data Grid](https://handsontable.com/)
 
 ## Documentation
 
@@ -85,6 +85,7 @@ console.log(mySum);
 
 HyperFormula doesn't assume any existing user interface, making it a great general-purpose library that can be used in various business applications. Here are some examples:
 
+- Spreadsheets
 - Business logic builders
 - Forms and form builders
 - Computation notebooks
