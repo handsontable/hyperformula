@@ -18,12 +18,21 @@ description: HyperFormula® - Complex Calculations Made Easy
 
 ## What is HyperFormula?
 
-HyperFormula is an open-source calculation engine that allows you
-to perform Excel-like calculations in your business applications.
-It is written in TypeScript and works with major
-JavaScript frameworks like [Vue](/guide/integration-with-vue.md),
-[React](/guide/integration-with-react.md), and [Angular](/guide/integration-with-angular.md). You can use it in a
-browser or as a service, with Node.js as your back-end technology.
+HyperFormula is a headless spreadsheet built on top of TypeScript. It is a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
+
+- High-speed Excel formula parsing and evaluating
+- A library of [380+ built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html) available in 16 languages
+- Support for [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html)
+- Function syntax [compatible with Excel and Google Sheets](https://handsontable.github.io/hyperformula/guide/known-limitations.html#google-sheets-and-microsoft-excel)
+- [Support for Node.js](https://handsontable.github.io/hyperformula/guide/server-side-installation.html#install-with-npm-or-yarn)
+- Support for [undo/redo](https://handsontable.github.io/hyperformula/guide/undo-redo.html)
+- Support for [CRUD operations](https://handsontable.github.io/hyperformula/guide/basic-operations.html)
+- Support for [clipboard](https://handsontable.github.io/hyperformula/guide/clipboard-operations.html)
+- Support for [named expressions](https://handsontable.github.io/hyperformula/guide/named-expressions.html)
+- Support for [data sorting](https://handsontable.github.io/hyperformula/guide/sorting-data.html)
+- Support for [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html), [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html), and [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
+- Open-source license
+- Actively maintained by the team that stands behind [Handsontable - JavaScript Data Grid](https://handsontable.com/)
 
 HyperFormula comes with a huge library of [{{ $page.functionsCount }} built-in functions](/guide/built-in-functions.md)
 grouped into categories:
@@ -44,48 +53,17 @@ The functions use A1 notation and are compatible with popular spreadsheet softwa
 Excel or Google Sheets, which means that you can easily transfer
 the data and formulas between them.
 
-HyperFormula covers most user-triggered actions such as
-[CRUD operations](/guide/basic-operations.md), [undo/redo](/guide/undo-redo.md),
-and [clipboard operations](/guide/clipboard-operations.md). It also supports
-the use of cross-sheet references, [named expressions](/guide/named-expressions.md),
-[different data types](/guide/types-of-values.md),
-and [custom functions](/guide/custom-functions.md).
+## What can it be used for?
 
-## What can I use it for?
+HyperFormula doesn't assume any existing user interface, making it a great general-purpose library that can be used in various business applications. Here are some examples:
 
-HyperFormula doesn't assume any existing user interface \(UI\),
-which makes it a great general-purpose library that can be used in
-various business applications. Here are some ideas on what you can
-build with HyperFormula:
-
-* Smart documents
-* Educational apps
-* Computation notebooks
-* Data grid components
-* Business logic builders
-* Forms and form builders
-* Spreadsheets
-* Online calculators
-* Low connectivity apps
-
-## Core features
-
-The features that HyperFormula offers make it a flexible and easy
-to use tool for many types of software.
-
-* High-speed formula calculations
-* A library of {{ $page.functionsCount }} built-in functions available in 16 languages
-* Support for cross-sheet references
-* Support for undo/redo
-* Support for copy/cut/paste
-* Support for wildcard characters
-* Support for data sorting
-* Works with popular JavaScript frameworks
-* Written in TypeScript and extensively tested
-* Function syntax compatible with Excel and Google Sheets
-* Double-licensed: GPL/Commercial
-* Actively maintained and supported by the
-[Handsontable](https://handsontable.com/) team
+- Spreadsheets
+- Business logic builders
+- Forms and form builders
+- Computation notebooks
+- Smart documents
+- Educational apps
+- Online calculators
 
 ## Resources
 
