@@ -18,13 +18,13 @@ following command:
   
 **npm:**
 
-```
+```bash
 $ npm install hyperformula
 ```
 
 **Yarn:**
 
-```
+```bash
 $ npm install hyperformula
 ```
 
