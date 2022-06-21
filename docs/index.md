@@ -21,16 +21,16 @@ description: HyperFormula® - Complex Calculations Made Easy
 HyperFormula is a headless spreadsheet built on top of TypeScript. It is a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
 
 - High-speed Excel formula parsing and evaluating
-- A library of [380+ built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html) available in 16 languages
-- Support for [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html)
-- Function syntax [compatible with Excel and Google Sheets](https://handsontable.github.io/hyperformula/guide/known-limitations.html#google-sheets-and-microsoft-excel)
-- [Support for Node.js](https://handsontable.github.io/hyperformula/guide/server-side-installation.html#install-with-npm-or-yarn)
-- Support for [undo/redo](https://handsontable.github.io/hyperformula/guide/undo-redo.html)
-- Support for [CRUD operations](https://handsontable.github.io/hyperformula/guide/basic-operations.html)
-- Support for [clipboard](https://handsontable.github.io/hyperformula/guide/clipboard-operations.html)
-- Support for [named expressions](https://handsontable.github.io/hyperformula/guide/named-expressions.html)
-- Support for [data sorting](https://handsontable.github.io/hyperformula/guide/sorting-data.html)
-- Support for [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html), [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html), and [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
+- A library of [380+ built-in functions](/guide/built-in-functions.html) available in 16 languages
+- Support for [custom functions](/guide/custom-functions.html)
+- Function syntax [compatible with Excel and Google Sheets](/guide/known-limitations.html#google-sheets-and-microsoft-excel)
+- [Support for Node.js](/guide/server-side-installation.html#install-with-npm-or-yarn)
+- Support for [undo/redo](/guide/undo-redo.html)
+- Support for [CRUD operations](/guide/basic-operations.html)
+- Support for [clipboard](/guide/clipboard-operations.html)
+- Support for [named expressions](/guide/named-expressions.html)
+- Support for [data sorting](/guide/sorting-data.html)
+- Support for [React](/guide/integration-with-react.html), [Angular](/guide/integration-with-angular.html), and [Vue.js](/guide/integration-with-vue.html)
 - Open-source license
 - Actively maintained by the team that stands behind [Handsontable - JavaScript Data Grid](https://handsontable.com/)
 
