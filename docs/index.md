@@ -21,16 +21,16 @@ description: HyperFormula® - Complex Calculations Made Easy
 HyperFormula is a headless spreadsheet built on top of TypeScript. It is a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
 
 - High-speed Excel formula parsing and evaluating
-- A library of [380+ built-in functions](/guide/built-in-functions.html) available in 16 languages
-- Support for [custom functions](/guide/custom-functions.html)
-- Function syntax [compatible with Excel and Google Sheets](/guide/known-limitations.html#google-sheets-and-microsoft-excel)
-- [Support for Node.js](/guide/server-side-installation.html#install-with-npm-or-yarn)
-- Support for [undo/redo](/guide/undo-redo.html)
-- Support for [CRUD operations](/guide/basic-operations.html)
-- Support for [clipboard](/guide/clipboard-operations.html)
-- Support for [named expressions](/guide/named-expressions.html)
-- Support for [data sorting](/guide/sorting-data.html)
-- Support for [React](/guide/integration-with-react.html), [Angular](/guide/integration-with-angular.html), and [Vue.js](/guide/integration-with-vue.html)
+- A library of [380+ built-in functions](/guide/built-in-functions.md) available in 16 languages
+- Support for [custom functions](/guide/custom-functions.md)
+- Function syntax [compatible with Excel and Google Sheets](/guide/known-limitations.md#google-sheets-and-microsoft-excel)
+- [Support for Node.js](/guide/server-side-installation.md#install-with-npm-or-yarn)
+- Support for [undo/redo](/guide/undo-redo.md)
+- Support for [CRUD operations](/guide/basic-operations.md)
+- Support for [clipboard](/guide/clipboard-operations.md)
+- Support for [named expressions](/guide/named-expressions.md)
+- Support for [data sorting](/guide/sorting-data.md)
+- Support for [React](/guide/integration-with-react.md), [Angular](/guide/integration-with-angular.md), and [Vue.js](/guide/integration-with-vue.md)
 - Open-source license
 - Actively maintained by the team that stands behind [Handsontable - JavaScript Data Grid](https://handsontable.com/)
 
