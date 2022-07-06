@@ -452,6 +452,28 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
 
     expect(engine.getCellValue(adr('A5'))).toEqual(13)
   })
+
+  it('coerces dates as numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '9160250011660588', '43469', '25000'],
+      ['2', '9160250011689568', '43631', '15000'],
+      ['=SUMIF(C2:C11,">31/05/2019",D2:D11)']
+    ], {dateFormats: ['DD/MM/YYYY']})
+    expect(engine.getCellValue(adr('A3'))).toEqual(15000)
+  })
+
+  it('works when criterion arg is a date', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['31/05/2019', '1'],
+      ['=DATEVALUE("31/05/2019")', '1'],
+      ['=DATE(2019, 5, 31)', '1'],
+      ['=A1', '1'],
+      ['43616', '1'],
+      ['=SUMIF(A1:A5, "31/05/2019", B1:B5)']
+    ], {dateFormats: ['DD/MM/YYYY']})
+
+    expect(engine.getCellValue(adr('A6'))).toEqual(5)
+  })
 })
 
 describe('Function SUMIFS - argument validations and combinations', () => {
@@ -562,15 +584,6 @@ describe('Function SUMIFS - argument validations and combinations', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
-  })
-
-  it('coerces dates as numbers', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '9160250011660588', '43469', '25000'],
-      ['2', '9160250011689568', '43631', '15000'],
-      ['=SUMIF(C2:C11,">31/05/2019",D2:D11)']
-    ], {dateFormats: ['DD/MM/YYYY']})
-    expect(engine.getCellValue(adr('A3'))).toEqual(15000)
   })
 
   it('works when criterion arg is an inline array', () => {
