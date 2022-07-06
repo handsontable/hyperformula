@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {CellValueDetailedType, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {plPL} from '../../src/i18n/languages'
@@ -473,6 +473,46 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     ], {dateFormats: ['DD/MM/YYYY']})
 
     expect(engine.getCellValue(adr('A6'))).toEqual(5)
+  })
+
+  it('works when criterion arg is a time value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['12:13', '1'],
+      ['=SUMIF(A1:A1, "12:13", B1:B1)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_TIME)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+  })
+
+  it('works when criterion arg is a datetime value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['31/05/2019 9:15', '1'],
+      ['=SUMIF(A1:A1, "31/05/2019 9:15", B1:B1)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_DATETIME)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+  })
+
+  it('works when criterion arg is a currency value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['$1', '1'],
+      ['=SUMIF(A1:A1, "$1", B1:B1)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+  })
+
+  it('works when criterion arg is a percent value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['20%', '1'],
+      ['=SUMIF(A1:A1, "20%", B1:B1)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_PERCENT)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
   })
 })
 
