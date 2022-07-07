@@ -22,7 +22,7 @@ module.exports = {
     // Google Console
     ['meta', { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' }]
   ],
-  base: '/hyperformula/',
+  base: '/',
   plugins: [
     searchBoxPlugin,
     // [
