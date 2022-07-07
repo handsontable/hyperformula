@@ -230,7 +230,29 @@ export class ArithmeticHelper {
       if (arg === '') {
         return 0
       }
-      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
+
+      const trimmedContent = arg.trim()
+
+      // percent
+      if (trimmedContent.endsWith('%')) {
+        const numOfPercents = trimmedContent.slice(0, trimmedContent.length - 1).trim()
+        const parsedNumOfPercents = this.numberLiteralsHelper.numericStringToMaybeNumber(numOfPercents)
+        if (parsedNumOfPercents !== undefined) {
+          return new PercentNumber(parsedNumOfPercents / 100)
+        }
+      }
+
+      // currency
+      const matchedCurrency = this.currencyMatcher(trimmedContent)
+      if (matchedCurrency !== undefined) {
+        const [currencySymbol, currencyValue] = matchedCurrency
+        const parsedCurrencyValue = this.numberLiteralsHelper.numericStringToMaybeNumber(currencyValue)
+        if (parsedCurrencyValue !== undefined) {
+          return new CurrencyNumber(parsedCurrencyValue, currencySymbol)
+        }
+      }
+
+      return this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
     } else if (isExtendedNumber(arg)) {
       return arg
     } else if (typeof arg === 'boolean') {
@@ -238,6 +260,18 @@ export class ArithmeticHelper {
     } else {
       return undefined
     }
+  }
+
+  private currencyMatcher(token: string): Maybe<[string, string]> {
+    for (const currency of this.config.currencySymbol) {
+      if (token.startsWith(currency)) {
+        return [currency, token.slice(currency.length)]
+      }
+      if (token.endsWith(currency)) {
+        return [currency, token.slice(0, token.length - currency.length)]
+      }
+    }
+    return undefined
   }
 
   public coerceComplexExactRanges(args: InterpreterValue[]): complex[] | CellError {
