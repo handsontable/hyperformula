@@ -73,12 +73,12 @@ export interface FunctionMetadata {
   method: string,
   /**
    * Engine.
-   *
-   * If set to `true`, the function is volatile.
    */
   arraySizeMethod?: string,
   /**
    * Engine.
+   *
+   * If set to `true`, the function is volatile.
    */
   isVolatile?: boolean,
   /**
