@@ -231,28 +231,17 @@ export class ArithmeticHelper {
         return 0
       }
 
-      const trimmedContent = arg.trim()
-
-      // percent
-      if (trimmedContent.endsWith('%')) {
-        const numOfPercents = trimmedContent.slice(0, trimmedContent.length - 1).trim()
-        const parsedNumOfPercents = this.numberLiteralsHelper.numericStringToMaybeNumber(numOfPercents)
-        if (parsedNumOfPercents !== undefined) {
-          return new PercentNumber(parsedNumOfPercents / 100)
-        }
+      const maybePercentNumber = this.coerceStringToMaybePercentNumber(arg)
+      if (maybePercentNumber !== undefined) {
+        return maybePercentNumber
       }
 
-      // currency
-      const matchedCurrency = this.currencyMatcher(trimmedContent)
-      if (matchedCurrency !== undefined) {
-        const [currencySymbol, currencyValue] = matchedCurrency
-        const parsedCurrencyValue = this.numberLiteralsHelper.numericStringToMaybeNumber(currencyValue)
-        if (parsedCurrencyValue !== undefined) {
-          return new CurrencyNumber(parsedCurrencyValue, currencySymbol)
-        }
+      const maybeCurrencyNumber = this.coerceStringToMaybeCurrencyNumber(arg)
+      if (maybeCurrencyNumber !== undefined) {
+        return maybeCurrencyNumber
       }
 
-      return this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
+      return this.numberLiteralsHelper.numericStringToMaybeNumber(arg.trim())
     } else if (isExtendedNumber(arg)) {
       return arg
     } else if (typeof arg === 'boolean') {
@@ -260,6 +249,34 @@ export class ArithmeticHelper {
     } else {
       return undefined
     }
+  }
+
+  private coerceStringToMaybePercentNumber(input: string): Maybe<PercentNumber> {
+    const trimmedInput = input.trim()
+
+    if (trimmedInput.endsWith('%')) {
+      const numOfPercents = trimmedInput.slice(0, trimmedInput.length - 1).trim()
+      const parsedNumOfPercents = this.numberLiteralsHelper.numericStringToMaybeNumber(numOfPercents)
+      if (parsedNumOfPercents !== undefined) {
+        return new PercentNumber(parsedNumOfPercents / 100)
+      }
+    }
+
+    return undefined
+  }
+
+  private coerceStringToMaybeCurrencyNumber(input: string): Maybe<CurrencyNumber> {
+    const matchedCurrency = this.currencyMatcher(input.trim())
+
+    if (matchedCurrency !== undefined) {
+      const [currencySymbol, currencyValue] = matchedCurrency
+      const parsedCurrencyValue = this.numberLiteralsHelper.numericStringToMaybeNumber(currencyValue)
+      if (parsedCurrencyValue !== undefined) {
+        return new CurrencyNumber(parsedCurrencyValue, currencySymbol)
+      }
+    }
+
+    return undefined
   }
 
   private currencyMatcher(token: string): Maybe<[string, string]> {

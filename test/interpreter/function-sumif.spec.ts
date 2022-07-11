@@ -498,11 +498,14 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
   it('works when criterion arg is a currency value', () => {
     const engine = HyperFormula.buildFromArray([
       ['$1', '1'],
-      ['=SUMIF(A1:A1, "$1", B1:B1)']
+      ['1$', '1'],
+      ['=SUMIF(A1:A2, "$1", B1:B2)'],
+      ['=SUMIF(A1:A2, "1$", B1:B2)']
     ])
 
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
 
   it('works when criterion arg is a percent value', () => {
