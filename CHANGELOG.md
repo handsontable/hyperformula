@@ -1,3 +1,4 @@
+
 # HyperFormula changelog
 All notable changes to this project will be documented in this file.
 
@@ -7,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle dates correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
+- Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
 
 ## [2.0.1] - 2022-06-14
 
