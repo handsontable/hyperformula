@@ -21,9 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2022-04-14
 
 For more information on this release, see:
-- [Release notes](https://handsontable.github.io/hyperformula/guide/release-notes.html)
+- [Release notes](https://hyperformula.handsontable.com/guide/release-notes.html)
 - [Blog post](https://handsontable.com/blog/articles/2022/04/whats-new-in-hyperformula-2.0.0)
-- [Migration guide](https://handsontable.github.io/hyperformula/guide/migration-from-1.0-to-2.0.html)
+- [Migration guide](https://hyperformula.handsontable.com/guide/migration-from-1.0-to-2.0.html)
 
 ### Added
 - Added support for reversed ranges. [#834](https://github.com/handsontable/hyperformula/issues/834)

@@ -1,6 +1,6 @@
 <br>
 <p align="center">
-  <a href="https://handsontable.github.io/hyperformula/">
+  <a href="https://hyperformula.handsontable.com/">
     <img src="https://raw.githubusercontent.com/handsontable/hyperformula/master/github-hf-logo-blue.svg" width="350" height="71" alt="HyperFormula - A headless spreadsheet, a parser and evaluator of Excel formulas"/>
   </a>
 </p>
@@ -22,31 +22,31 @@
 
 HyperFormula is a headless spreadsheet built on top of TypeScript. It is a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
 - High-speed Excel formula parsing and evaluating
-- A library of [380+ built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html) available in 16 languages
-- Support for [custom functions](https://handsontable.github.io/hyperformula/guide/custom-functions.html)
-- Function syntax [compatible with Excel and Google Sheets](https://handsontable.github.io/hyperformula/guide/known-limitations.html#google-sheets-and-microsoft-excel)
-- [Support for Node.js](https://handsontable.github.io/hyperformula/guide/server-side-installation.html#install-with-npm-or-yarn)
-- Support for [undo/redo](https://handsontable.github.io/hyperformula/guide/undo-redo.html)
-- Support for [CRUD operations](https://handsontable.github.io/hyperformula/guide/basic-operations.html)
-- Support for [clipboard](https://handsontable.github.io/hyperformula/guide/clipboard-operations.html)
-- Support for [named expressions](https://handsontable.github.io/hyperformula/guide/named-expressions.html)
-- Support for [data sorting](https://handsontable.github.io/hyperformula/guide/sorting-data.html)
-- Support for [React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html), [Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html), and [Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
+- A library of [380+ built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html) available in 16 languages
+- Support for [custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
+- Function syntax [compatible with Excel and Google Sheets](https://hyperformula.handsontable.com/guide/known-limitations.html#google-sheets-and-microsoft-excel)
+- [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)
+- Support for [undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
+- Support for [CRUD operations](https://hyperformula.handsontable.com/guide/basic-operations.html)
+- Support for [clipboard](https://hyperformula.handsontable.com/guide/clipboard-operations.html)
+- Support for [named expressions](https://hyperformula.handsontable.com/guide/named-expressions.html)
+- Support for [data sorting](https://hyperformula.handsontable.com/guide/sorting-data.html)
+- Support for [React](https://hyperformula.handsontable.com/guide/integration-with-react.html), [Angular](https://hyperformula.handsontable.com/guide/integration-with-angular.html), and [Vue.js](https://hyperformula.handsontable.com/guide/integration-with-vue.html)
 - Open-source license
 - Actively maintained by the team that stands behind [Handsontable - JavaScript Data Grid](https://handsontable.com/)
 
 ## Documentation
 
 - [Explainer video](https://www.youtube.com/watch?v=JJXUmACTDdk)
-- [Installation](https://handsontable.github.io/hyperformula/guide/client-side-installation.html)
-- [Basic usage](https://handsontable.github.io/hyperformula/guide/basic-usage.html)
-  - [Demo with React](https://handsontable.github.io/hyperformula/guide/integration-with-react.html)
-  - [Demo with Angular](https://handsontable.github.io/hyperformula/guide/integration-with-angular.html)
-  - [Demo with Vue.js](https://handsontable.github.io/hyperformula/guide/integration-with-vue.html)
-- [API Reference](https://handsontable.github.io/hyperformula/api/)
-- [Configuration options](https://handsontable.github.io/hyperformula/guide/configuration-options.html)
-- [List of built-in functions](https://handsontable.github.io/hyperformula/guide/built-in-functions.html)
-- [Key concepts](https://handsontable.github.io/hyperformula/guide/key-concepts.html)
+- [Installation](https://hyperformula.handsontable.com/guide/client-side-installation.html)
+- [Basic usage](https://hyperformula.handsontable.com/guide/basic-usage.html)
+  - [Demo with React](https://hyperformula.handsontable.com/guide/integration-with-react.html)
+  - [Demo with Angular](https://hyperformula.handsontable.com/guide/integration-with-angular.html)
+  - [Demo with Vue.js](https://hyperformula.handsontable.com/guide/integration-with-vue.html)
+- [API Reference](https://hyperformula.handsontable.com/api/)
+- [Configuration options](https://hyperformula.handsontable.com/guide/configuration-options.html)
+- [List of built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
+- [Key concepts](https://hyperformula.handsontable.com/guide/key-concepts.html)
 
 ## Installation and usage
 
@@ -96,7 +96,7 @@ HyperFormula doesn't assume any existing user interface, making it a great gener
 ## Contributing
 
 Help us build the fastest and most flexible calculation engine for
-business web apps. Please read the [Contributing Guide](https://handsontable.github.io/hyperformula/guide/contributing.html) before making a pull request.
+business web apps. Please read the [Contributing Guide](https://hyperformula.handsontable.com/guide/contributing.html) before making a pull request.
 
 ## License
 
