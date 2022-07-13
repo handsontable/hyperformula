@@ -152,8 +152,6 @@
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
-    "core-js": "^3.6.4",
-    "regenerator-runtime": "^0.13.3",
     "tiny-emitter": "^2.1.0",
     "unorm": "^1.6.0"
   },
