@@ -34,6 +34,18 @@
     "open formula",
     "openformula"
   ],
+  "browserslist": [
+    "last 2 chrome versions",
+    "last 2 and_chr versions",
+    "last 2 firefox versions",
+    "last 2 and_ff versions",
+    "last 2 safari versions",
+    "last 2 ios_saf versions",
+    "last 2 edge versions",
+    "last 2 and_uc versions",
+    "last 2 and_qq versions",
+    "last 2 op_mob versions"
+  ],
   "license": "SEE LICENSE IN LICENSE.txt",
   "module": "es/index.js",
   "main": "commonjs/index.js",

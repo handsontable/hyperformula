@@ -1,16 +1,9 @@
 module.exports = {
   presets: [
     ['@babel/preset-env', {
-      targets: {
-        chrome: '64',
-        firefox: '58',
-        ie: '11',
-        safari: '11'
-      },
       modules: false,
-      debug: false,
       useBuiltIns: 'usage',
-      corejs: 3,
+      corejs: '3.22',
     }]
   ],
   plugins: [
