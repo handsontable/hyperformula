@@ -35,6 +35,7 @@
     "openformula"
   ],
   "browserslist": [
+    "maintained node versions",
     "last 2 chrome versions",
     "last 2 and_chr versions",
     "last 2 firefox versions",
