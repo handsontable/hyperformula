@@ -350,6 +350,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Registers language from under given code string.
    *
+   * Note: This method has no effect on the existing HyperFormula instances.
+   *
    * @param {string} languageCode - code string of the translation package
    * @param {RawTranslationPackage} languagePackage - translation package to be registered
    *
@@ -376,6 +378,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Unregisters language that is registered under given code string.
+   *
+   * Note: This method has no effect on the existing HyperFormula instances.
    *
    * @param {string} languageCode - code string of the translation package
    *
@@ -418,7 +422,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Registers all functions in a given plugin with optional translations
+   * Registers all functions in a given plugin with optional translations.
+   *
+   * Note: This method has no effect on the existing HyperFormula instances.
    *
    * @param {FunctionPluginDefinition} plugin - plugin class
    * @param {FunctionTranslationsPackage} translations - optional package of function names translations
@@ -442,7 +448,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Unregisters all functions defined in given plugin
+   * Unregisters all functions defined in given plugin.
+   *
+   * Note: This method has no effect on the existing HyperFormula instances.
    *
    * @param {FunctionPluginDefinition} plugin - plugin class
    *
@@ -463,6 +471,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Registers a function with a given id if such exists in a plugin.
+   *
+   * Note: This method has no effect on the existing HyperFormula instances.
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    * @param {FunctionPluginDefinition} plugin - plugin class
@@ -489,7 +499,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Unregisters a function with a given id
+   * Unregisters a function with a given id.
+   *
+   * Note: This method has no effect on the existing HyperFormula instances.
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    *
@@ -515,7 +527,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Clears function registry
+   * Clears function registry.
+   *
+   * Note: This method has no effect on the existing HyperFormula instances.
    *
    * @example
    * ```js
@@ -577,7 +591,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns classes of all plugins registered in this instance of HyperFormula
+   * Returns classes of all plugins registered in HyperFormula
    *
    * @example
    * ```js
