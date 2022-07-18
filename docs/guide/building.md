@@ -62,7 +62,7 @@ Most likely, you will want to document the code. You can use the following comma
 
 ## Run the tests
 
-The tests are done with Jest and Jasmine. The same test suite should
+The tests are done with Jest and Karma. The same test suite should
 pass in both of them because the library might be used
 [server-side](server-side-installation) or in a browser, so you have
 to be sure that both environments are fine.
