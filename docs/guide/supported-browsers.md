@@ -17,6 +17,10 @@ users: performance and accuracy of calculations.
 | QQ browser       | Opera               |
 |                  | Samsung Internet    |
 
+## Node.js support
+
+We support all Node.js versions, which are [currently maintained by Node.js Foundation](https://nodejs.org/en/about/releases/).
+
 ## Full ICU support
 
 Browsers that do not support full-icu (e.g. UC Browser mobile) will
