@@ -517,6 +517,29 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
   })
+
+  it('ignores whitespace characters in criterion argument', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['=SUMIF(A1:A1, "$1")'],
+      ['=SUMIF(A1:A1, " $1")'],
+      ['=SUMIF(A1:A1, "$ 1")'],
+      ['=SUMIF(A1:A1, "$1 ")'],
+      ['=SUMIF(A1:A1, "100%")'],
+      ['=SUMIF(A1:A1, " 100%")'],
+      ['=SUMIF(A1:A1, "100 %")'],
+      ['=SUMIF(A1:A1, "100% ")'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A5'))).toEqual(1)
+    expect(engine.getCellValue(adr('A6'))).toEqual(1)
+    expect(engine.getCellValue(adr('A7'))).toEqual(1)
+    expect(engine.getCellValue(adr('A8'))).toEqual(1)
+    expect(engine.getCellValue(adr('A9'))).toEqual(1)
+  })
 })
 
 describe('Function SUMIFS - argument validations and combinations', () => {

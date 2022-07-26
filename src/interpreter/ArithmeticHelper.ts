@@ -282,10 +282,10 @@ export class ArithmeticHelper {
   private currencyMatcher(token: string): Maybe<[string, string]> {
     for (const currency of this.config.currencySymbol) {
       if (token.startsWith(currency)) {
-        return [currency, token.slice(currency.length)]
+        return [currency, token.slice(currency.length).trim()]
       }
       if (token.endsWith(currency)) {
-        return [currency, token.slice(0, token.length - currency.length)]
+        return [currency, token.slice(0, token.length - currency.length).trim()]
       }
     }
     return undefined
