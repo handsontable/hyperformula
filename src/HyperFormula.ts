@@ -588,7 +588,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns classes of all plugins registered in HyperFormula
+   * Returns classes of all plugins registered in HyperFormula.
    *
    * @example
    * ```js
