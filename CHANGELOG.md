@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Removed the polyfills. [#1011](https://github.com/handsontable/hyperformula/issues/1011)
+- Removed the polyfills for unsupported browsers. [#1011](https://github.com/handsontable/hyperformula/issues/1011)
 
 ## [2.0.1] - 2022-06-14
 
