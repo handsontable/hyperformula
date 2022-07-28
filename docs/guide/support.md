@@ -30,9 +30,3 @@ we can help you in many ways. For instance:
 * Provide technical leadership
 
 [Contact sales](contact.md)
-
-## Technical partners
-
-| Name | Website | Expertise |
-| :--- | :--- | :--- |
-| NavAlgo  | [navalgo.com](https://www.navalgo.com/en/) | Core development |
