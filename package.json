@@ -73,6 +73,7 @@
     "benchmark:basic": "npm run tsnode test/performance/run-basic-benchmark.ts",
     "benchmark:cruds": "npm run tsnode test/performance/run-cruds-benchmark.ts",
     "benchmark:write-to-file": "npm run tsnode test/performance/write-to-file.ts",
+    "benchmark:compare-benchmarks": "npm run tsnode test/performance/compare-benchmarks.ts",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "eslint . --ext .js,.ts --fix",
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
