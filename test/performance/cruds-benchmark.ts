@@ -5,8 +5,7 @@ import {sheet as sheetBGenerator} from './sheets/10-sheet-b'
 import {sheet as columnRangesGenerator} from './sheets/column-ranges'
 import {adr} from './utils/utils'
 
-(() => {
-
+export function runCrudsBenchmark(): BenchmarkResult[] {
   const result: BenchmarkResult[] = []
 
   batch(result,
@@ -61,8 +60,5 @@ import {adr} from './utils/utils'
     ])
   )
 
-  console.table(result.map(e => ({
-    name: e.name,
-    totalTime: e.totalTime
-  })))
-})()
+  return result
+}
