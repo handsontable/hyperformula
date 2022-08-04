@@ -157,7 +157,7 @@ function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables:
     if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {
       return
     }
-    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as RawScalarValue))
+    const conditionalFirsts = conditionalSplits.map((cs) => getRawValue(cs.value) as RawScalarValue)
     if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst))) {
       yield computable
     }

@@ -28,6 +28,7 @@ export class NumberLiteralHelper {
       }
       return num
     }
+
     return undefined
   }
 

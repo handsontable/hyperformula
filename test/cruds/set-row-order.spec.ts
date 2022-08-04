@@ -261,6 +261,24 @@ describe('reorder base case', () => {
     expect(engine.getSheetSerialized(0)).toEqual([[7, 8, 9], [1, 2, 3], [4, 5, 6]])
   })
 
+  it('should update the addressing in cells being sorted', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, '=A1+B1'], [4, 5, '=A2+B2'], [7, 8, '=A3+B3']])
+    expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [4, 5, 9], [7, 8, 15]])
+    expect(engine.isItPossibleToSetRowOrder(0, [1, 2, 0])).toEqual(true)
+    engine.setRowOrder(0, [1, 2, 0])
+    expect(engine.getSheetSerialized(0)).toEqual([[7, 8, '=A1+B1'], [1, 2, '=A2+B2'], [4, 5, '=A3+B3']])
+    expect(engine.getSheetValues(0)).toEqual([[7, 8, 15], [1, 2, 3], [4, 5, 9]])
+  })
+
+  it('should not change the constants in formulas when updating addresses', () => {
+    const engine = HyperFormula.buildFromArray([[1, 2, '=1+A1'], [4, 5, '=2+A2'], [7, 8, '=3+A3']])
+    expect(engine.getSheetValues(0)).toEqual([[1, 2, 2], [4, 5, 6], [7, 8, 10]])
+    expect(engine.isItPossibleToSetRowOrder(0, [1, 2, 0])).toEqual(true)
+    engine.setRowOrder(0, [1, 2, 0])
+    expect(engine.getSheetSerialized(0)).toEqual([[7, 8, '=3+A1'], [1, 2, '=1+A2'], [4, 5, '=2+A3']])
+    expect(engine.getSheetValues(0)).toEqual([[7, 8, 10], [1, 2, 2], [4, 5, 6]])
+  })
+
   it('should not move values unnecessarily', () => {
     const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6]])
     expect(engine.isItPossibleToSetRowOrder(0, [0, 1])).toEqual(true)
