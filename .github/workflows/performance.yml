@@ -24,7 +24,7 @@ jobs:
       - name: (develop) Checkout
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
         with:
-          ref: develop
+          ref: ${{ github.event.pull_request.base.sha }}
 
       - name: (develop) Install dependencies
         run: |
@@ -32,7 +32,7 @@ jobs:
 
       - name: (develop) Run performance tests
         run: |
-          npm run benchmark:write-to-file develop.json
+          npm run benchmark:write-to-file base.json
 
       - name: (current) Checkout
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # https://github.com/actions/checkout/releases/tag/v2.3.4
@@ -49,7 +49,7 @@ jobs:
 
       - name: Compare the results
         run: |
-          npm run benchmark:compare-benchmarks develop.json current.json performance-report.md
+          npm run benchmark:compare-benchmarks base.json current.json performance-report.md
 
       - name: Publish a comment in the PR
         uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
