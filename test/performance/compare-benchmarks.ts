@@ -73,8 +73,7 @@ function buildBenchmarkTableRow(testName: string, resultSuites: ResultSuite[]): 
 function calculateChangeFromBase(testResultsEntries: [string, number][]): [string, string][] {
   const [baseSuiteName, baseSuiteResult] = testResultsEntries[0]
   const resultsWithoutBase = testResultsEntries.filter(([currSuiteName, _]) => currSuiteName !== baseSuiteName)
-  const changeEntries = resultsWithoutBase.map(currResultEntry => buildChangeEntry(currResultEntry, baseSuiteResult))
-  return changeEntries
+  return resultsWithoutBase.map(currResultEntry => buildChangeEntry(currResultEntry, baseSuiteResult))
 }
 
 function buildChangeEntry([_, currSuiteResult]: [string, number], baseSuiteResult: number): [string, string] {
