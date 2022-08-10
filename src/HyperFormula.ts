@@ -2107,8 +2107,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Stores a copy of the cell block in internal clipboard for the further paste.
-   * Returns values of cells for use in external clipboard.
-   *
+   * Returns the copied values for use in external clipboard.
+   **
    * @param {SimpleCellRange} source - rectangle range to copy
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
@@ -2118,12 +2118,17 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2'],
+   *   ['1', '2'],
    * ]);
    *
-   * // should return: [ [ 2 ] ]
-   * const clipboardContent = hfInstance.copy({ start: { sheet: 0, col: 1, row: 0 }, end: { sheet: 0, col: 1, row: 0 } });
+   * // it copies [ [ 2 ] ]
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
@@ -2140,7 +2145,7 @@ export class HyperFormula implements TypedEmitter {
    * Stores information of the cell block in internal clipboard for further paste.
    * Calling [[paste]] right after this method is equivalent to call [[moveCells]].
    * Almost any CRUD operation called after this method will abort the cut operation.
-   * Returns values of cells for use in external clipboard.
+   * Returns the cut values for use in external clipboard.
    *
    * @param {SimpleCellRange} source - rectangle range to cut
    *
@@ -2151,12 +2156,17 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2'],
+   *   ['1', '2'],
    * ]);
    *
-   * // should return values that were cut: [ [ 1 ] ]
-   * const clipboardContent = hfInstance.cut({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 0, row: 0 } });
+   * // returns the values that were cut: [ [ 1 ] ]
+   * const clipboardContent = hfInstance.cut({
+   *   start: { sheet: 0, col: 0, row: 0 },
+   *   end: { sheet: 0, col: 0, row: 0 },
+   * });
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
@@ -2190,16 +2200,20 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2'],
+   *   ['1', '2'],
    * ]);
    *
-   * // do a copy, [ [ 2 ] ] was copied
-   * hfInstance.copy({ sheet: 0, col: 0, row: 0 }, 1, 1);
+   * // [ [ 2 ] ] was copied
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
    *
-   * // do a paste, should return a list of cells which values changed
-   * // after the operation, their absolute addresses and new values
+   * // returns a list of modified cells: their absolute addresses and new values
    * const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
@@ -2228,6 +2242,8 @@ export class HyperFormula implements TypedEmitter {
    * const isClipboardEmpty = hfInstance.isClipboardEmpty();
    * ```
    *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
+   *
    * @category Clipboard
    */
   public isClipboardEmpty(): boolean {
@@ -2242,6 +2258,8 @@ export class HyperFormula implements TypedEmitter {
    * // clears the clipboard, isClipboardEmpty() should return true if called afterwards
    * hfInstance.clearClipboard();
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
