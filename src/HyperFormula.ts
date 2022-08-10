@@ -2236,7 +2236,10 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // copy desired content
-   * hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
    *
    * // returns 'false', there is content in the clipboard
    * const isClipboardEmpty = hfInstance.isClipboardEmpty();
