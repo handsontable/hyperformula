@@ -9,9 +9,9 @@ The methods provided below store cut or copied data in a reference inside
 the memory, not directly in the system clipboard.
 :::
 
-## [Copy](../api/classes/clipboardoperations#copy)
+## [Copy](../api/classes/hyperformula.md#copy)
 
-You can copy cell content by using the [copy](../api/classes/clipboardoperations#copy) method, which accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
+You can copy cell content by using the [copy](../api/classes/hyperformula.md#copy) method, which accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
@@ -39,9 +39,9 @@ out of scope for these expressions, their scope will switch to global.
 If a copied named expression's scope is the same as the target's,
 the local scope will remain the same.
 
-## [Cut](../api/classes/clipboardoperations#cut)
+## [Cut](../api/classes/hyperformula.md#cut)
 
-You can cut cell content by using the [cut](../api/classes/clipboardoperations#cut) method, which also accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
+You can cut cell content by using the [cut](../api/classes/hyperformula.md#cut) method, which also accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
 
 **Any CRUD operation called after this method will abort the cut operation.**
 
@@ -57,9 +57,9 @@ const clipboardContent = hfInstance.cut({
 });
 ```
 
-## [Paste](../api/classes/clipboardoperations#paste)
+## [Paste](../api/classes/hyperformula.md#paste)
 
-You can paste cell content by using the [paste](../api/classes/clipboardoperations#paste) method.
+You can paste cell content by using the [paste](../api/classes/hyperformula.md#paste) method.
 This method requires only one parameter - the top left corner of the range, into which the content will be pasted.
 
 If the `paste` method is called after `copy` , it will paste
@@ -96,9 +96,9 @@ cell B1 into B2 it will become '=A2'.
 
 ## Clear the clipboard
 
-You can clear the clipboard on demand by using the [clearClipboard](../api/classes/clipboardoperations#clearclipboard)
+You can clear the clipboard on demand by using the [clearClipboard](../api/classes/hyperformula.md#clearclipboard)
 method. There is also a method for checking if there is any content
-inside the clipboard: [isClipboardEmpty](../api/classes/clipboardoperations#isclipboardempty).
+inside the clipboard: [isClipboardEmpty](../api/classes/hyperformula.md#isclipboardempty).
 
 ## Demo
 
