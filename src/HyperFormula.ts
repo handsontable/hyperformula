@@ -2108,7 +2108,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Stores a copy of the cell block in internal clipboard for the further paste.
    * Returns the copied values for use in external clipboard.
-   **
+   *
    * @param {SimpleCellRange} source - rectangle range to copy
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
