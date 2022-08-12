@@ -426,9 +426,11 @@ Total number of functions: **{{ $page.functionsCount }}**
 | LOGINV          | Returns value of inverse lognormal distribution.                                                          | LOGINV(P; Mean; Stddev)                                             |
 | MAX             | Returns the maximum value in a list of arguments.                                                         | MAX(Number1; Number2; ...Number30)                                  |
 | MAXA            | Returns the maximum value in a list of arguments.                                                         | MAXA(Value1; Value2; ... Value30)                                   |
+| MAXIFS          | Returns the max of the values of cells in a range that meets multiple criteria in multiple ranges.            | MAXIFS(Max_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
 | MEDIAN          | Returns the median of a set of numbers.                                                                   | MEDIAN(Number1; Number2; ...Number30)                               |
 | MIN             | Returns the minimum value in a list of arguments.                                                         | MIN(Number1; Number2; ...Number30)                                  |
 | MINA            | Returns the minimum value in a list of arguments.                                                         | MINA(Value1; Value2; ... Value30)                                   |
+| MINIFS          | Returns the min of the values of cells in a range that meets multiple criteria in multiple ranges.            | MINIFS(Min_Range ; Criterion_range1 ; Criterion1 [ ; Criterion_range2 ; Criterion2 [;...]]) |
 | NEGBINOM.DIST   | Returns density of negative binomial distribution.                                                        | NEGBINOM.DIST(Number1; Number2; Number3; Mode)                      |
 | NEGBINOMDIST    | Returns density of negative binomial distribution.                                                        | NEGBINOMDIST(Number1; Number2; Number3; Mode)                       |
 | NORM.DIST       | Returns density of normal distribution.                                                                   | NORM.DIST(X; Mean; Stddev; Mode)                                    |
