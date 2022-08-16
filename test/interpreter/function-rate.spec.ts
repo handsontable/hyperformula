@@ -123,7 +123,7 @@ describe('Function RATE', () => {
 
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.499693, requiredFinancialPrecision)
       expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-0.990099, requiredFinancialPrecision)
-      expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-1.000000, requiredFinancialPrecision) // noted in known-limitations
+      expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-1.000000, requiredFinancialPrecision) // noted in technical-limitations
       expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.3172435, requiredFinancialPrecision)
       expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM))
     })

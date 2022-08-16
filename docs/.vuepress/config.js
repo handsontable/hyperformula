@@ -161,7 +161,7 @@ module.exports = {
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
             ['/guide/license-key', 'License key'],
-            ['/guide/known-limitations', 'Known limitations'],
+            ['/guide/compatibility', 'Compatibility'],
           ]
         },
         {
@@ -217,6 +217,7 @@ module.exports = {
             ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
+            ['/guide/technical-limitations', 'Technical limitations'],
           ]
         },
         {
