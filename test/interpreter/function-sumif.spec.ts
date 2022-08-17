@@ -417,7 +417,19 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(1)
   })
 
-  it('regexps', () => {
+  it('regexp', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['abcd', '1'],
+      ['abd', '2'],
+      ['.*c.*', '4'],
+      [0, 8],
+      ['=SUMIF(A1:A4, ".*c.*", B1:B4)']
+    ], {useRegularExpressions: true})
+
+    expect(engine.getCellValue(adr('A5'))).toEqual(5)
+  })
+
+  it('regexp with not-equal operator', () => {
     const engine = HyperFormula.buildFromArray([
       ['abcd', '1'],
       ['abd', '2'],
@@ -429,7 +441,7 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(10)
   })
 
-  it('incorrect regexps', () => {
+  it('incorrect regexp', () => {
     const engine = HyperFormula.buildFromArray([
       ['abcd', '1'],
       ['abd', '2'],
