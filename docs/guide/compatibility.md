@@ -12,7 +12,30 @@ In certain situations, it is not possible to support all of them due to:
 
 ## Configuration
 
-It can be setup to work almost like Excel
+#### Numerical precision
+
+Automatic rounding of the floating-point numbers can be controlled using [smartRounding](../api/classes/config.md#smartrounding) and [precisionEpsilon](../api/classes/config.md#precisionepsilon) options.
+
+### Full config for the compatibility with Microsoft Excel
+
+// TODO
+::: tip
+This configuration makes HyperFormula mimic the default behavior of Microsoft Excel with en_us language and locale. The localization-specific configuration options are described in the XXX page. 
+:::
+
+```js
+// define options
+const options = {
+  smartRounding: true,
+  precisionEpsilon: 1e-13, // NO IDEA WHAT VALUE SHOULD BE HERE
+    
+  nullDate: { year: 1900, month: 1, day: 1 },
+  functionArgSeparator: '.'
+};
+
+// call the static method to build a new instance
+const hfInstance = HyperFormula.buildEmpty(options);
+```
 
 ## Incompatibilities with other popular spreadsheet software
 

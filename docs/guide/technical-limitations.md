@@ -1,6 +1,6 @@
 # Technical limitations
 
-This pages lists the known limitations of HyperFormula in its current development stage:
+This page lists the known limitations of HyperFormula in its current development stage:
 
 * Node.js versions older than 13 don't properly compare
 culture-insensitive strings. HyperFormula requires the full
@@ -40,3 +40,5 @@ you can't compare the arguments in a formula like this:
 ## [Compatibility](compatibility.md) with other popular spreadsheet software
 
 In most cases HyperFormula can be [configured](compatibility.md) to be compatible with Google Sheets or Microsoft Excel.
+
+// TODO: talk to Kuba about this page
