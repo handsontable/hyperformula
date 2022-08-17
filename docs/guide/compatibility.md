@@ -12,6 +12,15 @@ In certain situations, it is not possible to support all of them due to:
 
 ## Configuration
 
+#### `TRUE` and `FALSE` constants
+
+`TRUE` and `FALSE` constants can be defined as named expressions using functions [TRUE() and FALSE()](built-in-functions.md):
+
+```js
+hfInstance.addNamedExpression('TRUE', '=TRUE()');
+hfInstance.addNamedExpression('FALSE', '=FALSE()');
+```
+
 #### Criteria syntax
 
 The criterion parameter in functions `SUMIF`, `COUNTIF`, etc. is interpreted according to the configuration options:
@@ -46,12 +55,16 @@ const options = {
   smartRounding: true, // DEFAULT
   precisionEpsilon: 1e-13, // NO IDEA WHAT VALUE SHOULD BE HERE
     
-  nullDate: { year: 1900, month: 1, day: 1 },
-  functionArgSeparator: '.'
+  nullDate: { year: 1900, month: 1, day: 1 }, // ?
+  functionArgSeparator: '.', // ?
 };
 
 // call the static method to build a new instance
 const hfInstance = HyperFormula.buildEmpty(options);
+
+// define TRUE and FALSE constants
+hfInstance.addNamedExpression('TRUE', '=TRUE()');
+hfInstance.addNamedExpression('FALSE', '=FALSE()');
 ```
 
 ## Incompatibilities with other popular spreadsheet software
