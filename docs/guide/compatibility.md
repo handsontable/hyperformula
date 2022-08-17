@@ -32,6 +32,12 @@ The criterion parameter in functions `SUMIF`, `COUNTIF`, etc. is interpreted acc
 
 They can be set up to evaluate to zero using [evaluateNullToZero](../api/interfaces/configparams.md#evaluatenulltozero) option.
 
+#### Leap year bug
+
+Microsoft Excel incorrectly assumes that the year 1900 is a leap year. This behavior can be mimicked in HyperFormula by setting the following configuration parameters:
+- [leapYear1900](../api/interfaces/configparams.md#leapyear1900)
+- [nullDate](../api/interfaces/configparams.md#nulldate)
+
 #### Numerical precision
 
 Automatic rounding of the floating-point numbers can be controlled using [smartRounding](../api/interfaces/configparams.md#smartrounding) and [precisionEpsilon](../api/interfaces/configparams.md#precisionepsilon) options.
@@ -51,12 +57,12 @@ const options = {
   matchWholeCell: true, // DEFAULT
 
   evaluateNullToZero: true, // NON-DEFAULT
+
+  leapYear1900: true, // NON-DEFAULT
+  nullDate: { year:1899, month: 12, day: 31 }, // NON-DEFAULT
     
   smartRounding: true, // DEFAULT
   precisionEpsilon: 1e-13, // NO IDEA WHAT VALUE SHOULD BE HERE
-    
-  nullDate: { year: 1900, month: 1, day: 1 }, // ?
-  functionArgSeparator: '.', // ?
 };
 
 // call the static method to build a new instance
