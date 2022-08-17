@@ -15,13 +15,17 @@ In certain situations, it is not possible to support all of them due to:
 #### Criteria syntax
 
 The criterion parameter in functions `SUMIF`, `COUNTIF`, etc. is interpreted according to the configuration options:
-- [matchWholeCell](../api/classes/config.md#matchwholecell)
-- [useRegularExpressions](../api/classes/config.md#useregularexpressions)
-- [useWildcards](../api/classes/config.md#usewildcards)
+- [matchWholeCell](../api/interfaces/configparams.md#matchwholecell)
+- [useRegularExpressions](../api/interfaces/configparams.md#useregularexpressions)
+- [useWildcards](../api/interfaces/configparams.md#usewildcards)
+
+#### Handling formulas that evaluate to an empty value
+
+They can be set up to evaluate to zero using [evaluateNullToZero](../api/interfaces/configparams.md#evaluatenulltozero) option.
 
 #### Numerical precision
 
-Automatic rounding of the floating-point numbers can be controlled using [smartRounding](../api/classes/config.md#smartrounding) and [precisionEpsilon](../api/classes/config.md#precisionepsilon) options.
+Automatic rounding of the floating-point numbers can be controlled using [smartRounding](../api/interfaces/configparams.md#smartrounding) and [precisionEpsilon](../api/interfaces/configparams.md#precisionepsilon) options.
 
 ### Full config for the compatibility with Microsoft Excel
 
@@ -33,11 +37,13 @@ This configuration makes HyperFormula mimic the default behavior of Microsoft Ex
 ```js
 // define options
 const options = {
-  useWildcards: true,
-  useRegularExpressions: false,
-  matchWholeCell: true,
+  useWildcards: true, // DEFAULT
+  useRegularExpressions: false, // DEFAULT
+  matchWholeCell: true, // DEFAULT
+
+  evaluateNullToZero: true, // NON-DEFAULT
     
-  smartRounding: true,
+  smartRounding: true, // DEFAULT
   precisionEpsilon: 1e-13, // NO IDEA WHAT VALUE SHOULD BE HERE
     
   nullDate: { year: 1900, month: 1, day: 1 },
