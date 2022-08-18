@@ -12,6 +12,23 @@ In certain situations, it is not possible to support all of them due to:
 
 ## Configuration
 
+#### Separator characters
+
+In other spreadsheet software separators depend on the configured language and locale. You might want to set them up according to your internationalization settings. //TODO: link to i18n overview
+
+Microsoft Excel for en-US locale uses `,` (a comma) as both function argument separator and thousands separator and applies a context-based heuristic check to distinguish between them. HyperFormula requires `functionArgSeparator` and `thousandSeparator` to be different from each other, hence it is not possible to achieve the full compatibility with Excel with American English locale.
+
+In HyperFormula separator characters can be configured using the following parameters:
+- [functionArgSeparator](../api/interfaces/configparams.md#functionargseparator)
+- [decimalSeparator](../api/interfaces/configparams.md#decimalseparator)
+- [thousandSeparator](../api/interfaces/configparams.md#thousandseparator)
+- [arrayRowSeparator](../api/interfaces/configparams.md#arrayrowseparator)
+- [arrayColumnSeparator](../api/interfaces/configparams.md#arraycolumnseparator)
+
+#### Language/locale/date formats
+
+// TODO
+
 #### `TRUE` and `FALSE` constants
 
 `TRUE` and `FALSE` constants can be defined as named expressions using functions [TRUE() and FALSE()](built-in-functions.md):
@@ -46,22 +63,28 @@ Automatic rounding of the floating-point numbers can be controlled using [smartR
 
 // TODO
 ::: tip
-This configuration makes HyperFormula mimic the default behavior of Microsoft Excel with en_us language and locale. The localization-specific configuration options are described in the XXX page. 
+This configuration makes HyperFormula mimic the default behavior of Microsoft Excel with en-US locale (American English). The localization-specific configuration options are described in the XXX page. 
 :::
 
 ```js
 // define options
 const options = {
-  useWildcards: true, // DEFAULT
-  useRegularExpressions: false, // DEFAULT
-  matchWholeCell: true, // DEFAULT
+  functionArgSeparator: ',',
+  decimalSeparator: '.',
+  thousandSeparator: '',
+  arrayColumnSeparator: ',',
+  arrayRowSeparator: ';',
+  
+  useWildcards: true,
+  useRegularExpressions: false,
+  matchWholeCell: true,
 
   evaluateNullToZero: true, // NON-DEFAULT
 
   leapYear1900: true, // NON-DEFAULT
   nullDate: { year:1899, month: 12, day: 31 }, // NON-DEFAULT
     
-  smartRounding: true, // DEFAULT
+  smartRounding: true,
   precisionEpsilon: 1e-13, // NO IDEA WHAT VALUE SHOULD BE HERE
 };
 
