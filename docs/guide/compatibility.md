@@ -25,9 +25,31 @@ In HyperFormula separator characters can be configured using the following param
 - [arrayRowSeparator](../api/interfaces/configparams.md#arrayrowseparator)
 - [arrayColumnSeparator](../api/interfaces/configparams.md#arraycolumnseparator)
 
-#### Language/locale/date formats
+#### Date and time formats
 
-// TODO
+The basic date and time formats can be configured using the following parameters:
+- [dateFormats](../api/interfaces/configparams.md#dateFormats)
+- [timeFormats](../api/interfaces/configparams.md#timeFormats)
+- [nullYear](../api/interfaces/configparams.md#nullYear)
+
+If you want to add a custom date or time format, you can implement the following methods:
+- [parseDateTime](../api/interfaces/configparams.md#parseDateTime)
+- [stringifyDateTime](../api/interfaces/configparams.md#stringifyDateTime)
+- [stringifyDuration](../api/interfaces/configparams.md#stringifyDuration)
+
+#### Criteria and comparing strings
+
+Configuration parameters related to the [string comparison](types-of-operators.md#comparing-strings):
+- [caseSensitive](../api/interfaces/configparams.md#casesensitive)
+- [accentSensitive](../api/interfaces/configparams.md#accentsensitive)
+- [caseFirst](../api/interfaces/configparams.md#casefirst)
+- [ignorePunctuation](../api/interfaces/configparams.md#ignorepunctuation)
+- [localeLang](../api/interfaces/configparams.md#localelang)
+
+The criterion parameter in functions `SUMIF`, `COUNTIF`, etc. is interpreted according to the configuration options:
+- [matchWholeCell](../api/interfaces/configparams.md#matchwholecell)
+- [useRegularExpressions](../api/interfaces/configparams.md#useregularexpressions)
+- [useWildcards](../api/interfaces/configparams.md#usewildcards)
 
 #### `TRUE` and `FALSE` constants
 
@@ -37,13 +59,6 @@ In HyperFormula separator characters can be configured using the following param
 hfInstance.addNamedExpression('TRUE', '=TRUE()');
 hfInstance.addNamedExpression('FALSE', '=FALSE()');
 ```
-
-#### Criteria syntax
-
-The criterion parameter in functions `SUMIF`, `COUNTIF`, etc. is interpreted according to the configuration options:
-- [matchWholeCell](../api/interfaces/configparams.md#matchwholecell)
-- [useRegularExpressions](../api/interfaces/configparams.md#useregularexpressions)
-- [useWildcards](../api/interfaces/configparams.md#usewildcards)
 
 #### Handling formulas that evaluate to an empty value
 
@@ -69,23 +84,30 @@ This configuration makes HyperFormula mimic the default behavior of Microsoft Ex
 ```js
 // define options
 const options = {
-  functionArgSeparator: ',',
-  decimalSeparator: '.',
-  thousandSeparator: '',
-  arrayColumnSeparator: ',',
-  arrayRowSeparator: ';',
-  
-  useWildcards: true,
-  useRegularExpressions: false,
-  matchWholeCell: true,
+  functionArgSeparator: ',', // DEFAULT
+  decimalSeparator: '.', // DEFAULT
+  thousandSeparator: '', // DEFAULT
+  arrayColumnSeparator: ',', // DEFAULT
+  arrayRowSeparator: ';', // DEFAULT
 
-  evaluateNullToZero: true, // NON-DEFAULT
-
-  leapYear1900: true, // NON-DEFAULT
-  nullDate: { year:1899, month: 12, day: 31 }, // NON-DEFAULT
+  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
+  timeFormats: ['hh:mm', 'hh:mm:ss'],
+  nullYear: 30, // DEFAULT
     
-  smartRounding: true,
-  precisionEpsilon: 1e-13, // NO IDEA WHAT VALUE SHOULD BE HERE
+  caseSensitive: false, // DEFAULT
+  accentSensitive: true,
+  ignorePunctuation: false, // DEFAULT 
+  localeLang: 'en', // DEFAULT
+  useWildcards: true, // DEFAULT
+  useRegularExpressions: false, // DEFAULT
+  matchWholeCell: true, // DEFAULT
+
+  evaluateNullToZero: true,
+
+  leapYear1900: true,
+  nullDate: { year:1899, month: 12, day: 31 },
+    
+  smartRounding: true, // DEFAULT
 };
 
 // call the static method to build a new instance
