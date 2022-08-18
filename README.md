@@ -100,7 +100,7 @@ business web apps. Please read the [Contributing Guide](https://hyperformula.han
 
 ## License
 
-HyperFormula is available under the open source license ([GPLv3](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt)).
+HyperFormula is available under the open source license ([GPLv3](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt)).
 
 To buy a commercial license, please write to us at sales@handsontable.com
 
