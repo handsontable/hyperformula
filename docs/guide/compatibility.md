@@ -60,6 +60,14 @@ hfInstance.addNamedExpression('TRUE', '=TRUE()');
 hfInstance.addNamedExpression('FALSE', '=FALSE()');
 ```
 
+#### Array arithmetics
+
+Some popular spreadsheet software has array arithmetics enabled by default. In HyperFormula it can be configured by setting [useArrayArithmetic](../api/interfaces/configparams.md#useArrayArithmetic) to `true`.
+
+#### Handling whitespace inside formulas
+
+The popular spreadsheet software ignores all whitespace characters inside formulas. In HyperFormula it can be configured by setting [ignoreWhiteSpace](../api/interfaces/configparams.md#ignoreWhiteSpace) to `'any'`.
+
 #### Handling formulas that evaluate to an empty value
 
 They can be set up to evaluate to zero using [evaluateNullToZero](../api/interfaces/configparams.md#evaluatenulltozero) option.
@@ -102,6 +110,10 @@ const options = {
   useRegularExpressions: false, // DEFAULT
   matchWholeCell: true, // DEFAULT
 
+  useArrayArithmetic: true, 
+    
+  ignoreWhiteSpace: 'any',
+    
   evaluateNullToZero: true,
 
   leapYear1900: true,
