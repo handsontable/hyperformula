@@ -144,8 +144,5 @@
     "regenerator-runtime": "^0.13.3",
     "tiny-emitter": "^2.1.0",
     "unorm": "^1.6.0"
-  },
-  "optionalDependencies": {
-    "fsevents": "~2.3.2"
   }
 }
