@@ -36,4 +36,3 @@ you can't compare the arguments in a formula like this:
 * For certain inputs, the RATE function might have no solutions, or have multiple solutions. Our implementation uses an iterative algorithm (Newton's method) to find an approximation for one of the solutions to within 1e-7. If the approximation is not found after 50 iterations, the RATE function returns the `#NUM!` error.
 * The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
- can be [configured](compatibility.md) to be compatible with Google Sheets or Microsoft Excel.
