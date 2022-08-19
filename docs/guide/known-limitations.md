@@ -1,4 +1,4 @@
-# Technical limitations
+# Known limitations
 
 This page lists the known limitations of HyperFormula in its current development stage:
 

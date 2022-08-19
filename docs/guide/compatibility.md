@@ -8,7 +8,7 @@ while maintaining the compatibility with other popular spreadsheet software:
 In certain situations, it is not possible to be consistent with all three products due to:
 * inconsistencies between OpenDocument Standard, _Microsoft Excel_ and _Google Sheets_,
 * limitations of _Microsoft Excel_ or _Google Sheets_,
-* [technical limitations](technical-limitations.md) of HyperFormula in its current development stage.
+* [technical limitations](known-limitations.md) of HyperFormula in its current development stage.
 
 ## Configuration
 

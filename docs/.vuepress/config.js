@@ -217,7 +217,7 @@ module.exports = {
             ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
-            ['/guide/technical-limitations', 'Technical limitations'],
+            ['/guide/known-limitations', 'Known limitations'],
           ]
         },
         {
