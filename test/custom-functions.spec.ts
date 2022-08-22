@@ -8,7 +8,7 @@ import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
-import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
+import {ConditionalAggregationPlugin} from '../src/interpreter/plugin/ConditionalAggregationPlugin'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
@@ -161,7 +161,7 @@ describe('Register static custom plugin', () => {
   it('should return registered formula translations', () => {
     HyperFormula.unregisterAllFunctions()
     HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(ConditionalAggregationPlugin)
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
@@ -238,25 +238,25 @@ describe('Register static custom plugin', () => {
 
   it('should return registered plugins', () => {
     HyperFormula.unregisterAllFunctions()
-    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(ConditionalAggregationPlugin)
     HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
     HyperFormula.registerFunctionPlugin(SumWithExtra)
 
-    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [ConditionalAggregationPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should unregister whole plugin', () => {
     HyperFormula.unregisterAllFunctions()
     HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
-    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(ConditionalAggregationPlugin)
 
     HyperFormula.unregisterFunctionPlugin(NumericAggregationPlugin)
 
-    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [SumifPlugin])
+    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [ConditionalAggregationPlugin])
   })
 
   it('should return plugin for given functionId', () => {
-    expect(HyperFormula.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
+    expect(HyperFormula.getFunctionPlugin('SUMIF')).toBe(ConditionalAggregationPlugin)
   })
 
   it('should clear function registry', () => {
@@ -306,9 +306,9 @@ describe('Instance level formula registry', () => {
   })
 
   it('should return registered plugins', () => {
-    const engine = HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
+    const engine = HyperFormula.buildFromArray([], {functionPlugins: [ConditionalAggregationPlugin, NumericAggregationPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [ConditionalAggregationPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should instantiate engine with additional plugin', () => {
@@ -326,7 +326,7 @@ describe('Instance level formula registry', () => {
     const engine = HyperFormula.buildFromArray([])
 
     let registeredPlugins = new Set(engine.getAllFunctionPlugins())
-    expect(registeredPlugins.has(SumifPlugin)).toBe(true)
+    expect(registeredPlugins.has(ConditionalAggregationPlugin)).toBe(true)
     expect(registeredPlugins.has(FooPlugin)).toBe(false)
 
     engine.updateConfig({functionPlugins: [FooPlugin]})
@@ -338,7 +338,7 @@ describe('Instance level formula registry', () => {
   it('should return plugin for given functionId', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    expect(engine.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
+    expect(engine.getFunctionPlugin('SUMIF')).toBe(ConditionalAggregationPlugin)
   })
 })
 

@@ -59,7 +59,7 @@ function countifsCacheKey(conditions: Condition[]): string {
   return ['COUNTIFS', ...conditionsStrings].join(',')
 }
 
-export class SumifPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumifPlugin> {
+export class ConditionalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ConditionalAggregationPlugin> {
   public static implementedFunctions = {
     'SUMIF': {
       method: 'sumif',
