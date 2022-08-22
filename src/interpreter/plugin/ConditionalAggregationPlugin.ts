@@ -14,14 +14,12 @@ import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 class AverageResult {
-
   public static empty = new AverageResult(0, 0)
 
   constructor(
     public readonly sum: number,
     public readonly count: number,
-  ) {
-  }
+  ) {}
 
   public static single(arg: number): AverageResult {
     return new AverageResult(arg, 1)
@@ -41,22 +39,12 @@ class AverageResult {
 }
 
 /** Computes key for criterion function cache */
-function sumifCacheKey(conditions: Condition[]): string {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
-  return ['SUMIF', ...conditionsStrings].join(',')
-}
-
-function averageifCacheKey(conditions: Condition[]): string {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
-  return ['AVERAGEIF', ...conditionsStrings].join(',')
-}
-
-function countifsCacheKey(conditions: Condition[]): string {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
-  return ['COUNTIFS', ...conditionsStrings].join(',')
+function conditionalAggregationFunctionCacheKey(functionName: string): (conditions: Condition[]) => string {
+  return (conditions: Condition[]): string => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
+    return [functionName, ...conditionsStrings].join(',')
+  }
 }
 
 export class ConditionalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ConditionalAggregationPlugin> {
@@ -125,7 +113,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
 
         return new CriterionFunctionCompute<RawScalarValue>(
           this.interpreter,
-          sumifCacheKey,
+          conditionalAggregationFunctionCacheKey('SUMIF'),
           0,
           (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
           (arg) => getRawValue(arg),
@@ -148,7 +136,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
 
       return new CriterionFunctionCompute<RawScalarValue>(
         this.interpreter,
-        sumifCacheKey,
+        conditionalAggregationFunctionCacheKey('SUMIFS'),
         0,
         (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
         (arg) => getRawValue(arg),
@@ -168,7 +156,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
 
         const averageResult = new CriterionFunctionCompute<AverageResult>(
           this.interpreter,
-          averageifCacheKey,
+          conditionalAggregationFunctionCacheKey('AVERAGEIF'),
           AverageResult.empty,
           (left, right) => left.compose(right),
           (arg) => {
@@ -209,7 +197,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
 
         return new CriterionFunctionCompute<number>(
           this.interpreter,
-          () => 'COUNTIF',
+          conditionalAggregationFunctionCacheKey('COUNTIF'),
           0,
           (left, right) => left + right,
           () => 1,
@@ -232,7 +220,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
 
       return new CriterionFunctionCompute<number>(
         this.interpreter,
-        countifsCacheKey,
+        conditionalAggregationFunctionCacheKey('COUNTIFS'),
         0,
         (left, right) => left + right,
         () => 1,
