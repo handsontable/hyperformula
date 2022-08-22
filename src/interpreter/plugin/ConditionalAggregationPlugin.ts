@@ -9,7 +9,14 @@ import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InterpreterValue, isExtendedNumber, RawScalarValue} from '../InterpreterValue'
+import {
+  getRawValue,
+  InternalScalarValue,
+  InterpreterValue,
+  isExtendedNumber,
+  RawInterpreterValue,
+  RawScalarValue
+} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
@@ -102,78 +109,64 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
    * @param state
    */
   public sumif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SUMIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
-        if (criterion === undefined) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
-        }
+    const functionName = 'SUMIF'
 
-        valuesArg = valuesArg ?? conditionArg
-
-        return new CriterionFunctionCompute<RawScalarValue>(
-          this.interpreter,
-          conditionalAggregationFunctionCacheKey('SUMIF'),
-          0,
-          (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
-          (arg) => getRawValue(arg),
-        ).compute(valuesArg, [new Condition(conditionArg, criterion)])
-      }
+    const computeFn = (
+      conditionRange: SimpleRangeValue,
+      criterion: RawScalarValue,
+      values: Maybe<SimpleRangeValue>
+    ) => this.computeConditionalAggregationFunction<RawScalarValue>(
+      values ?? conditionRange,
+      [conditionRange, criterion],
+      functionName,
+      0,
+      (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
+      (arg) => getRawValue(arg),
     )
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
   public sumifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SUMIFS'), (values: SimpleRangeValue, ...args) => {
-      const conditions: Condition[] = []
-      for (let i = 0; i < args.length; i += 2) {
-        const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i + 1], this.arithmeticHelper)
-        if (criterionPackage === undefined) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
-        }
-        conditions.push(new Condition(conditionArg, criterionPackage))
-      }
+    const functionName = 'SUMIFS'
 
-      return new CriterionFunctionCompute<RawScalarValue>(
-        this.interpreter,
-        conditionalAggregationFunctionCacheKey('SUMIFS'),
-        0,
-        (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
-        (arg) => getRawValue(arg),
-      ).compute(values, conditions)
-    })
+    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => this.computeConditionalAggregationFunction<RawScalarValue>(
+      values,
+      args as RawInterpreterValue[],
+      functionName,
+      0,
+      (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
+      (arg) => getRawValue(arg),
+    )
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
   public averageif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('AVERAGEIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue, valuesArg: Maybe<SimpleRangeValue>) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
-        if (criterion === undefined) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
-        }
+    const functionName = 'AVERAGEIF'
 
-        valuesArg = valuesArg ?? conditionArg
+    const computeFn = (
+      conditionRange: SimpleRangeValue,
+      criterion: RawScalarValue,
+      values: Maybe<SimpleRangeValue>
+    ) => {
+      const averageResult = this.computeConditionalAggregationFunction<AverageResult>(
+        values ?? conditionRange,
+        [conditionRange, criterion],
+        functionName,
+        AverageResult.empty,
+        (left, right) => left.compose(right),
+        (arg) => isExtendedNumber(arg) ? AverageResult.single(getRawValue(arg)) : AverageResult.empty,
+        )
 
-        const averageResult = new CriterionFunctionCompute<AverageResult>(
-          this.interpreter,
-          conditionalAggregationFunctionCacheKey('AVERAGEIF'),
-          AverageResult.empty,
-          (left, right) => left.compose(right),
-          (arg) => {
-            if (isExtendedNumber(arg)) {
-              return AverageResult.single(getRawValue(arg))
-            } else {
-              return AverageResult.empty
-            }
-          },
-        ).compute(valuesArg, [new Condition(conditionArg, criterion)])
-        if (averageResult instanceof CellError) {
-          return averageResult
-        } else {
-          return averageResult.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
-        }
+      if (averageResult instanceof CellError) {
+        return averageResult
+      } else {
+        return averageResult.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
       }
-    )
+    }
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
   /**
@@ -188,43 +181,59 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
    * @param state
    */
   public countif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('COUNTIF'),
-      (conditionArg: SimpleRangeValue, criterionValue: RawScalarValue) => {
-        const criterion = this.interpreter.criterionBuilder.fromCellValue(criterionValue, this.arithmeticHelper)
-        if (criterion === undefined) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
-        }
+    const functionName = 'COUNTIF'
 
-        return new CriterionFunctionCompute<number>(
-          this.interpreter,
-          conditionalAggregationFunctionCacheKey('COUNTIF'),
-          0,
-          (left, right) => left + right,
-          () => 1,
-        ).compute(conditionArg, [new Condition(conditionArg, criterion)])
-      }
+    const computeFn = (conditionRange: SimpleRangeValue, criterion: RawScalarValue) => this.computeConditionalAggregationFunction<number>(
+      conditionRange,
+      [conditionRange, criterion],
+      functionName,
+      0,
+      (left, right) => left + right,
+      () => 1,
     )
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
   public countifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('COUNTIFS'), (...args) => {
-      const conditions: Condition[] = []
-      for (let i = 0; i < args.length; i += 2) {
-        const conditionArg = args[i] as SimpleRangeValue
-        const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(args[i + 1], this.arithmeticHelper)
-        if (criterionPackage === undefined) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
-        }
-        conditions.push(new Condition(conditionArg, criterionPackage))
-      }
+    const functionName = 'COUNTIFS'
 
-      return new CriterionFunctionCompute<number>(
-        this.interpreter,
-        conditionalAggregationFunctionCacheKey('COUNTIFS'),
-        0,
-        (left, right) => left + right,
-        () => 1,
-      ).compute(conditions[0].conditionRange, conditions)
-    })
+    const computeFn = (...args: unknown[]) => this.computeConditionalAggregationFunction<number>(
+      args[0] as SimpleRangeValue,
+      args as RawInterpreterValue[],
+      functionName,
+      0,
+      (left, right) => left + right,
+      () => 1,
+    )
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
+  }
+
+  private computeConditionalAggregationFunction<T>(
+    valuesRange: SimpleRangeValue,
+    conditionArgs: RawInterpreterValue[],
+    functionName: string,
+    reduceInitialValue: T,
+    composeFunction: (left: T, right: T) => T,
+    mapFunction: (arg: InternalScalarValue) => T
+  ): T | CellError {
+    const conditions: Condition[] = []
+    for (let i = 0; i < conditionArgs.length; i += 2) {
+      const conditionArg = conditionArgs[i] as SimpleRangeValue
+      const criterionPackage = this.interpreter.criterionBuilder.fromCellValue(conditionArgs[i + 1] as RawScalarValue, this.arithmeticHelper)
+      if (criterionPackage === undefined) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadCriterion)
+      }
+      conditions.push(new Condition(conditionArg, criterionPackage))
+    }
+
+    return new CriterionFunctionCompute<T>(
+      this.interpreter,
+      conditionalAggregationFunctionCacheKey(functionName),
+      reduceInitialValue,
+      composeFunction,
+      mapFunction,
+    ).compute(valuesRange, conditions)
   }
 }
