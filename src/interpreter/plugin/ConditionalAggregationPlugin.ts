@@ -233,14 +233,18 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
   public minifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'MINIFS'
 
-    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => this.computeConditionalAggregationFunction<RawScalarValue>(
-      values,
-      args as RawInterpreterValue[],
-      functionName,
-      99999999,
-      (left, right) => Math.min(left as number, right as number),
-      (arg) => getRawValue(arg),
-    )
+    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => {
+      const minResult = this.computeConditionalAggregationFunction<RawScalarValue>(
+        values,
+        args as RawInterpreterValue[],
+        functionName,
+        Infinity,
+        (left, right) => Math.min(left as number, right as number),
+        (arg) => getRawValue(arg),
+      )
+
+      return minResult === Infinity ? 0 : minResult
+    }
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
@@ -248,14 +252,18 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
   public maxifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'MAXIFS'
 
-    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => this.computeConditionalAggregationFunction<RawScalarValue>(
-      values,
-      args as RawInterpreterValue[],
-      functionName,
-      -99999999,
-      (left, right) => Math.max(left as number, right as number),
-      (arg) => getRawValue(arg),
-    )
+    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => {
+      const maxResult = this.computeConditionalAggregationFunction<RawScalarValue>(
+        values,
+        args as RawInterpreterValue[],
+        functionName,
+        -Infinity,
+        (left, right) => Math.max(left as number, right as number),
+        (arg) => getRawValue(arg),
+      )
+
+      return maxResult === -Infinity ? 0 : maxResult
+    }
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }

@@ -50,11 +50,15 @@ describe('Function MAXIFS - argument validations and combinations', () => {
   })
 
   it('scalars are treated like singular arrays', () => {
-    const engine = HyperFormula.buildFromArray([['=MAXIFS(42, 10, ">1")'], ['=MAXIFS(42, 0, ">1")']])
+    const engine = HyperFormula.buildFromArray([['=MAXIFS(42, 10, ">1")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(42)
-    // because compute() returns the initial value which is Number.NEGATIVE_INFINITY and this isNumberOverflow
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+  })
+
+  it('should return 0 as max from an empty range', () => {
+    const engine = HyperFormula.buildFromArray([['=MAXIFS(42, -1, ">1")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 
   it('error propagation', () => {

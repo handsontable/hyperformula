@@ -50,11 +50,15 @@ describe('Function MINIFS - argument validations and combinations', () => {
   })
 
   it('scalars are treated like singular arrays', () => {
-    const engine = HyperFormula.buildFromArray([['=MINIFS(42, 10, ">1")'], ['=MINIFS(42, 0, ">1")']])
+    const engine = HyperFormula.buildFromArray([['=MINIFS(42, 10, ">1")']])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(42)
-    // because compute() returns the initial value which is Number.POSITIVE_INFINITY and this isNumberOverflow
-    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+  })
+
+  it('should return 0 as min from an empty range', () => {
+    const engine = HyperFormula.buildFromArray([['=MINIFS(42, -1, ">1")']])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 
   it('error propagation', () => {
