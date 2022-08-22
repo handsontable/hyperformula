@@ -19,6 +19,8 @@ import {
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {CellContent} from '../../CellContentParser'
+import Number = CellContent.Number
 
 class AverageResult {
   public static empty = new AverageResult(0, 0)
@@ -56,7 +58,7 @@ function conditionalAggregationFunctionCacheKey(functionName: string): (conditio
 
 export class ConditionalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ConditionalAggregationPlugin> {
   public static implementedFunctions = {
-    'SUMIF': {
+    SUMIF: {
       method: 'sumif',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
@@ -64,14 +66,14 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
         {argumentType: ArgumentTypes.RANGE, optionalArg: true},
       ],
     },
-    'COUNTIF': {
+    COUNTIF: {
       method: 'countif',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.NOERROR},
       ],
     },
-    'AVERAGEIF': {
+    AVERAGEIF: {
       method: 'averageif',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
@@ -79,7 +81,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
         {argumentType: ArgumentTypes.RANGE, optionalArg: true},
       ],
     },
-    'SUMIFS': {
+    SUMIFS: {
       method: 'sumifs',
       parameters: [
         {argumentType: ArgumentTypes.RANGE},
@@ -88,9 +90,27 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
       ],
       repeatLastArgs: 2,
     },
-    'COUNTIFS': {
+    COUNTIFS: {
       method: 'countifs',
       parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
+      repeatLastArgs: 2,
+    },
+    MINIFS: {
+      method: 'minifs',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: ArgumentTypes.NOERROR},
+      ],
+      repeatLastArgs: 2,
+    },
+    MAXIFS: {
+      method: 'maxifs',
+      parameters: [
+        {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.RANGE},
         {argumentType: ArgumentTypes.NOERROR},
       ],
@@ -205,6 +225,36 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
       0,
       (left, right) => left + right,
       () => 1,
+    )
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
+  }
+
+  public minifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const functionName = 'MINIFS'
+
+    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => this.computeConditionalAggregationFunction<RawScalarValue>(
+      values,
+      args as RawInterpreterValue[],
+      functionName,
+      99999999,
+      (left, right) => Math.min(left as number, right as number),
+      (arg) => getRawValue(arg),
+    )
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
+  }
+
+  public maxifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const functionName = 'MAXIFS'
+
+    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => this.computeConditionalAggregationFunction<RawScalarValue>(
+      values,
+      args as RawInterpreterValue[],
+      functionName,
+      -99999999,
+      (left, right) => Math.max(left as number, right as number),
+      (arg) => getRawValue(arg),
     )
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
