@@ -627,12 +627,10 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       }
     }
 
-    const rangeStart = range.start
-    const rangeEnd = range.end
-    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)
+    const rangeVertex = this.dependencyGraph.getRange(range.start, range.end)
 
     if (rangeVertex === undefined) {
-      throw new Error(`Range does not exists in graph: (${rangeStart}, ${rangeEnd})`)
+      throw new Error(`Range does not exists in graph: (${range.start}, ${range.end})`)
     }
 
     let value = rangeVertex.getFunctionValue(functionName) as (T | CellError | undefined)
