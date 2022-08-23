@@ -9,22 +9,20 @@ The methods provided below store cut or copied data in a reference inside
 the memory, not directly in the system clipboard.
 :::
 
-## Copy
+## [Copy](../api/classes/hyperformula.md#copy)
 
-You can copy cell content by using the `copy` method.
-This method requires you to pass the arguments as follows:
-
-* The source left corner of a block of cells to be copied
-* Width of the block
-* Height of the block
+You can copy cell content by using the [copy](../api/classes/hyperformula.md#copy) method, which accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
- ['1', '2'],
+  ['1', '2'],
 ]);
 
 // it copies [ [ 2 ] ]
-const clipboardContent = hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
+const clipboardContent = hfInstance.copy({
+  start: { sheet: 0, col: 1, row: 0 }, 
+  end: { sheet: 0, col: 1, row: 0 },
+});
 ```
 
 Depending on what was copied, the data is stored as:
@@ -41,32 +39,28 @@ out of scope for these expressions, their scope will switch to global.
 If a copied named expression's scope is the same as the target's,
 the local scope will remain the same.
 
-## Cut
+## [Cut](../api/classes/hyperformula.md#cut)
 
-You can cut cell content by using the `cut` method. This
-method requires you to pass the arguments as follows:
+You can cut cell content by using the [cut](../api/classes/hyperformula.md#cut) method, which also accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
 
-* The source left corner of a block of cells to be copied
-* Width of the block
-* Height of the block
-
-**Any CRUD operation called after this method will abort the cut**
-operation.
+**Any CRUD operation called after this method will abort the cut operation.**
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
- ['1', '2'],
+  ['1', '2'],
 ]);
 
-// return the values that were cut: [ [ 1 ] ]
-const clipboardContent = hfInstance.cut({ sheet: 0, col: 0, row: 0 }, 1, 1);
+// returns the values that were cut: [ [ 1 ] ]
+const clipboardContent = hfInstance.cut({
+  start: { sheet: 0, col: 0, row: 0 },
+  end: { sheet: 0, col: 0, row: 0 },
+});
 ```
 
-## Paste
+## [Paste](../api/classes/hyperformula.md#paste)
 
-You can paste cell content by using the `paste` method.
-This method requires only one parameter - the target left corner
-into into which the content will be pasted.
+You can paste cell content by using the [paste](../api/classes/hyperformula.md#paste) method.
+This method requires only one parameter - the top left corner of the range, into which the content will be pasted.
 
 If the `paste` method is called after `copy` , it will paste
 copied values and formulas into a block of cells. If it is called
@@ -81,35 +75,31 @@ on many related cells in the workbook.
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
- ['1', '2'],
+  ['1', '2'],
 ]);
 
-// do a copy; [ [ 2 ] ] was copied
-hfInstance.copy({ sheet: 0, col: 0, row: 0 }, 1, 1);
+// [ [ 2 ] ] was copied
+const clipboardContent = hfInstance.copy({
+  start: { sheet: 0, col: 1, row: 0 },
+  end: { sheet: 0, col: 1, row: 0 },
+});
 
-// do a paste; should return a list of cells whose values changed
-// after the operation, their absolute addresses, and new values
+// returns a list of modified cells: their absolute addresses and new values
 const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
 ```
 
 **Cut and paste** behaves similarly to the `move` operation, so if the formula
- '=A1' is in cell B1 it will stay '=A1' after being placed into B2.
+'=A1' is in cell B1 it will stay '=A1' after being placed into B2.
 
 **Copy and paste** behaves a bit differently. If '=A1' is copied from
 cell B1 into B2 it will become '=A2'.
 
 ## Clear the clipboard
 
-You can clear the clipboard on demand by using the `clearClipboard`
+You can clear the clipboard on demand by using the [clearClipboard](../api/classes/hyperformula.md#clearclipboard)
 method. There is also a method for checking if there is any content
-inside the clipboard: `isClipboardEmpty` .
+inside the clipboard: [isClipboardEmpty](../api/classes/hyperformula.md#isclipboardempty).
 
 ## Demo
 
-<iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/clipboard-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="handsontable/hyperformula-demos: clipboard-operations"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+<iframe src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/clipboard-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" title="handsontable/hyperformula-demos: clipboard-operations" allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking" sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"></iframe>
