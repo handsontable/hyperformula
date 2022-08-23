@@ -58,7 +58,7 @@ jobs:
           message: |
             # Performance comparison of head (${{ github.event.pull_request.head.sha }}) vs base (${{ github.event.pull_request.base.sha }})
 
-      - name: Publish a comment - performance results
+      - name: Publish a comment - performance results report
         uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
         with:
           append: true
