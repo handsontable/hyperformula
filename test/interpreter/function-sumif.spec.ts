@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {CellValueDetailedType, HyperFormula} from '../../src'
 import {ErrorType} from '../../src/Cell'
 import {ErrorMessage} from '../../src/error-message'
 import {plPL} from '../../src/i18n/languages'
@@ -452,6 +452,94 @@ describe('Function SUMIF(S) - calculations and optimizations', () => {
 
     expect(engine.getCellValue(adr('A5'))).toEqual(13)
   })
+
+  it('coerces dates as numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '9160250011660588', '43469', '25000'],
+      ['2', '9160250011689568', '43631', '15000'],
+      ['=SUMIF(C2:C11,">31/05/2019",D2:D11)']
+    ], {dateFormats: ['DD/MM/YYYY']})
+    expect(engine.getCellValue(adr('A3'))).toEqual(15000)
+  })
+
+  it('works when criterion arg is a date', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['31/05/2019', '1'],
+      ['=DATEVALUE("31/05/2019")', '1'],
+      ['=DATE(2019, 5, 31)', '1'],
+      ['=A1', '1'],
+      ['43616', '1'],
+      ['=SUMIF(A1:A5, "31/05/2019", B1:B5)']
+    ], {dateFormats: ['DD/MM/YYYY']})
+
+    expect(engine.getCellValue(adr('A6'))).toEqual(5)
+  })
+
+  it('works when criterion arg is a time value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['12:13', '1'],
+      ['=SUMIF(A1:A1, "12:13", B1:B1)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_TIME)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+  })
+
+  it('works when criterion arg is a datetime value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['31/05/2019 9:15', '1'],
+      ['=SUMIF(A1:A1, "31/05/2019 9:15", B1:B1)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_DATETIME)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+  })
+
+  it('works when criterion arg is a currency value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['$1', '1'],
+      ['1$', '1'],
+      ['=SUMIF(A1:A2, "$1", B1:B2)'],
+      ['=SUMIF(A1:A2, "1$", B1:B2)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toEqual(2)
+  })
+
+  it('works when criterion arg is a percent value', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['20%', '1'],
+      ['=SUMIF(A1:A1, "20%", B1:B1)']
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_PERCENT)
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+  })
+
+  it('ignores whitespace characters in criterion argument', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1'],
+      ['=SUMIF(A1:A1, "$1")'],
+      ['=SUMIF(A1:A1, " $1")'],
+      ['=SUMIF(A1:A1, "$ 1")'],
+      ['=SUMIF(A1:A1, "$1 ")'],
+      ['=SUMIF(A1:A1, "100%")'],
+      ['=SUMIF(A1:A1, " 100%")'],
+      ['=SUMIF(A1:A1, "100 %")'],
+      ['=SUMIF(A1:A1, "100% ")'],
+    ])
+
+    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A5'))).toEqual(1)
+    expect(engine.getCellValue(adr('A6'))).toEqual(1)
+    expect(engine.getCellValue(adr('A7'))).toEqual(1)
+    expect(engine.getCellValue(adr('A8'))).toEqual(1)
+    expect(engine.getCellValue(adr('A9'))).toEqual(1)
+  })
 })
 
 describe('Function SUMIFS - argument validations and combinations', () => {
@@ -562,15 +650,6 @@ describe('Function SUMIFS - argument validations and combinations', () => {
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
-  })
-
-  it('coerces dates as numbers', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '9160250011660588', '43469', '25000'],
-      ['2', '9160250011689568', '43631', '15000'],
-      ['=SUMIF(C2:C11,">31/05/2019",D2:D11)']
-    ], {dateFormats: ['DD/MM/YYYY']})
-    expect(engine.getCellValue(adr('A3'))).toEqual(15000)
   })
 
   it('works when criterion arg is an inline array', () => {

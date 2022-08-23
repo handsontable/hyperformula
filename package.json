@@ -46,7 +46,7 @@
     "last 2 and_qq versions",
     "last 2 op_mob versions"
   ],
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "GPL-3.0-only",
   "module": "es/index.js",
   "main": "commonjs/index.js",
   "jsnext:main": "es/index.js",
@@ -155,8 +155,5 @@
     "chevrotain": "^6.5.0",
     "tiny-emitter": "^2.1.0",
     "unorm": "^1.6.0"
-  },
-  "optionalDependencies": {
-    "fsevents": "~2.3.2"
   }
 }
