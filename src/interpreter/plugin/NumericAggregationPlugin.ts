@@ -15,6 +15,7 @@ import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {RangeVertex} from '../../DependencyGraph'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -631,12 +632,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)
 
     if (rangeVertex === undefined) {
-      throw new Error('Range does not exists in graph')
+      throw new Error(`Range does not exists in graph: (${rangeStart}, ${rangeEnd})`)
     }
 
     let value = rangeVertex.getFunctionValue(functionName) as (T | CellError | undefined)
     if (value === undefined) {
-      const rangeValues = this.getRangeValues(functionName, range, mapFunction, coercionFunction)
+      const rangeValues = this.getRangeValues(functionName, range, rangeVertex, mapFunction, coercionFunction)
       value = rangeValues.reduce((arg1, arg2) => {
         if (arg1 instanceof CellError) {
           return arg1
@@ -660,20 +661,17 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    *
    * @param functionName - function name (e.g. SUM)
    * @param range - cell range
+   * @param rangeVertex
    * @param mapFunction
    * @param coercionFunction
    */
-  private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): (T | CellError)[] {
+  private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, rangeVertex: RangeVertex, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): (T | CellError)[] {
     const rangeResult: (T | CellError)[] = []
     const {smallerRangeVertex, restRange} = this.dependencyGraph.rangeMapping.findSmallerRange(range)
-    const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)
 
-    if (currentRangeVertex === undefined) {
-      throw new Error(`Range does not exists in graph: (${range.start}, ${range.end})`)
-    }
 
     let actualRange: AbsoluteCellRange
-    if (smallerRangeVertex !== undefined && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+    if (smallerRangeVertex !== undefined && this.dependencyGraph.existsEdge(smallerRangeVertex, rangeVertex)) {
       const cachedValue: Maybe<T> = smallerRangeVertex.getFunctionValue(functionName)
       if (cachedValue !== undefined) {
         rangeResult.push(cachedValue)
