@@ -159,7 +159,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
       functionName,
       0,
       (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
-      (arg) => getRawValue(arg),
+      mapToRawScalarValue as (arg: InternalScalarValue) => RawScalarValue,
     )
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
@@ -174,7 +174,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
       functionName,
       0,
       (left, right) => this.arithmeticHelper.nonstrictadd(left, right),
-      (arg) => getRawValue(arg),
+      mapToRawScalarValue as (arg: InternalScalarValue) => RawScalarValue,
     )
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
