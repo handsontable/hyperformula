@@ -1,7 +1,8 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {HyperFormula, ErrorType} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
+import {DateTimeHelper} from '../../src/DateTimeHelper'
+import {Config} from '../../src/Config'
 
 describe('Function MAXIFS - argument validations and combinations', () => {
   it('requires odd number of arguments, but at least 3', () => {
@@ -81,6 +82,108 @@ describe('Function MAXIFS - argument validations and combinations', () => {
     const engine = HyperFormula.buildFromArray([['2', '3'], ['=MAXIFS(B1, A1, ">1")']])
 
     expect(engine.getCellValue(adr('A2'))).toEqual(3)
+  })
+
+  it('works with numbers', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['2', 'a'],
+      ['3', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+  })
+
+  it('works with percents', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['2%', 'a'],
+      ['3%', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(.03)
+  })
+
+  it('works with currencies', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['$2', 'a'],
+      ['$3', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+  })
+
+  it('works with dates', () => {
+    const dateHelper = new DateTimeHelper(new Config())
+
+    const engine = HyperFormula.buildFromArray([
+      ['20/01/2020', 'a'],
+      ['30/01/2020', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(dateHelper.numberToSimpleDate(engine.getCellValue(adr('A3')) as number)).toEqual({ day: 30, month: 1, year: 2020 })
+  })
+
+  it('strings are ignored', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['-1', 'a'],
+      ['abc', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+  })
+
+  it('empty cells are ignored', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['-1', 'a'],
+      ['', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+  })
+
+  it('booleans are ignored', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['-1', 'a'],
+      ['=TRUE()', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+  })
+
+  it('max of empty cells is zero', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['', 'a'],
+      ['', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+  })
+
+  it('max of strings is zero', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['abc', 'a'],
+      ['cba', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+  })
+
+  it('max of booleans is zero', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TRUE()', 'a'],
+      ['=FALSE()', 'a'],
+      ['=MAXIFS(A1:A2, B1:B2, "a")'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(0)
   })
 
   it('works with range values', () => {

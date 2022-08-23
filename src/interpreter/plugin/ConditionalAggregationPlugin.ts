@@ -54,6 +54,26 @@ function conditionalAggregationFunctionCacheKey(functionName: string): (conditio
   }
 }
 
+function zeroForInfinite(value: InternalScalarValue) {
+  if (isExtendedNumber(value) && !Number.isFinite(getRawValue(value))) {
+    return 0
+  } else {
+    return value
+  }
+}
+
+function mapToRawScalarValue(arg: InternalScalarValue): Maybe<CellError | RawScalarValue> {
+  if (arg instanceof CellError) {
+    return arg
+  }
+
+  if (isExtendedNumber(arg)) {
+    return getRawValue(arg)
+  }
+
+  return undefined
+}
+
 export class ConditionalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ConditionalAggregationPlugin> {
   public static implementedFunctions = {
     SUMIF: {
@@ -231,17 +251,25 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
   public minifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'MINIFS'
 
+    const composeFunction = (left: RawScalarValue, right: RawScalarValue): RawScalarValue => {
+      if (right === undefined || left === undefined) {
+        return right === undefined ? left : right
+      }
+
+      return Math.min(left as number, right as number)
+    }
+
     const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => {
       const minResult = this.computeConditionalAggregationFunction<RawScalarValue>(
         values,
         args as RawInterpreterValue[],
         functionName,
-        Infinity,
-        (left, right) => Math.min(left as number, right as number),
-        (arg) => getRawValue(arg),
+        Number.POSITIVE_INFINITY,
+        composeFunction,
+        mapToRawScalarValue as (arg: InternalScalarValue) => RawScalarValue,
       )
 
-      return minResult === Infinity ? 0 : minResult
+      return zeroForInfinite(minResult)
     }
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
@@ -250,17 +278,25 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
   public maxifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'MAXIFS'
 
+    const composeFunction = (left: RawScalarValue, right: RawScalarValue): RawScalarValue => {
+      if (right === undefined || left === undefined) {
+        return right === undefined ? left : right
+      }
+
+      return Math.max(left as number, right as number)
+    }
+
     const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => {
       const maxResult = this.computeConditionalAggregationFunction<RawScalarValue>(
         values,
         args as RawInterpreterValue[],
         functionName,
-        -Infinity,
-        (left, right) => Math.max(left as number, right as number),
-        (arg) => getRawValue(arg),
+        Number.NEGATIVE_INFINITY,
+        composeFunction,
+        mapToRawScalarValue as (arg: InternalScalarValue) => RawScalarValue,
       )
 
-      return maxResult === -Infinity ? 0 : maxResult
+      return zeroForInfinite(maxResult)
     }
 
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)

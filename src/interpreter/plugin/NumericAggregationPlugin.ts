@@ -628,7 +628,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
 
     const rangeStart = range.start
     const rangeEnd = range.end
-    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
+    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)
 
     if (rangeVertex === undefined) {
       throw new Error('Range does not exists in graph')
@@ -666,7 +666,12 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): (T | CellError)[] {
     const rangeResult: (T | CellError)[] = []
     const {smallerRangeVertex, restRange} = this.dependencyGraph.rangeMapping.findSmallerRange(range)
-    const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
+    const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)
+
+    if (currentRangeVertex === undefined) {
+      throw new Error(`Range does not exists in graph: (${range.start}, ${range.end})`)
+    }
+
     let actualRange: AbsoluteCellRange
     if (smallerRangeVertex !== undefined && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
       const cachedValue: Maybe<T> = smallerRangeVertex.getFunctionValue(functionName)

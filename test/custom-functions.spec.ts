@@ -165,7 +165,7 @@ describe('Register static custom plugin', () => {
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
+    expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE', 'MAKS.WARUNKÓW', 'MIN.WARUNKÓW'], formulaNames)
   })
 
   it('should register all formulas from plugin', () => {
