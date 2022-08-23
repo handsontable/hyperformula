@@ -19,8 +19,6 @@ import {
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
-import {CellContent} from '../../CellContentParser'
-import Number = CellContent.Number
 
 class AverageResult {
   public static empty = new AverageResult(0, 0)
@@ -195,7 +193,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
    * Range is the range to which criterion is to be applied.
    * Criterion is the criteria used to choose which cells will be included in sum.
    *
-   * Returns number of cells on which criteria evaluates to true.
+   * Returns number of cells on which criteria evaluate to true.
    *
    * @param ast
    * @param state
