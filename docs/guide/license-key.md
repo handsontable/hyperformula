@@ -5,7 +5,7 @@ To use HyperFormula, you need to specify which [license type](licensing.md#avail
 ## GPLv3 license
 
 To use HyperFormula in a non-commercial or open-source
-project, use the [GNU General Public License v3.0](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) (GPLv3):
+project, use the [GNU General Public License v3.0](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt) (GPLv3):
 
 * In your [configuration options](configuration-options.md), assign the mandatory `licenseKey` property to a string, `gpl-v3`:
   ```js
