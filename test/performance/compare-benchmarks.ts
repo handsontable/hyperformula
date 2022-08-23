@@ -28,7 +28,7 @@ interface ResultSuite {
 
 function writeTableToFile(tableData: { [key: string]: string | number }[], filename: string): void {
   const tableRenderer = asTable.configure({ delimiter: ' | ', right: true })
-  const renderedTable = `# Performance comparison\n\n\`\`\`\n${tableRenderer(tableData)}\n\`\`\`\n`
+  const renderedTable = `\n\n\`\`\`\n${tableRenderer(tableData)}\n\`\`\`\n`
 
   try {
     fs.writeFileSync(filename, renderedTable)

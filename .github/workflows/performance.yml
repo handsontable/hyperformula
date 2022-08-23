@@ -51,8 +51,16 @@ jobs:
         run: |
           npm run benchmark:compare-benchmarks base.json head.json performance-report.md
 
-      - name: Publish a comment in the PR
+      - name: Publish a comment - header
         uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            # Performance comparison of head (${{ github.event.pull_request.head.sha }}) vs base (${{ github.event.pull_request.base.sha }})
+
+      - name: Publish a comment - performance results
+        uses: marocchino/sticky-pull-request-comment@6804b5ad49d19c10c9ae7cf5057352f7ff333f31 # https://github.com/marocchino/sticky-pull-request-comment/tree/v1.6.0
+        with:
+          append: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           path: performance-report.md
