@@ -10,6 +10,10 @@ import {Maybe} from './Maybe'
 const numDays: number[] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const prefSumDays: number[] = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
+const SECONDS_PER_MINUTE = 60
+const MINUTES_PER_HOUR = 60
+const HOURS_PER_DAY = 24
+
 export interface SimpleDate {
   year: number,
   month: number,
@@ -285,16 +289,19 @@ export function roundToNearestSecond(arg: number): number {
   return Math.round(arg * 3600 * 24) / (3600 * 24)
 }
 
+function roundToEpsilon(arg: number, epsilon: number = 1): number {
+  return Math.round(arg * epsilon) / epsilon
+}
+
+// Note: The result of this function might be { hours = 24, minutes = 0, seconds = 0 } if arg < 1 but arg ≈ 1
 export function numberToSimpleTime(arg: number): SimpleTime {
-  arg = Math.round(arg * 24 * 60 * 60 * 100000) / (24 * 60 * 60 * 100000)
-  arg *= 24
-  const hours = Math.floor(arg)
-  arg -= hours
-  arg *= 60
-  const minutes = Math.floor(arg)
-  arg -= minutes
-  arg *= 60
-  const seconds = Math.round(arg * 100000) / 100000
+  const argAsSeconds = arg * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE
+  const seconds = roundToEpsilon(argAsSeconds % SECONDS_PER_MINUTE, 100000) % SECONDS_PER_MINUTE
+  const argAsMinutes = (argAsSeconds - seconds) / SECONDS_PER_MINUTE
+  const minutes = Math.round(argAsMinutes % MINUTES_PER_HOUR) % MINUTES_PER_HOUR
+  const argAsHours = (argAsMinutes - minutes) / MINUTES_PER_HOUR
+  const hours = Math.round(argAsHours)
+
   return {hours, minutes, seconds}
 }
 
