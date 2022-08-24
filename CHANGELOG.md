@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added MAXIFS and MINIFS functions. Co-authored-by: Rene Kretzschmar <rkretzschmar@gmail.com>. [#1049](https://github.com/handsontable/hyperformula/issues/1049)
+- Added MAXIFS and MINIFS functions. [#1049](https://github.com/handsontable/hyperformula/issues/1049)
 
 ### Fixed
 - Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
