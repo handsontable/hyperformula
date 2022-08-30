@@ -30,6 +30,7 @@ export type SimpleDateTime = SimpleDate & SimpleTime
 
 export type DateTime = SimpleTime | SimpleDate | SimpleDateTime
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'year' in obj && typeof obj.year === 'number' && 'month' in obj && typeof obj.month === 'number' && 'day' in obj && typeof obj.day === 'number'
@@ -38,6 +39,7 @@ export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
   if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'hours' in obj && typeof obj.hours === 'number' && 'minutes' in obj && typeof obj.minutes === 'number' && 'seconds' in obj && typeof obj.seconds === 'number'
