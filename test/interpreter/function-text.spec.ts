@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src'
 import {SimpleDateTime} from '../../src/DateTimeHelper'
 import {ErrorMessage} from '../../src/error-message'
 import {defaultStringifyDateTime} from '../../src/format/format'
