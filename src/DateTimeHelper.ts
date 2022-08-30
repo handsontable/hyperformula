@@ -51,14 +51,14 @@ export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
 export const maxDate: SimpleDate = {year: 9999, month: 12, day: 31}
 
 export class DateTimeHelper {
-  private readonly minDateAboluteValue: number
+  private readonly minDateAbsoluteValue: number
   private readonly maxDateValue: number
   private readonly epochYearZero: number
   private readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   private readonly leapYear1900: boolean
 
   constructor(private readonly config: Config) {
-    this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
+    this.minDateAbsoluteValue = this.dateToNumberFromZero(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
     this.leapYear1900 = config.leapYear1900
 
@@ -129,15 +129,15 @@ export class DateTimeHelper {
   }
 
   public dateToNumber(date: SimpleDate): number {
-    return this.dateToNumberFromZero(date) - this.minDateAboluteValue
+    return this.dateToNumberFromZero(date) - this.minDateAbsoluteValue
   }
 
   public relativeNumberToAbsoluteNumber(arg: number): number {
-    return arg + this.minDateAboluteValue - (this.leapYear1900 ? 1 : 0)
+    return arg + this.minDateAbsoluteValue - (this.leapYear1900 ? 1 : 0)
   }
 
   public numberToSimpleDate(arg: number): SimpleDate {
-    const dateNumber = Math.floor(arg) + this.minDateAboluteValue
+    const dateNumber = Math.floor(arg) + this.minDateAbsoluteValue
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
       year++
