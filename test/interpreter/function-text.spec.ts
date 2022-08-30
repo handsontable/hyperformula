@@ -154,6 +154,30 @@ describe('Text', () => {
     expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
   })
 
+  it('date and time format', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1.100', '=TEXT(A1, "yyyy-mm-dd hh:mm:ss")'],
+      ['1.222', '=TEXT(A2, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.99999', '=TEXT(A3, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.999999', '=TEXT(A4, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.9999999', '=TEXT(A5, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.99999999', '=TEXT(A6, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.999999999', '=TEXT(A7, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.9999999999', '=TEXT(A8, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.99999999999', '=TEXT(A9, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.999999999999', '=TEXT(A10, "yyyy-mm-dd hh:mm:ss")']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('1899-12-31 02:24:00')
+    expect(engine.getCellValue(adr('B2'))).toEqual('1899-12-31 05:19:41')
+    expect(engine.getCellValue(adr('B3'))).toEqual('1899-12-30 23:59:59')
+    // expect(engine.getCellValue(adr('B4'))).toEqual('1899-12-31 00:00:00')
+    // expect(engine.getCellValue(adr('B5'))).toEqual('1899-12-31 00:00:00')
+    // expect(engine.getCellValue(adr('B6'))).toEqual('1899-12-31 00:00:00')
+    // expect(engine.getCellValue(adr('B7'))).toEqual('1899-12-31 00:00:00')
+    // expect(engine.getCellValue(adr('B8'))).toEqual('1899-12-31 00:00:00')
+    expect(engine.getCellValue(adr('B9'))).toEqual('1899-12-31 00:00:00')
+    expect(engine.getCellValue(adr('B10'))).toEqual('1899-12-31 00:00:00')
+  })
 })
 
 describe('time duration', () => {
@@ -206,9 +230,9 @@ describe('Custom date printing', () => {
   })
 
   it('date printing, month and minutes', () => {
-    const enigne = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")'],
+    const engine = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")'],
       ['1.222', '=TEXT(A2, "mm-dd mm:ss.sssss")']])
-    expect(enigne.getCellValue(adr('B1'))).toEqual('12-31 24:00')
-    expect(enigne.getCellValue(adr('B2'))).toEqual('12-31 19:40.8')
-  })
+    expect(engine.getCellValue(adr('B1'))).toEqual('12-31 24:00')
+    expect(engine.getCellValue(adr('B2'))).toEqual('12-31 19:40.8')
+  })q
 })

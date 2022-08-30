@@ -116,14 +116,6 @@ describe('Time arithmetic', () => {
     expect(engine.getCellValue(adr('C1'))).toBe('01:23')
   })
 
-  it('tmp', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['15:01', '14:00', '=TEXT(A1-B1, "hh:mm:ss")'],
-    ])
-
-    expect(engine.getCellValue(adr('C1'))).toBe('01:01:00')
-  })
-
   it('subtract two time values - rounding test', () => {
     const engine = HyperFormula.buildFromArray([
       ['15:00', '14:00', '=TEXT(A1-B1, "hh:mm")'],

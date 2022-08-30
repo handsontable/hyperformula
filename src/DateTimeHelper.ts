@@ -152,7 +152,12 @@ export class DateTimeHelper {
   }
 
   public numberToSimpleDateTime(arg: number): SimpleDateTime {
-    return {...this.numberToSimpleDate(Math.floor(arg)), ...numberToSimpleTime(arg % 1)}
+    const time = numberToSimpleTime(arg % 1)
+    const carryDays = Math.floor(time.hours / HOURS_PER_DAY)
+    time.hours = time.hours % HOURS_PER_DAY
+    const date = this.numberToSimpleDate(Math.floor(arg) + carryDays)
+
+    return { ...date, ...time }
   }
 
   public leapYearsCount(year: number): number {
@@ -304,7 +309,7 @@ export function numberToSimpleTime(arg: number): SimpleTime {
   const argAsHours = (argAsMinutes - minutes) / MINUTES_PER_HOUR
   const hours = Math.round(argAsHours)
 
-  return {hours, minutes, seconds}
+  return { hours, minutes, seconds }
 }
 
 export function timeToNumber(time: SimpleTime): number {
