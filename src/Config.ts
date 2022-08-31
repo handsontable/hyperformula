@@ -90,7 +90,7 @@ export interface ConfigParams {
    */
   currencySymbol: string[],
   /**
-   * Sets date formats accepted by the date-parsing function.
+   * Sets the date formats accepted by the date-parsing function.
    *
    * A format must be specified as a string consisting of tokens and separators.
    *
@@ -365,14 +365,16 @@ export interface ConfigParams {
    */
   thousandSeparator: '' | ',' | ' ' | '.',
   /**
-   * Sets time formats that will be supported by time-parsing functions.
+   * Sets the time formats accepted by the time-parsing function.
    *
-   * The separator is `:` (colon).
+   * A format must be specified as a string consisting of at least two tokens separated by `:` (a colon).
    *
-   * Accepts any configuration of at least two of the following, in any order:
-   * - `hh`: hours
-   * - `mm`: minutes
-   * - `ss`: seconds
+   * Supported tokes:
+   * - `hh` (hours)
+   * - `mm` (minutes)
+   * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc (seconds)
+   *
+   * The number of decimal places in the seconds token does not matter. All versions of the seconds token are equivalent in the context of parsing time values.
    *
    * @default ['hh:mm', 'hh:mm:ss.sss']
    *
