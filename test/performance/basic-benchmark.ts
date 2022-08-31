@@ -4,7 +4,7 @@ import {expectedValues as expectedValuesA, sheet as sheetAGenerator} from './she
 import {expectedValues as expectedValuesB, sheet as sheetBGenerator} from './sheets/10-sheet-b'
 import {sheet as columnRangesGenerator} from './sheets/column-ranges'
 
-(() => {
+export function runBasicBenchmark(): BenchmarkResult[] {
   const sheetA = sheetAGenerator()
   const sheetB = sheetBGenerator()
   const sheetT = sheetTGenerator()
@@ -21,8 +21,5 @@ import {sheet as columnRangesGenerator} from './sheets/column-ranges'
     }], {expectedTime: 1000, numberOfRuns: 10})
   )
 
-  console.table(result.map(e => ({
-    name: e.name,
-    totalTime: e.totalTime
-  })))
-})()
+  return result
+}
