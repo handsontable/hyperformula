@@ -90,16 +90,23 @@ export interface ConfigParams {
    */
   currencySymbol: string[],
   /**
-   * Sets date formats that are supported by date-parsing functions.
+   * Sets date formats accepted by the date-parsing function.
    *
-   * The separator is ignored and can be any of the following:
-   * - `-` (dash)
-   * - ` ` (empty space)
+   * A format must be specified as a string consisting of tokens and separators.
+   *
+   * Supported tokes:
+   * - `DD` (day of month)
+   * - `MM` (month as a number)
+   * - `YYYY` (year as a 4-digit number)
+   * - `YY` (year as a 2-digit number)
+   *
+   * Supported separators:
    * - `/` (slash)
+   * - `-` (dash)
+   * - `.` (dot)
+   * - ` ` (empty space)
    *
-   * `YY` can be replaced with `YYYY`.
-   *
-   * Any order of `YY`, `MM`, and `DD` is accepted as a date.
+   * Regardless of the separator specified in the format string, all of the above are accepted by the date-parsing function.
    *
    * @default ['DD/MM/YYYY', 'DD/MM/YY']
    *

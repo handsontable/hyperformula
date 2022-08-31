@@ -1,4 +1,4 @@
-import {CellType, HyperFormula} from '../src'
+import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
 import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
@@ -121,7 +121,7 @@ describe('Config', () => {
 
   it('should throw error when currency symbol is not a string', () => {
     expect(() => {
-      new Config({currencySymbol: [42 as any]})
+      new Config({currencySymbol: [ 42 as unknown as string ]})
     }).toThrowError('Expected value of type: string[] for config parameter: currencySymbol')
   })
 
@@ -223,9 +223,16 @@ describe('Config', () => {
 
     it('should parse the dates with different separators', () => {
       const dateFormats = ['DD/MM/YYYY']
-      const engine = HyperFormula.buildFromArray([
-        ['01/03/2022', '01-03-2022', '01 03 2022', '01.03.2022'],
-      ], { dateFormats })
+      const engine = HyperFormula.buildFromArray([[
+        '01/03/2022',
+        '01-03-2022',
+        '01 03 2022',
+        '01.03.2022',
+        '01/03-2022',
+        '01 03.2022',
+        '01 03/2022',
+        '01.03-2022',
+      ]], { dateFormats })
       expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_DATE)
       expect(engine.getCellValueFormat(adr('A1'))).toEqual('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('B1'))).toEqual(NumberType.NUMBER_DATE)
@@ -234,6 +241,14 @@ describe('Config', () => {
       expect(engine.getCellValueFormat(adr('C1'))).toEqual('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('D1'))).toEqual(NumberType.NUMBER_DATE)
       expect(engine.getCellValueFormat(adr('D1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('E1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('E1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('F1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('F1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('G1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('G1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('H1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('H1'))).toEqual('DD/MM/YYYY')
     })
   })
 
