@@ -144,6 +144,20 @@ describe('Register static custom plugin', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
 
+  it('registerFunction should not affect the existing HyperFormula instances', () => {
+    const engine = HyperFormula.buildFromArray([['=FOO()']])
+    HyperFormula.registerFunction('FOO', FooPlugin, FooPlugin.translations)
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
+  })
+
+  it('registerFunctionPlugin should not affect the existing HyperFormula instances', () => {
+    const engine = HyperFormula.buildFromArray([['=FOO()']])
+    HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
+  })
+
   it('should return registered formula translations', () => {
     HyperFormula.unregisterAllFunctions()
     HyperFormula.registerLanguage('plPL', plPL)

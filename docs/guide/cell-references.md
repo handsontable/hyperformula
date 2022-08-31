@@ -127,7 +127,7 @@ const source = { sheet: 0, col: 1, row: 0 };
 const destination = { sheet: 0, col: 2, row: 0 };
 
 // move B1
-const changes = hfInstance.moveCells(source, 1, 1, destination);
+const changes = hfInstance.moveCells({ start: source, end: source }, destination);
 
 // you can see the changes inside the console
 console.log(changes);
@@ -201,7 +201,7 @@ In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat sing
 :::
 
 ### More about ranges
-- [Key concepts: Handling ranges](/guide/key-concepts.md#handling-ranges)
+- [Ranges in the dependency graph](/guide/dependency-graph.md#ranges-in-the-dependency-graph)
 - [Types of operators: Reference operators](/guide/types-of-operators.md#reference-operators)
 - [API reference: Ranges](/api/classes/hyperformula.md#ranges)
 

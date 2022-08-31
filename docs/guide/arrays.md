@@ -6,13 +6,36 @@ Use array formulas to perform an operation (or call a function) on multiple cell
 
 In HyperFormula, an array can be:
 * A range of cell addresses (e.g. `A1:A10`)
-* An **ad-hoc array**: an input array with no ground-truth range that defines the values (e.g. `{1,3,5}`)
 * A result of an arithmetic operation (e.g. `5*A1:B5`)
 * A result of a function (e.g. `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5,2,2))`)
+* An **inline array**: an ad-hoc array that doesn't refer to any range of cells (e.g. `{1, 3, 5}`)
 
 An array is inherently a two-dimensional object.
 
 `1`x`1` arrays are treated as single, zero-dimensional values (**scalars**).
+
+### Inline arrays
+
+An inline array is defined by curly braces: `{ }`. It can contain one or more rows, separated by:
+- The [`arrayColumnSeparator`](../api/classes/config.md#arraycolumnseparator) (default: `,`)
+- The [`arrayRowSeparator`](../api/classes/config.md#arrayrowseparator) (default: `;`)
+  
+Every row must be of equal length.
+
+::: tip
+**Inline arrays are not recomputed after initialization.**
+
+If an inline array contains a cell reference, and the cell's value changes, the array is not updated.
+:::
+
+```js
+= {1, 2, 3} // an inline array with a single row
+= {1, 2 ; 3, 4} // an inline array with two rows
+= SUM({1, 2, 3}) // an inline array as an argument of a function
+= {A1, A2} // when the values of A1 or A2 change, this inline array is not updated
+
+= {1, 2 ; 3} // an invalid inline array: two rows of different lengths
+```
 
 ## Array arithmetic mode
 

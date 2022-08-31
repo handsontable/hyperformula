@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
 import {Config} from './Config'
@@ -28,6 +28,7 @@ export class NumberLiteralHelper {
       }
       return num
     }
+
     return undefined
   }
 

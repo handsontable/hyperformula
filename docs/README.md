@@ -22,25 +22,19 @@ To start a local HyperFormula docs server:
 3. From the main `hyperformula` directory, build HyperFormula:
    ```bash
    npm run bundle-all
-   ```   
-4. From the main `hyperformula` directory, generate the API reference:
-   ```bash
-   npm run docs:api
-   ```   
-5. From the main `hyperformula` directory, start your local docs server:
+   ```
+4. From the main `hyperformula` directory, create a dev build of the docs and start your local docs server:
    ```bash
    npm run docs:dev
    ```
-6. In your browser, go to: http://localhost:8080/hyperformula/.
+5. In your browser, go to: http://localhost:8080/hyperformula/.
 
 ## HyperFormula documentation npm scripts
 
 From the `hyperformula` directory, you can run the following npm scripts:
 
 * `npm run docs:dev` - Starts a local docs server at http://localhost:8080/hyperformula/.
-* `npm run docs:api` - Generates the HyperFormula API reference into `/docs/api`.
 * `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
-* `npm run docs` - Builds both the API reference and the docs output.
 
 ## HyperFormula docs directory structure
 

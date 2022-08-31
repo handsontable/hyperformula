@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
@@ -73,12 +73,12 @@ export interface FunctionMetadata {
   method: string,
   /**
    * Engine.
-   *
-   * If set to `true`, the function is volatile.
    */
   arraySizeMethod?: string,
   /**
    * Engine.
+   *
+   * If set to `true`, the function is volatile.
    */
   isVolatile?: boolean,
   /**
@@ -355,7 +355,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     metadata: FunctionMetadata,
     fn: (...arg: any) => InterpreterValue,
   ) => {
-    let argumentDefinitions: FunctionArgument[] = metadata.parameters!
+    let argumentDefinitions: FunctionArgument[] = metadata.parameters || []
     let argValues: [InterpreterValue, boolean][]
 
     if (metadata.expandRanges) {

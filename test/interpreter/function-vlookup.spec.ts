@@ -112,6 +112,21 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A6'))).toEqual('b')
     })
 
+    it('should return a single value even if there are more matching values', () => {
+      const engine = builder([
+        ['1', 'a'],
+        ['2', 'b'],
+        ['2', 'c'],
+        ['2', 'd'],
+        ['2', 'e'],
+        ['=VLOOKUP(2, A1:B5, 2, FALSE())']
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+      expect(engine.getCellValue(adr('B6'))).toEqual(null)
+      expect(engine.getCellValue(adr('A7'))).toEqual(null)
+    })
+
     it('works with wildcards', () => {
       const engine = builder([
         ['abd', 'a'],

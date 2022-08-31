@@ -66,42 +66,42 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 ### Array manipulation
 
-| Function ID     | Description                                                     | Syntax                                               |
-|:----------------|:----------------------------------------------------------------|:-----------------------------------------------------|
-| ARRAYFORMULA    | Enables the array arithmetic mode for a single formula.                                | ARRAYFORMULA(Formula)                                |
+| Function ID     | Description                                                      | Syntax                                               |
+|:----------------|:-----------------------------------------------------------------|:-----------------------------------------------------|
+| ARRAYFORMULA    | Enables the array arithmetic mode for a single formula.          | ARRAYFORMULA(Formula)                                |
 | FILTER          | Filters an array, based on multiple conditions (boolean arrays). | FILTER(SourceArray; BoolArray1[; BoolArray2[; ...]]) |
-| ARRAY_CONSTRAIN | Truncates an array to given dimensions.                        | ARRAY_CONSTRAIN(Array; Height; Width)                |
+| ARRAY_CONSTRAIN | Truncates an array to given dimensions.                          | ARRAY_CONSTRAIN(Array; Height; Width)                |
 
 ### Date and time
 
-| Function ID      | Description                                                                                | Syntax                                              |
-|:-----------------|:-------------------------------------------------------------------------------------------|:----------------------------------------------------|
-| DATE             | Calculates a date specified by year, month, day, and displays it in the cell's formatting. | DATE(Year; Month; Day)                              |
-| DATEDIF          | Calculates distance between two dates, in provided unit parameter.                         | DATEDIF(Date1; Date2; Units)                        |
-| DATEVALUE        | Interprets string as date.                                                                 | DATEVALUE(Datestring)                               |
-| DAY              | Returns the day of the given date value.                                                   | DAY(Number)                                         |
-| DAYS             | Calculates the difference between two date values.                                         | DAYS(Date2; Date1)                                  |
-| DAYS360          | Calculates the difference between two date values in days, in 360-day basis.               | DAYS360(Date2; Date1[; Format])                     |
-| EDATE            | Shifts the given startdate by given number of months.                                      | EDATE(Startdate; Months)                            |
-| EOMONTH          | Returns the date of the last day of a month which falls months away from the start date.   | EOMONTH(Startdate; Months)                          |
-| HOUR             | Returns hour component of given time.                                                      | HOUR(Time)                                          |
-| INTERVAL         | Returns interval string from given number of seconds.                                      | INTERVAL(Seconds)                                   |
-| ISOWEEKNUM       | Returns an ISO week number that corresponds to the week of year.                           | ISOWEEKNUM(Date)                                    |
-| MINUTE           | Returns minute component of given time.                                                    | MINUTE(Time)                                        |
-| MONTH            | Returns the month for the given date value.                                                | MONTH(Number)                                       |
-| NETWORKDAYS      | Returns the number of working days between two given dates.                                | NETWORKDAYS(Date1; Date2[; Holidays])               | 
-| NETWORKDAYS.INTL | Returns the number of working days between two given dates.                                | NETWORKDAYS.INTL(Date1; Date2[; Mode [; Holidays]]) |
-| NOW              | Returns current date + time.                                                               | NOW()                                               |
-| SECOND           | Returns second component of given time.                                                    | SECOND(Time)                                        |
-| TIME             | Calculates time from given hour, minute and second.                                        | TIME(Hour; Minute; Second)                          |
-| TIMEVALUE        | Interprets string as time.                                                                 | TIMEVALUE(Timestring)                               |
-| TODAY            | Returns current date.                                                                      | TODAY()                                             |
-| WEEKDAY          | Computes a number between 1-7 representing the day of week.                                | WEEKDAY(Date; Type)                                 |
-| WEEKNUM          | Returns a week number that corresponds to the week of year.                                | WEEKNUM(Date; Type)                                 |
-| WORKDAY          | Returns the working day number of days from start day.                                     | WORKDAY(Date, Shift[; Holidays])                    |
-| WORKDAY.INTL     | Returns the working day number of days from start day.                                     | WORKDAY(Date, Shift[; Mode[; Holidays]])            |
-| YEAR             | Returns the year as a number according to the internal calculation rules.                  | YEAR(Number)                                        |
-| YEARFRAC         | Computes the difference between two date values, in fraction of years.                     | YEARFRAC(Date2; Date1[; Format])                    |
+| Function ID      | Description                                                                                                                                                                                                   | Syntax                                              |
+|:-----------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------|
+| DATE             | Returns the specified date as a number of full days since [nullDate](../api/interfaces/configparams.html#nulldate).                                                                                           | DATE(Year; Month; Day)                              |
+| DATEDIF          | Calculates distance between two dates, in provided unit parameter.                                                                                                                                            | DATEDIF(Date1; Date2; Units)                        |
+| DATEVALUE        | Parses a date string and returns it as a number of full days since [nullDate](../api/interfaces/configparams.html#nulldate).                                                                                  | DATEVALUE(Datestring)                               |
+| DAY              | Returns the day of the given date value.                                                                                                                                                                      | DAY(Number)                                         |
+| DAYS             | Calculates the difference between two date values.                                                                                                                                                            | DAYS(Date2; Date1)                                  |
+| DAYS360          | Calculates the difference between two date values in days, in 360-day basis.                                                                                                                                  | DAYS360(Date2; Date1[; Format])                     |
+| EDATE            | Shifts the given startdate by given number of months and returns it as a number of full days since [nullDate](../api/interfaces/configparams.html#nulldate).                                                  | EDATE(Startdate; Months)                            |
+| EOMONTH          | Returns the date of the last day of a month which falls months away from the start date. Returns the value in the form of number of full days since [nullDate](../api/interfaces/configparams.html#nulldate). | EOMONTH(Startdate; Months)                          |
+| HOUR             | Returns hour component of given time.                                                                                                                                                                         | HOUR(Time)                                          |
+| INTERVAL         | Returns interval string from given number of seconds.                                                                                                                                                         | INTERVAL(Seconds)                                   |
+| ISOWEEKNUM       | Returns an ISO week number that corresponds to the week of year.                                                                                                                                              | ISOWEEKNUM(Date)                                    |
+| MINUTE           | Returns minute component of given time.                                                                                                                                                                       | MINUTE(Time)                                        |
+| MONTH            | Returns the month for the given date value.                                                                                                                                                                   | MONTH(Number)                                       |
+| NETWORKDAYS      | Returns the number of working days between two given dates.                                                                                                                                                   | NETWORKDAYS(Date1; Date2[; Holidays])               | 
+| NETWORKDAYS.INTL | Returns the number of working days between two given dates.                                                                                                                                                   | NETWORKDAYS.INTL(Date1; Date2[; Mode [; Holidays]]) |
+| NOW              | Returns current date + time as a number of days since [nullDate](../api/interfaces/configparams.html#nulldate).                                                                                               | NOW()                                               |
+| SECOND           | Returns second component of given time.                                                                                                                                                                       | SECOND(Time)                                        |
+| TIME             | Returns the number that represents a given time as a fraction of full day.                                                                                                                                    | TIME(Hour; Minute; Second)                          |
+| TIMEVALUE        | Parses a time string and returns a number that represents it as a fraction of full day.                                                                                                                       | TIMEVALUE(Timestring)                               |
+| TODAY            | Returns an integer representing the current date as a number of full days since [nullDate](../api/interfaces/configparams.html#nulldate).                                                                     | TODAY()                                             |
+| WEEKDAY          | Computes a number between 1-7 representing the day of week.                                                                                                                                                   | WEEKDAY(Date; Type)                                 |
+| WEEKNUM          | Returns a week number that corresponds to the week of year.                                                                                                                                                   | WEEKNUM(Date; Type)                                 |
+| WORKDAY          | Returns the working day number of days from start day.                                                                                                                                                        | WORKDAY(Date, Shift[; Holidays])                    |
+| WORKDAY.INTL     | Returns the working day number of days from start day.                                                                                                                                                        | WORKDAY(Date, Shift[; Mode[; Holidays]])            |
+| YEAR             | Returns the year as a number according to the internal calculation rules.                                                                                                                                     | YEAR(Number)                                        |
+| YEARFRAC         | Computes the difference between two date values, in fraction of years.                                                                                                                                        | YEARFRAC(Date2; Date1[; Format])                    |
 
 ### Engineering
 
@@ -224,19 +224,19 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 ### Lookup and reference
 
-| Function ID  | Description                                                                                              | Syntax                                              |
-|:-------------|:---------------------------------------------------------------------------------------------------------|:----------------------------------------------------|
-| CHOOSE       | Uses an index to return a value from a list of up to 30 values.                                          | CHOOSE(Index; Value1; ...; Value30)                 |
-| COLUMN       | Returns column number of a given reference or formula reference if argument not provided.                | COLUMNS([Reference])                                |
-| COLUMNS      | Returns the number of columns in the given reference.                                                    | COLUMNS(Array)                                      |
-| FORMULATEXT  | Returns a formula in a given cell as a string.                                                           | FORMULATEXT(Reference)                              |
-| HLOOKUP      | Searches horizontally with reference to adjacent cells to the bottom.                                    | HLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
-| INDEX        | Returns the content of a cell, specified by row and column number, or an optional range name.            | INDEX(Reference; Row; Column; Range)                |
-| MATCH        | Returns the relative position of an item in an array that matches a specified value.                     | MATCH(Searchcriterion; Lookuparray; Type)           |
-| OFFSET       | Returns the value of a cell offset by a certain number of rows and columns from a given reference point. | OFFSET(Reference; Rows; Columns; Height; Width)     |
-| ROW          | Returns row number of a given reference or formula reference if argument not provided.                   | ROW([Reference])                                    |
-| ROWS         | Returns the number of rows in the given reference.                                                       | ROWS(Array)                                         |
-| VLOOKUP      | Searches vertically with reference to adjacent cells to the right.                                       | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
+| Function ID | Description                                                                                                         | Syntax                                              |
+|:------------|:--------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------|
+| CHOOSE      | Uses an index to return a value from a list of up to 30 values.                                                     | CHOOSE(Index; Value1; ...; Value30)                 |
+| COLUMN      | Returns column number of a given reference or formula reference if argument not provided.                           | COLUMNS([Reference])                                |
+| COLUMNS     | Returns the number of columns in the given reference.                                                               | COLUMNS(Array)                                      |
+| FORMULATEXT | Returns a formula in a given cell as a string.                                                                      | FORMULATEXT(Reference)                              |
+| HLOOKUP     | Searches horizontally with reference to adjacent cells to the bottom.                                               | HLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
+| INDEX       | Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1. | INDEX(Range; Row [; Column])                        |
+| MATCH       | Returns the relative position of an item in an array that matches a specified value.                                | MATCH(Searchcriterion; Lookuparray; Type)           |
+| OFFSET      | Returns the value of a cell offset by a certain number of rows and columns from a given reference point.            | OFFSET(Reference; Rows; Columns; Height; Width)     |
+| ROW         | Returns row number of a given reference or formula reference if argument not provided.                              | ROW([Reference])                                    |
+| ROWS        | Returns the number of rows in the given reference.                                                                  | ROWS(Array)                                         |
+| VLOOKUP     | Searches vertically with reference to adjacent cells to the right.                                                  | VLOOKUP(Search_Criterion; Array; Index; Sort_Order) |
 
 ### Math and trigonometry
 
@@ -486,28 +486,28 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 ### Text
 
-| Function ID   | Description                                                                                                                             | Syntax                                                       |
-|:--------------|:----------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------|
-| CHAR          | Converts a number into a character according to the current code table.                                                                 | CHAR(Number)                                                 |
-| CLEAN         | Returns text that has been "cleaned" of line breaks and other non-printable characters.                                                 | CLEAN("Text")                                                |
-| CODE          | Returns a numeric code for the first character in a text string.                                                                        | CODE("Text")                                                 |
-| CONCATENATE   | Combines several text strings into one string.                                                                                          | CONCATENATE("Text1"; ...; "Text30")                          |
-| EXACT         | Returns TRUE if both text strings are exactly the same.                                                                                 | EXACT(Text; Text)                                            |
-| FIND          | Returns the location of one text string inside another.                                                                                 | FIND( "Text1"; "Text2"[; Number])                            |
-| LEFT          | Extracts a given number of characters from the left side of a text string.                                                              | LEFT("Text"; Number)                                         |
-| LEN           | Returns length of a given text.                                                                                                         | LEN("Text")                                                  |
-| LOWER         | Returns text converted to lowercase.                                                                                                    | LOWER(Text)                                                  |
-| MID           | Returns substring of a given length starting from Start_position.                                                                       | MID(Text, Start_position, Length)                            |
-| PROPER        | Capitalizes words given text string.                                                                                                    | PROPER("Text")                                               |
-| REPLACE       | Replaces substring of a text of a given length that starts at given position.                                                           | REPLACE(Text; Start_position; Length; New_text)              |
-| REPT          | Repeats text a given number of times.                                                                                                   | REPT("Text"; Number)                                         |
-| RIGHT         | Extracts a given number of characters from the right side of a text string.                                                             | RIGHT("Text"; Number)                                        |
-| SEARCH        | Returns the location of one text string inside another. (Allows the use of wildcards.)                                                  | SEARCH( "Text1"; "Text2"[; Number])                          |
-| SPLIT         | Divides text around a specified character or string, and puts each fragment into a separate cell in the row.                            | SPLIT(Text, Delimiter, [Split_by_each], [Remove_empty_text]) |
-| SUBSTITUTE    | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided. | SUBSTITUTE(Text; Old_text; New_text; [Occurrence])           |
-| T             | Returns text if given value is text, empty string otherwise.                                                                            | T(Value)                                                     |
-| TEXT          | Converts a number into text according to a given format.                                                                                | TEXT(Number; Format)                                         |
-| TRIM          | Strips extra spaces from text.                                                                                                          | TRIM("Text")                                                 |
-| UNICHAR       | Returns the character created by using provided code point.                                                                             | UNICHAR(Number)                                              |
-| UNICODE       | Returns the Unicode code point of a first character of a text.                                                                          | UNICODE(Text)                                                |
-| UPPER         | Returns text converted to uppercase.                                                                                                    | UPPER(Text)                                                  |
+| Function ID   | Description                                                                                                                                                                                                                               | Syntax                                             |
+|:--------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------|
+| CHAR          | Converts a number into a character according to the current code table.                                                                                                                                                                   | CHAR(Number)                                       |
+| CLEAN         | Returns text that has been "cleaned" of line breaks and other non-printable characters.                                                                                                                                                   | CLEAN("Text")                                      |
+| CODE          | Returns a numeric code for the first character in a text string.                                                                                                                                                                          | CODE("Text")                                       |
+| CONCATENATE   | Combines several text strings into one string.                                                                                                                                                                                            | CONCATENATE("Text1"; ...; "Text30")                |
+| EXACT         | Returns TRUE if both text strings are exactly the same.                                                                                                                                                                                   | EXACT(Text; Text)                                  |
+| FIND          | Returns the location of one text string inside another.                                                                                                                                                                                   | FIND( "Text1"; "Text2"[; Number])                  |
+| LEFT          | Extracts a given number of characters from the left side of a text string.                                                                                                                                                                | LEFT("Text"; Number)                               |
+| LEN           | Returns length of a given text.                                                                                                                                                                                                           | LEN("Text")                                        |
+| LOWER         | Returns text converted to lowercase.                                                                                                                                                                                                      | LOWER(Text)                                        |
+| MID           | Returns substring of a given length starting from Start_position.                                                                                                                                                                         | MID(Text, Start_position, Length)                  |
+| PROPER        | Capitalizes words given text string.                                                                                                                                                                                                      | PROPER("Text")                                     |
+| REPLACE       | Replaces substring of a text of a given length that starts at given position.                                                                                                                                                             | REPLACE(Text; Start_position; Length; New_text)    |
+| REPT          | Repeats text a given number of times.                                                                                                                                                                                                     | REPT("Text"; Number)                               |
+| RIGHT         | Extracts a given number of characters from the right side of a text string.                                                                                                                                                               | RIGHT("Text"; Number)                              |
+| SEARCH        | Returns the location of one text string inside another. (Allows the use of wildcards.)                                                                                                                                                    | SEARCH( "Text1"; "Text2"[; Number])                |
+| SPLIT         | Divides the provided text using the space character as a separator and returns the substring at the zero-based position specified by the second argument.<br>```SPLIT("Lorem ipsum", 0) -> "Lorem"```<br>```SPLIT("Lorem ipsum", 1) -> "ipsum"``` | SPLIT(Text; Index)                                 |
+| SUBSTITUTE    | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.                                                                                                   | SUBSTITUTE(Text; Old_text; New_text; [Occurrence]) |
+| T             | Returns text if given value is text, empty string otherwise.                                                                                                                                                                              | T(Value)                                           |
+| TEXT          | Converts a number into text according to a given format.                                                                                                                                                                                  | TEXT(Number; Format)                               |
+| TRIM          | Strips extra spaces from text.                                                                                                                                                                                                            | TRIM("Text")                                       |
+| UNICHAR       | Returns the character created by using provided code point.                                                                                                                                                                               | UNICHAR(Number)                                    |
+| UNICODE       | Returns the Unicode code point of a first character of a text.                                                                                                                                                                            | UNICODE(Text)                                      |
+| UPPER         | Returns text converted to uppercase.                                                                                                                                                                                                      | UPPER(Text)                                        |
