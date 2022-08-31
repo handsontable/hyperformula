@@ -34,7 +34,7 @@
     "open formula",
     "openformula"
   ],
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "GPL-3.0-only",
   "module": "es/index.js",
   "main": "commonjs/index.js",
   "jsnext:main": "es/index.js",
@@ -147,8 +147,5 @@
     "regenerator-runtime": "^0.13.3",
     "tiny-emitter": "^2.1.0",
     "unorm": "^1.6.0"
-  },
-  "optionalDependencies": {
-    "fsevents": "~2.3.2"
   }
 }
