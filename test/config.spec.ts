@@ -252,6 +252,82 @@ describe('Config', () => {
     })
   })
 
+  describe('#timeFormats', () => {
+    it('should work with the "hh:mm" format', () => {
+      const timeFormats = ['hh:mm']
+      const engine = HyperFormula.buildFromArray([
+        ['13.33'],
+        ['13:33'],
+        ['01:33'],
+        ['1:33'],
+        ['13:33:33'],
+      ], { timeFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(CellValueNoNumber.STRING)
+    })
+
+    it('should work with the "hh:mm:ss" format', () => {
+      const timeFormats = ['hh:mm:ss']
+      const engine = HyperFormula.buildFromArray([
+        ['13:33'],
+        ['13:33:00'],
+        ['01:33:33'],
+        ['1:33:33'],
+        ['13:33:33.3'],
+        ['13:33:33.33'],
+        ['13:33:33.333'],
+        ['13:33:33.3333'],
+        ['13:33:33.333333333333333333333333333333333333333333333333333333'],
+      ], { timeFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueNoNumber.STRING)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A6'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A7'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A8'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A9'))).toEqual(NumberType.NUMBER_TIME)
+    })
+
+    it('the parsing result should be the same regardless of decimal places specified in format string', () => {
+      const dateAsNumber = 0.564969131944444
+
+      let engine = HyperFormula.buildFromArray([
+        ['13:33:33.33333'],
+      ], { timeFormats: ['hh:mm:ss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([
+        ['13:33:33.33333'],
+      ], { timeFormats: ['hh:mm:ss.s'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([
+        ['13:33:33.33333'],
+      ], { timeFormats: ['hh:mm:ss.ss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([
+        ['13:33:33.33333'],
+      ], { timeFormats: ['hh:mm:ss.sss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([
+        ['13:33:33.33333'],
+      ], { timeFormats: ['hh:mm:ss.ssss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([
+        ['13:33:33.33333'],
+      ], { timeFormats: ['hh:mm:ss.sssss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+    })
+  })
+
   describe('deprecated option warning messages', () => {
     beforeEach(() => {
       spyOn(console, 'warn')
