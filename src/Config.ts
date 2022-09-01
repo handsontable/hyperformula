@@ -284,6 +284,8 @@ export interface ConfigParams {
   /**
    * Sets a function that parses strings representing date-time into actual date-time.
    *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
    * @default defaultParseToDateTime
    *
    * @category Date and Time
@@ -326,6 +328,8 @@ export interface ConfigParams {
   /**
    * Sets a function that converts date-time into strings.
    *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
    * @default defaultStringifyDateTime
    *
    * @category Date and Time
@@ -333,6 +337,8 @@ export interface ConfigParams {
   stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
   /**
    * Sets a function that converts time duration into strings.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default defaultStringifyDuration
    *
