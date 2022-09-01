@@ -166,6 +166,8 @@ describe('time duration', () => {
       ['0.1111', '=TEXT(A5, "[mm]:ss.ss")', ],
       ['0.1111', '=TEXT(A6, "[mm]:ss.00")', ],
       ['0.1111', '=TEXT(A7, "hh:[mm]:s")', ],
+      ['0.1111', '=TEXT(A8, "h:[mm]")', ],
+      ['0.1111', '=TEXT(A9, "abc")', ],
     ])
     expect(engine.getCellValue(adr('B1'))).toEqual('02:24:00')
     expect(engine.getCellValue(adr('B2'))).toEqual('26:24:00')
@@ -174,6 +176,8 @@ describe('time duration', () => {
     expect(engine.getCellValue(adr('B5'))).toEqual('159:59.04')
     expect(engine.getCellValue(adr('B6'))).toEqual('159:59.04')
     expect(engine.getCellValue(adr('B7'))).toEqual('02:39:59')
+    expect(engine.getCellValue(adr('B8'))).toEqual('2:39')
+    expect(engine.getCellValue(adr('B9'))).toEqual('abc')
   })
 })
 
