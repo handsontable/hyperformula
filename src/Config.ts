@@ -221,7 +221,7 @@ export interface ConfigParams {
   /**
    * When set to `true`, function criteria require whole cells to match the pattern.
    *
-   * When set to `false`, function criteria require just a subword to match the pattern.
+   * When set to `false`, function criteria require just a sub-word to match the pattern.
    *
    * @default true
    * @category String
@@ -350,7 +350,7 @@ export interface ConfigParams {
    */
   smartRounding: boolean,
   /**
-   * Sets a thousands separator symbol for parsing numerical literals.
+   * Sets the thousands' separator symbol for parsing numerical literals.
    *
    * Can be one of the following:
    * - empty
@@ -372,7 +372,7 @@ export interface ConfigParams {
    * Supported tokes:
    * - `hh` (hours)
    * - `mm` (minutes)
-   * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc (seconds)
+   * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc. (seconds)
    *
    * The number of decimal places in the seconds token does not matter. All versions of the seconds token are equivalent in the context of parsing time values.
    *
