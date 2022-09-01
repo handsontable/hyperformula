@@ -294,36 +294,25 @@ describe('Config', () => {
     })
 
     it('the parsing result should be the same regardless of decimal places specified in format string', () => {
+      const dateAsString = '13:33:33.33333'
       const dateAsNumber = 0.564969131944444
 
-      let engine = HyperFormula.buildFromArray([
-        ['13:33:33.33333'],
-      ], { timeFormats: ['hh:mm:ss'] })
+      let engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss'] })
       expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
 
-      engine = HyperFormula.buildFromArray([
-        ['13:33:33.33333'],
-      ], { timeFormats: ['hh:mm:ss.s'] })
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.s'] })
       expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
 
-      engine = HyperFormula.buildFromArray([
-        ['13:33:33.33333'],
-      ], { timeFormats: ['hh:mm:ss.ss'] })
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ss'] })
       expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
 
-      engine = HyperFormula.buildFromArray([
-        ['13:33:33.33333'],
-      ], { timeFormats: ['hh:mm:ss.sss'] })
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sss'] })
       expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
 
-      engine = HyperFormula.buildFromArray([
-        ['13:33:33.33333'],
-      ], { timeFormats: ['hh:mm:ss.ssss'] })
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ssss'] })
       expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
 
-      engine = HyperFormula.buildFromArray([
-        ['13:33:33.33333'],
-      ], { timeFormats: ['hh:mm:ss.sssss'] })
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sssss'] })
       expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
     })
   })
