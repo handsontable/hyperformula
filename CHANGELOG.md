@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
-- Fixed the rounding strategy in the default time-parsing function to be independent of the `timeFormats` configuration parameter. [#953](https://github.com/handsontable/hyperformula/issues/953)
+- Fixed the rounding strategy in the default time-parsing function to be independent of the `timeFormats` configuration parameter. Time values will be always rounded to the nearest milisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
 
 ## [2.0.1] - 2022-06-14
 
