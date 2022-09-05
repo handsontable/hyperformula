@@ -2,6 +2,7 @@
 
 Expand the function library of your application, by adding custom functions.
 
+**Contents:**
 [[toc]]
 
 ## Add a custom function

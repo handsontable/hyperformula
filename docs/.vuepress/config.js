@@ -208,6 +208,15 @@ module.exports = {
           ]
         },
         {
+          title: 'Compatibility',
+          collapsable: false,
+          children: [
+            ['/guide/microsoft-excel-compatibility', 'Compatibility with Microsoft Excel'],
+            ['/guide/google-sheets-compatibility', 'Compatibility with Google Sheets'],
+            ['/guide/list-of-differences', 'List of differences'],
+          ]
+        },
+        {
           title: 'Advanced topics',
           collapsable: false,
           children: [
@@ -216,7 +225,6 @@ module.exports = {
             ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
-            ['/guide/compatibility', 'Compatibility with other spreadsheets'],
             ['/guide/known-limitations', 'Known limitations'],
           ]
         },

@@ -1,151 +1,11 @@
-# Compatibility with other spreadsheets
+# List of differences with other spreadsheets
 
-While HyperFormula conforms to the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, it also follows industry practices that your users already know from other spreadsheets, such as Microsoft Excel or Google Sheets.
+See a full list of differences between HyperFormula, Microsoft Excel, and Google Sheets.
 
-That said, there are cases when HyperFormula can't be consistent with all three at the same time, because of:
-* Differences between the OpenDocument standard, Microsoft Excel and Google Sheets.
-* Limitations of Microsoft Excel or Google Sheets.
-* [Limitations](known-limitations.md) of HyperFormula at its current development stage.
+**Contents:**
+[[toc]]
 
-Still, through the right configuration, you can achieve nearly full consistency with Microsoft Excel or Google Sheets:
-- [Configure HyperFormula to match Microsoft Excel](#configure-hyperformula-to-match-microsoft-excel)
-- [Configure HyperFormula to match Google Sheets](#configure-hyperformula-to-match-google-sheets)
-
-## Configure HyperFormula to match Microsoft Excel
-
-
-
-## Configure HyperFormula to match Google Sheets
-
-## Differences with other spreadsheets
-
-
-
-## Configuration
-
-#### Separator characters
-
-In other spreadsheet software, separators depend on the configured language and locale. You might want to set them up according to your internationalization settings.
-
-Microsoft Excel uses `,` (a comma) as both function argument separator and thousands separator for en-US locale and applies a context-based heuristic check to deduce the meaning of this character. HyperFormula requires `functionArgSeparator` and `thousandSeparator` to be different from each other, so it is not possible to achieve the full compatibility with Microsoft Excel with American English locale.
-
-In HyperFormula, separator characters can be configured using the following parameters:
-- [functionArgSeparator](../api/interfaces/configparams.md#functionargseparator),
-- [decimalSeparator](../api/interfaces/configparams.md#decimalseparator),
-- [thousandSeparator](../api/interfaces/configparams.md#thousandseparator),
-- [arrayRowSeparator](../api/interfaces/configparams.md#arrayrowseparator),
-- [arrayColumnSeparator](../api/interfaces/configparams.md#arraycolumnseparator).
-
-#### Date and time formats
-
-Date and time formats are also locale-dependent. The easiest way to configure them in HyperFormula is by setting the following parameters:
-- [dateFormats](../api/interfaces/configparams.md#dateformats),
-- [timeFormats](../api/interfaces/configparams.md#timeformats),
-- [nullYear](../api/interfaces/configparams.md#nullyear).
-
-However, not all date and time formats can be configured that way. If you want to add a custom format, you can implement the following methods:
-- [parseDateTime](../api/interfaces/configparams.md#parsedatetime),
-- [stringifyDateTime](../api/interfaces/configparams.md#stringifydatetime),
-- [stringifyDuration](../api/interfaces/configparams.md#stringifyduration).
-
-#### Comparing strings
-
-In Microsoft Excel, string comparison is by default **case-insensitive** and **accent-sensitive**.
-
-Parameters related to the [string comparison](types-of-operators.md#comparing-strings) in HyperFormula:
-- [caseSensitive](../api/interfaces/configparams.md#casesensitive),
-- [accentSensitive](../api/interfaces/configparams.md#accentsensitive),
-- [caseFirst](../api/interfaces/configparams.md#casefirst),
-- [ignorePunctuation](../api/interfaces/configparams.md#ignorepunctuation),
-- [localeLang](../api/interfaces/configparams.md#localelang).
-
-#### Criterion parameter 
-
-The criterion parameter in functions `SUMIF`, `COUNTIF`, etc. is interpreted according to the configuration options:
-- [matchWholeCell](../api/interfaces/configparams.md#matchwholecell),
-- [useRegularExpressions](../api/interfaces/configparams.md#useregularexpressions),
-- [useWildcards](../api/interfaces/configparams.md#usewildcards).
-
-The default values for these options make HyperFormula behave consistently with Microsoft Excel. 
-
-#### `TRUE` and `FALSE` constants
-
-Microsoft Excel has built-in constants (keywords) for the boolean values `TRUE` and `FALSE`. In HyperFormula the same effect can be achieved by defining them as named expressions using functions [TRUE() and FALSE()](built-in-functions.md#logical):
-
-```js
-hfInstance.addNamedExpression('TRUE', '=TRUE()');
-hfInstance.addNamedExpression('FALSE', '=FALSE()');
-```
-
-#### Array arithmetics
-
-Microsoft Excel, unlike Google Sheets, has array arithmetics enabled by default. In HyperFormula it can be configured by setting [useArrayArithmetic](../api/interfaces/configparams.md#usearrayarithmetic) to `true`.
-
-#### Handling whitespace inside formulas
-
-Microsoft Excel ignores all whitespace characters inside formulas. In HyperFormula it can be configured by setting [ignoreWhiteSpace](../api/interfaces/configparams.md#ignorewhitespace) to `'any'`.
-
-#### Handling formulas that evaluate to an empty value
-
-Some formulas might evaluate to an empty value (null). To be consistent with Microsoft Excel, HyperFormula must be configured to treat the result of such formulas as zero. For that you can use the [evaluateNullToZero](../api/interfaces/configparams.md#evaluatenulltozero) option.
-
-#### Leap year bug
-
-Microsoft Excel incorrectly acts as if the year 1900 were a leap year. This behavior can be mimicked in HyperFormula by setting the following configuration parameters:
-- [leapYear1900](../api/interfaces/configparams.md#leapyear1900),
-- [nullDate](../api/interfaces/configparams.md#nulldate).
-
-#### Numerical precision
-
-Both HyperFormula and Microsoft Excel perform the automatic rounding of the floating-point numbers. This feature can be controlled using options:
-- [smartRounding](../api/interfaces/configparams.md#smartrounding),
-- [precisionEpsilon](../api/interfaces/configparams.md#precisionepsilon).
-
-### Full config for the compatibility with Microsoft Excel
-
-::: tip
-This configuration makes HyperFormula mimic the default behavior of Microsoft Excel with en-US locale (American English) as closely as possible, given the limitations at the current development stage.
-:::
-
-```js
-// define options
-const options = {
-  functionArgSeparator: ',', // SAME AS DEFAULT
-  decimalSeparator: '.', // SAME AS DEFAULT
-  thousandSeparator: '', // SAME AS DEFAULT
-  arrayColumnSeparator: ',', // SAME AS DEFAULT
-  arrayRowSeparator: ';', // SAME AS DEFAULT
-  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // SAME AS DEFAULT
-  nullYear: 30, // SAME AS DEFAULT
-  caseSensitive: false, // SAME AS DEFAULT
-  accentSensitive: true,
-  ignorePunctuation: false, // SAME AS DEFAULT 
-  localeLang: 'en', // SAME AS DEFAULT
-  useWildcards: true, // SAME AS DEFAULT
-  useRegularExpressions: false, // SAME AS DEFAULT
-  matchWholeCell: true, // SAME AS DEFAULT
-  useArrayArithmetic: true,
-  ignoreWhiteSpace: 'any',
-  evaluateNullToZero: true,
-  leapYear1900: true,
-  nullDate: { year: 1899, month: 12, day: 31 },
-  smartRounding: true, // SAME AS DEFAULT
-};
-
-// call the static method to build a new instance
-const hfInstance = HyperFormula.buildEmpty(options);
-
-// define TRUE and FALSE constants
-hfInstance.addNamedExpression('TRUE', '=TRUE()');
-hfInstance.addNamedExpression('FALSE', '=FALSE()');
-```
-
-## Incompatibilities with other popular spreadsheet software
-
-### General functionalities
-
-Here is a non-exclusive list of implementation differences between HyperFormula, Google Sheets and Microsoft Excel.
+## General functionalities 
 
 | Functionality                                      | Examples                                                                  | HyperFormula                                                                                                                                                                                                                           | Google Sheets                                                                                                          | Microsoft Excel                                          |
 | -------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
@@ -158,11 +18,11 @@ Here is a non-exclusive list of implementation differences between HyperFormula,
 | Cell references inside inline arrays               | ={A1, A2}                                                                 | The array's value is calculated but not updated when the cells' values change.                                                                                                                                                         | The array's value is calculated and updated when the cells' values change.                                             | ERROR: invalid array                                     |
 | SPLIT function                                     | =SPLIT("Lorem ipsum dolor", 0)                                            | This function works differently from Google Sheets version but should be sufficient to achieve the same functionality in most scenarios. Read SPLIT function description on [the Built-in Functions page](built-in-functions.md#text). | Different syntax and return value.                                                                                     | No such function.                                        |
 
-### Built-in functions
+## Built-in functions
 
 Some built-in functions are implemented differently than in Google Sheets or Microsoft Excel.
 
-To remove the differences, you can create custom implementations of those functions.
+To remove the differences, create [custom implementations](custom-functions.md) of those functions.
 
 | Function      | Example                                                     | HyperFormula | Google Sheets | Microsoft Excel |
 | ------------- | ----------------------------------------------------------- | -----------: | ------------: | --------------: |
