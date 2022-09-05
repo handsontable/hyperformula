@@ -282,7 +282,9 @@ export interface ConfigParams {
    */
   nullYear: number,
   /**
-   * Sets a function that parses strings representing date-time into actual date-time.
+   * Sets a function that parses strings representing date-time into actual date-time values.
+   *
+   * The function should return a [DateTime](globals.md#datetime) object or undefined.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
@@ -326,7 +328,9 @@ export interface ConfigParams {
    */
   precisionRounding: number,
   /**
-   * Sets a function that converts date-time into strings.
+   * Sets a function that converts date-time values into strings.
+   *
+   * The function should return a string or undefined.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
@@ -336,7 +340,9 @@ export interface ConfigParams {
    */
   stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
   /**
-   * Sets a function that converts time duration into strings.
+   * Sets a function that converts time duration values into strings.
+   *
+   * The function should return a string or undefined.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
