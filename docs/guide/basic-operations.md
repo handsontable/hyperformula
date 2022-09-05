@@ -247,10 +247,8 @@ the `SimpleCellAddress` .
 You can move one or more cells using the `moveCells` method. You need
 to pass the following parameters:
 
-* Source left corner as a simple address
-* Width of the block of cells to be moved
-* Height of the block of cells to be moved
-* Target left corner as a simple address
+* Source range ([SimpleCellRange](../api/interfaces/simplecellrange))
+* Top left corner of the destination range ([SimpleCellAddress](../api/interfaces/simplecelladdress))
 
 This method returns a list of cells whose values were affected by
 this operation together with their absolute addresses and new values.
@@ -263,7 +261,7 @@ const destination = { sheet: 0, col: 3, row: 0 };
 
 // track the changes triggered by moving
 // one cell from source to target location
-const changes = hfInstance.moveCells(source, 1, 1, destination);
+const changes = hfInstance.moveCells({ start: source, end: source }, destination);
 ```
 
 ### Updating cells

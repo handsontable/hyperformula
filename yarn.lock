@@ -2461,6 +2461,13 @@
   "resolved" "https://registry.npmjs.org/arraybuffer.slice/-/arraybuffer.slice-0.0.7.tgz"
   "version" "0.0.7"
 
+"as-table@^1.0.55":
+  "integrity" "sha512-xvsWESUJn0JN421Xb9MQw6AsMHRCUknCe0Wjlxvjud80mU4E6hQf1A6NzQKcYNmYw62MfzEtXc+badstZP3JpQ=="
+  "resolved" "https://registry.npmjs.org/as-table/-/as-table-1.0.55.tgz"
+  "version" "1.0.55"
+  dependencies:
+    "printable-characters" "^1.0.42"
+
 "asap@^2.0.0":
   "integrity" "sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA=="
   "resolved" "https://registry.npmjs.org/asap/-/asap-2.0.6.tgz"
@@ -9456,6 +9463,11 @@
   "integrity" "sha512-28iF6xPQrP8Oa6uxE6a1biz+lWeTOAPKggvjB8HAs6nVMKZwf5bG++632Dx614hIWgUPkgivRfG+a8uAXGTIbA=="
   "resolved" "https://registry.npmjs.org/pretty-time/-/pretty-time-1.1.0.tgz"
   "version" "1.1.0"
+
+"printable-characters@^1.0.42":
+  "integrity" "sha512-dKp+C4iXWK4vVYZmYSd0KBH5F/h1HoZRsbJ82AVKRO3PEo8L4lBS/vLwhVtpwwuYcoIsVY+1JYKR268yn480uQ=="
+  "resolved" "https://registry.npmjs.org/printable-characters/-/printable-characters-1.0.42.tgz"
+  "version" "1.0.42"
 
 "prismjs@^1.13.0":
   "integrity" "sha512-8aaXdYvl1F7iC7Xm1spqSaY/OJBpYW3v+KJ+F17iYxvdc8sfjW194COK5wVhMZX45tGteiBQgdvD/nhxcRwylw=="

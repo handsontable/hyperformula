@@ -127,7 +127,7 @@ const source = { sheet: 0, col: 1, row: 0 };
 const destination = { sheet: 0, col: 2, row: 0 };
 
 // move B1
-const changes = hfInstance.moveCells(source, 1, 1, destination);
+const changes = hfInstance.moveCells({ start: source, end: source }, destination);
 
 // you can see the changes inside the console
 console.log(changes);
