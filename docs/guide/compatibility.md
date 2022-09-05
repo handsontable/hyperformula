@@ -1,14 +1,25 @@
-# Compatibility
+# Compatibility with other spreadsheets
 
-HyperFormula is designed to follow the [OpenDocument Standard](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html)
-while maintaining the compatibility with other popular spreadsheet software:
-- _Microsoft Excel_,
-- _Google Sheets_.
+While HyperFormula conforms to the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, it also follows industry practices that your users already know from other spreadsheets, such as Microsoft Excel or Google Sheets.
 
-In certain situations, it is not possible to be consistent with all three products due to:
-* inconsistencies between OpenDocument Standard, _Microsoft Excel_ and _Google Sheets_,
-* limitations of _Microsoft Excel_ or _Google Sheets_,
-* [limitations](known-limitations.md) of HyperFormula in its current development stage.
+That said, there are cases when HyperFormula can't be consistent with all three at the same time, because of:
+* Differences between the OpenDocument standard, Microsoft Excel and Google Sheets.
+* Limitations of Microsoft Excel or Google Sheets.
+* [Limitations](known-limitations.md) of HyperFormula at its current development stage.
+
+Still, through the right configuration, you can achieve nearly full consistency with Microsoft Excel or Google Sheets:
+- [Configure HyperFormula to match Microsoft Excel](#configure-hyperformula-to-match-microsoft-excel)
+- [Configure HyperFormula to match Google Sheets](#configure-hyperformula-to-match-google-sheets)
+
+## Configure HyperFormula to match Microsoft Excel
+
+
+
+## Configure HyperFormula to match Google Sheets
+
+## Differences with other spreadsheets
+
+
 
 ## Configuration
 
@@ -16,7 +27,7 @@ In certain situations, it is not possible to be consistent with all three produc
 
 In other spreadsheet software, separators depend on the configured language and locale. You might want to set them up according to your internationalization settings.
 
-_Microsoft Excel_ uses `,` (a comma) as both function argument separator and thousands separator for en-US locale and applies a context-based heuristic check to deduce the meaning of this character. HyperFormula requires `functionArgSeparator` and `thousandSeparator` to be different from each other, so it is not possible to achieve the full compatibility with _Microsoft Excel_ with American English locale.
+Microsoft Excel uses `,` (a comma) as both function argument separator and thousands separator for en-US locale and applies a context-based heuristic check to deduce the meaning of this character. HyperFormula requires `functionArgSeparator` and `thousandSeparator` to be different from each other, so it is not possible to achieve the full compatibility with Microsoft Excel with American English locale.
 
 In HyperFormula, separator characters can be configured using the following parameters:
 - [functionArgSeparator](../api/interfaces/configparams.md#functionargseparator),
@@ -39,7 +50,7 @@ However, not all date and time formats can be configured that way. If you want t
 
 #### Comparing strings
 
-In _Microsoft Excel_, string comparison is by default **case-insensitive** and **accent-sensitive**.
+In Microsoft Excel, string comparison is by default **case-insensitive** and **accent-sensitive**.
 
 Parameters related to the [string comparison](types-of-operators.md#comparing-strings) in HyperFormula:
 - [caseSensitive](../api/interfaces/configparams.md#casesensitive),
@@ -55,11 +66,11 @@ The criterion parameter in functions `SUMIF`, `COUNTIF`, etc. is interpreted acc
 - [useRegularExpressions](../api/interfaces/configparams.md#useregularexpressions),
 - [useWildcards](../api/interfaces/configparams.md#usewildcards).
 
-The default values for these options make HyperFormula behave consistently with _Microsoft Excel_. 
+The default values for these options make HyperFormula behave consistently with Microsoft Excel. 
 
 #### `TRUE` and `FALSE` constants
 
-_Microsoft Excel_ has built-in constants (keywords) for the boolean values `TRUE` and `FALSE`. In HyperFormula the same effect can be achieved by defining them as named expressions using functions [TRUE() and FALSE()](built-in-functions.md#logical):
+Microsoft Excel has built-in constants (keywords) for the boolean values `TRUE` and `FALSE`. In HyperFormula the same effect can be achieved by defining them as named expressions using functions [TRUE() and FALSE()](built-in-functions.md#logical):
 
 ```js
 hfInstance.addNamedExpression('TRUE', '=TRUE()');
@@ -68,32 +79,32 @@ hfInstance.addNamedExpression('FALSE', '=FALSE()');
 
 #### Array arithmetics
 
-_Microsoft Excel_, unlike _Google Sheets_, has array arithmetics enabled by default. In HyperFormula it can be configured by setting [useArrayArithmetic](../api/interfaces/configparams.md#usearrayarithmetic) to `true`.
+Microsoft Excel, unlike Google Sheets, has array arithmetics enabled by default. In HyperFormula it can be configured by setting [useArrayArithmetic](../api/interfaces/configparams.md#usearrayarithmetic) to `true`.
 
 #### Handling whitespace inside formulas
 
-_Microsoft Excel_ ignores all whitespace characters inside formulas. In HyperFormula it can be configured by setting [ignoreWhiteSpace](../api/interfaces/configparams.md#ignorewhitespace) to `'any'`.
+Microsoft Excel ignores all whitespace characters inside formulas. In HyperFormula it can be configured by setting [ignoreWhiteSpace](../api/interfaces/configparams.md#ignorewhitespace) to `'any'`.
 
 #### Handling formulas that evaluate to an empty value
 
-Some formulas might evaluate to an empty value (null). To be consistent with _Microsoft Excel_, HyperFormula must be configured to treat the result of such formulas as zero. For that you can use the [evaluateNullToZero](../api/interfaces/configparams.md#evaluatenulltozero) option.
+Some formulas might evaluate to an empty value (null). To be consistent with Microsoft Excel, HyperFormula must be configured to treat the result of such formulas as zero. For that you can use the [evaluateNullToZero](../api/interfaces/configparams.md#evaluatenulltozero) option.
 
 #### Leap year bug
 
-_Microsoft Excel_ incorrectly acts as if the year 1900 were a leap year. This behavior can be mimicked in HyperFormula by setting the following configuration parameters:
+Microsoft Excel incorrectly acts as if the year 1900 were a leap year. This behavior can be mimicked in HyperFormula by setting the following configuration parameters:
 - [leapYear1900](../api/interfaces/configparams.md#leapyear1900),
 - [nullDate](../api/interfaces/configparams.md#nulldate).
 
 #### Numerical precision
 
-Both HyperFormula and _Microsoft Excel_ perform the automatic rounding of the floating-point numbers. This feature can be controlled using options:
+Both HyperFormula and Microsoft Excel perform the automatic rounding of the floating-point numbers. This feature can be controlled using options:
 - [smartRounding](../api/interfaces/configparams.md#smartrounding),
 - [precisionEpsilon](../api/interfaces/configparams.md#precisionepsilon).
 
-### Full config for the compatibility with _Microsoft Excel_
+### Full config for the compatibility with Microsoft Excel
 
 ::: tip
-This configuration makes HyperFormula mimic the default behavior of _Microsoft Excel_ with en-US locale (American English) as closely as possible, given the limitations at the current development stage.
+This configuration makes HyperFormula mimic the default behavior of Microsoft Excel with en-US locale (American English) as closely as possible, given the limitations at the current development stage.
 :::
 
 ```js
@@ -134,27 +145,27 @@ hfInstance.addNamedExpression('FALSE', '=FALSE()');
 
 ### General functionalities
 
-Here is a non-exclusive list of implementation differences between HyperFormula, _Google Sheets_ and _Microsoft Excel_.
+Here is a non-exclusive list of implementation differences between HyperFormula, Google Sheets and Microsoft Excel.
 
 | Functionality                                      | Examples                                                                  | HyperFormula                                                                                                                                                                                                                           | Google Sheets                                                                                                          | Microsoft Excel                                          |
-|----------------------------------------------------|---------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
-| Dependency collection                              | A1:=IF(FALSE(),A1,0)<br><br>ISREF(A1)                                     | Dependencies are collected during the parsing phase, which finds cycles that wouldn't appear in the evaluation.<br><br>`CYCLE` error for both examples.                                                                                 | Dependencies are collected during evaluation.<br><br>`0` for both examples.                                            | Same as _Google Sheets_.                                 |
+| -------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Dependency collection                              | A1:=IF(FALSE(),A1,0)<br><br>ISREF(A1)                                     | Dependencies are collected during the parsing phase, which finds cycles that wouldn't appear in the evaluation.<br><br>`CYCLE` error for both examples.                                                                                | Dependencies are collected during evaluation.<br><br>`0` for both examples.                                            | Same as Google Sheets.                                   |
 | Named expressions and named ranges                 | SALARY:=$A$10 COST:=10*$B$5+100<br>PROFIT:=SALARY-COST<br>A1:=SALARY-COST | Only absolute addresses are allowed<br>(e.g. SALARY:= $A$10).<br><br>Named expressions can be global or scoped to one sheet only.<br><br>They can contain other named expressions.                                                     | Named expressions are not available.<br><br>Named ranges can be used to create aliases for addresses and ranges.       | Named ranges and scoped named expressions are available. |
-| Applying a scalar value to a function taking range | COLUMNS(A1)                                                               | `CellRangeExpected` error.                                                                                                                                                                                                             | Treats the element as length-1 range. Returns 1 for the example.                                                       | Same as _Google Sheets_.                                 |
-| Coercion of explicit arguments                     | VARP(2, 3, 4, TRUE(), FALSE(), "1",)                                      | 1.9592, based on the behavior of _Microsoft Excel_.                                                                                                                                                                                    | GoogleSheets implementation is not consistent with the standard (see also `VAR.S`, `STDEV.P`, and `STDEV.S` function.) | 1,9592                                                   |
-| Ranges created with `:`                            | A1:A2<br><br>A$1:$A$2<br><br>A:C<br><br>1:2<br><br>Sheet1!A1:A2           | Allowed ranges consist of two addresses (A1:B5), columns (A:C) or rows (3:5).<br>They cannot be mixed or contain named expressions.                                                                                                    | Everything allowed.                                                                                                    | Same as _Google Sheets_.                                 |
-| Formatting inside the TEXT function                | TEXT(A1,"dd-mm-yy")<br><br>TEXT(A1,"###.###”)                             | Not all formatting options are supported,<br>e.g. only some date formatting options: (`hh`, `mm`, `ss`, `am`, `pm`, `a`, `p`, `dd`, `yy`, and `yyyy`).<br><br>No currency formatting inside the TEXT function.                         | A wide variety of options for string formatting is supported.                                                          | Same as _Google Sheets_.                                 |
+| Applying a scalar value to a function taking range | COLUMNS(A1)                                                               | `CellRangeExpected` error.                                                                                                                                                                                                             | Treats the element as length-1 range. Returns 1 for the example.                                                       | Same as Google Sheets.                                   |
+| Coercion of explicit arguments                     | VARP(2, 3, 4, TRUE(), FALSE(), "1",)                                      | 1.9592, based on the behavior of Microsoft Excel.                                                                                                                                                                                      | GoogleSheets implementation is not consistent with the standard (see also `VAR.S`, `STDEV.P`, and `STDEV.S` function.) | 1,9592                                                   |
+| Ranges created with `:`                            | A1:A2<br><br>A$1:$A$2<br><br>A:C<br><br>1:2<br><br>Sheet1!A1:A2           | Allowed ranges consist of two addresses (A1:B5), columns (A:C) or rows (3:5).<br>They cannot be mixed or contain named expressions.                                                                                                    | Everything allowed.                                                                                                    | Same as Google Sheets.                                   |
+| Formatting inside the TEXT function                | TEXT(A1,"dd-mm-yy")<br><br>TEXT(A1,"###.###”)                             | Not all formatting options are supported,<br>e.g. only some date formatting options: (`hh`, `mm`, `ss`, `am`, `pm`, `a`, `p`, `dd`, `yy`, and `yyyy`).<br><br>No currency formatting inside the TEXT function.                         | A wide variety of options for string formatting is supported.                                                          | Same as Google Sheets.                                   |
 | Cell references inside inline arrays               | ={A1, A2}                                                                 | The array's value is calculated but not updated when the cells' values change.                                                                                                                                                         | The array's value is calculated and updated when the cells' values change.                                             | ERROR: invalid array                                     |
-| SPLIT function                                     | =SPLIT("Lorem ipsum dolor", 0)                                            | This function works differently from _Google Sheets_ version but should be sufficient to achieve the same functionality in most scenarios. Read SPLIT function description on [the Built-in Functions page](built-in-functions.md#text). | Different syntax and return value.                                                                                     | No such function.                                        |
+| SPLIT function                                     | =SPLIT("Lorem ipsum dolor", 0)                                            | This function works differently from Google Sheets version but should be sufficient to achieve the same functionality in most scenarios. Read SPLIT function description on [the Built-in Functions page](built-in-functions.md#text). | Different syntax and return value.                                                                                     | No such function.                                        |
 
 ### Built-in functions
 
-Some built-in functions are implemented differently than in _Google Sheets_ or _Microsoft Excel_.
+Some built-in functions are implemented differently than in Google Sheets or Microsoft Excel.
 
 To remove the differences, you can create custom implementations of those functions.
 
 | Function      | Example                                                     | HyperFormula | Google Sheets | Microsoft Excel |
-|---------------|-------------------------------------------------------------|-------------:|--------------:|----------------:|
+| ------------- | ----------------------------------------------------------- | -----------: | ------------: | --------------: |
 | TBILLEQ       | =TBILLEQ(0, 180, 1.9)                                       |      38,5278 |           NUM |             NUM |
 | TBILLEQ       | =TBILLEQ(0, 180, 2)                                         |       0,0000 |           NUM |          0,0000 |
 | TBILLEQ       | =TBILLEQ("1/2/2000", "31/1/2001", 0.1)                      |       0,1128 |         VALUE |           VALUE |
