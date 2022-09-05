@@ -132,7 +132,7 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       default: {
         if (secondsExtendedRegexp.test(token.value)) {
           const fractionOfSecondPrecision = Math.max(token.value.length - 3, 0)
-          result += (time.seconds < 10 ? '0' : '') + Math.round(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
+          result += (time.seconds < 10 ? '0' : '') + Math.floor(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
           continue
         }
         return undefined
@@ -163,7 +163,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
 
     if (secondsExtendedRegexp.test(token.value)) {
       const fractionOfSecondPrecision = token.value.length - 3
-      result += (dateTime.seconds < 10 ? '0' : '') + Math.round(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
+      result += (dateTime.seconds < 10 ? '0' : '') + Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
       continue
     }
 
@@ -186,7 +186,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       /* seconds */
       case 's':
       case 'ss': {
-        result += padLeft(Math.round(dateTime.seconds), token.value.length)
+        result += padLeft(Math.floor(dateTime.seconds), token.value.length)
         break
       }
 
