@@ -161,12 +161,6 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       continue
     }
 
-    if (secondsExtendedRegexp.test(token.value)) {
-      const fractionOfSecondPrecision = token.value.length - 3
-      result += (dateTime.seconds < 10 ? '0' : '') + Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
-      continue
-    }
-
     switch (token.value.toLowerCase()) {
       /* hours*/
       case 'h':
@@ -223,6 +217,11 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
         break
       }
       default: {
+        if (secondsExtendedRegexp.test(token.value)) {
+          const fractionOfSecondPrecision = token.value.length - 3
+          result += (dateTime.seconds < 10 ? '0' : '') + Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
+          continue
+        }
         return undefined
       }
     }
