@@ -14,11 +14,14 @@ describe('Date helpers', () => {
   })
 
   it('#dateToNumber should return number representation of a date, excel compatibility', () => {
-    const dateHelper = new DateTimeHelper(new Config({leapYear1900: true}))
-    expect(dateHelper.dateToNumber({year: 1900, month: 1, day: 1})).toBe(2)
-    expect(dateHelper.dateToNumber({year: 1899, month: 12, day: 30})).toBe(0)
-    expect(dateHelper.dateToNumber({year: 1900, month: 12, day: 31})).toBe(367)
-    expect(dateHelper.dateToNumber({year: 2018, month: 12, day: 31})).toBe(43466)
+    const dateHelper = new DateTimeHelper(new Config({leapYear1900: true, nullDate: { year:1899, month: 12, day: 31 }}))
+    expect(dateHelper.dateToNumber({year: 1899, month: 12, day: 31})).toBe(0)
+    expect(dateHelper.dateToNumber({year: 1900, month: 1, day: 1})).toBe(1)
+    expect(dateHelper.dateToNumber({year: 1900, month: 2, day: 28})).toBe(59)
+    expect(dateHelper.dateToNumber({year: 1900, month: 2, day: 29})).toBe(60)
+    expect(dateHelper.dateToNumber({year: 1900, month: 3, day: 1})).toBe(61)
+    expect(dateHelper.dateToNumber({year: 1900, month: 12, day: 31})).toBe(366)
+    expect(dateHelper.dateToNumber({year: 2018, month: 12, day: 31})).toBe(43465)
   })
 
   it('#dateNumberToMonthNumber should return proper month number', () => {

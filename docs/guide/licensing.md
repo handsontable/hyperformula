@@ -6,8 +6,9 @@ To make HyperFormula a better fit for different types of projects, the source co
 
 HyperFormula is available under the following licenses:
 
-| Name                                                                                  | Type |
-|:--------------------------------------------------------------------------------------| :--- |
+
+| Name                                                                                  | Type        |
+|:--------------------------------------------------------------------------------------|:------------|
 | [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt) | Open source |
 | Commercial license                                                                    | Proprietary |
 
