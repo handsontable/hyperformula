@@ -211,8 +211,8 @@ module.exports = {
           title: 'Compatibility',
           collapsable: false,
           children: [
-            ['/guide/microsoft-excel-compatibility', 'Compatibility with Microsoft Excel'],
-            ['/guide/google-sheets-compatibility', 'Compatibility with Google Sheets'],
+            ['/guide/compatibility-with-microsoft-excel', 'Compatibility with Microsoft Excel'],
+            ['/guide/compatibility-with-google-sheets', 'Compatibility with Google Sheets'],
             ['/guide/list-of-differences', 'List of differences'],
           ]
         },
