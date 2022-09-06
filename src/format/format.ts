@@ -94,12 +94,6 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       continue
     }
 
-    if (secondsExtendedRegexp.test(token.value)) {
-      const fractionOfSecondPrecision = token.value.length - 3
-      result += (time.seconds < 10 ? '0' : '') + Math.floor(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
-      continue
-    }
-
     switch (token.value.toLowerCase()) {
       case 'h':
       case 'hh': {
@@ -131,11 +125,16 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       /* seconds */
       case 's':
       case 'ss': {
-        result += padLeft(time.seconds, token.value.length)
+        result += padLeft(Math.floor(time.seconds), token.value.length)
         break
       }
 
       default: {
+        if (secondsExtendedRegexp.test(token.value)) {
+          const fractionOfSecondPrecision = Math.max(token.value.length - 3, 0)
+          result += (time.seconds < 10 ? '0' : '') + Math.floor(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
+          continue
+        }
         return undefined
       }
     }
@@ -159,12 +158,6 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
     const token = tokens[i]
     if (token.type === TokenType.FREE_TEXT) {
       result += token.value
-      continue
-    }
-
-    if (secondsExtendedRegexp.test(token.value)) {
-      const fractionOfSecondPrecision = token.value.length - 3
-      result += (dateTime.seconds < 10 ? '0' : '') + Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
       continue
     }
 
@@ -224,6 +217,11 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
         break
       }
       default: {
+        if (secondsExtendedRegexp.test(token.value)) {
+          const fractionOfSecondPrecision = token.value.length - 3
+          result += (dateTime.seconds < 10 ? '0' : '') + Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
+          continue
+        }
         return undefined
       }
     }

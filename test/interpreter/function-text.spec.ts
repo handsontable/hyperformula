@@ -208,15 +208,23 @@ describe('time duration', () => {
       ['1.1', '=TEXT(A2, "[hh]:mm:ss")', ],
       ['0.1', '=TEXT(A3, "[mm]:ss")', ],
       ['1.1', '=TEXT(A4, "[mm]:ss")', ],
-      ['0.1111', '=TEXT(A5, "[mm]:ss.ss")', ],
-      ['0.1111', '=TEXT(A6, "[mm]:ss.00")', ],
+      ['1.1', '=TEXT(A5, "[hh]:m:ss")', ],
+      ['0.1111', '=TEXT(A6, "[mm]:ss.ss")', ],
+      ['0.1111', '=TEXT(A7, "[mm]:ss.00")', ],
+      ['0.1111', '=TEXT(A8, "hh:[mm]:s")', ],
+      ['0.1111', '=TEXT(A9, "h:[mm]")', ],
+      ['0.1111', '=TEXT(A10, "abc")', ],
     ])
     expect(engine.getCellValue(adr('B1'))).toEqual('02:24:00')
     expect(engine.getCellValue(adr('B2'))).toEqual('26:24:00')
     expect(engine.getCellValue(adr('B3'))).toEqual('144:00')
     expect(engine.getCellValue(adr('B4'))).toEqual('1584:00')
-    expect(engine.getCellValue(adr('B5'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B5'))).toEqual('26:24:00')
     expect(engine.getCellValue(adr('B6'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B7'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B8'))).toEqual('02:39:59')
+    expect(engine.getCellValue(adr('B9'))).toEqual('2:39')
+    expect(engine.getCellValue(adr('B10'))).toEqual('abc')
   })
 })
 
