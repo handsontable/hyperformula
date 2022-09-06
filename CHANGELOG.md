@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added MAXIFS and MINIFS functions. [#1049](https://github.com/handsontable/hyperformula/issues/1049)
+
+### Changed
+- Removed all polyfills from the CommonJS and ES Modules builds. Only keep the minimum required polyfills for the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html) in the UMD build. [#1011](https://github.com/handsontable/hyperformula/issues/1011)
+
 ### Fixed
 - Fixed TEXT function rounding issue that caused incorrect conversion of date and time values to strings. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
 - Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
