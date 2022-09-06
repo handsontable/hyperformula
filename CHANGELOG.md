@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2022-09-08
+
 ### Added
 - Added MAXIFS and MINIFS functions. [#1049](https://github.com/handsontable/hyperformula/issues/1049)
 
@@ -15,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed TEXT function rounding issue that caused incorrect conversion of date and time values to strings. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
 - Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
-- Fixed the rounding strategy in the default time-parsing function to be independent of the `timeFormats` configuration parameter. Time values will be always rounded to the nearest milisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
+- Fixed the rounding strategy in the default time-parsing function to be independent of the `timeFormats` configuration parameter. Time values will always be rounded to the nearest millisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
 
 ## [2.0.1] - 2022-06-14
 
