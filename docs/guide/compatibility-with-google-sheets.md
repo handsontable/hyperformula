@@ -88,16 +88,18 @@ This configuration aligns HyperFormula with the the default behavior of Google S
 
 ```js
 // define options
-functionArgSeparator: ',', // set by default
-decimalSeparator: '.', // set by default
-thousandSeparator: '', // set by default
-arrayColumnSeparator: ',', // set by default
-arrayRowSeparator: ';', // set by default
-dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-nullYear: 30, // set by default
-localeLang: 'en', // set by default
-useArrayArithmetic: true,
-leapYear1900: false, // set by default
-smartRounding: true, // set by default
+const options = {
+  functionArgSeparator: ',', // set by default
+  decimalSeparator: '.', // set by default
+  thousandSeparator: '', // set by default
+  arrayColumnSeparator: ',', // set by default
+  arrayRowSeparator: ';', // set by default
+  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
+  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+  nullYear: 30, // set by default
+  localeLang: 'en', // set by default
+  useArrayArithmetic: true,
+  leapYear1900: false, // set by default
+  smartRounding: true, // set by default
+};
 ```
