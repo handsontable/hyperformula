@@ -161,7 +161,6 @@ module.exports = {
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
             ['/guide/license-key', 'License key'],
-            ['/guide/compatibility', 'Compatibility'],
           ]
         },
         {
@@ -206,6 +205,15 @@ module.exports = {
           children: [
             ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
+          ]
+        },
+        {
+          title: 'Compatibility',
+          collapsable: false,
+          children: [
+            ['/guide/compatibility-with-microsoft-excel', 'Compatibility with Microsoft Excel'],
+            ['/guide/compatibility-with-google-sheets', 'Compatibility with Google Sheets'],
+            ['/guide/list-of-differences', 'Runtime differences with Microsoft Excel and Google Sheets'],
           ]
         },
         {
