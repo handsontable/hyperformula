@@ -10,6 +10,10 @@ import {Maybe} from './Maybe'
 const numDays: number[] = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 const prefSumDays: number[] = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
 
+const SECONDS_PER_MINUTE = 60
+const MINUTES_PER_HOUR = 60
+const HOURS_PER_DAY = 24
+
 export interface SimpleDate {
   year: number,
   month: number,
@@ -26,6 +30,7 @@ export type SimpleDateTime = SimpleDate & SimpleTime
 
 export type DateTime = SimpleTime | SimpleDate | SimpleDateTime
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'year' in obj && typeof obj.year === 'number' && 'month' in obj && typeof obj.month === 'number' && 'day' in obj && typeof obj.day === 'number'
@@ -34,6 +39,7 @@ export function instanceOfSimpleDate(obj: any): obj is SimpleDate {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
   if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'hours' in obj && typeof obj.hours === 'number' && 'minutes' in obj && typeof obj.minutes === 'number' && 'seconds' in obj && typeof obj.seconds === 'number'
@@ -45,14 +51,14 @@ export function instanceOfSimpleTime(obj: any): obj is SimpleTime {
 export const maxDate: SimpleDate = {year: 9999, month: 12, day: 31}
 
 export class DateTimeHelper {
-  private readonly minDateAboluteValue: number
+  private readonly minDateAbsoluteValue: number
   private readonly maxDateValue: number
   private readonly epochYearZero: number
-  private readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
+  private readonly parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   private readonly leapYear1900: boolean
 
   constructor(private readonly config: Config) {
-    this.minDateAboluteValue = this.dateToNumberFromZero(config.nullDate)
+    this.minDateAbsoluteValue = this.dateToNumberFromZero(config.nullDate)
     this.maxDateValue = this.dateToNumber(maxDate)
     this.leapYear1900 = config.leapYear1900
 
@@ -123,15 +129,15 @@ export class DateTimeHelper {
   }
 
   public dateToNumber(date: SimpleDate): number {
-    return this.dateToNumberFromZero(date) - this.minDateAboluteValue
+    return this.dateToNumberFromZero(date) - this.minDateAbsoluteValue
   }
 
   public relativeNumberToAbsoluteNumber(arg: number): number {
-    return arg + this.minDateAboluteValue - (this.leapYear1900 ? 1 : 0)
+    return arg + this.minDateAbsoluteValue - (this.leapYear1900 ? 1 : 0)
   }
 
   public numberToSimpleDate(arg: number): SimpleDate {
-    const dateNumber = Math.floor(arg) + this.minDateAboluteValue
+    const dateNumber = Math.floor(arg) + this.minDateAbsoluteValue
     let year = Math.floor(dateNumber / 365.2425)
     if (this.dateToNumberFromZero({year: year + 1, month: 1, day: 1}) <= dateNumber) {
       year++
@@ -146,7 +152,12 @@ export class DateTimeHelper {
   }
 
   public numberToSimpleDateTime(arg: number): SimpleDateTime {
-    return {...this.numberToSimpleDate(Math.floor(arg)), ...numberToSimpleTime(arg % 1)}
+    const time = numberToSimpleTime(arg % 1)
+    const carryDays = Math.floor(time.hours / HOURS_PER_DAY)
+    time.hours = time.hours % HOURS_PER_DAY
+    const date = this.numberToSimpleDate(Math.floor(arg) + carryDays)
+
+    return { ...date, ...time }
   }
 
   public leapYearsCount(year: number): number {
@@ -285,17 +296,20 @@ export function roundToNearestSecond(arg: number): number {
   return Math.round(arg * 3600 * 24) / (3600 * 24)
 }
 
+function roundToEpsilon(arg: number, epsilon: number = 1): number {
+  return Math.round(arg * epsilon) / epsilon
+}
+
+// Note: The result of this function might be { hours = 24, minutes = 0, seconds = 0 } if arg < 1 but arg ≈ 1
 export function numberToSimpleTime(arg: number): SimpleTime {
-  arg = Math.round(arg * 24 * 60 * 60 * 100000) / (24 * 60 * 60 * 100000)
-  arg *= 24
-  const hours = Math.floor(arg)
-  arg -= hours
-  arg *= 60
-  const minutes = Math.floor(arg)
-  arg -= minutes
-  arg *= 60
-  const seconds = Math.round(arg * 100000) / 100000
-  return {hours, minutes, seconds}
+  const argAsSeconds = arg * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE
+  const seconds = roundToEpsilon(argAsSeconds % SECONDS_PER_MINUTE, 100000) % SECONDS_PER_MINUTE
+  const argAsMinutes = (argAsSeconds - seconds) / SECONDS_PER_MINUTE
+  const minutes = Math.round(argAsMinutes % MINUTES_PER_HOUR) % MINUTES_PER_HOUR
+  const argAsHours = (argAsMinutes - minutes) / MINUTES_PER_HOUR
+  const hours = Math.round(argAsHours)
+
+  return { hours, minutes, seconds }
 }
 
 export function timeToNumber(time: SimpleTime): number {
