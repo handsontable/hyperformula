@@ -13,7 +13,7 @@ That said, there are cases when HyperFormula can't be compatible with all three 
 
 Still, with the right configuration, you can achieve nearly full compatibility.
 
-## What to configure
+## Configure compatibility with Google Sheets
 
 ### Array arithmetic mode
 
