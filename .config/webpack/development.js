@@ -17,17 +17,23 @@ module.exports.create = function create() {
     c.devtool = 'source-map';
     // Exclude all external dependencies from 'base' bundle
     c.externals = {
-      moment: {
-        root: 'moment',
-        commonjs2: 'moment',
-        commonjs: 'moment',
-        amd: 'moment',
-      },
       chevrotain: {
         root: 'chevrotain',
         commonjs2: 'chevrotain',
         commonjs: 'chevrotain',
         amd: 'chevrotain',
+      },
+      'tiny-emitter': {
+        root: 'TinyEmitter',
+        commonjs2: 'tiny-emitter',
+        commonjs: 'tiny-emitter',
+        amd: 'tiny-emitter',
+      },
+      unorm: {
+        root: 'unorm',
+        commonjs2: 'unorm',
+        commonjs: 'unorm',
+        amd: 'unorm',
       },
     };
     c.plugins.push(new WebpackBar({ name: ` ${PACKAGE_FILENAME}.js` }));
