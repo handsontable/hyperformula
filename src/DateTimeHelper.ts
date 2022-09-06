@@ -54,7 +54,7 @@ export class DateTimeHelper {
   private readonly minDateAbsoluteValue: number
   private readonly maxDateValue: number
   private readonly epochYearZero: number
-  private readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
+  private readonly parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   private readonly leapYear1900: boolean
 
   constructor(private readonly config: Config) {

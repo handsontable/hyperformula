@@ -284,7 +284,7 @@ export interface ConfigParams {
   /**
    * Sets a function that parses strings representing date-time into actual date-time values.
    *
-   * The function should return a [DateTime](globals.md#datetime) object or undefined.
+   * The function should return a [DateTime](../globals.md#datetime) object or undefined.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
@@ -540,7 +540,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<SimpleDateTime>
+  public readonly parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
