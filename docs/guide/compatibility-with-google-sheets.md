@@ -17,13 +17,12 @@ Still, with the right configuration, you can achieve nearly full compatibility.
 
 ### Array arithmetic mode
 
-In Google Sheets, the [array arithmetic mode](arrays.md#array-arithmetic-mode) is enabled by default.
+In Google Sheets, the [array arithmetic mode](arrays.md#array-arithmetic-mode) is disabled by default.
 
-To set up HyperFormula in the same way, set the [`useArrayArithmetic`](../api/interfaces/configparams.md#usearrayarithmetic) option to `true`.
+To set up HyperFormula in the same way, set the [`useArrayArithmetic`](../api/interfaces/configparams.md#usearrayarithmetic) option to `false`.
 
 ```js
-useArrayArithmetic: true,
-```
+useArrayArithmetic: false, // set by default
 
 ### Leap year bug
 
