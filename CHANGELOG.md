@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added MAXIFS and MINIFS functions. [#1049](https://github.com/handsontable/hyperformula/issues/1049)
 
 ### Fixed
+- Fixed TEXT function rounding issue that caused incorrect conversion of date and time values to strings. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
 - Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
 
 ## [2.0.1] - 2022-06-14
