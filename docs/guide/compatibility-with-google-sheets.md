@@ -71,7 +71,7 @@ In Google Sheets, date and time formats depend on your configured locale, wherea
 - [`timeFormats`](../api/interfaces/configparams.md#timeformats)
 - [`nullYear`](../api/interfaces/configparams.md#nullyear)
 
-To set up HyperFormula in the same way as Excel's `en-US` locale, use this configuration:
+To set up HyperFormula in the same way as Google Sheet's `en-US` locale, use this configuration:
 
 ```js
 dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
