@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the rounding strategy of the default time-parsing function to be independent of the `timeFormats` configuration option. Now, time values are always rounded to the nearest millisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
 
 ### Fixed
-- Fixed a rounding issue that caused the TEXT function to convert dates and times to strings incorrectly. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
+- Fixed a rounding issue that caused the TEXT function to incorrectly convert dates and times to strings. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
 - Fixed an issue where functions SUMIF, SUMIFS, COUNTIF, COUNTIFS, and AVERAGEIF incorrectly handled complex numeric values. [#951](https://github.com/handsontable/hyperformula/issues/951)
 
 ### Removed
