@@ -9,15 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.0] - 2022-09-08
 
 ### Added
-- Added MAXIFS and MINIFS functions. [#1049](https://github.com/handsontable/hyperformula/issues/1049)
+- Added two new functions: MAXIFS and MINIFS. [#1049](https://github.com/handsontable/hyperformula/issues/1049) 
 
 ### Changed
-- Removed all polyfills from the CommonJS and ES Modules builds. Only keep the minimum required polyfills for the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html) in the UMD build. [#1011](https://github.com/handsontable/hyperformula/issues/1011)
+- Changed the rounding strategy of the default time-parsing function to be independent of the `timeFormats` configuration option. Now, time values are always rounded to the nearest millisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
 
 ### Fixed
-- Fixed TEXT function rounding issue that caused incorrect conversion of date and time values to strings. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
-- Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
-- Fixed the rounding strategy in the default time-parsing function to be independent of the `timeFormats` configuration parameter. Time values will always be rounded to the nearest millisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
+- Fixed a rounding issue that caused the TEXT function to incorrectly convert dates and times to strings. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
+- Fixed an issue where functions SUMIF, SUMIFS, COUNTIF, COUNTIFS, and AVERAGEIF incorrectly handled complex numeric values. [#951](https://github.com/handsontable/hyperformula/issues/951)
+
+### Removed
+- Removed all polyfills from the CommonJS build and the ES modules build. In the UMD build, kept only the polyfills required by the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html). [#1011](https://github.com/handsontable/hyperformula/issues/1011)
 
 ## [2.0.1] - 2022-06-14
 
@@ -68,12 +70,12 @@ For more information on this release, see:
 
 ## [1.1.0] - 2021-08-12
 
-### Changed
-- Deprecated the `binarySearchThreshold` configuration option, as every search of sorted data always uses binary search. [#791](https://github.com/handsontable/hyperformula/issues/791)
-
 ### Added
 - Added support for the array arithmetic mode in the `calculateFormula()` method. [#782](https://github.com/handsontable/hyperformula/issues/782)
 - Added a new `CellType` returned by `getCellType`: `CellType.ARRAYFORMULA`. It's assigned to the top-left corner of an array, and is recognized by the `isCellPartOfArray()` and `doesCellHaveFormula()` methods. [#781](https://github.com/handsontable/hyperformula/issues/781)
+
+### Changed
+- Deprecated the `binarySearchThreshold` configuration option, as every search of sorted data always uses binary search. [#791](https://github.com/handsontable/hyperformula/issues/791)
 
 ### Fixed
 - Fixed an issue with searching sorted data. [#787](https://github.com/handsontable/hyperformula/issues/787)
@@ -81,6 +83,31 @@ For more information on this release, see:
 
 
 ## [1.0.0] - 2021-07-15
+
+### Added
+- Added support for array arithmetic. [#628](https://github.com/handsontable/hyperformula/issues/628)
+- Added performance improvements for array handling. [#629](https://github.com/handsontable/hyperformula/issues/629)
+- Added ARRAYFORMULA function. [#630](https://github.com/handsontable/hyperformula/issues/630)
+- Added FILTER function. [#668](https://github.com/handsontable/hyperformula/issues/668)
+- Added ARRAY_CONSTRAIN function. [#661](https://github.com/handsontable/hyperformula/issues/661)
+- Added casting to scalars from non-range arrays. [#663](https://github.com/handsontable/hyperformula/issues/663)
+- Added support for range interpolation. [#665](https://github.com/handsontable/hyperformula/issues/665)
+- Added parsing of arrays in formulas (together with respective config options for separators). [#671](https://github.com/handsontable/hyperformula/issues/671)
+- Added support for vectorization of scalar functions. [#673](https://github.com/handsontable/hyperformula/issues/673)
+- Added support for time in JS `Date()` objects on the input. [#648](https://github.com/handsontable/hyperformula/issues/648)
+- Added validation of API argument types for simple types. [#654](https://github.com/handsontable/hyperformula/issues/654)
+- Added named expression handling to engine factories. [#680](https://github.com/handsontable/hyperformula/issues/680)
+- Added `getAllNamedExpressionsSerialized` method. [#680](https://github.com/handsontable/hyperformula/issues/680)
+- Added parsing of arrays in formulas (together with respective config options for separators). [#671](https://github.com/handsontable/hyperformula/issues/671)
+- Added utility function for filling ranges with source from other range. [#678](https://github.com/handsontable/hyperformula/issues/678)
+- Added pretty print for detailedCellError. [#712](https://github.com/handsontable/hyperformula/issues/712)
+- Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. [#720](https://github.com/handsontable/hyperformula/issues/720)
+- Added `CellError` to exports. [#736](https://github.com/handsontable/hyperformula/issues/736)
+- Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. [#747](https://github.com/handsontable/hyperformula/issues/747)
+- Added `#SPILL!` error type. [#708](https://github.com/handsontable/hyperformula/issues/708)
+- Added large tests for CRUD interactions. [#755](https://github.com/handsontable/hyperformula/issues/755)
+- Added support for array arithmetic in plugins. [#766](https://github.com/handsontable/hyperformula/issues/766)
+- Added a flag to `getFillRangeData` to support different types of offsetting. [#767](https://github.com/handsontable/hyperformula/issues/767)
 
 ### Changed
 - **Breaking change**: Changed API of many sheet-related methods to take sheetId instead of sheetName as an argument. [#645](https://github.com/handsontable/hyperformula/issues/645)
@@ -118,31 +145,6 @@ For more information on this release, see:
 - Changed TRANSPOSE function, so it works with data of any type. [#708](https://github.com/handsontable/hyperformula/issues/708)
 - Changed the way how we include `gpu.js` making it even more optional [#753](https://github.com/handsontable/hyperformula/issues/753)
 
-### Added
-- Added support for array arithmetic. [#628](https://github.com/handsontable/hyperformula/issues/628)
-- Added performance improvements for array handling. [#629](https://github.com/handsontable/hyperformula/issues/629)
-- Added ARRAYFORMULA function. [#630](https://github.com/handsontable/hyperformula/issues/630)
-- Added FILTER function. [#668](https://github.com/handsontable/hyperformula/issues/668)
-- Added ARRAY_CONSTRAIN function. [#661](https://github.com/handsontable/hyperformula/issues/661)
-- Added casting to scalars from non-range arrays. [#663](https://github.com/handsontable/hyperformula/issues/663)
-- Added support for range interpolation. [#665](https://github.com/handsontable/hyperformula/issues/665)
-- Added parsing of arrays in formulas (together with respective config options for separators). [#671](https://github.com/handsontable/hyperformula/issues/671)
-- Added support for vectorization of scalar functions. [#673](https://github.com/handsontable/hyperformula/issues/673)
-- Added support for time in JS `Date()` objects on the input. [#648](https://github.com/handsontable/hyperformula/issues/648)
-- Added validation of API argument types for simple types. [#654](https://github.com/handsontable/hyperformula/issues/654)
-- Added named expression handling to engine factories. [#680](https://github.com/handsontable/hyperformula/issues/680)
-- Added `getAllNamedExpressionsSerialized` method. [#680](https://github.com/handsontable/hyperformula/issues/680)
-- Added parsing of arrays in formulas (together with respective config options for separators). [#671](https://github.com/handsontable/hyperformula/issues/671)
-- Added utility function for filling ranges with source from other range. [#678](https://github.com/handsontable/hyperformula/issues/678)
-- Added pretty print for detailedCellError. [#712](https://github.com/handsontable/hyperformula/issues/712)
-- Added `simpleCellRangeFromString` and `simpleCellRangeToString` helpers. [#720](https://github.com/handsontable/hyperformula/issues/720)
-- Added `CellError` to exports. [#736](https://github.com/handsontable/hyperformula/issues/736)
-- Added mapping policies to the exports:   `AlwaysDense`, `AlwaysSparse`, `DenseSparseChooseBasedOnThreshold`. [#747](https://github.com/handsontable/hyperformula/issues/747)
-- Added `#SPILL!` error type. [#708](https://github.com/handsontable/hyperformula/issues/708)
-- Added large tests for CRUD interactions. [#755](https://github.com/handsontable/hyperformula/issues/755)
-- Added support for array arithmetic in plugins. [#766](https://github.com/handsontable/hyperformula/issues/766)
-- Added a flag to `getFillRangeData` to support different types of offsetting. [#767](https://github.com/handsontable/hyperformula/issues/767)
-
 ### Fixed
 - Fixed an issue with arrays and cruds. [#651](https://github.com/handsontable/hyperformula/issues/651)
 - Fixed handling of arrays for ROWS/COLUMNS functions. [#677](https://github.com/handsontable/hyperformula/issues/677)
@@ -167,12 +169,12 @@ For more information on this release, see:
 
 ## [0.6.0] - 2021-04-27
 
-### Changed
-- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. [#642](https://github.com/handsontable/hyperformula/issues/642)
-
 ### Added
 - Added two new fired events, for suspending and resuming execution. [#637](https://github.com/handsontable/hyperformula/issues/637)
 - Added listing in scopes to `listNamedExpressions` method. [#638](https://github.com/handsontable/hyperformula/issues/638)
+
+### Changed
+- **Breaking change**: Moved `GPU.js` from `dependencies` to `devDependencies` and `optionalDependencies`. [#642](https://github.com/handsontable/hyperformula/issues/642)
 
 ### Fixed
 - Fixed issues with scoped named expression. [#646](https://github.com/handsontable/hyperformula/issues/646) [#641](https://github.com/handsontable/hyperformula/issues/641)
@@ -180,17 +182,17 @@ For more information on this release, see:
 
 ## [0.5.0] - 2021-04-15
 
-### Changed
-- **Breaking change**: A change to the type of value returned via serialization methods. [#617](https://github.com/handsontable/hyperformula/issues/617)
-- An input value should be preserved through serialization more precisely. [#617](https://github.com/handsontable/hyperformula/issues/617)
-- GPU.js constructor needs to be provided directly to engine configuration. [#355](https://github.com/handsontable/hyperformula/issues/355)
-- A deprecated config option vlookupThreshold has been removed. [#620](https://github.com/handsontable/hyperformula/issues/620)
-
 ### Added
 - Added support for row and column reordering. [#343](https://github.com/handsontable/hyperformula/issues/343)
 - Added type inferrence for subtypes for number. [#313](https://github.com/handsontable/hyperformula/issues/313)
 - Added parsing of number literals containing '%' or currency symbol (default '$'). [#590](https://github.com/handsontable/hyperformula/issues/590)
 - Added ability to fallback to plain CPU implementation for functions that uses GPU.js [#355](https://github.com/handsontable/hyperformula/issues/355)
+
+### Changed
+- **Breaking change**: A change to the type of value returned via serialization methods. [#617](https://github.com/handsontable/hyperformula/issues/617)
+- An input value should be preserved through serialization more precisely. [#617](https://github.com/handsontable/hyperformula/issues/617)
+- GPU.js constructor needs to be provided directly to engine configuration. [#355](https://github.com/handsontable/hyperformula/issues/355)
+- A deprecated config option vlookupThreshold has been removed. [#620](https://github.com/handsontable/hyperformula/issues/620)
 
 ### Fixed
 - Fixed minor issue. [#631](https://github.com/handsontable/hyperformula/issues/631)
@@ -203,15 +205,15 @@ For more information on this release, see:
 
 ## [0.4.0] - 2020-12-17
 
-### Changed
-- A **breaking change**: CEILING function implementation to be consistent with existing implementations. [#582](https://github.com/handsontable/hyperformula/issues/582)
-
 ### Added
 - Added 50 mathematical functions: ROMAN, ARABIC, FACT, FACTDOUBLE, COMBIN, COMBINA, GCD, LCM, MROUND, MULTINOMIAL, QUOTIENT, RANDBETWEEN, SERIESSUM, SIGN, SQRTPI, SUMX2MY2, SUMX2PY2, SUMXMY2, CEILING.MATH, FLOOR.MATH, FLOOR, CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING, COMPLEX, IMABS, IMAGINARY, IMARGUMENT, IMCONJUGATE, IMCOS, IMCOSH, IMCOT, IMCSC, IMCSCH, IMDIV, IMEXP, IMLN, IMLOG10, IMLOG2, IMPOWER, IMPRODUCT, IMREAL, IMSEC, IMSECH, IMSIN, IMSINH, IMSQRT, IMSUB,  IMSUM, IMTAN. [#537](https://github.com/handsontable/hyperformula/issues/537) [#582](https://github.com/handsontable/hyperformula/issues/582) [#281](https://github.com/handsontable/hyperformula/issues/281) [#581](https://github.com/handsontable/hyperformula/issues/581)
 - Added 106 statistical functions: EXPON.DIST, EXPONDIST, FISHER, FISHERINV, GAMMA, GAMMA.DIST, GAMMADIST, GAMMALN, GAMMALN.PRECISE, GAMMA.INV, GAMMAINV, GAUSS, BETA.DIST, BETADIST, BETA.INV, BETAINV, BINOM.DIST, BINOMDIST, BINOM.INV, BESSELI, BESSELJ, BESSELK, BESSELY, CHISQ.DIST, CHISQ.DIST.RT, CHISQ.INV, CHISQ.INV.RT, CHIDIST, CHIINV, F.DIST, F.DIST.RT, F.INV, F.INV.RT, FDIST, FINV, WEIBULL, WEIBULL.DIST, HYPGEOMDIST, HYPGEOM.DIST, T.DIST, T.DIST.2T, T.DIST.RT, T.INV, T.INV.2T, TDIST, TINV, LOGNORM.DIST, LOGNORMDIST, LOGNORM.INV, LOGINV, NORM.DIST, NORMDIST, NORM.S.DIST, NORMSDIST, NORM.INV, NORMINV, NORM.S.INV, NORMSINV, PHI, NEGBINOM.DIST, NEGBINOMDIST, POISSON, POISSON.DIST, LARGE, SMALL, AVEDEV, CONFIDENCE, CONFIDENCE.NORM, CONFIDENCE.T, DEVSQ, GEOMEAN, HARMEAN, CRITBINOM, COVAR, COVARIANCE.P, COVARIANCE.S, PEARSON, RSQ, STANDARDIZE, Z.TEST, ZTEST, F.TEST, FTEST, STEYX, SLOPE, CHITEST, CHISQ.TEST, T.TEST, TTEST, SKEW.P, SKEW, WEIBULLDIST, VARS, TINV2T, TDISTRT, TDIST2T, STDEVS, FINVRT, FDISTRT, CHIDISTRT, CHIINVRT, COVARIANCEP, COVARIANCES, LOGNORMINV, POISSONDIST, SKEWP. [#152](https://github.com/handsontable/hyperformula/issues/152) [#154](https://github.com/handsontable/hyperformula/issues/154) [#160](https://github.com/handsontable/hyperformula/issues/160)
 - Added function aliases mechanism. [#569](https://github.com/handsontable/hyperformula/issues/569)
 - Added support for scientific notation. [#579](https://github.com/handsontable/hyperformula/issues/579)
 - Added support for complex numbers. [#281](https://github.com/handsontable/hyperformula/issues/281)
+
+### Changed
+- A **breaking change**: CEILING function implementation to be consistent with existing implementations. [#582](https://github.com/handsontable/hyperformula/issues/582)
 
 ### Fixed
 - Fixed a problem with dependencies not collected for specific functions. [#550](https://github.com/handsontable/hyperformula/issues/550) [#549](https://github.com/handsontable/hyperformula/issues/549)

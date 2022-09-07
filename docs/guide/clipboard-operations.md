@@ -1,49 +1,34 @@
 # Clipboard operations
 
-HyperFormula supports clipboard operations such as **copy, cut,
-and paste**. These methods allow you to integrate the functionality
+Through a set of dedicated methods, HyperFormula supports clipboard operations, such as copying, cutting,
+and pasting. This lets you integrate the functionality
 of interacting with the clipboard.
 
-::: tip
-The methods provided below store cut or copied data in a reference inside
-the memory, not directly in the system clipboard.
-:::
+The copied or cut data is stored as a memory reference, not directly in the system clipboard.
 
-## [Copy](../api/classes/hyperformula.md#copy)
+## Copy
 
-You can copy cell content by using the [copy](../api/classes/hyperformula.md#copy) method, which accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
+To copy the contents of a cell or range, use the [`copy()`](../api/classes/hyperformula.md#copy) method. Pass arguments of type [`SimpleCellRange`](../api/interfaces/simplecellrange).
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
   ['1', '2'],
 ]);
 
-// it copies [ [ 2 ] ]
+// copy [ [ 2 ] ]
 const clipboardContent = hfInstance.copy({
   start: { sheet: 0, col: 1, row: 0 }, 
   end: { sheet: 0, col: 1, row: 0 },
 });
 ```
 
-Depending on what was copied, the data is stored as:
+## Cut
 
-* an array of arrays
-* a number
-* a string
-* a boolean
-* an empty value
+To cut the contents of a cell or range, use the [`cut()`](../api/classes/hyperformula.md#cut) method. Pass arguments of type [`SimpleCellRange`](../api/interfaces/simplecellrange).
 
-If a copied source formula contains named expressions which were
-defined for a local scope and it is pasted to a sheet which is
-out of scope for these expressions, their scope will switch to global.
-If a copied named expression's scope is the same as the target's,
-the local scope will remain the same.
-
-## [Cut](../api/classes/hyperformula.md#cut)
-
-You can cut cell content by using the [cut](../api/classes/hyperformula.md#cut) method, which also accepts an argument of type [SimpleCellRange](../api/interfaces/simplecellrange).
-
-**Any CRUD operation called after this method will abort the cut operation.**
+::: tip
+Any CRUD operation called after the [`cut()`](../api/classes/hyperformula.md#cut) method aborts the cut operation.
+:::
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
@@ -57,21 +42,11 @@ const clipboardContent = hfInstance.cut({
 });
 ```
 
-## [Paste](../api/classes/hyperformula.md#paste)
+## Paste
 
-You can paste cell content by using the [paste](../api/classes/hyperformula.md#paste) method.
-This method requires only one parameter - the top left corner of the range, into which the content will be pasted.
+To paste the contents of a cell or range, use the [`paste()`](../api/classes/hyperformula.md#paste) method.
 
-If the `paste` method is called after `copy` , it will paste
-copied values and formulas into a block of cells. If it is called
-after `cut` , it will perform the `moveCells` operation into the
-block of cells. The `paste` method does nothing if the clipboard
-is empty.
-
-The `paste` method triggers recalculation of the formulas
-affected by this operation. When it is called after `cut`, it
-will remove the content that was cut. This may have an impact
-on many related cells in the workbook.
+[`paste()`](../api/classes/hyperformula.md#paste) requires only one parameter: the top left corner of the target range.
 
 ```javascript
 const hfInstance = HyperFormula.buildFromArray([
@@ -88,17 +63,52 @@ const clipboardContent = hfInstance.copy({
 const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
 ```
 
-**Cut and paste** behaves similarly to the `move` operation, so if the formula
-'=A1' is in cell B1 it will stay '=A1' after being placed into B2.
+If the clipboard is empty, the [`paste()`](../api/classes/hyperformula.md#paste) method doesn't do anything.
 
-**Copy and paste** behaves a bit differently. If '=A1' is copied from
-cell B1 into B2 it will become '=A2'.
+### Copy and paste
+
+When called after [`copy()`](../api/classes/hyperformula.md#copy), the [`paste()`](../api/classes/hyperformula.md#paste) method:
+- Pastes the copied data into the target range.
+- Triggers a recalculation of all affected formulas.
+
+::: tip
+If a formula `=A1` is copied from cell B1 into B2, the B2 formula becomes `=A2`.
+:::
+
+### Cut and paste
+
+When called after [`cut()`](../api/classes/hyperformula.md#cut), the [`paste()`](../api/classes/hyperformula.md#paste) method:
+- Moves the cut data into the target range, by calling the [`moveCells()`](../api/classes/hyperformula.md#movecells) method.
+- Removes the cut data from the source range.
+- Triggers a recalculation of all affected formulas.
+
+::: tip
+If a formula `=A1` is cut from cell B1 into B2, the B2 formula becomes `=A1`.
+:::
+
+#### Pasting named expressions
+
+If a copied or cut formula contains a [named expression](named-expressions.md) defined for a local scope, and the formula is pasted to a sheet that is out of scope for that expression, the expression's scope changes to global.
+
+If the copied or cut named expression's scope is the same as the target's, the expression's local scope remains the same.
 
 ## Clear the clipboard
 
-You can clear the clipboard on demand by using the [clearClipboard](../api/classes/hyperformula.md#clearclipboard)
-method. There is also a method for checking if there is any content
-inside the clipboard: [isClipboardEmpty](../api/classes/hyperformula.md#isclipboardempty).
+To clear the clipboard, use the [`clearClipboard()`](../api/classes/hyperformula.md#clearclipboard)
+method.
+
+To check if the clipboard holds any data, use the [`isClipboardEmpty()`](../api/classes/hyperformula.md#isclipboardempty) method.
+
+## Data storage
+
+The copied or cut data is stored as a memory reference, not directly in the system clipboard.
+
+Depending on what was cut, the data is stored as:
+* An array of arrays
+* A number
+* A string
+* A boolean
+* An empty value
 
 ## Demo
 
