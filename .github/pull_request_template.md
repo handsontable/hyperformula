@@ -6,7 +6,7 @@
 
 ### Types of changes
 <!--- What types of changes does your code introduce? Put an `x` in each box that applies. -->
-- [ ] Breaking change (a fix or a feature that causes an existing functionality to not work as expected)
+- [ ] Breaking change (a fix or a feature because of which an existing functionality doesn't work as expected anymore)
 - [ ] New feature or improvement (a non-breaking change that adds functionality)
 - [ ] Bug fix (a non-breaking change that fixes an issue)
 - [ ] Additional language file, or a change to an existing language file (translations)
