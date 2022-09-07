@@ -4,20 +4,21 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2.1.0] - 2022-09-08
+## 2.1.0
 **Release date: September 8, 2022**
 
 ### Added
-- Added MAXIFS and MINIFS functions. [#1049](https://github.com/handsontable/hyperformula/issues/1049)
+- Added two new functions: MAXIFS and MINIFS. [#1049](https://github.com/handsontable/hyperformula/issues/1049) 
 
 ### Changed
-- Removed all polyfills from the CommonJS and ES Modules builds. Only keep the minimum required polyfills for the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html) in the UMD build. [#1011](https://github.com/handsontable/hyperformula/issues/1011)
+- Changed the rounding strategy of the default time-parsing function to be independent of the [`timeFormats`](../api/interfaces/configparams.md#timeformats) configuration option. Now, time values are always rounded to the nearest millisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
 
 ### Fixed
-- Fixed TEXT function rounding issue that caused incorrect conversion of date and time values to strings. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
-- Fixed functions SUMIF, SUMIFS, AVERAGEIF, COUNTIF, COUNTIFS to handle complex numeric values correctly. [#951](https://github.com/handsontable/hyperformula/issues/951)
-- Fixed the rounding strategy in the default time-parsing function to be independent of the `timeFormats` configuration parameter. Time values will always be rounded to the nearest millisecond (0.001 s). [#953](https://github.com/handsontable/hyperformula/issues/953)
+- Fixed a rounding issue that caused the TEXT function to convert dates and times to strings incorrectly. [#1043](https://github.com/handsontable/hyperformula/issues/1043)
+- Fixed an issue where functions SUMIF, SUMIFS, COUNTIF, COUNTIFS, and AVERAGEIF incorrectly handled complex numeric values. [#951](https://github.com/handsontable/hyperformula/issues/951)
 
+### Removed
+- Removed all polyfills from the CommonJS build and the ES modules build. In the UMD build, kept only the polyfills required by the [supported browsers](https://hyperformula.handsontable.com/guide/supported-browsers.html). [#1011](https://github.com/handsontable/hyperformula/issues/1011)
 
 ## 2.0.1
 **Release date: June 14, 2022**
