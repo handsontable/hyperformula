@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -133,12 +133,14 @@ export const dictionary: RawTranslationPackage = {
     MATCH: 'COINCIDIR',
     MAX: 'MAX',
     MAXA: 'MAXA',
+    MAXIFS: 'MAX.SI.CONJUNTO',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'MEDIANA',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'EXTRAE',
     MIN: 'MIN',
     MINA: 'MINA',
+    MINIFS: 'MIN.SI.CONJUNTO',
     MINUTE: 'MINUTO',
     MIRR: 'TIRM',
     MMULT: 'MMULT',

@@ -49,7 +49,7 @@ describe('license key', () => {
   })
 
   describe('expired key', () => {
-    xit('should verify that key is expired', () => {
+    it('should verify that key is expired', () => {
       const hf = HyperFormula.buildEmpty({
         licenseKey: '80584-cc272-2e7c4-06f16-4db00',
       })

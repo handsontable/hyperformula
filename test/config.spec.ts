@@ -1,8 +1,9 @@
 import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
-import {EmptyValue} from '../src/interpreter/InterpreterValue'
-import {unregisterAllLanguages} from './testUtils'
+import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
+import {adr, unregisterAllLanguages} from './testUtils'
+import {CellValueNoNumber} from '../src/Cell'
 
 describe('Config', () => {
   beforeEach(() => {
@@ -120,7 +121,7 @@ describe('Config', () => {
 
   it('should throw error when currency symbol is not a string', () => {
     expect(() => {
-      new Config({currencySymbol: [42 as any]})
+      new Config({currencySymbol: [ 42 as unknown as string ]})
     }).toThrowError('Expected value of type: string[] for config parameter: currencySymbol')
   })
 
@@ -205,6 +206,115 @@ describe('Config', () => {
     expect(() => new Config({nullYear: 42})).not.toThrowError()
     expect(() => new Config({nullYear: 100})).not.toThrowError()
     expect(() => new Config({nullYear: 101})).toThrowError('Config parameter nullYear should be at most 100')
+  })
+
+  describe('#dateFormats', () => {
+    it('should use the data formats provided in config param', () => {
+      const dateFormats = ['DD/MM/YYYY']
+      const engine = HyperFormula.buildFromArray([
+        ['1'],
+        ['01/03/2022'],
+        ['2022/01/01'],
+      ], { dateFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(CellValueNoNumber.STRING)
+    })
+
+    it('should parse the dates with different separators', () => {
+      const dateFormats = ['DD/MM/YYYY']
+      const engine = HyperFormula.buildFromArray([[
+        '01/03/2022',
+        '01-03-2022',
+        '01 03 2022',
+        '01.03.2022',
+        '01/03-2022',
+        '01 03.2022',
+        '01 03/2022',
+        '01.03-2022',
+      ]], { dateFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('A1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('B1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('B1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('C1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('C1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('D1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('D1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('E1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('E1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('F1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('F1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('G1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('G1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('H1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('H1'))).toEqual('DD/MM/YYYY')
+    })
+  })
+
+  describe('#timeFormats', () => {
+    it('should work with the "hh:mm" format', () => {
+      const timeFormats = ['hh:mm']
+      const engine = HyperFormula.buildFromArray([
+        ['13.33'],
+        ['13:33'],
+        ['01:33'],
+        ['1:33'],
+        ['13:33:33'],
+      ], { timeFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(CellValueNoNumber.STRING)
+    })
+
+    it('should work with the "hh:mm:ss" format', () => {
+      const timeFormats = ['hh:mm:ss']
+      const engine = HyperFormula.buildFromArray([
+        ['13:33'],
+        ['13:33:00'],
+        ['01:33:33'],
+        ['1:33:33'],
+        ['13:33:33.3'],
+        ['13:33:33.33'],
+        ['13:33:33.333'],
+        ['13:33:33.3333'],
+        ['13:33:33.333333333333333333333333333333333333333333333333333333'],
+      ], { timeFormats })
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueNoNumber.STRING)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A6'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A7'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A8'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A9'))).toEqual(NumberType.NUMBER_TIME)
+    })
+
+    it('the parsing result should be the same regardless of decimal places specified in format string', () => {
+      const dateAsString = '13:33:33.33333'
+      const dateAsNumber = 0.564969131944444
+
+      let engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.s'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ssss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sssss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+    })
   })
 
   describe('deprecated option warning messages', () => {

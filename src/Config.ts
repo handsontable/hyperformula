@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
 import {
@@ -90,16 +90,23 @@ export interface ConfigParams {
    */
   currencySymbol: string[],
   /**
-   * Sets date formats that are supported by date-parsing functions.
+   * Sets the date formats accepted by the date-parsing function.
    *
-   * The separator is ignored and can be any of the following:
-   * - `-` (dash)
-   * - ` ` (empty space)
+   * A format must be specified as a string consisting of tokens and separators.
+   *
+   * Supported tokes:
+   * - `DD` (day of month)
+   * - `MM` (month as a number)
+   * - `YYYY` (year as a 4-digit number)
+   * - `YY` (year as a 2-digit number)
+   *
+   * Supported separators:
    * - `/` (slash)
+   * - `-` (dash)
+   * - `.` (dot)
+   * - ` ` (empty space)
    *
-   * `YY` can be replaced with `YYYY`.
-   *
-   * Any order of `YY`, `MM`, and `DD` is accepted as a date.
+   * Regardless of the separator specified in the format string, all of the above are accepted by the date-parsing function.
    *
    * @default ['DD/MM/YYYY', 'DD/MM/YY']
    *
@@ -214,7 +221,7 @@ export interface ConfigParams {
   /**
    * When set to `true`, function criteria require whole cells to match the pattern.
    *
-   * When set to `false`, function criteria require just a subword to match the pattern.
+   * When set to `false`, function criteria require just a sub-word to match the pattern.
    *
    * @default true
    * @category String
@@ -275,7 +282,11 @@ export interface ConfigParams {
    */
   nullYear: number,
   /**
-   * Sets a function that parses strings representing date-time into actual date-time.
+   * Sets a function that parses strings representing date-time into actual date-time values.
+   *
+   * The function should return a [DateTime](../globals.md#datetime) object or undefined.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default defaultParseToDateTime
    *
@@ -317,7 +328,11 @@ export interface ConfigParams {
    */
   precisionRounding: number,
   /**
-   * Sets a function that converts date-time into strings.
+   * Sets a function that converts date-time values into strings.
+   *
+   * The function should return a string or undefined.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default defaultStringifyDateTime
    *
@@ -325,7 +340,11 @@ export interface ConfigParams {
    */
   stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
   /**
-   * Sets a function that converts time duration into strings.
+   * Sets a function that converts time duration values into strings.
+   *
+   * The function should return a string or undefined.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default defaultStringifyDuration
    *
@@ -343,7 +362,7 @@ export interface ConfigParams {
    */
   smartRounding: boolean,
   /**
-   * Sets a thousands separator symbol for parsing numerical literals.
+   * Sets the thousands' separator symbol for parsing numerical literals.
    *
    * Can be one of the following:
    * - empty
@@ -358,14 +377,16 @@ export interface ConfigParams {
    */
   thousandSeparator: '' | ',' | ' ' | '.',
   /**
-   * Sets time formats that will be supported by time-parsing functions.
+   * Sets the time formats accepted by the time-parsing function.
    *
-   * The separator is `:` (colon).
+   * A format must be specified as a string consisting of at least two tokens separated by `:` (a colon).
    *
-   * Accepts any configuration of at least two of the following, in any order:
-   * - `hh`: hours
-   * - `mm`: minutes
-   * - `ss`: seconds
+   * Supported tokes:
+   * - `hh` (hours)
+   * - `mm` (minutes)
+   * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc. (seconds)
+   *
+   * The number of decimal places in the seconds token does not matter. All versions of the seconds token are equivalent in the context of parsing time values.
    *
    * @default ['hh:mm', 'hh:mm:ss.sss']
    *
@@ -519,7 +540,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<SimpleDateTime>
+  public readonly parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */

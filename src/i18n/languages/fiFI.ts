@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -133,12 +133,14 @@ const dictionary: RawTranslationPackage = {
     MATCH: 'VASTINE',
     MAX: 'MAKS',
     MAXA: 'MAKSA',
+    MAXIFS: 'MAKS.JOS',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'MEDIAANI',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'POIMI.TEKSTI',
     MIN: 'MIN',
     MINA: 'MINA',
+    MINIFS: 'MIN.JOS',
     MINUTE: 'MINUUTIT',
     MIRR: 'MSISÄINEN',
     MMULT: 'MKERRO',

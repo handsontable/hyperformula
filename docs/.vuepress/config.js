@@ -161,7 +161,6 @@ module.exports = {
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
             ['/guide/license-key', 'License key'],
-            ['/guide/known-limitations', 'Known limitations'],
           ]
         },
         {
@@ -209,6 +208,15 @@ module.exports = {
           ]
         },
         {
+          title: 'Compatibility',
+          collapsable: false,
+          children: [
+            ['/guide/compatibility-with-microsoft-excel', 'Compatibility with Microsoft Excel'],
+            ['/guide/compatibility-with-google-sheets', 'Compatibility with Google Sheets'],
+            ['/guide/list-of-differences', 'Runtime differences with Microsoft Excel and Google Sheets'],
+          ]
+        },
+        {
           title: 'Advanced topics',
           collapsable: false,
           children: [
@@ -217,6 +225,7 @@ module.exports = {
             ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
+            ['/guide/known-limitations', 'Known limitations'],
           ]
         },
         {

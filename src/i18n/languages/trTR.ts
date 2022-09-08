@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -133,12 +133,14 @@ const dictionary: RawTranslationPackage = {
     MATCH: 'KAÇINCI',
     MAX: 'MAK',
     MAXA: 'MAKA',
+    MAXIFS: 'ÇOKEĞERMAK',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'ORTANCA',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'PARÇAAL',
     MIN: 'MİN',
     MINA: 'MİNA',
+    MINIFS: 'ÇOKEĞERMİN',
     MINUTE: 'DAKİKA',
     MIRR: 'D_İÇ_VERİM_ORANI',
     MMULT: 'DÇARP',

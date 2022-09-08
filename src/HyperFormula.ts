@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange} from './AbsoluteCellRange'
@@ -361,6 +361,7 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * // return registered language
    * HyperFormula.registerLanguage('plPL', plPL);
+   * const engine = HyperFormula.buildEmpty({language: 'plPL'});
    * ```
    *
    * @category Static Methods
@@ -418,7 +419,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Registers all functions in a given plugin with optional translations
+   * Registers all functions in a given plugin with optional translations.
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
    *
    * @param {FunctionPluginDefinition} plugin - plugin class
    * @param {FunctionTranslationsPackage} translations - optional package of function names translations
@@ -442,7 +445,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Unregisters all functions defined in given plugin
+   * Unregisters all functions defined in given plugin.
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
    *
    * @param {FunctionPluginDefinition} plugin - plugin class
    *
@@ -463,6 +468,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Registers a function with a given id if such exists in a plugin.
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    * @param {FunctionPluginDefinition} plugin - plugin class
@@ -489,7 +496,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Unregisters a function with a given id
+   * Unregisters a function with a given id.
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    *
@@ -515,7 +524,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Clears function registry
+   * Clears function registry.
+   *
+   * Note: This method does not affect the existing HyperFormula instances.
    *
    * @example
    * ```js
@@ -577,7 +588,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns classes of all plugins registered in this instance of HyperFormula
+   * Returns classes of all plugins registered in HyperFormula.
    *
    * @example
    * ```js
@@ -2096,7 +2107,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Stores a copy of the cell block in internal clipboard for the further paste.
-   * Returns values of cells for use in external clipboard.
+   * Returns the copied values for use in external clipboard.
    *
    * @param {SimpleCellRange} source - rectangle range to copy
    *
@@ -2107,12 +2118,17 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2'],
+   *   ['1', '2'],
    * ]);
    *
-   * // should return: [ [ 2 ] ]
-   * const clipboardContent = hfInstance.copy({ start: { sheet: 0, col: 1, row: 0 }, end: { sheet: 0, col: 1, row: 0 } });
+   * // it copies [ [ 2 ] ]
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
@@ -2129,7 +2145,7 @@ export class HyperFormula implements TypedEmitter {
    * Stores information of the cell block in internal clipboard for further paste.
    * Calling [[paste]] right after this method is equivalent to call [[moveCells]].
    * Almost any CRUD operation called after this method will abort the cut operation.
-   * Returns values of cells for use in external clipboard.
+   * Returns the cut values for use in external clipboard.
    *
    * @param {SimpleCellRange} source - rectangle range to cut
    *
@@ -2140,12 +2156,17 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2'],
+   *   ['1', '2'],
    * ]);
    *
-   * // should return values that were cut: [ [ 1 ] ]
-   * const clipboardContent = hfInstance.cut({ start: { sheet: 0, col: 0, row: 0 }, end: { sheet: 0, col: 0, row: 0 } });
+   * // returns the values that were cut: [ [ 1 ] ]
+   * const clipboardContent = hfInstance.cut({
+   *   start: { sheet: 0, col: 0, row: 0 },
+   *   end: { sheet: 0, col: 0, row: 0 },
+   * });
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
@@ -2179,16 +2200,20 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2'],
+   *   ['1', '2'],
    * ]);
    *
-   * // do a copy, [ [ 2 ] ] was copied
-   * hfInstance.copy({ sheet: 0, col: 0, row: 0 }, 1, 1);
+   * // [ [ 2 ] ] was copied
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
    *
-   * // do a paste, should return a list of cells which values changed
-   * // after the operation, their absolute addresses and new values
+   * // returns a list of modified cells: their absolute addresses and new values
    * const changes = hfInstance.paste({ sheet: 0, col: 1, row: 0 });
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
@@ -2211,11 +2236,16 @@ export class HyperFormula implements TypedEmitter {
    * ]);
    *
    * // copy desired content
-   * hfInstance.copy({ sheet: 0, col: 1, row: 0 }, 1, 1);
+   * const clipboardContent = hfInstance.copy({
+   *   start: { sheet: 0, col: 1, row: 0 },
+   *   end: { sheet: 0, col: 1, row: 0 },
+   * });
    *
    * // returns 'false', there is content in the clipboard
    * const isClipboardEmpty = hfInstance.isClipboardEmpty();
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
@@ -2231,6 +2261,8 @@ export class HyperFormula implements TypedEmitter {
    * // clears the clipboard, isClipboardEmpty() should return true if called afterwards
    * hfInstance.clearClipboard();
    * ```
+   *
+   * The usage of the internal clipboard is described thoroughly in the [Clipboard Operations guide](../../guide/clipboard-operations.md).
    *
    * @category Clipboard
    */
