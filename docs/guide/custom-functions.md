@@ -10,7 +10,7 @@ Expand the function library of your application, by adding custom functions.
 As an example, let's create a function that returns the number of letters in the word "HyperFormula".
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.0.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.1.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: custom-functions"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

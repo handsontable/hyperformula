@@ -69,11 +69,11 @@ to be sure that both environments are fine.
 
 * `npm run test` - runs the linter and all tests
 * `npm run test:unit` - runs unit tests
-  * If you want to run a test suite that matches a word, you can add a Jest `-t` flag. For example: `npm run test:unit -- -t 'SUMIF'` runs only the tests that match the word `SUMIF` within `describe()` or `it()`.
-  * If you want to run a specific test suite, pass the file name. For example: `npm run test:unit 'function-sumif.spec.ts'` runs only the unit tests from the file `function-sumif.spec.ts`.
+  * To run a test suite that matches a word, add a Jest `-t` flag. For example: `npm run test:unit -- -t 'SUMIF'` runs only the tests that match the word `SUMIF` within `describe()` or `it()`.
+  * To run a specific test suite, pass the file name. For example: `npm run test:unit 'function-sumif.spec.ts'` runs only the unit tests from the file `function-sumif.spec.ts`.
 * `npm run test:coverage` - runs unit tests and generates code coverage
 * `npm run test:browser` - runs tests in **karma** once and closes all open browsers
-  * If you want to run a specific `spec` file or a test suite you can add a Karma `--spec` flag. For example: `npm run test:browser.debug -- --spec=matrix.spec.ts` runs `matrix.spec.ts` browser tests only
+  * To run a specific `spec` file or a test suite you can add a Karma `--spec` flag. For example: `npm run test:browser.debug -- --spec=matrix.spec.ts` runs `matrix.spec.ts` browser tests only
 * `npm run test:browser.debug` - runs test in **karma** only in Chrome until you exit the process. It watches changes in `src` and `test` directories and rebuilds them automatically.
 
 ## Run the linter

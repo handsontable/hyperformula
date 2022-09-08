@@ -1,6 +1,6 @@
 # Known limitations
 
-This page lists the known limitations of HyperFormula in its current development stage:
+This page lists the known limitations of HyperFormula at its current development stage:
 
 * Node.js versions older than 13 don't properly compare
 culture-insensitive strings. HyperFormula requires the full
@@ -29,7 +29,7 @@ you can't compare the arguments in a formula like this:
 
 ## Nuances of the implemented functions
 
-* We immediately instantiate references to single cells to their values instead of treating them as 1-length ranges, which slightly changes the behavior of some functions (e.g., NPV).
+* HyperFormula immediately instantiates references to single cells to their values, instead of treating them as 1-length ranges, which slightly changes the behavior of some functions (e.g., NPV).
 * SUBTOTAL function does not ignore nested subtotals.
 * CHISQ.INV, CHISQ.INV.RT, CHISQ.DIST.RT, CHIDIST, CHIINV and CHISQ.DIST (CHISQ.DIST in CDF mode): Running time grows linearly with the value of the second parameter, degrees_of_freedom (slow for values>1e7).
 * GAMMA.DIST, GAMMA.INV, GAMMADIST, GAMMAINV (GAMMA.DIST and GAMMADIST in CDF mode): Running time grows linearly with the value of the second parameter, alpha (slow for values>1e7). 
