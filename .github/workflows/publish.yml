@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feature/issue-1059
 
 jobs:
   publish-docs:
