@@ -150,14 +150,14 @@ describe('Events', () => {
     engine.on(Events.EvaluationResumed, handlerResumed)
 
     engine.suspendEvaluation()
-    expect(handlerUpdated).toHaveBeenCalledTimes(0)
+    expect(handlerUpdated).not.toHaveBeenCalled()
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
-    expect(handlerResumed).toHaveBeenCalledTimes(0)
+    expect(handlerResumed).not.toHaveBeenCalled()
 
     engine.setCellContents(adr('A1'), [['13']])
-    expect(handlerUpdated).toHaveBeenCalledTimes(0)
+    expect(handlerUpdated).not.toHaveBeenCalled()
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
-    expect(handlerResumed).toHaveBeenCalledTimes(0)
+    expect(handlerResumed).not.toHaveBeenCalled()
 
     engine.resumeEvaluation()
     expect(handlerUpdated).toHaveBeenCalledTimes(1)

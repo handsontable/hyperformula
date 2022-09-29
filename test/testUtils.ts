@@ -243,3 +243,14 @@ export function expectColumnIndexToMatchSheet(expected: Sheet, engine: HyperForm
   expectArrayWithSameContent(normalizeSheet(expected, dimensions), normalizeSheet(exportedColumnIndex, dimensions))
 }
 
+export function resetSpy(spy: jasmine.Spy | unknown): void {
+  try {
+    // eslint-disable-next-line
+    // @ts-ignore
+    spy.mockClear() // clears mock in Jest env
+  } catch {
+    // eslint-disable-next-line
+    // @ts-ignore
+    spy.calls.reset() // clears mock in Jasmine env
+  }
+}

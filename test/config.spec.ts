@@ -2,7 +2,7 @@ import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
 import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
-import {adr, unregisterAllLanguages} from './testUtils'
+import {adr, resetSpy, unregisterAllLanguages} from './testUtils'
 import {CellValueNoNumber} from '../src/Cell'
 
 describe('Config', () => {
@@ -323,15 +323,7 @@ describe('Config', () => {
     })
 
     afterEach(() => {
-      try {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.mockClear() // clears mock in Jest env
-      } catch {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.calls.reset() // clears mock in Jasmine env
-      }
+      resetSpy(console.warn)
     })
 
     it('should log usage of deprecated options when they are passed while engine initialization', () => {
@@ -358,20 +350,11 @@ describe('Config', () => {
       const config = new Config({
         binarySearchThreshold: 20,
       })
-
-      try {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.mockClear() // clears mock in Jest env
-      } catch {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.calls.reset() // clears mock in Jasmine env
-      }
+      resetSpy(console.warn)
 
       config.mergeConfig({})
 
-      expect(console.warn).toHaveBeenCalledTimes(0)
+      expect(console.warn).not.toHaveBeenCalled()
     })
   })
 })
