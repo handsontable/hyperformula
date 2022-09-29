@@ -381,8 +381,8 @@ describe('Copy - paste integration', () => {
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 0))
-    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(1, -1, 1))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 1, 0))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(-1, 1, 1))
   })
 
   it('sheet reference should stay "relative" to other sheet', () => {
@@ -394,7 +394,7 @@ describe('Copy - paste integration', () => {
     engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A1', 1))
 
-    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0))
+    expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 1))
   })
 
   it('should throw error when trying to paste beyond sheet size limit', () => {

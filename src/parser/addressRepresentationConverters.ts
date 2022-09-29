@@ -49,7 +49,7 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
   } else if (result[7] === ABSOLUTE_OPERATOR) {
     return CellAddress.absoluteRow(col - baseAddress.col, row, sheet)
   } else {
-    return CellAddress.relative(row - baseAddress.row, col - baseAddress.col, sheet)
+    return CellAddress.relative(col - baseAddress.col, row - baseAddress.row, sheet)
   }
 }
 
