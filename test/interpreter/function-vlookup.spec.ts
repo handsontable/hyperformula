@@ -127,6 +127,32 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A7'))).toEqual(null)
     })
 
+    it('should return the first matching value if RangeLookup = FALSE', () => {
+      const engine = builder([
+        ['1', 'a'],
+        ['2', 'b'],
+        ['2', 'c'],
+        ['2', 'd'],
+        ['2', 'e'],
+        ['=VLOOKUP(2, A1:B5, 2, FALSE())']
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+    })
+
+    it('should return the last matching value if RangeLookup = TRUE', () => {
+      const engine = builder([
+        ['1', 'a'],
+        ['2', 'b'],
+        ['2', 'c'],
+        ['2', 'd'],
+        ['2', 'e'],
+        ['=VLOOKUP(2, A1:B5, 2, TRUE())']
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('e')
+    })
+
     it('works with wildcards', () => {
       const engine = builder([
         ['abd', 'a'],
@@ -205,7 +231,18 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
-    it('should return lower bound for sorted values', () => {
+    it('should return the lower bound for sorted values', () => {
+      const engine = builder([
+        ['1', 'a'],
+        ['2', 'b'],
+        ['8', 'c'],
+        ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A4'))).toEqual('b')
+    })
+
+    it('should return the lower bound for sorted values if all are smaller than the search value', () => {
       const engine = builder([
         ['1', 'a'],
         ['2', 'b'],

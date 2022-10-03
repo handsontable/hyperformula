@@ -105,6 +105,26 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A3'))).toEqual('b')
     })
 
+    it('should return the first matching value if RangeLookup = FALSE', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '2', '2', '5'],
+        ['a', 'b', 'c', 'd', 'e'],
+        ['=HLOOKUP(2, A1:E2, 2, FALSE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqual('b')
+    })
+
+    it('should return the last matching value if RangeLookup = TRUE', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '2', '2', '5'],
+        ['a', 'b', 'c', 'd', 'e'],
+        ['=HLOOKUP(2, A1:E2, 2, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqual('d')
+    })
+
     it('works with wildcards', () => {
       const engine = HyperFormula.buildFromArray([
         ['abd', 1, 'aaaa', 'ddaa', 'abcd'],
@@ -155,7 +175,17 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A3'))).toEqual('d')
     })
 
-    it('should return lower bound for sorted values', () => {
+    it('should return the lower bound for sorted values', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '8'],
+        ['a', 'b', 'c'],
+        ['=HLOOKUP(4, A1:C2, 2, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqual('b')
+    })
+
+    it('should return the lower bound for sorted values if all are smaller than the search value', () => {
       const engine = HyperFormula.buildFromArray([
         ['1', '2', '3'],
         ['a', 'b', 'c'],
