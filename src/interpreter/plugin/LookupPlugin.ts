@@ -95,8 +95,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
-      return this.doMatch(zeroIfEmpty(key), rangeValue, sorted)
+    return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number) => {
+      return this.doMatch(zeroIfEmpty(key), rangeValue, type)
     })
   }
 
@@ -170,22 +170,17 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
-  private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number): InternalScalarValue {
+  private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number): InternalScalarValue {
     if (rangeValue.width() > 1 && rangeValue.height() > 1) {
       return new CellError(ErrorType.NA)
     }
-    if (rangeValue.width() === 1) {
-      const index = this.columnSearch.find(key, rangeValue, sorted !== 0)
-      if (index === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
-      }
-      return index + 1
-    } else {
-      const index = this.rowSearch.find(key, rangeValue, sorted !== 0)
-      if (index === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
-      }
-      return index + 1
+
+    const searchStrategy = rangeValue.width() === 1 ? this.columnSearch : this.rowSearch
+    const index = searchStrategy.find(key, rangeValue, type !== 0)
+
+    if (index === -1) {
+      return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
+    return index + 1
   }
 }

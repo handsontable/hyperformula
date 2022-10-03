@@ -299,18 +299,6 @@ describe('Function MATCH', () => {
         expect(engine.getCellValue(adr('A1'))).toEqual(2)
       })
 
-      it('assumes that the range is sorted ascending', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=MATCH(113, A2:A5, 1)'],
-          ['100'],
-          ['120'],
-          ['110'],
-          ['113'],
-        ])
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
-      })
-
       it('doesn\'t return result from outside the search range', () => {
         const engine = HyperFormula.buildFromArray([
           ['=MATCH(103, A3:A6, 1)'],
@@ -381,15 +369,6 @@ describe('Function MATCH', () => {
         expect(engine.getCellValue(adr('A1'))).toEqual(2)
       })
 
-      it('assumes that the range is sorted ascending', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=MATCH(113, A2:D2, 1)'],
-          ['100', '130', '110', '113'],
-        ])
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
-      })
-
       it('doesn\'t return result from outside the search range', () => {
         const engine = HyperFormula.buildFromArray([
           ['=MATCH(103, B2:E2, 1)'],
@@ -435,7 +414,7 @@ describe('Function MATCH', () => {
         ]
       )
       expect(engine.getCellValue(adr('C1'))).toEqual(2)
-      expect(engine.getCellValue(adr('C2'))).toEqual(3)
+      expect(engine.getCellValue(adr('C2'))).toEqual(2)
     })
 
     it('uses binsearch', () => {
@@ -534,18 +513,6 @@ describe('Function MATCH', () => {
         expect(engine.getCellValue(adr('A1'))).toEqual(2)
       })
 
-      it('assumes that the range is sorted ascending', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=MATCH(113, A2:A5, -1)'],
-          ['130'],
-          ['100'],
-          ['120'],
-          ['113'],
-        ])
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
-      })
-
       it('doesn\'t return result from outside the search range', () => {
         const engine = HyperFormula.buildFromArray([
           ['=MATCH(103, A3:A6, -1)'],
@@ -614,15 +581,6 @@ describe('Function MATCH', () => {
         ])
 
         expect(engine.getCellValue(adr('A1'))).toEqual(2)
-      })
-
-      it('assumes that the range is sorted ascending', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=MATCH(113, A2:D2, -1)'],
-          ['130', '100', '120', '113'],
-        ])
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
       })
 
       it('doesn\'t return result from outside the search range', () => {
