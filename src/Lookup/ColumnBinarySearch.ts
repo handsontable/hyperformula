@@ -8,7 +8,7 @@ import {Config} from '../Config'
 import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {rangeLowerBound} from '../interpreter/binarySearch'
+import {findInOrderedRange} from '../interpreter/findInOrderedRange'
 import {getRawValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {ColumnsSpan} from '../Span'
@@ -75,7 +75,7 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
         return arg === key
       })
     } else {
-      return rangeLowerBound(range, key, this.dependencyGraph, 'row')
+      return findInOrderedRange(key, range, { searchCoordinate: 'row', orderingDirection: 'asc' }, this.dependencyGraph)
     }
   }
 }

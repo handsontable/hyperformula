@@ -6,7 +6,7 @@
 import {Config} from '../Config'
 import {DependencyGraph} from '../DependencyGraph'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {rangeLowerBound} from '../interpreter/binarySearch'
+import {findInOrderedRange} from '../interpreter/findInOrderedRange'
 import {getRawValue, RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {AdvancedFind} from './AdvancedFind'
@@ -34,7 +34,7 @@ export class RowSearchStrategy extends AdvancedFind implements SearchStrategy {
         return arg === key
       })
     } else {
-      return rangeLowerBound(range, key, this.dependencyGraph, 'col')
+      return findInOrderedRange(key, range, { searchCoordinate: 'col', orderingDirection: 'asc' }, this.dependencyGraph)
     }
   }
 }

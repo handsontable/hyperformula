@@ -1,66 +1,69 @@
-import {compare, lowerBound} from '../../src/interpreter/binarySearch'
+import {compare, findLastMatchingIndex} from '../../src/interpreter/findInOrderedRange'
+import {RawInterpreterValue, RawNoErrorScalarValue} from '../../src/interpreter/InterpreterValue'
 
-describe('Binary search', () => {
-  const centerValueFn = (values: any[]) => (center: number) => values[center]
-
+describe('findLastMatchingIndex', () => {
+  function findInArray(searchKey: RawNoErrorScalarValue, array: RawInterpreterValue[]): number {
+    return findLastMatchingIndex(index => compare(searchKey, array[index]) >= 0, 0, array.length - 1)
+  }
+  
   it('should return -1 when empty array', () => {
     const values: number[] = []
-    expect(lowerBound(centerValueFn(values), 1, 0, values.length - 1)).toBe(-1)
+    expect(findInArray(1, values)).toBe(-1)
   })
 
   it('should work for one element', () => {
     const values: number[] = [1]
-    expect(lowerBound(centerValueFn(values), 1, 0, values.length - 1)).toBe(0)
+    expect(findInArray(1, values)).toBe(0)
   })
 
   it('should return -1 when all elements are greater', () => {
     const values: number[] = [3, 5, 10]
-    expect(lowerBound(centerValueFn(values), 1, 0, values.length - 1)).toBe(-1)
+    expect(findInArray(1, values)).toBe(-1)
   })
 
   it('should find index of element in values of odd length', () => {
     const values: number[] = [3, 5, 10]
-    expect(lowerBound(centerValueFn(values), 3, 0, values.length - 1)).toBe(0)
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(1)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(2)
+    expect(findInArray(3, values)).toBe(0)
+    expect(findInArray(5, values)).toBe(1)
+    expect(findInArray(10, values)).toBe(2)
   })
 
   it('should find index of element in values of even length', () => {
     const values: number[] = [3, 5, 10, 11]
-    expect(lowerBound(centerValueFn(values), 3, 0, values.length - 1)).toBe(0)
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(1)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(2)
-    expect(lowerBound(centerValueFn(values), 11, 0, values.length - 1)).toBe(3)
+    expect(findInArray(3, values)).toBe(0)
+    expect(findInArray(5, values)).toBe(1)
+    expect(findInArray(10, values)).toBe(2)
+    expect(findInArray(11, values)).toBe(3)
   })
 
   it('should find index of lower bound', () => {
     const values: number[] = [1, 2, 3, 7]
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(2)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(3)
+    expect(findInArray(5, values)).toBe(2)
+    expect(findInArray(10, values)).toBe(3)
   })
 
   it('should work for strings', () => {
     const values: string[] = ['aaaa', 'bar', 'foo', 'xyz']
-    expect(lowerBound(centerValueFn(values), 'foo', 0, values.length - 1)).toBe(2)
+    expect(findInArray('foo', values)).toBe(2)
   })
 
   it('should work for bools', () => {
     const values: boolean[] = [false, false, false, true, true]
-    expect(lowerBound(centerValueFn(values), true, 0, values.length - 1)).toBe(4)
+    expect(findInArray(true, values)).toBe(4)
   })
 
   it('should work for different types in array', () => {
     const values = [3, 5, 7, 'aaaa', 'bar', 'foo', false, false, true]
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(1)
-    expect(lowerBound(centerValueFn(values), 'foo', 0, values.length - 1)).toBe(5)
-    expect(lowerBound(centerValueFn(values), false, 0, values.length - 1)).toBe(7)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(2)
-    expect(lowerBound(centerValueFn(values), 'xyz', 0, values.length - 1)).toBe(5)
+    expect(findInArray(5, values)).toBe(1)
+    expect(findInArray('foo', values)).toBe(5)
+    expect(findInArray(false, values)).toBe(7)
+    expect(findInArray(10, values)).toBe(2)
+    expect(findInArray('xyz', values)).toBe(5)
   })
 
   it('should return the last occurence', () => {
     const values = [1, 2, 2, 2, 2, 2, 3, 3, 3]
-    expect(lowerBound(centerValueFn(values), 2, 0, values.length - 1)).toBe(5)
+    expect(findInArray(2, values)).toBe(5)
   })
 })
 
