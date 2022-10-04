@@ -277,13 +277,13 @@ const sharedExamples = (builder: (sheet: Sheet, config?: Partial<ConfigParams>) 
 
     it('should find value if index build during evaluation', () => {
       const engine = builder([
-        ['=A2', 'a'],
-        ['1', 'b'],
+        ['1', 'a'],
+        ['=A1', 'b'],
         ['2', 'c'],
         ['=VLOOKUP(1, A1:B3, 2, TRUE())'],
       ])
 
-      expect(engine.getCellValue(adr('A4'))).toEqual('a')
+      expect(engine.getCellValue(adr('A4'))).toEqual('b')
     })
 
     it('should properly calculate absolute row index', () => {

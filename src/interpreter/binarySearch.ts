@@ -30,8 +30,8 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarV
     centerValueFn = (center: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, center, range.start.row)))
   }
 
-  const pos = lowerBound(centerValueFn, key, start, end)
-  if (typeof centerValueFn(pos) !== typeof key) {
+  const pos = findLastInSortedRange(index => compare(key, centerValueFn(index)) >= 0, start, end)
+  if (centerValueFn(pos) === -1 || typeof centerValueFn(pos) !== typeof key) {
     return -1
   } else {
     return pos - start
@@ -39,32 +39,36 @@ export function rangeLowerBound(range: AbsoluteCellRange, key: RawNoErrorScalarV
 }
 
 /*
-* If key exists returns first index of key element
-* Otherwise returns first index of greatest element smaller than key
-* assuming sorted values
-* */
-export function lowerBound(value: (index: number) => RawInterpreterValue, key: RawNoErrorScalarValue, start: number, end: number): number {
-  while (start <= end) {
-    const center = Math.floor((start + end) / 2)
-    const cmp = compare(key, value(center))
-    if (cmp > 0) {
-      start = center + 1
-    } else if (cmp < 0) {
-      end = center - 1
-    } else if (start != center) {
-      end = center
+ * Returns:
+ *   - the last element in the range for which predicate === true or
+ *   - value -1 if predicate === false for all elements
+ * Assumption: All elements for which predicate === true are before the elements for which predicate === false.
+ */
+export function findLastInSortedRange(predicate: (index: number) => boolean, startRange: number, endRange: number): number {
+  let start = startRange
+  let end = endRange
+
+  while(start < end) {
+    const pivot = Math.ceil((start + end) / 2)
+
+    if (predicate(pivot)) {
+      start = pivot
     } else {
-      return center
+      end = pivot - 1
     }
   }
 
-  return end
+  if (start === end && predicate(start)) {
+    return start
+  }
+
+  return -1
 }
 
 /*
-* numbers < strings < false < true
-* */
-export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue): number {
+ * numbers < strings < false < true
+ */
+export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue): number { // why different types?
   if (typeof left === typeof right) {
     if (left === EmptyValue) {
       return 0

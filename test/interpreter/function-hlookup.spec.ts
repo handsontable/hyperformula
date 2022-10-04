@@ -217,12 +217,12 @@ describe('Function HLOOKUP', () => {
 
     it('should find value if index build during evaluation', () => {
       const engine = HyperFormula.buildFromArray([
-        ['=B1', '1', '2'],
+        ['1', '=A1', '2'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(1, A1:C2, 2, TRUE())'],
       ])
 
-      expect(engine.getCellValue(adr('A3'))).toEqual('a')
+      expect(engine.getCellValue(adr('A3'))).toEqual('b')
     })
 
     it('should properly calculate absolute row index', () => {

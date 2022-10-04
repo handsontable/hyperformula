@@ -46,21 +46,21 @@ describe('Binary search', () => {
 
   it('should work for bools', () => {
     const values: boolean[] = [false, false, false, true, true]
-    expect(lowerBound(centerValueFn(values), true, 0, values.length - 1)).toBe(3)
+    expect(lowerBound(centerValueFn(values), true, 0, values.length - 1)).toBe(4)
   })
 
   it('should work for different types in array', () => {
     const values = [3, 5, 7, 'aaaa', 'bar', 'foo', false, false, true]
     expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(1)
     expect(lowerBound(centerValueFn(values), 'foo', 0, values.length - 1)).toBe(5)
-    expect(lowerBound(centerValueFn(values), false, 0, values.length - 1)).toBe(6)
+    expect(lowerBound(centerValueFn(values), false, 0, values.length - 1)).toBe(7)
     expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(2)
     expect(lowerBound(centerValueFn(values), 'xyz', 0, values.length - 1)).toBe(5)
   })
 
-  it('should return first occurence', () => {
+  it('should return the last occurence', () => {
     const values = [1, 2, 2, 2, 2, 2, 3, 3, 3]
-    expect(lowerBound(centerValueFn(values), 2, 0, values.length - 1)).toBe(1)
+    expect(lowerBound(centerValueFn(values), 2, 0, values.length - 1)).toBe(5)
   })
 })
 
