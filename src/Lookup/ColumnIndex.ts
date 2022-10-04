@@ -24,6 +24,7 @@ import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnSearchStrategy} from './SearchStrategy'
+import {compare, findLastMatchingIndex} from '../interpreter/findInOrderedRange'
 
 type ColumnMap = Map<RawInterpreterValue, ValueIndex>
 
@@ -106,10 +107,15 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
   public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
+    function findInArray(searchKey: RawNoErrorScalarValue, array: RawInterpreterValue[]): number {
+      return findLastMatchingIndex(index => compare(searchKey, array[index]) >= 0, 0, array.length - 1)
+    }
+
     const range = rangeValue.range
     if (range === undefined) {
       return this.binarySearchStrategy.find(key, rangeValue, sorted)
     }
+
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -126,9 +132,18 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return this.binarySearchStrategy.find(key, rangeValue, sorted)
     }
 
-    const index = upperBound(valueIndex.index, range.start.row)
+    const index = sorted ? findInArray(range.end.row, valueIndex.index) : upperBound(valueIndex.index, range.start.row)
+    if (index === -1) {// Maybe?
+      return this.binarySearchStrategy.find(key, rangeValue, sorted)
+    }
+
     const rowNumber = valueIndex.index[index]
-    return rowNumber <= range.end.row ? rowNumber - range.start.row : this.binarySearchStrategy.find(key, rangeValue, sorted)
+
+    if (rowNumber >= range.start.row && rowNumber <= range.end.row ) {
+      return rowNumber - range.start.row
+    }
+
+    return this.binarySearchStrategy.find(key, rangeValue, sorted)
   }
 
   public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number {

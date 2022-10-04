@@ -336,14 +336,24 @@ describe('ColumnIndex#find', () => {
     expect(row).toBe(1)
   })
 
-  it('should find smallest row number for value', () => {
+  it('should find the smallest row number for value if sorted = false', () => {
+    const index = buildEmptyIndex(transformService, new Config(), stats)
+
+    index.add(1, adr('A4'))
+    index.add(1, adr('A10'))
+    const row = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A20')), undefined!), false)
+
+    expect(row).toBe(3)
+  })
+
+  it('should find the largest row number for value if sorted = true', () => {
     const index = buildEmptyIndex(transformService, new Config(), stats)
 
     index.add(1, adr('A4'))
     index.add(1, adr('A10'))
     const row = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A20')), undefined!), true)
 
-    expect(row).toBe(3)
+    expect(row).toBe(9)
   })
 })
 
