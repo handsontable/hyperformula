@@ -830,10 +830,13 @@ describe('Named expressions - named ranges', () => {
       ['3'],
     ])
 
-    engine.addNamedExpression('fooo', '=Sheet1!$A:Sheet1!$A')
-    engine.setCellContents(adr('B1'), [['=SUM(fooo)']])
+    engine.addNamedExpression('foo', '=Sheet1!$A:Sheet1!$A')
+    engine.addNamedExpression('bar', '=Sheet1!$A:$A')
+    engine.setCellContents(adr('B1'), [['=SUM(foo)']])
+    engine.setCellContents(adr('B2'), [['=SUM(bar)']])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
+    expect(engine.getCellValue(adr('B2'))).toEqual(4)
   })
 
   it('should recalculate when named range changes definition', () => {
