@@ -9,19 +9,21 @@ import {DependencyGraph} from '../DependencyGraph'
 import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
 
 /*
- * Searches for the searchKey in a sorted 1-D range
+ * Searches for the searchKey in a sorted 1-D range.
  *
  * Options:
- * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search
- * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range
+ * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search,
+ * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range.
  *
- * If orderingDirection === 'asc', searches for the lower bound for the searchKey value
- * If orderingDirection === 'asc', searches for the upper bound for the searchKey value
- * If the search range contains duplicates, returns the last matching value
+ * Semantics:
+ * - If orderingDirection === 'asc', searches for the lower bound for the searchKey value.
+ * - If orderingDirection === 'desc', searches for the upper bound for the searchKey value.
+ * - If the search range contains duplicates, returns the last matching value.
+ * - If no value in the range satisfies the above, returns -1.
  *
- * Note: this function does not normalize input strings
+ * Note: this function does not normalize input strings.
  */
-export function findInOrderedRange(
+export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
   range: AbsoluteCellRange,
   { searchCoordinate, orderingDirection }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc' },
@@ -49,9 +51,26 @@ export function findInOrderedRange(
 }
 
 /*
+ * Searches for the searchKey in a sorted array.
+ * Param orderingDirection must be set to either 'asc' or 'desc' to indicate the ordering direction of the array.
+ *
+ * Semantics:
+ * - If orderingDirection === 'asc', searches for the lower bound for the searchKey value.
+ * - If orderingDirection === 'desc', searches for the upper bound for the searchKey value.
+ * - If the array contains duplicates, returns the last matching value.
+ * - If no value in the range satisfies the above, returns -1.
+ */
+export function findLastOccurrenceInOrderedArray(searchKey: RawNoErrorScalarValue, array: RawInterpreterValue[], orderingDirection: 'asc' | 'desc' = 'asc'): number {
+  const predicate = orderingDirection === 'asc'
+    ? (index: number) => compare(searchKey, array[index]) >= 0
+    : (index: number) => -compare(searchKey, array[index]) >= 0
+  return findLastMatchingIndex(predicate, 0, array.length - 1)
+}
+
+/*
  * Returns:
- *   - the last element in the range for which predicate === true or
- *   - value -1 if predicate === false for all elements
+ *   - the last element in the range for which predicate === true or,
+ *   - value -1 if predicate === false for all elements.
  * Assumption: All elements for which predicate === true are before the elements for which predicate === false.
  */
 export function findLastMatchingIndex(predicate: (index: number) => boolean, startRange: number, endRange: number): number {
