@@ -165,7 +165,7 @@ describe('remove sheet - adjust formula dependencies', () => {
 
     const reference = extractReference(engine, adr('B1'))
 
-    expect(reference).toEqual(CellAddress.relative(0, -1))
+    expect(reference).toEqual(CellAddress.relative(-1, 0))
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['1', '=A1']]))
   })
 

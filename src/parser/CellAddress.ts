@@ -44,19 +44,18 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
   }
 
   public static fromColAndRow(col: ColumnAddress, row: RowAddress, sheet: number | undefined): CellAddress {
-    const factoryMethod = col.isColumnAbsolute() && row.isRowAbsolute()
+    const factoryMethod: (col: number, row: number, sheet?: number) => CellAddress = col.isColumnAbsolute() && row.isRowAbsolute()
       ? CellAddress.absolute.bind(this)
       : col.isColumnAbsolute()
         ? CellAddress.absoluteCol.bind(this)
         : row.isRowAbsolute()
           ? CellAddress.absoluteRow.bind(this)
-          // this is because `CellAddress.relative` expects arguments in a different order
-          : (col: number, row: number, sheet?: number) => CellAddress.relative(row, col, sheet)
+          : CellAddress.relative.bind(this)
 
     return factoryMethod(col.col, row.row, sheet)
   }
 
-  public static relative(row: number, col: number, sheet?: number) {
+  public static relative(col: number, row: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_RELATIVE, sheet)
   }
 

@@ -35,3 +35,4 @@ jobs:
           publish_dir: docs/.vuepress/dist
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
+          cname: hyperformula.handsontable.com # as in https://github.com/peaceiris/actions-gh-pages/blob/ba0b7df03e25ff29c924be8149041119e9421ea6/README.md#%EF%B8%8F-cname
