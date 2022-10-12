@@ -86,12 +86,12 @@ export const expectNoDuplicates = (array: any[]) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
-  expect(actual.length).toBe(expected.length)
-  for (const iter of expected) {
+export const expectArrayWithSameContent = (actualArray: any[], expectedArray: any[]) => {
+  expect(actualArray.length).toBe(expectedArray.length)
+  for (const expectedItem of expectedArray) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
-    expect(actual).toContainEqual(iter)
+    expect(actualArray).toContainEqual(expectedItem)
   }
 }
 
