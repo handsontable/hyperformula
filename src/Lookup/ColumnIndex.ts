@@ -23,7 +23,7 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
-import {ColumnSearchStrategy} from './SearchStrategy'
+import {ColumnSearchStrategy, SearchOptions} from './SearchStrategy'
 import {Maybe} from '../Maybe'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
@@ -48,7 +48,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     private readonly stats: Statistics,
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
-    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
+    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph)
   }
 
   public add(value: RawInterpreterValue, address: SimpleCellAddress) {
@@ -107,9 +107,12 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
-    const resultUsingColumnIndex = this.findUsingColumnIndex(key, rangeValue, sorted)
-    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(key, rangeValue, sorted)
+  /*
+   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
+   */
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, matchExactly }: SearchOptions): number {
+    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, matchExactly !== true) // TODO
+    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, matchExactly })
   }
 
   private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): Maybe<number> {

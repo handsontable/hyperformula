@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
-import {SearchStrategy} from '../../Lookup/SearchStrategy'
+import {SearchOptions, SearchStrategy} from '../../Lookup/SearchStrategy'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
@@ -45,7 +45,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       ]
     },
   }
-  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
+  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.dependencyGraph)
 
   /**
    * Corresponds to VLOOKUP(key, range, index, [sorted])
@@ -107,7 +107,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         range
       )
     } else {
-      return searchStrategy.find(key, range, sorted)
+      const searchOptions: SearchOptions = sorted ? { ordering: 'asc' } : { ordering: 'none', matchExactly: true }
+      return searchStrategy.find(key, range, searchOptions)
     }
   }
 
@@ -176,7 +177,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     const searchStrategy = rangeValue.width() === 1 ? this.columnSearch : this.rowSearch
-    const index = searchStrategy.find(key, rangeValue, type !== 0)
+    const searchOptions: SearchOptions = type === 0
+      ? { ordering: 'none', matchExactly: true }
+      : { ordering: type === -1 ? 'desc' : 'asc' }
+    const index = searchStrategy.find(key, rangeValue, searchOptions)
 
     if (index === -1) {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)

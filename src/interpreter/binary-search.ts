@@ -8,16 +8,19 @@ import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
 import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
 
+const NOT_FOUND = -1
+
 /*
  * Searches for the searchKey in a sorted 1-D range.
  *
  * Options:
  * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search,
- * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range.
+ * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range,
+ * - matchExactly - when set to false, searches for the lower/upper bound.
  *
  * Semantics:
- * - If orderingDirection === 'asc', searches for the lower bound for the searchKey value.
- * - If orderingDirection === 'desc', searches for the upper bound for the searchKey value.
+ * - If orderingDirection === 'asc', searches for the lower bound for the searchKey value (unless marchExactly === true).
+ * - If orderingDirection === 'desc', searches for the upper bound for the searchKey value (unless marchExactly === true).
  * - If the search range contains duplicates, returns the last matching value.
  * - If no value in the range satisfies the above, returns -1.
  *
@@ -26,7 +29,7 @@ import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} fro
 export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
   range: AbsoluteCellRange,
-  { searchCoordinate, orderingDirection }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc' },
+  { searchCoordinate, orderingDirection, matchExactly }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', matchExactly?: boolean },
   dependencyGraph: DependencyGraph,
 ): number {
   const start = range.start[searchCoordinate]
@@ -43,8 +46,12 @@ export function findLastOccurrenceInOrderedRange(
   const foundIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
   const foundValue = getValueFromIndexFn(foundIndex)
 
-  if (foundIndex === -1 || typeof foundValue !== typeof searchKey) {
-    return -1
+  if (foundIndex === NOT_FOUND || typeof foundValue !== typeof searchKey) {
+    return NOT_FOUND
+  }
+
+  if (matchExactly && foundValue !== searchKey) {
+    return NOT_FOUND
   }
 
   return foundIndex - start
@@ -91,7 +98,7 @@ export function findLastMatchingIndex(predicate: (index: number) => boolean, sta
     return start
   }
 
-  return -1
+  return NOT_FOUND
 }
 
 /*
