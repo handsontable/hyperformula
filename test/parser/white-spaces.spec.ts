@@ -59,7 +59,7 @@ describe('tokenizeFormula', () => {
     const tokens = lexer.tokenizeFormula('=PV(A1 ,   ,A2)').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
 
-    expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'ProcedureName', 'CellReference', 'ArrayColSep', 'WhiteSpace', 'ArgSeparator', 'CellReference', 'RParen'])
+    expect(tokenTypes).toEqual(['EqualsOp', 'ProcedureName', 'CellReference', 'ArrayColSep', 'WhiteSpace', 'ArrayColSep', 'CellReference', 'RParen'])
   })
 
   it('should treat space as whitespace', () => {

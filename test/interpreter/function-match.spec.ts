@@ -517,10 +517,10 @@ describe('Function MATCH', () => {
         const engine = HyperFormula.buildFromArray([
           ['=MATCH(103, A3:A6, -1)'],
           ['103', '103'],
-          ['200', '103'],
-          ['200', '103'],
-          ['200', '103'],
-          ['200', '103'],
+          ['100', '103'],
+          ['100', '103'],
+          ['100', '103'],
+          ['100', '103'],
           ['103', '103'],
         ])
 
@@ -586,7 +586,7 @@ describe('Function MATCH', () => {
       it('doesn\'t return result from outside the search range', () => {
         const engine = HyperFormula.buildFromArray([
           ['=MATCH(103, B2:E2, -1)'],
-          ['103', '200', '200', '200', '200', '103'],
+          ['103', '100', '100', '100', '100', '103'],
           ['103', '103', '103', '103', '103', '103'],
         ])
 

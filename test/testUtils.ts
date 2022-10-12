@@ -88,11 +88,8 @@ export const expectNoDuplicates = (array: any[]) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const expectArrayWithSameContent = (actualArray: any[], expectedArray: any[]) => {
   expect(actualArray.length).toBe(expectedArray.length)
-  for (const expectedItem of expectedArray) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    expect(actualArray).toContainEqual(expectedItem)
-  }
+  expectedArray.forEach(expectedItem => expect(actualArray).toContainEqual(expectedItem))
+  actualArray.forEach(actualItem => expect(expectedArray).toContainEqual(actualItem))
 }
 
 export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, expected: string, precision?: number) => {
