@@ -111,11 +111,12 @@ export class ColumnIndex implements ColumnSearchStrategy {
    * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
    */
   public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, matchExactly }: SearchOptions): number {
-    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, matchExactly !== true) // TODO
+    const handlingDuplicates = matchExactly === true ? 'findFirst' : 'findLast'
+    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, handlingDuplicates)
     return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, matchExactly })
   }
 
-  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): Maybe<number> {
+  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, handlingDuplicates: 'findFirst' | 'findLast'): Maybe<number> {
     const range = rangeValue.range
     if (range === undefined) {
       return undefined
@@ -134,7 +135,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return undefined
     }
 
-    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, sorted ? 'findLast' : 'findFirst')
+    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, handlingDuplicates)
     return rowNumber !== undefined ? rowNumber - range.start.row : undefined
   }
 
@@ -152,6 +153,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
     const rowNumber = valueIndex.index[positionInIndex]
     const isRowNumberBelongingToRange = rowNumber >= start && rowNumber <= end
+
     return isRowNumberBelongingToRange ? rowNumber : undefined
   }
 

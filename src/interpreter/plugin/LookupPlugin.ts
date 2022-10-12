@@ -172,6 +172,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number): InternalScalarValue {
+    if (![0, 1, -1].includes(type)) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+    }
+
     if (rangeValue.width() > 1 && rangeValue.height() > 1) {
       return new CellError(ErrorType.NA)
     }
