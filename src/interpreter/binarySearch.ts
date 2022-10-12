@@ -104,7 +104,7 @@ export function findLastMatchingIndex(predicate: (index: number) => boolean, sta
 /*
  * numbers < strings < false < true
  */
-export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue): number { // why different types?
+export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue): number {
   if (typeof left === typeof right) {
     if (left === EmptyValue) {
       return 0

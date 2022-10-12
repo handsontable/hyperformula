@@ -1,14 +1,14 @@
 import {deepStrictEqual} from 'assert'
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellError, ErrorType} from '../src/Cell'
+import {CellError, ErrorType} from '../src'
 import {Config} from '../src/Config'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {AddRowsTransformer} from '../src/dependencyTransformers/AddRowsTransformer'
 import {RemoveRowsTransformer} from '../src/dependencyTransformers/RemoveRowsTransformer'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {EmptyValue} from '../src/interpreter/InterpreterValue'
-import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from '../src'
 import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
 import {ColumnIndex} from '../src/Lookup/ColumnIndex'
 import {NamedExpressions} from '../src/NamedExpressions'
@@ -331,7 +331,7 @@ describe('ColumnIndex#find', () => {
     const index = buildEmptyIndex(transformService, new Config(), stats)
 
     index.add(1, adr('A2'))
-    const row = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A3')), undefined!),{ ordering: 'asc' })
+    const row = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A3')), undefined!), { ordering: 'asc' })
 
     expect(row).toBe(1)
   })
@@ -540,7 +540,7 @@ describe('ColumnIndex#removeRows', () => {
   })
 })
 
-describe('ColumnIndex - lazy cruds', () => {
+describe('ColumnIndex - lazy crud operations', () => {
   it('should add rows only in specific column after find', () => {
     const stats = new Statistics()
     const transformService = new LazilyTransformingAstService(stats)
@@ -629,7 +629,7 @@ describe('Arrays', () => {
     ], engine)
   })
 
-  it('shoud remove values when replacing array with parsing error', () => {
+  it('should remove values when replacing array with parsing error', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=-A1:B1'],
     ], {useArrayArithmetic: true, useColumnIndex: true})
