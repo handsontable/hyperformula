@@ -13,7 +13,7 @@ import {
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {SearchOptions} from './SearchStrategy'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {findLastOccurrenceInOrderedRange} from '../interpreter/binary-search'
+import {findLastOccurrenceInOrderedRange} from '../interpreter/binarySearch'
 
 export abstract class AdvancedFind {
   protected constructor(

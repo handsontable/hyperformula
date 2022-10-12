@@ -10,7 +10,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {ColumnsSpan} from '../Span'
-import {Statistics} from '../statistics/Statistics'
+import {Statistics} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 

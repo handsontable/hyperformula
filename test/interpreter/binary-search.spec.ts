@@ -1,4 +1,4 @@
-import {compare, findLastMatchingIndex, findLastOccurrenceInOrderedArray} from '../../src/interpreter/binary-search'
+import {compare, findLastMatchingIndex, findLastOccurrenceInOrderedArray} from '../../src/interpreter/binarySearch'
 import {RawInterpreterValue, RawNoErrorScalarValue} from '../../src/interpreter/InterpreterValue'
 
 describe('findLastMatchingIndex', () => {

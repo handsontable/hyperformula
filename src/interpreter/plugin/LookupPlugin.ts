@@ -75,7 +75,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to HLOOKUP(key, range, index, [sorted])
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
   public hlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
