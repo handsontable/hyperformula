@@ -1456,9 +1456,10 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Reorders columns of a sheet according to a permutation.
+   * Reorders columns of a sheet according to a permutation of 0-based indexes.
+   * Parameter `newColumnOrder` should have a form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`
    *
-   * Note that this method may trigger dependency graph recalculation.
+   * Note: This method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {number[]} newColumnOrder - permutation of columns
@@ -1473,29 +1474,14 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  [1, 2, 4],
-   *  [5]
+   *   ['A', 'B', 'C', 'D']
    * ]);
-   * // columns 0 and 2 swap places
    *
-   * // returns:
-   * // [{
-   * //   address: { sheet: 0, col: 2, row: 0 },
-   * //   newValue: 1,
-   * // },
-   * // {
-   * //   address: { sheet: 0, col: 2, row: 1 },
-   * //   newValue: 5,
-   * // },
-   * // {
-   * //   address: { sheet: 0, col: 0, row: 0 },
-   * //   newValue: 4,
-   * // },
-   * // {
-   * //   address: { sheet: 0, col: 0, row: 1 },
-   * //   newValue: null,
-   * // }]
-   * const changes = hfInstance.setColumnOrder(0, [2, 1, 0]);
+   * const newColumnOrder = [0, 3, 2, 1]; // [ newPosForA, newPosForB, newPosForC, newPosForD ]
+   *
+   * const changes = hfInstance.setColumnOrder(0, newColumnOrder);
+   *
+   * // Sheet after this operation: [['A', 'D', 'C', 'B']]
    * ```
    *
    * @category Columns

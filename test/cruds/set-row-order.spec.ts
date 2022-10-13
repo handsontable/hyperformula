@@ -7,7 +7,7 @@ describe('swapping rows - checking if it is possible', () => {
     expect(engine.isItPossibleToSwapRowIndexes(0, [[-1, 0]])).toEqual(false)
     expect(() =>
       engine.swapRowIndexes(0, [[-1, 0]])
-    ).toThrowError('Invalid arguments, expected row numbers to be non-negative integers and less than sheet height.')
+    ).toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 
   it('should validate sources for non-integer values', () => {
@@ -15,7 +15,7 @@ describe('swapping rows - checking if it is possible', () => {
     expect(engine.isItPossibleToSwapRowIndexes(0, [[1, 1], [0.5, 0]])).toEqual(false)
     expect(() =>
       engine.swapRowIndexes(0, [[1, 1], [0.5, 0]])
-    ).toThrowError('Invalid arguments, expected row numbers to be non-negative integers and less than sheet height.')
+    ).toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 
   it('should validate sources for values exceeding sheet height', () => {
@@ -23,7 +23,7 @@ describe('swapping rows - checking if it is possible', () => {
     expect(engine.isItPossibleToSwapRowIndexes(0, [[1, 1], [3, 0]])).toEqual(false)
     expect(() =>
       engine.swapRowIndexes(0, [[3, 0]])
-    ).toThrowError('Invalid arguments, expected row numbers to be non-negative integers and less than sheet height.')
+    ).toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 
   it('should validate sources to be unique', () => {
@@ -260,7 +260,7 @@ describe('reorder base case', () => {
     expect(engine.getSheetSerialized(0)).toEqual([[7, 8, 9], [1, 2, 3], [4, 5, 6]])
   })
 
-  it('should work for strings', () => {
+  it('should work with strings', () => {
     const hfInstance = HyperFormula.buildFromArray([
       ['A'],
       ['B'],
