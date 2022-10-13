@@ -48,8 +48,16 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('when MatchType is empty defaults to 1', () => {
-    // ...
+  it('when MatchType is empty defaults to 1 (returns lower bound)', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(113, A2:A5, 1)'],
+      ['100'],
+      ['110'],
+      ['120'],
+      ['130'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
   })
 
   describe('when MatchType = 0', () => {
@@ -417,7 +425,7 @@ describe('Function MATCH', () => {
       expect(engine.getCellValue(adr('C2'))).toEqual(2)
     })
 
-    it('uses binsearch', () => {
+    it('uses binary search', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
       resetSpy(spy)
@@ -631,7 +639,7 @@ describe('Function MATCH', () => {
       expect(engine.getCellValue(adr('C2'))).toEqual(2)
     })
 
-    it('uses binsearch', () => {
+    it('uses binary search', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const spy = spyOn(DependencyGraph.prototype as any, 'computeListOfValuesInRange')
       resetSpy(spy)
@@ -648,43 +656,6 @@ describe('Function MATCH', () => {
       expect(spy).not.toHaveBeenCalled()
     })
   })
-
-  // it('returns lower bound match for sorted data', () => {
-  //   const engine = HyperFormula.buildFromArray([
-  //     ['=MATCH(203, A2:A5, 1)'],
-  //     ['100'],
-  //     ['200'],
-  //     ['300'],
-  //     ['400'],
-  //     ['500'],
-  //   ])
-  //
-  //   expect(engine.getCellValue(adr('A1'))).toEqual(2)
-  // })
-
-  // it('should properly report no match', () => {
-  //   const engine = HyperFormula.buildFromArray([
-  //     ['=MATCH("0", A2:A5)'],
-  //     [1],
-  //     [2],
-  //     [3],
-  //     ['\'1'],
-  //   ])
-  //
-  //   expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
-  // })
-  //
-  // it('should properly report approximate match', () => {
-  //   const engine = HyperFormula.buildFromArray([
-  //     ['=MATCH("2", A2:A5)'],
-  //     [1],
-  //     [2],
-  //     [3],
-  //     ['\'1'],
-  //   ])
-  //
-  //   expect(engine.getCellValue(adr('A1'))).toEqual(4)
-  // })
 
   it('should coerce empty arg to 0', () => {
     const engine = HyperFormula.buildFromArray([
