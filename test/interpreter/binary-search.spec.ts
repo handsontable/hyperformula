@@ -1,5 +1,6 @@
-import {compare, findLastMatchingIndex, findLastOccurrenceInOrderedArray} from '../../src/interpreter/binarySearch'
-import {RawInterpreterValue, RawNoErrorScalarValue} from '../../src/interpreter/InterpreterValue'
+import {compare, findLastOccurrenceInOrderedArray} from '../../src/interpreter/binarySearch'
+import {EmptyValue} from '../../src/interpreter/InterpreterValue'
+import {CellError, ErrorType} from '../../src'
 
 describe('findLastOccurrenceInOrderedArray', () => {
   it('should return -1 when empty array', () => {
@@ -107,5 +108,15 @@ describe('compare', () => {
 
   it('string length', () => {
     expect(compare('a', 'aa')).toBe(-1)
+  })
+
+  it('empty value', () => {
+    expect(compare(EmptyValue, EmptyValue)).toBe(0)
+    expect(compare(EmptyValue, 'foo')).toBe(-1)
+    expect(compare('foo', EmptyValue)).toBe(1)
+  })
+
+  it('error', () => {
+    expect(compare('foo', new CellError(ErrorType.DIV_BY_ZERO))).toBe(0)
   })
 })
