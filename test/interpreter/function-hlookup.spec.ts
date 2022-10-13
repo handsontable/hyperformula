@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -69,6 +69,16 @@ describe('Function HLOOKUP', () => {
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
       expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
+    })
+
+    it('should return #VALUE error when the found value is a range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '3', '4', '5'],
+        ['a', '=D2:E2', 'c', 'd', 'e'],
+        ['=HLOOKUP(2, A1:E2, 2)']
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     })
 
     it('should propagate errors properly', () => {
@@ -241,7 +251,7 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(4)
     })
 
-    it('should calculate indexes properly when using naitve approach', () => {
+    it('should calculate indexes properly when using naive approach', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(4, E1:J1, 1, TRUE())', null, null, null, '1', '2', '3', '4', '5']
       ], {useColumnIndex: false})

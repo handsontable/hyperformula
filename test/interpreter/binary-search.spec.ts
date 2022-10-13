@@ -1,7 +1,7 @@
 import {compare, findLastMatchingIndex, findLastOccurrenceInOrderedArray} from '../../src/interpreter/binarySearch'
 import {RawInterpreterValue, RawNoErrorScalarValue} from '../../src/interpreter/InterpreterValue'
 
-describe('findLastMatchingIndex', () => {
+describe('findLastOccurrenceInOrderedArray', () => {
   it('should return -1 when empty array', () => {
     const values: number[] = []
     expect(findLastOccurrenceInOrderedArray(1, values)).toBe(-1)
@@ -60,6 +60,14 @@ describe('findLastMatchingIndex', () => {
   it('should return the last occurence', () => {
     const values = [1, 2, 2, 2, 2, 2, 3, 3, 3]
     expect(findLastOccurrenceInOrderedArray(2, values)).toBe(5)
+  })
+
+  it('should work for arrays ordered descending', () => {
+    const values: number[] = [11, 10, 5, 3]
+    expect(findLastOccurrenceInOrderedArray(3, values, 'desc')).toBe(3)
+    expect(findLastOccurrenceInOrderedArray(5, values, 'desc')).toBe(2)
+    expect(findLastOccurrenceInOrderedArray(10, values, 'desc')).toBe(1)
+    expect(findLastOccurrenceInOrderedArray(11, values, 'desc')).toBe(0)
   })
 })
 

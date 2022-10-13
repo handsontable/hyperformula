@@ -38,6 +38,18 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
   })
 
+  it('validates that 3rd argument is in [-1, 0, 1]', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(0, B1:B1, -2)'],
+      ['=MATCH(0, B1:B1, 0.5)'],
+      ['=MATCH(0, B1:B1, 100)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+  })
+
   it('should propagate errors properly', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(1/0, B1:B1)'],
@@ -50,7 +62,7 @@ describe('Function MATCH', () => {
 
   it('when MatchType is empty defaults to 1 (returns lower bound)', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=MATCH(113, A2:A5, 1)'],
+      ['=MATCH(113, A2:A5)'],
       ['100'],
       ['110'],
       ['120'],

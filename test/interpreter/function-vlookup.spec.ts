@@ -70,6 +70,19 @@ describe('ColumnIndex strategy', () => {
       expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     })
 
+    it('should return #VALUE error when the found value is a range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', 'a'],
+        ['2', '=A1:B1'],
+        ['3', 'c'],
+        ['4', 'd'],
+        ['5', 'e'],
+        ['=VLOOKUP(2, A1:B5, 2)'],
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    })
+
     it('should propagate errors properly', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VLOOKUP(1/0, B1:B1, 1)'],
