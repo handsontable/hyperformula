@@ -1297,7 +1297,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders rows of a sheet according to a permutation of 0-based indexes.
-   * Parameter `newRowOrder` should have a form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`
+   * Parameter `newRowOrder` should have a form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`.
+   * This method might be used to [sort the rows of a sheet](../../guide/sorting-data.md).
    *
    * Note: This method may trigger dependency graph recalculation.
    *
@@ -1457,7 +1458,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders columns of a sheet according to a permutation of 0-based indexes.
-   * Parameter `newColumnOrder` should have a form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`
+   * Parameter `newColumnOrder` should have a form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`.
+   * This method might be used to [sort the columns of a sheet](../../guide/sorting-data.md).
    *
    * Note: This method may trigger dependency graph recalculation.
    *
