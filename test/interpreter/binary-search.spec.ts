@@ -117,6 +117,6 @@ describe('compare', () => {
   })
 
   it('error', () => {
-    expect(compare('foo', new CellError(ErrorType.DIV_BY_ZERO))).toBe(0)
+    expect(compare('foo', new CellError(ErrorType.DIV_BY_ZERO))).toBe(-1)
   })
 })
