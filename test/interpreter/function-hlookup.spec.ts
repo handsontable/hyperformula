@@ -145,6 +145,16 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A3'))).toEqual('e')
     })
 
+    it('returns error when there is no matching value for the wildcard pattern', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['abd', 1, 'aaaa', 'ddaa', 'abbd'],
+        ['a', 'b', 'c', 'd', 'e'],
+        ['=HLOOKUP("*c*", A1:E2, 2, FALSE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
+
     it('on sorted data ignores wildcards', () => {
       const engine = HyperFormula.buildFromArray([
         ['abd', 1, '*c*', 'ddaa', 'abcd'],

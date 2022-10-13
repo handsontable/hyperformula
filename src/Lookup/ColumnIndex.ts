@@ -131,7 +131,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
     const normalizedKey = typeof key === 'string' ? forceNormalizeString(key) : key
     const valueIndexForTheKey = columnMap.get(normalizedKey)
-    if (!valueIndexForTheKey) {
+    if (!valueIndexForTheKey || !valueIndexForTheKey.index || valueIndexForTheKey.index.length === 0) {
       return undefined
     }
 

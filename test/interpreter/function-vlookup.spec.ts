@@ -286,6 +286,19 @@ describe('ColumnIndex strategy', () => {
       expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
+    it('should return #NA when searching in an empty range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', 'a'],
+        ['2', 'b'],
+        ['3', 'c'],
+        ['4', 'd'],
+        ['5', 'e'],
+        ['=VLOOKUP(42, X10:Y20, 2)'],
+      ], { useColumnIndex: true })
+
+      expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
+
     it('should find value if index build during evaluation', () => {
       const engine = HyperFormula.buildFromArray([
         ['1', 'a'],
@@ -514,6 +527,19 @@ describe('BinarySearchStrategy', () => {
       expect(engine.getCellValue(adr('A6'))).toEqual('e')
     })
 
+    it('returns error when there is no matching value for the wildcard pattern', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['abd', 'a'],
+        [1, 'b'],
+        ['aaaa', 'c'],
+        ['ddaa', 'd'],
+        ['abbd', 'e'],
+        ['=VLOOKUP("*c*", A1:B5, 2, FALSE())'],
+      ], { useColumnIndex: false })
+
+      expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
+
     it('on sorted data ignores wildcards', () => {
       const engine = HyperFormula.buildFromArray([
         ['abd', 'a'],
@@ -610,6 +636,19 @@ describe('BinarySearchStrategy', () => {
       ], { useColumnIndex: false })
 
       expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
+
+    it('should return #NA when searching in an empty range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', 'a'],
+        ['2', 'b'],
+        ['3', 'c'],
+        ['4', 'd'],
+        ['5', 'e'],
+        ['=VLOOKUP(42, X10:Y20, 2)'],
+      ], { useColumnIndex: false })
+
+      expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
     it('should return error when value not present using linear search', () => {
