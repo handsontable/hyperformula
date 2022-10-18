@@ -54,8 +54,8 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   }
 
   /*
- * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
- */
+   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
+   */
   public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchOptions: SearchOptions): number {
     return this.basicFind(searchKey, rangeValue, 'row', searchOptions)
   }
