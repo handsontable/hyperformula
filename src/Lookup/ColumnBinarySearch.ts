@@ -4,22 +4,16 @@
  */
 
 import {SimpleCellAddress} from '../Cell'
-import {Config} from '../Config'
 import {CellValueChange} from '../ContentChanges'
 import {DependencyGraph} from '../DependencyGraph'
-import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
-import {rangeLowerBound} from '../interpreter/binarySearch'
-import {getRawValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
+import {RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {ColumnsSpan} from '../Span'
 import {AdvancedFind} from './AdvancedFind'
-import {ColumnSearchStrategy} from './SearchStrategy'
+import {ColumnSearchStrategy, SearchOptions} from './SearchStrategy'
 
 export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStrategy {
-  constructor(
-    protected dependencyGraph: DependencyGraph,
-    private config: Config,
-  ) {
+  constructor(protected dependencyGraph: DependencyGraph) {
     super(dependencyGraph)
   }
 
@@ -59,23 +53,10 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {
   }
 
-  public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
-    if (typeof key === 'string') {
-      key = forceNormalizeString(key)
-    }
-    const range = rangeValue.range
-    if (range === undefined) {
-      return rangeValue.valuesFromTopLeftCorner().map(getRawValue).map(arg =>
-        (typeof arg === 'string') ? forceNormalizeString(arg) : arg
-      ).indexOf(key)
-    } else if (!sorted) {
-      return this.dependencyGraph.computeListOfValuesInRange(range).findIndex(arg => {
-        arg = getRawValue(arg)
-        arg = (typeof arg === 'string') ? forceNormalizeString(arg) : arg
-        return arg === key
-      })
-    } else {
-      return rangeLowerBound(range, key, this.dependencyGraph, 'row')
-    }
+  /*
+   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
+   */
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchOptions: SearchOptions): number {
+    return this.basicFind(searchKey, rangeValue, 'row', searchOptions)
   }
 }

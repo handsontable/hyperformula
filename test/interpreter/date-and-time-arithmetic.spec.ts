@@ -10,6 +10,14 @@ describe('Date arithmetic', () => {
     expect(engine.getCellValue(adr('C1'))).toBe(361)
   })
 
+  it('subtract two dates with custom date format', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['09/20/2022', '09/25/2022', '=B1-A1'],
+    ], { dateFormats: ['MM/DD/YYYY'] })
+
+    expect(engine.getCellValue(adr('C1'))).toBe(5)
+  })
+
   it('compare two dates', () => {
     const engine = HyperFormula.buildFromArray([
       ['02/02/2020', '02/06/2019', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1'],

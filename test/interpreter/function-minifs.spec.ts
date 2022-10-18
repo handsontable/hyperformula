@@ -236,18 +236,15 @@ describe('Function MINIFS - calcultions on more than one criteria', () => {
 })
 
 describe('Function MINIFS - cache recalculation after cruds', () => {
-  it('recalculates MINIFS if changes in summed range', () => {
+  it('recalculates MINIFS if changes in the first range', () => {
     const sheet = [['10', '10'], ['5', '6'], ['7', '8'], ['=MINIFS(A1:B1, A2:B2, ">=5", A3:B3, ">=7")']]
     const engine = HyperFormula.buildFromArray(sheet)
 
     const changes = engine.setCellContents(adr('A1'), [['1', '3']])
+    const newValues = changes.map(c => c.newValue)
 
     expect(engine.getCellValue(adr('A4'))).toEqual(1)
-    expect(changes.length).toEqual(3)
-    expectArrayWithSameContent(
-      changes.map((change) => change.newValue),
-      [1, 3, 4]
-    )
+    expectArrayWithSameContent(newValues, [1, 3, 1])
   })
 
   it('recalculates MINIFS if changes in one of the tested range', () => {

@@ -23,7 +23,9 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
-import {ColumnSearchStrategy} from './SearchStrategy'
+import {ColumnSearchStrategy, SearchOptions} from './SearchStrategy'
+import {Maybe} from '../Maybe'
+import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
 type ColumnMap = Map<RawInterpreterValue, ValueIndex>
 
@@ -46,7 +48,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     private readonly stats: Statistics,
   ) {
     this.transformingService = this.dependencyGraph.lazilyTransformingAstService
-    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph, config)
+    this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph)
   }
 
   public add(value: RawInterpreterValue, address: SimpleCellAddress) {
@@ -105,11 +107,21 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: boolean): number {
+  /*
+   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
+   */
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, matchExactly }: SearchOptions): number {
+    const handlingDuplicates = matchExactly === true ? 'findFirst' : 'findLast'
+    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, handlingDuplicates)
+    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, matchExactly })
+  }
+
+  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, handlingDuplicates: 'findFirst' | 'findLast'): Maybe<number> {
     const range = rangeValue.range
     if (range === undefined) {
-      return this.binarySearchStrategy.find(key, rangeValue, sorted)
+      return undefined
     }
+
     this.ensureRecentData(range.sheet, range.start.col, key)
 
     const columnMap = this.getColumnMap(range.sheet, range.start.col)
@@ -117,19 +129,34 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return -1
     }
 
-    if (typeof key === 'string') {
-      key = forceNormalizeString(key)
+    const normalizedKey = typeof key === 'string' ? forceNormalizeString(key) : key
+    const valueIndexForTheKey = columnMap.get(normalizedKey)
+    if (!valueIndexForTheKey || !valueIndexForTheKey.index || valueIndexForTheKey.index.length === 0) {
+      return undefined
     }
 
-    const valueIndex = columnMap.get(key)
-    if (!valueIndex) {
-      return this.binarySearchStrategy.find(key, rangeValue, sorted)
-    }
-
-    const index = upperBound(valueIndex.index, range.start.row)
-    const rowNumber = valueIndex.index[index]
-    return rowNumber <= range.end.row ? rowNumber - range.start.row : this.binarySearchStrategy.find(key, rangeValue, sorted)
+    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, handlingDuplicates)
+    return rowNumber !== undefined ? rowNumber - range.start.row : undefined
   }
+
+  private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, handlingDuplicates: 'findFirst' | 'findLast'): Maybe<number> {
+    const start = range.start.row
+    const end = range.end.row
+
+    const positionInIndex = handlingDuplicates === 'findFirst'
+      ? findInOrderedArray(start, valueIndex.index, 'upperBound')
+      : findInOrderedArray(end, valueIndex.index, 'lowerBound')
+
+    if (positionInIndex === -1) {
+      return undefined
+    }
+
+    const rowNumber = valueIndex.index[positionInIndex]
+    const isRowNumberBelongingToRange = rowNumber >= start && rowNumber <= end
+
+    return isRowNumberBelongingToRange ? rowNumber : undefined
+  }
+
 
   public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number {
     return this.binarySearchStrategy.advancedFind(keyMatcher, range)
@@ -211,7 +238,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
         value = forceNormalizeString(value)
       }
       const valueIndex = this.getValueIndex(address.sheet, address.col, value)
-      this.addValue(valueIndex, address.row)
+      ColumnIndex.addValue(valueIndex, address.row)
     })
   }
 
@@ -228,8 +255,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
         return
       }
 
-      const index = upperBound(valueIndex.index, address.row)
-      valueIndex.index.splice(index, 1)
+      const positionInIndex = findInOrderedArray(address.row, valueIndex.index)
+      if (positionInIndex > -1) {
+        valueIndex.index.splice(positionInIndex, 1)
+      }
 
       if (valueIndex.index.length === 0) {
         columnMap.delete(value)
@@ -243,52 +272,53 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
   private addRows(col: number, rowsSpan: RowsSpan, value: RawInterpreterValue) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
-    this.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
+    ColumnIndex.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
   }
 
   private removeRows(col: number, rowsSpan: RowsSpan, value: RawInterpreterValue) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
-    this.removeRowsFromValues(valueIndex, rowsSpan)
-    this.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
+    ColumnIndex.removeRowsFromValues(valueIndex, rowsSpan)
+    ColumnIndex.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
   }
 
-  private addValue(valueIndex: ValueIndex, rowNumber: number): void {
-    const rowIndex = lowerBound(valueIndex.index, rowNumber)
-    const value = valueIndex.index[rowIndex]
-    if (value === rowNumber) {
-      /* do not add same row twice */
-      return
-    }
+  private static addValue(valueIndex: ValueIndex, rowNumber: number): void {
+    const rowIndex = findInOrderedArray(rowNumber, valueIndex.index, 'lowerBound')
+    const isRowNumberAlreadyInIndex = valueIndex.index[rowIndex] === rowNumber
 
-    if (rowIndex === valueIndex.index.length - 1) {
-      valueIndex.index.push(rowNumber)
-    } else {
+    if (!isRowNumberAlreadyInIndex) {
       valueIndex.index.splice(rowIndex + 1, 0, rowNumber)
     }
   }
 
-  private removeRowsFromValues(rows: ValueIndex, rowsSpan: RowsSpan) {
-    const start = upperBound(rows.index, rowsSpan.rowStart)
-    const end = lowerBound(rows.index, rowsSpan.rowEnd)
-    if (rows.index[start] <= rowsSpan.rowEnd) {
-      rows.index.splice(start, end - start + 1)
+  private static removeRowsFromValues(valueIndex: ValueIndex, rowsSpan: RowsSpan) {
+    const start = findInOrderedArray(rowsSpan.rowStart, valueIndex.index, 'upperBound')
+    const end = findInOrderedArray(rowsSpan.rowEnd, valueIndex.index, 'lowerBound')
+    const isFoundSpanValid = start > -1 && end > -1 && start <= end && valueIndex.index[start] <= rowsSpan.rowEnd
+
+    if (isFoundSpanValid) {
+      valueIndex.index.splice(start, end - start + 1)
     }
   }
 
-  private shiftRows(rows: ValueIndex, afterRow: number, numberOfRows: number) {
-    const index = upperBound(rows.index, afterRow)
-    for (let i = index; i < rows.index.length; ++i) {
-      rows.index[i] += numberOfRows
+  private static shiftRows(valueIndex: ValueIndex, afterRow: number, numberOfRows: number) {
+    const positionInIndex = findInOrderedArray(afterRow, valueIndex.index, 'upperBound')
+    if (positionInIndex === -1) {
+      return
+    }
+
+    for (let i = positionInIndex; i < valueIndex.index.length; ++i) {
+      valueIndex.index[i] += numberOfRows
     }
   }
 }
 
 /*
-* If key exists returns index of key
-* Otherwise returns index of smallest element greater than key
-* assuming sorted array and no repetitions
-* */
-export function upperBound(values: number[], key: number): number {
+ * Returns:
+ * - index of the key, if the key exists in the array,
+ * - index of the lower/upper bound (depending on handlingMisses parameter) otherwise.
+ * Assumption: The array is ordered ascending and contains no repetitions.
+ */
+export function findInOrderedArray(key: number, values: number[], handlingMisses: 'lowerBound' | 'upperBound' = 'upperBound'): number {
   let start = 0
   let end = values.length - 1
 
@@ -303,28 +333,7 @@ export function upperBound(values: number[], key: number): number {
     }
   }
 
-  return start
-}
-
-/*
-* If key exists returns index of key
-* Otherwise returns index of greatest element smaller than key
-* assuming sorted array and no repetitions
-* */
-export function lowerBound(values: number[], key: number): number {
-  let start = 0
-  let end = values.length - 1
-
-  while (start <= end) {
-    const center = Math.floor((start + end) / 2)
-    if (key > values[center]) {
-      start = center + 1
-    } else if (key < values[center]) {
-      end = center - 1
-    } else {
-      return center
-    }
-  }
-
-  return end
+  const foundIndex = handlingMisses === 'lowerBound' ? end : start
+  const isIndexInRange = foundIndex >= 0 && foundIndex <= values.length
+  return isIndexInRange ? foundIndex : -1
 }

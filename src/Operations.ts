@@ -892,7 +892,7 @@ export class Operations {
   }
 
   private allocateNamedExpressionAddressSpace() {
-    this.dependencyGraph.addressMapping.addSheet(-1, new SparseStrategy(0, 0))
+    this.dependencyGraph.addressMapping.addSheet(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, new SparseStrategy(0, 0))
   }
 
   private copyOrFetchGlobalNamedExpressionVertex(expressionName: string, sourceVertex: CellVertex, addedNamedExpressions: string[]): CellVertex {
