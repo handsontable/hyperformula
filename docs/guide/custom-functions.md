@@ -327,7 +327,7 @@ Before using a translated function name, remember to [register and set the langu
 
 If you want your custom function to return an error, check the [API reference](../api) for the HyperFormula [error types](types-of-errors.md).
 
-:::tip
+::: tip
 All HyperFormula [error types](types-of-errors.md) support optional custom error messages. Put them to good use: let your users know what caused the error and how to avoid it in the future.
 :::
 
