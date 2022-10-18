@@ -154,7 +154,11 @@ describe('i18n', () => {
       expect(engineUS.getCellValue(adr('A1'))).toBe(42)
     })
 
-    it('should has the same translations as "enGB"', () => {
+    it('should langCode = "enGU"', () => {
+      expect(enUS.langCode).toEqual('enUS')
+    })
+
+    it('should have the same translations as "enGB"', () => {
       const allFunctions = Object.keys(enGB.functions)
       const areAllTranslationsTheSame = allFunctions.every(key => enGB.functions[key] === enUS.functions[key])
 
