@@ -17,7 +17,7 @@ Still, with the right configuration, you can achieve nearly full compatibility.
 
 ### String comparison rules
 
-In Microsoft Excel, by default, [string comparison](types-of-operators.md#comparing-strings) is accent-sensitive and case-insensitive.
+In US version of Microsoft Excel, by default, [string comparison](types-of-operators.md#comparing-strings) is accent-sensitive and case-insensitive.
 
 To set up HyperFormula in the same way, use this configuration:
 
@@ -25,7 +25,7 @@ To set up HyperFormula in the same way, use this configuration:
 caseSensitive: false, // set by default
 accentSensitive: true,
 ignorePunctuation: false, // set by default
-localeLang: 'en', // set by default
+localeLang: 'en-US',
 ```
 
 Related options:
@@ -154,7 +154,7 @@ You can also add custom date and time formats by using these API methods:
 
 ## Full configuration
 
-This configuration aligns HyperFormula with the the default behavior of Microsoft Excel (set to locale `en-US`), as closely as possible at this development stage (version `{{ $page.version }}`).
+This configuration aligns HyperFormula with the default behavior of Microsoft Excel (set to locale `en-US`), as closely as possible at this development stage (version `{{ $page.version }}`).
 
 ```js
 // define options
@@ -170,7 +170,7 @@ const options = {
   caseSensitive: false, // set by default
   accentSensitive: true,
   ignorePunctuation: false, // set by default
-  localeLang: 'en', // set by default
+  localeLang: 'en-US',
   useWildcards: true, // set by default
   useRegularExpressions: false, // set by default
   matchWholeCell: true, // set by default
