@@ -154,7 +154,7 @@ describe('i18n', () => {
       expect(engineUS.getCellValue(adr('A1'))).toBe(42)
     })
 
-    it('should langCode = "enGU"', () => {
+    it('should langCode = "enUS"', () => {
       expect(enUS.langCode).toEqual('enUS')
     })
 

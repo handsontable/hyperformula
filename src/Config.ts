@@ -387,6 +387,21 @@ export interface ConfigParams {
    * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc. (seconds)
    *
    * The number of decimal places in the seconds token does not matter. All versions of the seconds token are equivalent in the context of parsing time values.
+   * Regardless of the time format specified, the hours-minutes-seconds value may be followed by the AM/PM designator.
+   *
+   * @example
+   * E.g. for `timeFormats = ['hh:mm:ss']`, valid time strings include:
+   * - `1:33:33`
+   * - `1:33:33.3`
+   * - `1:33:33.33`
+   * - `1:33:33.333`
+   * - `01:33:33`
+   * - `1:33:33 AM`
+   * - `1:33:33 PM`
+   * - `1:33:33 am`
+   * - `1:33:33 pm`
+   * - `1:33:33AM`
+   * - `1:33:33PM`
    *
    * @default ['hh:mm', 'hh:mm:ss.sss']
    *
