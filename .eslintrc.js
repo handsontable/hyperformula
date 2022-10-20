@@ -4,6 +4,7 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'license-header',
+    'jsdoc',
   ],
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -67,6 +68,17 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/interface-name-prefix': 'warn',
+
+    "jsdoc/require-jsdoc": ['error', {
+      require: {
+        ArrowFunctionExpression: true,
+        ClassDeclaration: true,
+        ClassExpression: true,
+        FunctionDeclaration: true,
+        FunctionExpression: true,
+        MethodDefinition: true,
+      }
+    }],
   },
   overrides: [
     {
