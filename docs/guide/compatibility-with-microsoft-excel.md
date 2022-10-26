@@ -17,7 +17,7 @@ Still, with the right configuration, you can achieve nearly full compatibility.
 
 ### String comparison rules
 
-In US version of Microsoft Excel, by default, [string comparison](types-of-operators.md#comparing-strings) is accent-sensitive and case-insensitive.
+In the US version of Microsoft Excel, by default, [string comparison](types-of-operators.md#comparing-strings) is accent-sensitive and case-insensitive.
 
 To set up HyperFormula in the same way, use this configuration:
 
@@ -151,6 +151,8 @@ You can also add custom date and time formats by using these API methods:
 - [`parseDateTime()`](../api/interfaces/configparams.md#parsedatetime)
 - [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime)
 - [`stringifyDuration()`](../api/interfaces/configparams.md#stringifyduration)
+
+// TODO: link to date-and-time guide
 
 ## Full configuration
 

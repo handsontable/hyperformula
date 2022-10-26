@@ -1,7 +1,7 @@
 # Localizing functions
 
 You can localize a function's ID and error
-messages. Currently, the library supports 16 languages with English
+messages. Currently, the library supports 17 languages with English
 as the default.
 
 To change the default language all you need to do is to import and
@@ -86,24 +86,25 @@ const translations = {
 ```
 
 ### List of supported languages
-| Language name | Language code |
-| :--- | :--- |
-| English | enGB |
-| Czech | csCZ |
-| Danish | daDK |
-| Dutch | nlNL |
-| Finnish | fiFI |
-| French | frFR |
-| German | deDE |
-| Hungarian | huHU |
-| Italian | itIT |
-| Norwegian | nbNO |
-| Polish | plPL |
-| Portuguese | ptPT |
-| Russian | ruRU |
-| Spanish | esES |
-| Swedish | svSE |
-| Turkish | trTR |
+| Language name    | Language code |
+|:-----------------|:--------------|
+| British English  | enGB          |
+| American English | enUS          |
+| Czech            | csCZ          |
+| Danish           | daDK          |
+| Dutch            | nlNL          |
+| Finnish          | fiFI          |
+| French           | frFR          |
+| German           | deDE          |
+| Hungarian        | huHU          |
+| Italian          | itIT          |
+| Norwegian        | nbNO          |
+| Polish           | plPL          |
+| Portuguese       | ptPT          |
+| Russian          | ruRU          |
+| Spanish          | esES          |
+| Swedish          | svSE          |
+| Turkish          | trTR          |
 
 ## Demo
 
@@ -112,5 +113,5 @@ const translations = {
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: localizing-functions"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>
