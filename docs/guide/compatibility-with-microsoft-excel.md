@@ -135,24 +135,15 @@ Related options:
 
 ### Date and time formats
 
-In Microsoft Excel, date and time formats depend on your configured locale, whereas in HyperFormula, you set up date and time formats through these options:
+In Microsoft Excel, date and time formats depend on your configured locale, whereas in HyperFormula you can [set them up freely](i18n-overview.md#date-and-time-formats).
+
+Options related to date and time formats:
 - [`dateFormats`](../api/interfaces/configparams.md#dateformats)
 - [`timeFormats`](../api/interfaces/configparams.md#timeformats)
 - [`nullYear`](../api/interfaces/configparams.md#nullyear)
-
-To set up HyperFormula in the same way as Excel's `en-US` locale, use this configuration:
-
-```js
-dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-```
-
-You can also add custom date and time formats by using these API methods:
 - [`parseDateTime()`](../api/interfaces/configparams.md#parsedatetime)
 - [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime)
 - [`stringifyDuration()`](../api/interfaces/configparams.md#stringifyduration)
-
-// TODO: link to date-and-time guide
 
 ## Full configuration
 
