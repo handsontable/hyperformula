@@ -1,10 +1,10 @@
 # Localizing functions
 
 You can localize a function's ID and error
-messages. Currently, the library supports 17 languages with English
+messages. Currently, the library supports 17 languages with British English
 as the default.
 
-To change the default language all you need to do is to import and
+To change the language all you need to do is import and
 register the language like so:
 
 ```javascript
@@ -33,10 +33,10 @@ const options = {
 };
 ```
 
-Language pack names should be passed as a string. They follow a
+Language pack names should be passed as strings. They follow a
 naming convention that incorporates two standards: ISO-639 and
 ISO-3166-1. The pattern is `languageCOUNTRY`, for
-example `nbNO`, `frFR`, `enGB` etc.
+example `enUS`, `enGB`, `frFR`,  etc.
 
 You can freely use the localized names: `SUM` can be written as
 `SOMME` and the functionality of the function will remain the same.
@@ -76,13 +76,16 @@ different languages too. You need to define the translations and register the co
 
 ```javascript
 const translations = {
-    'enGB': {
-      'HYPER': 'HYPER'
-    },
-    'plPL': {
-      'HYPER': 'HAJPER'
-    }
+  'enGB': {
+    'HYPER': 'HYPER'
+  },
+  'enUS': {
+    'HYPER': 'HYPER'
+  },
+  'plPL': {
+    'HYPER': 'HAJPER'
   }
+}
 ```
 
 ### List of supported languages
