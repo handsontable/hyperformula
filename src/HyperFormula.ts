@@ -348,7 +348,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Registers language from under given code string.
+   * Registers language under given code string.
+   *
+   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
    *
    * @param {string} languageCode - code string of the translation package
    * @param {RawTranslationPackage} languagePackage - translation package to be registered
@@ -360,8 +362,8 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * // return registered language
-   * HyperFormula.registerLanguage('plPL', plPL);
-   * const engine = HyperFormula.buildEmpty({language: 'plPL'});
+   * HyperFormula.registerLanguage('enUS', enUS);
+   * const engine = HyperFormula.buildEmpty({language: 'enUS'});
    * ```
    *
    * @category Static Methods

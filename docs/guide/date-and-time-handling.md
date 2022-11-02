@@ -1,9 +1,9 @@
 # Date and time handling
 
 The formats for the default date and time parsing functions can be set using configuration options:
-- [dateFormats](../api/interfaces/configparams.md#dateformats),
-- [timeFormats](../api/interfaces/configparams.md#timeformats),
-- [nullYear](../api/interfaces/configparams.md#nullyear).
+- [`dateFormats`](../api/interfaces/configparams.md#dateformats),
+- [`timeFormats`](../api/interfaces/configparams.md#timeformats),
+- [`nullYear`](../api/interfaces/configparams.md#nullyear).
 
 
 ## Example
