@@ -117,7 +117,7 @@ export class CountHF extends FunctionPlugin {
 
 Register your function plugin (and its translations) so that HyperFormula can recognize it.
 
-Use the `registerFunctionPlugin()` method:
+Use the [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin) method:
 
 ```javascript
 HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
