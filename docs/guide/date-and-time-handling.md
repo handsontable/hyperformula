@@ -6,14 +6,14 @@ The formats for the default date and time parsing functions can be set using con
 - [nullYear](../api/interfaces/configparams.md#nullyear).
 
 
-## Example with Chinese
+## Example
 
 ```javascript
 const options = {
-    // add popular date format used in China
-    dateFormats: ['yyyy-M-d', 'MM/DD/YYYY', 'MM/DD/YY'],
+    // add popular date formats used in USA
+    dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
     // add a custom time format
-    timeFormats: ['hh:mm:ss', 'hh:mm', 'hh:mm:ss.sss'],
+    timeFormats: ['hh:mm', 'hh:mm:ss', 'hh:mm:ss.sss'],
 };
 ```
 
@@ -23,25 +23,25 @@ HyperFormula offers the possibility to extend the number of supported
 date/time formats as well as the behavior of this functionality by exposing
 three options:
 
-- [parseDateTime](../api/interfaces/configparams.md#parsedatetime), which allows to provide a function that accepts
+- [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime), which allows to provide a function that accepts
 a string representing date/time and parses it into an actual date/time format
-- [stringifyDateTime](../api/interfaces/configparams.md#stringifydatetime), which allows to provide a function that
+- [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime), which allows to provide a function that
 takes the date/time and prints it as a string
-- [stringifyDuration](../api/interfaces/configparams.md#stringifyduration), which allows to provide a function that
+- [`stringifyDuration`](../api/interfaces/configparams.md#stringifyduration), which allows to provide a function that
 takes time duration and prints it as a string
 
 To extend the number of possible date formats, you will need to
-configure `parseDateTime` . This functionality is based on callbacks,
+configure [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime) . This functionality is based on callbacks,
 and you can customize the formats by integrating a third-party
 library like [Moment.js](https://momentjs.com/), or by writing your
-own custom function that returns a [DateTime](../api/globals.md#datetime) object.
+own custom function that returns a [`DateTime`](../api/globals.md#datetime) object.
 
 The configuration of date formats and stringify options may impact some built-in functions.
-For instance, VALUE transforms strings
-into numbers, which means it uses `parseDatetime`. TEXT
+For instance, `VALUE` function transforms strings
+into numbers, which means it uses [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime). `TEXT` function
 works the other way round - it accepts a number and returns a string,
 so it uses `stringifyDateTime`. Any change here might give you
-different results. Criteria-based functions (SUMIF, AVERAGEIF, etc.) perform comparisons, so they also need to
+different results. Criteria-based functions (`SUMIF`, `AVERAGEIF`, etc.) perform comparisons, so they also need to
 work on strings, dates, etc.
 
 ## Moment.js integration
