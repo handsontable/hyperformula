@@ -152,18 +152,22 @@ This configuration aligns HyperFormula with the default behavior of Microsoft Ex
 ```js
 // define options
 const options = {
+  // locale-dependent options  
+  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
+  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+  currencySymbol: ['$', 'USD'],
+  localeLang: 'en-US',
   functionArgSeparator: ',', // set by default
   decimalSeparator: '.', // set by default
   thousandSeparator: '', // set by default
   arrayColumnSeparator: ',', // set by default
   arrayRowSeparator: ';', // set by default
-  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+
+  // locale-independent options
   nullYear: 30, // set by default
   caseSensitive: false, // set by default
   accentSensitive: true,
   ignorePunctuation: false, // set by default
-  localeLang: 'en-US',
   useWildcards: true, // set by default
   useRegularExpressions: false, // set by default
   matchWholeCell: true, // set by default

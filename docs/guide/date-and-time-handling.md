@@ -10,7 +10,7 @@ The formats for the default date and time parsing functions can be set using con
 
 ```javascript
 const options = {
-    // add popular date formats used in USA
+    // add popular date formats used in the USA
     dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
     // add a custom time format
     timeFormats: ['hh:mm', 'hh:mm:ss', 'hh:mm:ss.sss'],

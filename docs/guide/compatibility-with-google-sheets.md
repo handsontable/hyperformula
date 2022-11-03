@@ -65,39 +65,36 @@ Related options:
 
 ### Date and time formats
 
-In Google Sheets, date and time formats depend on your configured locale, whereas in HyperFormula, you set up date and time formats through these options:
+In Google Sheets, date and time formats depend on your configured locale, whereas in HyperFormula you can [set them up freely](i18n-overview.md#date-and-time-formats).
+
+Options related to date and time formats:
 - [`dateFormats`](../api/interfaces/configparams.md#dateformats)
 - [`timeFormats`](../api/interfaces/configparams.md#timeformats)
 - [`nullYear`](../api/interfaces/configparams.md#nullyear)
-
-To set up HyperFormula in the same way as Google Sheet's `en-US` locale, use this configuration:
-
-```js
-dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-```
-
-You can also add custom date and time formats by using these API methods:
 - [`parseDateTime()`](../api/interfaces/configparams.md#parsedatetime)
 - [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime)
 - [`stringifyDuration()`](../api/interfaces/configparams.md#stringifyduration)
 
 ## Full configuration
 
-This configuration aligns HyperFormula with the the default behavior of Google Sheets (set to locale `en-US`), as closely as possible at this development stage (version `{{ $page.version }}`).
+This configuration aligns HyperFormula with the default behavior of Google Sheets (set to locale `en-US`), as closely as possible at this development stage (version `{{ $page.version }}`).
 
 ```js
 // define options
 const options = {
+  // locale-dependent options  
+  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
+  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+  currencySymbol: ['$', 'USD'],
+  localeLang: 'en-US',
   functionArgSeparator: ',', // set by default
   decimalSeparator: '.', // set by default
   thousandSeparator: '', // set by default
   arrayColumnSeparator: ',', // set by default
   arrayRowSeparator: ';', // set by default
-  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+
+  // locale-independent options
   nullYear: 30, // set by default
-  localeLang: 'en', // set by default
   useArrayArithmetic: true,
   leapYear1900: false, // set by default
   smartRounding: true, // set by default
