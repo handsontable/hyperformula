@@ -16,6 +16,7 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:jsdoc/recommended',
   ],
   rules: {
     // Automatic fixers
@@ -69,7 +70,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/interface-name-prefix': 'warn',
 
-    "jsdoc/require-jsdoc": ['error', {
+    "jsdoc/require-jsdoc": ['warn', {
       require: {
         ArrowFunctionExpression: true,
         ClassDeclaration: true,
