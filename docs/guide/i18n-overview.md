@@ -112,7 +112,6 @@ const options = {
 
 This demo presents the configuration of HyperFormula for `en-US` locale.
 
-// TODO link to the new demo
 <iframe
   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/feature/issue-1025/i18n?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
