@@ -24,6 +24,15 @@ describe('Function EOMONTH', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
+  it('should return a raw number', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2019, 7, 31)'],
+      ['=EOMONTH(A1, 1)'],
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_RAW)
+  })
+
   it('works for 0', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2019, 3, 10)'],
@@ -31,7 +40,6 @@ describe('Function EOMONTH', () => {
     ])
 
     expectToHaveDate(engine, adr('A2'), '31/03/2019')
-    expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 
   it('works for exact end of month', () => {

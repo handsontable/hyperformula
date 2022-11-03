@@ -60,7 +60,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
       method: 'month',
       parameters: [
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-      ]
+      ],
     },
     'YEAR': {
       method: 'year',
@@ -91,7 +91,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
       parameters: [
         {argumentType: ArgumentTypes.NUMBER},
         {argumentType: ArgumentTypes.STRING},
-      ]
+      ],
     },
     'EOMONTH': {
       method: 'eomonth',
@@ -99,7 +99,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER},
       ],
-      returnNumberType: NumberType.NUMBER_DATE
+      returnNumberType: NumberType.NUMBER_DATE // TODO
     },
     'DAY': {
       method: 'day',
@@ -139,14 +139,14 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
       parameters: [
         {argumentType: ArgumentTypes.STRING},
       ],
-      returnNumberType: NumberType.NUMBER_DATE
+      returnNumberType: NumberType.NUMBER_DATE // TODO
     },
     'TIMEVALUE': {
       method: 'timevalue',
       parameters: [
         {argumentType: ArgumentTypes.STRING},
       ],
-      returnNumberType: NumberType.NUMBER_TIME
+      returnNumberType: NumberType.NUMBER_TIME // TODO
     },
     'NOW': {
       method: 'now',
@@ -166,7 +166,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         {argumentType: ArgumentTypes.NUMBER, minValue: 0},
         {argumentType: ArgumentTypes.NUMBER},
       ],
-      returnNumberType: NumberType.NUMBER_DATE
+      returnNumberType: NumberType.NUMBER_DATE // TODO
     },
     'DAYS360': {
       method: 'days360',
