@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added a new mode to the MATCH function that searches in ranges ordered descending. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
+- Added suppoert for American English language [#1025](https://github.com/handsontable/hyperformula/issues/1025)
 
 ### Fixed
 - Fixed functions VLOOKUP and HLOOKUP to handle duplicates according to the specification. [#1072](https://github.com/handsontable/hyperformula/issues/1072)
