@@ -23,6 +23,7 @@ To set up HyperFormula in the same way, set the [`useArrayArithmetic`](../api/in
 
 ```js
 useArrayArithmetic: false, // set by default
+```
 
 ### Leap year bug
 
@@ -82,7 +83,6 @@ This configuration aligns HyperFormula with the default behavior of Google Sheet
 ```js
 // define options
 const options = {
-  // locale-dependent options  
   dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
   timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   currencySymbol: ['$', 'USD'],
@@ -92,10 +92,8 @@ const options = {
   thousandSeparator: '', // set by default
   arrayColumnSeparator: ',', // set by default
   arrayRowSeparator: ';', // set by default
-
-  // locale-independent options
   nullYear: 30, // set by default
-  useArrayArithmetic: true,
+  useArrayArithmetic: false, // set by default
   leapYear1900: false, // set by default
   smartRounding: true, // set by default
 };

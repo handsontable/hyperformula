@@ -152,7 +152,6 @@ This configuration aligns HyperFormula with the default behavior of Microsoft Ex
 ```js
 // define options
 const options = {
-  // locale-dependent options  
   dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
   timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   currencySymbol: ['$', 'USD'],
@@ -162,8 +161,6 @@ const options = {
   thousandSeparator: '', // set by default
   arrayColumnSeparator: ',', // set by default
   arrayRowSeparator: ';', // set by default
-
-  // locale-independent options
   nullYear: 30, // set by default
   caseSensitive: false, // set by default
   accentSensitive: true,
