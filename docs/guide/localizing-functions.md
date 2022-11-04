@@ -29,7 +29,7 @@ Then set it inside it the [configuration options](configuration-options.md):
 ```javascript
 // configure the instance
 const options = {
-    language: 'frFR'
+  language: 'frFR'
 };
 ```
 
@@ -45,11 +45,11 @@ Here are some example functions and their translations in French:
 
 ```javascript
 // localized functions
- functions: {
-   MATCH: 'EQUIV',
-   CORREL: 'COEFFICIENT.CORRELATION',
-   AVERAGE: 'MOYENNE'
- },
+functions: {
+  MATCH: 'EQUIV',
+  CORREL: 'COEFFICIENT.CORRELATION',
+  AVERAGE: 'MOYENNE'
+},
 ```
 
 Same goes for the [errors](types-of-errors.md) displayed inside
@@ -57,16 +57,16 @@ cells when something goes wrong:
 
 ```javascript
 // localized errors
-  errors: {
-    CYCLE: '#CYCLE!',
-    DIV_BY_ZERO: '#DIV/0!',
-    ERROR: '#ERROR!',
-    NA: '#N/A',
-    NAME: '#NOM?',
-    NUM: '#NOMBRE!',
-    REF: '#REF!',
-    VALUE: '#VALEUR!',
-  },
+errors: {
+  CYCLE: '#CYCLE!',
+  DIV_BY_ZERO: '#DIV/0!',
+  ERROR: '#ERROR!',
+  NA: '#N/A',
+  NAME: '#NOM?',
+  NUM: '#NOMBRE!',
+  REF: '#REF!',
+  VALUE: '#VALEUR!',
+}
 ```
 
 ## Localizing custom functions
@@ -112,9 +112,9 @@ const translations = {
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.1.x/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="handsontable/hyperformula-demos: localizing-functions"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.1.x/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: localizing-functions"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>

@@ -1,5 +1,5 @@
 import {HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
-import {ProtectedFunctionTranslationError} from '../src/errors'
+import {ProtectedFunctionTranslationError} from '../src'
 import {RawTranslationPackage, TranslationPackage} from '../src/i18n'
 import * as languages from '../src/i18n/languages'
 import {enGB, plPL, enUS} from '../src/i18n/languages'
@@ -169,6 +169,7 @@ describe('i18n', () => {
   describe('registerLanguage', () => {
     it('should throw error when language code is not a string', () => {
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         HyperFormula.registerLanguage(42 as any, enGB)
       }).toThrowError('Expected value of type: string for config parameter: languageCode')
     })
