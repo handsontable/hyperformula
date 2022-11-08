@@ -96,7 +96,7 @@ export interface ConfigParams {
    *
    * A format must be specified as a string consisting of tokens and separators.
    *
-   * Supported tokes:
+   * Supported tokens:
    * - `DD` (day of month)
    * - `MM` (month as a number)
    * - `YYYY` (year as a 4-digit number)
@@ -397,7 +397,7 @@ export interface ConfigParams {
    *
    * A format must be specified as a string consisting of at least two tokens separated by `:` (a colon).
    *
-   * Supported tokes:
+   * Supported tokens:
    * - `hh` (hours)
    * - `mm` (minutes)
    * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc. (seconds)
