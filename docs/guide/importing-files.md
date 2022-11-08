@@ -4,14 +4,14 @@ Use HyperFormula to calculate the formulas exported from other spreadsheets.
 
 ## Overview
 
-HyperFormula itself has no file import functionality. If you want to work with XLSX or CSV file, you need to use one of the [file parsing libraries](https://www.npmjs.com/search?q=xlsx) and then pass its result to HyperFormula as a javascript array.
+HyperFormula itself has no file import functionality. If you want to work with XLSX or CSV files, you need to use one of the [file parsing libraries](https://www.npmjs.com/search?q=xlsx) and then pass its result to HyperFormula as a javascript array.
 
 ## Node script importing XLSX files into HyperFormula
 
 This example code uses [ExcelJS](https://www.npmjs.com/package/exceljs) library, but the same feature can be implemented with any other XLSX parsing library.
 
 ::: tip
-[ExcelJS](https://www.npmjs.com/package/exceljs) library can also be used to read CSV files.
+[ExcelJS](https://www.npmjs.com/package/exceljs) library can also read CSV files.
 :::
 
 ```js
@@ -21,10 +21,10 @@ const { HyperFormula } = require('hyperformula');
 async function run(filename) {
   const xlsxWorkbook = await readXlsxWorkbookFromFile(filename);
   const sheetsAsJavascriptArrays = convertXlsxWorkbookToJavascriptArrays(xlsxWorkbook)
-  const hfInstance = HyperFormula.buildFromSheets(sheetsAsJavascriptArrays, { licenseKey: 'gpl-v3' });
+  const hf = HyperFormula.buildFromSheets(sheetsAsJavascriptArrays, { licenseKey: 'gpl-v3' });
 
-  console.log('Formulas:', hfInstance.getSheetSerialized(0));
-  console.log('Values:  ', hfInstance.getSheetValues(0));
+  console.log('Formulas:', hf.getSheetSerialized(0));
+  console.log('Values:  ', hf.getSheetValues(0));
 }
 
 async function readXlsxWorkbookFromFile(filename) {
