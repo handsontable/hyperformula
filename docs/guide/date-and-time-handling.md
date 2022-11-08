@@ -8,12 +8,21 @@ The formats for the default date and time parsing functions can be set using con
 
 ## Example
 
+The following date and time format configuration is used by default:
+
 ```javascript
 const options = {
-    // add popular date formats used in the USA
-    dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-    // add a custom time format
-    timeFormats: ['hh:mm', 'hh:mm:ss', 'hh:mm:ss.sss'],
+    dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'], // set by default
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+};
+```
+
+To use the date and time formats popular in the USA, set:
+
+```javascript
+const options = {
+    dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'], // date formats used in the USA
+    timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
 };
 ```
 
