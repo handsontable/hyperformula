@@ -74,7 +74,14 @@ functionArgSeparator: ';', // might cause incompatibility with other spreadsheet
 ### Currency symbol
 
 A currency symbol can be configured through [`currencySymbol`](../api/interfaces/configparams.md#currencysymbol) parameter.
-For US dollar symbol, use:
+
+The following currency symbol is used by default:
+
+```js
+currencySymbol: ['$'], // set by default
+```
+
+You can customize the symbol or provide multiple symbols to be recognized, e.g. for all symbols used in the USA:
 ```js
 currencySymbol: ['$', 'USD'],
 ```
