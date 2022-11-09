@@ -67,6 +67,8 @@ String comparison works according to the conventions of the language provided as
 localeLang: 'en-US',
 ```
 
+The provided `localeLang` value is processed by the JavaScript standard library [`Intl.Collator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator) object.
+
 If this is not sufficient, the rules of comparison can be further configured using these options:
 - [`caseSensitive`](../api/interfaces/configparams.md#casesensitive)
 - [`accentSensitive`](../api/interfaces/configparams.md#accentsensitive)
