@@ -43,6 +43,14 @@ With these options, you can configure the characters used to separate different 
   In some cases it might cause compatibility issues with other spreadsheets e.g. [Microsoft Excel](compatibility-with-microsoft-excel.md#separators) or [Google Sheets](compatibility-with-google-sheets.md#separators).
 :::
 
+The following number format configuration is used by default (e.g. `1000000.00`):
+
+```js
+decimalSeparator: '.', // set by default
+thousandSeparator: '', // set by default
+functionArgSeparator: ',', // set by default
+```
+
 To use the number format popular in the USA (i.e. `1,000,000.00`), set:
 
 ```js
@@ -54,7 +62,14 @@ functionArgSeparator: ';', // might cause incompatibility with other spreadsheet
 ### Currency symbol
 
 A currency symbol can be configured through [`currencySymbol`](../api/interfaces/configparams.md#currencysymbol) parameter.
-For US dollar symbol, use:
+
+The following currency symbol is used by default:
+
+```js
+currencySymbol: ['$'], // set by default
+```
+
+You can customize the symbol or provide multiple symbols to be recognized, e.g. for all symbols used in the USA:
 ```js
 currencySymbol: ['$', 'USD'],
 ```
