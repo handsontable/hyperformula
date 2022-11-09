@@ -9,18 +9,6 @@ By default HyperFormula uses European-style date formats.
 **Contents:**
 [[toc]]
 
-## Overview
-
-Internationalization support in HyperFormula includes:
-- localization of function names and errors;
-- different formats of:
-  - date,
-  - time,
-  - numbers;
-- custom currency symbols;
-- string comparison conventions (including accents);
-- compatibility with locale-dependent syntax differences in other spreadsheet software.
-
 ## Configuration related to internationalization
 
 ### Localization of function names and errors
