@@ -4050,7 +4050,15 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(formulaString, 'string', 'formulaString')
     const { ast } = this.extractTemporaryFormula(formulaString)
 
-    return ast !== undefined && !(ast.type === AstNodeType.ERROR && !ast.error)
+    if (ast === undefined) {
+      return false
+    }
+
+    if (ast.type === AstNodeType.ERROR && !ast.error) {
+      return false
+    }
+
+    return true
   }
 
   /**

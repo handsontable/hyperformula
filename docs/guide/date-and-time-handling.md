@@ -5,7 +5,6 @@ The formats for the default date and time parsing functions can be set using con
 - [`timeFormats`](../api/interfaces/configparams.md#timeformats),
 - [`nullYear`](../api/interfaces/configparams.md#nullyear).
 
-
 ## Example
 
 ```javascript
