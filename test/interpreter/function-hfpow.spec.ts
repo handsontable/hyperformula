@@ -14,7 +14,7 @@ describe('Function HF.POW', () => {
 
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=HF.POW(2,3)'],
+      ['=HF.POW(2, 3)'],
       ['=HF.POW(,1)'],
       ['=HF.POW(,)']
     ])

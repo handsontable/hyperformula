@@ -14,7 +14,7 @@ This section contains information about the class for creating HyperFormula inst
 The snippet shows an example how to use `buildFromArray` which is one of [three static methods](/api/classes/hyperformula.html#factories) for creating an instance of HyperFormula:
 ```javascript
 const sheetData = [
-  ['0', '=SUM(1,2,3)', '52'],
+  ['0', '=SUM(1, 2, 3)', '52'],
   ['=SUM(A1:C1)', '', '=A1'],
   ['2', '=SUM(A1:C1)', '91'],
 ];

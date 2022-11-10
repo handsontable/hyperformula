@@ -7,7 +7,7 @@ Use array formulas to perform an operation (or call a function) on multiple cell
 In HyperFormula, an array can be:
 * A range of cell addresses (e.g. `A1:A10`)
 * A result of an arithmetic operation (e.g. `5*A1:B5`)
-* A result of a function (e.g. `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5,2,2))`)
+* A result of a function (e.g. `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5, 2, 2))`)
 * An **inline array**: an ad-hoc array that doesn't refer to any range of cells (e.g. `{1, 3, 5}`)
 
 An array is inherently a two-dimensional object.
@@ -128,17 +128,17 @@ If an input array has a dimension of `1`, it's automatically repeated ("broadcas
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can filter an array, based on boolean arrays, using the `FILTER` function:
 
-| Syntax | Example |
-| :--- | :--- |
-| `FILTER(your_array, BoolArray1[; BoolArray2[; ...]]` | `=ARRAYFORMULA(FILTER(A2:A5*10), {1,0,0,1})` |
+| Syntax | Example                                         |
+| :--- |:------------------------------------------------|
+| `FILTER(your_array, BoolArray1[; BoolArray2[; ...]]` | `=ARRAYFORMULA(FILTER(A2:A5*10), {1, 0, 0, 1})` |
 
 ### Constraining an array's size
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can constrain the size of the output array, using the `ARRAY_CONSTRAIN` function:
 
-| Syntax | Example |
-| :--- | :--- |
-| `ARRAY_CONSTRAIN(your_array,height,width)` | `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5,2,2))` |
+| Syntax | Example                                       |
+| :--- |:----------------------------------------------|
+| `ARRAY_CONSTRAIN(your_array,height,width)` | `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5, 2, 2))` |
 
 If your specified output array size is smaller than the input array size, only the corresponding top-left cells of the input array are taken into account.
 

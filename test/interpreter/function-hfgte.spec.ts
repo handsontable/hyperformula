@@ -14,19 +14,19 @@ describe('Function HF.GTE', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=HF.GTE(1,0)'],
-      ['=HF.GTE(1,1)'],
-      ['=HF.GTE("1","0")'],
-      ['=HF.GTE("1","1")'],
-      ['=HF.GTE(TRUE(),FALSE())'],
-      ['=HF.GTE(TRUE(),TRUE())'],
+      ['=HF.GTE(1, 0)'],
+      ['=HF.GTE(1, 1)'],
+      ['=HF.GTE("1", "0")'],
+      ['=HF.GTE("1", "1")'],
+      ['=HF.GTE(TRUE(), FALSE())'],
+      ['=HF.GTE(TRUE(), TRUE())'],
       ['=HF.GTE(,)'],
       ['=HF.GTE(1,)'],
       ['=HF.GTE("1",)'],
       ['=HF.GTE(TRUE(),)'],
-      ['=HF.GTE("1",1)'],
-      ['=HF.GTE(TRUE(),1)'],
-      ['=HF.GTE(TRUE(),"1")'],
+      ['=HF.GTE("1", 1)'],
+      ['=HF.GTE(TRUE(), 1)'],
+      ['=HF.GTE(TRUE(), "1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)

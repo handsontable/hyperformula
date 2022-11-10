@@ -244,7 +244,7 @@ export interface ConfigParams {
   /**
    * Sets the maximum number of rows.
    *
-   * @default 40,000
+   * @default 40.000
    *
    * @category Engine
    * */
@@ -252,7 +252,7 @@ export interface ConfigParams {
   /**
    * Sets the maximum number of columns.
    *
-   * @default 18,278
+   * @default 18.278
    *
    * @category Engine
    * */
