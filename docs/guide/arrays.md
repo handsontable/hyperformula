@@ -128,9 +128,9 @@ If an input array has a dimension of `1`, it's automatically repeated ("broadcas
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can filter an array, based on boolean arrays, using the `FILTER` function:
 
-| Syntax | Example |
-| :--- | :--- |
-| `FILTER(your_array, BoolArray1[; BoolArray2[; ...]]` | `=ARRAYFORMULA(FILTER(A2:A5*10), {1,0,0,1})` |
+| Syntax                                               | Example |
+|:-----------------------------------------------------| :--- |
+| `FILTER(your_array, BoolArray1[, BoolArray2[, ...]]` | `=ARRAYFORMULA(FILTER(A2:A5*10), {1,0,0,1})` |
 
 ### Constraining an array's size
 
