@@ -8,7 +8,7 @@ HyperFormula itself has no file import functionality. Rather, the static method 
 
 If you want to work with XLSX or CSV files, you can decide to use one of the [file parsing libraries](https://www.npmjs.com/search?q=xlsx) and then pass the result to HyperFormula as a JavaScript array.
 
-## Node script importing XLSX files into HyperFormula
+## Example: Importing XLSX files into HyperFormula in Node
 
 This example code uses [ExcelJS](https://www.npmjs.com/package/exceljs) library, but the same feature can be implemented with any other XLSX parsing library.
 
