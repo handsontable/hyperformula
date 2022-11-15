@@ -10,7 +10,7 @@ If you want to work with XLSX or CSV files, you can decide to use one of the [fi
 
 ## Example: Importing XLSX files into HyperFormula in Node
 
-This example code uses [ExcelJS](https://www.npmjs.com/package/exceljs) library, but the same feature can be implemented with any other XLSX parsing library.
+This example uses [ExcelJS](https://www.npmjs.com/package/exceljs), but the same feature can be implemented with any other XLSX parsing library.
 
 ::: tip
 [ExcelJS](https://www.npmjs.com/package/exceljs) library can also read CSV files.
