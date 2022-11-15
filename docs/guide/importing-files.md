@@ -13,7 +13,7 @@ If you want to work with XLSX or CSV files, you can decide to use one of the [fi
 This example uses [ExcelJS](https://www.npmjs.com/package/exceljs), but the same feature can be implemented with any other XLSX parsing library.
 
 ::: tip
-[ExcelJS](https://www.npmjs.com/package/exceljs) library can also read CSV files.
+Popular choices include using [ExcelJS](https://www.npmjs.com/package/exceljs) or [xlsx](https://www.npmjs.com/package/xlsx) packages for the XLSX file format, and [PapaParse](https://www.npmjs.com/package/papaparse) or [csv-parse](https://www.npmjs.com/package/csv-parse) for the CSV file format.
 :::
 
 ```js
