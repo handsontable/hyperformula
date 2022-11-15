@@ -4,7 +4,9 @@ Use HyperFormula to calculate the formulas exported from other spreadsheets.
 
 ## Overview
 
-HyperFormula itself has no file import functionality. If you want to work with XLSX or CSV files, you need to use one of the [file parsing libraries](https://www.npmjs.com/search?q=xlsx) and then pass its result to HyperFormula as a javascript array.
+HyperFormula itself has no file import functionality. Rather, the static method [`buildFromArray`](../api/classes/hyperformula.md#buildfromarray) uses only the standard JavaScript data types for easy integration with any data importing solution.
+
+If you want to work with XLSX or CSV files, you can decide to use one of the [file parsing libraries](https://www.npmjs.com/search?q=xlsx) and then pass the result to HyperFormula as a JavaScript array.
 
 ## Node script importing XLSX files into HyperFormula
 
