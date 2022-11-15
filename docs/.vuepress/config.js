@@ -213,7 +213,6 @@ module.exports = {
           children: [
             ['/guide/compatibility-with-microsoft-excel', 'Compatibility with Microsoft Excel'],
             ['/guide/compatibility-with-google-sheets', 'Compatibility with Google Sheets'],
-            ['/guide/importing-files', 'Importing XLSX/CSV files'],
             ['/guide/list-of-differences', 'Runtime differences with Microsoft Excel and Google Sheets'],
           ]
         },
@@ -227,6 +226,7 @@ module.exports = {
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
             ['/guide/known-limitations', 'Known limitations'],
+            ['/guide/importing-files', 'Importing XLSX/CSV files'],
           ]
         },
         {
