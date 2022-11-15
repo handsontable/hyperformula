@@ -16,7 +16,7 @@ returns a cycle error regardless of whether TRUE or FALSE causes
 a circular reference.
 * There is no data validation against named ranges. For example,
 you can't compare the arguments in a formula like this:
-=IF(firstRange>secondRange; TRUE; FALSE).
+=IF(firstRange>secondRange, TRUE, FALSE).
 * There is no relative referencing in named ranges.
 * The library doesn't offer (at least not yet) the following features:
   * 3D references

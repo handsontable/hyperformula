@@ -227,6 +227,7 @@ module.exports = {
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
             ['/guide/known-limitations', 'Known limitations'],
+            ['/guide/importing-files', 'Importing XLSX/CSV files'],
           ]
         },
         {

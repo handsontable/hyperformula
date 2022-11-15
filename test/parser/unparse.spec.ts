@@ -27,7 +27,7 @@ describe('Unparse', () => {
   })
 
   it('#unparse', () => {
-    const formula = '=1+SUM(1,2,3)*3'
+    const formula = '=1+SUM(1, 2, 3)*3'
     const ast = parser.parse(formula, adr('A1')).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
     expect(unparsed).toEqual(formula)
@@ -150,12 +150,12 @@ describe('Unparse', () => {
   })
 
   it('#unparse forgets about downcase', () => {
-    const formula = '=sum(1,2,3)'
+    const formula = '=sum(1, 2, 3)'
     const ast = parser.parse(formula, adr('A1')).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=SUM(1,2,3)')
+    expect(unparsed).toEqual('=SUM(1, 2, 3)')
   })
 
   it('#unparse should not forget about spaces', () => {
@@ -350,12 +350,12 @@ describe('Unparse', () => {
     const unparserPL = new Unparser(configPL, buildLexerConfig(configPL), sheetMapping.fetchDisplayName, new NamedExpressions())
     const unparserEN = new Unparser(configEN, buildLexerConfig(configEN), sheetMapping.fetchDisplayName, new NamedExpressions())
 
-    const formula = '=SUMA(1,2)'
+    const formula = '=SUMA(1, 2)'
 
     const ast = parser.parse(formula, adr('A1')).ast
 
-    expect(unparserPL.unparse(ast, adr('A1'))).toEqual('=SUMA(1,2)')
-    expect(unparserEN.unparse(ast, adr('A1'))).toEqual('=SUM(1,2)')
+    expect(unparserPL.unparse(ast, adr('A1'))).toEqual('=SUMA(1, 2)')
+    expect(unparserEN.unparse(ast, adr('A1'))).toEqual('=SUM(1, 2)')
   })
 
   it('unparsing sheet names in references sometimes have to wrap in quotes', () => {
@@ -401,12 +401,12 @@ describe('Unparse', () => {
   })
 
   it('unparsing function without translation should unparse to canonical name', () => {
-    const formula = '=FOOBAR(1,2,3)'
+    const formula = '=FOOBAR(1, 2, 3)'
     const ast = parser.parse(formula, adr('A1')).ast
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=FOOBAR(1,2,3)')
+    expect(unparsed).toEqual('=FOOBAR(1, 2, 3)')
   })
 
   it('unparsing numbers with decimal separator', () => {

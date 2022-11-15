@@ -297,7 +297,7 @@ describe('Copy - paste integration', () => {
 
   it('should update edges between infinite range and pasted values', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=SUM(2:3)', '1', '=SUM(1,2)']
+      ['=SUM(2:3)', '1', '=SUM(1, 2)']
     ])
 
     engine.copy(AbsoluteCellRange.spanFrom(adr('B1'), 1, 1))
