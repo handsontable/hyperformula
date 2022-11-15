@@ -14,7 +14,7 @@ Popular choices include [ExcelJS](https://www.npmjs.com/package/exceljs) or [xls
 This example uses [ExcelJS](https://www.npmjs.com/package/exceljs), but the same feature can be implemented with any other XLSX parsing library.
 
 ::: tip
-The full source code for this example is available on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/feature/issue-992/read-excel-file)
+The full source code for this example is available on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/develop/read-excel-file)
 :::
 
 ```js
