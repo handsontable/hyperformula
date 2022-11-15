@@ -14,19 +14,19 @@ describe('Function HF.LTE', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=HF.LTE(1,0)'],
-      ['=HF.LTE(1,1)'],
-      ['=HF.LTE("1","0")'],
-      ['=HF.LTE("1","1")'],
-      ['=HF.LTE(TRUE(),FALSE())'],
-      ['=HF.LTE(TRUE(),TRUE())'],
+      ['=HF.LTE(1, 0)'],
+      ['=HF.LTE(1, 1)'],
+      ['=HF.LTE("1", "0")'],
+      ['=HF.LTE("1", "1")'],
+      ['=HF.LTE(TRUE(), FALSE())'],
+      ['=HF.LTE(TRUE(), TRUE())'],
       ['=HF.LTE(,)'],
       ['=HF.LTE(1,)'],
       ['=HF.LTE("1",)'],
       ['=HF.LTE(TRUE(),)'],
-      ['=HF.LTE("1",1)'],
-      ['=HF.LTE(TRUE(),1)'],
-      ['=HF.LTE(TRUE(),"1")'],
+      ['=HF.LTE("1", 1)'],
+      ['=HF.LTE(TRUE(), 1)'],
+      ['=HF.LTE(TRUE(), "1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(false)

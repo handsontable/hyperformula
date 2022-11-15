@@ -211,7 +211,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
   it('insert row, formula vertex address shifted', () => {
     const engine = HyperFormula.buildFromArray([
       // new row
-      ['=SUM(1,2)'],
+      ['=SUM(1, 2)'],
     ])
 
     let vertex = engine.addressMapping.fetchCell(adr('A1')) as FormulaCellVertex

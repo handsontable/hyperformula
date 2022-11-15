@@ -6,7 +6,7 @@ import {adr, detailedError} from '../testUtils'
 describe('Function FV', () => {
   it('should return #NA! error with the wrong number of arguments', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=FV(1,1)', '=FV(1, 1, 1, 1, 1, 1)'],
+      ['=FV(1, 1)', '=FV(1, 1, 1, 1, 1, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))

@@ -15,8 +15,8 @@ describe('Function HF.ADD', () => {
 
   it('should calculate the correct value with correct defaults', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=HF.ADD(2,3)'],
-      ['=HF.ADD(1.0000000000001,-1)'],
+      ['=HF.ADD(2, 3)'],
+      ['=HF.ADD(1.0000000000001, -1)'],
       ['=HF.ADD(1,)'],
       ['=HF.ADD(,)']
     ])
