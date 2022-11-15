@@ -7,7 +7,7 @@ The formats for the default date and time parsing functions can be set using con
 
 ## Example
 
-The following date and time format configuration is used by default:
+By default, HyperFormula uses European date and time format configuration:
 
 ```javascript
 const options = {
