@@ -66,7 +66,7 @@ Related options:
 
 ### Date and time formats
 
-In Google Sheets, date and time formats depend on your configured locale, whereas in HyperFormula you can [set them up freely](i18n-overview.md#date-and-time-formats).
+In Google Sheets, date and time formats depend on the spreadsheet's configured locale and are shared across all users, whereas in HyperFormula you can [set them up freely](i18n-overview.md#date-and-time-formats).
 
 Options related to date and time formats:
 - [`dateFormats`](../api/interfaces/configparams.md#dateformats)
