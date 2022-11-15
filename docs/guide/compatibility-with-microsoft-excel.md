@@ -135,7 +135,7 @@ Related options:
 
 ### Date and time formats
 
-In Microsoft Excel, date and time formats depend on your configured locale, whereas in HyperFormula you can [set them up freely](i18n-overview.md#date-and-time-formats).
+In Microsoft Excel, date and time formats depend on your configured locale, whereas in HyperFormula you can [set them up freely](date-and-time-handling.md).
 
 Options related to date and time formats:
 - [`dateFormats`](../api/interfaces/configparams.md#dateformats)
