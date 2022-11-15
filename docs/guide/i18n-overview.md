@@ -2,10 +2,6 @@
 
 Configure HyperFormula to work with your language and local conventions.
 
-::: tip
-By default HyperFormula uses European-style date formats.
-:::
-
 **Contents:**
 [[toc]]
 
@@ -18,19 +14,7 @@ The library comes with [17 built-in languages and the ability to define a custom
 
 ### Date and time formats
 
-In HyperFormula, you set up date and time formats through these options:
-- [`dateFormats`](../api/interfaces/configparams.md#dateformats)
-- [`timeFormats`](../api/interfaces/configparams.md#timeformats)
-- [`nullYear`](../api/interfaces/configparams.md#nullyear)
-
-If you want to use a format that cannot be configured using the options above, you can define [custom methods for parsing and stringifying date and time values](date-and-time-handling.md#custom-functions-for-handling-date-and-time):
-
-To set up formats popular in the USA, use this configuration:
-
-```js
-dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-```
+By default, HyperFormula uses European date and time formats, but it can be [configured to follow any regional convention](date-and-time-handling.md).
 
 ### Number format
 
@@ -118,7 +102,7 @@ const options = {
 This demo presents the configuration of HyperFormula for `en-US` locale.
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/feature/issue-1025/i18n?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/develop/i18n?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: basic-operations"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

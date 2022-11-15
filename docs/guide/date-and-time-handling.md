@@ -16,7 +16,7 @@ const options = {
 };
 ```
 
-To use the date and time formats popular in the USA, set:
+To use the formats popular in the USA, set:
 
 ```javascript
 const options = {
