@@ -6,11 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Added a new mode to the MATCH function that searches in ranges ordered descending. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
-
 ### Fixed
 - Fixed functions VLOOKUP and HLOOKUP to handle duplicates according to the specification. [#1072](https://github.com/handsontable/hyperformula/issues/1072)
+- Fixed function MATCH to handle ranges ordered descending according to the specification. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
 
 ## [2.1.0] - 2022-09-08
 
