@@ -911,7 +911,7 @@ describe('Matrices', () => {
   it('longer matrix with extras', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('={SUM(1,2,3),2,{1,2,3}}', adr('A1')).ast as ArrayAst
+    const ast = parser.parse('={SUM(1, 2, 3), 2, {1,2,3}}', adr('A1')).ast as ArrayAst
     expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(1)
     expect(ast.args[0].length).toEqual(3)

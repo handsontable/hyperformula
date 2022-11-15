@@ -23,7 +23,7 @@ describe('Function LARGE', () => {
 
   it('should work', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LARGE(A2:D2,0)', '=LARGE(A2:D2,1)', '=LARGE(A2:D2,2)', '=LARGE(A2:D2,3)', '=LARGE(A2:D2,4)', '=LARGE(A2:D2,5)'],
+      ['=LARGE(A2:D2, 0)', '=LARGE(A2:D2, 1)', '=LARGE(A2:D2, 2)', '=LARGE(A2:D2, 3)', '=LARGE(A2:D2, 4)', '=LARGE(A2:D2, 5)'],
       [1, 4, 2, 4],
     ])
 
@@ -37,7 +37,7 @@ describe('Function LARGE', () => {
 
   it('should ignore non-numbers', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LARGE(A2:D2,0)', '=LARGE(A2:D2,1)', '=LARGE(A2:D2,2)', '=LARGE(A2:D2,3)'],
+      ['=LARGE(A2:D2, 0)', '=LARGE(A2:D2, 1)', '=LARGE(A2:D2, 2)', '=LARGE(A2:D2, 3)'],
       [1, 4, true, 'abcd'],
     ])
 
@@ -49,7 +49,7 @@ describe('Function LARGE', () => {
 
   it('should propagate errors', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LARGE(A2:D2,0)', '=LARGE(A2:D2,1)', '=LARGE(A2:D2,2)', '=LARGE(A2:D2,3)'],
+      ['=LARGE(A2:D2, 0)', '=LARGE(A2:D2, 1)', '=LARGE(A2:D2, 2)', '=LARGE(A2:D2, 3)'],
       [1, 4, '=NA()', 'abcd'],
     ])
 
@@ -61,7 +61,7 @@ describe('Function LARGE', () => {
 
   it('should truncate second arg', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LARGE(A2:D2,0.9)', '=LARGE(A2:D2,1.9)', '=LARGE(A2:D2,2.9)', '=LARGE(A2:D2,3.9)', '=LARGE(A2:D2,4.9)', '=LARGE(A2:D2,5.9)'],
+      ['=LARGE(A2:D2, 0.9)', '=LARGE(A2:D2, 1.9)', '=LARGE(A2:D2, 2.9)', '=LARGE(A2:D2, 3.9)', '=LARGE(A2:D2, 4.9)', '=LARGE(A2:D2, 5.9)'],
       [1, 4, 2, 4],
     ])
 

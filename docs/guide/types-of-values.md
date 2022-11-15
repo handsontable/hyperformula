@@ -30,7 +30,7 @@ a cell. Here is the list of possible cell types: `'FORMULA'`, `'VALUE'`,
 
 You can also use the `getCellValueType` method which returns
 the calculated value type, so a cell's value for the formula:
-`'=SUM(1,2,3)'` will be 'NUMBER'. Here is the list of possible cell value
+`'=SUM(1, 2, 3)'` will be 'NUMBER'. Here is the list of possible cell value
 types: `'NUMBER'`, `'STRING'`, `'BOOLEAN'`, `'ERROR'`, `'EMPTY'`.
 
 ## Getting detailed cell value type
