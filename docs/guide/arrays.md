@@ -28,7 +28,7 @@ Every row must be of equal length.
 If an inline array contains a cell reference, and the cell's value changes, the array is not updated.
 :::
 
-```js
+```
 = {1, 2, 3} // an inline array with a single row
 = {1, 2 ; 3, 4} // an inline array with two rows
 = SUM({1, 2, 3}) // an inline array as an argument of a function
@@ -49,20 +49,20 @@ You can enable the array arithmetic mode:
 
 To enable the array arithmetic mode once, within a particular function or formula, use the `ARRAYFORMULA` function:
 
-| Syntax | Example |
-| :--- | :--- |
-| `ARRAYFORMULA(your_array_formula)` | `=ARRAYFORMULA(A2:A5*B2:B5)` |
+| Syntax                                            | Example                           |
+|:--------------------------------------------------|:----------------------------------|
+| `ARRAYFORMULA(your_array_formula)`                | `=ARRAYFORMULA(A2:A5*B2:B5)`      |
 | `ARRAYFORMULA(YOUR_FUNCTION(your_array_formula))` | `=ARRAYFORMULA(ISEVEN(A2:A5*10))` |
 
 ### Enabling the array arithmetic mode globally
 
 To enable the array arithmetic mode by default, everywhere in your HyperFormula instance:
 
-* In your HyperFormula [configuration](../api/interfaces/configparams.html#usearrayarithmetic), set the `useArrayArithmetic` option to `true`.
+* In your HyperFormula [configuration](../api/interfaces/configparams.md#usearrayarithmetic), set the `useArrayArithmetic` option to `true`.
 
 With the array arithmetic mode enabled globally, you can operate on arrays without using the `ARRAYFORMULA` function:
 
-```js
+```
 =A2:A5*B2:B5
 
 ISEVEN(A2:A5*10)
@@ -85,7 +85,7 @@ You can operate on arrays just like on single values.
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, each output array value is the result of your operation on the corresponding input array value.
 
-```js
+```
 =ARRAYFORMULA(A2:A5*B2:B5)
 
 // calculates:
@@ -100,7 +100,7 @@ You can pass arrays to functions that would normally accept [scalars](#about-arr
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, and you pass an array to a [scalar](#about-arrays) function, that function produces an array on the output as well.
 
-```js
+```
 =ARRAYFORMULA(ISEVEN(A2:A5*10))
 
 // calculates:
@@ -114,7 +114,7 @@ When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled
 
 If an input array has a dimension of `1`, it's automatically repeated ("broadcast") on that dimension to match the size of the output.
 
-```js
+```
 =ARRAYFORMULA(ISEVEN(A2:A5*B2))
 
 // calculates:
@@ -128,16 +128,16 @@ If an input array has a dimension of `1`, it's automatically repeated ("broadcas
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can filter an array, based on boolean arrays, using the `FILTER` function:
 
-| Syntax | Example                                         |
-| :--- |:------------------------------------------------|
-| `FILTER(your_array, BoolArray1[; BoolArray2[; ...]]` | `=ARRAYFORMULA(FILTER(A2:A5*10), {1, 0, 0, 1})` |
+| Syntax                                               | Example                                         |
+|:-----------------------------------------------------|:------------------------------------------------|
+| `FILTER(your_array, BoolArray1[, BoolArray2[, ...]]` | `=ARRAYFORMULA(FILTER(A2:A5*10), {1, 0, 0, 1})` |
 
 ### Constraining an array's size
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can constrain the size of the output array, using the `ARRAY_CONSTRAIN` function:
 
-| Syntax | Example                                       |
-| :--- |:----------------------------------------------|
+| Syntax                                     | Example                                       |
+|:-------------------------------------------|:----------------------------------------------|
 | `ARRAY_CONSTRAIN(your_array,height,width)` | `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5, 2, 2))` |
 
 If your specified output array size is smaller than the input array size, only the corresponding top-left cells of the input array are taken into account.
@@ -160,7 +160,7 @@ When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disable
 
 When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of width/height equal to `1`, the behavior depends on your array formula's location:
 
-| Your array formula's location | Behavior |
-| :--- | :--- |
+| Your array formula's location                     | Behavior                               |
+|:--------------------------------------------------|:---------------------------------------|
 | In the same row as as one of the range's elements | Only that particular element is taken. |
-| Any other cell | `#VALUE!` error |
+| Any other cell                                    | `#VALUE!` error                        |
