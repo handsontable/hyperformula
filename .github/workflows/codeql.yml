@@ -1,10 +1,16 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches: [ "master", "develop", "gh-pages", "milestone-1", "milestone-2-old-way", "milestone-2", "milestone-3", "milestone-4" ]
   pull_request:
-    branches: [ "master" ]
+    types:
+      - opened
+      - reopened
+      - synchronize # the head branch is updated from the base branch, new commits are pushed to the head branch, or the base branch is changed
+  push:
+    branches:
+      - 'master'
+      - 'develop'
+      - 'release/**'
   schedule:
     - cron: "39 19 * * 5"
 
