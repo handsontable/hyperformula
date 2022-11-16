@@ -4,6 +4,16 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.2.0
+**Release date: November 17, 2022**
+
+### Added
+- Added American English (`enUS`) language pack. This is a convenience alias, since the function names provided by it are identical to the ones in the existing British English (`enGB`) language pack. [#1025](https://github.com/handsontable/hyperformula/issues/1025)
+
+### Fixed
+- Fixed functions VLOOKUP and HLOOKUP to handle duplicates according to the specification. [#1072](https://github.com/handsontable/hyperformula/issues/1072)
+- Fixed function MATCH to handle ranges ordered descending according to the specification. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
+
 ## 2.1.0
 **Release date: September 8, 2022**
 

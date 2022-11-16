@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2022-11-17
+
 ### Added
 - Added American English (`enUS`) language pack. This is a convenience alias, since the function names provided by it are identical to the ones in the existing British English (`enGB`) language pack. [#1025](https://github.com/handsontable/hyperformula/issues/1025)
 
