@@ -1,21 +1,24 @@
-# Importing XLSX/CSV files into HyperFormula
+# File import
 
-Use HyperFormula to calculate the formulas exported from other spreadsheets.
+Import XLSX and CSV files into HyperFormula.
 
 ## Overview
 
-HyperFormula itself has no file import functionality. Rather, the [factory methods](../api/classes/hyperformula.md#factories) use standard JavaScript data types for easy integration with any data importing solution.
+HyperFormula has no built-in file import functionality. But its [factory methods](../api/classes/hyperformula.md#factories) use standard JavaScript data types. This lets you easily integrate HyperFormula with any third-party file import library.
 
-If you want to work with XLSX or CSV files, you can decide to use one of the [file parsing libraries](https://www.npmjs.com/search?q=xlsx) and then pass the result to HyperFormula as a JavaScript array.
-Popular choices include [ExcelJS](https://www.npmjs.com/package/exceljs) or [xlsx](https://www.npmjs.com/package/xlsx) packages for the XLSX file format, and [PapaParse](https://www.npmjs.com/package/papaparse) or [csv-parse](https://www.npmjs.com/package/csv-parse) for the CSV file format.
+## Import CSV files
 
-## Example: Importing XLSX files into HyperFormula in Node
+To import CSV files, use a third-party [CSV parser](https://www.npmjs.com/search?q=csv) (e.g., [PapaParse](https://www.npmjs.com/package/papaparse) or [csv-parse](https://www.npmjs.com/package/csv-parse)). Then pass the result to HyperFormula as a JavaScript array.
 
-This example uses [ExcelJS](https://www.npmjs.com/package/exceljs), but the same feature can be implemented with any other XLSX parsing library.
+## Import XLSX files
 
-::: tip
-The full source code for this example is available on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/2.2.x/read-excel-file)
-:::
+To import XLSX files, use a third-party [XLSX parser](https://www.npmjs.com/search?q=xlsx) (e.g., [ExcelJS](https://www.npmjs.com/package/exceljs) or [xlsx](https://www.npmjs.com/package/xlsx)). Then pass the result to HyperFormula as a JavaScript array.
+
+### Example: Import XLSX files in Node
+
+This example uses [ExcelJS](https://www.npmjs.com/package/exceljs) to import XLSX files into HyperFormula. 
+
+See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/2.2.x/read-excel-file).
 
 ```js
 const ExcelJS = require('exceljs');
