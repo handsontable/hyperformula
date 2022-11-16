@@ -1,8 +1,8 @@
 import {HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
-import {ProtectedFunctionTranslationError} from '../src/errors'
+import {ProtectedFunctionTranslationError} from '../src'
 import {RawTranslationPackage, TranslationPackage} from '../src/i18n'
 import * as languages from '../src/i18n/languages'
-import {enGB, plPL} from '../src/i18n/languages'
+import {enGB, plPL, enUS} from '../src/i18n/languages'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
@@ -146,9 +146,30 @@ describe('i18n', () => {
     ).toThrow(new LanguageNotRegisteredError())
   })
 
+  describe('language "enUS"', () => {
+    it('should be available', () => {
+      HyperFormula.registerLanguage('enUS', enUS)
+      const engineUS = HyperFormula.buildFromArray([['=SUM(42)']], { language: 'enUS' })
+
+      expect(engineUS.getCellValue(adr('A1'))).toBe(42)
+    })
+
+    it('should langCode = "enUS"', () => {
+      expect(enUS.langCode).toEqual('enUS')
+    })
+
+    it('should have the same translations as "enGB"', () => {
+      const allFunctions = Object.keys(enGB.functions)
+      const areAllTranslationsTheSame = allFunctions.every(key => enGB.functions[key] === enUS.functions[key])
+
+      expect(areAllTranslationsTheSame).toBeTruthy()
+    })
+  })
+
   describe('registerLanguage', () => {
     it('should throw error when language code is not a string', () => {
       expect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         HyperFormula.registerLanguage(42 as any, enGB)
       }).toThrowError('Expected value of type: string for config parameter: languageCode')
     })

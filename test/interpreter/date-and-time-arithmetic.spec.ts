@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {CellValueDetailedType, HyperFormula} from '../../src'
 import {adr} from '../testUtils'
 
 describe('Date arithmetic', () => {
@@ -289,5 +289,23 @@ describe('Time arithmetic', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(0.8521613392800845)
+  })
+
+  it('Don\'t convert string to time value when prepended with apostrophe', () => {
+    const engine = HyperFormula.buildFromArray([
+      ["'13:13"],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('13:13')
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.STRING)
+  })
+
+  it('Don\'t convert string to time value when there is no timeFormats configured', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1:80'],
+    ], { timeFormats: [] })
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('1:80')
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.STRING)
   })
 })

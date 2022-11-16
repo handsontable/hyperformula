@@ -11,8 +11,6 @@ const WebpackOnBuildPlugin = require('on-build-webpack');
 const fs  = require('fs');
 const fsExtra  = require('fs-extra');
 
-const PACKAGE_FILENAME = process.env.HOT_FILENAME;
-
 function getEntryJsFiles() {
   const entryObject = {};
   const filesInLanguagesDirectory = fs.readdirSync(SOURCE_LANGUAGES_DIRECTORY);
