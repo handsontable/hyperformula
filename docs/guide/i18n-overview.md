@@ -1,105 +1,133 @@
-# Internationalization overview
+# Internationalization features
 
-Configure HyperFormula to work with your language and local conventions.
+Configure HyperFormula to match the languages and regions of your users.
 
 **Contents:**
 [[toc]]
 
-## Configuration related to internationalization
+## Function names and errors
 
-### Localization of function names and errors
+Each of HyperFormula's [built-in functions](built-in-functions.md) and [errors](types-of-errors.md) is available in [17 languages](localizing-functions.md#list-of-supported-languages).
 
-HyperFormula accepts localized function names and displays errors translated to the configured language.
-The library comes with [17 built-in languages and the ability to define a custom one](localizing-functions.md).
+To switch between translations of all function names and errors, set HyperFormula's language ([`language`](../api/interfaces/configparams.md#language)).
 
-### Date and time formats
+The default language is British English:
 
-By default, HyperFormula uses European date and time formats, but it can be [configured to follow any regional convention](date-and-time-handling.md).
+```js
+language: 'enGB',
+```
 
-### Number format
+To use American English, set:
 
-With these options, you can configure the characters used to separate different parts of the number:
-- [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator)
-- [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator)
+```js
+language: 'enUS',
+```
 
-::: tip
-  In HyperFormula both [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) must be different from [`functionArgSeparator`](../api/interfaces/configparams.md#functionargseparator).
-  In some cases it might cause compatibility issues with other spreadsheets e.g. [Microsoft Excel](compatibility-with-microsoft-excel.md#separators) or [Google Sheets](compatibility-with-google-sheets.md#separators).
-:::
+When adding a [custom function](custom-functions.md), you can define the function's [name](custom-functions.md#_3-add-your-function-s-names) in every language that you support.
 
-The following number format configuration is used by default (e.g. `1000000.00`):
+To support more languages, add a [custom language pack](localizing-functions.md).
+
+## Date and time formats
+
+To match a region's calendar conventions, you can set multiple date formats ([`dateFormats`](../api/interfaces/configparams.md#dateformats)) and time formats ([`timeFormats`](../api/interfaces/configparams.md#timeformats)).
+
+By default, HyperFormula uses the European date and time formats.
+
+```javascript
+dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'], // set by default
+timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+```
+
+To use the US date and time formats, set:
+
+```javascript
+dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'], // US date formats
+timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+```
+
+You can also add custom ways of [handling dates and times](date-and-time-handling.md#custom-date-and-time-handling).
+
+## Number format
+
+To match a region's number format, configure HyperFormula's decimal separator ([`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator)) and thousands separator ([`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator)).
+
+By default, HyperFormula uses the European number format (`1000000.00`):
 
 ```js
 decimalSeparator: '.', // set by default
 thousandSeparator: '', // set by default
-functionArgSeparator: ',', // set by default
 ```
 
-To use the number format popular in the USA (i.e. `1,000,000.00`), set:
+To use the US number format (`1,000,000.00`), set:
 
 ```js
 decimalSeparator: '.', // set by default
 thousandSeparator: ',',
-functionArgSeparator: ';', // might cause incompatibility with other spreadsheets
 ```
 
-### Currency symbol
+::: tip
+  In HyperFormula, both [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) and [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) must be different from [`functionArgSeparator`](../api/interfaces/configparams.md#functionargseparator).
+  In some cases it might cause compatibility issues with other spreadsheets, e.g., [Microsoft Excel](compatibility-with-microsoft-excel.md#separators) or [Google Sheets](compatibility-with-google-sheets.md#separators).
+:::
 
-A currency symbol can be configured through [`currencySymbol`](../api/interfaces/configparams.md#currencysymbol) parameter.
+## Currency symbol
 
-The following currency symbol is used by default:
+To match your users' currency, you can configure multiple currency symbols ([`currencySymbol`](../api/interfaces/configparams.md#currencysymbol)).
 
-```js
-currencySymbol: ['$'], // set by default
-```
+The default currency symbol is `$`. To add `USD` as an alternative, set:
 
-You can customize the symbol or provide multiple symbols to be recognized, e.g. for all symbols used in the USA:
 ```js
 currencySymbol: ['$', 'USD'],
 ```
 
-### String comparison
+## String comparison rules
 
-String comparison works according to the conventions of the language provided as [`localeLang`](../api/interfaces/configparams.md#localelang):
+To make sure that language-sensitive strings are compared in line with your users' language (e.g., `Préservation` vs. `Preservation`), set HyperFormula's [string comparison rules](types-of-operators.md#comparing-strings) ([`localeLang`](../api/interfaces/configparams.md#localelang)).
+
+The value of [`localeLang`](../api/interfaces/configparams.md#localelang) is processed by [`Intl.Collator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator), a JavaScript standard object.
+
+The default setting is:
+
+```js
+localeLang: 'en', // set by default
+```
+
+To set the `en-US` string comparison rules, set:
 
 ```js
 localeLang: 'en-US',
 ```
 
-The provided `localeLang` value is processed by the JavaScript standard library [`Intl.Collator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator) object.
-
-If this is not sufficient, the rules of comparison can be further configured using these options:
+To further customize string comparison rules, use these options:
 - [`caseSensitive`](../api/interfaces/configparams.md#casesensitive)
 - [`accentSensitive`](../api/interfaces/configparams.md#accentsensitive)
 - [`caseFirst`](../api/interfaces/configparams.md#casefirst)
 - [`ignorePunctuation`](../api/interfaces/configparams.md#ignorepunctuation)
 
-### Compatibility with locale-dependent syntax in other spreadsheet software
+## Compatibility with other spreadsheet software
 
-The locale-dependent compatibility is described in the dedicated guides:
+For information on compatibility with locale-dependent syntax in other spreadsheet software, see:
 - [Compatibility with Microsoft Excel](compatibility-with-microsoft-excel.md)
 - [Compatibility with Google Sheets](compatibility-with-google-sheets.md)
 
-### Full configuration
+## `en-US` configuration
 
-This configuration aligns HyperFormula with the `en-US` locale. Due to the [configuration of separators](#number-format) it might not be fully compatible with formulas from other spreadsheet software.
+This configuration aligns HyperFormula with the `en-US` locale. Due to the configuration of [separators](#number-format), it might not be fully compatible with formulas coming from other spreadsheet software.
 
 ```js
-const options = {
-  language: 'enUS',
-  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-  decimalSeparator: '.', // set by default
-  thousandSeparator: ',',
-  functionArgSeparator: ';', // might cause incompatibility with other spreadsheets
-  currencySymbol: ['$', 'USD'],
-  localeLang: 'en-US',
-};
+language: 'enUS',
+dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
+timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+decimalSeparator: '.', // set by default
+thousandSeparator: ',',
+functionArgSeparator: ';', // might cause incompatibility with other spreadsheets
+currencySymbol: ['$', 'USD'],
+localeLang: 'en-US',
 ```
 
-## Demo
+## `en-US` demo
 
-This demo presents the configuration of HyperFormula for `en-US` locale.
+This demo shows HyperFormula configured for the `en-US` locale.
 
 <iframe
   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/i18n?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"

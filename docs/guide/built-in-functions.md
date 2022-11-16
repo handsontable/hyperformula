@@ -28,17 +28,11 @@ The latest version of HyperFormula has an extensive collection of **{{ $page.fun
 _Some categories such as compatibility, cube, and database
 are yet to be supported._
 
-## Language packs
+## Internationalization
 
-HyperFormula provides translation packs for 16 languages thus making
-it easier to create localized applications. The supported languages
-are: English (default), Czech, Danish, Dutch, Finnish, French,
-German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian,
-Spanish, Swedish, and Turkish.
+Each of HyperFormula's built-in function names (and [errors](types-of-errors.md)) is available in [17 language versions](localizing-functions.md#list-of-supported-languages).
 
-The package includes localization of function names and error values
-(such as #REF! or #NAME!). To support more languages or properties
-create your own [custom language pack](localizing-functions).
+To support more languages or properties, create a [custom language pack](localizing-functions).
 
 ## Custom functions
 
