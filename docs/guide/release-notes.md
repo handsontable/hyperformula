@@ -12,7 +12,7 @@ HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Fixed
 - Fixed functions VLOOKUP and HLOOKUP to handle duplicates in the way specified by the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#HLOOKUP) standard. [#1072](https://github.com/handsontable/hyperformula/issues/1072)
-- Fixed the MATCH function to handle descending ranges in the way specified by the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#MATCH) [#1063](https://github.com/handsontable/hyperformula/issues/1063)
+- Fixed the MATCH function to handle descending ranges in the way specified by the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#MATCH) standard. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
 
 ## 2.1.0
 **Release date: September 8, 2022**
