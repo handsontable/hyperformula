@@ -227,7 +227,7 @@ module.exports = {
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
             ['/guide/known-limitations', 'Known limitations'],
-            ['/guide/importing-files', 'File import'],
+            ['/guide/file-import', 'File import'],
           ]
         },
         {
