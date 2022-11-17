@@ -9,19 +9,7 @@ Configure HyperFormula to match the languages and regions of your users.
 
 Each of HyperFormula's [built-in functions](built-in-functions.md) and [errors](types-of-errors.md) is available in [17 languages](localizing-functions.md#list-of-supported-languages).
 
-To switch between translations of all function names and errors, set HyperFormula's language ([`language`](../api/interfaces/configparams.md#language)).
-
-The default language is British English:
-
-```js
-language: 'enGB',
-```
-
-To use American English, set:
-
-```js
-language: 'enUS',
-```
+You can easily [switch between languages](localizing-functions.md) ([`language`](../api/interfaces/configparams.md#language)).
 
 When adding a [custom function](custom-functions.md), you can define the function's [name](custom-functions.md#_3-add-your-function-s-names) in every language that you support.
 
@@ -31,19 +19,7 @@ To support more languages, add a [custom language pack](localizing-functions.md)
 
 To match a region's calendar conventions, you can set multiple date formats ([`dateFormats`](../api/interfaces/configparams.md#dateformats)) and time formats ([`timeFormats`](../api/interfaces/configparams.md#timeformats)).
 
-By default, HyperFormula uses the European date and time formats.
-
-```javascript
-dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'], // set by default
-timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-```
-
-To use the US date and time formats, set:
-
-```javascript
-dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'], // US date formats
-timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-```
+By default, HyperFormula uses the European date and time formats. [You can easily change them](date-and-time-handling.md#example).
 
 You can also add custom ways of [handling dates and times](date-and-time-handling.md#custom-date-and-time-handling).
 
