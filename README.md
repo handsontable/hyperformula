@@ -26,7 +26,7 @@
 HyperFormula is a headless spreadsheet built on top of TypeScript. It is a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
 - High-speed Excel formula parsing and evaluating
 - A library of nearly [400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
-- Support for [internationalization](https://hyperformula.handsontable.com/guide/i18n-overview.html) with 17 built-in languages
+- Support for [internationalization](https://hyperformula.handsontable.com/guide/i18n-features.html) with 17 built-in languages
 - Support for [custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
 - Function syntax compatible with [Microsoft Excel](https://hyperformula.handsontable.com/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/guide/compatibility-with-google-sheets.html)
 - [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)

@@ -203,7 +203,7 @@ module.exports = {
           title: 'Internationalization',
           collapsable: false,
           children: [
-            ['/guide/i18n-overview', 'Internationalization features'],
+            ['/guide/i18n-features', 'Internationalization features'],
             ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
           ]
