@@ -84,7 +84,7 @@ export interface ConfigParams {
   /**
    * Sets symbols that denote currency numbers.
    *
-   * For more information, see the [Internationalization overview guide](/guide/i18n-overview.md).
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default ['$']
    *
@@ -122,7 +122,7 @@ export interface ConfigParams {
    *
    * Must be different from [[decimalSeparator]] and [[thousandSeparator]].
    *
-   * For more information, see the [Internationalization overview guide](/guide/i18n-overview.md).
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default ','
    *
@@ -138,7 +138,7 @@ export interface ConfigParams {
    *
    * Must be different from [[thousandSeparator]] and [[functionArgSeparator]].
    *
-   * For more information, see the [Internationalization overview guide](/guide/i18n-overview.md).
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default '.'
    *
@@ -223,7 +223,7 @@ export interface ConfigParams {
    *
    * Accepts **IETF BCP 47** language tags.
    *
-   * For more information, see the [Internationalization overview guide](/guide/i18n-overview.md).
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default 'en'
    *
@@ -385,7 +385,7 @@ export interface ConfigParams {
    *
    * Must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
-   * For more information, see the [Internationalization overview guide](/guide/i18n-overview.md).
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default ''
    *
