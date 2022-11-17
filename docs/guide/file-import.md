@@ -4,7 +4,7 @@ Import XLSX and CSV files into HyperFormula.
 
 ## Overview
 
-HyperFormula has no built-in file import functionality. But its [factory methods](../api/classes/hyperformula.md#factories) use standard JavaScript data types. This lets you easily integrate HyperFormula with any third-party file import library.
+HyperFormula has no built-in file import functionality. But its [factory methods](../api/classes/hyperformula.md#factories) use standard JavaScript data types, for easy integration with any way of importing data.
 
 ## Import CSV files
 

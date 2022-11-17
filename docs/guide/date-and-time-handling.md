@@ -42,7 +42,7 @@ own custom function that returns a [`DateTime`](../api/globals.md#datetime) obje
 
 The configuration of date formats and stringify options may impact some built-in functions.
 For instance, the `VALUE` function transforms strings
-into numbers, which means it uses [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime). the `TEXT` function
+into numbers, which means it uses [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime). The `TEXT` function
 works the other way round - it accepts a number and returns a string,
 so it uses `stringifyDateTime`. Any change here might give you
 different results. Criteria-based functions (`SUMIF`, `AVERAGEIF`, etc.) perform comparisons, so they also need to
