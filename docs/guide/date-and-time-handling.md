@@ -7,25 +7,21 @@ The formats for the default date and time parsing functions can be set using con
 
 ## Example
 
-By default, HyperFormula uses European date and time format configuration:
+By default, HyperFormula uses the European date and time formats.
 
 ```javascript
-const options = {
-    dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'], // set by default
-    timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-};
+dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'], // set by default
+timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
 ```
 
-To use the formats popular in the USA, set:
+To use the US date and time formats, set:
 
 ```javascript
-const options = {
-    dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'], // date formats used in the USA
-    timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-};
+dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'], // US date formats
+timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
 ```
 
-## Custom functions for handling date and time 
+## Custom date and time handling
 
 HyperFormula offers the possibility to extend the number of supported
 date/time formats as well as the behavior of this functionality by exposing
@@ -45,8 +41,8 @@ library like [Moment.js](https://momentjs.com/), or by writing your
 own custom function that returns a [`DateTime`](../api/globals.md#datetime) object.
 
 The configuration of date formats and stringify options may impact some built-in functions.
-For instance, `VALUE` function transforms strings
-into numbers, which means it uses [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime). `TEXT` function
+For instance, the `VALUE` function transforms strings
+into numbers, which means it uses [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime). The `TEXT` function
 works the other way round - it accepts a number and returns a string,
 so it uses `stringifyDateTime`. Any change here might give you
 different results. Criteria-based functions (`SUMIF`, `AVERAGEIF`, etc.) perform comparisons, so they also need to
@@ -103,7 +99,7 @@ And now, HyperFormula recognizes these values as valid dates and can operate on 
 ## Demo
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.1.x/date-time?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/date-time?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: date-time"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

@@ -28,17 +28,11 @@ The latest version of HyperFormula has an extensive collection of **{{ $page.fun
 _Some categories such as compatibility, cube, and database
 are yet to be supported._
 
-## Language packs
+## Internationalization
 
-HyperFormula provides translation packs for 16 languages thus making
-it easier to create localized applications. The supported languages
-are: English (default), Czech, Danish, Dutch, Finnish, French,
-German, Hungarian, Italian, Norwegian, Polish, Portuguese, Russian,
-Spanish, Swedish, and Turkish.
+Each of HyperFormula's built-in function names (and [errors](types-of-errors.md)) is available in [17 language versions](localizing-functions.md#list-of-supported-languages).
 
-The package includes localization of function names and error values
-(such as #REF! or #NAME!). To support more languages or properties
-create your own [custom language pack](localizing-functions).
+To support more languages or properties, create a [custom language pack](localizing-functions).
 
 ## Custom functions
 
@@ -51,7 +45,7 @@ lets you design your own [custom functions](custom-functions).
 ## Demo
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.1.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: built-in-functions"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
