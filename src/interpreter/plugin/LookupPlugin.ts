@@ -7,7 +7,7 @@ import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {CellError, ErrorType, simpleCellAddress} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
-import {SearchStrategy} from '../../Lookup/SearchStrategy'
+import {SearchOptions, SearchStrategy} from '../../Lookup/SearchStrategy'
 import {ProcedureAst} from '../../parser'
 import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
@@ -45,7 +45,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       ]
     },
   }
-  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.config, this.dependencyGraph)
+  private rowSearch: RowSearchStrategy = new RowSearchStrategy(this.dependencyGraph)
 
   /**
    * Corresponds to VLOOKUP(key, range, index, [sorted])
@@ -75,7 +75,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * Corresponds to HLOOKUP(key, range, index, [sorted])
    *
    * @param ast
-   * @param formulaAddress
+   * @param state
    */
   public hlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HLOOKUP'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean) => {
@@ -95,8 +95,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number) => {
-      return this.doMatch(zeroIfEmpty(key), rangeValue, sorted)
+    return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number) => {
+      return this.doMatch(zeroIfEmpty(key), rangeValue, type)
     })
   }
 
@@ -107,7 +107,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         range
       )
     } else {
-      return searchStrategy.find(key, range, sorted)
+      const searchOptions: SearchOptions = sorted ? { ordering: 'asc' } : { ordering: 'none', matchExactly: true }
+      return searchStrategy.find(key, range, searchOptions)
     }
   }
 
@@ -170,22 +171,24 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
-  private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, sorted: number): InternalScalarValue {
+  private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number): InternalScalarValue {
+    if (![-1, 0, 1].includes(type)) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+    }
+
     if (rangeValue.width() > 1 && rangeValue.height() > 1) {
       return new CellError(ErrorType.NA)
     }
-    if (rangeValue.width() === 1) {
-      const index = this.columnSearch.find(key, rangeValue, sorted !== 0)
-      if (index === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
-      }
-      return index + 1
-    } else {
-      const index = this.rowSearch.find(key, rangeValue, sorted !== 0)
-      if (index === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
-      }
-      return index + 1
+
+    const searchStrategy = rangeValue.width() === 1 ? this.columnSearch : this.rowSearch
+    const searchOptions: SearchOptions = type === 0
+      ? { ordering: 'none', matchExactly: true }
+      : { ordering: type === -1 ? 'desc' : 'asc' }
+    const index = searchStrategy.find(key, rangeValue, searchOptions)
+
+    if (index === -1) {
+      return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
     }
+    return index + 1
   }
 }

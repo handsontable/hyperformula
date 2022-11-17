@@ -10,12 +10,20 @@ import {DependencyGraph} from '../DependencyGraph'
 import {RawInterpreterValue, RawNoErrorScalarValue, RawScalarValue} from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
 import {ColumnsSpan} from '../Span'
-import {Statistics} from '../statistics/Statistics'
+import {Statistics} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 
+export interface SearchOptions {
+  ordering: 'asc' | 'desc' | 'none',
+  matchExactly?: boolean,
+}
+
 export interface SearchStrategy {
-  find(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean): number,
+  /*
+   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
+   */
+  find(searchKey: RawNoErrorScalarValue, range: SimpleRangeValue, options: SearchOptions): number,
 
   advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number,
 }
@@ -44,6 +52,6 @@ export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, conf
   if (config.useColumnIndex) {
     return new ColumnIndex(dependencyGraph, config, statistics)
   } else {
-    return new ColumnBinarySearch(dependencyGraph, config)
+    return new ColumnBinarySearch(dependencyGraph)
   }
 }

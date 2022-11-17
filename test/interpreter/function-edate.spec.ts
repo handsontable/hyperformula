@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {CellValueDetailedType, ErrorType, SimpleCellAddress} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType, SimpleCellAddress} from '../../src'
 import {Config} from '../../src/Config'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'

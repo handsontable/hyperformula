@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {HyperFormula, AlwaysSparse} from '../../src'
 import {adr} from '../testUtils'
 
 describe('swapping rows - checking if it is possible', () => {
@@ -11,7 +10,7 @@ describe('swapping rows - checking if it is possible', () => {
     ).toThrowError('Invalid arguments, expected row numbers to be nonnegative integers and less than sheet height.')
   })
 
-  it('should validate sources for noninteger values', () => {
+  it('should validate sources for non-integer values', () => {
     const engine = HyperFormula.buildFromArray([[]])
     expect(engine.isItPossibleToSwapRowIndexes(0, [[1, 1], [0.5, 0]])).toEqual(false)
     expect(() =>
@@ -191,7 +190,7 @@ describe('setting row order - checking if it is possible', () => {
     ).toThrowError('Invalid arguments, expected number of rows provided to be sheet height.')
   })
 
-  it('should validate sources for noninteger values', () => {
+  it('should validate sources for non-integer values', () => {
     const engine = HyperFormula.buildFromArray([[0], [0]])
     expect(engine.isItPossibleToSetRowOrder(0, [0, 0.5])).toEqual(false)
     expect(() =>
@@ -259,6 +258,18 @@ describe('reorder base case', () => {
     expect(engine.isItPossibleToSetRowOrder(0, [1, 2, 0])).toEqual(true)
     engine.setRowOrder(0, [1, 2, 0])
     expect(engine.getSheetSerialized(0)).toEqual([[7, 8, 9], [1, 2, 3], [4, 5, 6]])
+  })
+
+  it('should work with strings', () => {
+    const hfInstance = HyperFormula.buildFromArray([
+      ['A'],
+      ['B'],
+      ['C'],
+      ['D']
+    ])
+
+    hfInstance.setRowOrder(0, [0, 3, 2, 1])
+    expect(hfInstance.getSheetSerialized(0)).toEqual([['A'], ['D'], ['C'], ['B']])
   })
 
   it('should update the addressing in cells being sorted', () => {

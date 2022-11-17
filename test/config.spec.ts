@@ -2,7 +2,7 @@ import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
 import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
-import {adr, unregisterAllLanguages} from './testUtils'
+import {adr, resetSpy, unregisterAllLanguages} from './testUtils'
 import {CellValueNoNumber} from '../src/Cell'
 
 describe('Config', () => {
@@ -216,6 +216,7 @@ describe('Config', () => {
         ['01/03/2022'],
         ['2022/01/01'],
       ], { dateFormats })
+
       expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
       expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_DATE)
       expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(CellValueNoNumber.STRING)
@@ -233,6 +234,7 @@ describe('Config', () => {
         '01 03/2022',
         '01.03-2022',
       ]], { dateFormats })
+
       expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_DATE)
       expect(engine.getCellValueFormat(adr('A1'))).toEqual('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('B1'))).toEqual(NumberType.NUMBER_DATE)
@@ -262,6 +264,7 @@ describe('Config', () => {
         ['1:33'],
         ['13:33:33'],
       ], { timeFormats })
+
       expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
       expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
       expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
@@ -269,19 +272,53 @@ describe('Config', () => {
       expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(CellValueNoNumber.STRING)
     })
 
+    it('should accept "AM/PM" designator', () => {
+      const timeFormats = ['hh:mm']
+      const engine = HyperFormula.buildFromArray([
+        ['1:33 AM'],
+        ['1:33 PM'],
+        ['01:33 am'],
+        ['1:33 pm'],
+        ['1:33AM'],
+        ['1:33PM'],
+        ['1:33          AM'],
+        ['1:33          PM'],
+        ['13:33 AM'],
+      ], { timeFormats })
+
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A6'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A7'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A8'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A9'))).toEqual(CellValueNoNumber.STRING)
+    })
+
     it('should work with the "hh:mm:ss" format', () => {
       const timeFormats = ['hh:mm:ss']
       const engine = HyperFormula.buildFromArray([
         ['13:33'],
-        ['13:33:00'],
-        ['01:33:33'],
         ['1:33:33'],
-        ['13:33:33.3'],
-        ['13:33:33.33'],
-        ['13:33:33.333'],
-        ['13:33:33.3333'],
-        ['13:33:33.333333333333333333333333333333333333333333333333333333'],
+        ['1:33:33 AM'],
+        ['1:33:33 PM'],
+        ['1:33:33 am'],
+        ['1:33:33 pm'],
+        ['1:33:33 a'],
+        ['1:33:33 p'],
+        ['1:33:33 A'],
+        ['1:33:33 P'],
+        ['13:33:33'],
+        ['01:33:33'],
+        ['1:33:33.3'],
+        ['1:33:33.33'],
+        ['1:33:33.333'],
+        ['1:33:33.3333'],
+        ['1:33:33.333333333333333333333333333333333333333333333333333333'],
       ], { timeFormats })
+
       expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueNoNumber.STRING)
       expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
       expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
@@ -291,6 +328,14 @@ describe('Config', () => {
       expect(engine.getCellValueDetailedType(adr('A7'))).toEqual(NumberType.NUMBER_TIME)
       expect(engine.getCellValueDetailedType(adr('A8'))).toEqual(NumberType.NUMBER_TIME)
       expect(engine.getCellValueDetailedType(adr('A9'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A10'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A11'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A12'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A13'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A14'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A15'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A16'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A17'))).toEqual(NumberType.NUMBER_TIME)
     })
 
     it('the parsing result should be the same regardless of decimal places specified in format string', () => {
@@ -323,15 +368,7 @@ describe('Config', () => {
     })
 
     afterEach(() => {
-      try {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.mockClear() // clears mock in Jest env
-      } catch {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.calls.reset() // clears mock in Jasmine env
-      }
+      resetSpy(console.warn)
     })
 
     it('should log usage of deprecated options when they are passed while engine initialization', () => {
@@ -358,20 +395,11 @@ describe('Config', () => {
       const config = new Config({
         binarySearchThreshold: 20,
       })
-
-      try {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.mockClear() // clears mock in Jest env
-      } catch {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.calls.reset() // clears mock in Jasmine env
-      }
+      resetSpy(console.warn)
 
       config.mergeConfig({})
 
-      expect(console.warn).toHaveBeenCalledTimes(0)
+      expect(console.warn).not.toHaveBeenCalled()
     })
   })
 })

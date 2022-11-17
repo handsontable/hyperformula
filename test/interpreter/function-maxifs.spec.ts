@@ -236,18 +236,15 @@ describe('Function MAXIFS - calcultions on more than one criteria', () => {
 })
 
 describe('Function MAXIFS - cache recalculation after cruds', () => {
-  it('recalculates MAXIFS if changes in summed range', () => {
+  it('recalculates MAXIFS if changes in the first range', () => {
     const sheet = [['10', '10'], ['5', '6'], ['7', '8'], ['=MAXIFS(A1:B1, A2:B2, ">=5", A3:B3, ">=7")']]
     const engine = HyperFormula.buildFromArray(sheet)
 
     const changes = engine.setCellContents(adr('A1'), [['1', '3']])
+    const newValues = changes.map(c => c.newValue)
 
     expect(engine.getCellValue(adr('A4'))).toEqual(3)
-    expect(changes.length).toEqual(3)
-    expectArrayWithSameContent(
-      changes.map((change) => change.newValue),
-      [1, 3, 4]
-    )
+    expectArrayWithSameContent(newValues, [1, 3, 3])
   })
 
   it('recalculates MAXIFS if changes in one of the tested range', () => {

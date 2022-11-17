@@ -51,7 +51,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [2, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1))
     })
 
     it('same sheet, case Rab', () => {
@@ -64,7 +64,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [2, 1])
 
-      expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.relative(-2, 0))
+      expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.relative(0, -2))
     })
 
     it('same sheet, case Rba', () => {
@@ -77,7 +77,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [2, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(3, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 3))
     })
 
     it('same sheet, case Rbb', () => {
@@ -90,7 +90,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [1, 1])
 
-      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(1, 0))
+      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(0, 1))
     })
 
     it('same sheet, same row', () => {
@@ -101,7 +101,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [1, 1])
 
-      expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.relative(0, -1))
+      expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.relative(-1, 0))
     })
   })
 
@@ -136,7 +136,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [0, 1])
 
-      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(-2, 0, 1))
+      expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.relative(0, -2, 1))
     })
 
     it('r = R', () => {
@@ -188,7 +188,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [0, 1])
 
-      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(2, 0, 0))
+      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 2, 0))
     })
 
     it('dependency address at added row', () => {
@@ -204,7 +204,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(0, [0, 1])
 
-      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(1, 0, 0))
+      expect(extractReference(engine, adr('A1', 1))).toEqual(CellAddress.relative(0, 1, 0))
     })
 
     it('dependency address after added row', () => {
@@ -240,7 +240,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(1, [1, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1))
     })
   })
 
@@ -264,7 +264,7 @@ describe('Adding row - fixing dependencies', () => {
 
       engine.addRows(2, [1, 1])
 
-      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0, 1))
+      expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1, 1))
     })
   })
 })

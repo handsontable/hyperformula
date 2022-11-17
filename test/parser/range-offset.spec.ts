@@ -43,7 +43,7 @@ describe('Parser - range offset', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
-    const ast = parser.parse('=Sheet1!A1:OFFSET(B2,0,0)', adr('A1')).ast as CellRangeAst
+    const ast = parser.parse('=Sheet1!A1:OFFSET(B2, 0, 0)', adr('A1')).ast as CellRangeAst
 
     expect(ast.type).toEqual(AstNodeType.CELL_RANGE)
     expect(ast.sheetReferenceType).toEqual(RangeSheetReferenceType.START_ABSOLUTE)

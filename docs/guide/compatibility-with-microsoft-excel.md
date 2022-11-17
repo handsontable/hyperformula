@@ -17,7 +17,7 @@ Still, with the right configuration, you can achieve nearly full compatibility.
 
 ### String comparison rules
 
-In Microsoft Excel, by default, [string comparison](types-of-operators.md#comparing-strings) is accent-sensitive and case-insensitive.
+In the US version of Microsoft Excel, by default, [string comparison](types-of-operators.md#comparing-strings) is accent-sensitive and case-insensitive.
 
 To set up HyperFormula in the same way, use this configuration:
 
@@ -25,7 +25,7 @@ To set up HyperFormula in the same way, use this configuration:
 caseSensitive: false, // set by default
 accentSensitive: true,
 ignorePunctuation: false, // set by default
-localeLang: 'en', // set by default
+localeLang: 'en-US',
 ```
 
 Related options:
@@ -135,42 +135,36 @@ Related options:
 
 ### Date and time formats
 
-In Microsoft Excel, date and time formats depend on your configured locale, whereas in HyperFormula, you set up date and time formats through these options:
+In Microsoft Excel, date and time formats depend on your configured locale, whereas in HyperFormula you can [set them up freely](date-and-time-handling.md).
+
+Options related to date and time formats:
 - [`dateFormats`](../api/interfaces/configparams.md#dateformats)
 - [`timeFormats`](../api/interfaces/configparams.md#timeformats)
 - [`nullYear`](../api/interfaces/configparams.md#nullyear)
-
-To set up HyperFormula in the same way as Excel's `en-US` locale, use this configuration:
-
-```js
-dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
-```
-
-You can also add custom date and time formats by using these API methods:
 - [`parseDateTime()`](../api/interfaces/configparams.md#parsedatetime)
 - [`stringifyDateTime()`](../api/interfaces/configparams.md#stringifydatetime)
 - [`stringifyDuration()`](../api/interfaces/configparams.md#stringifyduration)
 
 ## Full configuration
 
-This configuration aligns HyperFormula with the the default behavior of Microsoft Excel (set to locale `en-US`), as closely as possible at this development stage (version `{{ $page.version }}`).
+This configuration aligns HyperFormula with the default behavior of Microsoft Excel (set to locale `en-US`), as closely as possible at this development stage (version `{{ $page.version }}`).
 
 ```js
 // define options
 const options = {
+  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
+  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+  currencySymbol: ['$', 'USD'],
+  localeLang: 'en-US',
   functionArgSeparator: ',', // set by default
   decimalSeparator: '.', // set by default
   thousandSeparator: '', // set by default
   arrayColumnSeparator: ',', // set by default
   arrayRowSeparator: ';', // set by default
-  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
-  timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
   nullYear: 30, // set by default
   caseSensitive: false, // set by default
   accentSensitive: true,
   ignorePunctuation: false, // set by default
-  localeLang: 'en', // set by default
   useWildcards: true, // set by default
   useRegularExpressions: false, // set by default
   matchWholeCell: true, // set by default

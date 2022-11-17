@@ -86,13 +86,10 @@ export const expectNoDuplicates = (array: any[]) => {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const expectArrayWithSameContent = (expected: any[], actual: any[]) => {
-  expect(actual.length).toBe(expected.length)
-  for (const iter of expected) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    expect(actual).toContainEqual(iter)
-  }
+export const expectArrayWithSameContent = (actualArray: any[], expectedArray: any[]) => {
+  expect(actualArray.length).toBe(expectedArray.length)
+  expectedArray.forEach(expectedItem => expect(actualArray).toContainEqual(expectedItem))
+  actualArray.forEach(actualItem => expect(expectedArray).toContainEqual(actualItem))
 }
 
 export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, expected: string, precision?: number) => {
@@ -243,3 +240,14 @@ export function expectColumnIndexToMatchSheet(expected: Sheet, engine: HyperForm
   expectArrayWithSameContent(normalizeSheet(expected, dimensions), normalizeSheet(exportedColumnIndex, dimensions))
 }
 
+export function resetSpy(spy: jasmine.Spy | unknown): void {
+  try {
+    // eslint-disable-next-line
+    // @ts-ignore
+    spy.mockClear() // clears mock in Jest env
+  } catch {
+    // eslint-disable-next-line
+    // @ts-ignore
+    spy.calls.reset() // clears mock in Jasmine env
+  }
+}

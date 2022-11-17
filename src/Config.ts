@@ -84,6 +84,8 @@ export interface ConfigParams {
   /**
    * Sets symbols that denote currency numbers.
    *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
+   *
    * @default ['$']
    *
    * @category Number
@@ -94,7 +96,7 @@ export interface ConfigParams {
    *
    * A format must be specified as a string consisting of tokens and separators.
    *
-   * Supported tokes:
+   * Supported tokens:
    * - `DD` (day of month)
    * - `MM` (month as a number)
    * - `YYYY` (year as a 4-digit number)
@@ -108,6 +110,8 @@ export interface ConfigParams {
    *
    * Regardless of the separator specified in the format string, all of the above are accepted by the date-parsing function.
    *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
    * @default ['DD/MM/YYYY', 'DD/MM/YY']
    *
    * @category Date and Time
@@ -117,6 +121,8 @@ export interface ConfigParams {
    * Sets a separator character that separates procedure arguments in formulas.
    *
    * Must be different from [[decimalSeparator]] and [[thousandSeparator]].
+   *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default ','
    *
@@ -131,6 +137,8 @@ export interface ConfigParams {
    * - `,` (comma)
    *
    * Must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default '.'
    *
@@ -164,6 +172,8 @@ export interface ConfigParams {
   ignorePunctuation: boolean,
   /**
    * Sets a translation package for function and error names.
+   *
+   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
    *
    * @default 'enGB'
    *
@@ -201,7 +211,7 @@ export interface ConfigParams {
    *
    * To use HyperFormula with your commercial license, set this option to your valid license key string.
    *
-   * For more information, go [here](/guide/license-key.html).
+   * For more information, go [here](/guide/license-key.md).
    *
    * @default undefined
    *
@@ -212,6 +222,8 @@ export interface ConfigParams {
    * Sets the locale for language-sensitive string comparison.
    *
    * Accepts **IETF BCP 47** language tags.
+   *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default 'en'
    *
@@ -244,7 +256,7 @@ export interface ConfigParams {
   /**
    * Sets the maximum number of rows.
    *
-   * @default 40,000
+   * @default 40.000
    *
    * @category Engine
    * */
@@ -252,7 +264,7 @@ export interface ConfigParams {
   /**
    * Sets the maximum number of columns.
    *
-   * @default 18,278
+   * @default 18.278
    *
    * @category Engine
    * */
@@ -261,6 +273,8 @@ export interface ConfigParams {
    * Internally, each date is represented as a number of days that passed since `nullDate`.
    *
    * This option sets a specific date from which that number of days is counted.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default {year: 1899, month: 12, day: 30}
    *
@@ -371,6 +385,8 @@ export interface ConfigParams {
    *
    * Must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
+   *
    * @default ''
    *
    * @category Number
@@ -381,12 +397,29 @@ export interface ConfigParams {
    *
    * A format must be specified as a string consisting of at least two tokens separated by `:` (a colon).
    *
-   * Supported tokes:
+   * Supported tokens:
    * - `hh` (hours)
    * - `mm` (minutes)
    * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc. (seconds)
    *
    * The number of decimal places in the seconds token does not matter. All versions of the seconds token are equivalent in the context of parsing time values.
+   * Regardless of the time format specified, the hours-minutes-seconds value may be followed by the AM/PM designator.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
+   * @example
+   * E.g. for `timeFormats = ['hh:mm:ss.sss']`, valid time strings include:
+   * - `1:33:33`
+   * - `1:33:33.3`
+   * - `1:33:33.33`
+   * - `1:33:33.333`
+   * - `01:33:33`
+   * - `1:33:33 AM`
+   * - `1:33:33 PM`
+   * - `1:33:33 am`
+   * - `1:33:33 pm`
+   * - `1:33:33AM`
+   * - `1:33:33PM`
    *
    * @default ['hh:mm', 'hh:mm:ss.sss']
    *
@@ -398,7 +431,7 @@ export interface ConfigParams {
    *
    * When set to `false`, array arithmetic is enabled only inside array functions (`ARRAYFORMULA`, `FILTER`, and `ARRAY_CONSTRAIN`).
    *
-   * For more information, see the [Arrays guide](/guide/arrays.html).
+   * For more information, see the [Arrays guide](/guide/arrays.md).
    *
    * @default false
    *

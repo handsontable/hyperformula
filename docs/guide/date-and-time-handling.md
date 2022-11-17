@@ -1,47 +1,51 @@
 # Date and time handling
 
 The formats for the default date and time parsing functions can be set using configuration options:
-- [dateFormats](../api/interfaces/configparams.md#dateformats),
-- [timeFormats](../api/interfaces/configparams.md#timeformats),
-- [nullYear](../api/interfaces/configparams.md#nullyear).
+- [`dateFormats`](../api/interfaces/configparams.md#dateformats),
+- [`timeFormats`](../api/interfaces/configparams.md#timeformats),
+- [`nullYear`](../api/interfaces/configparams.md#nullyear).
 
+## Example
 
-## Example with Chinese
+By default, HyperFormula uses the European date and time formats.
 
 ```javascript
-const options = {
-    // add popular date format used in China
-    dateFormats: ['yyyy-M-d', 'MM/DD/YYYY', 'MM/DD/YY'],
-    // add a custom time format
-    timeFormats: ['hh:mm:ss', 'hh:mm', 'hh:mm:ss.sss'],
-};
+dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'], // set by default
+timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
 ```
 
-## Custom functions for handling date and time 
+To use the US date and time formats, set:
+
+```javascript
+dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'], // US date formats
+timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
+```
+
+## Custom date and time handling
 
 HyperFormula offers the possibility to extend the number of supported
 date/time formats as well as the behavior of this functionality by exposing
 three options:
 
-- [parseDateTime](../api/interfaces/configparams.md#parsedatetime), which allows to provide a function that accepts
+- [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime), which allows to provide a function that accepts
 a string representing date/time and parses it into an actual date/time format
-- [stringifyDateTime](../api/interfaces/configparams.md#stringifydatetime), which allows to provide a function that
+- [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime), which allows to provide a function that
 takes the date/time and prints it as a string
-- [stringifyDuration](../api/interfaces/configparams.md#stringifyduration), which allows to provide a function that
+- [`stringifyDuration`](../api/interfaces/configparams.md#stringifyduration), which allows to provide a function that
 takes time duration and prints it as a string
 
 To extend the number of possible date formats, you will need to
-configure `parseDateTime` . This functionality is based on callbacks,
+configure [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime) . This functionality is based on callbacks,
 and you can customize the formats by integrating a third-party
 library like [Moment.js](https://momentjs.com/), or by writing your
-own custom function that returns a [DateTime](../api/globals.md#datetime) object.
+own custom function that returns a [`DateTime`](../api/globals.md#datetime) object.
 
 The configuration of date formats and stringify options may impact some built-in functions.
-For instance, VALUE transforms strings
-into numbers, which means it uses `parseDatetime`. TEXT
+For instance, the `VALUE` function transforms strings
+into numbers, which means it uses [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime). The `TEXT` function
 works the other way round - it accepts a number and returns a string,
 so it uses `stringifyDateTime`. Any change here might give you
-different results. Criteria-based functions (SUMIF, AVERAGEIF, etc.) perform comparisons, so they also need to
+different results. Criteria-based functions (`SUMIF`, `AVERAGEIF`, etc.) perform comparisons, so they also need to
 work on strings, dates, etc.
 
 ## Moment.js integration
@@ -94,125 +98,10 @@ And now, HyperFormula recognizes these values as valid dates and can operate on 
 
 ## Demo
 
-<iframe src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.1.x/date-time?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" title="handsontable/hyperformula-demos: date-time" allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking" sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"></iframe>
-
-<br><br>
-
-## Cheat sheet
-
-Below is a cheat sheet with the most popular date formats in
-different countries.
-
-| Country                | Language   | Format      |
-|:-----------------------|:-----------|:------------|
-| Albania                | Albanian   | yyyy-MM-dd  |
-| United Arab Emirates   | Arabic     | dd/MM/yyyy  |
-| Argentina              | Spanish    | dd/MM/yyyy  |
-| Australia              | English    | d/MM/yyyy   |
-| Austria                | German     | dd.MM.yyyy  |
-| Belgium                | French     | d/MM/yyyy   |
-| Belgium                | Dutch      | d/MM/yyyy   |
-| Bulgaria               | Bulgarian  | yyyy-M-d    |
-| Bahrain                | Arabic     | dd/MM/yyyy  |
-| Bosnia and Herzegovina | Bosnian    | dd.MM.yyyy. |
-| Bosnia and Herzegovina | Serbian    | dd.MM.yyyy. |
-| Bosnia and Herzegovina | Croatian   | dd.MM.yyyy. |
-| Belarus                | Belarusian | d.M.yyyy    |
-| Bolivia                | Spanish    | dd-MM-yyyy  |
-| Brazil                 | Portuguese | dd/MM/yyyy  |
-| Canada                 | French     | yyyy-MM-dd  |
-| Canada                 | English    | dd/MM/yyyy  |
-| Switzerland            | German     | dd.MM.yyyy  |
-| Switzerland            | French     | dd.MM.yyyy  |
-| Switzerland            | Italian    | dd.MM.yyyy  |
-| Chile                  | Spanish    | dd-MM-yyyy  |
-| China                  | Chinese    | yyyy-M-d    |
-| Colombia               | Spanish    | d/MM/yyyy   |
-| Costa Rica             | Spanish    | dd/MM/yyyy  |
-| Cyprus                 | Greek      | dd/MM/yyyy  |
-| Czech Republic         | Czech      | d.M.yyyy    |
-| Germany                | German     | dd.MM.yyyy  |
-| Denmark                | Danish     | dd-MM-yyyy  |
-| Dominican Republic     | Spanish    | MM/dd/yyyy  |
-| Algeria                | Arabic     | dd/MM/yyyy  |
-| Ecuador                | Spanish    | dd/MM/yyyy  |
-| Egypt                  | Arabic     | dd/MM/yyyy  |
-| Spain                  | Spanish    | d/MM/yyyy   |
-| Spain                  | Catalan    | dd/MM/yyyy  |
-| Estonia                | Estonian   | d.MM.yyyy   |
-| Finland                | Finnish    | d.M.yyyy    |
-| France                 | French     | dd/MM/yyyy  |
-| United Kingdom         | English    | dd/MM/yyyy  |
-| Greece                 | Greek      | d/M/yyyy    |
-| Guatemala              | Spanish    | d/MM/yyyy   |
-| Hong Kong              | Chinese    | yyyy年M月d日   |
-| Honduras               | Spanish    | MM-dd-yyyy  |
-| Croatia                | Croatian   | dd.MM.yyyy. |
-| Hungary                | Hungarian  | yyyy.MM.dd. |
-| Indonesia              | Indonesian | dd/MM/yyyy  |
-| India                  | Hindi      | ३/६/१२      |
-| India                  | English    | d/M/yyyy    |
-| Ireland                | Irish      | dd/MM/yyyy  |
-| Ireland                | English    | dd/MM/yyyy  |
-| Iraq                   | Arabic     | dd/MM/yyyy  |
-| Iceland                | Icelandic  | d.M.yyyy    |
-| Israel                 | Hebrew     | dd/MM/yyyy  |
-| Italy                  | Italian    | dd/MM/yyyy  |
-| Jordan                 | Arabic     | dd/MM/yyyy  |
-| Japan                  | Japanese   | yyyy/MM/dd  |
-| Japan                  | Japanese   | H24.MM.dd   |
-| South Korea            | Korean     | yyyy. M. d  |
-| Kuwait                 | Arabic     | dd/MM/yyyy  |
-| Lebanon                | Arabic     | dd/MM/yyyy  |
-| Libya                  | Arabic     | dd/MM/yyyy  |
-| Lithuania              | Lithuanian | yyyy.M.d    |
-| Luxembourg             | French     | dd/MM/yyyy  |
-| Luxembourg             | German     | dd.MM.yyyy  |
-| Latvia                 | Latvian    | yyyy.d.M    |
-| Morocco                | Arabic     | dd/MM/yyyy  |
-| Mexico                 | Spanish    | d/MM/yyyy   |
-| Macedonia              | Macedonian | d.M.yyyy    |
-| Malta                  | English    | dd/MM/yyyy  |
-| Malta                  | Maltese    | dd/MM/yyyy  |
-| Montenegro             | Serbian    | d.M.yyyy.   |
-| Malaysia               | Malay      | dd/MM/yyyy  |
-| Nicaragua              | Spanish    | MM-dd-yyyy  |
-| Netherlands            | Dutch      | d-M-yyyy    |
-| Norway                 | Norwegian  | dd.MM.yyyy  |
-| Norway                 | Norwegian  | dd.MM.yyyy  |
-| New Zealand            | English    | d/MM/yyyy   |
-| Oman                   | Arabic     | dd/MM/yyyy  |
-| Panama                 | Spanish    | MM/dd/yyyy  |
-| Peru                   | Spanish    | dd/MM/yyyy  |
-| Philippines            | English    | M/d/yyyy    |
-| Poland                 | Polish     | dd.MM.yyyy  |
-| Puerto Rico            | Spanish    | MM-dd-yyyy  |
-| Portugal               | Portuguese | dd-MM-yyyy  |
-| Paraguay               | Spanish    | dd/MM/yyyy  |
-| Qatar                  | Arabic     | dd/MM/yyyy  |
-| Romania                | Romanian   | dd.MM.yyyy  |
-| Russia                 | Russian    | dd.MM.yyyy  |
-| Saudi Arabia           | Arabic     | dd/MM/yyyy  |
-| Serbia and Montenegro  | Serbian    | d.M.yyyy.   |
-| Sudan                  | Arabic     | dd/MM/yyyy  |
-| Singapore              | Chinese    | dd/MM/yyyy  |
-| Singapore              | English    | M/d/yyyy    |
-| El Salvador            | Spanish    | MM-dd-yyyy  |
-| Serbia                 | Serbian    | d.M.yyyy.   |
-| Slovakia               | Slovak     | d.M.yyyy    |
-| Slovenia               | Slovenian  | d.M.yyyy    |
-| Sweden                 | Swedish    | yyyy-MM-dd  |
-| Syria                  | Arabic     | dd/MM/yyyy  |
-| Thailand               | Thai       | d/M/2555    |
-| Thailand               | Thai       | ๓/๖/๒๕๕๕    |
-| Tunisia                | Arabic     | dd/MM/yyyy  |
-| Turkey                 | Turkish    | dd.MM.yyyy  |
-| Taiwan                 | Chinese    | yyyy/M/d    |
-| Ukraine                | Ukrainian  | dd.MM.yyyy  |
-| Uruguay                | Spanish    | dd/MM/yyyy  |
-| United States          | English    | M/d/yyyy    |
-| United States          | Spanish    | M/d/yyyy    |
-| Venezuela              | Spanish    | dd/MM/yyyy  |
-| Vietnam                | Vietnamese | dd/MM/yyyy  |
-| Yemen                  | Arabic     | dd/MM/yyyy  |
-| South Africa           | English    | yyyy/MM/dd  |
+<iframe
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/date-time?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: date-time"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>

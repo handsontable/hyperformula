@@ -279,6 +279,9 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  /**
+   * Implementation for the EOMONTH function
+   */
   public eomonth(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.dateTimeHelper.numberToSimpleDate(dateNumber)

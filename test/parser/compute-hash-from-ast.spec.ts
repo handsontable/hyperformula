@@ -38,7 +38,7 @@ describe('Compute hash from ast', () => {
   })
 
   it('function call', () => {
-    const formula = '=SUM(1,2,3)'
+    const formula = '=SUM(1, 2, 3)'
     expectHashFromAstMatchHashFromTokens(formula)
   })
 

@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src/'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -71,6 +71,16 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     })
 
+    it('should return #VALUE error when the found value is a range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '3', '4', '5'],
+        ['a', '=D2:E2', 'c', 'd', 'e'],
+        ['=HLOOKUP(2, A1:E2, 2)']
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    })
+
     it('should propagate errors properly', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(1/0, B1:B1, 1)'],
@@ -105,6 +115,26 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A3'))).toEqual('b')
     })
 
+    it('should return the first matching value if RangeLookup = FALSE', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '2', '2', '5'],
+        ['a', 'b', 'c', 'd', 'e'],
+        ['=HLOOKUP(2, A1:E2, 2, FALSE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqual('b')
+    })
+
+    it('should return the last matching value if RangeLookup = TRUE', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '2', '2', '5'],
+        ['a', 'b', 'c', 'd', 'e'],
+        ['=HLOOKUP(2, A1:E2, 2, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqual('d')
+    })
+
     it('works with wildcards', () => {
       const engine = HyperFormula.buildFromArray([
         ['abd', 1, 'aaaa', 'ddaa', 'abcd'],
@@ -113,6 +143,16 @@ describe('Function HLOOKUP', () => {
       ])
 
       expect(engine.getCellValue(adr('A3'))).toEqual('e')
+    })
+
+    it('returns error when there is no matching value for the wildcard pattern', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['abd', 1, 'aaaa', 'ddaa', 'abbd'],
+        ['a', 'b', 'c', 'd', 'e'],
+        ['=HLOOKUP("*c*", A1:E2, 2, FALSE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
     })
 
     it('on sorted data ignores wildcards', () => {
@@ -155,7 +195,17 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A3'))).toEqual('d')
     })
 
-    it('should return lower bound for sorted values', () => {
+    it('should return the lower bound for sorted values', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2', '8'],
+        ['a', 'b', 'c'],
+        ['=HLOOKUP(4, A1:C2, 2, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toEqual('b')
+    })
+
+    it('should return the lower bound for sorted values if all are smaller than the search value', () => {
       const engine = HyperFormula.buildFromArray([
         ['1', '2', '3'],
         ['a', 'b', 'c'],
@@ -187,12 +237,12 @@ describe('Function HLOOKUP', () => {
 
     it('should find value if index build during evaluation', () => {
       const engine = HyperFormula.buildFromArray([
-        ['=B1', '1', '2'],
+        ['1', '=A1', '2'],
         ['a', 'b', 'c'],
         ['=HLOOKUP(1, A1:C2, 2, TRUE())'],
       ])
 
-      expect(engine.getCellValue(adr('A3'))).toEqual('a')
+      expect(engine.getCellValue(adr('A3'))).toEqual('b')
     })
 
     it('should properly calculate absolute row index', () => {
@@ -211,7 +261,7 @@ describe('Function HLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(4)
     })
 
-    it('should calculate indexes properly when using naitve approach', () => {
+    it('should calculate indexes properly when using naive approach', () => {
       const engine = HyperFormula.buildFromArray([
         ['=HLOOKUP(4, E1:J1, 1, TRUE())', null, null, null, '1', '2', '3', '4', '5']
       ], {useColumnIndex: false})

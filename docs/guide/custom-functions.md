@@ -10,7 +10,7 @@ Expand the function library of your application, by adding custom functions.
 As an example, let's create a function that returns the number of letters in the word "HyperFormula".
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.1.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: custom-functions"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -117,7 +117,7 @@ export class CountHF extends FunctionPlugin {
 
 Register your function plugin (and its translations) so that HyperFormula can recognize it.
 
-Use the `registerFunctionPlugin()` method:
+Use the [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin) method:
 
 ```javascript
 HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
@@ -198,7 +198,7 @@ MyFunctionPlugin.implementedFunctions = {
 You can set the following options for your function:
 
 | Option                              | Type    | Description                                                                                                                                  |
-| ----------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+|-------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
 | `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                 |
 | `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency (other arguments are properly evaluated). |
 | `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                              |
@@ -232,15 +232,15 @@ MyFunctionPlugin.implementedFunctions = {
 
 You can set the following argument validation options:
 
-| Option         | Type                                      | Description                                                                                                                                                                                                                      |
-| -------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `passSubtype`  | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).                                                                                       |
-| `defaultValue` | `InternalScalarValue` \| `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                         |
-| `optionalArg`  | Boolean                                   | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
-| `minValue`     | Number                                    | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                      |
-| `maxValue`     | Number                                    | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                         |
-| `lessThan`     | Number                                    | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
-| `greaterThan`  | Number                                    | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
+| Option         | Type                    | Description                                                                                                                                                                                                                      |
+|----------------|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `passSubtype`  | Boolean                 | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).                                                                                       |
+| `defaultValue` | `InternalScalarValue` \ | `RawScalarValue`                                                                                                                                                                                                                 | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                         |
+| `optionalArg`  | Boolean                 | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
+| `minValue`     | Number                  | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                      |
+| `maxValue`     | Number                  | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                         |
+| `lessThan`     | Number                  | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
+| `greaterThan`  | Number                  | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
 
 #### Handling missing arguments
 
@@ -327,7 +327,7 @@ Before using a translated function name, remember to [register and set the langu
 
 If you want your custom function to return an error, check the [API reference](../api) for the HyperFormula [error types](types-of-errors.md).
 
-:::tip
+::: tip
 All HyperFormula [error types](types-of-errors.md) support optional custom error messages. Put them to good use: let your users know what caused the error and how to avoid it in the future.
 :::
 

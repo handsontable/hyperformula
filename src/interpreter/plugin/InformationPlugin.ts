@@ -329,7 +329,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * Returns number of columns in provided range of cells
    *
    * @param ast
-   * @param _state
+   * @param state
    */
   public columns(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
@@ -381,7 +381,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * Returns number of rows in provided range of cells
    *
    * @param ast
-   * @param _state
+   * @param state
    */
   public rows(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
@@ -413,7 +413,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   /**
-   * Corresponds to INDEX(range;)
+   * Corresponds to INDEX
    *
    * Returns specific position in 2d array.
    *
