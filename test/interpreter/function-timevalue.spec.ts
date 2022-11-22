@@ -46,9 +46,9 @@ describe('Function TIMEVALUE', () => {
 
   it('should return NUMBER_TIME', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=TIMEVALUE(14:31)'],
+      ['=TIMEVALUE("14:31")'],
     ])
 
-    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_TIME)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_TIME)
   })
 })

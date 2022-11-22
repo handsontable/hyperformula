@@ -46,9 +46,9 @@ describe('Function DATEVALUE', () => {
 
   it('should return NUMBER_DATE', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DATEVALUE(25/02/1991)'],
+      ['=DATEVALUE("25/02/1991")'],
     ])
 
-    expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATE)
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
   })
 })
