@@ -52,6 +52,15 @@ describe('Function EDATE', () => {
     expectToHaveDate(engine, adr('A2'), '31/08/2019')
   })
 
+  it('should return NUMBER_DATE', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATE(2019, 7, 31)'],
+      ['=EDATE(A1, 1)'],
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
+  })
+
   it('works for negative numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DATE(2019, 8, 31)'],
