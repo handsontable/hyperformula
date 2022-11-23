@@ -11,7 +11,7 @@ import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   public static implementedFunctions = {
@@ -20,16 +20,16 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       arraySizeMethod: 'arrayformulaArraySize',
       arrayFunction: true,
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
     },
     'ARRAY_CONSTRAIN': {
       method: 'arrayconstrain',
       arraySizeMethod: 'arrayconstrainArraySize',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
       ],
       vectorizationForbidden: true,
     },
@@ -38,8 +38,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       arraySizeMethod: 'filterArraySize',
       arrayFunction: true,
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
     }

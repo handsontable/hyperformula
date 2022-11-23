@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RandomPlugin> {
   public static implementedFunctions = {
@@ -20,8 +20,8 @@ export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypech
     'RANDBETWEEN': {
       method: 'randbetween',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       isVolatile: true,
     },

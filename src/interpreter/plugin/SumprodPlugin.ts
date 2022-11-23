@@ -9,14 +9,14 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumprodPlugin> {
   public static implementedFunctions = {
     'SUMPRODUCT': {
       method: 'sumproduct',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
     },

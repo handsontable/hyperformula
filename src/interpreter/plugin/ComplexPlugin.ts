@@ -9,171 +9,171 @@ import {ProcedureAst} from '../../parser'
 import {coerceComplexToString, complex} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue, RawInterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class ComplexPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ComplexPlugin> {
   public static implementedFunctions = {
     'COMPLEX': {
       method: 'complex',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.STRING, defaultValue: 'i'},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.STRING, defaultValue: 'i'},
       ],
     },
     'IMABS': {
       method: 'imabs',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMAGINARY': {
       method: 'imaginary',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMREAL': {
       method: 'imreal',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMARGUMENT': {
       method: 'imargument',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMCONJUGATE': {
       method: 'imconjugate',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMCOS': {
       method: 'imcos',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMCOSH': {
       method: 'imcosh',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMCOT': {
       method: 'imcot',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMCSC': {
       method: 'imcsc',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMCSCH': {
       method: 'imcsch',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMSEC': {
       method: 'imsec',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMSECH': {
       method: 'imsech',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMSIN': {
       method: 'imsin',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMSINH': {
       method: 'imsinh',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMTAN': {
       method: 'imtan',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMDIV': {
       method: 'imdiv',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMPRODUCT': {
       method: 'improduct',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'IMSUM': {
       method: 'imsum',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'IMSUB': {
       method: 'imsub',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMEXP': {
       method: 'imexp',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMLN': {
       method: 'imln',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMLOG10': {
       method: 'imlog10',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMLOG2': {
       method: 'imlog2',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
     'IMPOWER': {
       method: 'impower',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.COMPLEX},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'IMSQRT': {
       method: 'imsqrt',
       parameters: [
-        {argumentType: ArgumentTypes.COMPLEX},
+        {argumentType: FunctionArgumentType.COMPLEX},
       ],
     },
   }

@@ -6,7 +6,7 @@
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export const PI = parseFloat(Math.PI.toFixed(14))
 
@@ -19,7 +19,7 @@ export class MathConstantsPlugin extends FunctionPlugin implements FunctionPlugi
     'SQRTPI': {
       method: 'sqrtpi',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0}
       ],
     },
   }

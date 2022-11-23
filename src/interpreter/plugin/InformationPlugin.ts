@@ -10,7 +10,7 @@ import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing information functions
@@ -20,7 +20,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'COLUMN': {
       method: 'column',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR, optional: true}
+        {argumentType: FunctionArgumentType.NOERROR, optional: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -29,7 +29,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'COLUMNS': {
       method: 'columns',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE}
+        {argumentType: FunctionArgumentType.RANGE}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -38,19 +38,19 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ISBINARY': {
       method: 'isbinary',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'ISERR': {
       method: 'iserr',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISFORMULA': {
       method: 'isformula',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR}
+        {argumentType: FunctionArgumentType.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
@@ -58,58 +58,58 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ISNA': {
       method: 'isna',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISREF': {
       method: 'isref',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ],
       vectorizationForbidden: true,
     },
     'ISERROR': {
       method: 'iserror',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISBLANK': {
       method: 'isblank',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISNUMBER': {
       method: 'isnumber',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISLOGICAL': {
       method: 'islogical',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISTEXT': {
       method: 'istext',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISNONTEXT': {
       method: 'isnontext',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'INDEX': {
       method: 'index',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'NA': {
@@ -119,7 +119,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ROW': {
       method: 'row',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR, optional: true}
+        {argumentType: FunctionArgumentType.NOERROR, optional: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -128,7 +128,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ROWS': {
       method: 'rows',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE}
+        {argumentType: FunctionArgumentType.RANGE}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -137,7 +137,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'SHEET': {
       method: 'sheet',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
@@ -145,7 +145,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'SHEETS': {
       method: 'sheets',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
