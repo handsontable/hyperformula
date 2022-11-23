@@ -1,14 +1,12 @@
-import {FunctionPluginValidationError, HyperFormula, SimpleRangeValue} from '../src'
+import {CellError, FunctionPluginValidationError, HyperFormula, SimpleRangeValue, ErrorType} from '../src'
 import {ArraySize} from '../src/ArraySize'
-import {ErrorType} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
-import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
-import {ConditionalAggregationPlugin} from '../src/interpreter/plugin/ConditionalAggregationPlugin'
+import {NumericAggregationPlugin, ConditionalAggregationPlugin} from '../src/interpreter/plugin'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
@@ -123,6 +121,39 @@ class ReservedNamePlugin extends FunctionPlugin implements FunctionPluginTypeche
 
   public version(_ast: ProcedureAst, _state: InterpreterState): InternalScalarValue {
     return 'foo'
+  }
+}
+
+class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<SquarePlugin> {
+  public static implementedFunctions = {
+    // Key of the mapping describes which function will be used to compute it
+    'SQUARE': {
+      method: 'square',
+    },
+  }
+
+  public square(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    // Take ast of first argument from list of arguments
+    const arg = ast.args[0]
+
+    // If there was no argument, return NA error
+    if (!arg) {
+      return new CellError(ErrorType.NA)
+    }
+
+    // Compute value of argument
+    const argValue = this.evaluateAst(arg, state)
+
+    if (argValue instanceof CellError) {
+      // If the value is some error, return that error
+      return argValue
+    } else if (typeof argValue === 'number') {
+      // If it's a number, compute the result
+      return (argValue * argValue)
+    } else {
+      // If it's some other type which doesn't make sense in terms of square (string, boolean), return VALUE error
+      return new CellError(ErrorType.VALUE)
+    }
   }
 }
 
@@ -391,5 +422,24 @@ describe('aliases', () => {
     expect(() => {
       HyperFormula.registerFunctionPlugin(OverloadedAliasPlugin)
     }).toThrow(new AliasAlreadyExisting('FOO', 'OverloadedAliasPlugin'))
+  })
+})
+
+describe('Argument validation implemented by hand (without call to runFunction)', () => {
+  it('works', () => {
+    HyperFormula.registerFunctionPlugin(SquarePlugin)
+    HyperFormula.getLanguage('enGB').extendFunctions({SQUARE: 'SQUARE'})
+
+    const engine = HyperFormula.buildFromArray([
+      ['=SQUARE(2)'],
+      ['=SQUARE()'],
+      ['=SQUARE(TRUE())'],
+      ['=SQUARE(1/0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 })
