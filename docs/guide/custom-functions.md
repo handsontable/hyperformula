@@ -7,7 +7,7 @@ Expand the function library of your application, by adding custom functions.
 
 ## Add a custom function
 
-As an example, let's create a function that returns the number of letters in the word "HyperFormula".
+As an example, let's create a function that accepts a username as a string argument and returns a personalized greeting. 
 
 <iframe
   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
