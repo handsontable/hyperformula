@@ -1,4 +1,11 @@
-import {CellError, FunctionPluginValidationError, HyperFormula, SimpleRangeValue, ErrorType} from '../src'
+import {
+  CellError,
+  ErrorType,
+  FunctionArgumentType,
+  FunctionPluginValidationError,
+  HyperFormula,
+  SimpleRangeValue
+} from '../src'
 import {ArraySize} from '../src/ArraySize'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
@@ -6,7 +13,7 @@ import {plPL} from '../src/i18n/languages'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
-import {NumericAggregationPlugin, ConditionalAggregationPlugin} from '../src/interpreter/plugin'
+import {ConditionalAggregationPlugin, NumericAggregationPlugin} from '../src/interpreter/plugin'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
@@ -154,6 +161,41 @@ class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<Squ
       // If it's some other type which doesn't make sense in terms of square (string, boolean), return VALUE error
       return new CellError(ErrorType.VALUE)
     }
+  }
+}
+
+class GreetingsPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    GREET: {
+      method: 'greet',
+      parameters: [
+        { argumentType: FunctionArgumentType.STRING }
+      ],
+    }
+  }
+
+  public static translations = {
+    enGB: {
+      GREET: 'GREET',
+    },
+    enUS: {
+      GREET: 'GREET',
+    }
+  }
+  
+  greet(ast: ProcedureAst, state: InterpreterState) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('GREET'),
+      (username) => {
+        if (!username) {
+          return new CellError(ErrorType.VALUE)
+        }
+
+        return `👋 Hello, ${username}!`
+      },
+    )
   }
 }
 
@@ -441,5 +483,41 @@ describe('Argument validation implemented by hand (without call to runFunction)'
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE))
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+})
+
+
+describe('Custom function implemented with runFunction)', () => {
+  it('works for a non-empty string', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('👋 Hello, Anthony!')
+  })
+
+  it('returns #VALUE! error for empty string', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['', '=GREET(A1)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE))
+  })
+
+  it('propagates #DIV_BY_ZERO! error', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['=1/0', '=GREET(A1)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('propagates #CYCLE! error', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['=B1', '=GREET(A1)']])
+
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
   })
 })
