@@ -24,34 +24,37 @@ Import `FunctionPlugin`, and extend it with a new class. For example:
 ```javascript
 import { FunctionPlugin } from 'hyperformula';
 
-// let's call the function plugin `CountHF`
-export class CountHF extends FunctionPlugin {
+// let's call the function plugin `GreetingsPlugin`
+export class GreetingsPlugin extends FunctionPlugin {
   
 }
 ```
 
-### 2. Define your function's ID and method
+### 2. Define your function's ID, method and metadata
 
-In your function plugin, in the static `implementedFunctions` property, define an object that contains your custom function.
+// TODO: link API ref for ImplementedFunctions, 
+
+In your function plugin, in the static `implementedFunctions` property, define an object that declares the functions provided by this plugin.
 
 The name of that object becomes the ID by which [translations](#function-translations), [aliases](#function-aliases), and other elements refer to your function.
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
 
-Then, in your function's object, define a `method` property, which maps your function to an implementation method (we'll define it later on).
+In your function's object, you can specify:
+- a `method` property, which maps your function to an implementation method (we'll define it later on),
+- a `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument.
+- other [custom function options](#custom-function-options)
 
 ```javascript
 CountHF.implementedFunctions = {
-  // let's define the function's ID as `HYPER`
-  HYPER: {
-    // we'll define the `hyper` method later on
-    method: 'hyper',
-  },
+  // let's define the function's ID as `GREET`
+  GREET: {
+    method: "greet",
+    parameters: [
+      { argumentType: "STRING" }
+    ],
+  }
 };
 ```
-
-::: tip
-In `implementedFunctions`, you can also define your [custom function options](#custom-function-options) and [argument validation options](#argument-validation-options).
-:::
 
 ::: tip
 To define multiple functions in a single function plugin, add them all to the `implementedFunctions` object.

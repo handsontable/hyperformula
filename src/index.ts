@@ -47,7 +47,7 @@ import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from 
 import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
-import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType} from './interpreter'
+import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata} from './interpreter'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
 import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
@@ -149,6 +149,8 @@ export {
   ExpectedOneOfValuesError,
   ExpectedValueOfTypeError,
   FunctionPlugin,
+  ImplementedFunctions,
+  FunctionMetadata,
   FunctionArgumentType,
   FunctionPluginValidationError,
   InvalidAddressError,

@@ -486,7 +486,6 @@ describe('Argument validation implemented by hand (without call to runFunction)'
   })
 })
 
-
 describe('Custom function implemented with runFunction)', () => {
   it('works for a non-empty string', () => {
     HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
