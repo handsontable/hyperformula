@@ -95,20 +95,6 @@ In your function plugin, add a method that implements your function's calculatio
 * Take two optional arguments: `ast` and `state`.
 * Return the results of your calculations.
 
-```javascript
-export class GreetingsPlugin extends FunctionPlugin {
-  greet(ast, state) {
-    return (username) => {
-      if (!username) {
-        return new CellError('VALUE');
-      }
-
-      return `👋 Hello, ${username}!`;
-    };
-  }
-}
-```
-
 To benefit from HyperFormula's automatic validations, wrap your method in the built-in `runFunction()` method, which:
 * Verifies the format of the values returned by your function.
 * Validates your function's parameters against your [custom function options](#custom-function-options).
@@ -145,7 +131,7 @@ HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translation
 
 ### 6. Use your custom function inside a formula
 
-Now, you can use your HYPER function inside a formula:
+Now, you can use your GREET function inside a formula:
 
 ```javascript
 // prepare spreadsheet data
@@ -202,6 +188,27 @@ GreetingsPlugin.translations = {
 };
 
 HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
+```
+
+### Test your function
+
+You may add some unit tests to make sure that your custom function works correctly using one of the javascript testing libraries.
+
+```js
+describe('GreetingsPlugin', () => {
+  it('works for a non-empty string', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
+    const engine = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
+    expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 })).toEqual('👋 Hello, Anthony!');
+  });
+
+  it('returns #VALUE! error for empty string', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
+    const engine = HyperFormula.buildFromArray([['', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
+    expect(engine.getCellValueType({ sheet: 0, row: 0, col: 1 })).toEqual('ERROR');
+    expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 }).value).toEqual('#VALUE!');
+  });
+});
 ```
 
 ## Custom function options
