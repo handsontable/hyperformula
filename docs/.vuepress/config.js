@@ -203,7 +203,7 @@ module.exports = {
           title: 'Internationalization',
           collapsable: false,
           children: [
-            ['/guide/i18n-overview', 'Internationalization overview'],
+            ['/guide/i18n-features', 'Internationalization features'],
             ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
           ]
@@ -227,7 +227,7 @@ module.exports = {
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
             ['/guide/known-limitations', 'Known limitations'],
-            ['/guide/importing-files', 'Importing XLSX/CSV files'],
+            ['/guide/file-import', 'File import'],
           ]
         },
         {

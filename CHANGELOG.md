@@ -6,12 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2022-11-17
+
 ### Added
-- Added American English (`enUS`) language pack. This is a convenience alias, since the function names provided by it are identical to the ones in the existing British English (`enGB`) language pack. [#1025](https://github.com/handsontable/hyperformula/issues/1025)
+- Added an American English (`enUS`) language pack. It's a convenience alias: it contains the same translations as the existing British English (`enGB`) language pack. [#1025](https://github.com/handsontable/hyperformula/issues/1025)
 
 ### Fixed
-- Fixed functions VLOOKUP and HLOOKUP to handle duplicates according to the specification. [#1072](https://github.com/handsontable/hyperformula/issues/1072)
-- Fixed function MATCH to handle ranges ordered descending according to the specification. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
+- Fixed functions VLOOKUP and HLOOKUP to handle duplicates in the way specified by the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#HLOOKUP) standard. [#1072](https://github.com/handsontable/hyperformula/issues/1072)
+- Fixed the MATCH function to handle descending ranges in the way specified by the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#MATCH) standard. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
 
 ## [2.1.0] - 2022-09-08
 

@@ -4,6 +4,16 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.2.0
+**Release date: November 17, 2022**
+
+### Added
+- Added an American English (`enUS`) language pack. It's a convenience alias: it contains the same translations as the existing British English (`enGB`) language pack. [#1025](https://github.com/handsontable/hyperformula/issues/1025)
+
+### Fixed
+- Fixed functions VLOOKUP and HLOOKUP to handle duplicates in the way specified by the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#HLOOKUP) standard. [#1072](https://github.com/handsontable/hyperformula/issues/1072)
+- Fixed the MATCH function to handle descending ranges in the way specified by the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#MATCH) standard. [#1063](https://github.com/handsontable/hyperformula/issues/1063)
+
 ## 2.1.0
 **Release date: September 8, 2022**
 
