@@ -32,20 +32,18 @@ export class GreetingsPlugin extends FunctionPlugin {
 
 ### 2. Define your function's ID, method and metadata
 
-// TODO: link API ref for ImplementedFunctions, 
-
 In your function plugin, in the static `implementedFunctions` property, define an object that declares the functions provided by this plugin.
 
 The name of that object becomes the ID by which [translations](#function-translations), [aliases](#function-aliases), and other elements refer to your function.
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
 
 In your function's object, you can specify:
-- a `method` property, which maps your function to an implementation method (we'll define it later on),
-- a `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument.
-- other [custom function options](#custom-function-options)
+- a `method` property (required), which maps your function to an implementation method (we'll define it later on),
+- an `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
+- other [custom function options](#custom-function-options).
 
 ```javascript
-CountHF.implementedFunctions = {
+GreetingsPlugin.implementedFunctions = {
   // let's define the function's ID as `GREET`
   GREET: {
     method: "greet",
@@ -59,11 +57,11 @@ CountHF.implementedFunctions = {
 ::: tip
 To define multiple functions in a single function plugin, add them all to the `implementedFunctions` object.
 ```js
-CountHF.implementedFunctions = {
-  HYPER: {
+GreetingsPlugin.implementedFunctions = {
+  GREET: {
     //...
-  },
-  SUPER: {
+  }, 
+  FAREWELL: {
     //...
   },
 };
@@ -81,11 +79,13 @@ Function names are case-insensitive, as they are all normalized to uppercase.
 :::
 
 ```javascript
-CountHF.translations = {
+GreetingsPlugin.translations = {
   enGB: {
-    // in English, let's set the function's name to `HYPER`
-    HYPER: 'HYPER',
+    GREET: "GREET",
   },
+  enUS: {
+    GREET: "GREET",
+  }
 };
 ```
 
@@ -96,9 +96,15 @@ In your function plugin, add a method that implements your function's calculatio
 * Return the results of your calculations.
 
 ```javascript
-export class CountHF extends FunctionPlugin {
-  hyper(ast, state) {
-    return 'Hyperformula'.length;
+export class GreetingsPlugin extends FunctionPlugin {
+  greet(ast, state) {
+    return (username) => {
+      if (!username) {
+        return new CellError('VALUE');
+      }
+
+      return `👋 Hello, ${username}!`;
+    };
   }
 }
 ```
@@ -109,9 +115,20 @@ To benefit from HyperFormula's automatic validations, wrap your method in the bu
 * Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
 
 ```javascript
-export class CountHF extends FunctionPlugin {
-  hyper(ast, state) {
-    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length);
+export class GreetingsPlugin extends FunctionPlugin {
+  greet(ast, state) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata("GREET"),
+      (username) => {
+        if (!username) {
+          return new CellError('VALUE');
+        }
+
+        return `👋 Hello, ${username}!`;
+      },
+    );
   }
 }
 ```
@@ -122,8 +139,8 @@ Register your function plugin (and its translations) so that HyperFormula can re
 
 Use the [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin) method:
 
-```javascript
-HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
+```js
+HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
 ```
 
 ### 6. Use your custom function inside a formula
@@ -132,13 +149,13 @@ Now, you can use your HYPER function inside a formula:
 
 ```javascript
 // prepare spreadsheet data
-const data = [['=HYPER()']];
+const data = [['Anthony', '=GREET(A1)']];
 
 // build a HyperFormula instance where you can use your function directly
 const hfInstance = HyperFormula.buildFromArray(data);
 
 // read the value of cell A1
-const result = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 });
+const result = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
 
 // open the browser's console to see the results
 console.log(result);
@@ -146,28 +163,45 @@ console.log(result);
 
 ### Full example
 
-```javascript
-import { FunctionPlugin } from 'hyperformula';
+```js
+import { FunctionPlugin, CellError } from 'hyperformula';
 
-export class CountHF extends FunctionPlugin {
-  hyper(ast, state) {
-    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length);
+export class GreetingsPlugin extends FunctionPlugin {
+  greet(ast, state) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata("GREET"),
+      (username) => {
+        if (!username) {
+          return new CellError('VALUE');
+        }
+
+        return `👋 Hello, ${username}!`;
+      },
+    );
   }
 }
 
-CountHF.implementedFunctions = {
-  HYPER: {
-    method: 'hyper',
-  },
+GreetingsPlugin.implementedFunctions = {
+  GREET: {
+    method: "greet",
+    parameters: [
+      { argumentType: "STRING" }
+    ],
+  }
 };
 
-CountHF.translations = {
+GreetingsPlugin.translations = {
   enGB: {
-    HYPER: 'HYPER',
+    GREET: "GREET",
   },
+  enUS: {
+    GREET: "GREET",
+  }
 };
 
-HyperFormula.registerFunctionPlugin(CountHF, CountHF.translations);
+HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
 ```
 
 ## Custom function options
