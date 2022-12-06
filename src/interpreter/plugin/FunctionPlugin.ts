@@ -67,20 +67,24 @@ export interface FunctionMetadata {
    * Return number value is packed into this subtype.
    */
   returnNumberType?: NumberType,
+
   /**
    * Engine.
    */
   method: string,
+
   /**
    * Engine.
    */
   arraySizeMethod?: string,
+
   /**
    * Engine.
    *
    * If set to `true`, the function is volatile.
    */
   isVolatile?: boolean,
+
   /**
    * Engine.
    *
@@ -88,6 +92,7 @@ export interface FunctionMetadata {
    * (e.g. when adding/removing rows or columns).
    */
   isDependentOnSheetStructureChange?: boolean,
+
   /**
    * Engine.
    *
@@ -96,6 +101,7 @@ export interface FunctionMetadata {
    * Other arguments are properly evaluated.
    */
   doesNotNeedArgumentsToBeComputed?: boolean,
+
   /**
    * Engine.
    *

@@ -213,14 +213,21 @@ describe('GreetingsPlugin', () => {
 
 ## Custom function options
 
-You can configure your custom function to:
-* Use the [array arithmetic mode](arrays.md).
-* Treat reference or range arguments as arguments that don't create dependency.
-* Inline range arguments to scalar arguments.
-* Get recalculated with each sheet shape change.
-* Be a [volatile](volatile-functions.md) function.
-* Repeat a specified number of last arguments indefinitely.
-* Never get vectorized.
+You can set the following options for your function:
+
+| Option                              | Type    | Description                                                                                                                                  |
+|-------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                |
+| `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                        |
+| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                |
+| `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                              |
+| `returnNumberType`                  | String  | Function return type.                                                                                                                        |
+| `arraySizeMethod`                   | ?       | ?                                                                                                                                            |
+| `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).                                                                                   |
+| `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).                            |
+| `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency (other arguments are properly evaluated). |
+| `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                 |
+| `vectorizationForbidden`            | Boolean | `true`: the function will never get vectorized.                                                                                              |
 
 In your function plugin, in the static `implementedFunctions` property, add your function's options:
 
@@ -228,7 +235,6 @@ In your function plugin, in the static `implementedFunctions` property, add your
 MyFunctionPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
-    // set options for `MY_FUNCTION`
     arrayFunction: false,
     doesNotNeedArgumentsToBeComputed: false,
     expandRanges: false,
@@ -239,20 +245,20 @@ MyFunctionPlugin.implementedFunctions = {
 };
 ```
 
-You can set the following options for your function:
-
-| Option                              | Type    | Description                                                                                                                                  |
-|-------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                 |
-| `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency (other arguments are properly evaluated). |
-| `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                              |
-| `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).                            |
-| `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).                                                                                   |
-| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                |
-
 ### Argument validation options
 
-You can set rules for your function's argument validation.
+You can set the following argument validation options:
+
+| Option                    | Type                                     | Description                                                                                                                                                                                                                      |
+|---------------------------|------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `argumentType` (required) | String                                   | Expected type of the argument.                                                                                                                                                                                                   |
+| `passSubtype`             | Boolean                                  | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).                                                                                       |
+| `defaultValue`            | `InternalScalarValue` \ `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                         |
+| `optionalArg`             | Boolean                                  | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
+| `minValue`                | Number                                   | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                      |
+| `maxValue`                | Number                                   | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                         |
+| `lessThan`                | Number                                   | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
+| `greaterThan`             | Number                                   | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
 
 In your function plugin, in the static `implementedFunctions` property, next to other options add an array called `parameters`:
 
@@ -260,7 +266,6 @@ In your function plugin, in the static `implementedFunctions` property, next to 
 MyFunctionPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
-    // set argument validation options for `MY_FUNCTION`
     parameters: [{
       passSubtype: false,
       defaultValue: 10,
@@ -273,18 +278,6 @@ MyFunctionPlugin.implementedFunctions = {
   }
 };
 ```
-
-You can set the following argument validation options:
-
-| Option         | Type                    | Description                                                                                                                                                                                                                      |
-|----------------|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `passSubtype`  | Boolean                 | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).                                                                                       |
-| `defaultValue` | `InternalScalarValue` \ | `RawScalarValue`                                                                                                                                                                                                                 | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                         |
-| `optionalArg`  | Boolean                 | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br><br>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
-| `minValue`     | Number                  | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                      |
-| `maxValue`     | Number                  | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                         |
-| `lessThan`     | Number                  | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
-| `greaterThan`  | Number                  | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
 
 #### Handling missing arguments
 
