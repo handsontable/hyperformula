@@ -92,17 +92,11 @@ describe('Clear sheet content', () => {
 
   it('should clear sheet and dont break edge between cells, case with range', () => {
     const engine = HyperFormula.buildFromSheets({
-      Sheet1: [
-        ['1'],
-      ],
-      Sheet2: [
-        ['=SUM(Sheet1!A1:B1)'],
-      ],
+      Sheet1: [[ '1' ]],
+      Sheet2: [[ '=SUM(Sheet1!A1:B1)' ]],
     })
 
-    // eslint-disable-next-line
-    const changes = engine.clearSheet(0)
-
+    engine.clearSheet(0)
     engine.setCellContents(adr('A1'), '2')
     engine.setCellContents(adr('B1'), '3')
 

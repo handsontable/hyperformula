@@ -4,15 +4,32 @@ import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {Interpreter} from '../src/interpreter/Interpreter'
 import {buildEmptyParserWithCaching} from './parser/common'
 import {adr} from './testUtils'
+import {DependencyGraph} from '../src/DependencyGraph'
+import {ColumnSearchStrategy} from '../src/Lookup/SearchStrategy'
+import {Statistics} from '../src/statistics'
+import {ArithmeticHelper} from '../src/interpreter/ArithmeticHelper'
+import {NamedExpressions} from '../src/NamedExpressions'
+import {Serialization} from '../src/Serialization'
+import {DateTimeHelper} from '../src/DateTimeHelper'
 
 describe('Matrix size check tests', () => {
   const config = new Config()
   const functionRegistry = new FunctionRegistry(config)
-  /* eslint-enable */
   const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
-  /* eslint-disable */
-  // @ts-ignore
-  const interpreter = new Interpreter(config, undefined, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor, undefined)
+
+  new Interpreter(
+    config,
+    undefined as unknown as DependencyGraph,
+    undefined as unknown as ColumnSearchStrategy,
+    undefined as unknown as Statistics,
+    undefined as unknown as ArithmeticHelper,
+    functionRegistry,
+    undefined as unknown as NamedExpressions,
+    undefined as unknown as Serialization,
+    arraySizePredictor,
+    undefined as unknown as DateTimeHelper
+  )
+
   it('check', () => {
     const parser = buildEmptyParserWithCaching(config)
     const ast = parser.parse('=mmult(A1:B3,C1:E2)', adr('A1')).ast
@@ -145,11 +162,20 @@ describe('Matrix size check tests', () => {
 describe('Matrix size check tests, with different config', () => {
   const config = new Config({useArrayArithmetic: true})
   const functionRegistry = new FunctionRegistry(config)
-  /* eslint-enable */
   const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
-  /* eslint-disable */
-  // @ts-ignore
-  const interpreter = new Interpreter(config, undefined, undefined, undefined, undefined, functionRegistry, undefined, undefined, arraySizePredictor, undefined)
+
+  new Interpreter(
+    config,
+    undefined as unknown as DependencyGraph,
+    undefined as unknown as ColumnSearchStrategy,
+    undefined as unknown as Statistics,
+    undefined as unknown as ArithmeticHelper,
+    functionRegistry,
+    undefined as unknown as NamedExpressions,
+    undefined as unknown as Serialization,
+    arraySizePredictor,
+    undefined as unknown as DateTimeHelper
+  )
 
   it('check binary array arithmetic', () => {
     const parser = buildEmptyParserWithCaching(config)
