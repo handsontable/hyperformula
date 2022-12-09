@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {CellValueDetailedType, ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -42,5 +42,13 @@ describe('Function TIMEVALUE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('should return NUMBER_TIME', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TIMEVALUE("14:31")'],
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_TIME)
   })
 })

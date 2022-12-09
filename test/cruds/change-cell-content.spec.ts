@@ -1,4 +1,11 @@
-import {ErrorType, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {
+  CellValueDetailedType,
+  ErrorType,
+  ExportedCellChange,
+  HyperFormula,
+  InvalidAddressError,
+  NoSheetWithIdError
+} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ArraySize} from '../../src/ArraySize'
 import {simpleCellAddress} from '../../src/Cell'
@@ -557,6 +564,18 @@ describe('changing cell content', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     engine.setCellContents(adr('C1'), '=MMULT(A1:B2,A1:B2)')
+  })
+
+  it('should set the cell value type based on the format of the input value', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents({ sheet: 0, col: 0, row: 0 }, '42')
+    engine.setCellContents({ sheet: 0, col: 0, row: 1 }, '$42')
+    engine.setCellContents({ sheet: 0, col: 0, row: 2 }, '42%')
+
+    expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 0 })).toEqual(CellValueDetailedType.NUMBER_RAW)
+    expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 1 })).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
+    expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 2 })).toEqual(CellValueDetailedType.NUMBER_PERCENT)
   })
 })
 

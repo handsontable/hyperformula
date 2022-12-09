@@ -251,3 +251,12 @@ export function resetSpy(spy: jasmine.Spy | unknown): void {
     spy.calls.reset() // clears mock in Jasmine env
   }
 }
+
+/**
+ * Helper method. Expects the cell value pointed by cellAddress to:
+ * - be a date and
+ * - when stringified, be equal to expectedDateString
+ */
+export function expectCellValueToEqualDate(engine: HyperFormula, cellAddress: SimpleCellAddress, expectedDateString: string) {
+  expect(dateNumberToString(engine.getCellValue(cellAddress), new Config())).toEqual(expectedDateString)
+}
