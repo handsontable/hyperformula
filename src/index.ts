@@ -4,6 +4,7 @@
  */
 
 import {SimpleCellRange} from './AbsoluteCellRange'
+import {ArraySize} from './ArraySize'
 import {CellError, CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
@@ -72,6 +73,7 @@ class HyperFormulaNS extends HyperFormula {
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
+  public static ArraySize = ArraySize
   public static FunctionPlugin = FunctionPlugin
   public static FunctionArgumentType = FunctionArgumentType
   public static FunctionPluginValidationError = FunctionPluginValidationError
@@ -148,6 +150,7 @@ export {
   EvaluationSuspendedError,
   ExpectedOneOfValuesError,
   ExpectedValueOfTypeError,
+  ArraySize,
   FunctionPlugin,
   ImplementedFunctions,
   FunctionMetadata,

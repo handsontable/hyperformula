@@ -101,9 +101,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
           return new CellError(ErrorType.NA, ErrorMessage.EqualLength)
         }
       }
+
       if (rangeVals.width() > 1 && rangeVals.height() > 1) {
         return new CellError(ErrorType.NA, ErrorMessage.WrongDimension)
       }
+
       const vals = rangeVals.data
       const ret = []
       for (let i = 0; i < rangeVals.height(); i++) {

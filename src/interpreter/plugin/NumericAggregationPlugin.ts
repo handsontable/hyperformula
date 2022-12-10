@@ -552,6 +552,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       if (acc instanceof CellError) {
         return acc
       }
+
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
         if (val instanceof CellError) {
@@ -559,6 +560,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         }
         return reducingFunction(val, acc)
       }
+
       let value
       value = this.evaluateAst(arg, state)
       if (value instanceof SimpleRangeValue) {

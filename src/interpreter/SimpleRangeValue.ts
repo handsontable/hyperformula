@@ -135,6 +135,7 @@ export class SimpleRangeValue {
     if (this._data !== undefined) {
       return
     }
+
     this._hasOnlyNumbers = true
     this._data = this.range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
       const value = this.dependencyGraph!.getCellValue(cellFromRange)
@@ -148,6 +149,5 @@ export class SimpleRangeValue {
         return value as InternalScalarValue
       }
     })
-
   }
 }
