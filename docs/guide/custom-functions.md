@@ -5,17 +5,9 @@ Expand the function library of your application, by adding custom functions.
 **Contents:**
 [[toc]]
 
-## Add a custom function
+## Add a simple custom function
 
 As an example, let's create a function that accepts a person's first name as a string argument and returns a personalized greeting.
-
-<iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-  style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
-  title="handsontable/hyperformula-demos: custom-functions"
-  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
-</iframe>
 
 ### 1. Create a function plugin
 
@@ -108,10 +100,6 @@ export class MyCustomPlugin extends FunctionPlugin {
       state,
       this.metadata('GREET'),
       (firstName) => {
-        if (!firstName) {
-          return new CellError('VALUE', 'The argument of the GREET function must be a non-empty string.');
-        }
-
         return `👋 Hello, ${firstName}!`;
       },
     );
@@ -149,6 +137,8 @@ console.log(result);
 
 ### Full example
 
+The complete implementation of this custom function is also included in the [demo](#working-demo).
+
 ```js
 import { FunctionPlugin, CellError } from 'hyperformula';
 
@@ -159,10 +149,6 @@ export class MyCustomPlugin extends FunctionPlugin {
       state,
       this.metadata('GREET'),
       (firstName) => {
-        if (!firstName) {
-          return new CellError('VALUE', 'The argument of the GREET function must be a non-empty string.');
-        }
-
         return `👋 Hello, ${firstName}!`;
       },
     );
@@ -173,7 +159,7 @@ MyCustomPlugin.implementedFunctions = {
   GREET: {
     method: 'greet',
     parameters: [
-      {argumentType: 'STRING'}
+      { argumentType: 'STRING' }
     ],
   }
 };
@@ -187,30 +173,51 @@ MyCustomPlugin.translations = {
   }
 };
 
-
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
 ```
 
+## Advanced custom function example
+
+In more advanced example we'll create a function that takes a range of numbers and returns the range of the same size with all the numbers doubled.
+
+### Accept a range argument
+
+`SimpleRangeValue`
+
+### Work with different value types
+
+`InternalScalarValue`
+
+### Validate the arguments
+
+`CellError`
+
+[error handling](#returning-errors)
+
+### Return an array of data
+
+`arraySizeMethod`
+`ArraySize`
+
 ### Test your function
 
-You may add some unit tests to make sure that your custom function works correctly using one of the javascript testing libraries.
+You may add unit tests to make sure that your custom function works correctly using one of the javascript testing libraries.
 
 ```js
-describe('GREET function', () => {
-  it('works for a non-empty string', () => {
-    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
-    const engine = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
-    expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 })).toEqual('👋 Hello, Anthony!');
-  });
-
-  it('returns #VALUE! error for empty string', () => {
-    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
-    const engine = HyperFormula.buildFromArray([['', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
-    expect(engine.getCellValueType({ sheet: 0, row: 0, col: 1 })).toEqual('ERROR');
-    expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 }).value).toEqual('#VALUE!');
-  });
-});
+// TODO: unit tests for DOUBLE_RANGE
 ```
+
+## Working demo
+
+This demo contains the implementation of both `GREET` and `DOUBLE_RANGE` custom functions.
+
+<iframe
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: custom-functions"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>
 
 ## Custom function options
 
@@ -314,6 +321,8 @@ MyFunctionPlugin.translations = {
 :::
 
 ## Function name translations
+
+// TODO: merge this section with the simple custom function tutorial
 
 You can configure the name of your function with multiple translations.
 Your end users call your function by referring to those translations.
