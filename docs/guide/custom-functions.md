@@ -7,7 +7,7 @@ Expand the function library of your application, by adding custom functions.
 
 ## Add a custom function
 
-As an example, let's create a function that accepts a username as a string argument and returns a personalized greeting. 
+As an example, let's create a function that accepts a person's first name as a string argument and returns a personalized greeting.
 
 <iframe
   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
@@ -25,7 +25,7 @@ Import `FunctionPlugin`, and extend it with a new class. For example:
 import { FunctionPlugin } from 'hyperformula';
 
 // let's call the function plugin `GreetingsPlugin`
-export class GreetingsPlugin extends FunctionPlugin {
+export class MyCustomPlugin extends FunctionPlugin {
   
 }
 ```
@@ -43,7 +43,7 @@ In your function's object, you can specify:
 - other [custom function options](#custom-function-options).
 
 ```javascript
-GreetingsPlugin.implementedFunctions = {
+MyCustomPlugin.implementedFunctions = {
   // let's define the function's ID as `GREET`
   GREET: {
     method: "greet",
@@ -57,7 +57,7 @@ GreetingsPlugin.implementedFunctions = {
 ::: tip
 To define multiple functions in a single function plugin, add them all to the `implementedFunctions` object.
 ```js
-GreetingsPlugin.implementedFunctions = {
+MyCustomPlugin.implementedFunctions = {
   GREET: {
     //...
   }, 
@@ -101,18 +101,18 @@ To benefit from HyperFormula's automatic validations, wrap your method in the bu
 * Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
 
 ```javascript
-export class GreetingsPlugin extends FunctionPlugin {
+export class MyCustomPlugin extends FunctionPlugin {
   greet(ast, state) {
     return this.runFunction(
       ast.args,
       state,
-      this.metadata("GREET"),
-      (username) => {
-        if (!username) {
-          return new CellError('VALUE');
+      this.metadata('GREET'),
+      (firstName) => {
+        if (!firstName) {
+          return new CellError('VALUE', 'The argument of the GREET function must be a non-empty string.');
         }
 
-        return `👋 Hello, ${username}!`;
+        return `👋 Hello, ${firstName}!`;
       },
     );
   }
@@ -126,7 +126,7 @@ Register your function plugin (and its translations) so that HyperFormula can re
 Use the [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin) method:
 
 ```js
-HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
 ```
 
 ### 6. Use your custom function inside a formula
@@ -152,42 +152,43 @@ console.log(result);
 ```js
 import { FunctionPlugin, CellError } from 'hyperformula';
 
-export class GreetingsPlugin extends FunctionPlugin {
+export class MyCustomPlugin extends FunctionPlugin {
   greet(ast, state) {
     return this.runFunction(
       ast.args,
       state,
-      this.metadata("GREET"),
-      (username) => {
-        if (!username) {
-          return new CellError('VALUE');
+      this.metadata('GREET'),
+      (firstName) => {
+        if (!firstName) {
+          return new CellError('VALUE', 'The argument of the GREET function must be a non-empty string.');
         }
 
-        return `👋 Hello, ${username}!`;
+        return `👋 Hello, ${firstName}!`;
       },
     );
   }
 }
 
-GreetingsPlugin.implementedFunctions = {
+MyCustomPlugin.implementedFunctions = {
   GREET: {
-    method: "greet",
+    method: 'greet',
     parameters: [
-      { argumentType: "STRING" }
+      {argumentType: 'STRING'}
     ],
   }
 };
 
-GreetingsPlugin.translations = {
+MyCustomPlugin.translations = {
   enGB: {
-    GREET: "GREET",
+    GREET: 'GREET',
   },
   enUS: {
-    GREET: "GREET",
+    GREET: 'GREET',
   }
 };
 
-HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
+
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
 ```
 
 ### Test your function
@@ -195,7 +196,7 @@ HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translation
 You may add some unit tests to make sure that your custom function works correctly using one of the javascript testing libraries.
 
 ```js
-describe('GreetingsPlugin', () => {
+describe('GREET function', () => {
   it('works for a non-empty string', () => {
     HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations);
     const engine = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']], { licenseKey: 'gpl-v3' });
