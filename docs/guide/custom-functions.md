@@ -26,7 +26,7 @@ export class MyCustomPlugin extends FunctionPlugin {
 
 In your function plugin, in the static `implementedFunctions` property, define an object that declares the functions provided by this plugin.
 
-The name of that object becomes the ID by which [translations](#function-translations), [aliases](#function-aliases), and other elements refer to your function.
+The name of that object becomes the ID by which [translations](#function-name-translations), [aliases](#function-aliases), and other elements refer to your function.
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
 
 In your function's object, you can specify:
@@ -194,16 +194,18 @@ MyCustomPlugin.implementedFunctions = {
 The range arguments are passed to the implementation method as instances of the [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
 ```js
-doubleRange(ast, state) {
-  return this.runFunction(
-    ast.args,
-    state,
-    this.metadata('DOUBLE_RANGE'),
-    (range) => {
-      const rangeData = range.data;
-      // ...
-    },
-  );
+export class MyCustomPlugin extends FunctionPlugin {
+  doubleRange(ast, state) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('DOUBLE_RANGE'),
+      (range) => {
+        const rangeData = range.data;
+        // ...
+      },
+    );
+  }
 }
 ```
 
@@ -228,15 +230,13 @@ export class MyCustomPlugin extends FunctionPlugin {
     const arg = ast?.args?.[0];
 
     if (arg?.start == null || arg?.end == null) {
-      // return new ArraySize.scalar();
-      return { width: 1, height: 1, isRef: false, isScalar: () => true };
+      return new ArraySize.scalar();
     }
 
     const width = arg.end.col - arg.start.col + 1;
     const height = arg.end.row - arg.start.row + 1;
 
-    // return new ArraySize(width, height);
-    return { width, height, isRef: false, isScalar: () => width === 1 && height === 1 };
+    return new ArraySize(width, height);
   }
 }
 
