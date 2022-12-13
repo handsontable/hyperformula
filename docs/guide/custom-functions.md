@@ -7,7 +7,7 @@ Expand the function library of your application, by adding custom functions.
 
 ## Add a simple custom function
 
-As an example, let's create a function that accepts a person's first name as a string argument and returns a personalized greeting.
+As an example, let's create a custom function `GREET` that accepts a person's first name as a string argument and returns a personalized greeting.
 
 ### 1. Create a function plugin
 
@@ -62,13 +62,9 @@ MyCustomPlugin.implementedFunctions = {
 
 ### 3. Add your function's names
 
-In your function plugin, in the static `translations` property, define your function's names in every language you want to support. Your end users use these names to call your function inside formulas.
+In your function plugin, in the static `translations` property, define your function's [names in every language you want to support](#function-name-translations). Your end users use these names to call your function inside formulas.
 
 If you support just one language, you still need to define the name of your function in that language.
-
-::: tip
-Function names are case-insensitive, as they are all normalized to uppercase.
-:::
 
 ```javascript
 GreetingsPlugin.translations = {
@@ -178,33 +174,128 @@ HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations)
 
 ## Advanced custom function example
 
-In more advanced example we'll create a function that takes a range of numbers and returns the range of the same size with all the numbers doubled.
+In more advanced example, we'll create a custom function `DOUBLE_RANGE` that takes a range of numbers and returns the range of the same size with all the numbers doubled.
 
 ### Accept a range argument
 
-`SimpleRangeValue`
+To accept a range argument, declare it in the `parameters` array:
 
-### Work with different value types
+```js
+MyCustomPlugin.implementedFunctions = {
+  DOUBLE_RANGE: {
+    method: 'doubleRange',
+    parameters: [
+      { argumentType: 'RANGE' },
+    ],
+  }
+};
+```
 
-`InternalScalarValue`
+The range arguments are passed to the implementation method as instances of the [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
-### Validate the arguments
-
-`CellError`
-
-[error handling](#returning-errors)
+```js
+doubleRange(ast, state) {
+  return this.runFunction(
+    ast.args,
+    state,
+    this.metadata('DOUBLE_RANGE'),
+    (range) => {
+      const rangeData = range.data;
+      // ...
+    },
+  );
+}
+```
 
 ### Return an array of data
 
-`arraySizeMethod`
-`ArraySize`
+A function may return multiple values in the form of an array. To do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
+
+```js
+const resultArray = //...
+return SimpleRangeValue.onlyValues(resultArray);
+```
+
+You also need to provide the `arraySizeMethod` that calculates the size of the result array based on the function arguments and returns an instance of the [`ArraySize` class](../api/classes/arraysize.md).
+
+::: tip
+If you don't define the `arraySizeMethod`, returning an array will cause the `#VALUE!` error.
+:::
+
+```js
+export class MyCustomPlugin extends FunctionPlugin {
+  doubleRangeResultArraySize(ast, state) {
+    const arg = ast?.args?.[0];
+
+    if (arg?.start == null || arg?.end == null) {
+      // return new ArraySize.scalar();
+      return { width: 1, height: 1, isRef: false, isScalar: () => true };
+    }
+
+    const width = arg.end.col - arg.start.col + 1;
+    const height = arg.end.row - arg.start.row + 1;
+
+    // return new ArraySize(width, height);
+    return { width, height, isRef: false, isScalar: () => width === 1 && height === 1 };
+  }
+}
+
+MyCustomPlugin.implementedFunctions = {
+  DOUBLE_RANGE: {
+    method: 'doubleRange',
+    arraySizeMethod: 'doubleRangeResultArraySize',
+    parameters: [
+      { argumentType: 'RANGE' },
+    ],
+  }
+};
+```
+
+### Validate the arguments and return an error
+
+To handle invalid inputs, the custom function should return an instance of the [`CellError` class](../api/classes/cellerror.md). Check the available [error types](types-of-errors.md). Errors are localized according to your [language settings](localizing-functions.md).
+
+```js
+if (rangeData.some(row => row.some(val => typeof rawValue !== 'number'))) {
+  return new CellError('VALUE', 'Function DOUBLE_RANGE operates only on numbers.');
+}
+```
+
+::: tip
+All HyperFormula [error types](types-of-errors.md) support optional custom error messages. Put them to good use: let your users know what caused the error and how to avoid it in the future.
+:::
 
 ### Test your function
 
 You may add unit tests to make sure that your custom function works correctly using one of the javascript testing libraries.
 
 ```js
-// TODO: unit tests for DOUBLE_RANGE
+it('works for a range of numbers', () => {
+  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+
+  const engine = HyperFormula.buildFromArray([
+    [1, '=DOUBLE_RANGE(A1:A3)'],
+    [2],
+    [3],
+  ], { licenseKey: 'gpl-v3' });
+
+  expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 })).toEqual(2);
+  expect(engine.getCellValue({ sheet: 0, row: 1, col: 1 })).toEqual(4);
+  expect(engine.getCellValue({ sheet: 0, row: 2, col: 1 })).toEqual(6);
+});
+
+it('returns a VALUE error if the range argument contains a string', () => {
+  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+
+  const engine = HyperFormula.buildFromArray([
+    [1, '=DOUBLE_RANGE(A1:A3)'],
+    ['I should not be here'],
+    [3],
+  ], { licenseKey: 'gpl-v3' });
+
+  expect(engine.getCellValueType({ sheet: 0, row: 0, col: 1 })).toEqual('ERROR');
+  expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 }).value).toEqual('#VALUE!');
+});
 ```
 
 ## Working demo
@@ -240,7 +331,7 @@ You can set the following options for your function:
 In your function plugin, in the static `implementedFunctions` property, add your function's options:
 
 ```javascript
-MyFunctionPlugin.implementedFunctions = {
+MyCustomPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
     arrayFunction: false,
@@ -271,7 +362,7 @@ You can set the following argument validation options:
 In your function plugin, in the static `implementedFunctions` property, next to other options add an array called `parameters`:
 
 ```javascript
-MyFunctionPlugin.implementedFunctions = {
+MyCustomPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
     parameters: [{
@@ -302,7 +393,7 @@ You can assign multiple aliases to a single custom function.
 In your function plugin, in the static `aliases` property, add aliases for your function:
 
 ```javascript
-MyFunctionPlugin.aliases = {
+MyCustomPlugin.aliases = {
   // `=MY_ALIAS()` will work the same as `=MY_FUNCTION()`
   'MY_ALIAS': 'MY_FUNCTION'
 };
@@ -311,7 +402,7 @@ MyFunctionPlugin.aliases = {
 ::: tip
 For each alias of your function, define a translation, even if you want to support only one language.
 ```js
-MyFunctionPlugin.translations = {
+MyCustomPlugin.translations = {
   enGB: {
     'MY_FUNCTION': 'MY_FUNCTION',
     'MY_ALIAS': 'MY_ALIAS',
@@ -321,8 +412,6 @@ MyFunctionPlugin.translations = {
 :::
 
 ## Function name translations
-
-// TODO: merge this section with the simple custom function tutorial
 
 You can configure the name of your function with multiple translations.
 Your end users call your function by referring to those translations.
@@ -335,7 +424,7 @@ Function names are case-insensitive, as they are all normalized to uppercase.
 :::
 
 ```javascript
-MyFunctionPlugin.translations = {
+MyCustomPlugin.translations = {
   enGB: {
     // formula in English: `=MY_FUNCTION()`
     'MY_FUNCTION': 'MY_FUNCTION'
@@ -347,7 +436,7 @@ MyFunctionPlugin.translations = {
 };
 
 // register your function plugin and translations
-HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionPlugin.translations);
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
 ```
 
 You can also define `translations` as a standalone object:
@@ -363,44 +452,9 @@ export const MyFunctionNameTranslations = {
 };
 
 // register your function plugin and translations
-HyperFormula.registerFunctionPlugin(MyFunctionPlugin, MyFunctionNameTranslations);
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyFunctionNameTranslations);
 ```
 
 ::: tip
 Before using a translated function name, remember to [register and set the language](localizing-functions.md).
 :::
-
-## Returning errors
-
-If you want your custom function to return an error, check the [API reference](../api) for the HyperFormula [error types](types-of-errors.md).
-
-::: tip
-All HyperFormula [error types](types-of-errors.md) support optional custom error messages. Put them to good use: let your users know what caused the error and how to avoid it in the future.
-:::
-
-For example, if you want to return a `#DIV/0!` error with your custom error message, use the [`CellError` class](../api/classes/cellerror.md), and the [DIV_BY_ZERO](../api/enums/errortype.md#div-by-zero) error type:
-
-```javascript
-// import `CellError` and `ErrorType`
-import { FunctionPlugin, CellError, ErrorType } from 'hyperformula';
-
-export class MyFunctionPlugin extends FunctionPlugin {
-  myFunctionMethod(ast, state) {
-    if (!ast.args.length) {
-      // create a `CellError` instance with an `ErrorType` of `DIV_BY_ZERO`
-      // with your custom error message (optional)
-      return new CellError(ErrorType.DIV_BY_ZERO, 'Sorry, cannot divide by zero!');
-    }
-  
-    return this.runFunction(ast.args, state, this.metadata('HYPER'), () => 'Hyperformula'.length)
-  }
-}
-```
-
-The error displays as `#DIV/0` and gets translated appropriately.
-
-### Error localization
-
-Errors returned by methods such as `getCellValue` are wrapped in the [`DetailedCellError` type](../api/classes/detailedcellerror.md).
-
-`DetailedCellError` localizes the error based on your [internationalization settings](localizing-functions.md).
