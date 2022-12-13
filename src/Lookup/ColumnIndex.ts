@@ -18,7 +18,7 @@ import {
   RawNoErrorScalarValue,
   RawScalarValue
 } from '../interpreter/InterpreterValue'
-import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'

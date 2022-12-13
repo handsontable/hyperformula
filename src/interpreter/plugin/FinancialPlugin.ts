@@ -15,7 +15,7 @@ import {
   NumberType,
   RawInterpreterValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FinancialPlugin> {

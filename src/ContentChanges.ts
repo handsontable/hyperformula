@@ -5,7 +5,7 @@
 
 import {addressKey, SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export interface CellValueChange {
   address: SimpleCellAddress,

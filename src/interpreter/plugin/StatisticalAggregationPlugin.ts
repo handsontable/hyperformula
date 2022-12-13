@@ -14,7 +14,7 @@ import {
   isExtendedNumber,
   RawInterpreterValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {
   centralF,
   chisquare,

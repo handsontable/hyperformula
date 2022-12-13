@@ -4,7 +4,7 @@
  */
 
 import {CellError} from '../Cell'
-import {SimpleRangeValue} from './SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 
 export const EmptyValue = Symbol('Empty value')
 export type EmptyValueType = typeof EmptyValue

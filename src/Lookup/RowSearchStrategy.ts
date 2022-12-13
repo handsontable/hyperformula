@@ -5,7 +5,7 @@
 
 import {DependencyGraph} from '../DependencyGraph'
 import {RawNoErrorScalarValue} from '../interpreter/InterpreterValue'
-import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {AdvancedFind} from './AdvancedFind'
 import {SearchOptions, SearchStrategy} from './SearchStrategy'
 

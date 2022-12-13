@@ -17,7 +17,7 @@ import {
   RawInterpreterValue,
   RawScalarValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 class AverageResult {

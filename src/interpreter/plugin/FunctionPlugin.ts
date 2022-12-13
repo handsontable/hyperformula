@@ -35,7 +35,7 @@ import {
   RawNoErrorScalarValue,
   RawScalarValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
