@@ -74,6 +74,8 @@ GreetingsPlugin.translations = {
   enUS: {
     GREET: "GREET",
   }
+
+  // repeat for all languages used in your system...
 };
 ```
 
@@ -321,7 +323,7 @@ You can set the following options for your function:
 | `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                |
 | `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                              |
 | `returnNumberType`                  | String  | Function return type.                                                                                                                        |
-| `arraySizeMethod`                   | ?       | ?                                                                                                                                            |
+| `arraySizeMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                      |
 | `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).                                                                                   |
 | `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).                            |
 | `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency (other arguments are properly evaluated). |
