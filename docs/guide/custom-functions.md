@@ -16,7 +16,7 @@ Import `FunctionPlugin`, and extend it with a new class. For example:
 ```js
 import { FunctionPlugin } from 'hyperformula';
 
-// let's call the function plugin `GreetingsPlugin`
+// let's call the function plugin `MyCustomPlugin`
 export class MyCustomPlugin extends FunctionPlugin {
   
 }
@@ -30,7 +30,7 @@ The name of that object becomes the ID by which [translations](#function-name-tr
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
 
 In your function's object, you can specify:
-- a `method` property (required), which maps your function to an implementation method (we'll define it later on),
+- a `method` property (required), which maps your function to the implementation method (we'll define it later on),
 - a `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
 - other [custom function options](#custom-function-options).
 
@@ -62,10 +62,10 @@ MyCustomPlugin.implementedFunctions = {
 
 ### 3. Add your function's names
 
-In your function plugin, in the static `translations` property, define your function's names in [every language you want to support](#function-name-translations).
+In your function plugin, in the static `translations` property, [define your function's names in every language you want to support](#function-name-translations).
 
 ```js
-GreetingsPlugin.translations = {
+MyCustomPlugin.translations = {
   enGB: {
     GREET: "GREET",
   },
@@ -213,8 +213,20 @@ export class MyCustomPlugin extends FunctionPlugin {
 A function may return multiple values in the form of an array. To do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
 ```js
-const resultArray = //...
-return SimpleRangeValue.onlyValues(resultArray);
+export class MyCustomPlugin extends FunctionPlugin {
+  doubleRange(ast, state) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('DOUBLE_RANGE'),
+      (range) => {
+        // ...
+        const resultArray = //...
+        return SimpleRangeValue.onlyValues(resultArray);
+      },
+    );
+  }
+}
 ```
 
 You also need to provide the `arraySizeMethod` that calculates the size of the result array based on the function arguments and returns an instance of the [`ArraySize` class](../api/classes/arraysize.md).
