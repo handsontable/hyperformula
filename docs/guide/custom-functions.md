@@ -1,6 +1,6 @@
 # Custom functions
 
-Expand the function library of your application, by adding custom functions.
+Expand the function library of your application by adding custom functions.
 
 **Contents:**
 [[toc]]
@@ -22,7 +22,7 @@ export class MyCustomPlugin extends FunctionPlugin {
 }
 ```
 
-### 2. Define your function's ID, method and metadata
+### 2. Define your function's ID, method, and metadata
 
 In your function plugin, in the static `implementedFunctions` property, define an object that declares the functions provided by this plugin.
 
@@ -173,7 +173,7 @@ HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations)
 
 ## Advanced custom function example
 
-In more advanced example, we'll create a custom function `DOUBLE_RANGE` that takes a range of numbers and returns the range of the same size with all the numbers doubled.
+In a more advanced example, we'll create a custom function `DOUBLE_RANGE` that takes a range of numbers and returns the range of the same size with all the numbers doubled.
 
 ### Accept a range argument
 
@@ -220,7 +220,6 @@ export class MyCustomPlugin extends FunctionPlugin {
       state,
       this.metadata('DOUBLE_RANGE'),
       (range) => {
-        // ...
         const resultArray = //...
         return SimpleRangeValue.onlyValues(resultArray);
       },
@@ -241,7 +240,7 @@ export class MyCustomPlugin extends FunctionPlugin {
     const arg = ast?.args?.[0];
 
     if (arg?.start == null || arg?.end == null) {
-      return new ArraySize.scalar();
+      return ArraySize.scalar();
     }
 
     const width = arg.end.col - arg.start.col + 1;
@@ -264,7 +263,8 @@ MyCustomPlugin.implementedFunctions = {
 
 ### Validate the arguments and return an error
 
-To handle invalid inputs, the custom function should return an instance of the [`CellError` class](../api/classes/cellerror.md). Check the available [error types](types-of-errors.md). Errors are localized according to your [language settings](localizing-functions.md).
+To handle invalid inputs, the custom function should return an instance of the [`CellError` class](../api/classes/cellerror.md) with the relevant [error type](types-of-errors.md).
+Errors are localized according to your [language settings](localizing-functions.md).
 
 ```js
 if (rangeData.some(row => row.some(val => typeof rawValue !== 'number'))) {
@@ -278,7 +278,7 @@ All HyperFormula [error types](types-of-errors.md) support optional custom error
 
 ### Test your function
 
-You may add unit tests to make sure that your custom function works correctly using one of the JavaScript testing libraries.
+You may add unit tests to ensure your custom function works correctly using one of the JavaScript testing libraries.
 
 ```js
 it('works for a range of numbers', () => {
@@ -330,7 +330,7 @@ You can set the following options for your function:
 | `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                                                                                                                 |
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
 | `arraySizeMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
-| `returnNumberType`                  | String  | If function returns a numeric value, this option indicates the way to interpret the returned number.<br/>Possible values: `NUMBER_RAW, NUMBER_DATE, NUMBER_TIME, NUMBER_DATETIME, NUMBER_CURRENCY, NUMBER_PERCENT`.<br/>Default: `NUMBER_RAW` |
+| `returnNumberType`                  | String  | If the function returns a numeric value, this option indicates how to interpret the returned number.<br/>Possible values: `NUMBER_RAW, NUMBER_DATE, NUMBER_TIME, NUMBER_DATETIME, NUMBER_CURRENCY, NUMBER_PERCENT`.<br/>Default: `NUMBER_RAW` |
 | `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.<br/>Default: `0`                                                                                                                |
 | `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.<br/>Default: `false`                                                                                                                          |
 | `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).<br/>Default: `false`                                                                                                                                                               |
@@ -359,16 +359,16 @@ MyCustomPlugin.implementedFunctions = {
 
 You can set the following argument validation options:
 
-| Option                    | Type                                      | Description                                                                                                                                                                                                                                        |
-|---------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `argumentType` (required) | String                                    | Expected type of the argument. Possible values: `STRING, NUMBER, BOOLEAN, SCALAR, NOERROR, RANGE, INTEGER, COMPLEX, ANY`.                                                                                                                          |
-| `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                           |
-| `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                    |
+| Option                    | Type                                      | Description                                                                                                                                                                                                                                      |
+|---------------------------|-------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `argumentType` (required) | String                                    | Expected type of the argument. Possible values: `STRING, NUMBER, BOOLEAN, SCALAR, NOERROR, RANGE, INTEGER, COMPLEX, ANY`.                                                                                                                        |
+| `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                         |
+| `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                  |
 | `optionalArg`             | Boolean                                   | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br/>Default: `false`<br/>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
-| `minValue`                | Number                                    | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                                        |
-| `maxValue`                | Number                                    | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                                           |
-| `lessThan`                | Number                                    | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                                        |
-| `greaterThan`             | Number                                    | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                                  |
+| `minValue`                | Number                                    | If set: numerical arguments need to be greater than or equal to `minValue`.                                                                                                                                                                      |
+| `maxValue`                | Number                                    | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                                         |
+| `lessThan`                | Number                                    | If set: numerical argument needs to be less than `lessThan`.                                                                                                                                                                                     |
+| `greaterThan`             | Number                                    | If set: numerical argument needs to be greater than `greaterThan`.                                                                                                                                                                               |
 
 In your function plugin, in the static `implementedFunctions` property, add an array called `parameters`:
 
