@@ -62,9 +62,7 @@ MyCustomPlugin.implementedFunctions = {
 
 ### 3. Add your function's names
 
-In your function plugin, in the static `translations` property, define your function's [names in every language you want to support](#function-name-translations). Your end users use these names to call your function inside formulas.
-
-If you support just one language, you still need to define the name of your function in that language.
+In your function plugin, in the static `translations` property, define your function's names in [every language you want to support](#function-name-translations).
 
 ```js
 GreetingsPlugin.translations = {
@@ -74,7 +72,6 @@ GreetingsPlugin.translations = {
   enUS: {
     GREET: "GREET",
   }
-
   // repeat for all languages used in your system...
 };
 ```
@@ -388,9 +385,53 @@ Setting a `defaultValue` for an argument always makes that argument optional. Bu
 
 If you don't want to set any `defaultValue` (because, for example, your function's behavior depends on the number of valid arguments passed), use the `optionalArg` setting instead.
 
+## Function name translations
+
+You can provide the translations for your function name in multiple languages.
+Your end users use the translated names to call your function inside formulas.
+
+::: tip
+If you support just one language, you still need to define the name of your function in that language.
+:::
+
+Define the translations for every language you want to support in the static `translations` property.
+Function names are case-insensitive, as they are all normalized to uppercase.
+
+```js
+MyCustomPlugin.translations = {
+  enGB: {
+    // formula in English: `=MY_FUNCTION()`
+    'MY_FUNCTION': 'MY_FUNCTION'
+  },
+  deDE: {
+    // formula in German: `=MEINE_FUNKTION()`
+    'MY_FUNCTION': 'MEINE_FUNKTION'
+  },
+  // repeat for all languages used in your system...
+};
+
+// register your function plugin and translations
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+```
+
+You can also define `translations` as a standalone object:
+
+```js
+export const MyFunctionNameTranslations = {
+  // ...
+};
+
+// register your function plugin and translations
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyFunctionNameTranslations);
+```
+
+::: tip
+Before using a translated function name, remember to [register and set the language](localizing-functions.md).
+:::
+
 ## Function aliases
 
-You can assign multiple aliases to a single custom function.
+You can also assign multiple aliases to a single custom function.
 
 In your function plugin, in the static `aliases` property, add aliases for your function:
 
@@ -404,6 +445,7 @@ MyCustomPlugin.aliases = {
 ::: tip
 For each alias of your function, define a translation, even if you want to support only one language.
 ```js
+
 MyCustomPlugin.translations = {
   enGB: {
     'MY_FUNCTION': 'MY_FUNCTION',
@@ -411,52 +453,4 @@ MyCustomPlugin.translations = {
   },
 };
 ```
-:::
-
-## Function name translations
-
-You can configure the name of your function with multiple translations.
-Your end users call your function by referring to those translations.
-
-In your function plugin, in the static `translations` property, define your function's names,
-in every language that you want to support.
-
-::: tip
-Function names are case-insensitive, as they are all normalized to uppercase.
-:::
-
-```js
-MyCustomPlugin.translations = {
-  enGB: {
-    // formula in English: `=MY_FUNCTION()`
-    'MY_FUNCTION': 'MY_FUNCTION'
-  },
-  deDE: {
-    // formula in German: `=MEINE_FUNKTION()`
-    'MY_FUNCTION': 'MEINE_FUNKTION'
-  }
-};
-
-// register your function plugin and translations
-HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
-```
-
-You can also define `translations` as a standalone object:
-
-```js
-export const MyFunctionNameTranslations = {
-  enGB: {
-    'MY_FUNCTION': 'MY_FUNCTION'
-  },
-  deDE: {
-    'MY_FUNCTION': 'MEINE_FUNKTION'
-  }
-};
-
-// register your function plugin and translations
-HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyFunctionNameTranslations);
-```
-
-::: tip
-Before using a translated function name, remember to [register and set the language](localizing-functions.md).
 :::
