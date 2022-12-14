@@ -13,7 +13,7 @@ As an example, let's create a custom function `GREET` that accepts a person's fi
 
 Import `FunctionPlugin`, and extend it with a new class. For example:
 
-```javascript
+```js
 import { FunctionPlugin } from 'hyperformula';
 
 // let's call the function plugin `GreetingsPlugin`
@@ -31,10 +31,10 @@ Make the ID unique among all HyperFormula functions ([built-in](built-in-functio
 
 In your function's object, you can specify:
 - a `method` property (required), which maps your function to an implementation method (we'll define it later on),
-- an `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
+- a `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
 - other [custom function options](#custom-function-options).
 
-```javascript
+```js
 MyCustomPlugin.implementedFunctions = {
   // let's define the function's ID as `GREET`
   GREET: {
@@ -66,7 +66,7 @@ In your function plugin, in the static `translations` property, define your func
 
 If you support just one language, you still need to define the name of your function in that language.
 
-```javascript
+```js
 GreetingsPlugin.translations = {
   enGB: {
     GREET: "GREET",
@@ -90,7 +90,7 @@ To benefit from HyperFormula's automatic validations, wrap your method in the bu
 * Validates your function's parameters against your [custom function options](#custom-function-options).
 * Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
 
-```javascript
+```js
 export class MyCustomPlugin extends FunctionPlugin {
   greet(ast, state) {
     return this.runFunction(
@@ -119,7 +119,7 @@ HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations)
 
 Now, you can use your GREET function inside a formula:
 
-```javascript
+```js
 // prepare spreadsheet data
 const data = [['Anthony', '=GREET(A1)']];
 
@@ -269,7 +269,7 @@ All HyperFormula [error types](types-of-errors.md) support optional custom error
 
 ### Test your function
 
-You may add unit tests to make sure that your custom function works correctly using one of the javascript testing libraries.
+You may add unit tests to make sure that your custom function works correctly using one of the JavaScript testing libraries.
 
 ```js
 it('works for a range of numbers', () => {
@@ -330,7 +330,7 @@ You can set the following options for your function:
 | `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                 |
 | `vectorizationForbidden`            | Boolean | `true`: the function will never get vectorized.                                                                                              |
 
-In your function plugin, in the static `implementedFunctions` property, add your function's options:
+The options listed above are set in the static `implementedFunctions` property of your function plugin:
 
 ```javascript
 MyCustomPlugin.implementedFunctions = {
@@ -361,9 +361,9 @@ You can set the following argument validation options:
 | `lessThan`                | Number                                   | If set: numerical argument need to be less than `lessThan`.                                                                                                                                                                      |
 | `greaterThan`             | Number                                   | If set: numerical argument need to be greater than `greaterThan`.                                                                                                                                                                |
 
-In your function plugin, in the static `implementedFunctions` property, next to other options add an array called `parameters`:
+In your function plugin, in the static `implementedFunctions` property, add an array called `parameters`:
 
-```javascript
+```js
 MyCustomPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
@@ -394,7 +394,7 @@ You can assign multiple aliases to a single custom function.
 
 In your function plugin, in the static `aliases` property, add aliases for your function:
 
-```javascript
+```js
 MyCustomPlugin.aliases = {
   // `=MY_ALIAS()` will work the same as `=MY_FUNCTION()`
   'MY_ALIAS': 'MY_FUNCTION'
@@ -425,7 +425,7 @@ in every language that you want to support.
 Function names are case-insensitive, as they are all normalized to uppercase.
 :::
 
-```javascript
+```js
 MyCustomPlugin.translations = {
   enGB: {
     // formula in English: `=MY_FUNCTION()`
