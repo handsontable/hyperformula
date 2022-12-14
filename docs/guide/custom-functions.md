@@ -316,19 +316,19 @@ This demo contains the implementation of both `GREET` and `DOUBLE_RANGE` custom 
 
 You can set the following options for your function:
 
-| Option                              | Type    | Description                                                                                                                                  |
-|-------------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                |
-| `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                        |
-| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                |
-| `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                              |
-| `returnNumberType`                  | String  | Function return type.                                                                                                                        |
-| `arraySizeMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                      |
-| `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).                                                                                   |
-| `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).                            |
-| `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency (other arguments are properly evaluated). |
-| `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                 |
-| `vectorizationForbidden`            | Boolean | `true`: the function will never get vectorized.                                                                                              |
+| Option                              | Type    | Description                                                                                                                                                                                                         |
+|-------------------------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                                                                                       |
+| `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                               |
+| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.                                                                                                       |
+| `returnNumberType`                  | String  | If function returns a numeric value, this option indicates the way to interpret the returned number.<br/>Possible values: `NUMBER_RAW, NUMBER_DATE, NUMBER_TIME, NUMBER_DATETIME, NUMBER_CURRENCY, NUMBER_PERCENT`. |
+| `arraySizeMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                             |
+| `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.                                                                                                                     |
+| `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).                                                                                                                                                          |
+| `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).                                                                                                   |
+| `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency (other arguments are properly evaluated).                                                                        |
+| `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.                                                                                                        |
+| `vectorizationForbidden`            | Boolean | `true`: the function will never get vectorized.                                                                                                                                                                     |
 
 The options listed above are set in the static `implementedFunctions` property of your function plugin:
 
