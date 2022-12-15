@@ -72,7 +72,7 @@ ISEVEN(A2:A5*10)
 
 Thanks to HyperFormula's built-in array features, you can:
 * [Operate on arrays](#operating-on-arrays) just like on [scalars](#about-arrays)
-* [Pass arrays to functions](#passing-arrays-to-scalar-functions) that accept [scalars](#about-arrays)
+* [Pass arrays to functions](#passing-arrays-to-scalar-functions-vectorization) that accept [scalars](#about-arrays)
 * [Broadcast](#broadcasting) smaller input arrays across larger output areas
 
 You can also:
@@ -83,7 +83,7 @@ You can also:
 
 You can operate on arrays just like on single values.
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, each output array value is the result of your operation on the corresponding input array value.
+When the [array arithmetic mode](#array-arithmetic-mode) is enabled, each output array value is the result of your operation on the corresponding input array value.
 
 ```
 =ARRAYFORMULA(A2:A5*B2:B5)
@@ -95,22 +95,23 @@ When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled
 // =A5*B5
 ```
 
-### Passing arrays to scalar functions
-You can pass arrays to functions that would normally accept [scalars](#about-arrays) (thanks to HyperFormula's **vectorization** feature).
+### Passing arrays to scalar functions (vectorization)
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, and you pass an array to a [scalar](#about-arrays) function, that function produces an array on the output as well.
+When the [array arithmetic mode](#array-arithmetic-mode) is enabled, HyperFormula automatically _vectorizes_ most functions.
+
+As a consequence of that, you can pass arrays to functions that would normally accept [scalars](#about-arrays). The result would also be an array.
 
 ```
-=ARRAYFORMULA(ISEVEN(A2:A5*10))
+=ARRAYFORMULA(ISEVEN(A2:A5))
 
 // calculates:
-// =ISEVEN(A2*10)
-// =ISEVEN(A3*10)
-// =ISEVEN(A4*10)
-// =ISEVEN(A5*10)
+// =ISEVEN(A2)
+// =ISEVEN(A3)
+// =ISEVEN(A4)
+// =ISEVEN(A5)
 ```
 
-#### Broadcasting
+### Broadcasting
 
 If an input array has a dimension of `1`, it's automatically repeated ("broadcast") on that dimension to match the size of the output.
 
@@ -126,7 +127,7 @@ If an input array has a dimension of `1`, it's automatically repeated ("broadcas
 
 ### Filtering an array
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can filter an array, based on boolean arrays, using the `FILTER` function:
+When the [array arithmetic mode](#array-arithmetic-mode) is enabled, you can filter an array, based on boolean arrays, using the `FILTER` function:
 
 | Syntax                                               | Example                                         |
 |:-----------------------------------------------------|:------------------------------------------------|
@@ -134,7 +135,7 @@ When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled
 
 ### Constraining an array's size
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, you can constrain the size of the output array, using the `ARRAY_CONSTRAIN` function:
+When the [array arithmetic mode](#array-arithmetic-mode) is enabled, you can constrain the size of the output array, using the `ARRAY_CONSTRAIN` function:
 
 | Syntax                                     | Example                                       |
 |:-------------------------------------------|:----------------------------------------------|
@@ -148,7 +149,7 @@ If your specified output array size is larger or equal to the input array size, 
 
 ### With the array arithmetic mode enabled
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled, and you pass an array to a [scalar](#about-arrays) function, the following rules apply:
+When the [array arithmetic mode](#array-arithmetic-mode) is enabled, and you pass an array to a [scalar](#about-arrays) function, the following rules apply:
 * Array dimensions need to be consistent (e.g. every row needs to be of the same length).
 * If an input array value is missing (due to a difference in dimensions), the corresponding output array value is `#N/A`.
 * If a cell evaluates to an array, the array values are spilled into neighboring cells (unless the neighboring cells are already filled).<br>This behavior doesn't apply to ranges, which return the `#VALUE!` error in this case.
@@ -156,9 +157,9 @@ When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is enabled
 
 ### With the array arithmetic mode disabled
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you pass an array to a [scalar](#about-arrays) function, the array is reduced to 1 element (usually the array's top-left value).
+When the [array arithmetic mode](#array-arithmetic-mode) is disabled, and you pass an array to a [scalar](#about-arrays) function, the array is reduced to 1 element (usually the array's top-left value).
 
-When the [array arithmetic mode](#enabling-the-array-arithmetic-mode) is disabled, and you operate on a range of width/height equal to `1`, the behavior depends on your array formula's location:
+When the [array arithmetic mode](#array-arithmetic-mode) is disabled, and you operate on a range of width/height equal to `1`, the behavior depends on your array formula's location:
 
 | Your array formula's location                     | Behavior                               |
 |:--------------------------------------------------|:---------------------------------------|
