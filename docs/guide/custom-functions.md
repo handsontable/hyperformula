@@ -135,7 +135,7 @@ console.log(result);
 The complete implementation of this custom function is also included in the [demo](#working-demo).
 
 ```js
-import { FunctionPlugin, CellError } from 'hyperformula';
+import { FunctionPlugin } from 'hyperformula';
 
 export class MyCustomPlugin extends FunctionPlugin {
   greet(ast, state) {
@@ -210,7 +210,7 @@ export class MyCustomPlugin extends FunctionPlugin {
 
 ### Return an array of data
 
-A function may return multiple values in the form of an array. To do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
+A function may return multiple values in the form of an [array](arrays.md). To do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
@@ -228,11 +228,8 @@ export class MyCustomPlugin extends FunctionPlugin {
 }
 ```
 
-You also need to provide the `arraySizeMethod` that calculates the size of the result array based on the function arguments and returns an instance of the [`ArraySize` class](../api/classes/arraysize.md).
-
-::: tip
-If you don't define the `arraySizeMethod`, returning an array will cause the `#VALUE!` error.
-:::
+A function that returns an array will cause the `VALUE!` error unless you also declare a companion method for the array size.
+To do that, provide the `arraySizeMethod` that calculates the size of the result array based on the function arguments and returns an instance of the [`ArraySize` class](../api/classes/arraysize.md).
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
