@@ -62,10 +62,10 @@ MyCustomPlugin.implementedFunctions = {
 
 ### 3. Add your function's names
 
-In your function plugin, in the static `translations` property, [define your function's names in every language you want to support](#function-name-translations).
+In a separate object, [define your function's names in every language you want to support](#function-name-translations).
 
 ```js
-MyCustomPlugin.translations = {
+export const MyCustomPluginTranslations = {
   enGB: {
     GREET: "GREET",
   },
@@ -109,7 +109,7 @@ Register your function plugin (and its translations) so that HyperFormula can re
 Use the [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin) method:
 
 ```js
-HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
 ### 6. Use your custom function inside a formula
@@ -159,7 +159,7 @@ MyCustomPlugin.implementedFunctions = {
   }
 };
 
-MyCustomPlugin.translations = {
+export const MyCustomPluginTranslations = {
   enGB: {
     GREET: 'GREET',
   },
@@ -168,7 +168,7 @@ MyCustomPlugin.translations = {
   }
 };
 
-HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
 ## Advanced custom function example
@@ -279,7 +279,7 @@ You may add unit tests to ensure your custom function works correctly using one 
 
 ```js
 it('works for a range of numbers', () => {
-  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 
   const engine = HyperFormula.buildFromArray([
     [1, '=DOUBLE_RANGE(A1:A3)'],
@@ -293,7 +293,7 @@ it('works for a range of numbers', () => {
 });
 
 it('returns a VALUE error if the range argument contains a string', () => {
-  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 
   const engine = HyperFormula.buildFromArray([
     [1, '=DOUBLE_RANGE(A1:A3)'],
@@ -403,11 +403,11 @@ Your end users use the translated names to call your function inside formulas.
 If you support just one language, you still need to define the name of your function in that language.
 :::
 
-Define the translations for every language you want to support in the static `translations` property.
+In a separate object, define the translations of your custom functions' names in every language you want to support.
 Function names are case-insensitive, as they are all normalized to uppercase.
 
 ```js
-MyCustomPlugin.translations = {
+export const MyCustomPluginTranslations = {
   enGB: {
     // formula in English: `=MY_FUNCTION()`
     'MY_FUNCTION': 'MY_FUNCTION'
@@ -420,18 +420,7 @@ MyCustomPlugin.translations = {
 };
 
 // register your function plugin and translations
-HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
-```
-
-You can also define `translations` as a standalone object:
-
-```js
-export const MyFunctionNameTranslations = {
-  // ...
-};
-
-// register your function plugin and translations
-HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyFunctionNameTranslations);
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
 ::: tip
