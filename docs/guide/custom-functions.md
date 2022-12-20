@@ -52,10 +52,10 @@ MyCustomPlugin.implementedFunctions = {
 To define multiple functions in a single function plugin, add them all to the `implementedFunctions` object.
 ```js
 MyCustomPlugin.implementedFunctions = {
-  GREET: {
+  FUNCTION_A: {
     //...
-  }, 
-  FAREWELL: {
+  },
+  FUNCTION_B: {
     //...
   },
 };
