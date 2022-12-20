@@ -35,12 +35,14 @@ In your function's object, you can specify:
 - other [custom function options](#custom-function-options).
 
 ```js
+import { FunctionPlugin, FunctionArgumentType } from 'hyperformula';
+
 MyCustomPlugin.implementedFunctions = {
   // let's define the function's ID as `GREET`
   GREET: {
     method: "greet",
     parameters: [
-      { argumentType: "STRING" }
+      { argumentType: FunctionArgumentType.STRING }
     ],
   }
 };
@@ -135,7 +137,7 @@ console.log(result);
 The complete implementation of this custom function is also included in the [demo](#working-demo).
 
 ```js
-import { FunctionPlugin } from 'hyperformula';
+import { FunctionPlugin, FunctionArgumentType } from 'hyperformula';
 
 export class MyCustomPlugin extends FunctionPlugin {
   greet(ast, state) {
@@ -154,7 +156,7 @@ MyCustomPlugin.implementedFunctions = {
   GREET: {
     method: 'greet',
     parameters: [
-      { argumentType: 'STRING' }
+      { argumentType: FunctionArgumentType.STRING }
     ],
   }
 };
@@ -184,7 +186,7 @@ MyCustomPlugin.implementedFunctions = {
   DOUBLE_RANGE: {
     method: 'doubleRange',
     parameters: [
-      { argumentType: 'RANGE' },
+      { argumentType: FunctionArgumentType.RANGE },
     ],
   }
 };
@@ -252,7 +254,7 @@ MyCustomPlugin.implementedFunctions = {
     method: 'doubleRange',
     arraySizeMethod: 'doubleRangeResultArraySize',
     parameters: [
-      { argumentType: 'RANGE' },
+      { argumentType: FunctionArgumentType.RANGE },
     ],
   }
 };
@@ -358,7 +360,7 @@ You can set the following argument validation options:
 
 | Option                    | Type                                      | Description                                                                                                                                                                                                                                        |
 |---------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `argumentType` (required) | String                                    | Expected type of the argument. Possible values: `STRING, NUMBER, BOOLEAN, SCALAR, NOERROR, RANGE, INTEGER, COMPLEX, ANY`.                                                                                                                          |
+| `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the argument. Possible values: `STRING, NUMBER, BOOLEAN, SCALAR, NOERROR, RANGE, INTEGER, COMPLEX, ANY`.                                                                                                                          |
 | `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                           |
 | `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                    |
 | `optionalArg`             | Boolean                                   | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br/>Default: `false`<br/>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
