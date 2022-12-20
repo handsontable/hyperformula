@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2022-12-22
+
 ### Added
 - Expanded the HyperFormula public API by adding the code entities that are necessary to implement a complex custom function: `ArraySize`, `ImplementedFunctions`, `FunctionMetadata`, `FunctionArgumentType`. [#779](https://github.com/handsontable/hyperformula/issues/779)
 

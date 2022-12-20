@@ -4,6 +4,12 @@ This page lists HyperFormula release notes. The format is based on [Keep a Chang
 
 HyperFormula adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.3.0
+**Release date: December 22, 2022**
+
+### Added
+- Expanded the HyperFormula public API by adding the code entities that are necessary to implement a complex custom function: `ArraySize`, `ImplementedFunctions`, `FunctionMetadata`, `FunctionArgumentType`. [#779](https://github.com/handsontable/hyperformula/issues/779)
+
 ## 2.2.0
 **Release date: November 17, 2022**
 
