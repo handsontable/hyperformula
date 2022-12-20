@@ -6,7 +6,7 @@
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LogarithmPlugin> {
 
@@ -14,20 +14,20 @@ export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTyp
     'LOG10': {
       method: 'log10',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'LOG': {
       method: 'log',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 10, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 10, greaterThan: 0},
       ]
     },
     'LN': {
       method: 'ln',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
   }

@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const MAX_48BIT_INTEGER = 281474976710655
 const SHIFT_MIN_POSITIONS = -53
@@ -19,15 +19,15 @@ export class BitShiftPlugin extends FunctionPlugin implements FunctionPluginType
     'BITLSHIFT': {
       method: 'bitlshift',
       parameters: [
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS},
       ]
     },
     'BITRSHIFT': {
       method: 'bitrshift',
       parameters: [
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: SHIFT_MIN_POSITIONS, maxValue: SHIFT_MAX_POSITIONS},
       ]
     },
   }

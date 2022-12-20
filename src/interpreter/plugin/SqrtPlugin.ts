@@ -6,14 +6,14 @@
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class SqrtPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SqrtPlugin> {
   public static implementedFunctions = {
     'SQRT': {
       method: 'sqrt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ],
     },
   }

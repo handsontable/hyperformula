@@ -1,6 +1,5 @@
-import {DetailedCellError, ErrorType, HyperFormula} from '../src'
+import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellType, CellValueDetailedType, CellValueType} from '../src/Cell'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
@@ -874,5 +873,4 @@ describe('#getFillRangeData', () => {
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2', 0), 1, 1), AbsoluteCellRange.spanFrom(adr('C3', 1), 1, 1))
     ).toEqual([[null]])
   })
-
 })

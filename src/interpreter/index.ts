@@ -9,7 +9,8 @@ import {
   FunctionMetadata,
   FunctionPlugin,
   FunctionPluginDefinition,
-  ImplementedFunctions
+  ImplementedFunctions,
+  FunctionArgumentType,
 } from './plugin/FunctionPlugin'
 
 export {
@@ -18,5 +19,6 @@ export {
   FunctionPlugin,
   ImplementedFunctions,
   FunctionMetadata,
-  FunctionTranslationsPackage
+  FunctionTranslationsPackage,
+  FunctionArgumentType,
 }

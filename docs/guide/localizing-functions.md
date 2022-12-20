@@ -71,22 +71,8 @@ errors: {
 
 ## Localizing custom functions
 
-You can translate your own [custom functions](custom-functions) into
-different languages too. You need to define the translations and register the corresponding language pack after registering a plugin:
-
-```javascript
-const translations = {
-  'enGB': {
-    'HYPER': 'HYPER'
-  },
-  'enUS': {
-    'HYPER': 'HYPER'
-  },
-  'plPL': {
-    'HYPER': 'HAJPER'
-  }
-}
-```
+Localization of custom functions is also supported.
+[Custom functions guide](custom-functions.md#function-name-translations) describes, how to define the translations for your custom functions in multiple languages.
 
 ### List of supported languages
 | Language name    | Language code |

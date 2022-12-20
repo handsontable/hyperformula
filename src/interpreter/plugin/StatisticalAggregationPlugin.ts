@@ -14,7 +14,7 @@ import {
   isExtendedNumber,
   RawInterpreterValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {
   centralF,
   chisquare,
@@ -28,122 +28,122 @@ import {
   sumsqerr,
   variance
 } from './3rdparty/jstat/jstat'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class StatisticalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<StatisticalAggregationPlugin> {
   public static implementedFunctions = {
     'AVEDEV': {
       method: 'avedev',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'DEVSQ': {
       method: 'devsq',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'GEOMEAN': {
       method: 'geomean',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'HARMEAN': {
       method: 'harmean',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'CORREL': {
       method: 'correl',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'RSQ': {
       method: 'rsq',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'COVARIANCE.P': {
       method: 'covariancep',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'COVARIANCE.S': {
       method: 'covariances',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'Z.TEST': {
       method: 'ztest',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
       ],
     },
     'F.TEST': {
       method: 'ftest',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'STEYX': {
       method: 'steyx',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'SLOPE': {
       method: 'slope',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'CHISQ.TEST': {
       method: 'chisqtest',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'T.TEST': {
       method: 'ttest',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 2},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 3},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1, maxValue: 2},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1, maxValue: 3},
       ],
     },
     'SKEW': {
       method: 'skew',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'SKEW.P': {
       method: 'skewp',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },

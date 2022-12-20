@@ -1,5 +1,5 @@
 import {CellValueChange, ChangeExporter, ContentChanges} from '../src/ContentChanges'
-import {SimpleRangeValue} from '../src/interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from '../src/SimpleRangeValue'
 import {adr} from './testUtils'
 
 class SimpleChangeExporter implements ChangeExporter<CellValueChange> {

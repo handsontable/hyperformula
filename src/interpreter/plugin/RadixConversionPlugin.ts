@@ -10,7 +10,7 @@ import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 const MAX_LENGTH = 10
 const DECIMAL_NUMBER_OF_BITS = 255
@@ -23,97 +23,97 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     'DEC2BIN': {
       method: 'dec2bin',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 1, maxValue: 10},
       ],
     },
     'DEC2OCT': {
       method: 'dec2oct',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 1, maxValue: 10},
       ],
     },
     'DEC2HEX': {
       method: 'dec2hex',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 1, maxValue: 10},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 1, maxValue: 10},
       ],
     },
     'BIN2DEC': {
       method: 'bin2dec',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
     },
     'BIN2OCT': {
       method: 'bin2oct',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'BIN2HEX': {
       method: 'bin2hex',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'OCT2DEC': {
       method: 'oct2dec',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
     },
     'OCT2BIN': {
       method: 'oct2bin',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'OCT2HEX': {
       method: 'oct2hex',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'HEX2DEC': {
       method: 'hex2dec',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
     },
     'HEX2BIN': {
       method: 'hex2bin',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'HEX2OCT': {
       method: 'hex2oct',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0, maxValue: MAX_LENGTH},
       ],
     },
     'DECIMAL': {
       method: 'decimal',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE},
       ],
     },
     'BASE': {
       method: 'base',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: MIN_BASE, maxValue: MAX_BASE},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, minValue: 0, maxValue: DECIMAL_NUMBER_OF_BITS},
       ],
     },
   }

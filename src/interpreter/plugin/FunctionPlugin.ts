@@ -35,7 +35,7 @@ import {
   RawNoErrorScalarValue,
   RawScalarValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 
 export interface ImplementedFunctions {
   [formulaId: string]: FunctionMetadata,
@@ -67,20 +67,24 @@ export interface FunctionMetadata {
    * Return number value is packed into this subtype.
    */
   returnNumberType?: NumberType,
+
   /**
    * Engine.
    */
   method: string,
+
   /**
    * Engine.
    */
   arraySizeMethod?: string,
+
   /**
    * Engine.
    *
    * If set to `true`, the function is volatile.
    */
   isVolatile?: boolean,
+
   /**
    * Engine.
    *
@@ -88,6 +92,7 @@ export interface FunctionMetadata {
    * (e.g. when adding/removing rows or columns).
    */
   isDependentOnSheetStructureChange?: boolean,
+
   /**
    * Engine.
    *
@@ -96,6 +101,7 @@ export interface FunctionMetadata {
    * Other arguments are properly evaluated.
    */
   doesNotNeedArgumentsToBeComputed?: boolean,
+
   /**
    * Engine.
    *
@@ -120,7 +126,7 @@ export interface FunctionPluginDefinition {
   new(interpreter: Interpreter): FunctionPlugin,
 }
 
-export enum ArgumentTypes {
+export enum FunctionArgumentType {
 
   /**
    * String type.
@@ -169,7 +175,7 @@ export enum ArgumentTypes {
 }
 
 export interface FunctionArgument {
-  argumentType: ArgumentTypes,
+  argumentType: FunctionArgumentType,
 
   /**
    * If set to `true`, arguments need to be passed with full type information.
@@ -279,8 +285,8 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     let ret
     if (arg instanceof SimpleRangeValue) {
       switch (coercedType.argumentType) {
-        case ArgumentTypes.RANGE:
-        case ArgumentTypes.ANY:
+        case FunctionArgumentType.RANGE:
+        case FunctionArgumentType.ANY:
           ret = arg
           break
         default: {
@@ -294,8 +300,8 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
     if (!(arg instanceof SimpleRangeValue)) {
       switch (coercedType.argumentType) {
-        case ArgumentTypes.INTEGER:
-        case ArgumentTypes.NUMBER:
+        case FunctionArgumentType.INTEGER:
+        case FunctionArgumentType.NUMBER:
           // eslint-disable-next-line no-case-declarations
           const coerced = this.coerceScalarToNumberOrError(arg)
           if (!isExtendedNumber(coerced)) {
@@ -316,29 +322,29 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
           if (coercedType.greaterThan !== undefined && value <= coercedType.greaterThan) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
           }
-          if (coercedType.argumentType === ArgumentTypes.INTEGER && !Number.isInteger(value)) {
+          if (coercedType.argumentType === FunctionArgumentType.INTEGER && !Number.isInteger(value)) {
             return new CellError(ErrorType.NUM, ErrorMessage.IntegerExpected)
           }
           ret = coerced
           break
-        case ArgumentTypes.STRING:
+        case FunctionArgumentType.STRING:
           ret = coerceScalarToString(arg)
           break
-        case ArgumentTypes.BOOLEAN:
+        case FunctionArgumentType.BOOLEAN:
           ret = coerceScalarToBoolean(arg)
           break
-        case ArgumentTypes.SCALAR:
-        case ArgumentTypes.NOERROR:
-        case ArgumentTypes.ANY:
+        case FunctionArgumentType.SCALAR:
+        case FunctionArgumentType.NOERROR:
+        case FunctionArgumentType.ANY:
           ret = arg
           break
-        case ArgumentTypes.RANGE:
+        case FunctionArgumentType.RANGE:
           if (arg instanceof CellError) {
             return arg
           }
           ret = coerceToRange(arg)
           break
-        case ArgumentTypes.COMPLEX:
+        case FunctionArgumentType.COMPLEX:
           return this.arithmeticHelper.coerceScalarToComplex(getRawValue(arg))
       }
     }
@@ -381,7 +387,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     if (!metadata.vectorizationForbidden && state.arraysFlag) {
       for (let i = 0; i < argValues.length; i++) {
         const [val] = argValues[i]
-        if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+        if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
           maxHeight = Math.max(maxHeight, val.height())
           maxWidth = Math.max(maxWidth, val.width())
         }
@@ -406,7 +412,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         for (let i = 0; i < argumentDefinitions.length; i++) {
           // eslint-disable-next-line prefer-const
           let [val, ignorable] = argValues[i] ?? [undefined, undefined]
-          if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+          if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
             if (!metadata.vectorizationForbidden && state.arraysFlag) {
               val = val.data[val.height() !== 1 ? row : 0]?.[val.width() !== 1 ? col : 0]
             }
@@ -418,7 +424,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
             //we apply coerce only to non-default values
             const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[i], state) : arg
             if (coercedArg !== undefined) {
-              if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== ArgumentTypes.SCALAR) {
+              if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== FunctionArgumentType.SCALAR) {
                 //if this is first error encountered, store it
                 argCoerceFailure = argCoerceFailure ?? coercedArg
               }

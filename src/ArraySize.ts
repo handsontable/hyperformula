@@ -8,7 +8,7 @@ import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {ArgumentTypes} from './interpreter/plugin/FunctionPlugin'
+import {FunctionArgumentType} from './interpreter/plugin/FunctionPlugin'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
 export class ArraySize {
@@ -156,7 +156,7 @@ export class ArraySizePredictor {
     let maxWidth = 1
     let maxHeight = 1
     for (let i = 0; i < subChecks.length; i++) {
-      if (argumentDefinitions[i].argumentType !== ArgumentTypes.RANGE && argumentDefinitions[i].argumentType !== ArgumentTypes.ANY) {
+      if (argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
         maxHeight = Math.max(maxHeight, subChecks[i].height)
         maxWidth = Math.max(maxWidth, subChecks[i].width)
       }

@@ -20,7 +20,7 @@ import {
   InterpreterValue,
   RawScalarValue
 } from '../interpreter/InterpreterValue'
-import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'

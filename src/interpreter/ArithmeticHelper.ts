@@ -33,7 +33,7 @@ import {
   RawScalarValue,
   TimeNumber
 } from './InterpreterValue'
-import {SimpleRangeValue} from './SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import Collator = Intl.Collator
 
 export type complex = [number, number]

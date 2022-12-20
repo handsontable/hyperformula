@@ -3,12 +3,13 @@
  * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {ArraySize} from '../ArraySize'
-import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
-import {DependencyGraph} from '../DependencyGraph'
-import {ErrorMessage} from '../error-message'
-import {InternalScalarValue, isExtendedNumber} from './InterpreterValue'
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {ArraySize} from './ArraySize'
+import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {DependencyGraph} from './DependencyGraph'
+import {ErrorMessage} from './error-message'
+import {InternalScalarValue, isExtendedNumber} from './interpreter/InterpreterValue'
+
 
 export class SimpleRangeValue {
   public readonly size: ArraySize
@@ -135,6 +136,7 @@ export class SimpleRangeValue {
     if (this._data !== undefined) {
       return
     }
+
     this._hasOnlyNumbers = true
     this._data = this.range!.addressesArrayMap(this.dependencyGraph!, cellFromRange => {
       const value = this.dependencyGraph!.getCellValue(cellFromRange)
@@ -148,6 +150,5 @@ export class SimpleRangeValue {
         return value as InternalScalarValue
       }
     })
-
   }
 }

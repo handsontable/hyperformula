@@ -6,14 +6,14 @@
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class RadiansPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadiansPlugin> {
   public static implementedFunctions = {
     'RADIANS': {
       method: 'radians',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ],
     },
   }
