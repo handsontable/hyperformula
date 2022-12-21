@@ -1,7 +1,7 @@
 # Localizing functions
 
 You can localize a function's ID and error
-messages. Currently, the library supports 17 languages with British English
+messages. Currently, HyperFormula supports 17 languages, with British English
 as the default.
 
 To change the language all you need to do is import and
@@ -71,8 +71,7 @@ errors: {
 
 ## Localizing custom functions
 
-Localization of custom functions is also supported.
-[Custom functions guide](custom-functions.md#function-name-translations) describes, how to define the translations for your custom functions in multiple languages.
+You can localize your custom functions as well. For details, see the [Custom functions](custom-functions.md#function-name-translations) guide.
 
 ### List of supported languages
 | Language name    | Language code |
