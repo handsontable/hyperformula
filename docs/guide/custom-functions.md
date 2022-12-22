@@ -30,9 +30,9 @@ The name of that object becomes the ID by which [translations](#function-name-tr
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
 
 In your function's object, you can specify:
-- a `method` property (required), which maps your function to the implementation method (we'll define it later on),
-- a `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
-- other [custom function options](#custom-function-options).
+- A `method` property (required), which maps your function to the implementation method (we'll define it later on),
+- A `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
+- Other [custom function options](#function-options).
 
 ```js
 import { FunctionPlugin, FunctionArgumentType } from 'hyperformula';
@@ -74,7 +74,7 @@ export const MyCustomPluginTranslations = {
   enUS: {
     GREET: "GREET",
   }
-  // repeat for all languages used in your system...
+  // repeat for all languages used in your system
 };
 ```
 
@@ -86,7 +86,7 @@ In your function plugin, add a method that implements your function's calculatio
 
 To benefit from HyperFormula's automatic validations, wrap your method in the built-in `runFunction()` method, which:
 * Verifies the format of the values returned by your function.
-* Validates your function's parameters against your [custom function options](#custom-function-options).
+* Validates your function's parameters against your [custom function options](#function-options).
 * Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
 
 ```js
@@ -277,7 +277,7 @@ All HyperFormula [error types](types-of-errors.md) support optional custom error
 
 ### Test your function
 
-You may add unit tests to ensure your custom function works correctly using one of the JavaScript testing libraries.
+To make sure your function works correctly, add unit tests. Use a JavaScript testing library of your choice.
 
 ```js
 it('works for a range of numbers', () => {
@@ -310,17 +310,17 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
-This demo contains the implementation of both `GREET` and `DOUBLE_RANGE` custom functions.
+This demo contains the implementation of both the [`GREET`](#add-a-simple-custom-function) and [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: custom-functions"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
   sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>
 
-## Custom function options
+## Function options
 
 You can set the following options for your function:
 
@@ -338,18 +338,24 @@ You can set the following options for your function:
 | `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.<br/>Default: `false`                                                                                                             |
 | `vectorizationForbidden`            | Boolean | `true`: the function will never get [vectorized](arrays.md#passing-arrays-to-scalar-functions-vectorization).<br/>Default: `false`                                                                                                            |
 
-The options listed above are set in the static `implementedFunctions` property of your function plugin:
+You can set the options in the static `implementedFunctions` property of your function plugin:
 
 ```javascript
 MyCustomPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
-    arrayFunction: false,
-    doesNotNeedArgumentsToBeComputed: false,
+    parameters: [{
+      // your argument validation options
+    }],
+    arraySizeMethod: 'myArraySizeMethod',
+    returnNumberType: 'NUMBER_RAW',
+    repeatLastArgs: 0,
     expandRanges: false,
+    isVolatile: false,
     isDependentOnSheetStructureChange: false,
-    isVolatile: true,
-    repeatLastArgs: 4,
+    doesNotNeedArgumentsToBeComputed: false,
+    arrayFunction: false,
+    vectorizationForbidden: false,
   },
 };
 ```
@@ -360,7 +366,7 @@ You can set the following argument validation options:
 
 | Option                    | Type                                      | Description                                                                                                                                                                                                                                        |
 |---------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the argument. Possible values: `STRING, NUMBER, BOOLEAN, SCALAR, NOERROR, RANGE, INTEGER, COMPLEX, ANY`.                                                                                                                          |
+| `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the argument. Possible values: `STRING`, `NUMBER`, `BOOLEAN`, `SCALAR`, `NOERROR`, `RANGE`, `INTEGER`, `COMPLEX`, `ANY`.                                                                                                                          |
 | `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                           |
 | `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                    |
 | `optionalArg`             | Boolean                                   | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br/>Default: `false`<br/>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
@@ -376,8 +382,9 @@ MyCustomPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
     parameters: [{
-      passSubtype: false,
+      argumentType: FunctionArgumentType.STRING,
       defaultValue: 10,
+      passSubtype: false,
       optionalArg: false,
       minValue: 5,
       maxValue: 15,
@@ -398,7 +405,7 @@ If you don't want to set any `defaultValue` (because, for example, your function
 
 ## Function name translations
 
-You can provide the translations for your function name in multiple languages.
+You can add translations of your function's name in multiple languages.
 Your end users use the translated names to call your function inside formulas.
 
 ::: tip
@@ -418,7 +425,7 @@ export const MyCustomPluginTranslations = {
     // formula in German: `=MEINE_FUNKTION()`
     'MY_FUNCTION': 'MEINE_FUNKTION'
   },
-  // repeat for all languages used in your system...
+  // repeat for all languages used in your system
 };
 
 // register your function plugin and translations
