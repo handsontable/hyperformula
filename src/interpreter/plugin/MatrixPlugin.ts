@@ -9,8 +9,8 @@ import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export type KernelRunShortcut = (...args: any[]) => number[][]
 
@@ -43,8 +43,8 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       method: 'mmult',
       arraySizeMethod: 'mmultArraySize',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
       vectorizationForbidden: true,
     },
@@ -52,7 +52,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       method: 'transpose',
       arraySizeMethod: 'transposeArraySize',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
       vectorizationForbidden: true,
     },
@@ -60,9 +60,9 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       method: 'maxpool',
       arraySizeMethod: 'maxpoolArraySize',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
       ],
       vectorizationForbidden: true,
     },
@@ -70,9 +70,9 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       method: 'medianpool',
       arraySizeMethod: 'medianpoolArraySize',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
       ],
       vectorizationForbidden: true,
     },

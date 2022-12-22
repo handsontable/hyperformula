@@ -4,6 +4,7 @@
  */
 
 import {SimpleCellRange} from './AbsoluteCellRange'
+import {ArraySize} from './ArraySize'
 import {CellError, CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
@@ -47,15 +48,17 @@ import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from 
 import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
-import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
+import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata} from './interpreter'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 
-/** @internal */
+/**
+ * Aggregate class for default export
+ */
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static ErrorType = ErrorType
@@ -70,7 +73,9 @@ class HyperFormulaNS extends HyperFormula {
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
+  public static ArraySize = ArraySize
   public static FunctionPlugin = FunctionPlugin
+  public static FunctionArgumentType = FunctionArgumentType
   public static FunctionPluginValidationError = FunctionPluginValidationError
   public static InvalidAddressError = InvalidAddressError
   public static InvalidArgumentsError = InvalidArgumentsError
@@ -145,7 +150,11 @@ export {
   EvaluationSuspendedError,
   ExpectedOneOfValuesError,
   ExpectedValueOfTypeError,
+  ArraySize,
   FunctionPlugin,
+  ImplementedFunctions,
+  FunctionMetadata,
+  FunctionArgumentType,
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,

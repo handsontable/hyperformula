@@ -8,62 +8,62 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue, RawInterpreterValue} from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class MathPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MathPlugin> {
   public static implementedFunctions = {
     'FACT': {
       method: 'fact',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 170}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 170}
       ]
     },
     'FACTDOUBLE': {
       method: 'factdouble',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 288}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 288}
       ]
     },
     'COMBIN': {
       method: 'combin',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1030},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, lessThan: 1030},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0}
       ]
     },
     'COMBINA': {
       method: 'combina',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0}
       ]
     },
     'GCD': {
       method: 'gcd',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1
     },
     'LCM': {
       method: 'lcm',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1
     },
     'MROUND': {
       method: 'mround',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'MULTINOMIAL': {
       method: 'multinomial',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -71,44 +71,44 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'QUOTIENT': {
       method: 'quotient',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'SERIESSUM': {
       method: 'seriessum',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'SIGN': {
       method: 'sign',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'SUMX2MY2': {
       method: 'sumx2my2',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'SUMX2PY2': {
       method: 'sumx2py2',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
     'SUMXMY2': {
       method: 'sumxmy2',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
   }

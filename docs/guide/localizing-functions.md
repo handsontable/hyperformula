@@ -1,7 +1,7 @@
 # Localizing functions
 
 You can localize a function's ID and error
-messages. Currently, the library supports 17 languages with British English
+messages. Currently, HyperFormula supports 17 languages, with British English
 as the default.
 
 To change the language all you need to do is import and
@@ -71,22 +71,7 @@ errors: {
 
 ## Localizing custom functions
 
-You can translate your own [custom functions](custom-functions) into
-different languages too. You need to define the translations and register the corresponding language pack after registering a plugin:
-
-```javascript
-const translations = {
-  'enGB': {
-    'HYPER': 'HYPER'
-  },
-  'enUS': {
-    'HYPER': 'HYPER'
-  },
-  'plPL': {
-    'HYPER': 'HAJPER'
-  }
-}
-```
+You can localize your custom functions as well. For details, see the [Custom functions](custom-functions.md#function-name-translations) guide.
 
 ### List of supported languages
 | Language name    | Language code |
@@ -112,7 +97,7 @@ const translations = {
 ## Demo
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.2.x/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/localizing-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: localizing-functions"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

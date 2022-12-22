@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing boolean functions
@@ -26,15 +26,15 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'IF': {
       method: 'conditionalIf',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, defaultValue: false, passSubtype: true},
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, passSubtype: true},
       ],
     },
     'AND': {
       method: 'and',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -42,7 +42,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'OR': {
       method: 'or',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -50,7 +50,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'XOR': {
       method: 'xor',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -58,37 +58,37 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'NOT': {
       method: 'not',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'SWITCH': {
       method: 'switch',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.NOERROR},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ],
       repeatLastArgs: 1,
     },
     'IFERROR': {
       method: 'iferror',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ]
     },
     'IFNA': {
       method: 'ifna',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ]
     },
     'CHOOSE': {
       method: 'choose',
       parameters: [
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ],
       repeatLastArgs: 1,
     },

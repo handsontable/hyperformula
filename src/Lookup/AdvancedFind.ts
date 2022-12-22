@@ -10,7 +10,7 @@ import {
   RawInterpreterValue,
   RawNoErrorScalarValue
 } from '../interpreter/InterpreterValue'
-import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 import {SearchOptions} from './SearchStrategy'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {findLastOccurrenceInOrderedRange} from '../interpreter/binarySearch'

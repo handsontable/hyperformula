@@ -8,8 +8,8 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
@@ -20,22 +20,22 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
     'MEDIAN': {
       method: 'median',
       parameters: [
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
     },
     'LARGE': {
       method: 'large',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
     },
     'SMALL': {
       method: 'small',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
     },
   }

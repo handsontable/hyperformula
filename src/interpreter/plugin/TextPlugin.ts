@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing text-specific functions
@@ -18,7 +18,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'CONCATENATE': {
       method: 'concatenate',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -26,120 +26,120 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'EXACT': {
       method: 'exact',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'SPLIT': {
       method: 'split',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER},
       ]
     },
     'LEN': {
       method: 'len',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'LOWER': {
       method: 'lower',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'MID': {
       method: 'mid',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ]
     },
     'TRIM': {
       method: 'trim',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'T': {
       method: 't',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'PROPER': {
       method: 'proper',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'CLEAN': {
       method: 'clean',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'REPT': {
       method: 'rept',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER},
       ]
     },
     'RIGHT': {
       method: 'right',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'LEFT': {
       method: 'left',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'REPLACE': {
       method: 'replace',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'SEARCH': {
       method: 'search',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'SUBSTITUTE': {
       method: 'substitute',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true}
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true}
       ]
     },
     'FIND': {
       method: 'find',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.STRING},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'UPPER': {
       method: 'upper',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
   }

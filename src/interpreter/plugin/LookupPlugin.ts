@@ -13,35 +13,35 @@ import {StatType} from '../../statistics'
 import {zeroIfEmpty} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue, RawNoErrorScalarValue} from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
   public static implementedFunctions = {
     'VLOOKUP': {
       method: 'vlookup',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.BOOLEAN, defaultValue: true},
+        {argumentType: FunctionArgumentType.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: true},
       ]
     },
     'HLOOKUP': {
       method: 'hlookup',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.BOOLEAN, defaultValue: true},
+        {argumentType: FunctionArgumentType.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: true},
       ]
     },
     'MATCH': {
       method: 'match',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
   }

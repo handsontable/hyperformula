@@ -6,7 +6,7 @@
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
@@ -17,7 +17,7 @@ export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTy
     'COUNTBLANK': {
       method: 'countblank',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ],
       repeatLastArgs: 1,
       expandRanges: true,

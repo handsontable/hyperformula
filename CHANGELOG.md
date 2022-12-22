@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2022-12-22
+
+### Added
+- Exported the `ArraySize` class as a public API. [#843](https://github.com/handsontable/hyperformula/issues/843)
+- Renamed an internal interface from `ArgumentTypes` to `FunctionArgumentType`, and exported it as a public API. [#1108](https://github.com/handsontable/hyperformula/pull/1108)
+- Exported `ImplementedFunctions` and `FunctionMetadata` as public APIs. [#1108](https://github.com/handsontable/hyperformula/pull/1108)
+
 ## [2.2.0] - 2022-11-17
 
 ### Added

@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValueType, InterpreterValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function
@@ -17,7 +17,7 @@ export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginT
     'COUNTUNIQUE': {
       method: 'countunique',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
       ],
       repeatLastArgs: 1,
       expandRanges: true,

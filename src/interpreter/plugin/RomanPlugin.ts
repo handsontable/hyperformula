@@ -8,21 +8,21 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {getRawValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RomanPlugin> {
   public static implementedFunctions = {
     'ROMAN': {
       method: 'roman',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, lessThan: 4000},
-        {argumentType: ArgumentTypes.NOERROR, optionalArg: true, defaultValue: 0}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1, lessThan: 4000},
+        {argumentType: FunctionArgumentType.NOERROR, optionalArg: true, defaultValue: 0}
       ],
     },
     'ARABIC': {
       method: 'arabic',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
+        {argumentType: FunctionArgumentType.STRING},
       ],
     },
   }

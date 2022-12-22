@@ -39,7 +39,7 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {SimpleRangeValue} from './SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder

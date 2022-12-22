@@ -9,14 +9,14 @@ import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from '../index'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FormulaTextPlugin> {
   public static implementedFunctions = {
     'FORMULATEXT': {
       method: 'formulatext',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR}
+        {argumentType: FunctionArgumentType.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       isDependentOnSheetStructureChange: true,

@@ -30,361 +30,361 @@ import {
   tci,
   weibull
 } from './3rdparty/jstat/jstat'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 export class StatisticalPlugin extends FunctionPlugin implements FunctionPluginTypecheck<StatisticalPlugin> {
   public static implementedFunctions = {
     'ERF': {
       method: 'erf',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
       ]
     },
     'ERFC': {
       method: 'erfc',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'EXPON.DIST': {
       method: 'expondist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'FISHER': {
       method: 'fisher',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1, lessThan: 1}
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: -1, lessThan: 1}
       ]
     },
     'FISHERINV': {
       method: 'fisherinv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'GAMMA': {
       method: 'gamma',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'GAMMA.DIST': {
       method: 'gammadist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'GAMMALN': {
       method: 'gammaln',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0}
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0}
       ]
     },
     'GAMMA.INV': {
       method: 'gammainv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ]
     },
     'GAUSS': {
       method: 'gauss',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'BETA.DIST': {
       method: 'betadist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'BETA.INV': {
       method: 'betainv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'BINOM.DIST': {
       method: 'binomialdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'BINOM.INV': {
       method: 'binomialinv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
     'BESSELI': {
       method: 'besselifn',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'BESSELJ': {
       method: 'besseljfn',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'BESSELK': {
       method: 'besselkfn',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'BESSELY': {
       method: 'besselyfn',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'CHISQ.DIST': {
       method: 'chisqdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1, maxValue: 1e10},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'CHISQ.DIST.RT': {
       method: 'chisqdistrt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1, maxValue: 1e10},
       ]
     },
     'CHISQ.INV': {
       method: 'chisqinv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1, maxValue: 1e10},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1, maxValue: 1e10},
       ]
     },
     'CHISQ.INV.RT': {
       method: 'chisqinvrt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'F.DIST': {
       method: 'fdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'F.DIST.RT': {
       method: 'fdistrt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'F.INV': {
       method: 'finv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'F.INV.RT': {
       method: 'finvrt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'WEIBULL.DIST': {
       method: 'weibulldist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'POISSON.DIST': {
       method: 'poissondist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'HYPGEOM.DIST': {
       method: 'hypgeomdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'T.DIST': {
       method: 'tdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'T.DIST.2T': {
       method: 'tdist2t',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'T.DIST.RT': {
       method: 'tdistrt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'TDIST': {
       method: 'tdistold',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 2},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1, maxValue: 2},
       ]
     },
     'T.INV': {
       method: 'tinv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'T.INV.2T': {
       method: 'tinv2t',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ]
     },
     'LOGNORM.DIST': {
       method: 'lognormdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'LOGNORM.INV': {
       method: 'lognorminv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ]
     },
     'NORM.DIST': {
       method: 'normdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'NORM.INV': {
       method: 'norminv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ]
     },
     'NORM.S.DIST': {
       method: 'normsdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'NORM.S.INV': {
       method: 'normsinv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
       ]
     },
     'PHI': {
       method: 'phi',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'NEGBINOM.DIST': {
       method: 'negbinomdist',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0, maxValue: 1},
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'CONFIDENCE.NORM': {
       method: 'confidencenorm',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
     },
     'CONFIDENCE.T': {
       method: 'confidencet',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, lessThan: 1},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
     },
     'STANDARDIZE': {
       method: 'standardize',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ],
     },
   }

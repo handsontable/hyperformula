@@ -17,8 +17,8 @@ import {
   RawInterpreterValue,
   RawScalarValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
 
 class AverageResult {
   public static empty = new AverageResult(0, 0)
@@ -79,58 +79,58 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
     SUMIF: {
       method: 'sumif',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NOERROR},
-        {argumentType: ArgumentTypes.RANGE, optionalArg: true},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE, optionalArg: true},
       ],
     },
     COUNTIF: {
       method: 'countif',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
       ],
     },
     AVERAGEIF: {
       method: 'averageif',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NOERROR},
-        {argumentType: ArgumentTypes.RANGE, optionalArg: true},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE, optionalArg: true},
       ],
     },
     SUMIFS: {
       method: 'sumifs',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
       ],
       repeatLastArgs: 2,
     },
     COUNTIFS: {
       method: 'countifs',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
       ],
       repeatLastArgs: 2,
     },
     MINIFS: {
       method: 'minifs',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
       ],
       repeatLastArgs: 2,
     },
     MAXIFS: {
       method: 'maxifs',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NOERROR},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
       ],
       repeatLastArgs: 2,
     },
