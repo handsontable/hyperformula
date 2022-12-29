@@ -119,15 +119,15 @@ describe('Named expressions - checking the name validity', () => {
     expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
   })
 
-  it('user', () => {
-    const name = 'AITYU'
+  it('works for named expression name made of upper-case letters', () => {
+    const name = 'AAA'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
 
     expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
     expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
   })
 
-  it('user2', () => {
+  it('works for named expression name that starts with a valid cell reference', () => {
     const name = 'A9IOP'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
 
@@ -135,7 +135,7 @@ describe('Named expressions - checking the name validity', () => {
     expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
   })
 
-  it('user3', () => {
+  it('works for a named expressions name that contains an underscore', () => {
     const name = 'HF2_2'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
 
@@ -143,12 +143,11 @@ describe('Named expressions - checking the name validity', () => {
     expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
   })
 
-  it('should throw', () => {
+  it('throws when the named expression name is a valid cell reference', () => {
     const name = 'AAA111'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
 
     expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
-    expect((engine.getCellValue(adr('A1', 0)) as DetailedCellError)).toEqual('#NAME?')
   })
 })
 
