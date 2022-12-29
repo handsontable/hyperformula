@@ -1,5 +1,4 @@
 import {
-  DetailedCellError,
   ExportedCellChange,
   ExportedNamedExpressionChange,
   HyperFormula,

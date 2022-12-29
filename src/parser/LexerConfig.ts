@@ -74,7 +74,7 @@ export const CellReference = createToken({
   // eslint-disable-next-line @typescript-eslint/camelcase
   start_chars_hint: [
     ABSOLUTE_OPERATOR,
-    '\'',
+    "'",
     '_',
     ...Array.from(Array(26)).map((_, i) => i + 'A'.charCodeAt(0)).map(code => String.fromCharCode(code)),
     ...Array.from(Array(26)).map((_, i) => i + 'a'.charCodeAt(0)).map(code => String.fromCharCode(code)),
