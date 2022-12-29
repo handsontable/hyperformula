@@ -158,11 +158,23 @@ export class NamedExpressions {
     return this.worksheetStore(sheetId)?.has(expressionName) ?? false
   }
 
+  /**
+   * Checks the validity of the named expression name.
+   * - contains only UNICODE letters, numbers, underscore and dot characters
+   * - starts with a letter or underscore
+   * - does not look like a cell address ([A-Za-z]+[0-9]+)
+   *
+   * Differences from [ODFF](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#__RefHeading__1017964_715980110):
+   * - ODFF allows also the CombiningChar character
+   * - ODFF does not allow dot character
+   * - ODFF does not allow underscore as the first character
+   * - ODFF does not allow named expressions "True" and "False" (reserved keywords)
+   */
   public isNameValid(expressionName: string): boolean {
-    if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
+    if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) { // TODO: reuse regex from token
       return false
     }
-    return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*$/.test(expressionName)
+    return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*$/.test(expressionName) // TODO: reuse regex from token
   }
 
   public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {
