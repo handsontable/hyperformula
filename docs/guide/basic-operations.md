@@ -309,7 +309,7 @@ handled in a similar manner.
 
 For example, imagine you let users rename their sheets in an
 application but by mistake they choose a sheet ID that does not exist.
-It would be nice to display the error to the user so they are aware
+It would be nice to display the error to the user, so they are aware
 of this fact.
 
 ```javascript
@@ -336,11 +336,11 @@ try {
 ## isItPossibleTo* methods
 
 There are also methods that you may find useful to call in pair with
-the above mentioned operations. These methods are prefixed with
+the above-mentioned operations. These methods are prefixed with
 `isItPossibleTo*` whose sole purpose is to check if the desired
 operation is possible. They all return a simple `boolean` value.
 You will find it handy when you want to give the user a more generic
-message and you don't want to react to specific errors.
+message, and you don't want to react to specific errors.
 
 This can be particularly useful for interaction with the UI of the
 application you work on. For example, you can allow the user to add
@@ -389,9 +389,9 @@ This demo presents several basic operations integrated with a
 sample UI.
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/basic-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="handsontable/hyperformula-demos: basic-operations"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/basic-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: basic-operations"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>

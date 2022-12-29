@@ -24,20 +24,20 @@ the names as follows:
 
 ## Examples
 
-| Type | Custom name | Example expression |
-| :--- | :--- | :--- |
-| Named cell | myCell | =A1 |
-| Named range of cells | myRange | =A1:D10 |
-| Named constant (number) | myNumber | =10 |
-| Named constant (string) | myText | ="One Small Step for Man" |
-| Named formula | myFormula | =SUM(A1:D10) |
+| Type                    | Custom name | Example expression        |
+|:------------------------|:------------|:--------------------------|
+| Named cell              | myCell      | =A1                       |
+| Named range of cells    | myRange     | =A1:D10                   |
+| Named constant (number) | myNumber    | =10                       |
+| Named constant (string) | myText      | ="One Small Step for Man" |
+| Named formula           | myFormula   | =SUM(A1:D10)              |
 
-## Naming convention
+## Name rules
 
 * The name has to **be unique within the scope**; if you set
-'MyPotato' globally (meaning you do not define any scope) it has
-to be unique globally. However, you can still define 'MyPotato'
-again in the local scope of a sheet.
+  'MyPotato' globally (meaning you do not define any scope) it has
+  to be unique globally. However, you can still define 'MyPotato'
+  again in the local scope of a sheet.
 
 ```javascript
 // define for a global scope
@@ -47,9 +47,11 @@ hfInstance.addNamedExpression('MyPotato', '=SUM(100+10)');
 hfInstance.addNamedExpression('MyPotato', '=Sheet2!$A$1+100', 1);
 ```
 
+// TODO: verify rules and examples
+
 * The name starts with a letter or an underscore. The minimum required
-length of a name is based on the `maxColumns`value inside
-[configuration object](configuration-options.md).
+  length of a name is based on the `maxColumns`value inside
+  [configuration object](configuration-options.md).
 * The name must not equal a cell reference, e.g. A1, $A$1, R1C1; a separate “1” or “A” is also invalid.
 * The name is case-insensitive.
 * A space character is not allowed.
@@ -57,16 +59,16 @@ length of a name is based on the `maxColumns`value inside
 
 **Examples of correct and incorrect names:**
 
-| Name | Validity |
-| :--- | :--- |
-| myRevenue | Correct |
-| quarter_1 | Correct |
-| _1stQuarter | Correct |
-| my Revenue | Incorrect |
-| 1stQuarter | Incorrect |
-| A1 | Incorrect |
-| R1C1 | Incorrect |
-| !A$1:D10 | Incorrect |
+| Name        | Validity  |
+|:------------|:----------|
+| myRevenue   | Correct   |
+| quarter_1   | Correct   |
+| _1stQuarter | Correct   |
+| my Revenue  | Incorrect |
+| 1stQuarter  | Incorrect |
+| A1          | Incorrect |
+| R1C1        | Incorrect |
+| !A$1:D10    | Incorrect |
 
 ## Available methods
 
@@ -97,7 +99,7 @@ You can change a named expression by using the `changeNamedExpression`
 method. Select the name of an expression to change and pass it as
 the first parameter,  then define the new expression as raw cell
 content and optionally add the scope. If you do not define the scope
-it will be set to global, meaning the expression will be vaild for the whole workbook. If you want to change many of them, it is advised
+it will be set to global, meaning the expression will be valid for the whole workbook. If you want to change many of them, it is advised
 to do so in a [batch](batch-operations.md). This method returns
 a list of cells whose values were affected by this operation, their absolute addresses, and new values. See the "changes"
 section in [basic operations](basic-operations) for more info.
@@ -113,10 +115,8 @@ You can remove a named expression by using the `removeNamedExpression`
 method. Select the name of an expression to remove and pass it as
 the first parameter and optionally define the scope. If you do
 not define the scope it will be understood as global, meaning,
-the whole workbook. This method returns a list of cells whose values
-were affected by this operation, their absolute addresses, and new values.
-See the changes section in
-[basic operations](basic-operations) for more info.
+the whole workbook. This method returns a list of [cells whose values
+were affected by this operation](basic-operations.md#what-are-the-changes), their absolute addresses, and new values.
 
 ```javascript
 // remove 'prettyName' expression from 'Sheet1' (sheetId=0)
@@ -137,17 +137,15 @@ const listOfExpressions = hfInstance.listNamedExpressions();
 ## Handling errors
 
 Operations on named expressions throw errors when something goes
-wrong. These errors can be handled to provide a good user experience
-in the application. Be sure to check the
-[basic operations](basic-operations) section to read about
-error handling. It is also possible to check the availability of operations using `isItPossibleTo*` methods, which are also described in [that section](basic-operations#isitpossibleto-methods).
+wrong. These errors can be [handled](basic-operations.md#handling-an-error) to provide a good user experience
+in the application. It is also possible to check the availability of operations using `isItPossibleTo*` methods, which are also described in [that section](basic-operations#isitpossibleto-methods).
 
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/named-expressions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="handsontable/hyperformula-demos: named-expressions"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/named-expressions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: named-expressions"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>
