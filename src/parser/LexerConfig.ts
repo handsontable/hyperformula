@@ -6,92 +6,52 @@
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
+import {
+  ABSOLUTE_OPERATOR,
+  ALL_WHITESPACE_REGEXP_PATTERN,
+  CELL_REFERENCE_REGEXP_PATTERN,
+  NAMED_EXPRESSION_REGEXP_PATTERN,
+  ODFF_WHITESPACE_REGEXP_PATTERN,
+  RANGE_OPERATOR,
+  SHEET_NAME_REGEXP_PATTERN
+} from './parser-consts'
+import {CellReferenceMatcher} from './CellReferenceMatcher'
+import {NamedExpressionMatcher} from './NamedExpressionMatcher'
 
-export const RANGE_OPERATOR = ':'
-export const ABSOLUTE_OPERATOR = '$'
-export const ALL_WHITESPACE_REGEXP = /\s+/
-export const ODFF_WHITESPACE_REGEXP = /[ \t\n\r]+/
-
-/* arithmetic */
-// abstract for + -
-export const AdditionOp = createToken({
-  name: 'AdditionOp',
-  pattern: Lexer.NA,
-})
+// operators
+export const AdditionOp = createToken({ name: 'AdditionOp', pattern: Lexer.NA })
 export const PlusOp = createToken({name: 'PlusOp', pattern: /\+/, categories: AdditionOp})
 export const MinusOp = createToken({name: 'MinusOp', pattern: /-/, categories: AdditionOp})
-
-// abstract for * /
-export const MultiplicationOp = createToken({
-  name: 'MultiplicationOp',
-  pattern: Lexer.NA,
-})
+export const MultiplicationOp = createToken({ name: 'MultiplicationOp', pattern: Lexer.NA })
 export const TimesOp = createToken({name: 'TimesOp', pattern: /\*/, categories: MultiplicationOp})
 export const DivOp = createToken({name: 'DivOp', pattern: /\//, categories: MultiplicationOp})
-
 export const PowerOp = createToken({name: 'PowerOp', pattern: /\^/})
-
 export const PercentOp = createToken({name: 'PercentOp', pattern: /%/})
-
-export const BooleanOp = createToken({
-  name: 'BooleanOp',
-  pattern: Lexer.NA,
-})
+export const BooleanOp = createToken({ name: 'BooleanOp', pattern: Lexer.NA })
 export const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/, categories: BooleanOp})
 export const NotEqualOp = createToken({name: 'NotEqualOp', pattern: /<>/, categories: BooleanOp})
 export const GreaterThanOp = createToken({name: 'GreaterThanOp', pattern: />/, categories: BooleanOp})
 export const LessThanOp = createToken({name: 'LessThanOp', pattern: /</, categories: BooleanOp})
 export const GreaterThanOrEqualOp = createToken({name: 'GreaterThanOrEqualOp', pattern: />=/, categories: BooleanOp})
 export const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern: /<=/, categories: BooleanOp})
-
 export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
-/* addresses */
-export const simpleSheetName = '[A-Za-z0-9_\u00C0-\u02AF]+'
-export const quotedSheetName = "'(((?!').|'')*)'"
-export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
-
-export const cellReferenceRegexp = new RegExp(`((${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+\\${ABSOLUTE_OPERATOR}?[0-9]+)[^A-Za-z0-9\u00C0-\u02AF._]`, 'y')
-export const namedExpressionRegexp = new RegExp('[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*', 'y')
-
-function machCellReference(text: string, startOffset: number): RegExpExecArray | null {
-  // using 'y' sticky flag (Note it is not supported on IE11...)
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
-  cellReferenceRegexp.lastIndex = startOffset
-
-  const execResult = cellReferenceRegexp.exec(text+'@')
-
-  if (execResult == null || execResult[1] == null) {
-    return null
-  }
-
-  execResult[0] = execResult[1]
-  return execResult
-}
-
+export const cellReferenceMather = new CellReferenceMatcher()
 export const CellReference = createToken({
   name: 'CellReference',
-  pattern: machCellReference,
+  pattern: cellReferenceMather.match.bind(cellReferenceMather),
   // eslint-disable-next-line @typescript-eslint/camelcase
-  start_chars_hint: [
-    ABSOLUTE_OPERATOR,
-    "'",
-    '_',
-    ...Array.from(Array(26)).map((_, i) => i + 'A'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(26)).map((_, i) => i + 'a'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(10)).map((_, i) => i).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(0x02AF-0x00C0+1)).map((_, i) => i + 0x00C0).map(code => String.fromCharCode(code)),
-  ],
+  start_chars_hint: cellReferenceMather.POSSIBLE_START_CHARACTERS
 })
 
 export const ColumnRange = createToken({
   name: 'ColumnRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
+  pattern: new RegExp(`(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
 })
 
 export const RowRange = createToken({
   name: 'RowRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
+  pattern: new RegExp(`(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
 export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${RANGE_OPERATOR}`})
@@ -110,34 +70,13 @@ export const ProcedureName = createToken({
   pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/
 })
 
-function matchNamedExpression(text: string, startOffset: number): RegExpExecArray | null {
-  // using 'y' sticky flag (Note it is not supported on IE11...)
-  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
-  namedExpressionRegexp.lastIndex = startOffset
-
-  const execResult = namedExpressionRegexp.exec(text)
-
-  if (execResult == null || execResult[0] == null) {
-    return null
-  }
-
-  if (/^[rR][0-9]*[cC][0-9]*$/.test(execResult[0])) {
-    return null
-  }
-
-  return execResult
-}
-
+export const namedExpressionMatcher = new NamedExpressionMatcher()
 export const NamedExpression = createToken({
   name: 'NamedExpression',
-  pattern: matchNamedExpression,
+  pattern: namedExpressionMatcher.match.bind(namedExpressionMatcher),
   // eslint-disable-next-line @typescript-eslint/camelcase
-  start_chars_hint: [
-    '_',
-    ...Array.from(Array(26)).map((_, i) => i + 'A'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(26)).map((_, i) => i + 'a'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(0x02AF-0x00C0+1)).map((_, i) => i + 0x00C0).map(code => String.fromCharCode(code)),
-  ],})
+  start_chars_hint: namedExpressionMatcher.POSSIBLE_START_CHARACTERS
+})
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
@@ -164,14 +103,16 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
-  const whitespaceTokenRegexp = config.ignoreWhiteSpace === 'standard' ? ODFF_WHITESPACE_REGEXP : ALL_WHITESPACE_REGEXP
+  const whitespaceTokenRegexp = new RegExp(config.ignoreWhiteSpace === 'standard' ? ODFF_WHITESPACE_REGEXP_PATTERN : ALL_WHITESPACE_REGEXP_PATTERN)
 
   const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: whitespaceTokenRegexp })
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
+  const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`) })
+  const OffsetProcedureName = createToken({ name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i') })
 
-  /* configurable tokens */
-  let ArgSeparator, inject: TokenType[]
+  let ArgSeparator: TokenType
+  let inject: TokenType[]
   if (config.functionArgSeparator === config.arrayColumnSeparator) {
     ArgSeparator = ArrayColSeparator
     inject = []
@@ -182,14 +123,6 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
     inject = [ArgSeparator]
   }
-  const NumberLiteral = createToken({
-    name: 'NumberLiteral',
-    pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)
-  })
-  const OffsetProcedureName = createToken({
-    name: 'OffsetProcedureName',
-    pattern: new RegExp(offsetProcedureNameLiteral, 'i')
-  })
 
   /* order is important, first pattern is used */
   const allTokens = [
