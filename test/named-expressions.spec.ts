@@ -5,10 +5,10 @@ import {
   NoSheetWithIdError
 } from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {ErrorType} from '../src/Cell'
-import {Vertex} from '../src/DependencyGraph/Vertex'
+import {ErrorType} from '../src'
+import {Vertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
-import {NoRelativeAddressesAllowedError} from '../src/errors'
+import {NoRelativeAddressesAllowedError} from '../src'
 import {adr, detailedError} from './testUtils'
 
 describe('Named expressions - checking if its possible', () => {
@@ -149,14 +149,6 @@ describe('Named expressions - name validity', () => {
     expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
   })
 
-  it('R1C1 reference works', () => {
-    const name = 'R1C1'
-    const engine = HyperFormula.buildFromArray([[`=${name}`]])
-
-    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
-    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
-  })
-
   it('a one-character name works', () => {
     const name = 'A'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
@@ -195,6 +187,38 @@ describe('Named expressions - name validity', () => {
 
     expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
     expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a valid R1C1-style reference does not work', () => {
+    const name = 'R5C17'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a R1C1-style reference with empty row number does not work', () => {
+    const name = 'RC17'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a R1C1-style reference with empty column number does not work', () => {
+    const name = 'R5C'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a R1C1-style reference with empty row and column numbers does not work', () => {
+    const name = 'RC'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
   })
 
   it('validates characters which are allowed in name', () => {
@@ -570,6 +594,9 @@ describe('Named expressions - store manipulation', () => {
   })
 })
 
+/**
+ * A mock object for testing the dependency graph for the existence of the named expression vertex.
+ */
 const namedExpressionVertex = (engine: HyperFormula, expressionName: string, sheetId?: number): Vertex => {
   let namedExpression
   if (sheetId === undefined) {

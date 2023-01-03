@@ -52,6 +52,7 @@ export const quotedSheetName = "'(((?!').|'')*)'"
 export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
 
 export const cellReferenceRegexp = new RegExp(`((${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+\\${ABSOLUTE_OPERATOR}?[0-9]+)[^A-Za-z0-9\u00C0-\u02AF._]`, 'y')
+export const namedExpressionRegexp = new RegExp('[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*', 'y')
 
 function machCellReference(text: string, startOffset: number): RegExpExecArray | null {
   // using 'y' sticky flag (Note it is not supported on IE11...)
@@ -109,11 +110,34 @@ export const ProcedureName = createToken({
   pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/
 })
 
-/* named expressions */
+function matchNamedExpression(text: string, startOffset: number): RegExpExecArray | null {
+  // using 'y' sticky flag (Note it is not supported on IE11...)
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
+  namedExpressionRegexp.lastIndex = startOffset
+
+  const execResult = namedExpressionRegexp.exec(text)
+
+  if (execResult == null || execResult[0] == null) {
+    return null
+  }
+
+  if (/^[rR][0-9]*[cC][0-9]*$/.test(execResult[0])) {
+    return null
+  }
+
+  return execResult
+}
+
 export const NamedExpression = createToken({
   name: 'NamedExpression',
-  pattern: /[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*/
-})
+  pattern: matchNamedExpression,
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  start_chars_hint: [
+    '_',
+    ...Array.from(Array(26)).map((_, i) => i + 'A'.charCodeAt(0)).map(code => String.fromCharCode(code)),
+    ...Array.from(Array(26)).map((_, i) => i + 'a'.charCodeAt(0)).map(code => String.fromCharCode(code)),
+    ...Array.from(Array(0x02AF-0x00C0+1)).map((_, i) => i + 0x00C0).map(code => String.fromCharCode(code)),
+  ],})
 
 /* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})

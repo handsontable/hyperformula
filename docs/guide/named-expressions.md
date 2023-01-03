@@ -39,7 +39,8 @@ A name of an expression:
 - must be unique within the scope,
 - must contain only UNICODE letters, numbers, an underscore character and a dot character,
 - must start with a letter or an underscore,
-- must be distinctive from a cell reference, e.g. `Q4`, `YEAR2023`.
+- must be distinctive from a cell reference in A1-style, e.g. `Q4`, `YEAR2023`,
+- must be distinctive from a cell reference in R1C1-style, e.g. `R4C5`, `RC`, `R0C`.
 
 **Examples of correct and incorrect names:**
 
@@ -53,6 +54,7 @@ A name of an expression:
 | _1stQuarter | Correct   |
 | A1          | Incorrect |
 | $A$1        | Incorrect |
+| RC          | Incorrect |
 
 ::: tip 
 The name must be unique **within the scope**, but it's possible to override a global named expression by a local one.

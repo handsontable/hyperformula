@@ -174,6 +174,11 @@ export class NamedExpressions {
     if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) { // TODO: reuse regex from token
       return false
     }
+
+    if (/^[rR][0-9]*[cC][0-9]*$/.test(expressionName)) { // TODO: reuse regex from token
+      return false
+    }
+
     return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*$/.test(expressionName) // TODO: reuse regex from token
   }
 
