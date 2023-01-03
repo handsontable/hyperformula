@@ -8,17 +8,16 @@ import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
 import {
   ABSOLUTE_OPERATOR,
-  ALL_WHITESPACE_REGEXP_PATTERN,
-  CELL_REFERENCE_REGEXP_PATTERN,
-  NAMED_EXPRESSION_REGEXP_PATTERN,
-  ODFF_WHITESPACE_REGEXP_PATTERN,
+  ALL_WHITESPACE_PATTERN,
+  CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN,
+  NAMED_EXPRESSION_PATTERN,
+  ODFF_WHITESPACE_PATTERN,
   RANGE_OPERATOR,
-  SHEET_NAME_REGEXP_PATTERN
+  SHEET_NAME_PATTERN
 } from './parser-consts'
 import {CellReferenceMatcher} from './CellReferenceMatcher'
 import {NamedExpressionMatcher} from './NamedExpressionMatcher'
 
-// operators
 export const AdditionOp = createToken({ name: 'AdditionOp', pattern: Lexer.NA })
 export const PlusOp = createToken({name: 'PlusOp', pattern: /\+/, categories: AdditionOp})
 export const MinusOp = createToken({name: 'MinusOp', pattern: /-/, categories: AdditionOp})
@@ -36,7 +35,27 @@ export const GreaterThanOrEqualOp = createToken({name: 'GreaterThanOrEqualOp', p
 export const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern: /<=/, categories: BooleanOp})
 export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
-export const cellReferenceMather = new CellReferenceMatcher()
+export const LParen = createToken({name: 'LParen', pattern: /\(/})
+export const RParen = createToken({name: 'RParen', pattern: /\)/})
+export const ArrayLParen = createToken({name: 'ArrayLParen', pattern: /{/})
+export const ArrayRParen = createToken({name: 'ArrayRParen', pattern: /}/})
+
+export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
+export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[?!]?/})
+
+export const RangeSeparator = createToken({ name: 'RangeSeparator', pattern: new RegExp(RANGE_OPERATOR) })
+export const ColumnRange = createToken({
+  name: 'ColumnRange',
+  pattern: new RegExp(`(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
+})
+export const RowRange = createToken({
+  name: 'RowRange',
+  pattern: new RegExp(`(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
+})
+
+export const ProcedureName = createToken({ name: 'ProcedureName', pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/ })
+
+const cellReferenceMather = new CellReferenceMatcher()
 export const CellReference = createToken({
   name: 'CellReference',
   pattern: cellReferenceMather.match.bind(cellReferenceMather),
@@ -44,45 +63,13 @@ export const CellReference = createToken({
   start_chars_hint: cellReferenceMather.POSSIBLE_START_CHARACTERS
 })
 
-export const ColumnRange = createToken({
-  name: 'ColumnRange',
-  pattern: new RegExp(`(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
-})
-
-export const RowRange = createToken({
-  name: 'RowRange',
-  pattern: new RegExp(`(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${SHEET_NAME_REGEXP_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
-})
-
-export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${RANGE_OPERATOR}`})
-
-/* parenthesis */
-export const LParen = createToken({name: 'LParen', pattern: /\(/})
-export const RParen = createToken({name: 'RParen', pattern: /\)/})
-
-/* array parenthesis */
-export const ArrayLParen = createToken({name: 'ArrayLParen', pattern: /{/})
-export const ArrayRParen = createToken({name: 'ArrayRParen', pattern: /}/})
-
-/* procedures */
-export const ProcedureName = createToken({
-  name: 'ProcedureName',
-  pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/
-})
-
-export const namedExpressionMatcher = new NamedExpressionMatcher()
+const namedExpressionMatcher = new NamedExpressionMatcher()
 export const NamedExpression = createToken({
   name: 'NamedExpression',
   pattern: namedExpressionMatcher.match.bind(namedExpressionMatcher),
   // eslint-disable-next-line @typescript-eslint/camelcase
   start_chars_hint: namedExpressionMatcher.POSSIBLE_START_CHARACTERS
 })
-
-/* string literal */
-export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
-
-/* error literal */
-export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[?!]?/})
 
 export interface ILexerConfig {
   ArgSeparator: TokenType,
@@ -103,7 +90,7 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
   const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
-  const whitespaceTokenRegexp = new RegExp(config.ignoreWhiteSpace === 'standard' ? ODFF_WHITESPACE_REGEXP_PATTERN : ALL_WHITESPACE_REGEXP_PATTERN)
+  const whitespaceTokenRegexp = new RegExp(config.ignoreWhiteSpace === 'standard' ? ODFF_WHITESPACE_PATTERN : ALL_WHITESPACE_PATTERN)
 
   const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: whitespaceTokenRegexp })
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})

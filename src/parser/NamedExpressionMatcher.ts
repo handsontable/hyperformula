@@ -3,7 +3,7 @@
  * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
-import {NAMED_EXPRESSION_REGEXP_PATTERN} from './parser-consts'
+import {NAMED_EXPRESSION_PATTERN} from './parser-consts'
 
 /**
  * TBP
@@ -15,7 +15,7 @@ export class NamedExpressionMatcher {
     ...Array.from(Array(26)).map((_, i) => i + 'a'.charCodeAt(0)).map(code => String.fromCharCode(code)),
     ...Array.from(Array(0x02AF-0x00C0+1)).map((_, i) => i + 0x00C0).map(code => String.fromCharCode(code)),
   ]
-  private namedExpressionRegexp = new RegExp(NAMED_EXPRESSION_REGEXP_PATTERN, 'y')
+  private namedExpressionRegexp = new RegExp(NAMED_EXPRESSION_PATTERN, 'y')
 
   /**
    * TBP

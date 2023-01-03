@@ -8,16 +8,16 @@ import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
-import {ABSOLUTE_OPERATOR, RANGE_OPERATOR, SHEET_NAME_REGEXP_PATTERN, UNQUOTED_SHEET_NAME_REGEXP_PATTERN} from './parser-consts'
+import {ABSOLUTE_OPERATOR, RANGE_OPERATOR, SHEET_NAME_PATTERN, UNQUOTED_SHEET_NAME_PATTERN} from './parser-consts'
 import {RowAddress} from './RowAddress'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
-const addressRegex = new RegExp(`^(${SHEET_NAME_REGEXP_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
-const columnRegex = new RegExp(`^(${SHEET_NAME_REGEXP_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)$`)
-const rowRegex = new RegExp(`^(${SHEET_NAME_REGEXP_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
-const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_REGEXP_PATTERN}$`)
+const addressRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
+const columnRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)$`)
+const rowRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
+const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
