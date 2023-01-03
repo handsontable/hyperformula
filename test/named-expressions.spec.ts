@@ -92,13 +92,109 @@ describe('Named expressions - checking if its possible', () => {
   })
 })
 
-describe('Named expressions - checking the name validity', () => {
-  it('named expressions is validated when added', () => {
-    const engine = HyperFormula.buildEmpty()
+describe('Named expressions - name validity', () => {
+  it('name made of letters works', () => {
+    const name = 'ABC'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
 
-    expect(() => {
-      engine.addNamedExpression('1definitelyIncorrectName', '=42')
-    }).toThrowError('Name of Named Expression \'1definitelyIncorrectName\' is invalid')
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that starts with a valid cell reference works', () => {
+    const name = 'A9IOP'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains a valid cell reference works', () => {
+    const name = '___C42___'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that ends with a valid cell reference works', () => {
+    const name = '___C42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains an underscore works', () => {
+    const name = 'HF2_2'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains a dot character works', () => {
+    const name = 'EXPR.2'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name starts with an underscore works', () => {
+    const name = '___'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('R1C1 reference works', () => {
+    const name = 'R1C1'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('a one-character name works', () => {
+    const name = 'A'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('a 1000-character name works', () => {
+    const name = 'A'.repeat(1000)
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that starts with a digit does not work', () => {
+    const name = '1definitelyIncorrectName'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that starts with a dot character does not work', () => {
+    const name = '.EXPR'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a valid cell reference does not work', () => {
+    const name = 'AAA111'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
   })
 
   it('validates characters which are allowed in name', () => {
@@ -116,37 +212,6 @@ describe('Named expressions - checking the name validity', () => {
     expect(() => engine.addNamedExpression('A100', '=42')).toThrowError(/Name .* is invalid/)
     expect(() => engine.addNamedExpression('$A$50', '=42')).toThrowError(/Name .* is invalid/)
     expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
-  })
-
-  it('works for named expression name made of upper-case letters', () => {
-    const name = 'AAA'
-    const engine = HyperFormula.buildFromArray([[`=${name}`]])
-
-    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
-    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
-  })
-
-  it('works for named expression name that starts with a valid cell reference', () => {
-    const name = 'A9IOP'
-    const engine = HyperFormula.buildFromArray([[`=${name}`]])
-
-    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
-    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
-  })
-
-  it('works for a named expressions name that contains an underscore', () => {
-    const name = 'HF2_2'
-    const engine = HyperFormula.buildFromArray([[`=${name}`]])
-
-    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
-    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
-  })
-
-  it('throws when the named expression name is a valid cell reference', () => {
-    const name = 'AAA111'
-    const engine = HyperFormula.buildFromArray([[`=${name}`]])
-
-    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
   })
 })
 
