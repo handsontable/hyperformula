@@ -34,10 +34,30 @@ the names as follows:
 
 ## Name rules
 
-* The name has to **be unique within the scope**; if you set
-  'MyPotato' globally (meaning you do not define any scope) it has
-  to be unique globally. However, you can still define 'MyPotato'
-  again in the local scope of a sheet.
+A name of an expression:
+- is case-insensitive,
+- must be unique within the scope,
+- must contain only UNICODE letters, numbers, an underscore character and a dot character,
+- must start with a letter or an underscore,
+- must be distinctive from a cell reference, e.g. `Q4`, `YEAR2023`.
+
+**Examples of correct and incorrect names:**
+
+| Name        | Validity  |
+|:------------|:----------|
+| my Revenue  | Incorrect |
+| myRevenue   | Correct   |
+| quarter1    | Incorrect |
+| quarter_1   | Correct   |
+| 1stQuarter  | Incorrect |
+| _1stQuarter | Correct   |
+| A1          | Incorrect |
+| $A$1        | Incorrect |
+
+::: tip 
+The name must be unique **within the scope**, but it's possible to override a global named expression by a local one.
+
+E.g. if you set 'MyPotato' globally it has to be unique globally. However, you can still define 'MyPotato' again in the local scope of a sheet.
 
 ```javascript
 // define for a global scope
@@ -46,29 +66,7 @@ hfInstance.addNamedExpression('MyPotato', '=SUM(100+10)');
 // define for the local scope of Sheet2 (sheetId = 1), still a valid name
 hfInstance.addNamedExpression('MyPotato', '=Sheet2!$A$1+100', 1);
 ```
-
-// TODO: verify rules and examples
-
-* The name starts with a letter or an underscore. The minimum required
-  length of a name is based on the `maxColumns`value inside
-  [configuration object](configuration-options.md).
-* The name must not equal a cell reference, e.g. A1, $A$1, R1C1; a separate “1” or “A” is also invalid.
-* The name is case-insensitive.
-* A space character is not allowed.
-* The maximum number of characters is 255.
-
-**Examples of correct and incorrect names:**
-
-| Name        | Validity  |
-|:------------|:----------|
-| myRevenue   | Correct   |
-| quarter_1   | Correct   |
-| _1stQuarter | Correct   |
-| my Revenue  | Incorrect |
-| 1stQuarter  | Incorrect |
-| A1          | Incorrect |
-| R1C1        | Incorrect |
-| !A$1:D10    | Incorrect |
+:::
 
 ## Available methods
 
