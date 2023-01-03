@@ -3,7 +3,13 @@
  * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
-import {ABSOLUTE_OPERATOR, CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN} from './parser-consts'
+import {
+  ABSOLUTE_OPERATOR,
+  CELL_REFERENCE_PATTERN,
+  NON_RESERVED_CHARACTER_PATTERN
+} from './parser-consts'
+
+const CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN = `(${CELL_REFERENCE_PATTERN})[^${NON_RESERVED_CHARACTER_PATTERN}]`
 
 /**
  * TBP
@@ -18,6 +24,7 @@ export class CellReferenceMatcher {
     ...Array.from(Array(10)).map((_, i) => i).map(code => String.fromCharCode(code)),
     ...Array.from(Array(0x02AF-0x00C0+1)).map((_, i) => i + 0x00C0).map(code => String.fromCharCode(code)),
   ]
+
   private cellReferenceRegexp = new RegExp(CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN, 'y')
 
   /**
