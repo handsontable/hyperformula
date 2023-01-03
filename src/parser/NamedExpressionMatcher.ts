@@ -3,35 +3,31 @@
  * Copyright (c) 2022 Handsoncode. All rights reserved.
  */
 
-import {NAMED_EXPRESSION_PATTERN} from './parser-consts'
+import {ALL_UNICODE_LETTERS_ARRAY, NAMED_EXPRESSION_PATTERN, R1C1_CELL_REFERENCE_PATTERN} from './parser-consts'
 
 /**
- * Helper class for recognizing NamedExpression token in the text
+ * Helper class for recognizing NamedExpression token in text
  */
 export class NamedExpressionMatcher {
-  readonly POSSIBLE_START_CHARACTERS = [
-    '_',
-    ...Array.from(Array(26)).map((_, i) => i + 'A'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(26)).map((_, i) => i + 'a'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(0x02AF-0x00C0+1)).map((_, i) => i + 0x00C0).map(code => String.fromCharCode(code)),
-  ]
+  readonly POSSIBLE_START_CHARACTERS = [ ...ALL_UNICODE_LETTERS_ARRAY, '_' ]
   private namedExpressionRegexp = new RegExp(NAMED_EXPRESSION_PATTERN, 'y')
+  private r1c1CellRefRegexp = new RegExp(`^${R1C1_CELL_REFERENCE_PATTERN}$`)
 
   /**
-   * Method used by the lexer to recognize NamedExpression token in the text
+   * Method used by the lexer to recognize NamedExpression token in text
+   *
+   * Note: using 'y' sticky flag for a named expression which is not supported on IE11...
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
    */
   match(text: string, startOffset: number): RegExpExecArray | null {
-    // using 'y' sticky flag (Note it is not supported on IE11...)
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
     this.namedExpressionRegexp.lastIndex = startOffset
-
     const execResult = this.namedExpressionRegexp.exec(text)
 
     if (execResult == null || execResult[0] == null) {
       return null
     }
 
-    if (/^[rR][0-9]*[cC][0-9]*$/.test(execResult[0])) {
+    if (this.r1c1CellRefRegexp.test(execResult[0])) {
       return null
     }
 

@@ -4,7 +4,7 @@
  */
 
 import {
-  ABSOLUTE_OPERATOR,
+  ABSOLUTE_OPERATOR, ALL_UNICODE_LETTERS_ARRAY,
   CELL_REFERENCE_PATTERN,
   NON_RESERVED_CHARACTER_PATTERN
 } from './parser-consts'
@@ -12,27 +12,19 @@ import {
 const CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN = `(${CELL_REFERENCE_PATTERN})[^${NON_RESERVED_CHARACTER_PATTERN}]`
 
 /**
- * Helper class for recognizing CellReference token in the text
+ * Helper class for recognizing CellReference token in text
  */
 export class CellReferenceMatcher {
-  readonly POSSIBLE_START_CHARACTERS = [
-    ABSOLUTE_OPERATOR,
-    "'",
-    '_',
-    ...Array.from(Array(26)).map((_, i) => i + 'A'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(26)).map((_, i) => i + 'a'.charCodeAt(0)).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(10)).map((_, i) => i).map(code => String.fromCharCode(code)),
-    ...Array.from(Array(0x02AF-0x00C0+1)).map((_, i) => i + 0x00C0).map(code => String.fromCharCode(code)),
-  ]
-
+  readonly POSSIBLE_START_CHARACTERS = [ ...ALL_UNICODE_LETTERS_ARRAY, ABSOLUTE_OPERATOR, "'", '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ]
   private cellReferenceRegexp = new RegExp(CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN, 'y')
 
   /**
-   * Method used by the lexer to recognize CellReference token in the text
+   * Method used by the lexer to recognize CellReference token in text
+   *
+   * Note: using 'y' sticky flag for a named expression which is not supported on IE11...
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
    */
   match(text: string, startOffset: number): RegExpExecArray | null {
-    // using 'y' sticky flag (Note it is not supported on IE11...)
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/sticky
     this.cellReferenceRegexp.lastIndex = startOffset
 
     const execResult = this.cellReferenceRegexp.exec(text+'@')
