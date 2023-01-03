@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed error caused by the named expression names that start with a cell reference. [#1058](https://github.com/handsontable/hyperformula/issues/1058)
+
 ## [2.3.0] - 2022-12-22
 
 ### Added
