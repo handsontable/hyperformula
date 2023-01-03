@@ -7,12 +7,12 @@ import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
 import {
-  ABSOLUTE_OPERATOR,
   ALL_WHITESPACE_PATTERN,
+  COLUMN_REFERENCE_PATTERN,
   NON_RESERVED_CHARACTER_PATTERN,
   ODFF_WHITESPACE_PATTERN,
   RANGE_OPERATOR,
-  SHEET_NAME_PATTERN,
+  ROW_REFERENCE_PATTERN,
   UNICODE_LETTER_PATTERN,
 } from './parser-consts'
 import {CellReferenceMatcher} from './CellReferenceMatcher'
@@ -44,14 +44,8 @@ export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"
 export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[?!]?/})
 
 export const RangeSeparator = createToken({ name: 'RangeSeparator', pattern: new RegExp(RANGE_OPERATOR) })
-export const ColumnRange = createToken({
-  name: 'ColumnRange',
-  pattern: new RegExp(`(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
-})
-export const RowRange = createToken({
-  name: 'RowRange',
-  pattern: new RegExp(`(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
-})
+export const ColumnRange = createToken({ name: 'ColumnRange', pattern: new RegExp(`${COLUMN_REFERENCE_PATTERN}${RANGE_OPERATOR}${COLUMN_REFERENCE_PATTERN}`) })
+export const RowRange = createToken({ name: 'RowRange', pattern: new RegExp(`${ROW_REFERENCE_PATTERN}${RANGE_OPERATOR}${ROW_REFERENCE_PATTERN}`) })
 
 export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(`([${UNICODE_LETTER_PATTERN}][${NON_RESERVED_CHARACTER_PATTERN}]*)\\(`) })
 
