@@ -12,7 +12,7 @@ import {
 const CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN = `(${CELL_REFERENCE_PATTERN})[^${NON_RESERVED_CHARACTER_PATTERN}]`
 
 /**
- * TBP
+ * Helper class for recognizing CellReference token in the text
  */
 export class CellReferenceMatcher {
   readonly POSSIBLE_START_CHARACTERS = [
@@ -28,7 +28,7 @@ export class CellReferenceMatcher {
   private cellReferenceRegexp = new RegExp(CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN, 'y')
 
   /**
-   * TBP
+   * Method used by the lexer to recognize CellReference token in the text
    */
   match(text: string, startOffset: number): RegExpExecArray | null {
     // using 'y' sticky flag (Note it is not supported on IE11...)

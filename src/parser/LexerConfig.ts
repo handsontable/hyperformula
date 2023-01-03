@@ -80,6 +80,9 @@ export interface LexerConfig {
   maxRows: number,
 }
 
+/**
+ * Builds the configuration object for the lexer
+ */
 export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping

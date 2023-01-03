@@ -6,7 +6,7 @@
 import {NAMED_EXPRESSION_PATTERN} from './parser-consts'
 
 /**
- * TBP
+ * Helper class for recognizing NamedExpression token in the text
  */
 export class NamedExpressionMatcher {
   readonly POSSIBLE_START_CHARACTERS = [
@@ -18,7 +18,7 @@ export class NamedExpressionMatcher {
   private namedExpressionRegexp = new RegExp(NAMED_EXPRESSION_PATTERN, 'y')
 
   /**
-   * TBP
+   * Method used by the lexer to recognize NamedExpression token in the text
    */
   match(text: string, startOffset: number): RegExpExecArray | null {
     // using 'y' sticky flag (Note it is not supported on IE11...)
