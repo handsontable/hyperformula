@@ -9,10 +9,11 @@ import {ParserConfig} from './ParserConfig'
 import {
   ABSOLUTE_OPERATOR,
   ALL_WHITESPACE_PATTERN,
-  NAMED_EXPRESSION_PATTERN,
-  ODFF_WHITESPACE_PATTERN, PROCEDURE_NAME_WITH_OPEN_PARENTHESIS_PATTERN,
+  NON_RESERVED_CHARACTER_PATTERN,
+  ODFF_WHITESPACE_PATTERN,
   RANGE_OPERATOR,
-  SHEET_NAME_PATTERN
+  SHEET_NAME_PATTERN,
+  UNICODE_LETTER_PATTERN,
 } from './parser-consts'
 import {CellReferenceMatcher} from './CellReferenceMatcher'
 import {NamedExpressionMatcher} from './NamedExpressionMatcher'
@@ -52,7 +53,7 @@ export const RowRange = createToken({
   pattern: new RegExp(`(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${SHEET_NAME_PATTERN})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
 })
 
-export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(PROCEDURE_NAME_WITH_OPEN_PARENTHESIS_PATTERN) })
+export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(`([${UNICODE_LETTER_PATTERN}][${NON_RESERVED_CHARACTER_PATTERN}]*)\\(`) })
 
 const cellReferenceMather = new CellReferenceMatcher()
 export const CellReference = createToken({
