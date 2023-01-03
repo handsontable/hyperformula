@@ -15,7 +15,14 @@ const CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN = `(${CELL_REFERENCE_PATTERN})[
  * Helper class for recognizing CellReference token in text
  */
 export class CellReferenceMatcher {
-  readonly POSSIBLE_START_CHARACTERS = [ ...ALL_UNICODE_LETTERS_ARRAY, ABSOLUTE_OPERATOR, "'", '_', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ]
+  readonly POSSIBLE_START_CHARACTERS = [
+    ...ALL_UNICODE_LETTERS_ARRAY,
+    ...Array.from(Array(10)).map((_, i) => i + '0'.charCodeAt(0)).map(code => String.fromCharCode(code)),
+    ABSOLUTE_OPERATOR,
+    "'",
+    '_',
+  ]
+
   private cellReferenceRegexp = new RegExp(CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN, 'y')
 
   /**
