@@ -21,7 +21,7 @@ import {
   buildLexerConfig,
   CellReference,
   ColumnRange,
-  ILexerConfig,
+  LexerConfig,
   ProcedureName,
   RowRange,
 } from './LexerConfig'
@@ -43,7 +43,7 @@ export class ParserWithCaching {
   public statsCacheUsed: number = 0
   private cache: Cache
   private lexer: FormulaLexer
-  private readonly lexerConfig: ILexerConfig
+  private readonly lexerConfig: LexerConfig
   private formulaParser: FormulaParser
 
   constructor(

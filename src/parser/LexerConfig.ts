@@ -65,7 +65,7 @@ export const NamedExpression = createToken({
   start_chars_hint: namedExpressionMatcher.POSSIBLE_START_CHARACTERS
 })
 
-export interface ILexerConfig {
+export interface LexerConfig {
   ArgSeparator: TokenType,
   NumberLiteral: TokenType,
   OffsetProcedureName: TokenType,
@@ -80,7 +80,7 @@ export interface ILexerConfig {
   maxRows: number,
 }
 
-export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
+export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
