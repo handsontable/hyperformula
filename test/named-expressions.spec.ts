@@ -182,7 +182,15 @@ describe('Named expressions - name validity', () => {
   })
 
   it('name that is a valid cell reference does not work', () => {
-    const name = 'AAA111'
+    const name = 'D42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a valid cell reference with 4-letter column address does not work', () => {
+    const name = 'ABCD42'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
 
     expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
