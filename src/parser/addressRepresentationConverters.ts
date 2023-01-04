@@ -150,7 +150,7 @@ export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAd
  * @param sheetIndexMapping - mapping function needed to change sheet index to sheet name
  * @param address - object representation of absolute address
  * @param sheetIndex - if is not equal with address sheet index, string representation will contain sheet name
- * */
+ */
 export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): Maybe<string> => {
   const column = columnIndexToLabel(address.col)
   const sheetName = sheetIndexToString(address.sheet, sheetIndexMapping)
@@ -181,7 +181,7 @@ export const simpleCellRangeToString = (sheetIndexMapping: SheetIndexMappingFn, 
  *
  * @param columnStringRepresentation - column label (e.g. 'AAB')
  * @returns column index
- * */
+ */
 function columnLabelToIndex(columnStringRepresentation: string): number {
   if (columnStringRepresentation.length === 1) {
     return columnStringRepresentation.toUpperCase().charCodeAt(0) - 65
