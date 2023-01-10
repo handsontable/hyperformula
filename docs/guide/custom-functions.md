@@ -366,7 +366,7 @@ You can set the following argument validation options:
 
 | Option                    | Type                                      | Description                                                                                                                                                                                                                                        |
 |---------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the argument. Possible values: `STRING`, `NUMBER`, `BOOLEAN`, `SCALAR`, `NOERROR`, `RANGE`, `INTEGER`, `COMPLEX`, `ANY`.                                                                                                                          |
+| `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the function argument. See [possible values](#types-of-the-function-argument).                                                                                                                                                    |
 | `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                           |
 | `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                    |
 | `optionalArg`             | Boolean                                   | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br/>Default: `false`<br/>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
@@ -395,7 +395,21 @@ MyCustomPlugin.implementedFunctions = {
 };
 ```
 
-#### Handling missing arguments
+### Types of the function argument
+
+| Type      | Description                                                                                              | Example                                      |
+|-----------|----------------------------------------------------------------------------------------------------------|----------------------------------------------|
+| `NUMBER`  | A general numeric value such as floating-point number, date/time value, currency value or percent value. | `3`, `3.14`, `$100`, `1939/09/01`, `4:45 AM` |
+| `INTEGER` | An integer.                                                                                              | `42`                                         |
+| `COMPLEX` | A text representing a complex value.                                                                     | `"-3+4i"`                                    |
+| `STRING`  | A text value.                                                                                            | `"aaa"`                                      |
+| `BOOLEAN` | A logical value (`True` or `False`).                                                                     | `=TRUE()`                                    |
+| `NOERROR` | Any non-range and non-error value.                                                                       | All of the above                             |
+| `SCALAR`  | Any non-range value.                                                                                     | All of the above                             |
+| `RANGE`   | Multiple values as a range of cells or an inline array.                                                  | `A1:B100`, `{1, 2}`                          |
+| `ANY`     | Any value.                                                                                               | All of the above                             |
+
+### Handling missing arguments
 
 Both the `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
 
