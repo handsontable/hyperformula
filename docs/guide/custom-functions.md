@@ -403,7 +403,7 @@ MyCustomPlugin.implementedFunctions = {
 | `INTEGER` | An integer.                                                                                              | `42`                                         |
 | `COMPLEX` | A text representing a complex value.                                                                     | `"-3+4i"`                                    |
 | `STRING`  | A text value.                                                                                            | `"aaa"`                                      |
-| `BOOLEAN` | A logical value (`True` or `False`).                                                                     | `=TRUE()`                                    |
+| `BOOLEAN` | A logical value.                                                                                         | `=TRUE()`                                    |
 | `NOERROR` | Any non-range and non-error value.                                                                       | All of the above                             |
 | `SCALAR`  | Any non-range value.                                                                                     | All of the above                             |
 | `RANGE`   | Multiple values as a range of cells or an inline array.                                                  | `A1:B100`, `{1, 2}`                          |

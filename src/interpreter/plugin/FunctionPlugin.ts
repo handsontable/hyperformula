@@ -355,50 +355,34 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
   }
 
+  /**
+   * A method that should wrap the implementation logic for every built-in function and custom function. It:
+   * - evaluates the function arguments
+   * - validates the number of function arguments
+   * - validation against metadata
+   * - automatic coersions
+   */
   protected runFunction = (
     args: Ast[],
     state: InterpreterState,
     metadata: FunctionMetadata,
     fn: (...arg: any) => InterpreterValue,
   ) => {
-    let argumentDefinitions: FunctionArgument[] = metadata.parameters || []
-    let argValues: [InterpreterValue, boolean][]
+    const argumentValues: [InterpreterValue, boolean][] = this.evaluateArguments(args, state, metadata)
+    const argumentMetadata = this.buildMetadataForEachArgumentValue(argumentValues.length, metadata)
 
-    if (metadata.expandRanges) {
-      argValues = this.listOfScalarValues(args, state)
-    } else {
-      argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
-    }
-
-    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
+    if (!this.isNumberOfArgumentValuesValid(argumentMetadata, argumentValues.length)) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < argValues.length &&
-      (argValues.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    argumentDefinitions = [...argumentDefinitions]
-    while (argumentDefinitions.length < argValues.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
     }
 
     let maxWidth = 1
     let maxHeight = 1
     if (!metadata.vectorizationForbidden && state.arraysFlag) {
-      for (let i = 0; i < argValues.length; i++) {
-        const [val] = argValues[i]
-        if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
+      for (let i = 0; i < argumentValues.length; i++) {
+        const [val] = argumentValues[i]
+        if (val instanceof SimpleRangeValue && argumentMetadata[i].argumentType !== FunctionArgumentType.RANGE && argumentMetadata[i].argumentType !== FunctionArgumentType.ANY) {
           maxHeight = Math.max(maxHeight, val.height())
           maxWidth = Math.max(maxWidth, val.width())
-        }
-      }
-    }
-
-    for (let i = argValues.length; i < argumentDefinitions.length; i++) {
-      if (argumentDefinitions[i]?.defaultValue === undefined) {
-        if (!argumentDefinitions[i]?.optionalArg) {
-          //not enough values passed as arguments, and there was no default value and argument was not optional
-          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
         }
       }
     }
@@ -409,22 +393,22 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       for (let col = 0; col < maxWidth; col++) {
         let argCoerceFailure: Maybe<CellError> = undefined
         const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
-        for (let i = 0; i < argumentDefinitions.length; i++) {
+        for (let i = 0; i < argumentMetadata.length; i++) {
           // eslint-disable-next-line prefer-const
-          let [val, ignorable] = argValues[i] ?? [undefined, undefined]
-          if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
+          let [val, ignorable] = argumentValues[i] ?? [undefined, undefined]
+          if (val instanceof SimpleRangeValue && argumentMetadata[i].argumentType !== FunctionArgumentType.RANGE && argumentMetadata[i].argumentType !== FunctionArgumentType.ANY) {
             if (!metadata.vectorizationForbidden && state.arraysFlag) {
               val = val.data[val.height() !== 1 ? row : 0]?.[val.width() !== 1 ? col : 0]
             }
           }
-          const arg = val ?? argumentDefinitions[i]?.defaultValue
+          const arg = val ?? argumentMetadata[i]?.defaultValue
           if (arg === undefined) {
             coercedArguments.push(undefined) //we verified in previous loop that this arg is optional
           } else {
             //we apply coerce only to non-default values
-            const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[i], state) : arg
+            const coercedArg = val !== undefined ? this.coerceToType(arg, argumentMetadata[i], state) : arg
             if (coercedArg !== undefined) {
-              if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== FunctionArgumentType.SCALAR) {
+              if (coercedArg instanceof CellError && argumentMetadata[i].argumentType !== FunctionArgumentType.SCALAR) {
                 //if this is first error encountered, store it
                 argCoerceFailure = argCoerceFailure ?? coercedArg
               }
@@ -448,6 +432,37 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       retArr.push(rowArr)
     }
     return SimpleRangeValue.onlyValues(retArr)
+  }
+
+  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean][] {
+    return metadata.expandRanges ? this.listOfScalarValues(args, state) : args.map((ast) => [this.evaluateAst(ast, state), false])
+  }
+
+  protected buildMetadataForEachArgumentValue(numberOfArgumentValuesPassed: number, metadata: FunctionMetadata): FunctionArgument[] {
+    const argumentsMetadata: FunctionArgument[] = metadata.parameters ? [ ...metadata.parameters ] : []
+    const isRepeatLastArgsValid = metadata.repeatLastArgs !== undefined && Number.isInteger(metadata.repeatLastArgs) && metadata.repeatLastArgs > 0
+
+    if (isRepeatLastArgsValid) {
+      while (numberOfArgumentValuesPassed > argumentsMetadata.length) {
+        argumentsMetadata.push(...argumentsMetadata.slice(argumentsMetadata.length - metadata.repeatLastArgs!))
+      }
+    }
+
+    return argumentsMetadata
+  }
+
+  protected isNumberOfArgumentValuesValid(argumentsMetadata: FunctionArgument[], numberOfArgumentValuesPassed: number): boolean {
+    if (numberOfArgumentValuesPassed > argumentsMetadata.length) {
+      return false
+    }
+
+    if (numberOfArgumentValuesPassed < argumentsMetadata.length) {
+      const metadataForMissingArguments = argumentsMetadata.slice(numberOfArgumentValuesPassed)
+      const areMissingArgumentsOptional = metadataForMissingArguments.every(argMetadata => argMetadata?.optionalArg || argMetadata?.defaultValue !== undefined)
+      return areMissingArgumentsOptional
+    }
+
+    return true
   }
 
   protected runFunctionWithReferenceArgument = (
