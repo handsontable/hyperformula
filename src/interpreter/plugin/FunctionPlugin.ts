@@ -359,7 +359,8 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
    * A method that should wrap the implementation logic for every built-in function and custom function. It:
    * - evaluates the function arguments
    * - validates the number of function arguments
-   * - validation against metadata
+   * - performs function vectorization if necessary
+   * - performs argument broadcasting if necessary
    * - automatic coersions
    */
   protected runFunction = (
@@ -368,70 +369,83 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     metadata: FunctionMetadata,
     fn: (...arg: any) => InterpreterValue,
   ) => {
-    const argumentValues: [InterpreterValue, boolean][] = this.evaluateArguments(args, state, metadata)
+    const evaluatedArguments: [InterpreterValue, boolean][] = this.evaluateArguments(args, state, metadata)
+    const argumentValues = evaluatedArguments.map(([value, _]) => value)
+    const argumentIgnorableFlags = evaluatedArguments.map(([_, ignorable]) => ignorable)
     const argumentMetadata = this.buildMetadataForEachArgumentValue(argumentValues.length, metadata)
 
     if (!this.isNumberOfArgumentValuesValid(argumentMetadata, argumentValues.length)) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
 
-    let maxWidth = 1
-    let maxHeight = 1
-    if (!metadata.vectorizationForbidden && state.arraysFlag) {
-      for (let i = 0; i < argumentValues.length; i++) {
-        const [val] = argumentValues[i]
-        if (val instanceof SimpleRangeValue && argumentMetadata[i].argumentType !== FunctionArgumentType.RANGE && argumentMetadata[i].argumentType !== FunctionArgumentType.ANY) {
-          maxHeight = Math.max(maxHeight, val.height())
-          maxWidth = Math.max(maxWidth, val.width())
-        }
-      }
-    }
+    const isVectorizationOn = state.arraysFlag && !metadata.vectorizationForbidden
+    const [ maxHeight, maxWidth ] = isVectorizationOn ? this.calculateSizeOfVectorizedResultArray(argumentValues, argumentMetadata) : [ 1, 1 ]
 
     const retArr: InternalScalarValue[][] = []
     for (let row = 0; row < maxHeight; row++) {
       const rowArr: InternalScalarValue[] = []
       for (let col = 0; col < maxWidth; col++) {
+
         let argCoerceFailure: Maybe<CellError> = undefined
         const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
+
+        const vectorizedArguments = this.vectorizeAndbroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, row, col)
+
+        // COERCIONS ?
         for (let i = 0; i < argumentMetadata.length; i++) {
-          // eslint-disable-next-line prefer-const
-          let [val, ignorable] = argumentValues[i] ?? [undefined, undefined]
-          if (val instanceof SimpleRangeValue && argumentMetadata[i].argumentType !== FunctionArgumentType.RANGE && argumentMetadata[i].argumentType !== FunctionArgumentType.ANY) {
-            if (!metadata.vectorizationForbidden && state.arraysFlag) {
-              val = val.data[val.height() !== 1 ? row : 0]?.[val.width() !== 1 ? col : 0]
-            }
-          }
-          const arg = val ?? argumentMetadata[i]?.defaultValue
+          const argumentValue = vectorizedArguments[i]
+          const arg = argumentValue ?? argumentMetadata[i]?.defaultValue
           if (arg === undefined) {
             coercedArguments.push(undefined) //we verified in previous loop that this arg is optional
           } else {
             //we apply coerce only to non-default values
-            const coercedArg = val !== undefined ? this.coerceToType(arg, argumentMetadata[i], state) : arg
+            const coercedArg = argumentValue !== undefined ? this.coerceToType(arg, argumentMetadata[i], state) : arg
             if (coercedArg !== undefined) {
               if (coercedArg instanceof CellError && argumentMetadata[i].argumentType !== FunctionArgumentType.SCALAR) {
                 //if this is first error encountered, store it
                 argCoerceFailure = argCoerceFailure ?? coercedArg
               }
               coercedArguments.push(coercedArg)
-            } else if (!ignorable) {
+            } else if (!argumentIgnorableFlags[i]) {
               //if this is first error encountered, store it
               argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
             }
           }
         }
 
+        // EVALUATION
         const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata.returnNumberType)
+
         if (maxHeight === 1 && maxWidth === 1) {
           return ret
         }
+
         if (ret instanceof SimpleRangeValue) {
-          throw 'Function returning array cannot be vectorized.'
+          throw 'Function returning array cannot be vectorized.' // test it
         }
+
         rowArr.push(ret)
       }
+
       retArr.push(rowArr)
     }
+
     return SimpleRangeValue.onlyValues(retArr)
+  }
+
+  private vectorizeAndbroadcastArgumentsIfNecessary(isVectorizationOn: boolean, argumentValues: InterpreterValue[], argumentMetadata: FunctionArgument[], row: number, col: number): Maybe<InterpreterValue>[] {
+    return argumentValues.map((value, i) =>
+      isVectorizationOn && this.isRangePassedAsAScalarArgument(value, argumentMetadata[i])
+        ? this.vectorizeAndBroadcastRangeArgument(value, row, col)
+        : value
+    )
+  }
+
+  private vectorizeAndBroadcastRangeArgument(argumentValue: SimpleRangeValue, rowNum: number, colNum: number): Maybe<InterpreterValue> {
+    const targetRowNum = argumentValue.height() === 1 ? 0 : rowNum
+    const targetColNum = argumentValue.width() === 1 ? 0 : colNum
+
+    return argumentValue.data[targetRowNum]?.[targetColNum]
   }
 
   protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean][] {
@@ -463,6 +477,25 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
 
     return true
+  }
+
+  protected calculateSizeOfVectorizedResultArray(argumentValues: InterpreterValue[], argumentMetadata: FunctionArgument[]): [ number, number ] {
+    const argumentsThatRequireVectorization = argumentValues
+      .filter((value, i) => this.isRangePassedAsAScalarArgument(value, argumentMetadata[i])) as SimpleRangeValue[]
+
+    const height = Math.max(1, ...argumentsThatRequireVectorization.map(val => val.height()))
+    const width = Math.max(1, ...argumentsThatRequireVectorization.map(val => val.width()))
+
+    return [ height, width ]
+  }
+
+  protected isRangePassedAsAScalarArgument(argumentValue: Maybe<InterpreterValue>, argumentMetadata: Maybe<FunctionArgument>): argumentValue is SimpleRangeValue {
+    if (argumentValue == null || argumentMetadata == null) {
+      return false
+    }
+
+    return argumentValue instanceof SimpleRangeValue
+      && ![ FunctionArgumentType.RANGE, FunctionArgumentType.ANY ].includes(argumentMetadata.argumentType)
   }
 
   protected runFunctionWithReferenceArgument = (
