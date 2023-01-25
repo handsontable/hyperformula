@@ -144,6 +144,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {ALT: EMPTY_ALT(buildEmptyArgAst())}
     ])
   })
+
   /**
    * Rule for procedure expressions: SUM(1,A1)
    */
@@ -172,10 +173,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as ExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
+
   private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
     const name = this.CONSUME(NamedExpression) as ExtendedToken
     return buildNamedExpressionAst(name.image, name.leadingWhitespace)
   })
+
   /**
    * Rule for OFFSET() function expression
    */
@@ -263,6 +266,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
   })
+
   /**
    * Rule for end range reference expression with additional checks considering range start
    */
@@ -289,6 +293,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return this.buildCellRange(startAddress, endAddress, start.leadingWhitespace?.image)
   })
+
   /**
    * Rule for end of range expression
    *
@@ -319,6 +324,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ])
   })
+
   /**
    * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
    */
@@ -327,6 +333,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     this.CONSUME2(RangeSeparator)
     return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
   })
+
   /**
    * Rule for end range reference expression starting with offset procedure with additional checks considering range start
    */
@@ -345,6 +352,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return this.buildCellRange(start.reference, endAddress, start.leadingWhitespace)
   })
+
   /**
    * Rule for end of range expression
    *
@@ -369,6 +377,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ])
   })
+
   /**
    * Rule for expressions that start with the OFFSET function.
    *
@@ -396,6 +405,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return offsetProcedure
   })
+
   private insideArrayExpression: AstRule = this.RULE('insideArrayExpression', () => {
     const ret: Ast[][] = [[]]
     ret[ret.length - 1].push(this.SUBRULE(this.booleanExpression))
@@ -418,6 +428,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
     return buildArrayAst(ret)
   })
+
   /**
    * Rule for parenthesis expression
    */
@@ -427,6 +438,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as ExtendedToken
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
+
   private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
     return this.OR([
       {
@@ -550,6 +562,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ]))
   })
+
   private rightUnaryOpAtomicExpression: AstRule = this.RULE('rightUnaryOpAtomicExpression', () => {
     const positiveAtomicExpression = this.SUBRULE(this.positiveAtomicExpression)
 
@@ -563,6 +576,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return positiveAtomicExpression
   })
+
   /**
    * Rule for atomic expressions, which is positive atomic expression or negation of it
    */
@@ -587,6 +601,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ])
   })
+
   /**
    * Rule for power expression
    */
@@ -608,6 +623,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for multiplication category operators (e.g. 1 * A1, 1 / A1)
    */
@@ -631,6 +647,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for addition category operators (e.g. 1 + A1, 1 - A1)
    */
@@ -654,6 +671,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for concatenation operator expression (e.g. "=" & A1)
    */
@@ -668,6 +686,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for boolean expression (e.g. 1 <= A1)
    */
@@ -699,6 +718,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Entry rule
    */
