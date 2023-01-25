@@ -52,6 +52,8 @@ A name of an expression:
 | quarter_1   | Correct   |
 | 1stQuarter  | Incorrect |
 | _1stQuarter | Correct   |
+| .NET        | Incorrect |
+| ASP.NET     | Correct   |
 | A1          | Incorrect |
 | $A$1        | Incorrect |
 | RC          | Incorrect |

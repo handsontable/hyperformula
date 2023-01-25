@@ -49,12 +49,12 @@ export const RowRange = createToken({ name: 'RowRange', pattern: new RegExp(`${R
 
 export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(`([${UNICODE_LETTER_PATTERN}][${NON_RESERVED_CHARACTER_PATTERN}]*)\\(`) })
 
-const cellReferenceMather = new CellReferenceMatcher()
+const cellReferenceMatcher = new CellReferenceMatcher()
 export const CellReference = createToken({
   name: 'CellReference',
-  pattern: cellReferenceMather.match.bind(cellReferenceMather),
+  pattern: cellReferenceMatcher.match.bind(cellReferenceMatcher),
   // eslint-disable-next-line @typescript-eslint/camelcase
-  start_chars_hint: cellReferenceMather.POSSIBLE_START_CHARACTERS
+  start_chars_hint: cellReferenceMatcher.POSSIBLE_START_CHARACTERS
 })
 
 const namedExpressionMatcher = new NamedExpressionMatcher()

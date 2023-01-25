@@ -340,7 +340,7 @@ the above-mentioned operations. These methods are prefixed with
 `isItPossibleTo*` whose sole purpose is to check if the desired
 operation is possible. They all return a simple `boolean` value.
 You will find it handy when you want to give the user a more generic
-message, and you don't want to react to specific errors.
+message and you don't want to react to specific errors.
 
 This can be particularly useful for interaction with the UI of the
 application you work on. For example, you can allow the user to add
