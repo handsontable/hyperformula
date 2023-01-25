@@ -4,12 +4,8 @@
  */
 
 import {
-  ABSOLUTE_OPERATOR, ALL_UNICODE_LETTERS_ARRAY,
-  CELL_REFERENCE_PATTERN,
-  NON_RESERVED_CHARACTER_PATTERN
+  ABSOLUTE_OPERATOR, ALL_DIGITS_ARRAY, ALL_UNICODE_LETTERS_ARRAY, CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN
 } from './parser-consts'
-
-const CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN = `(${CELL_REFERENCE_PATTERN})[^${NON_RESERVED_CHARACTER_PATTERN}]`
 
 /**
  * Helper class for recognizing CellReference token in text
@@ -17,7 +13,7 @@ const CELL_REFERENCE_WITH_NEXT_CHARACTER_PATTERN = `(${CELL_REFERENCE_PATTERN})[
 export class CellReferenceMatcher {
   readonly POSSIBLE_START_CHARACTERS = [
     ...ALL_UNICODE_LETTERS_ARRAY,
-    ...Array.from(Array(10)).map((_, i) => i + '0'.charCodeAt(0)).map(code => String.fromCharCode(code)),
+    ...ALL_DIGITS_ARRAY,
     ABSOLUTE_OPERATOR,
     "'",
     '_',
