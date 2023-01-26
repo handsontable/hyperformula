@@ -149,6 +149,22 @@ describe('Named expressions - name validity', () => {
     expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
   })
 
+  it('name consisting of a underscore nad many dots works', () => {
+    const name = '_.......'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name with unicode characters works', () => {
+    const name = 'ąęļćłó'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
   it('a one-character name works', () => {
     const name = 'A'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
@@ -175,6 +191,22 @@ describe('Named expressions - name validity', () => {
 
   it('name that starts with a dot character does not work', () => {
     const name = '.EXPR'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that contains a single quote character does not work', () => {
+    const name = "NAMED'EXPR"
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that contains an exclamation mark does not work', () => {
+    const name = 'NAMED!EXPR'
     const engine = HyperFormula.buildFromArray([[`=${name}`]])
 
     expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
