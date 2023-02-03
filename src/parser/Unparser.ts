@@ -17,13 +17,13 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {ILexerConfig} from './LexerConfig'
+import {LexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
-    private readonly lexerConfig: ILexerConfig,
+    private readonly lexerConfig: LexerConfig,
     private readonly sheetMappingFn: SheetIndexMappingFn,
     private readonly namedExpressions: NamedExpressions,
   ) {

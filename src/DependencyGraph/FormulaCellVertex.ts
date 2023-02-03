@@ -207,7 +207,7 @@ export class ArrayVertex extends FormulaVertex {
 
   /**
    * No-op as array vertices are transformed eagerly.
-   * */
+   */
   ensureRecentData(_updatingService: LazilyTransformingAstService) {
   }
 

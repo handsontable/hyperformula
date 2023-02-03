@@ -6,6 +6,11 @@
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
 import {Ast, AstNodeType} from './parser'
+import {
+  CELL_REFERENCE_PATTERN,
+  NAMED_EXPRESSION_PATTERN,
+  R1C1_CELL_REFERENCE_PATTERN
+} from './parser/parser-consts'
 
 export interface NamedExpression {
   name: string,
@@ -158,11 +163,25 @@ export class NamedExpressions {
     return this.worksheetStore(sheetId)?.has(expressionName) ?? false
   }
 
+  /**
+   * Checks the validity of the named expression name.
+   * - contains only UNICODE letters, numbers, underscore and dot characters
+   * - starts with a letter or underscore
+   * - does not look like a A1-style cell address ([A-Za-z]+[0-9]+)
+   * - does not look like a R1C1-style cell address ([rR][0-9]*[cC][0-9]*)
+   *
+   *  ODFF: https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#__RefHeading__1017964_715980110
+   */
   public isNameValid(expressionName: string): boolean {
-    if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
+    const a1CellRefRegexp = new RegExp(`^${CELL_REFERENCE_PATTERN}$`)
+    const r1c1CellRefRegexp = new RegExp(`^${R1C1_CELL_REFERENCE_PATTERN}$`)
+    const namedExpRegexp = new RegExp(`^${NAMED_EXPRESSION_PATTERN}$`)
+
+    if (a1CellRefRegexp.test(expressionName) || r1c1CellRefRegexp.test(expressionName)) {
       return false
     }
-    return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*$/.test(expressionName)
+
+    return namedExpRegexp.test(expressionName)
   }
 
   public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {

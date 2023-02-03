@@ -451,7 +451,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    *
    * @param ast
    * @param state
-   * */
+   */
   public sheet(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEET'),
       () => state.formulaAddress.sheet + 1,
@@ -475,7 +475,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    *
    * @param ast
    * @param state
-   * */
+   */
   public sheets(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEETS'),
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument
