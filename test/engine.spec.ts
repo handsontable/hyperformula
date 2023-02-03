@@ -65,7 +65,7 @@ describe('#buildFromArray', () => {
   })
 
   it('parsing error', () => {
-    const engine = HyperFormula.buildFromArray([['=A1B1']])
+    const engine = HyperFormula.buildFromArray([['=1A1']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })

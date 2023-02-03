@@ -543,7 +543,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * @param reducingFunction - reducing function
    * @param mapFunction
    * @param coercionFunction
-   * */
+   */
   private reduce<T>(args: Ast[], state: InterpreterState, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): CellError | T {
     if (args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
