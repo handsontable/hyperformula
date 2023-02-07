@@ -357,11 +357,15 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
   /**
    * A method that should wrap the implementation logic for every built-in function and custom function. It:
-   * - evaluates the function arguments
-   * - validates the number of function arguments
-   * - performs function vectorization if necessary
-   * - performs argument broadcasting if necessary
-   * - automatic coersions
+   * - evaluates the arguments of your custom function
+   * - validates the number of arguments according to the [`parameters` array](#function-options)
+   * - performs coersion of the argument values to types set in the [`parameters` array](#argument-validation-options)
+   * - handles optional arguments and default values according to options set in the [`parameters` array](#argument-validation-options)
+   * - validates the arguments of your custom function against the [argument validation options](#argument-validation-options)
+   * - duplicates the arguments according to [`repeatLastArgs` option](#function-options)
+   * - handles [array arithmetic mode](arrays#array-arithmetic-mode)
+   * - performs [function vectorization](arrays#passing-arrays-to-scalar-functions-vectorization)
+   * - performs [argument broadcasting](arrays#broadcasting)
    */
   protected runFunction = (
     args: Ast[],

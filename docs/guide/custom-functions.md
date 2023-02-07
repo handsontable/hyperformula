@@ -84,10 +84,16 @@ In your function plugin, add a method that implements your function's calculatio
 * Take two optional arguments: `ast` and `state`.
 * Return the results of your calculations.
 
-To benefit from HyperFormula's automatic validations, wrap your method in the built-in `runFunction()` method, which:
-* Verifies the format of the values returned by your function.
-* Validates your function's parameters against your [custom function options](#function-options).
-* Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
+Wrap your implementation in the built-in `runFunction()` method, which:
+- evaluates the arguments of your custom function
+- validates the number of arguments according to the [`parameters` array](#function-options)
+- performs coersion of the argument values to types set in the [`parameters` array](#argument-validation-options)
+- handles optional arguments and default values according to options set in the [`parameters` array](#argument-validation-options)
+- validates the arguments of your custom function against the [argument validation options](#argument-validation-options)
+- duplicates the arguments according to [`repeatLastArgs` option](#function-options)
+- handles [array arithmetic mode](arrays#array-arithmetic-mode)
+- performs [function vectorization](arrays#passing-arrays-to-scalar-functions-vectorization)
+- performs [argument broadcasting](arrays#broadcasting)
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
