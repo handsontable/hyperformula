@@ -379,17 +379,17 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
 
-    const [ maxHeight, maxWidth ] = isVectorizationOn ? this.calculateSizeOfVectorizedResultArray(argumentValues, argumentMetadata) : [ 1, 1 ]
+    const [ resultArrayHeight, resultArrayWidth ] = isVectorizationOn ? this.calculateSizeOfVectorizedResultArray(argumentValues, argumentMetadata) : [ 1, 1 ]
 
-    if (maxHeight === 1 && maxWidth === 1) {
+    if (resultArrayHeight === 1 && resultArrayWidth === 1) {
       const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, 0, 0)
-      return this.processSingleCell(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
+      return this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
     }
 
-    const resultArray: InternalScalarValue[][] = [ ...Array(maxHeight).keys() ].map(row =>
-      [ ...Array(maxWidth).keys() ].map(col => {
+    const resultArray: InternalScalarValue[][] = [ ...Array(resultArrayHeight).keys() ].map(row =>
+      [ ...Array(resultArrayWidth).keys() ].map(col => {
         const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, row, col)
-        const result = this.processSingleCell(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
+        const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
 
         if (result instanceof SimpleRangeValue) {
           throw 'Function returning array cannot be vectorized.' // TODO: test it
@@ -402,41 +402,58 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return SimpleRangeValue.onlyValues(resultArray)
   }
 
-  private processSingleCell(
+  protected calculateSingleCellOfResultArray(
     state: InterpreterState,
     vectorizedArguments: Maybe<InterpreterValue>[],
-    argumentMetadata: FunctionArgument[],
+    argumentsMetadata: FunctionArgument[],
     argumentIgnorableFlags: boolean[],
     functionImplementation: (...arg: any) => InterpreterValue,
     returnNumberType: NumberType | undefined,
   ): InternalScalarValue | SimpleRangeValue {
-    const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
+    const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags)
 
-    // COERCION
-    for (let i = 0; i < argumentMetadata.length; i++) {
-      const argumentValue = vectorizedArguments[i]
-      const arg = argumentValue ?? argumentMetadata[i]?.defaultValue
-      if (arg === undefined) {
-        coercedArguments.push(undefined)
-      } else {
-        // we coerce non-default values only
-        const coercedArg = argumentValue !== undefined ? this.coerceToType(arg, argumentMetadata[i], state) : arg
-        if (coercedArg !== undefined) {
-          if (coercedArg instanceof CellError && argumentMetadata[i].argumentType !== FunctionArgumentType.SCALAR) {
-            return coercedArg
-          }
-          coercedArguments.push(coercedArg)
-        } else if (!argumentIgnorableFlags[i]) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-        }
-      }
+    if (coercedArguments instanceof CellError) {
+      return coercedArguments
     }
 
     const functionCalculationResult = functionImplementation(...coercedArguments)
     return this.returnNumberWrapper(functionCalculationResult, returnNumberType)
   }
 
-  private vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn: boolean, argumentValues: InterpreterValue[], argumentMetadata: FunctionArgument[], row: number, col: number): Maybe<InterpreterValue>[] {
+  protected coerceArgumentsToRequiredTypes(
+    state: InterpreterState,
+    vectorizedArguments: Maybe<InterpreterValue>[],
+    argumentsMetadata: FunctionArgument[],
+    argumentIgnorableFlags: boolean[],
+  ):  CellError | Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] {
+    const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
+
+    for (let i = 0; i < argumentsMetadata.length; i++) {
+      const argumentMetadata = argumentsMetadata[i]
+      const argumentValue = vectorizedArguments[i] !== undefined ? vectorizedArguments[i] : argumentMetadata?.defaultValue
+
+      if (argumentValue === undefined) {
+        coercedArguments.push(undefined)
+        continue
+      }
+
+      const coercedValue = this.coerceToType(argumentValue, argumentMetadata, state)
+
+      if (coercedValue === undefined && !argumentIgnorableFlags[i]) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+
+      if (coercedValue instanceof CellError && argumentMetadata.argumentType !== FunctionArgumentType.SCALAR) {
+        return coercedValue
+      }
+
+      coercedArguments.push(coercedValue)
+    }
+
+    return coercedArguments
+  }
+
+  protected vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn: boolean, argumentValues: InterpreterValue[], argumentMetadata: FunctionArgument[], row: number, col: number): Maybe<InterpreterValue>[] {
     return argumentValues.map((value, i) =>
       isVectorizationOn && this.isRangePassedAsAScalarArgument(value, argumentMetadata[i])
         ? this.vectorizeAndBroadcastRangeArgument(value, row, col)
@@ -444,7 +461,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     )
   }
 
-  private vectorizeAndBroadcastRangeArgument(argumentValue: SimpleRangeValue, rowNum: number, colNum: number): Maybe<InterpreterValue> {
+  protected vectorizeAndBroadcastRangeArgument(argumentValue: SimpleRangeValue, rowNum: number, colNum: number): Maybe<InterpreterValue> {
     const targetRowNum = argumentValue.height() === 1 ? 0 : rowNum
     const targetColNum = argumentValue.width() === 1 ? 0 : colNum
 
@@ -547,7 +564,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     throw new Error(`No metadata for function ${name}.`)
   }
 
-  private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
+  protected returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
     if (type !== undefined && isExtendedNumber(val)) {
       return this.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
     } else {
