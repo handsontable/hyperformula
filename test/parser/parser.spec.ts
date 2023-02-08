@@ -959,7 +959,7 @@ describe('Parsing errors', () => {
   it('parsing error - not all input parsed', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const {errors} = parser.parse('=A1B1', adr('A1'))
+    const {errors} = parser.parse('=1A1', adr('A1'))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 

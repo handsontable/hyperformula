@@ -77,7 +77,7 @@ import {
   ErrorLiteral,
   GreaterThanOp,
   GreaterThanOrEqualOp,
-  ILexerConfig,
+  LexerConfig,
   LessThanOp,
   LessThanOrEqualOp,
   LParen,
@@ -123,7 +123,7 @@ export interface FormulaParserResult {
  * P -> SUM(..) <br/>
  */
 export class FormulaParser extends EmbeddedActionsParser {
-  private lexerConfig: ILexerConfig
+  private lexerConfig: LexerConfig
 
   /**
    * Address of the cell in which formula is located
@@ -455,7 +455,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
-  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
+  constructor(lexerConfig: LexerConfig, sheetMapping: SheetMappingFn) {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
     this.lexerConfig = lexerConfig
     this.sheetMapping = sheetMapping
@@ -919,7 +919,7 @@ export interface ExtendedToken extends IToken {
 export class FormulaLexer {
   private readonly lexer: Lexer
 
-  constructor(private lexerConfig: ILexerConfig) {
+  constructor(private lexerConfig: LexerConfig) {
     this.lexer = new Lexer(lexerConfig.allTokens, {ensureOptimizations: true})
   }
 

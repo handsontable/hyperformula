@@ -1,9 +1,14 @@
-import {ExportedCellChange, ExportedNamedExpressionChange, HyperFormula, NoSheetWithIdError} from '../src'
+import {
+  ExportedCellChange,
+  ExportedNamedExpressionChange,
+  HyperFormula,
+  NoSheetWithIdError
+} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {ErrorType} from '../src/Cell'
-import {Vertex} from '../src/DependencyGraph/Vertex'
+import {ErrorType} from '../src'
+import {Vertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
-import {NoRelativeAddressesAllowedError} from '../src/errors'
+import {NoRelativeAddressesAllowedError} from '../src'
 import {adr, detailedError} from './testUtils'
 
 describe('Named expressions - checking if its possible', () => {
@@ -84,6 +89,193 @@ describe('Named expressions - checking if its possible', () => {
   it('no if trying to change not existing expression', () => {
     const engine = HyperFormula.buildFromArray([])
     expect(engine.isItPossibleToChangeNamedExpression('foo', 'foo')).toBe(false)
+  })
+})
+
+describe('Named expressions - name validity', () => {
+  it('name made of letters works', () => {
+    const name = 'ABC'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that starts with a valid cell reference works', () => {
+    const name = 'A9IOP'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains a valid cell reference works', () => {
+    const name = '___C42___'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that ends with a valid cell reference works', () => {
+    const name = '___C42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains an underscore works', () => {
+    const name = 'HF2_2'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains a dot character works', () => {
+    const name = 'EXPR.2'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name starts with an underscore works', () => {
+    const name = '___'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name consisting of a underscore nad many dots works', () => {
+    const name = '_.......'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name with unicode characters works', () => {
+    const name = 'ąęļćłó'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('a one-character name works', () => {
+    const name = 'A'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('a 1000-character name works', () => {
+    const name = 'A'.repeat(1000)
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that starts with a digit does not work', () => {
+    const name = '1definitelyIncorrectName'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that starts with a dot character does not work', () => {
+    const name = '.EXPR'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that contains a single quote character does not work', () => {
+    const name = "NAMED'EXPR"
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that contains an exclamation mark does not work', () => {
+    const name = 'NAMED!EXPR'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a valid cell reference does not work', () => {
+    const name = 'D42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a valid cell reference with 4-letter column address does not work', () => {
+    const name = 'ABCD42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]], { maxColumns: 500000 })
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a valid R1C1-style reference does not work', () => {
+    const name = 'R5C17'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a R1C1-style reference with empty row number does not work', () => {
+    const name = 'RC17'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a R1C1-style reference with empty column number does not work', () => {
+    const name = 'R5C'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a R1C1-style reference with empty row and column numbers does not work', () => {
+    const name = 'RC'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('validates characters which are allowed in name', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => engine.addNamedExpression('1CantStartWithNumber', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('Spaces Are Not Allowed', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('.CantStartWithDot', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('_CanStartWithUnderscore', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('dots.are.fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('underscores_are_fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('A100.Reference_Like_Substrings_In_The_Beginning_Are_Also_Fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('A100', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('$A$50', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
   })
 })
 
@@ -238,14 +430,6 @@ describe('Named expressions - store manipulation', () => {
     }).toThrowError('Name of Named Expression \'myName\' is already present')
   })
 
-  it('named expressions is validated when added', () => {
-    const engine = HyperFormula.buildEmpty()
-
-    expect(() => {
-      engine.addNamedExpression('1definitelyIncorrectName', '=42')
-    }).toThrowError('Name of Named Expression \'1definitelyIncorrectName\' is invalid')
-  })
-
   it('when adding named expression, matrix formulas are not accepted', () => {
     const engine = HyperFormula.buildEmpty()
 
@@ -395,22 +579,6 @@ describe('Named expressions - store manipulation', () => {
     }).not.toThrowError()
   })
 
-  it('validates characters which are allowed in name', () => {
-    const engine = HyperFormula.buildEmpty()
-
-    expect(() => engine.addNamedExpression('1CantStartWithNumber', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('Spaces Are Not Allowed', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('.CantStartWithDot', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('_CanStartWithUnderscore', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('dots.are.fine', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('underscores_are_fine', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('A100', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('$A$50', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
-  })
-
   it('#getNamedExpressionFormula when it exists', () => {
     const engine = HyperFormula.buildFromArray([])
 
@@ -466,6 +634,9 @@ describe('Named expressions - store manipulation', () => {
   })
 })
 
+/**
+ * A mock object for testing the dependency graph for the existence of the named expression vertex.
+ */
 const namedExpressionVertex = (engine: HyperFormula, expressionName: string, sheetId?: number): Vertex => {
   let namedExpression
   if (sheetId === undefined) {
