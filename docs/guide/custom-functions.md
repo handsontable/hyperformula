@@ -29,7 +29,7 @@ In your function plugin, in the static `implementedFunctions` property, define a
 The name of that object becomes the ID by which [translations](#function-name-translations), [aliases](#function-aliases), and other elements refer to your function.
 Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
 
-In your function's object, you can specify:
+In your function's object, you can specify the following:
 - A `method` property (required), which maps your function to the implementation method (we'll define it later on),
 - A `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
 - Other [custom function options](#function-options).
@@ -87,7 +87,7 @@ In your function plugin, add a method that implements your function's calculatio
 Wrap your implementation in the built-in `runFunction()` method, which:
 - evaluates the arguments of your custom function
 - validates the number of arguments according to the [`parameters` array](#function-options)
-- performs coersion of the argument values to types set in the [`parameters` array](#argument-validation-options)
+- performs coercion of the argument values to types set in the [`parameters` array](#argument-validation-options)
 - handles optional arguments and default values according to options set in the [`parameters` array](#argument-validation-options)
 - validates the arguments of your custom function against the [argument validation options](#argument-validation-options)
 - duplicates the arguments according to [`repeatLastArgs` option](#function-options)

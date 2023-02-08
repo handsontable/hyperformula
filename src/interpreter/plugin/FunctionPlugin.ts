@@ -359,7 +359,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
    * A method that should wrap the implementation logic for every built-in function and custom function. It:
    * - evaluates the arguments of your custom function
    * - validates the number of arguments according to the [`parameters` array](#function-options)
-   * - performs coersion of the argument values to types set in the [`parameters` array](#argument-validation-options)
+   * - performs coercion of the argument values to types set in the [`parameters` array](#argument-validation-options)
    * - handles optional arguments and default values according to options set in the [`parameters` array](#argument-validation-options)
    * - validates the arguments of your custom function against the [argument validation options](#argument-validation-options)
    * - duplicates the arguments according to [`repeatLastArgs` option](#function-options)
@@ -396,7 +396,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
         const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
 
         if (result instanceof SimpleRangeValue) {
-          throw 'Function returning array cannot be vectorized.' // TODO: test it
+          throw 'Function returning array cannot be vectorized.'
         }
 
         return result
