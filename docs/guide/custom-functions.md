@@ -91,9 +91,9 @@ Wrap your implementation in the built-in `runFunction()` method, which:
 - handles optional arguments and default values according to options set in the [`parameters` array](#argument-validation-options)
 - validates the arguments of your custom function against the [argument validation options](#argument-validation-options)
 - duplicates the arguments according to [`repeatLastArgs` option](#function-options)
-- handles [array arithmetic mode](arrays#array-arithmetic-mode)
-- performs [function vectorization](arrays#passing-arrays-to-scalar-functions-vectorization)
-- performs [argument broadcasting](arrays#broadcasting)
+- handles [array arithmetic mode](arrays.md#array-arithmetic-mode)
+- performs [function vectorization](arrays.md#passing-arrays-to-scalar-functions-vectorization)
+- performs [argument broadcasting](arrays.md#broadcasting)
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
