@@ -10,61 +10,104 @@ import {DependencyGraph} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
 import {InternalScalarValue, isExtendedNumber} from './interpreter/InterpreterValue'
 
-
 /**
- * class
+ * A class that represents a range of data.
  */
 export class SimpleRangeValue {
+  /**
+   * A property representing the size of the range.
+   */
   public readonly size: ArraySize
 
+  /**
+   * In most cases it's more convenient to create a SimpleRangeValue object by calling one of the static factory methods.
+   */
   constructor(
     private _data?: InternalScalarValue[][],
+    /**
+     * A property representing the address of the range.
+     */
     public readonly range?: AbsoluteCellRange,
     private readonly dependencyGraph?: DependencyGraph,
     private _hasOnlyNumbers?: boolean,
   ) {
+    if (_data === undefined && (range === undefined || dependencyGraph === undefined)) {
+      throw new Error('Invalid SimpleRangeValue constructor call')
+    }
+
     this.size = _data === undefined
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       ? new ArraySize(range!.effectiveWidth(dependencyGraph!), range!.effectiveHeight(dependencyGraph!))
       : new ArraySize(_data[0].length, _data.length)
   }
 
+  /**
+   * Returns the range data as a 2D-array.
+   */
   public get data(): InternalScalarValue[][] {
     this.ensureThatComputed()
     return this._data!
   }
 
+  /**
+   * Factory method. Returns a SimpleRangeValue object with address and provided data.
+   */
   public static fromRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
   }
 
+  /**
+   * Factory method. Returns a SimpleRangeValue object with provided numeric data.
+   */
   public static onlyNumbers(data: number[][]): SimpleRangeValue {
     return new SimpleRangeValue(data, undefined, undefined, true)
   }
 
+  /**
+   * Factory method. Returns a SimpleRangeValue object with provided data.
+   */
   public static onlyValues(data: InternalScalarValue[][]): SimpleRangeValue {
     return new SimpleRangeValue(data, undefined, undefined, undefined)
   }
 
+  /**
+   * Factory method. Returns a SimpleRangeValue object with address.
+   */
   public static onlyRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(undefined, range, dependencyGraph, undefined)
   }
 
+  /**
+   * Factory method. Returns a SimpleRangeValue object containing the single value.
+   */
   public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
     return new SimpleRangeValue([[scalar]], undefined, undefined, undefined)
   }
 
+  /**
+   * Returns true if and only if the SimpleRangeValue has no address set.
+   */
   public isAdHoc(): boolean {
     return this.range === undefined
   }
 
+  /**
+   * Returns the number of columns contained in the range.
+   */
   public width(): number {
-    return this.size.width //should be equal to this.data[0].length
+    return this.size.width
   }
 
+  /**
+   * Returns the number of rows contained in the range.
+   */
   public height(): number {
-    return this.size.height //should be equal to this.data.length
+    return this.size.height
   }
 
+  /**
+   * Returns the range data as a 1D-array.
+   */
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
     this.ensureThatComputed()
 
@@ -78,6 +121,9 @@ export class SimpleRangeValue {
     return ret
   }
 
+  /**
+   * Generates the addresses of the cells contained in the range assuming the provided address is the left corner of the range.
+   */
   public* effectiveAddressesFromData(leftCorner: SimpleCellAddress): IterableIterator<SimpleCellAddress> {
     for (let row = 0; row < this.data.length; ++row) {
       const rowData = this.data[row]
@@ -87,6 +133,11 @@ export class SimpleRangeValue {
     }
   }
 
+  /**
+   * Generates both values and addresses of the cells contained in the range assuming the provided address is the left corner of the range.
+   *
+   * This method combines the functionalities of `iterateValuesFromTopLeftCorner` and `effectiveAddressesFromData`.
+   */
   public* entriesFromTopLeftCorner(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     this.ensureThatComputed()
     for (let row = 0; row < this.size.height; ++row) {
@@ -96,15 +147,24 @@ export class SimpleRangeValue {
     }
   }
 
+  /**
+   * Generates the values of the cells contained in the range assuming the provided address is the left corner of the range.
+   */
   public* iterateValuesFromTopLeftCorner(): IterableIterator<InternalScalarValue> {
     yield* this.valuesFromTopLeftCorner()
   }
 
+  /**
+   * Returns the number of cells contained in the range.
+   */
   public numberOfElements(): number {
     return this.size.width * this.size.height
   }
 
-  public hasOnlyNumbers() {
+  /**
+   * Returns true if and only if the range contains only numeric values.
+   */
+  public hasOnlyNumbers(): boolean {
     if (this._hasOnlyNumbers === undefined) {
       this._hasOnlyNumbers = true
       for (const row of this.data) {
@@ -120,20 +180,37 @@ export class SimpleRangeValue {
     return this._hasOnlyNumbers
   }
 
+  /**
+   * Returns the range data as a 2D-array of numbers.
+   *
+   * Internal use only.
+   */
   public rawNumbers(): number[][] {
     return this._data as number[][]
   }
 
+
+  /**
+   * Returns the range data as a 2D-array.
+   *
+   * Internal use only.
+   */
   public rawData(): InternalScalarValue[][] {
     this.ensureThatComputed()
     return this._data ?? []
   }
 
+  /**
+   * Returns true if and only if the range has the same width and height as the provided range object.
+   */
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
     return this.width() === other.width() && this.height() === other.height()
   }
 
-  private ensureThatComputed() {
+  /**
+   * Computes the range data if it is not computed yet.
+   */
+  private ensureThatComputed(): void {
     if (this._data !== undefined) {
       return
     }

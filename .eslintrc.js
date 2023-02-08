@@ -90,7 +90,6 @@ module.exports = {
     "jsdoc/require-returns-check": 'warn',
     "jsdoc/require-returns-description": 'warn',
     "jsdoc/require-returns-type": 'warn',
-    "jsdoc/require-yields": 'warn',
     "jsdoc/require-yields-check": 'warn',
     "jsdoc/valid-types": 'warn',
     "jsdoc/require-jsdoc": ['warn', {
