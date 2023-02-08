@@ -11,6 +11,9 @@ import {ErrorMessage} from './error-message'
 import {InternalScalarValue, isExtendedNumber} from './interpreter/InterpreterValue'
 
 
+/**
+ * class
+ */
 export class SimpleRangeValue {
   public readonly size: ArraySize
 
@@ -20,11 +23,9 @@ export class SimpleRangeValue {
     private readonly dependencyGraph?: DependencyGraph,
     private _hasOnlyNumbers?: boolean,
   ) {
-    if (_data === undefined) {
-      this.size = new ArraySize(range!.effectiveWidth(dependencyGraph!), range!.effectiveHeight(dependencyGraph!))
-    } else {
-      this.size = new ArraySize(_data[0].length, _data.length)
-    }
+    this.size = _data === undefined
+      ? new ArraySize(range!.effectiveWidth(dependencyGraph!), range!.effectiveHeight(dependencyGraph!))
+      : new ArraySize(_data[0].length, _data.length)
   }
 
   public get data(): InternalScalarValue[][] {
