@@ -14,6 +14,7 @@ import {InternalScalarValue, isExtendedNumber} from './interpreter/InterpreterVa
  * A class that represents a range of data.
  */
 export class SimpleRangeValue {
+
   /**
    * A property representing the size of the range.
    */
@@ -24,6 +25,7 @@ export class SimpleRangeValue {
    */
   constructor(
     private _data?: InternalScalarValue[][],
+
     /**
      * A property representing the address of the range.
      */
@@ -31,12 +33,7 @@ export class SimpleRangeValue {
     private readonly dependencyGraph?: DependencyGraph,
     private _hasOnlyNumbers?: boolean,
   ) {
-    if (_data === undefined && (range === undefined || dependencyGraph === undefined)) {
-      throw new Error('Invalid SimpleRangeValue constructor call')
-    }
-
     this.size = _data === undefined
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       ? new ArraySize(range!.effectiveWidth(dependencyGraph!), range!.effectiveHeight(dependencyGraph!))
       : new ArraySize(_data[0].length, _data.length)
   }
