@@ -135,4 +135,33 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(10)
     expect(engine.getCellValue(adr('A6'))).toEqual(10)
   })
+
+  it('tmp relative', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, '=SUM(A1:A1)'],
+      [2, '=SUM(A2:A1)'],
+    ])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+  })
+
+  it('tmp absolute', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, '=SUM(A1:A$1)'],
+      [2, '=SUM(A2:A$1)'],
+    ])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+  })
+
+  it('tmp aux', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1],
+      [2, '=SUM(A2:A$1)'],
+    ])
+
+    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+  })
 })

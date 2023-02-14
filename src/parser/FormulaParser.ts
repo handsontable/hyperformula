@@ -215,7 +215,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
-    const { start, end } = this.orderColumnRangeEnds(firstEnd, secondEnd)
+    const { start, end } = { start: firstEnd, end: secondEnd } // this.orderColumnRangeEnds(firstEnd, secondEnd)
 
     return buildColumnRangeAst(start, end, sheetRefType, range.leadingWhitespace)
   })
@@ -242,7 +242,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
-    const { start, end } = this.orderRowRangeEnds(firstEnd, secondEnd)
+    const { start, end } = { start: firstEnd, end: secondEnd } //this.orderRowRangeEnds(firstEnd, secondEnd)
 
     return buildRowRangeAst(start, end, sheetRefType, range.leadingWhitespace)
   })
@@ -723,7 +723,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
-    const { start, end } = this.orderCellRangeEnds(firstEnd, secondEnd)
+    const { start, end } = { start: firstEnd, end: secondEnd } //this.orderCellRangeEnds(firstEnd, secondEnd)
 
     return buildCellRangeAst(start, end, sheetRefType, leadingWhitespace)
   }
@@ -771,7 +771,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
   }
   
-  private static  compareSheetIds(sheetA: number | undefined, sheetB: number | undefined): number {
+  private static compareSheetIds(sheetA: number | undefined, sheetB: number | undefined): number {
     sheetA = sheetA != null ? sheetA : Infinity
     sheetB = sheetB != null ? sheetB : Infinity
     return sheetA - sheetB
