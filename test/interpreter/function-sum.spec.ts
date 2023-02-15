@@ -120,7 +120,7 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  describe('works with reversed ranges', () => {
+  describe('works with reversed cell ranges', () => {
     it('simple case', () => {
       const engine = HyperFormula.buildFromArray([
         ['1', '2'],
@@ -184,15 +184,88 @@ describe('SUM', () => {
       })
     })
 
-  it('when one of the ranges is a single value', () => {
-    const engine = HyperFormula.buildFromArray([
-      [1, '=SUM(A1:A$1)'],
-      [2, '=SUM(A2:A$1)'],
-    ])
+    it('when one of the ranges is a single value', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, '=SUM(A1:A$1)'],
+        [2, '=SUM(A2:A$1)'],
+      ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(3)
+      expect(engine.getCellValue(adr('B1'))).toEqual(1)
+      expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    })
   })
-})
+
+  describe('works with reversed column ranges', () => {
+    it('1st address absolute', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['', '=SUM(E:D)', 1, 2, 3], // C[3]:C[2]
+        ['', '=SUM($D:D)'], // C3:C[2]
+      ])
+
+      expect(engine.getCellValue(adr('B1'))).toEqual(5)
+      expect(engine.getCellValue(adr('B2'))).toEqual(2)
+    })
+
+    it('2nd address absolute', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['', '=SUM(E:D)', 1, 2, 3], // C[3]:C[2]
+        ['', '=SUM(E:$C)'], // C[3]:C2
+      ])
+
+      expect(engine.getCellValue(adr('B1'))).toEqual(5)
+      expect(engine.getCellValue(adr('B2'))).toEqual(6)
+    })
+
+    it('both addresses absolute', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['', '=SUM(E:D)', 1, 2, 3], // C[3]:C[2]
+        ['', '=SUM($D:$C)'], // C3:C2
+      ])
+
+      expect(engine.getCellValue(adr('B1'))).toEqual(5)
+      expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    })
+  })
+
+  describe('works with reversed row ranges', () => {
+    it('1st address absolute', () => {
+      const engine = HyperFormula.buildFromArray([
+        [],
+        ['=SUM(5:4)', '=SUM($4:4)'], // R[3]:R[2] // R3:R[2]
+        [1],
+        [2],
+        [3],
+      ])
+
+      expect(engine.getCellValue(adr('A2'))).toEqual(5)
+      expect(engine.getCellValue(adr('B2'))).toEqual(2)
+    })
+
+    it('2st address absolute', () => {
+      const engine = HyperFormula.buildFromArray([
+        [],
+        ['=SUM(5:4)', '=SUM(5:$3)'], // R[3]:R[2] // R[3]:R2
+        [1],
+        [2],
+        [3],
+      ])
+
+      expect(engine.getCellValue(adr('A2'))).toEqual(5)
+      expect(engine.getCellValue(adr('B2'))).toEqual(6)
+    })
+
+    it('both addresses absolute', () => {
+      const engine = HyperFormula.buildFromArray([
+        [],
+        ['=SUM(5:4)', '=SUM($4:$3)'], // R[3]:R[2] // R3:R2
+        [1],
+        [2],
+        [3],
+      ])
+
+      expect(engine.getCellValue(adr('A2'))).toEqual(5)
+      expect(engine.getCellValue(adr('B2'))).toEqual(3)
+    })
+  })
 })
 
