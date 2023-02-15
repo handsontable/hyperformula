@@ -120,33 +120,71 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('works with reversed ranges', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1', '2'],
-      ['3', '4'],
-      ['=SUM(A1:B2)'],
-      ['=SUM(A2:B1)'],
-      ['=SUM(B1:A2)'],
-      ['=SUM(B2:A1)'],
-    ])
+  describe('works with reversed ranges', () => {
+    it('simple case', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1', '2'],
+        ['3', '4'],
+        ['=SUM(A1:B2)'],
+        ['=SUM(A2:B1)'],
+        ['=SUM(B1:A2)'],
+        ['=SUM(B2:A1)'],
+      ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(10)
-    expect(engine.getCellValue(adr('A4'))).toEqual(10)
-    expect(engine.getCellValue(adr('A5'))).toEqual(10)
-    expect(engine.getCellValue(adr('A6'))).toEqual(10)
-  })
+      expect(engine.getCellValue(adr('A3'))).toEqual(10)
+      expect(engine.getCellValue(adr('A4'))).toEqual(10)
+      expect(engine.getCellValue(adr('A5'))).toEqual(10)
+      expect(engine.getCellValue(adr('A6'))).toEqual(10)
+    })
 
-  it('tmp relative', () => {
-    const engine = HyperFormula.buildFromArray([
-      [1, '=SUM(A1:A1)'],
-      [2, '=SUM(A2:A1)'],
-    ])
+    describe('that has the same R1C1 representation (may cause cache clash)', () => {
+      it('relative addressing', () => {
+        const engine = HyperFormula.buildFromArray([
+          ['=SUM(B2:B1)', 1], // R[1]C[1]:R[0]C[1]
+          ['=SUM(B3:B2)', 2], // R[1]C[1]:R[0]C[1]
+          ['', 3],
+        ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(3)
-  })
+        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A2'))).toEqual(5)
+      })
 
-  it('tmp absolute', () => {
+      it('1st row absolute', () => {
+        const engine = HyperFormula.buildFromArray([
+          ['=SUM(B2:B1)', 1], // R[1]C[1]:R[0]C[1]
+          ['=SUM(B$2:B2)', 2], // R1C[1]:R[0]C[1]
+          ['', 3],
+        ])
+
+        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A2'))).toEqual(2)
+      })
+
+      it('2nd row absolute', () => {
+        const engine = HyperFormula.buildFromArray([
+          ['=SUM(B2:B1)', 1], // R[1]C[1]:R[0]C[1]
+          ['=SUM(B3:B$1)', 2], // R[1]C[1]:R0C[1]
+          ['', 3],
+        ])
+
+        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A2'))).toEqual(6)
+      })
+
+      it('both rows absolute', () => {
+        const engine = HyperFormula.buildFromArray([
+          ['', 0],
+          ['=SUM(B3:B2)', 1], // R[1]C[1]:R[0]C[1]
+          ['=SUM(B$2:B$1)', 2], // R1C[1]:R0C[1]
+          ['', 3],
+        ])
+
+        expect(engine.getCellValue(adr('A2'))).toEqual(3)
+        expect(engine.getCellValue(adr('A3'))).toEqual(1)
+      })
+    })
+
+  it('when one of the ranges is a single value', () => {
     const engine = HyperFormula.buildFromArray([
       [1, '=SUM(A1:A$1)'],
       [2, '=SUM(A2:A$1)'],
@@ -155,13 +193,6 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('B2'))).toEqual(3)
   })
-
-  it('tmp aux', () => {
-    const engine = HyperFormula.buildFromArray([
-      [1],
-      [2, '=SUM(A2:A$1)'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual(3)
-  })
 })
+})
+
