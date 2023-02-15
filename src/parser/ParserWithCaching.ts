@@ -101,15 +101,15 @@ export class ParserWithCaching {
         cacheResult = this.cache.set(hash, parsingResult.ast)
       }
     }
+
     const {ast, hasVolatileFunction, hasStructuralChangeFunction } = cacheResult
+    const astWithNoReversedRanges = this.convertReversedRangesToRegularRanges(ast)
+    const dependencies = collectDependencies(astWithNoReversedRanges, this.functionRegistry)
 
-    const fixedAst = this.handleReversedRanges(ast)
-    const dependencies = collectDependencies(fixedAst, this.functionRegistry)
-
-    return {ast: fixedAst, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies }
+    return {ast: astWithNoReversedRanges, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies }
   }
 
-  private handleReversedRanges(ast: Ast): Ast {
+  private convertReversedRangesToRegularRanges(ast: Ast): Ast {
     switch (ast.type) {
       case AstNodeType.EMPTY:
       case AstNodeType.NUMBER:
@@ -137,7 +137,7 @@ export class ParserWithCaching {
       case AstNodeType.PERCENT_OP:
       case AstNodeType.PLUS_UNARY_OP:
       case AstNodeType.MINUS_UNARY_OP: {
-        const valueFixed = this.handleReversedRanges(ast.value)
+        const valueFixed = this.convertReversedRangesToRegularRanges(ast.value)
         return { ...ast, value: valueFixed }
       }
       case AstNodeType.CONCATENATE_OP:
@@ -152,20 +152,20 @@ export class ParserWithCaching {
       case AstNodeType.TIMES_OP:
       case AstNodeType.DIV_OP:
       case AstNodeType.POWER_OP: {
-        const leftFixed = this.handleReversedRanges(ast.left)
-        const rightFixed = this.handleReversedRanges(ast.right)
+        const leftFixed = this.convertReversedRangesToRegularRanges(ast.left)
+        const rightFixed = this.convertReversedRangesToRegularRanges(ast.right)
         return { ...ast, left: leftFixed, right: rightFixed }
       }
       case AstNodeType.PARENTHESIS: {
-        const exprFixed = this.handleReversedRanges(ast.expression)
+        const exprFixed = this.convertReversedRangesToRegularRanges(ast.expression)
         return { ...ast, expression: exprFixed }
       }
       case AstNodeType.FUNCTION_CALL: {
-        const argsFixed = ast.args.map(arg => this.handleReversedRanges(arg))
+        const argsFixed = ast.args.map(arg => this.convertReversedRangesToRegularRanges(arg))
         return { ...ast, args: argsFixed }
       }
       case AstNodeType.ARRAY: {
-        const argsFixed = ast.args.map(argsRow => argsRow.map(arg => this.handleReversedRanges(arg)))
+        const argsFixed = ast.args.map(argsRow => argsRow.map(arg => this.convertReversedRangesToRegularRanges(arg)))
         return { ...ast, args: argsFixed }
       }
     }
