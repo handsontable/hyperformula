@@ -101,12 +101,12 @@ export class ParserWithCaching {
         cacheResult = this.cache.set(hash, parsingResult.ast)
       }
     }
-    const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies } = cacheResult
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction } = cacheResult
 
     const fixedAst = this.handleReversedRanges(ast)
-    const fixedRrelativeDependencies = collectDependencies(fixedAst, this.functionRegistry)
+    const dependencies = collectDependencies(fixedAst, this.functionRegistry)
 
-    return {ast: fixedAst, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: fixedRrelativeDependencies}
+    return {ast: fixedAst, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies }
   }
 
   private handleReversedRanges(ast: Ast): Ast {
