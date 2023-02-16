@@ -291,8 +291,6 @@ export class DependencyGraph {
   }
 
   public removeSheet(removedSheetId: number) {
-    this.clearSheet(removedSheetId)
-
     const arrays: Set<ArrayVertex> = new Set()
     for (const [adr, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
       if (vertex instanceof ArrayVertex) {
