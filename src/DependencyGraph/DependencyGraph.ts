@@ -291,27 +291,15 @@ export class DependencyGraph {
   }
 
   public removeSheet(removedSheetId: number) {
-    const arrays: Set<ArrayVertex> = new Set()
+    this.clearSheet(removedSheetId)
+
     for (const [adr, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
-      if (vertex instanceof ArrayVertex) {
-        if (arrays.has(vertex)) {
-          continue
-        } else {
-          arrays.add(vertex)
-        }
-      }
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsSpecialRecentlyChanged(adjacentNode)
       }
       this.removeVertex(vertex)
       this.addressMapping.removeCell(adr)
     }
-
-    this.stats.measure(StatType.ADJUSTING_ARRAY_MAPPING, () => {
-      for (const array of arrays.values()) {
-        this.arrayMapping.removeArray(array.getRange())
-      }
-    })
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)

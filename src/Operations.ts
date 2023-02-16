@@ -218,7 +218,6 @@ export class Operations {
   }
 
   public removeSheet(sheetId: number) {
-    this.dependencyGraph.clearSheet(sheetId)
     this.dependencyGraph.removeSheet(sheetId)
 
     let version: number
