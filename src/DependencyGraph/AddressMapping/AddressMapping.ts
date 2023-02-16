@@ -5,7 +5,7 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
-import {NoSheetWithIdError, VertexMissingInAddressMapping} from '../../errors'
+import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {Maybe} from '../../Maybe'
 import {Sheet, SheetBoundaries} from '../../Sheet'
