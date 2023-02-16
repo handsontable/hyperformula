@@ -3887,8 +3887,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Lists named expressions.
-   * If scope parameter is provided, returns an array of expression names defined for this scope.
-   * If scope parameter is undefined, returns an array of global expression names.
+   * - If scope parameter is provided, returns an array of expression names defined for this scope.
+   * - If scope parameter is undefined, returns an array of global expression names.
    *
    * @param {number?} scope - scope of the named expressions, `sheetId` for local scope or `undefined` for global scope
    *
