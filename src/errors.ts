@@ -394,12 +394,3 @@ export class AliasAlreadyExisting extends Error {
     super(`Alias id ${name} in plugin ${pluginName} already defined as a function or alias.`)
   }
 }
-
-/**
- * Error thrown when no vertex was found for specified address in AddressMapping object.
- */
-export class VertexMissingInAddressMapping extends Error {
-  constructor(address: SimpleCellAddress) {
-    super(`Vertex missing in AddressMapping for address { sheet: ${address.sheet}, col: ${address.col}, row: ${address.row} }`)
-  }
-}

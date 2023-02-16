@@ -39,7 +39,7 @@ export class AddressMapping {
     }
     const vertex = sheetMapping.getCell(address)
     if (!vertex) {
-      throw new VertexMissingInAddressMapping(address)
+      throw Error('Vertex for address missing in AddressMapping')
     }
     return vertex
   }
