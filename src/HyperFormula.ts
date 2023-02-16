@@ -995,7 +995,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Serializes and deserializes whole engine, effectively reloading it.
+   * Rebuilds the HyperFormula instance preserving the current sheets data.
    *
    * @example
    * ```js
