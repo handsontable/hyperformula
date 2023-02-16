@@ -6,7 +6,7 @@ import {defaultStringifyDateTime} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
-describe('Text', () => {
+describe('TEXT()', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([[
       '2',
