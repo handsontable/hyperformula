@@ -5,7 +5,7 @@
 
 import {SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
-import {NoSheetWithIdError} from '../../errors'
+import {NoSheetWithIdError, VertexMissingInAddressMapping} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {Maybe} from '../../Maybe'
 import {Sheet, SheetBoundaries} from '../../Sheet'
@@ -39,7 +39,7 @@ export class AddressMapping {
     }
     const vertex = sheetMapping.getCell(address)
     if (!vertex) {
-      throw Error('Vertex for address missing in AddressMapping')
+      throw new VertexMissingInAddressMapping(address)
     }
     return vertex
   }
