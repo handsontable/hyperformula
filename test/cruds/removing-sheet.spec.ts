@@ -109,6 +109,17 @@ describe('remove sheet', () => {
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
   })
+
+  it('should remove a sheet with a cell reference to a value in the same sheet', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, '=A1'],
+    ])
+
+    engine.removeSheet(0)
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
+    expect(Array.from(engine.addressMapping.entries())).toEqual([])
+  })
 })
 
 describe('remove sheet - adjust edges', () => {
