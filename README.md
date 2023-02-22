@@ -108,4 +108,4 @@ HyperFormula is available under the open source license ([GPLv3](https://github.
 To buy a commercial license, please write to us at sales@handsontable.com
 
 ## Copyrights
-© 2022 [Handsoncode](https://handsontable.com)
+© 2023 [Handsoncode](https://handsontable.com)
