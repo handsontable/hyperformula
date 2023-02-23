@@ -65,13 +65,17 @@ describe('Function LEFT', () => {
 
   it('should coerce other types to string', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LEFT(1, 1)'],
+      ['=LEFT(10, 1)'],
       ['=LEFT(5+5, 1)'],
       ['=LEFT(TRUE(), 1)'],
+      ['=LEFT("010", 1)'],
+      ['=LEFT(B5, 1)', "'010"],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual('1')
     expect(engine.getCellValue(adr('A2'))).toEqual('1')
     expect(engine.getCellValue(adr('A3'))).toEqual('T')
+    expect(engine.getCellValue(adr('A4'))).toEqual('0')
+    expect(engine.getCellValue(adr('A5'))).toEqual('0')
   })
 })
