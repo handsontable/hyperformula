@@ -6,7 +6,7 @@ import {defaultStringifyDateTime} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
-describe('Text', () => {
+describe('TEXT()', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([[
       '2',
@@ -144,14 +144,52 @@ describe('Text', () => {
   })
 
   it('works for number format', () => {
-    const engine = HyperFormula.buildFromArray([[
-      '12.45',
-      '=TEXT(A1, "###.###")',
-      '=TEXT(A1, "000.000")',
-    ]])
+    const engine = HyperFormula.buildFromArray([
+      ['12.45'],
+      ['=TEXT(A1, "###.###")'],
+      ['=TEXT(A1, "000.000")'],
+      ['=TEXT(A1, "$000.00")'],
+      ['=TEXT(A1, "$#.000")'],
+      ['=TEXT(A1, "$###.000")'],
+      ['=TEXT(A1, "000.00.00$")'],
+      ['=TEXT(A1, "###.##.##$")'],
+      ['=TEXT(A1, "$###,##0.00")'],
+    ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
-    expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
+    expect(engine.getCellValue(adr('A2'))).toEqual('12.45')
+    expect(engine.getCellValue(adr('A3'))).toEqual('012.450')
+    expect(engine.getCellValue(adr('A4'))).toEqual('$012.45')
+    expect(engine.getCellValue(adr('A5'))).toEqual('$12.450')
+    expect(engine.getCellValue(adr('A6'))).toEqual('$12.450')
+    expect(engine.getCellValue(adr('A7'))).toEqual('012.45.00$')
+    expect(engine.getCellValue(adr('A8'))).toEqual('12.45.##$')
+    expect(engine.getCellValue(adr('A9'))).toEqual('$12,##0.00')
+  })
+
+  it('works with currency format "$#.00"', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TEXT(0.5, "$#.00")'],
+      ['=TEXT(10, "$#.00")'],
+      ['=TEXT(100, "$#.00")'],
+      ['=TEXT(1000, "$#.00")'],
+      ['=TEXT(10000, "$#.00")'],
+      ['=TEXT(100000, "$#.00")'],
+      ['=TEXT(1000000, "$#.00")'],
+      ['=TEXT(10000000, "$#.00")'],
+      ['=TEXT(10000000.99, "$#.00")'],
+      ['=TEXT(10000000.99999, "$#.00")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('$0.50')
+    expect(engine.getCellValue(adr('A2'))).toEqual('$10.00')
+    expect(engine.getCellValue(adr('A3'))).toEqual('$100.00')
+    expect(engine.getCellValue(adr('A4'))).toEqual('$1000.00')
+    expect(engine.getCellValue(adr('A5'))).toEqual('$10000.00')
+    expect(engine.getCellValue(adr('A6'))).toEqual('$100000.00')
+    expect(engine.getCellValue(adr('A7'))).toEqual('$1000000.00')
+    expect(engine.getCellValue(adr('A8'))).toEqual('$10000000.00')
+    expect(engine.getCellValue(adr('A9'))).toEqual('$10000000.99')
+    expect(engine.getCellValue(adr('A10'))).toEqual('$10000001.00')
   })
 
   it('date and time format', () => {
