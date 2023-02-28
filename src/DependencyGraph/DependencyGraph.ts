@@ -311,8 +311,6 @@ export class DependencyGraph {
         this.addressMapping.removeSheet(removedSheetId)
       })
     })
-
-    this.addStructuralNodesToChangeSet()
   }
 
   public clearSheet(sheetId: number) {
