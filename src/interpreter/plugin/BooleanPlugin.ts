@@ -142,7 +142,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public and(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AND'),
-      (...args) => !args.some((arg: boolean) => !arg)
+      (...args) => args.filter((arg: boolean | undefined) => arg !== undefined).every((arg: boolean) => !!arg)
     )
   }
 
@@ -156,7 +156,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public or(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OR'),
-      (...args) => args.some((arg: boolean) => arg)
+      (...args) => args.filter((arg: boolean | undefined) => arg !== undefined).some((arg: boolean) => arg)
     )
   }
 
@@ -167,7 +167,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   public xor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('XOR'), (...args) => {
       let cnt = 0
-      args.forEach((arg: boolean) => {
+      args.filter((arg: boolean | undefined) => arg !== undefined).forEach((arg: boolean) => {
         if (arg) {
           cnt++
         }

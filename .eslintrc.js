@@ -73,7 +73,7 @@ module.exports = {
     "jsdoc/check-alignment": 'warn',
     "jsdoc/check-param-names": 'warn',
     "jsdoc/check-property-names": 'warn',
-    "jsdoc/check-tag-names": 'warn',
+    "jsdoc/check-tag-names": ['warn', {definedTags: ['category']}],
     "jsdoc/check-types": 'warn',
     "jsdoc/empty-tags": 'warn',
     "jsdoc/implements-on-classes": 'warn',
@@ -90,9 +90,7 @@ module.exports = {
     "jsdoc/require-returns-check": 'warn',
     "jsdoc/require-returns-description": 'warn',
     "jsdoc/require-returns-type": 'warn',
-    "jsdoc/require-yields": 'warn',
     "jsdoc/require-yields-check": 'warn',
-    "jsdoc/tag-lines": 'warn',
     "jsdoc/valid-types": 'warn',
     "jsdoc/require-jsdoc": ['warn', {
       require: {

@@ -85,4 +85,14 @@ describe('Function OR', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
+  it('when called with a range, ignores strings other than "true", "false" and ""', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['foo', '=TRUE()', '=OR(A1:B1)'],
+      ['foo', '=FALSE()', '=OR(A2:B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('C1'))).toEqual(true)
+    expect(engine.getCellValue(adr('C2'))).toEqual(false)
+  })
 })
