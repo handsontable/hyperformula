@@ -109,6 +109,38 @@ describe('remove sheet', () => {
     expect(engine.sheetMapping.numberOfSheets()).toBe(0)
     expect(Array.from(engine.addressMapping.entries())).toEqual([])
   })
+
+  it('should remove a sheet with a cell reference to a value in the same sheet', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, '=A1'],
+    ])
+
+    engine.removeSheet(0)
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(0)
+    expect(Array.from(engine.addressMapping.entries())).toEqual([])
+  })
+
+  it('should not affect data in the sheets that were referenced by the sheet being removed', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        ['=Sheet2!A1)'],
+        ['=SUM(Sheet2!A1:A2)'],
+      ],
+      Sheet2: [
+        [1],
+        [2],
+        [3],
+      ],
+    })
+
+    engine.removeSheet(0)
+
+    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet2'])
+    expect(engine.getCellValue(adr('A1', 1))).toBe(1)
+    expect(engine.getCellValue(adr('A2', 1))).toBe(2)
+    expect(engine.getCellValue(adr('A3', 1))).toBe(3)
+  })
 })
 
 describe('remove sheet - adjust edges', () => {
