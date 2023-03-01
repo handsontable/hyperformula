@@ -12,14 +12,12 @@ and this project adheres to
 
 ### Fixed
 
-- Fixed an issue where named-expression names were not allowed to start with a
-  cell reference.
-  [#1058](https://github.com/handsontable/hyperformula/issues/1058)
-- Fixed an issue where named-expression names were allowed to start with "R1C1"
-  cell references. For better compatibility with other spreadsheet software,
-  strings such as `R4C5`, `RC1000`, `R1C` or `RC` can't be used in
-  named-expression names anymore.
-  [#1058](https://github.com/handsontable/hyperformula/issues/1058)
+- Fixed an issue where expression names were not allowed to start with a cell
+  reference. [#1058](https://github.com/handsontable/hyperformula/issues/1058)
+- Fixed an issue where expression names were allowed to start with R1C1-notation
+  references. For better compatibility with other spreadsheet software, strings
+  such as `R4C5`, `RC1000`, `R1C` or `RC` can't be used in expression names
+  anymore. [#1058](https://github.com/handsontable/hyperformula/issues/1058)
 - Fixed an issue where using reversed ranges with absolute addressing could
   cause the `Incorrect array size` error.
   [#1106](https://github.com/handsontable/hyperformula/issues/1106)
