@@ -80,7 +80,6 @@ module.exports = {
     "jsdoc/multiline-blocks": 'warn',
     "jsdoc/newline-after-description": 'warn',
     "jsdoc/no-multi-asterisks": 'warn',
-    "jsdoc/no-undefined-types": 'warn',
     "jsdoc/require-param-description": 'warn',
     "jsdoc/require-param-name": 'warn',
     "jsdoc/require-param-type": 'warn',
