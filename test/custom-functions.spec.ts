@@ -4,9 +4,9 @@ import {
   FunctionArgumentType,
   FunctionPluginValidationError,
   HyperFormula,
-  SimpleRangeValue
+  SimpleRangeValue,
+  ArraySize,
 } from '../src'
-import {ArraySize} from '../src/ArraySize'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'
@@ -29,6 +29,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     'ARRAYFOO': {
       method: 'arrayfoo',
       arraySizeMethod: 'arraysizeFoo',
+      parameters: [{ argumentType: FunctionArgumentType.NUMBER }],
     },
   }
 
@@ -171,15 +172,23 @@ class GreetingsPlugin extends FunctionPlugin {
       parameters: [
         { argumentType: FunctionArgumentType.STRING }
       ],
+    },
+    EXAMPLE_ARRAY_FUNCTION: {
+      method: 'exampleArrayFunction',
+      parameters: [
+        { argumentType: FunctionArgumentType.NUMBER }
+      ],
     }
   }
 
   public static translations = {
     enGB: {
       GREET: 'GREET',
+      EXAMPLE_ARRAY_FUNCTION: 'EXAMPLE_ARRAY_FUNCTION',
     },
     enUS: {
       GREET: 'GREET',
+      EXAMPLE_ARRAY_FUNCTION: 'EXAMPLE_ARRAY_FUNCTION',
     }
   }
   
@@ -194,6 +203,17 @@ class GreetingsPlugin extends FunctionPlugin {
         }
 
         return `👋 Hello, ${username}!`
+      },
+    )
+  }
+
+  exampleArrayFunction(ast: ProcedureAst, state: InterpreterState) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('EXAMPLE_ARRAY_FUNCTION'),
+      (val: number) => {
+        return SimpleRangeValue.onlyValues([[val, val], [val, val]])
       },
     )
   }
@@ -269,7 +289,7 @@ describe('Register static custom plugin', () => {
   it('should register single array functions', () => {
     HyperFormula.registerFunction('ARRAYFOO', FooPlugin, FooPlugin.translations)
     const engine = HyperFormula.buildFromArray([
-      ['=ARRAYFOO()']
+      ['=ARRAYFOO(0)']
     ])
 
     expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
@@ -516,7 +536,19 @@ describe('Custom function implemented with runFunction)', () => {
 
     const engine = HyperFormula.buildFromArray([['=B1', '=GREET(A1)']])
 
-
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
+  })
+
+  it('function returning array throws error when user tries to vectorize it', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    expect(() => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2, 3],
+        ['=EXAMPLE_ARRAY_FUNCTION(A1:C1)'],
+      ], {useArrayArithmetic: true})
+
+      engine.getCellValue(adr('A2'))
+    }).toThrow(new Error('Function returning array cannot be vectorized.'))
   })
 })
