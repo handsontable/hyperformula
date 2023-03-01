@@ -56,6 +56,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
   }
 
   public static fromSimpleCellAddresses(start: SimpleCellAddress, end: SimpleCellAddress): AbsoluteCellRange {
+    if (start.sheet !== end.sheet) {
+      throw new SheetsNotEqual(start.sheet, end.sheet)
+    }
+
     const width = end.col - start.col
     const height = end.row - start.row
 
