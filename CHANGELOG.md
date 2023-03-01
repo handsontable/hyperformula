@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed error caused by the named expression names that start with a cell reference. [#1058](https://github.com/handsontable/hyperformula/issues/1058)
 - Fixed the validation of the named expression names. Strings `R4C5`, `RC1000`, `R1C`, `RC`, etc. are now considered invalid. (cell references in R1C1 style). [#1058](https://github.com/handsontable/hyperformula/issues/1058)
 - Fixed error caused by specific usage of reversed ranges with absolute addressing. [#1106](https://github.com/handsontable/hyperformula/issues/1106)
+- Fixed error caused by removing a sheet with a cell reference to a value in the same sheet. [#1121](https://github.com/handsontable/hyperformula/issues/1121)
 
 ## [2.3.0] - 2022-12-22
 
