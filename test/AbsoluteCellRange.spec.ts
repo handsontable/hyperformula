@@ -40,6 +40,8 @@ describe('AbsoluteCellRange', () => {
         const end = { sheet: 0, row: 666, col: 666 }
         const range = AbsoluteCellRange.fromSimpleCellAddresses(start, end)
 
+        expect(range.start).toEqual(start)
+        expect(range.end).toEqual(end)
         expect(range).toBeInstanceOf(AbsoluteCellRange)
         expect(range).not.toBeInstanceOf(AbsoluteColumnRange)
         expect(range).not.toBeInstanceOf(AbsoluteRowRange)
@@ -50,6 +52,28 @@ describe('AbsoluteCellRange', () => {
         const end = { sheet: 0, row: Infinity, col: 43 }
         const range = AbsoluteCellRange.fromSimpleCellAddresses(start, end)
 
+        expect(range.start).toEqual(start)
+        expect(range.end).toEqual(end)
+        expect(range).toBeInstanceOf(AbsoluteColumnRange)
+      })
+
+      it('constructs a AbsoluteRowRange when called with end.col = Infinity', () => {
+        const start = { sheet: 0, row: 42, col: 0 }
+        const end = { sheet: 0, row: 43, col: Infinity }
+        const range = AbsoluteCellRange.fromSimpleCellAddresses(start, end)
+
+        expect(range.start).toEqual(start)
+        expect(range.end).toEqual(end)
+        expect(range).toBeInstanceOf(AbsoluteRowRange)
+      })
+
+      it('constructs a AbsoluteColumnRange when called with end.row = Infinity, and end.col = Infinity', () => {
+        const start = { sheet: 0, row: 0, col: 0 }
+        const end = { sheet: 0, row: Infinity, col: Infinity }
+        const range = AbsoluteCellRange.fromSimpleCellAddresses(start, end)
+
+        expect(range.start).toEqual(start)
+        expect(range.end).toEqual(end)
         expect(range).toBeInstanceOf(AbsoluteColumnRange)
       })
     })
