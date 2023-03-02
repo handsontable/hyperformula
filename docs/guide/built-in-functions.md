@@ -2,15 +2,15 @@
 
 ## Overview
 
-HyperFormula comes with an extensive library of pre-built functions.
-You can use them to create complex formulas for any business application.
-Formula syntax and logic of function are similar to what is
-considered the standard in modern spreadsheet software. That is
-because a spreadsheet is probably the most universal software
-ever created. We wanted the same flexibility for HyperFormula
+HyperFormula comes with an extensive library of pre-built functions. You can use
+them to create complex formulas for any business application. Formula syntax and
+logic of function are similar to what is considered the standard in modern
+spreadsheet software. That is because a spreadsheet is probably the most
+universal software ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
-The latest version of HyperFormula has an extensive collection of **{{ $page.functionsCount }}** functions grouped into categories:
+The latest version of HyperFormula has an extensive collection of
+**{{ $page.functionsCount }}** functions grouped into categories:
 
 - [Array manipulation](#array-manipulation)
 - [Date and time](#date-and-time)
@@ -25,22 +25,25 @@ The latest version of HyperFormula has an extensive collection of **{{ $page.fun
 - [Statistical](#statistical)
 - [Text](#text)
 
-_Some categories such as compatibility, cube, and database
-are yet to be supported._
+_Some categories such as compatibility, cube, and database are yet to be
+supported._
 
 ## Internationalization
 
-Each of HyperFormula's built-in function names (and [errors](types-of-errors.md)) is available in [17 language versions](localizing-functions.md#list-of-supported-languages).
+Each of HyperFormula's built-in function names (and
+[errors](types-of-errors.md)) is available in
+[17 language versions](localizing-functions.md#list-of-supported-languages).
 
-To support more languages or properties, create a [custom language pack](localizing-functions).
+To support more languages or properties, create a
+[custom language pack](localizing-functions).
 
 ## Custom functions
 
-One of the most valuable features of HyperFormula is its extensibility.
-All functions are implemented within the plugin architecture which
-means it is easy to remove or replace them. This means you are not
-limited by the current functionality of the engine. HyperFormula
-lets you design your own [custom functions](custom-functions).
+One of the most valuable features of HyperFormula is its extensibility. All
+functions are implemented within the plugin architecture which means it is easy
+to remove or replace them. This means you are not limited by the current
+functionality of the engine. HyperFormula lets you design your own
+[custom functions](custom-functions).
 
 ## Demo
 
@@ -61,165 +64,165 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Array manipulation
 
 | Function ID     | Description                                                      | Syntax                                               |
-|:----------------|:-----------------------------------------------------------------|:-----------------------------------------------------|
+| :-------------- | :--------------------------------------------------------------- | :--------------------------------------------------- |
 | ARRAYFORMULA    | Enables the array arithmetic mode for a single formula.          | ARRAYFORMULA(Formula)                                |
 | FILTER          | Filters an array, based on multiple conditions (boolean arrays). | FILTER(SourceArray, BoolArray1[, BoolArray2[, ...]]) |
 | ARRAY_CONSTRAIN | Truncates an array to given dimensions.                          | ARRAY_CONSTRAIN(Array, Height, Width)                |
 
 ### Date and time
 
-| Function ID      | Description                                                                                                                                                                                                                                   | Syntax                                              |
-|:-----------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------|
-| DATE             | Returns the specified date as the number of full days since [nullDate](../api/interfaces/configparams.md#nulldate).                                                                                                                           | DATE(Year, Month, Day)                              |
-| DATEDIF          | Calculates distance between two dates, in provided unit parameter.                                                                                                                                                                            | DATEDIF(Date1, Date2, Units)                        |
-| DATEVALUE        | Parses a date string and returns it as the number of full days since [nullDate](../api/interfaces/configparams.md#nulldate).<br/>It supports the formats specified in the [dateFormats array](../api/interfaces/configparams.md#dateformats). | DATEVALUE(Datestring)                               |
-| DAY              | Returns the day of the given date value.                                                                                                                                                                                                      | DAY(Number)                                         |
-| DAYS             | Calculates the difference between two date values.                                                                                                                                                                                            | DAYS(Date2, Date1)                                  |
-| DAYS360          | Calculates the difference between two date values in days, in 360-day basis.                                                                                                                                                                  | DAYS360(Date2, Date1[, Format])                     |
-| EDATE            | Shifts the given startdate by given number of months and returns it as the number of full days since [nullDate](../api/interfaces/configparams.md#nulldate).[^non-odff]                                                                       | EDATE(Startdate, Months)                            |
-| EOMONTH          | Returns the date of the last day of a month which falls months away from the start date. Returns the value in the form of number of full days since [nullDate](../api/interfaces/configparams.md#nulldate).[^non-odff]                        | EOMONTH(Startdate, Months)                          |
-| HOUR             | Returns hour component of given time.                                                                                                                                                                                                         | HOUR(Time)                                          |
-| INTERVAL         | Returns interval string from given number of seconds.                                                                                                                                                                                         | INTERVAL(Seconds)                                   |
-| ISOWEEKNUM       | Returns an ISO week number that corresponds to the week of year.                                                                                                                                                                              | ISOWEEKNUM(Date)                                    |
-| MINUTE           | Returns minute component of given time.                                                                                                                                                                                                       | MINUTE(Time)                                        |
-| MONTH            | Returns the month for the given date value.                                                                                                                                                                                                   | MONTH(Number)                                       |
-| NETWORKDAYS      | Returns the number of working days between two given dates.                                                                                                                                                                                   | NETWORKDAYS(Date1, Date2[, Holidays])               | 
-| NETWORKDAYS.INTL | Returns the number of working days between two given dates.                                                                                                                                                                                   | NETWORKDAYS.INTL(Date1, Date2[, Mode [, Holidays]]) |
-| NOW              | Returns current date + time as a number of days since [nullDate](../api/interfaces/configparams.md#nulldate).                                                                                                                                 | NOW()                                               |
-| SECOND           | Returns second component of given time.                                                                                                                                                                                                       | SECOND(Time)                                        |
-| TIME             | Returns the number that represents a given time as a fraction of full day.                                                                                                                                                                    | TIME(Hour, Minute, Second)                          |
-| TIMEVALUE        | Parses a time string and returns a number that represents it as a fraction of full day.<br/>It supports the formats specified in the [timeFormats array](../api/interfaces/configparams.md#timeformats).                                      | TIMEVALUE(Timestring)                               |
-| TODAY            | Returns an integer representing the current date as the number of full days since [nullDate](../api/interfaces/configparams.md#nulldate).                                                                                                     | TODAY()                                             |
-| WEEKDAY          | Computes a number between 1-7 representing the day of week.                                                                                                                                                                                   | WEEKDAY(Date, Type)                                 |
-| WEEKNUM          | Returns a week number that corresponds to the week of year.                                                                                                                                                                                   | WEEKNUM(Date, Type)                                 |
-| WORKDAY          | Returns the working day number of days from start day.                                                                                                                                                                                        | WORKDAY(Date, Shift[, Holidays])                    |
-| WORKDAY.INTL     | Returns the working day number of days from start day.                                                                                                                                                                                        | WORKDAY(Date, Shift[, Mode[, Holidays]])            |
-| YEAR             | Returns the year as a number according to the internal calculation rules.                                                                                                                                                                     | YEAR(Number)                                        |
-| YEARFRAC         | Computes the difference between two date values, in fraction of years.                                                                                                                                                                        | YEARFRAC(Date2, Date1[, Format])                    |
+| Function ID      | Description                                                                                                                                                                                                                             | Syntax                                              |
+| :--------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------- |
+| DATE             | Returns the specified date as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).                                                                                                                   | DATE(Year, Month, Day)                              |
+| DATEDIF          | Calculates distance between two dates, in provided unit parameter.                                                                                                                                                                      | DATEDIF(Date1, Date2, Units)                        |
+| DATEVALUE        | Parses a date string and returns it as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).<br><br>Accepts formats set by the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option. | DATEVALUE(Datestring)                               |
+| DAY              | Returns the day of the given date value.                                                                                                                                                                                                | DAY(Number)                                         |
+| DAYS             | Calculates the difference between two date values.                                                                                                                                                                                      | DAYS(Date2, Date1)                                  |
+| DAYS360          | Calculates the difference between two date values in days, in 360-day basis.                                                                                                                                                            | DAYS360(Date2, Date1[, Format])                     |
+| EDATE            | Shifts the given startdate by given number of months and returns it as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).[^non-odff]                                                               | EDATE(Startdate, Months)                            |
+| EOMONTH          | Returns the date of the last day of a month which falls months away from the start date. Returns the value in the form of number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).[^non-odff]                | EOMONTH(Startdate, Months)                          |
+| HOUR             | Returns hour component of given time.                                                                                                                                                                                                   | HOUR(Time)                                          |
+| INTERVAL         | Returns interval string from given number of seconds.                                                                                                                                                                                   | INTERVAL(Seconds)                                   |
+| ISOWEEKNUM       | Returns an ISO week number that corresponds to the week of year.                                                                                                                                                                        | ISOWEEKNUM(Date)                                    |
+| MINUTE           | Returns minute component of given time.                                                                                                                                                                                                 | MINUTE(Time)                                        |
+| MONTH            | Returns the month for the given date value.                                                                                                                                                                                             | MONTH(Number)                                       |
+| NETWORKDAYS      | Returns the number of working days between two given dates.                                                                                                                                                                             | NETWORKDAYS(Date1, Date2[, Holidays])               |
+| NETWORKDAYS.INTL | Returns the number of working days between two given dates.                                                                                                                                                                             | NETWORKDAYS.INTL(Date1, Date2[, Mode [, Holidays]]) |
+| NOW              | Returns current date + time as a number of days since [`nullDate`](../api/interfaces/configparams.md#nulldate).                                                                                                                         | NOW()                                               |
+| SECOND           | Returns second component of given time.                                                                                                                                                                                                 | SECOND(Time)                                        |
+| TIME             | Returns the number that represents a given time as a fraction of full day.                                                                                                                                                              | TIME(Hour, Minute, Second)                          |
+| TIMEVALUE        | Parses a time string and returns a number that represents it as a fraction of a full day.<br><br>Accepts formats set by the [`timeFormats`](../api/interfaces/configparams.md#timeformats) option.                                      | TIMEVALUE(Timestring)                               |
+| TODAY            | Returns an integer representing the current date as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).                                                                                             | TODAY()                                             |
+| WEEKDAY          | Computes a number between 1-7 representing the day of week.                                                                                                                                                                             | WEEKDAY(Date, Type)                                 |
+| WEEKNUM          | Returns a week number that corresponds to the week of year.                                                                                                                                                                             | WEEKNUM(Date, Type)                                 |
+| WORKDAY          | Returns the working day number of days from start day.                                                                                                                                                                                  | WORKDAY(Date, Shift[, Holidays])                    |
+| WORKDAY.INTL     | Returns the working day number of days from start day.                                                                                                                                                                                  | WORKDAY(Date, Shift[, Mode[, Holidays]])            |
+| YEAR             | Returns the year as a number according to the internal calculation rules.                                                                                                                                                               | YEAR(Number)                                        |
+| YEARFRAC         | Computes the difference between two date values, in fraction of years.                                                                                                                                                                  | YEARFRAC(Date2, Date1[, Format])                    |
 
 ### Engineering
 
-| Function ID  | Description                                                                         | Syntax                           |
-|:-------------|:------------------------------------------------------------------------------------|:---------------------------------|
-| BIN2DEC      | The result is the decimal number for the binary number entered.                     | BIN2DEC(Number)                  |
-| BIN2HEX      | The result is the hexadecimal number for the binary number entered.                 | BIN2HEX(Number, Places)          |
-| BIN2OCT      | The result is the octal number for the binary number entered.                       | BIN2OCT(Number, Places)          |
-| BITAND       | Returns a bitwise logical "and" of the parameters.                                  | BITAND(Number1, Number2)         |
-| BITLSHIFT    | Shifts a number left by n bits.                                                     | BITLSHIFT(Number, Shift)         |
-| BITOR        | Returns a bitwise logical "or" of the parameters.                                   | BITOR(Number1, Number2)          |
-| BITRSHIFT    | Shifts a number right by n bits.                                                    | BITRSHIFT(Number, Shift)         |
-| BITXOR       | Returns a bitwise logical "exclusive or" of the parameters.                         | BITXOR(Number1, Number2)         |
-| COMPLEX      | Returns complex number from Re and Im parts.                                        | COMPLEX(Re, Im[, Symbol])        |
-| DEC2BIN      | Returns the binary number for the decimal number entered between –512 and 511.      | DEC2BIN(Number, Places)          |
-| DEC2HEX      | Returns the hexadecimal number for the decimal number entered.                      | DEC2HEX(Number, Places)          |
-| DEC2OCT      | Returns the octal number for the decimal number entered.                            | DEC2OCT(Number, Places)          |
-| DELTA        | Returns TRUE (1) if both numbers are equal, otherwise returns FALSE (0).            | DELTA(Number_1, Number_2)        |
-| ERF          | Returns values of the Gaussian error integral.                                      | ERF(Lower_Limit, Upper_Limit)    |
-| ERFC         | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit)                |
-| HEX2BIN      | The result is the binary number for the hexadecimal number entered.                 | HEX2BIN(Number, Places)          |
-| HEX2DEC      | The result is the decimal number for the hexadecimal number entered.                | HEX2DEC(Number)                  |
-| HEX2OCT      | The result is the octal number for the hexadecimal number entered.                  | HEX2OCT(Number, Places)          |
-| IMABS        | Returns module of a complex number.                                                 | IMABS(Complex)                   |
-| IMAGINARY    | Returns imaginary part of a complex number.                                         | IMAGINARY(Complex)               |
-| IMARGUMENT   | Returns argument of a complex number.                                               | IMARGUMENT(Complex)              |
-| IMCONJUGATE  | Returns conjugate of a complex number.                                              | IMCONJUGATE(Complex)             |
-| IMCOS        | Returns cosine of a complex number.                                                 | IMCOS(Complex)                   |
-| IMCOSH       | Returns hyperbolic cosine of a complex number.                                      | IMCOSH(Complex)                  |
-| IMCOT        | Returns cotangens of a complex number.                                              | IMCOT(Complex)                   |
-| IMCSC        | Returns cosecans of a complex number.                                               | IMCSC(Complex)                   |
-| IMCSCH       | Returns hyperbolic cosecans of a complex number.                                    | IMCSCH(Complex)                  |
-| IMDIV        | Divides two complex numbers.                                                        | IMDIV(Complex1, Complex2)        |
-| IMEXP        | Returns exponent of a complex number.                                               | IMEXP(Complex)                   |
-| IMLN         | Returns natural logarithm of a complex number.                                      | IMLN(Complex)                    |
-| IMLOG2       | Returns binary logarithm of a complex number.                                       | IMLOG2(Complex)                  |
-| IMLOG10      | Returns base-10 logarithm of a complex number.                                      | IMLOG10(Complex)                 |
-| IMPOWER      | Returns a complex number raised to a given power.                                   | IMPOWER(Complex, Number)         |
-| IMPRODUCT    | Multiplies complex numbers.                                                         | IMPRODUCT(Complex1 ...Complex30) |
-| IMREAL       | Returns real part of a complex number.                                              | IMREAL(Complex)                  |
-| IMSEC        | Returns the secant of a complex number.                                             | IMSEC(Complex)                   |
-| IMSECH       | Returns the hyperbolic secant of a complex number.                                  | IMSECH(Complex)                  |
-| IMSIN        | Returns sine of a complex number.                                                   | IMSIN(Complex)                   |
-| IMSINH       | Returns hyperbolic sine of a complex number.                                        | IMSINH(Complex)                  |
-| IMSQRT       | Returns a square root of a complex number.                                          | IMSQRT(Complex)                  |
-| IMSUB        | Subtracts two complex numbers.                                                      | IMSUB(Complex1, Complex2)        |
-| IMSUM        | Adds complex numbers.                                                               | IMSUM(Complex1 ...Complex30)     |
-| IMTAN        | Returns the tangent of a complex number.                                            | IMTAN(Complex)                   |
-| OCT2BIN      | The result is the binary number for the octal number entered.                       | OCT2BIN(Number, Places)          |
-| OCT2DEC      | The result is the decimal number for the octal number entered.                      | OCT2DEC(Number)                  |
-| OCT2HEX      | The result is the hexadecimal number for the octal number entered.                  | OCT2HEX(Number, Places)          |
+| Function ID | Description                                                                         | Syntax                           |
+| :---------- | :---------------------------------------------------------------------------------- | :------------------------------- |
+| BIN2DEC     | The result is the decimal number for the binary number entered.                     | BIN2DEC(Number)                  |
+| BIN2HEX     | The result is the hexadecimal number for the binary number entered.                 | BIN2HEX(Number, Places)          |
+| BIN2OCT     | The result is the octal number for the binary number entered.                       | BIN2OCT(Number, Places)          |
+| BITAND      | Returns a bitwise logical "and" of the parameters.                                  | BITAND(Number1, Number2)         |
+| BITLSHIFT   | Shifts a number left by n bits.                                                     | BITLSHIFT(Number, Shift)         |
+| BITOR       | Returns a bitwise logical "or" of the parameters.                                   | BITOR(Number1, Number2)          |
+| BITRSHIFT   | Shifts a number right by n bits.                                                    | BITRSHIFT(Number, Shift)         |
+| BITXOR      | Returns a bitwise logical "exclusive or" of the parameters.                         | BITXOR(Number1, Number2)         |
+| COMPLEX     | Returns complex number from Re and Im parts.                                        | COMPLEX(Re, Im[, Symbol])        |
+| DEC2BIN     | Returns the binary number for the decimal number entered between –512 and 511.      | DEC2BIN(Number, Places)          |
+| DEC2HEX     | Returns the hexadecimal number for the decimal number entered.                      | DEC2HEX(Number, Places)          |
+| DEC2OCT     | Returns the octal number for the decimal number entered.                            | DEC2OCT(Number, Places)          |
+| DELTA       | Returns TRUE (1) if both numbers are equal, otherwise returns FALSE (0).            | DELTA(Number_1, Number_2)        |
+| ERF         | Returns values of the Gaussian error integral.                                      | ERF(Lower_Limit, Upper_Limit)    |
+| ERFC        | Returns complementary values of the Gaussian error integral between x and infinity. | ERFC(Lower_Limit)                |
+| HEX2BIN     | The result is the binary number for the hexadecimal number entered.                 | HEX2BIN(Number, Places)          |
+| HEX2DEC     | The result is the decimal number for the hexadecimal number entered.                | HEX2DEC(Number)                  |
+| HEX2OCT     | The result is the octal number for the hexadecimal number entered.                  | HEX2OCT(Number, Places)          |
+| IMABS       | Returns module of a complex number.                                                 | IMABS(Complex)                   |
+| IMAGINARY   | Returns imaginary part of a complex number.                                         | IMAGINARY(Complex)               |
+| IMARGUMENT  | Returns argument of a complex number.                                               | IMARGUMENT(Complex)              |
+| IMCONJUGATE | Returns conjugate of a complex number.                                              | IMCONJUGATE(Complex)             |
+| IMCOS       | Returns cosine of a complex number.                                                 | IMCOS(Complex)                   |
+| IMCOSH      | Returns hyperbolic cosine of a complex number.                                      | IMCOSH(Complex)                  |
+| IMCOT       | Returns cotangens of a complex number.                                              | IMCOT(Complex)                   |
+| IMCSC       | Returns cosecans of a complex number.                                               | IMCSC(Complex)                   |
+| IMCSCH      | Returns hyperbolic cosecans of a complex number.                                    | IMCSCH(Complex)                  |
+| IMDIV       | Divides two complex numbers.                                                        | IMDIV(Complex1, Complex2)        |
+| IMEXP       | Returns exponent of a complex number.                                               | IMEXP(Complex)                   |
+| IMLN        | Returns natural logarithm of a complex number.                                      | IMLN(Complex)                    |
+| IMLOG2      | Returns binary logarithm of a complex number.                                       | IMLOG2(Complex)                  |
+| IMLOG10     | Returns base-10 logarithm of a complex number.                                      | IMLOG10(Complex)                 |
+| IMPOWER     | Returns a complex number raised to a given power.                                   | IMPOWER(Complex, Number)         |
+| IMPRODUCT   | Multiplies complex numbers.                                                         | IMPRODUCT(Complex1 ...Complex30) |
+| IMREAL      | Returns real part of a complex number.                                              | IMREAL(Complex)                  |
+| IMSEC       | Returns the secant of a complex number.                                             | IMSEC(Complex)                   |
+| IMSECH      | Returns the hyperbolic secant of a complex number.                                  | IMSECH(Complex)                  |
+| IMSIN       | Returns sine of a complex number.                                                   | IMSIN(Complex)                   |
+| IMSINH      | Returns hyperbolic sine of a complex number.                                        | IMSINH(Complex)                  |
+| IMSQRT      | Returns a square root of a complex number.                                          | IMSQRT(Complex)                  |
+| IMSUB       | Subtracts two complex numbers.                                                      | IMSUB(Complex1, Complex2)        |
+| IMSUM       | Adds complex numbers.                                                               | IMSUM(Complex1 ...Complex30)     |
+| IMTAN       | Returns the tangent of a complex number.                                            | IMTAN(Complex)                   |
+| OCT2BIN     | The result is the binary number for the octal number entered.                       | OCT2BIN(Number, Places)          |
+| OCT2DEC     | The result is the decimal number for the octal number entered.                      | OCT2DEC(Number)                  |
+| OCT2HEX     | The result is the hexadecimal number for the octal number entered.                  | OCT2HEX(Number, Places)          |
 
 ### Information
 
-| Function ID  | Description                                                                                                    | Syntax           |
-|:-------------|:---------------------------------------------------------------------------------------------------------------|:-----------------|
-| ISBINARY     | Returns TRUE if provided value is a valid binary number.                                                       | ISBINARY(Value)  |
-| ISBLANK      | Returns TRUE if the reference to a cell is blank.                                                              | ISBLANK(Value)   |
-| ISERR        | Returns TRUE if the value is error value except #N/A!.                                                         | ISERR(Value)     |
-| ISERROR      | Returns TRUE if the value is general error value.                                                              | ISERROR(Value)   |
-| ISEVEN       | Returns TRUE if the value is an even integer, or FALSE if the value is odd.                                    | ISEVEN(Value)    |
-| ISFORMULA    | Checks whether referenced cell is a formula.                                                                   | ISFORMULA(Value) |
-| ISLOGICAL    | Tests for a logical value (TRUE or FALSE).                                                                     | ISLOGICAL(Value) |
-| ISNA         | Returns TRUE if the value is #N/A! error.                                                                      | ISNA(Value)      |
-| ISNONTEXT    | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text.                    | ISNONTEXT(Value) |
-| ISNUMBER     | Returns TRUE if the value refers to a number.                                                                  | ISNUMBER(Value)  |
-| ISODD        | Returns TRUE if the value is odd, or FALSE if the number is even.                                              | ISODD(Value)     |
-| ISREF        | Returns TRUE if provided value is #REF! error.                                                                 | ISREF(Value)     |
-| ISTEXT       | Returns TRUE if the cell contents refer to text.                                                               | ISTEXT(Value)    |
-| SHEET        | Returns sheet number of a given value or a formula sheet number if no argument is provided.                    | SHEET([Value])   |
-| SHEETS       | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value])  |
-| NA           | Returns #N/A! error value.                                                                                     | NA(Value)        |
+| Function ID | Description                                                                                                    | Syntax           |
+| :---------- | :------------------------------------------------------------------------------------------------------------- | :--------------- |
+| ISBINARY    | Returns TRUE if provided value is a valid binary number.                                                       | ISBINARY(Value)  |
+| ISBLANK     | Returns TRUE if the reference to a cell is blank.                                                              | ISBLANK(Value)   |
+| ISERR       | Returns TRUE if the value is error value except #N/A!.                                                         | ISERR(Value)     |
+| ISERROR     | Returns TRUE if the value is general error value.                                                              | ISERROR(Value)   |
+| ISEVEN      | Returns TRUE if the value is an even integer, or FALSE if the value is odd.                                    | ISEVEN(Value)    |
+| ISFORMULA   | Checks whether referenced cell is a formula.                                                                   | ISFORMULA(Value) |
+| ISLOGICAL   | Tests for a logical value (TRUE or FALSE).                                                                     | ISLOGICAL(Value) |
+| ISNA        | Returns TRUE if the value is #N/A! error.                                                                      | ISNA(Value)      |
+| ISNONTEXT   | Tests if the cell contents are text or numbers, and returns FALSE if the contents are text.                    | ISNONTEXT(Value) |
+| ISNUMBER    | Returns TRUE if the value refers to a number.                                                                  | ISNUMBER(Value)  |
+| ISODD       | Returns TRUE if the value is odd, or FALSE if the number is even.                                              | ISODD(Value)     |
+| ISREF       | Returns TRUE if provided value is #REF! error.                                                                 | ISREF(Value)     |
+| ISTEXT      | Returns TRUE if the cell contents refer to text.                                                               | ISTEXT(Value)    |
+| SHEET       | Returns sheet number of a given value or a formula sheet number if no argument is provided.                    | SHEET([Value])   |
+| SHEETS      | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value])  |
+| NA          | Returns #N/A! error value.                                                                                     | NA(Value)        |
 
 ### Financial
 
-| Function ID  | Description                                                                                                                | Syntax                                     |
-|:-------------|:---------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------|
-| CUMIPMT      | Returns the cumulative interest paid on a loan between a start period and an end period.                                   | CUMIPMT(Rate, Nper, Pv, Start, End, type)  |
-| CUMPRINC     | Returns the cumulative principal paid on a loan between a start period and an end period.                                  | CUMPRINC(Rate, Nper, Pv, Start, End, Type) |
-| DB           | Returns the depreciation of an asset for a period using the fixed-declining balance method.                                | DB(Cost, Salvage, Life, Period[, Month])   |
-| DDB          | Returns the depreciation of an asset for a period using the double-declining balance method.                               | DDB(Cost, Salvage, Life, Period[, Factor]) |
-| DOLLARDE     | Converts a price entered with a special notation to a price displayed as a decimal number.                                 | DOLLARDE(Price, Fraction)                  |
-| DOLLARFR     | Converts a price displayed as a decimal number to a price entered with a special notation.                                 | DOLLARFR(Price, Fraction)                  |
-| EFFECT       | Calculates the effective annual interest rate from a nominal interest rate and the number of compounding periods per year. | EFFECT (Nominal_rate, Npery)               |
-| FV           | Returns the future value of an investment.                                                                                 | FV(Rate, Nper, Pmt[, Pv,[ Type]])          |
-| FVSCHEDULE   | Returns the future value of an investment based on a rate schedule.                                                        | FV(Pv, Schedule)                           |
-| IPMT         | Returns the interest portion of a given loan payment in a given payment period.                                            | IPMT(Rate, Per, Nper, Pv[, Fv[, Type]])    |
-| ISPMT        | Returns the interest paid for a given period of an investment with equal principal payments.                               | ISPMT(Rate, Per, Nper, Value)              |
-| MIRR         | Returns modified internal value for cashflows.                                                                             | MIRR(Flows, FRate, RRate)                  |
-| NOMINAL      | Returns the nominal interest rate.                                                                                         | NOMINAL(Effect_rate, Npery)                |
-| NPER         | Returns the number of periods for an investment assuming periodic, constant payments and a constant interest rate.         | NPER(Rate, Pmt, Pv[, Fv[, Type]])          |
-| NPV          | Returns net present value.                                                                                                 | NPV(Rate, Value1, ..., Value30)            |
-| PDURATION    | Returns number of periods to reach specific value.                                                                         | PDURATION(Rate, Pv, Fv)                    |
-| PMT          | Returns the periodic payment for a loan.                                                                                   | PMT(Rate, Nper, Pv[, Fv[, Type]])          |
-| PPMT         | Calculates the principal portion of a given loan payment.                                                                  | PPMT(Rate, Per, Nper, Pv[, Fv[, Type]])    |
-| PV           | Returns the present value of an investment.                                                                                | PV(Rate, Nper, Pmt[, Fv[, Type]])          |
-| RATE         | Returns the interest rate per period of an annuity.                                                                        | RATE(Nper, Pmt, Pv[, Fv[, Type[, guess]]]) |
-| RRI          | Returns an equivalent interest rate for the growth of an investment.                                                       | RRI(Nper, Pv, Fv)                          |
-| SLN          | Returns the depreciation of an asset for one period, based on a straight-line method.                                      | SLN(Cost, Salvage, Life)                   |
-| SYD          | Returns the "sum-of-years" depreciation for an asset in a period.                                                          | SYD(Cost, Salvage, Life, Period)           |
-| TBILLEQ      | Returns the bond-equivalent yield for a Treasury bill.                                                                     | TBILLEQ(Settlement, Maturity, Discount)    |
-| TBILLPRICE   | Returns the price per $100 face value for a Treasury bill.                                                                 | TBILLPRICE(Settlement, Maturity, Discount) |
-| TBILLYIELD   | Returns the yield for a Treasury bill.                                                                                     | TBILLYIELD(Settlement, Maturity, Price)    |
-| XNPV         | Returns net present value.                                                                                                 | XNPV(Rate, Payments, Dates)                |
+| Function ID | Description                                                                                                                | Syntax                                     |
+| :---------- | :------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |
+| CUMIPMT     | Returns the cumulative interest paid on a loan between a start period and an end period.                                   | CUMIPMT(Rate, Nper, Pv, Start, End, type)  |
+| CUMPRINC    | Returns the cumulative principal paid on a loan between a start period and an end period.                                  | CUMPRINC(Rate, Nper, Pv, Start, End, Type) |
+| DB          | Returns the depreciation of an asset for a period using the fixed-declining balance method.                                | DB(Cost, Salvage, Life, Period[, Month])   |
+| DDB         | Returns the depreciation of an asset for a period using the double-declining balance method.                               | DDB(Cost, Salvage, Life, Period[, Factor]) |
+| DOLLARDE    | Converts a price entered with a special notation to a price displayed as a decimal number.                                 | DOLLARDE(Price, Fraction)                  |
+| DOLLARFR    | Converts a price displayed as a decimal number to a price entered with a special notation.                                 | DOLLARFR(Price, Fraction)                  |
+| EFFECT      | Calculates the effective annual interest rate from a nominal interest rate and the number of compounding periods per year. | EFFECT (Nominal_rate, Npery)               |
+| FV          | Returns the future value of an investment.                                                                                 | FV(Rate, Nper, Pmt[, Pv,[ Type]])          |
+| FVSCHEDULE  | Returns the future value of an investment based on a rate schedule.                                                        | FV(Pv, Schedule)                           |
+| IPMT        | Returns the interest portion of a given loan payment in a given payment period.                                            | IPMT(Rate, Per, Nper, Pv[, Fv[, Type]])    |
+| ISPMT       | Returns the interest paid for a given period of an investment with equal principal payments.                               | ISPMT(Rate, Per, Nper, Value)              |
+| MIRR        | Returns modified internal value for cashflows.                                                                             | MIRR(Flows, FRate, RRate)                  |
+| NOMINAL     | Returns the nominal interest rate.                                                                                         | NOMINAL(Effect_rate, Npery)                |
+| NPER        | Returns the number of periods for an investment assuming periodic, constant payments and a constant interest rate.         | NPER(Rate, Pmt, Pv[, Fv[, Type]])          |
+| NPV         | Returns net present value.                                                                                                 | NPV(Rate, Value1, ..., Value30)            |
+| PDURATION   | Returns number of periods to reach specific value.                                                                         | PDURATION(Rate, Pv, Fv)                    |
+| PMT         | Returns the periodic payment for a loan.                                                                                   | PMT(Rate, Nper, Pv[, Fv[, Type]])          |
+| PPMT        | Calculates the principal portion of a given loan payment.                                                                  | PPMT(Rate, Per, Nper, Pv[, Fv[, Type]])    |
+| PV          | Returns the present value of an investment.                                                                                | PV(Rate, Nper, Pmt[, Fv[, Type]])          |
+| RATE        | Returns the interest rate per period of an annuity.                                                                        | RATE(Nper, Pmt, Pv[, Fv[, Type[, guess]]]) |
+| RRI         | Returns an equivalent interest rate for the growth of an investment.                                                       | RRI(Nper, Pv, Fv)                          |
+| SLN         | Returns the depreciation of an asset for one period, based on a straight-line method.                                      | SLN(Cost, Salvage, Life)                   |
+| SYD         | Returns the "sum-of-years" depreciation for an asset in a period.                                                          | SYD(Cost, Salvage, Life, Period)           |
+| TBILLEQ     | Returns the bond-equivalent yield for a Treasury bill.                                                                     | TBILLEQ(Settlement, Maturity, Discount)    |
+| TBILLPRICE  | Returns the price per $100 face value for a Treasury bill.                                                                 | TBILLPRICE(Settlement, Maturity, Discount) |
+| TBILLYIELD  | Returns the yield for a Treasury bill.                                                                                     | TBILLYIELD(Settlement, Maturity, Price)    |
+| XNPV        | Returns net present value.                                                                                                 | XNPV(Rate, Payments, Dates)                |
 
 ### Logical
 
-| Function ID  | Description                                                                                                                      | Syntax                                                                         |
-|:-------------|:---------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------|
-| AND          | Returns TRUE if all arguments are TRUE.                                                                                          | AND(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                            |
-| FALSE        | Returns the logical value FALSE.                                                                                                 | FALSE()                                                                        |
-| IF           | Specifies a logical test to be performed.                                                                                        | IF(Test, Then value, Otherwisevalue)                                           |
-| IFNA         | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value, Alternate_value)                                                   |
-| IFERROR      | Returns the value if the cell does not contains an error value, or the alternative value if it does.                             | IFERROR(Value, Alternate_value)                                                |
-| NOT          | Complements (inverts) a logical value.                                                                                           | NOT(Logicalvalue)                                                              |
-| SWITCH       | Evaluates a list of arguments, consisting of an expression followed by a value.                                                  | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]]) |
-| OR           | Returns TRUE if at least one argument is TRUE.                                                                                   | OR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                             |
-| TRUE         | The logical value is set to TRUE.                                                                                                | TRUE()                                                                         |
-| XOR          | Returns true if an odd number of arguments evaluates to TRUE.                                                                    | XOR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                            |
+| Function ID | Description                                                                                                                      | Syntax                                                                         |
+| :---------- | :------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
+| AND         | Returns TRUE if all arguments are TRUE.                                                                                          | AND(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                            |
+| FALSE       | Returns the logical value FALSE.                                                                                                 | FALSE()                                                                        |
+| IF          | Specifies a logical test to be performed.                                                                                        | IF(Test, Then value, Otherwisevalue)                                           |
+| IFNA        | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value, Alternate_value)                                                   |
+| IFERROR     | Returns the value if the cell does not contains an error value, or the alternative value if it does.                             | IFERROR(Value, Alternate_value)                                                |
+| NOT         | Complements (inverts) a logical value.                                                                                           | NOT(Logicalvalue)                                                              |
+| SWITCH      | Evaluates a list of arguments, consisting of an expression followed by a value.                                                  | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]]) |
+| OR          | Returns TRUE if at least one argument is TRUE.                                                                                   | OR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                             |
+| TRUE        | The logical value is set to TRUE.                                                                                                | TRUE()                                                                         |
+| XOR         | Returns true if an odd number of arguments evaluates to TRUE.                                                                    | XOR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                            |
 
 ### Lookup and reference
 
 | Function ID | Description                                                                                                         | Syntax                                              |
-|:------------|:--------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------|
+| :---------- | :------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------- |
 | CHOOSE      | Uses an index to return a value from a list of up to 30 values.                                                     | CHOOSE(Index, Value1, ..., Value30)                 |
 | COLUMN      | Returns column number of a given reference or formula reference if argument not provided.                           | COLUMNS([Reference])                                |
 | COLUMNS     | Returns the number of columns in the given reference.                                                               | COLUMNS(Array)                                      |
@@ -235,7 +238,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Math and trigonometry
 
 | Function ID     | Description                                                                                                   | Syntax                                                                                      |
-|:----------------|:--------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------|
+| :-------------- | :------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------ |
 | ABS             | Returns the absolute value of a number.                                                                       | ABS(Number)                                                                                 |
 | ACOS            | Returns the inverse trigonometric cosine of a number.                                                         | ACOS(Number)                                                                                |
 | ACOSH           | Returns the inverse hyperbolic cosine of a number.                                                            | ACOSH(Number)                                                                               |
@@ -314,17 +317,17 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 ### Matrix functions
 
-| Function ID  | Description                                                                                                 | Syntax                                 |
-|:-------------|:------------------------------------------------------------------------------------------------------------|:---------------------------------------|
-| MMULT        | Calculates the array product of two arrays.                                                                 | MMULT(Array, Array)                    |
-| MEDIANPOOL   | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element.  | MEDIANPOOL(Range, Window_size, Stride) |
-| MAXPOOL      | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride)    |
-| TRANSPOSE    | Transposes the rows and columns of an array.                                                                | TRANSPOSE(Array)                       |
+| Function ID | Description                                                                                                 | Syntax                                 |
+| :---------- | :---------------------------------------------------------------------------------------------------------- | :------------------------------------- |
+| MMULT       | Calculates the array product of two arrays.                                                                 | MMULT(Array, Array)                    |
+| MEDIANPOOL  | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element.  | MEDIANPOOL(Range, Window_size, Stride) |
+| MAXPOOL     | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride)    |
+| TRANSPOSE   | Transposes the rows and columns of an array.                                                                | TRANSPOSE(Array)                       |
 
 ### Operator
 
 | Function ID      | Description                                  | Syntax                      |
-|:-----------------|:---------------------------------------------|:----------------------------|
+| :--------------- | :------------------------------------------- | :-------------------------- |
 | HF.ADD           | Adds two values.                             | HF.ADD(Number, Number)      |
 | HF.CONCAT        | Concatenates two strings.                    | HF.CONCAT(String, String)   |
 | HF.DIVIDE        | Divides two values.                          | HF.DIVIDE(Number, Number)   |
@@ -344,7 +347,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Statistical
 
 | Function ID     | Description                                                                                               | Syntax                                                                                      |
-|:----------------|:----------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------|
+| :-------------- | :-------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
 | AVEDEV          | Returns the average deviation of the arguments.                                                           | AVEDEV(Number1, Number2, ...Number30)                                                       |
 | AVERAGE         | Returns the average of the arguments.                                                                     | AVERAGE(Number1, Number2, ...Number30)                                                      |
 | AVERAGEA        | Returns the average of the arguments.                                                                     | AVERAGEA(Value1, Value2, ... Value30)                                                       |
@@ -482,30 +485,34 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 ### Text
 
-| Function ID | Description                                                                                                                                                                                                                                                                                                                          | Syntax                                             |
-|:------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------|
-| CHAR        | Converts a number into a character according to the current code table.                                                                                                                                                                                                                                                              | CHAR(Number)                                       |
-| CLEAN       | Returns text that has been "cleaned" of line breaks and other non-printable characters.                                                                                                                                                                                                                                              | CLEAN("Text")                                      |
-| CODE        | Returns a numeric code for the first character in a text string.                                                                                                                                                                                                                                                                     | CODE("Text")                                       |
-| CONCATENATE | Combines several text strings into one string.                                                                                                                                                                                                                                                                                       | CONCATENATE("Text1", ..., "Text30")                |
-| EXACT       | Returns TRUE if both text strings are exactly the same.                                                                                                                                                                                                                                                                              | EXACT(Text, Text)                                  |
-| FIND        | Returns the location of one text string inside another.                                                                                                                                                                                                                                                                              | FIND( "Text1", "Text2"[, Number])                  |
-| LEFT        | Extracts a given number of characters from the left side of a text string.                                                                                                                                                                                                                                                           | LEFT("Text", Number)                               |
-| LEN         | Returns length of a given text.                                                                                                                                                                                                                                                                                                      | LEN("Text")                                        |
-| LOWER       | Returns text converted to lowercase.                                                                                                                                                                                                                                                                                                 | LOWER(Text)                                        |
-| MID         | Returns substring of a given length starting from Start_position.                                                                                                                                                                                                                                                                    | MID(Text, Start_position, Length)                  |
-| PROPER      | Capitalizes words given text string.                                                                                                                                                                                                                                                                                                 | PROPER("Text")                                     |
-| REPLACE     | Replaces substring of a text of a given length that starts at given position.                                                                                                                                                                                                                                                        | REPLACE(Text, Start_position, Length, New_text)    |
-| REPT        | Repeats text a given number of times.                                                                                                                                                                                                                                                                                                | REPT("Text", Number)                               |
-| RIGHT       | Extracts a given number of characters from the right side of a text string.                                                                                                                                                                                                                                                          | RIGHT("Text", Number)                              |
-| SEARCH      | Returns the location of one text string inside another. (Allows the use of wildcards.)                                                                                                                                                                                                                                               | SEARCH( "Text1", "Text2"[, Number])                |
-| SPLIT       | Divides the provided text using the space character as a separator and returns the substring at the zero-based position specified by the second argument.<br>```SPLIT("Lorem ipsum", 0) -> "Lorem"```<br>```SPLIT("Lorem ipsum", 1) -> "ipsum"```                                                                                    | SPLIT(Text, Index)                                 |
-| SUBSTITUTE  | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.                                                                                                                                                                                              | SUBSTITUTE(Text, Old_text, New_text, [Occurrence]) |
-| T           | Returns text if given value is text, empty string otherwise.                                                                                                                                                                                                                                                                         | T(Value)                                           |
-| TEXT        | Converts a number into text according to a given format.<br/>By default, it accepts the same formats as can be passed to the [dateFormats array](../api/interfaces/configparams.md#dateformats) and can be further customized by implementing the [stringifyDateTime](../api/interfaces/configparams.md#stringifydatetime) function. | TEXT(Number, Format)                               |
-| TRIM        | Strips extra spaces from text.                                                                                                                                                                                                                                                                                                       | TRIM("Text")                                       |
-| UNICHAR     | Returns the character created by using provided code point.                                                                                                                                                                                                                                                                          | UNICHAR(Number)                                    |
-| UNICODE     | Returns the Unicode code point of a first character of a text.                                                                                                                                                                                                                                                                       | UNICODE(Text)                                      |
-| UPPER       | Returns text converted to uppercase.                                                                                                                                                                                                                                                                                                 | UPPER(Text)                                        |
+| Function ID | Description                                                                                                                                                                                                                                                                                                                     | Syntax                                             |
+| :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------- |
+| CHAR        | Converts a number into a character according to the current code table.                                                                                                                                                                                                                                                         | CHAR(Number)                                       |
+| CLEAN       | Returns text that has been "cleaned" of line breaks and other non-printable characters.                                                                                                                                                                                                                                         | CLEAN("Text")                                      |
+| CODE        | Returns a numeric code for the first character in a text string.                                                                                                                                                                                                                                                                | CODE("Text")                                       |
+| CONCATENATE | Combines several text strings into one string.                                                                                                                                                                                                                                                                                  | CONCATENATE("Text1", ..., "Text30")                |
+| EXACT       | Returns TRUE if both text strings are exactly the same.                                                                                                                                                                                                                                                                         | EXACT(Text, Text)                                  |
+| FIND        | Returns the location of one text string inside another.                                                                                                                                                                                                                                                                         | FIND( "Text1", "Text2"[, Number])                  |
+| LEFT        | Extracts a given number of characters from the left side of a text string.                                                                                                                                                                                                                                                      | LEFT("Text", Number)                               |
+| LEN         | Returns length of a given text.                                                                                                                                                                                                                                                                                                 | LEN("Text")                                        |
+| LOWER       | Returns text converted to lowercase.                                                                                                                                                                                                                                                                                            | LOWER(Text)                                        |
+| MID         | Returns substring of a given length starting from Start_position.                                                                                                                                                                                                                                                               | MID(Text, Start_position, Length)                  |
+| PROPER      | Capitalizes words given text string.                                                                                                                                                                                                                                                                                            | PROPER("Text")                                     |
+| REPLACE     | Replaces substring of a text of a given length that starts at given position.                                                                                                                                                                                                                                                   | REPLACE(Text, Start_position, Length, New_text)    |
+| REPT        | Repeats text a given number of times.                                                                                                                                                                                                                                                                                           | REPT("Text", Number)                               |
+| RIGHT       | Extracts a given number of characters from the right side of a text string.                                                                                                                                                                                                                                                     | RIGHT("Text", Number)                              |
+| SEARCH      | Returns the location of one text string inside another. (Allows the use of wildcards.)                                                                                                                                                                                                                                          | SEARCH( "Text1", "Text2"[, Number])                |
+| SPLIT       | Divides the provided text using the space character as a separator and returns the substring at the zero-based position specified by the second argument.<br>`SPLIT("Lorem ipsum", 0) -> "Lorem"`<br>`SPLIT("Lorem ipsum", 1) -> "ipsum"`                                                                                       | SPLIT(Text, Index)                                 |
+| SUBSTITUTE  | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.                                                                                                                                                                                         | SUBSTITUTE(Text, Old_text, New_text, [Occurrence]) |
+| T           | Returns text if given value is text, empty string otherwise.                                                                                                                                                                                                                                                                    | T(Value)                                           |
+| TEXT        | Converts a number into text according to a given format.<br><br>By default, accepts the same formats that can be passed to the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option, but can be further customized with the [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) option. | TEXT(Number, Format)                               |
+| TRIM        | Strips extra spaces from text.                                                                                                                                                                                                                                                                                                  | TRIM("Text")                                       |
+| UNICHAR     | Returns the character created by using provided code point.                                                                                                                                                                                                                                                                     | UNICHAR(Number)                                    |
+| UNICODE     | Returns the Unicode code point of a first character of a text.                                                                                                                                                                                                                                                                  | UNICODE(Text)                                      |
+| UPPER       | Returns text converted to uppercase.                                                                                                                                                                                                                                                                                            | UPPER(Text)                                        |
 
-[^non-odff]: The return value of this function is compliant with the [OpenDocument standard](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html), but the return type is not. See [compatibility notes](list-of-differences.md).
+[^non-odff]:
+    The return value of this function is compliant with the
+    [OpenDocument standard](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html),
+    but the return type is not. See
+    [compatibility notes](list-of-differences.md).
