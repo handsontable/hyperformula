@@ -134,7 +134,7 @@ export class SimpleRangeValue {
   /**
    * Generates values and addresses of the cells contained in the range assuming the provided address is the left corner of the range.
    *
-   * This method combines the functionalities of [`iterateValuesFromTopLeftCorner()`](#iteratevaluesfromtopleftcorner) and [`effectiveAddressesFromData()`](http://localhost:8080/api/classes/simplerangevalue.html#effectiveaddressesfromdata).
+   * This method combines the functionalities of [`iterateValuesFromTopLeftCorner()`](#iteratevaluesfromtopleftcorner) and [`effectiveAddressesFromData()`](#effectiveaddressesfromdata).
    */
   public* entriesFromTopLeftCorner(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     this.ensureThatComputed()

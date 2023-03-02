@@ -34,7 +34,7 @@ follows:
 
 ## Naming rules
 
-Expression names are case-insensitive, but they:
+Expression names are case-insensitive, and they:
 
 - Must start with a Unicode letter or with an underscore (`_`).
 - Can contain only Unicode letters, numbers, underscores, and periods (`.`).
@@ -59,7 +59,7 @@ hfInstance.addNamedExpression('MyRevenue', '=Sheet2!$A$1+100', 1);
 
 :::
 
-See the following table for examples of valid and invalid expression names:
+For examples of valid and invalid expression names, see the following table:
 
 | Name         | Validity |
 | :----------- | :------- |
