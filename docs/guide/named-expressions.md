@@ -68,7 +68,7 @@ For examples of valid and invalid expression names, see the following table:
 | quarter1     | Invalid  |
 | quarter_1    | Valid    |
 | 1stQuarter   | Invalid  |
-| \_1stQuarter | Valid    |
+| _1stQuarter | Valid    |
 | .NET         | Invalid  |
 | ASP.NET      | Valid    |
 | A1           | Invalid  |
