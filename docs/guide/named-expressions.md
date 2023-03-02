@@ -37,8 +37,7 @@ follows:
 Expression names are case-insensitive, but they:
 
 - Must start with a Unicode letter or with an underscore (`_`).
-- Can contain only Unicode letters, numbers, underscores (`_`), and periods
-  (`.`).
+- Can contain only Unicode letters, numbers, underscores, and periods (`.`).
 - Can't be the same as any possible reference in the A1 notation (for example,
   `Q4` or `YEAR2023`).
 - Can't be the same as any possible reference in the R1C1 notation (for example,
@@ -48,7 +47,7 @@ Expression names are case-insensitive, but they:
 ::: tip
 
 Expression names must be unique within a given scope, but you can override a
-global named-expression with a local one.
+global named-expression with a local one. For example:
 
 ```javascript
 // `MyRevenue` has to be unique within the global scope
@@ -143,7 +142,7 @@ You can retrieve a whole list of named expressions by using the
 expressions as an array of strings.
 
 ```javascript
-// get all named expression names
+// get all named-expression names
 const listOfExpressions = hfInstance.listNamedExpressions();
 ```
 

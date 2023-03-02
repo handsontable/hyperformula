@@ -3554,9 +3554,9 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named expression name is not available.
-   * @throws [[NamedExpressionNameIsInvalidError]] when the named expression name is not valid
-   * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named-expression name is not available.
+   * @throws [[NamedExpressionNameIsInvalidError]] when the named-expression name is not valid
+   * @throws [[NoRelativeAddressesAllowedError]] when the named-expression formula contains relative references
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    *
    * @example

@@ -103,7 +103,7 @@ describe('Events', () => {
     }).toThrow(new NamedExpressionDoesNotExistError('myName'))
   })
 
-  it('namedExpressionRemoved contains actual named expression name', () => {
+  it('namedExpressionRemoved contains an actual named-expression name', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jasmine.createSpy()

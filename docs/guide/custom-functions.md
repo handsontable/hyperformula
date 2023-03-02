@@ -103,7 +103,7 @@ Wrap your implementation in the built-in `runFunction()` method, which:
   [`parameters` array](#argument-validation-options).
 - Validates the arguments of your custom function against the
   [argument validation options](#argument-validation-options).
-- Duplicates the arguments according to
+- Duplicates the arguments according to the
   [`repeatLastArgs` option](#function-options).
 - Handles the [array arithmetic mode](arrays.md#array-arithmetic-mode).
 - Performs

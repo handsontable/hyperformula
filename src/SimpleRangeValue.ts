@@ -16,18 +16,19 @@ import {InternalScalarValue, isExtendedNumber} from './interpreter/InterpreterVa
 export class SimpleRangeValue {
 
   /**
-   * A property representing the size of the range.
+   * A property that represents the size of the range.
    */
   public readonly size: ArraySize
 
   /**
-   * In most cases it's more convenient to create a SimpleRangeValue object by calling one of the static factory methods.
+   * In most cases, it's more convenient to create a `SimpleRangeValue` object
+   * by calling one of the [static factory methods](#fromrange).
    */
   constructor(
     private _data?: InternalScalarValue[][],
 
     /**
-     * A property representing the address of the range.
+     * A property that represents the address of the range.
      */
     public readonly range?: AbsoluteCellRange,
     private readonly dependencyGraph?: DependencyGraph,
@@ -39,7 +40,7 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Returns the range data as a 2D-array.
+   * Returns the range data as a 2D array.
    */
   public get data(): InternalScalarValue[][] {
     this.ensureThatComputed()
@@ -47,42 +48,42 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Factory method. Returns a SimpleRangeValue object with address and provided data.
+   * A factory method. Returns a `SimpleRangeValue` object with the provided range address and the provided data.
    */
   public static fromRange(data: InternalScalarValue[][], range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(data, range, dependencyGraph, true)
   }
 
   /**
-   * Factory method. Returns a SimpleRangeValue object with provided numeric data.
+   * A factory method. Returns a `SimpleRangeValue` object with the provided numeric data.
    */
   public static onlyNumbers(data: number[][]): SimpleRangeValue {
     return new SimpleRangeValue(data, undefined, undefined, true)
   }
 
   /**
-   * Factory method. Returns a SimpleRangeValue object with provided data.
+   * A factory method. Returns a `SimpleRangeValue` object with the provided data.
    */
   public static onlyValues(data: InternalScalarValue[][]): SimpleRangeValue {
     return new SimpleRangeValue(data, undefined, undefined, undefined)
   }
 
   /**
-   * Factory method. Returns a SimpleRangeValue object with address.
+   * A factory method. Returns a `SimpleRangeValue` object with the provided range address.
    */
   public static onlyRange(range: AbsoluteCellRange, dependencyGraph: DependencyGraph): SimpleRangeValue {
     return new SimpleRangeValue(undefined, range, dependencyGraph, undefined)
   }
 
   /**
-   * Factory method. Returns a SimpleRangeValue object containing the single value.
+   * A factory method. Returns a `SimpleRangeValue` object that contains a single value.
    */
   public static fromScalar(scalar: InternalScalarValue): SimpleRangeValue {
     return new SimpleRangeValue([[scalar]], undefined, undefined, undefined)
   }
 
   /**
-   * Returns true if and only if the SimpleRangeValue has no address set.
+   * Returns `true` if and only if the `SimpleRangeValue` has no address set.
    */
   public isAdHoc(): boolean {
     return this.range === undefined
@@ -103,7 +104,7 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Returns the range data as a 1D-array.
+   * Returns the range data as a 1D array.
    */
   public valuesFromTopLeftCorner(): InternalScalarValue[] {
     this.ensureThatComputed()
@@ -131,9 +132,9 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Generates both values and addresses of the cells contained in the range assuming the provided address is the left corner of the range.
+   * Generates values and addresses of the cells contained in the range assuming the provided address is the left corner of the range.
    *
-   * This method combines the functionalities of `iterateValuesFromTopLeftCorner` and `effectiveAddressesFromData`.
+   * This method combines the functionalities of [`iterateValuesFromTopLeftCorner()`](#iteratevaluesfromtopleftcorner) and [`effectiveAddressesFromData()`](http://localhost:8080/api/classes/simplerangevalue.html#effectiveaddressesfromdata).
    */
   public* entriesFromTopLeftCorner(leftCorner: SimpleCellAddress): IterableIterator<[InternalScalarValue, SimpleCellAddress]> {
     this.ensureThatComputed()
@@ -159,7 +160,7 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Returns true if and only if the range contains only numeric values.
+   * Returns `true` if and only if the range contains only numeric values.
    */
   public hasOnlyNumbers(): boolean {
     if (this._hasOnlyNumbers === undefined) {
@@ -178,7 +179,7 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Returns the range data as a 2D-array of numbers.
+   * Returns the range data as a 2D array of numbers.
    *
    * Internal use only.
    */
@@ -188,7 +189,7 @@ export class SimpleRangeValue {
 
 
   /**
-   * Returns the range data as a 2D-array.
+   * Returns the range data as a 2D array.
    *
    * Internal use only.
    */
@@ -198,7 +199,7 @@ export class SimpleRangeValue {
   }
 
   /**
-   * Returns true if and only if the range has the same width and height as the provided range object.
+   * Returns `true` if and only if the range has the same width and height as the `other` range object.
    */
   public sameDimensionsAs(other: SimpleRangeValue): boolean {
     return this.width() === other.width() && this.height() === other.height()
