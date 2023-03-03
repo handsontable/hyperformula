@@ -8,7 +8,7 @@ HyperFormula adheres to
 
 ## 2.3.1
 
-**Release date: March 2, 2023**
+**Release date: March 3, 2023**
 
 ### Fixed
 
