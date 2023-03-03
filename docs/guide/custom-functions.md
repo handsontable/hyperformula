@@ -51,7 +51,8 @@ MyCustomPlugin.implementedFunctions = {
 };
 ```
 
-::: tip To define multiple functions in a single function plugin, add them all
+::: tip
+To define multiple functions in a single function plugin, add them all
 to the `implementedFunctions` object.
 
 ```js
@@ -64,7 +65,6 @@ MyCustomPlugin.implementedFunctions = {
   },
 };
 ```
-
 :::
 
 ### 3. Add your function's names
@@ -302,9 +302,11 @@ if (rangeData.some((row) => row.some((val) => typeof rawValue !== 'number'))) {
 }
 ```
 
-::: tip All HyperFormula [error types](types-of-errors.md) support optional
+::: tip
+All HyperFormula [error types](types-of-errors.md) support optional
 custom error messages. Put them to good use: let your users know what caused the
-error and how to avoid it in the future. :::
+error and how to avoid it in the future.
+:::
 
 ### Test your function
 
@@ -476,8 +478,10 @@ function's behavior depends on the number of valid arguments passed), use the
 You can add translations of your function's name in multiple languages. Your end
 users use the translated names to call your function inside formulas.
 
-::: tip If you support just one language, you still need to define the name of
-your function in that language. :::
+::: tip
+If you support just one language, you still need to define the name of
+your function in that language.
+:::
 
 In a separate object, define the translations of your custom functions' names in
 every language you want to support. Function names are case-insensitive, as they
@@ -500,8 +504,10 @@ export const MyCustomPluginTranslations = {
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
-::: tip Before using a translated function name, remember to
-[register and set the language](localizing-functions.md). :::
+::: tip
+Before using a translated function name, remember to
+[register and set the language](localizing-functions.md).
+:::
 
 ## Function aliases
 
@@ -517,7 +523,8 @@ MyCustomPlugin.aliases = {
 };
 ```
 
-::: tip For each alias of your function, define a translation, even if you want
+::: tip
+For each alias of your function, define a translation, even if you want
 to support only one language.
 
 ```js
@@ -528,5 +535,4 @@ MyCustomPlugin.translations = {
   },
 };
 ```
-
 :::
