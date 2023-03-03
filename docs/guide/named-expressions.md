@@ -45,7 +45,6 @@ Expression names are case-insensitive, and they:
 - Must be unique within a given scope.
 
 ::: tip
-
 Expression names must be unique within a given scope, but you can override a
 global named-expression with a local one. For example:
 
@@ -56,7 +55,6 @@ hfInstance.addNamedExpression('MyRevenue', '=SUM(100+10)');
 // but you can still use `MyRevenue` within the local scope of Sheet2 (sheetId = 1)
 hfInstance.addNamedExpression('MyRevenue', '=Sheet2!$A$1+100', 1);
 ```
-
 :::
 
 For examples of valid and invalid expression names, see the following table:
