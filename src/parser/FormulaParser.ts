@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {
@@ -77,7 +77,7 @@ import {
   ErrorLiteral,
   GreaterThanOp,
   GreaterThanOrEqualOp,
-  ILexerConfig,
+  LexerConfig,
   LessThanOp,
   LessThanOrEqualOp,
   LParen,
@@ -95,8 +95,6 @@ import {
   StringLiteral,
   TimesOp,
 } from './LexerConfig'
-import {RowAddress} from './RowAddress'
-import {ColumnAddress} from './ColumnAddress'
 import {AddressWithSheet} from './Address'
 
 export interface FormulaParserResult {
@@ -123,7 +121,7 @@ export interface FormulaParserResult {
  * P -> SUM(..) <br/>
  */
 export class FormulaParser extends EmbeddedActionsParser {
-  private lexerConfig: ILexerConfig
+  private lexerConfig: LexerConfig
 
   /**
    * Address of the cell in which formula is located
@@ -144,6 +142,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {ALT: EMPTY_ALT(buildEmptyArgAst())}
     ])
   })
+
   /**
    * Rule for procedure expressions: SUM(1,A1)
    */
@@ -172,10 +171,12 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as ExtendedToken
     return buildProcedureAst(canonicalProcedureName, args, procedureNameToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
+
   private namedExpressionExpression: AstRule = this.RULE('namedExpressionExpression', () => {
     const name = this.CONSUME(NamedExpression) as ExtendedToken
     return buildNamedExpressionAst(name.image, name.leadingWhitespace)
   })
+
   /**
    * Rule for OFFSET() function expression
    */
@@ -215,9 +216,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
-    const { start, end } = this.orderColumnRangeEnds(firstEnd, secondEnd)
 
-    return buildColumnRangeAst(start, end, sheetRefType, range.leadingWhitespace)
+    return buildColumnRangeAst(firstEnd, secondEnd, sheetRefType, range.leadingWhitespace)
   })
 
   /**
@@ -242,9 +242,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
-    const { start, end } = this.orderRowRangeEnds(firstEnd, secondEnd)
 
-    return buildRowRangeAst(start, end, sheetRefType, range.leadingWhitespace)
+    return buildRowRangeAst(firstEnd, secondEnd, sheetRefType, range.leadingWhitespace)
   })
 
   /**
@@ -263,6 +262,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       return buildCellReferenceAst(address, cell.leadingWhitespace)
     }
   })
+
   /**
    * Rule for end range reference expression with additional checks considering range start
    */
@@ -289,6 +289,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return this.buildCellRange(startAddress, endAddress, start.leadingWhitespace?.image)
   })
+
   /**
    * Rule for end of range expression
    *
@@ -319,6 +320,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ])
   })
+
   /**
    * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
    */
@@ -327,6 +329,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     this.CONSUME2(RangeSeparator)
     return this.SUBRULE(this.endOfRangeExpression, {ARGS: [start]})
   })
+
   /**
    * Rule for end range reference expression starting with offset procedure with additional checks considering range start
    */
@@ -345,6 +348,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return this.buildCellRange(start.reference, endAddress, start.leadingWhitespace)
   })
+
   /**
    * Rule for end of range expression
    *
@@ -369,6 +373,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ])
   })
+
   /**
    * Rule for expressions that start with the OFFSET function.
    *
@@ -396,6 +401,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return offsetProcedure
   })
+
   private insideArrayExpression: AstRule = this.RULE('insideArrayExpression', () => {
     const ret: Ast[][] = [[]]
     ret[ret.length - 1].push(this.SUBRULE(this.booleanExpression))
@@ -418,6 +424,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     })
     return buildArrayAst(ret)
   })
+
   /**
    * Rule for parenthesis expression
    */
@@ -427,6 +434,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const rParenToken = this.CONSUME(RParen) as ExtendedToken
     return buildParenthesisAst(expression, lParenToken.leadingWhitespace, rParenToken.leadingWhitespace)
   })
+
   private arrayExpression: AstRule = this.RULE('arrayExpression', () => {
     return this.OR([
       {
@@ -443,7 +451,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     ])
   })
 
-  constructor(lexerConfig: ILexerConfig, sheetMapping: SheetMappingFn) {
+  constructor(lexerConfig: LexerConfig, sheetMapping: SheetMappingFn) {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
     this.lexerConfig = lexerConfig
     this.sheetMapping = sheetMapping
@@ -454,8 +462,8 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Parses tokenized formula and builds abstract syntax tree
    *
-   * @param tokens - tokenized formula
-   * @param formulaAddress - address of the cell in which formula is located
+   * @param {ExtendedToken[]} tokens - tokenized formula
+   * @param {SimpleCellAddress} formulaAddress - address of the cell in which formula is located
    */
   public parseFromTokens(tokens: ExtendedToken[], formulaAddress: SimpleCellAddress): FormulaParserResult {
     this.input = tokens
@@ -550,6 +558,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ]))
   })
+
   private rightUnaryOpAtomicExpression: AstRule = this.RULE('rightUnaryOpAtomicExpression', () => {
     const positiveAtomicExpression = this.SUBRULE(this.positiveAtomicExpression)
 
@@ -563,6 +572,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return positiveAtomicExpression
   })
+
   /**
    * Rule for atomic expressions, which is positive atomic expression or negation of it
    */
@@ -587,6 +597,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       },
     ])
   })
+
   /**
    * Rule for power expression
    */
@@ -608,6 +619,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for multiplication category operators (e.g. 1 * A1, 1 / A1)
    */
@@ -631,6 +643,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for addition category operators (e.g. 1 + A1, 1 - A1)
    */
@@ -654,6 +667,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for concatenation operator expression (e.g. "=" & A1)
    */
@@ -668,6 +682,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Rule for boolean expression (e.g. 1 <= A1)
    */
@@ -699,6 +714,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
     return lhs
   })
+
   /**
    * Entry rule
    */
@@ -710,7 +726,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   /**
    * Entry rule wrapper that sets formula address
    *
-   * @param address - address of the cell in which formula is located
+   * @param {SimpleCellAddress} address - address of the cell in which formula is located
    */
   private formulaWithContext(address: SimpleCellAddress): Ast {
     this.formulaAddress = address
@@ -723,9 +739,8 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
 
     const { firstEnd, secondEnd, sheetRefType } = FormulaParser.fixSheetIdsForRangeEnds(firstAddress, secondAddress)
-    const { start, end } = this.orderCellRangeEnds(firstEnd, secondEnd)
 
-    return buildCellRangeAst(start, end, sheetRefType, leadingWhitespace)
+    return buildCellRangeAst(firstEnd, secondEnd, sheetRefType, leadingWhitespace)
   }
 
   private static fixSheetIdsForRangeEnds<T extends AddressWithSheet>(firstEnd: T, secondEnd: T): { firstEnd: T, secondEnd: T, sheetRefType: RangeSheetReferenceType } {
@@ -737,50 +752,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     return { firstEnd, secondEnd: secondEndFixed, sheetRefType }
   }
 
-  private orderCellRangeEnds(endA: CellAddress, endB: CellAddress): { start: CellAddress, end: CellAddress } {
-    const ends = [ endA, endB ]
-    const [ startCol, endCol ] = ends.map(e => e.toColumnAddress()).sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress))
-    const [ startRow, endRow ] = ends.map(e => e.toRowAddress()).sort(RowAddress.compareByAbsoluteAddress(this.formulaAddress))
-    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(FormulaParser.compareSheetIds.bind(this))
-
-    return {
-      start: CellAddress.fromColAndRow(startCol, startRow, startSheet),
-      end: CellAddress.fromColAndRow(endCol, endRow, endSheet),
-    }
-  }
-
-  private orderColumnRangeEnds(endA: ColumnAddress, endB: ColumnAddress): { start: ColumnAddress, end: ColumnAddress } {
-    const ends = [ endA, endB ]
-    const [ startCol, endCol ] = ends.sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress))
-    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(FormulaParser.compareSheetIds.bind(this))
-
-    return {
-      start: new ColumnAddress(startCol.type, startCol.col, startSheet),
-      end: new ColumnAddress(endCol.type, endCol.col, endSheet),
-    }
-  }
-
-  private orderRowRangeEnds(endA: RowAddress, endB: RowAddress): { start: RowAddress, end: RowAddress } {
-    const ends = [ endA, endB ]
-    const [ startRow, endRow ] = ends.sort(RowAddress.compareByAbsoluteAddress(this.formulaAddress))
-    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(FormulaParser.compareSheetIds.bind(this))
-
-    return {
-      start: new RowAddress(startRow.type, startRow.row, startSheet),
-      end: new RowAddress(endRow.type, endRow.row, endSheet),
-    }
-  }
-  
-  private static  compareSheetIds(sheetA: number | undefined, sheetB: number | undefined): number {
-    sheetA = sheetA != null ? sheetA : Infinity
-    sheetB = sheetB != null ? sheetB : Infinity
-    return sheetA - sheetB
-  }
-
   /**
    * Returns {@link CellReferenceAst} or {@link CellRangeAst} based on OFFSET function arguments
    *
-   * @param args - OFFSET function arguments
+   * @param {Ast[]} args - OFFSET function arguments
    */
   private handleOffsetHeuristic(args: Ast[]): Ast {
     const cellArg = args[0]
@@ -899,14 +874,14 @@ export interface ExtendedToken extends IToken {
 export class FormulaLexer {
   private readonly lexer: Lexer
 
-  constructor(private lexerConfig: ILexerConfig) {
+  constructor(private lexerConfig: LexerConfig) {
     this.lexer = new Lexer(lexerConfig.allTokens, {ensureOptimizations: true})
   }
 
   /**
    * Returns Lexer tokens from formula string
    *
-   * @param text - string representation of a formula
+   * @param {string} text - string representation of a formula
    */
   public tokenizeFormula(text: string): ILexingResult {
     const lexingResult = this.lexer.tokenize(text)

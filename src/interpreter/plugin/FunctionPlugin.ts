@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
@@ -355,99 +355,171 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
   }
 
+  /**
+   * A method that should wrap the logic of every built-in function and custom function. It:
+   * - Evaluates the function's arguments.
+   * - Validates the number of arguments against the [`parameters` array](#function-options).
+   * - Coerces the argument values to types set in the [`parameters` array](#argument-validation-options).
+   * - Handles optional arguments and default values according to options set in the [`parameters` array](#argument-validation-options).
+   * - Validates the function's arguments against the [argument validation options](#argument-validation-options).
+   * - Duplicates the arguments according to the [`repeatLastArgs` option](#function-options).
+   * - Handles the [array arithmetic mode](arrays.md#array-arithmetic-mode).
+   * - Performs [function vectorization](arrays.md#passing-arrays-to-scalar-functions-vectorization).
+   * - Performs [argument broadcasting](arrays.md#broadcasting).
+   */
   protected runFunction = (
     args: Ast[],
     state: InterpreterState,
     metadata: FunctionMetadata,
-    fn: (...arg: any) => InterpreterValue,
+    functionImplementation: (...arg: any) => InterpreterValue,
   ) => {
-    let argumentDefinitions: FunctionArgument[] = metadata.parameters || []
-    let argValues: [InterpreterValue, boolean][]
+    const evaluatedArguments: [InterpreterValue, boolean][] = this.evaluateArguments(args, state, metadata)
+    const argumentValues = evaluatedArguments.map(([value, _]) => value)
+    const argumentIgnorableFlags = evaluatedArguments.map(([_, ignorable]) => ignorable)
+    const argumentMetadata = this.buildMetadataForEachArgumentValue(argumentValues.length, metadata)
+    const isVectorizationOn = state.arraysFlag && !metadata.vectorizationForbidden
 
-    if (metadata.expandRanges) {
-      argValues = this.listOfScalarValues(args, state)
-    } else {
-      argValues = args.map((ast) => [this.evaluateAst(ast, state), false])
-    }
-
-    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < argValues.length) {
+    if (!this.isNumberOfArgumentValuesValid(argumentMetadata, argumentValues.length)) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < argValues.length &&
-      (argValues.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
-      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-    }
-    argumentDefinitions = [...argumentDefinitions]
-    while (argumentDefinitions.length < argValues.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
+
+    const [ resultArrayHeight, resultArrayWidth ] = isVectorizationOn ? this.calculateSizeOfVectorizedResultArray(argumentValues, argumentMetadata) : [ 1, 1 ]
+
+    if (resultArrayHeight === 1 && resultArrayWidth === 1) {
+      const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, 0, 0)
+      return this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
     }
 
-    let maxWidth = 1
-    let maxHeight = 1
-    if (!metadata.vectorizationForbidden && state.arraysFlag) {
-      for (let i = 0; i < argValues.length; i++) {
-        const [val] = argValues[i]
-        if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
-          maxHeight = Math.max(maxHeight, val.height())
-          maxWidth = Math.max(maxWidth, val.width())
+    const resultArray: InternalScalarValue[][] = [ ...Array(resultArrayHeight).keys() ].map(row =>
+      [ ...Array(resultArrayWidth).keys() ].map(col => {
+        const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, row, col)
+        const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
+
+        if (result instanceof SimpleRangeValue) {
+          throw new Error('Function returning array cannot be vectorized.')
         }
+
+        return result
+      })
+    )
+
+    return SimpleRangeValue.onlyValues(resultArray)
+  }
+
+  protected calculateSingleCellOfResultArray(
+    state: InterpreterState,
+    vectorizedArguments: Maybe<InterpreterValue>[],
+    argumentsMetadata: FunctionArgument[],
+    argumentIgnorableFlags: boolean[],
+    functionImplementation: (...arg: any) => InterpreterValue,
+    returnNumberType: NumberType | undefined,
+  ): InternalScalarValue | SimpleRangeValue {
+    const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags)
+
+    if (coercedArguments instanceof CellError) {
+      return coercedArguments
+    }
+
+    const functionCalculationResult = functionImplementation(...coercedArguments)
+    return this.returnNumberWrapper(functionCalculationResult, returnNumberType)
+  }
+
+  protected coerceArgumentsToRequiredTypes(
+    state: InterpreterState,
+    vectorizedArguments: Maybe<InterpreterValue>[],
+    argumentsMetadata: FunctionArgument[],
+    argumentIgnorableFlags: boolean[],
+  ):  CellError | Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] {
+    const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
+
+    for (let i = 0; i < argumentsMetadata.length; i++) {
+      const argumentMetadata = argumentsMetadata[i]
+      const argumentValue = vectorizedArguments[i] !== undefined ? vectorizedArguments[i] : argumentMetadata?.defaultValue
+
+      if (argumentValue === undefined) {
+        coercedArguments.push(undefined)
+        continue
+      }
+
+      const coercedValue = this.coerceToType(argumentValue, argumentMetadata, state)
+
+      if (coercedValue === undefined && !argumentIgnorableFlags[i]) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
+
+      if (coercedValue instanceof CellError && argumentMetadata.argumentType !== FunctionArgumentType.SCALAR) {
+        return coercedValue
+      }
+
+      coercedArguments.push(coercedValue)
+    }
+
+    return coercedArguments
+  }
+
+  protected vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn: boolean, argumentValues: InterpreterValue[], argumentMetadata: FunctionArgument[], row: number, col: number): Maybe<InterpreterValue>[] {
+    return argumentValues.map((value, i) =>
+      isVectorizationOn && this.isRangePassedAsAScalarArgument(value, argumentMetadata[i])
+        ? this.vectorizeAndBroadcastRangeArgument(value, row, col)
+        : value
+    )
+  }
+
+  protected vectorizeAndBroadcastRangeArgument(argumentValue: SimpleRangeValue, rowNum: number, colNum: number): Maybe<InterpreterValue> {
+    const targetRowNum = argumentValue.height() === 1 ? 0 : rowNum
+    const targetColNum = argumentValue.width() === 1 ? 0 : colNum
+
+    return argumentValue.data[targetRowNum]?.[targetColNum]
+  }
+
+  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean][] {
+    return metadata.expandRanges ? this.listOfScalarValues(args, state) : args.map((ast) => [this.evaluateAst(ast, state), false])
+  }
+
+  protected buildMetadataForEachArgumentValue(numberOfArgumentValuesPassed: number, metadata: FunctionMetadata): FunctionArgument[] {
+    const argumentsMetadata: FunctionArgument[] = metadata.parameters ? [ ...metadata.parameters ] : []
+    const isRepeatLastArgsValid = metadata.repeatLastArgs !== undefined && Number.isInteger(metadata.repeatLastArgs) && metadata.repeatLastArgs > 0
+
+    if (isRepeatLastArgsValid) {
+      while (numberOfArgumentValuesPassed > argumentsMetadata.length) {
+        argumentsMetadata.push(...argumentsMetadata.slice(argumentsMetadata.length - metadata.repeatLastArgs!))
       }
     }
 
-    for (let i = argValues.length; i < argumentDefinitions.length; i++) {
-      if (argumentDefinitions[i]?.defaultValue === undefined) {
-        if (!argumentDefinitions[i]?.optionalArg) {
-          //not enough values passed as arguments, and there was no default value and argument was not optional
-          return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
-        }
-      }
+    return argumentsMetadata
+  }
+
+  protected isNumberOfArgumentValuesValid(argumentsMetadata: FunctionArgument[], numberOfArgumentValuesPassed: number): boolean {
+    if (numberOfArgumentValuesPassed > argumentsMetadata.length) {
+      return false
     }
 
-    const retArr: InternalScalarValue[][] = []
-    for (let row = 0; row < maxHeight; row++) {
-      const rowArr: InternalScalarValue[] = []
-      for (let col = 0; col < maxWidth; col++) {
-        let argCoerceFailure: Maybe<CellError> = undefined
-        const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
-        for (let i = 0; i < argumentDefinitions.length; i++) {
-          // eslint-disable-next-line prefer-const
-          let [val, ignorable] = argValues[i] ?? [undefined, undefined]
-          if (val instanceof SimpleRangeValue && argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
-            if (!metadata.vectorizationForbidden && state.arraysFlag) {
-              val = val.data[val.height() !== 1 ? row : 0]?.[val.width() !== 1 ? col : 0]
-            }
-          }
-          const arg = val ?? argumentDefinitions[i]?.defaultValue
-          if (arg === undefined) {
-            coercedArguments.push(undefined) //we verified in previous loop that this arg is optional
-          } else {
-            //we apply coerce only to non-default values
-            const coercedArg = val !== undefined ? this.coerceToType(arg, argumentDefinitions[i], state) : arg
-            if (coercedArg !== undefined) {
-              if (coercedArg instanceof CellError && argumentDefinitions[i].argumentType !== FunctionArgumentType.SCALAR) {
-                //if this is first error encountered, store it
-                argCoerceFailure = argCoerceFailure ?? coercedArg
-              }
-              coercedArguments.push(coercedArg)
-            } else if (!ignorable) {
-              //if this is first error encountered, store it
-              argCoerceFailure = argCoerceFailure ?? (new CellError(ErrorType.VALUE, ErrorMessage.WrongType))
-            }
-          }
-        }
-
-        const ret = argCoerceFailure ?? this.returnNumberWrapper(fn(...coercedArguments), metadata.returnNumberType)
-        if (maxHeight === 1 && maxWidth === 1) {
-          return ret
-        }
-        if (ret instanceof SimpleRangeValue) {
-          throw 'Function returning array cannot be vectorized.'
-        }
-        rowArr.push(ret)
-      }
-      retArr.push(rowArr)
+    if (numberOfArgumentValuesPassed < argumentsMetadata.length) {
+      const metadataForMissingArguments = argumentsMetadata.slice(numberOfArgumentValuesPassed)
+      const areMissingArgumentsOptional = metadataForMissingArguments.every(argMetadata => argMetadata?.optionalArg || argMetadata?.defaultValue !== undefined)
+      return areMissingArgumentsOptional
     }
-    return SimpleRangeValue.onlyValues(retArr)
+
+    return true
+  }
+
+  protected calculateSizeOfVectorizedResultArray(argumentValues: InterpreterValue[], argumentMetadata: FunctionArgument[]): [ number, number ] {
+    const argumentsThatRequireVectorization = argumentValues
+      .filter((value, i) => this.isRangePassedAsAScalarArgument(value, argumentMetadata[i])) as SimpleRangeValue[]
+
+    const height = Math.max(1, ...argumentsThatRequireVectorization.map(val => val.height()))
+    const width = Math.max(1, ...argumentsThatRequireVectorization.map(val => val.width()))
+
+    return [ height, width ]
+  }
+
+  protected isRangePassedAsAScalarArgument(argumentValue: Maybe<InterpreterValue>, argumentMetadata: Maybe<FunctionArgument>): argumentValue is SimpleRangeValue {
+    if (argumentValue == null || argumentMetadata == null) {
+      return false
+    }
+
+    return argumentValue instanceof SimpleRangeValue
+      && ![ FunctionArgumentType.RANGE, FunctionArgumentType.ANY ].includes(argumentMetadata.argumentType)
   }
 
   protected runFunctionWithReferenceArgument = (
@@ -496,7 +568,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     throw new Error(`No metadata for function ${name}.`)
   }
 
-  private returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
+  protected returnNumberWrapper<T>(val: T | ExtendedNumber, type?: NumberType, format?: FormatInfo): T | ExtendedNumber {
     if (type !== undefined && isExtendedNumber(val)) {
       return this.arithmeticHelper.ExtendedNumberFactory(getRawValue(val), {type, format})
     } else {

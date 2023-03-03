@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
@@ -664,7 +664,7 @@ export class Operations {
    * @param sheet - sheet id from which rows will be removed
    * @param rowStart - number of the first row to be deleted
    * @param rowEnd - number of the last row to be deleted
-   * */
+   */
   private doRemoveRows(rowsToRemove: RowsSpan): RowsRemoval | undefined {
     if (this.rowEffectivelyNotInSheet(rowsToRemove.rowStart, rowsToRemove.sheet)) {
       return

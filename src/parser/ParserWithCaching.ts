@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {IToken, tokenMatcher, ILexingResult} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
-import {AstNodeType, buildParsingErrorAst, RelativeDependency} from './'
+import {AstNodeType, buildParsingErrorAst, CellAddress, collectDependencies, RelativeDependency} from './'
 import {
   cellAddressFromString,
   columnAddressFromString,
@@ -21,12 +21,14 @@ import {
   buildLexerConfig,
   CellReference,
   ColumnRange,
-  ILexerConfig,
+  LexerConfig,
   ProcedureName,
   RowRange,
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
+import {ColumnAddress} from './ColumnAddress'
+import {RowAddress} from './RowAddress'
 
 export interface ParsingResult {
   ast: Ast,
@@ -43,8 +45,9 @@ export class ParserWithCaching {
   public statsCacheUsed: number = 0
   private cache: Cache
   private lexer: FormulaLexer
-  private readonly lexerConfig: ILexerConfig
+  private readonly lexerConfig: LexerConfig
   private formulaParser: FormulaParser
+  private formulaAddress?: SimpleCellAddress
 
   constructor(
     private readonly config: ParserConfig,
@@ -64,6 +67,7 @@ export class ParserWithCaching {
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
   public parse(text: string, formulaAddress: SimpleCellAddress): ParsingResult {
+    this.formulaAddress = formulaAddress
     const lexerResult = this.tokenizeFormula(text)
 
     if (lexerResult.errors.length > 0) {
@@ -97,9 +101,114 @@ export class ParserWithCaching {
         cacheResult = this.cache.set(hash, parsingResult.ast)
       }
     }
-    const {ast, hasVolatileFunction, hasStructuralChangeFunction, relativeDependencies} = cacheResult
 
-    return {ast, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies: relativeDependencies}
+    const {ast, hasVolatileFunction, hasStructuralChangeFunction } = cacheResult
+    const astWithNoReversedRanges = this.convertReversedRangesToRegularRanges(ast)
+    const dependencies = collectDependencies(astWithNoReversedRanges, this.functionRegistry)
+
+    return {ast: astWithNoReversedRanges, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies }
+  }
+
+  private convertReversedRangesToRegularRanges(ast: Ast): Ast {
+    switch (ast.type) {
+      case AstNodeType.EMPTY:
+      case AstNodeType.NUMBER:
+      case AstNodeType.STRING:
+      case AstNodeType.ERROR:
+      case AstNodeType.ERROR_WITH_RAW_INPUT:
+      case AstNodeType.CELL_REFERENCE:
+      case AstNodeType.NAMED_EXPRESSION:
+        return ast
+      case AstNodeType.CELL_RANGE: {
+        const { start, end } = ast
+        const orderedEnds = this.orderCellRangeEnds(start, end)
+        return { ...ast, start: orderedEnds.start, end: orderedEnds.end }
+      }
+      case AstNodeType.COLUMN_RANGE: {
+        const { start, end } = ast
+        const orderedEnds = this.orderColumnRangeEnds(start, end)
+        return { ...ast, start: orderedEnds.start, end: orderedEnds.end }
+      }
+      case AstNodeType.ROW_RANGE: {
+        const { start, end } = ast
+        const orderedEnds = this.orderRowRangeEnds(start, end)
+        return { ...ast, start: orderedEnds.start, end: orderedEnds.end }
+      }
+      case AstNodeType.PERCENT_OP:
+      case AstNodeType.PLUS_UNARY_OP:
+      case AstNodeType.MINUS_UNARY_OP: {
+        const valueFixed = this.convertReversedRangesToRegularRanges(ast.value)
+        return { ...ast, value: valueFixed }
+      }
+      case AstNodeType.CONCATENATE_OP:
+      case AstNodeType.EQUALS_OP:
+      case AstNodeType.NOT_EQUAL_OP:
+      case AstNodeType.LESS_THAN_OP:
+      case AstNodeType.GREATER_THAN_OP:
+      case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      case AstNodeType.MINUS_OP:
+      case AstNodeType.PLUS_OP:
+      case AstNodeType.TIMES_OP:
+      case AstNodeType.DIV_OP:
+      case AstNodeType.POWER_OP: {
+        const leftFixed = this.convertReversedRangesToRegularRanges(ast.left)
+        const rightFixed = this.convertReversedRangesToRegularRanges(ast.right)
+        return { ...ast, left: leftFixed, right: rightFixed }
+      }
+      case AstNodeType.PARENTHESIS: {
+        const exprFixed = this.convertReversedRangesToRegularRanges(ast.expression)
+        return { ...ast, expression: exprFixed }
+      }
+      case AstNodeType.FUNCTION_CALL: {
+        const argsFixed = ast.args.map(arg => this.convertReversedRangesToRegularRanges(arg))
+        return { ...ast, args: argsFixed }
+      }
+      case AstNodeType.ARRAY: {
+        const argsFixed = ast.args.map(argsRow => argsRow.map(arg => this.convertReversedRangesToRegularRanges(arg)))
+        return { ...ast, args: argsFixed }
+      }
+    }
+  }
+
+  private orderCellRangeEnds(endA: CellAddress, endB: CellAddress): { start: CellAddress, end: CellAddress } {
+    const ends = [ endA, endB ]
+    const [ startCol, endCol ] = ends.map(e => e.toColumnAddress()).sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress!))
+    const [ startRow, endRow ] = ends.map(e => e.toRowAddress()).sort(RowAddress.compareByAbsoluteAddress(this.formulaAddress!))
+    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(ParserWithCaching.compareSheetIds.bind(this))
+
+    return {
+      start: CellAddress.fromColAndRow(startCol, startRow, startSheet),
+      end: CellAddress.fromColAndRow(endCol, endRow, endSheet),
+    }
+  }
+
+  private orderColumnRangeEnds(endA: ColumnAddress, endB: ColumnAddress): { start: ColumnAddress, end: ColumnAddress } {
+    const ends = [ endA, endB ]
+    const [ startCol, endCol ] = ends.sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress!))
+    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(ParserWithCaching.compareSheetIds.bind(this))
+
+    return {
+      start: new ColumnAddress(startCol.type, startCol.col, startSheet),
+      end: new ColumnAddress(endCol.type, endCol.col, endSheet),
+    }
+  }
+
+  private orderRowRangeEnds(endA: RowAddress, endB: RowAddress): { start: RowAddress, end: RowAddress } {
+    const ends = [ endA, endB ]
+    const [ startRow, endRow ] = ends.sort(RowAddress.compareByAbsoluteAddress(this.formulaAddress!))
+    const [ startSheet, endSheet ] = ends.map(e => e.sheet).sort(ParserWithCaching.compareSheetIds.bind(this))
+
+    return {
+      start: new RowAddress(startRow.type, startRow.row, startSheet),
+      end: new RowAddress(endRow.type, endRow.row, endSheet),
+    }
+  }
+
+  private static compareSheetIds(sheetA: number | undefined, sheetB: number | undefined): number {
+    sheetA = sheetA != null ? sheetA : Infinity
+    sheetB = sheetB != null ? sheetB : Infinity
+    return sheetA - sheetB
   }
 
   public fetchCachedResultForAst(ast: Ast): ParsingResult {

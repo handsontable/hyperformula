@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange} from './AbsoluteCellRange'
@@ -995,7 +995,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Serializes and deserializes whole engine, effectively reloading it.
+   * Rebuilds the HyperFormula instance preserving the current sheets data.
    *
    * @example
    * ```js
@@ -3554,9 +3554,9 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named expression name is not available.
-   * @throws [[NamedExpressionNameIsInvalidError]] when the named expression name is not valid
-   * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   * @throws [[NamedExpressionNameIsAlreadyTakenError]] when the named-expression name is not available.
+   * @throws [[NamedExpressionNameIsInvalidError]] when the named-expression name is not valid
+   * @throws [[NoRelativeAddressesAllowedError]] when the named-expression formula contains relative references
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    *
    * @example
@@ -3886,10 +3886,11 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Lists all named expressions.
-   * Returns an array of expression names defined in a scope, as strings.
+   * Lists named expressions.
+   * - If scope parameter is provided, returns an array of expression names defined for this scope.
+   * - If scope parameter is undefined, returns an array of global expression names.
    *
-   * @param {number?} scope - scope definition, `sheetId` for local scope or `undefined` for global scope
+   * @param {number?} scope - scope of the named expressions, `sheetId` for local scope or `undefined` for global scope
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists

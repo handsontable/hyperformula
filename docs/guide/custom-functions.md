@@ -2,12 +2,12 @@
 
 Expand the function library of your application by adding custom functions.
 
-**Contents:**
-[[toc]]
+**Contents:** [[toc]]
 
 ## Add a simple custom function
 
-As an example, let's create a custom function `GREET` that accepts a person's first name as a string argument and returns a personalized greeting.
+As an example, let's create a custom function `GREET` that accepts a person's
+first name as a string argument and returns a personalized greeting.
 
 ### 1. Create a function plugin
 
@@ -17,21 +17,26 @@ Import `FunctionPlugin`, and extend it with a new class. For example:
 import { FunctionPlugin } from 'hyperformula';
 
 // let's call the function plugin `MyCustomPlugin`
-export class MyCustomPlugin extends FunctionPlugin {
-  
-}
+export class MyCustomPlugin extends FunctionPlugin {}
 ```
 
 ### 2. Define your function's ID, method, and metadata
 
-In your function plugin, in the static `implementedFunctions` property, define an object that declares the functions provided by this plugin.
+In your function plugin, in the static `implementedFunctions` property, define
+an object that declares the functions provided by this plugin.
 
-The name of that object becomes the ID by which [translations](#function-name-translations), [aliases](#function-aliases), and other elements refer to your function.
-Make the ID unique among all HyperFormula functions ([built-in](built-in-functions.md#list-of-available-functions) and custom).
+The name of that object becomes the ID by which
+[translations](#function-name-translations), [aliases](#function-aliases), and
+other elements refer to your function. Make the ID unique among all HyperFormula
+functions ([built-in](built-in-functions.md#list-of-available-functions) and
+custom).
 
 In your function's object, you can specify:
-- A `method` property (required), which maps your function to the implementation method (we'll define it later on),
-- A `parameters` array that describes the arguments accepted by your function and [validation options](#argument-validation-options) for each argument,
+
+- A `method` property (required), which maps your function to the implementation
+  method (we'll define it later on),
+- A `parameters` array that describes the arguments accepted by your function
+  and [validation options](#argument-validation-options) for each argument,
 - Other [custom function options](#function-options).
 
 ```js
@@ -40,16 +45,15 @@ import { FunctionPlugin, FunctionArgumentType } from 'hyperformula';
 MyCustomPlugin.implementedFunctions = {
   // let's define the function's ID as `GREET`
   GREET: {
-    method: "greet",
-    parameters: [
-      { argumentType: FunctionArgumentType.STRING }
-    ],
-  }
+    method: 'greet',
+    parameters: [{ argumentType: FunctionArgumentType.STRING }],
+  },
 };
 ```
 
-::: tip
-To define multiple functions in a single function plugin, add them all to the `implementedFunctions` object.
+::: tip To define multiple functions in a single function plugin, add them all
+to the `implementedFunctions` object.
+
 ```js
 MyCustomPlugin.implementedFunctions = {
   FUNCTION_A: {
@@ -60,34 +64,51 @@ MyCustomPlugin.implementedFunctions = {
   },
 };
 ```
+
 :::
 
 ### 3. Add your function's names
 
-In a separate object, [define your function's names in every language you want to support](#function-name-translations).
+In a separate object,
+[define your function's names in every language you want to support](#function-name-translations).
 
 ```js
 export const MyCustomPluginTranslations = {
   enGB: {
-    GREET: "GREET",
+    GREET: 'GREET',
   },
   enUS: {
-    GREET: "GREET",
-  }
+    GREET: 'GREET',
+  },
   // repeat for all languages used in your system
 };
 ```
 
 ### 4. Implement your function's logic
 
-In your function plugin, add a method that implements your function's calculations. Your method needs to:
-* Take two optional arguments: `ast` and `state`.
-* Return the results of your calculations.
+In your function plugin, add a method that implements your function's
+calculations. Your method needs to:
 
-To benefit from HyperFormula's automatic validations, wrap your method in the built-in `runFunction()` method, which:
-* Verifies the format of the values returned by your function.
-* Validates your function's parameters against your [custom function options](#function-options).
-* Validates arguments passed to your function against your [argument validation options](#argument-validation-options).
+- Take two optional arguments: `ast` and `state`.
+- Return the results of your calculations.
+
+Wrap your implementation in the built-in `runFunction()` method, which:
+
+- Evaluates the arguments of your custom function.
+- Validates the number of arguments against the
+  [`parameters` array](#function-options).
+- Coerces the argument values to types set in the
+  [`parameters` array](#argument-validation-options).
+- Handles optional arguments and default values according to options set in the
+  [`parameters` array](#argument-validation-options).
+- Validates the arguments of your custom function against the
+  [argument validation options](#argument-validation-options).
+- Duplicates the arguments according to the
+  [`repeatLastArgs` option](#function-options).
+- Handles the [array arithmetic mode](arrays.md#array-arithmetic-mode).
+- Performs
+  [function vectorization](arrays.md#passing-arrays-to-scalar-functions-vectorization).
+- Performs [argument broadcasting](arrays.md#broadcasting).
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
@@ -98,7 +119,7 @@ export class MyCustomPlugin extends FunctionPlugin {
       this.metadata('GREET'),
       (firstName) => {
         return `👋 Hello, ${firstName}!`;
-      },
+      }
     );
   }
 }
@@ -106,9 +127,12 @@ export class MyCustomPlugin extends FunctionPlugin {
 
 ### 5. Register your function plugin
 
-Register your function plugin (and its translations) so that HyperFormula can recognize it.
+Register your function plugin (and its translations) so that HyperFormula can
+recognize it.
 
-Use the [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin) method:
+Use the
+[`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin)
+method:
 
 ```js
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
@@ -134,7 +158,8 @@ console.log(result);
 
 ### Full example
 
-The complete implementation of this custom function is also included in the [demo](#working-demo).
+The complete implementation of this custom function is also included in the
+[demo](#working-demo).
 
 ```js
 import { FunctionPlugin, FunctionArgumentType } from 'hyperformula';
@@ -147,7 +172,7 @@ export class MyCustomPlugin extends FunctionPlugin {
       this.metadata('GREET'),
       (firstName) => {
         return `👋 Hello, ${firstName}!`;
-      },
+      }
     );
   }
 }
@@ -155,10 +180,8 @@ export class MyCustomPlugin extends FunctionPlugin {
 MyCustomPlugin.implementedFunctions = {
   GREET: {
     method: 'greet',
-    parameters: [
-      { argumentType: FunctionArgumentType.STRING }
-    ],
-  }
+    parameters: [{ argumentType: FunctionArgumentType.STRING }],
+  },
 };
 
 export const MyCustomPluginTranslations = {
@@ -167,7 +190,7 @@ export const MyCustomPluginTranslations = {
   },
   enUS: {
     GREET: 'GREET',
-  }
+  },
 };
 
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
@@ -175,7 +198,9 @@ HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 
 ## Advanced custom function example
 
-In a more advanced example, we'll create a custom function `DOUBLE_RANGE` that takes a range of numbers and returns the range of the same size with all the numbers doubled.
+In a more advanced example, we'll create a custom function `DOUBLE_RANGE` that
+takes a range of numbers and returns the range of the same size with all the
+numbers doubled.
 
 ### Accept a range argument
 
@@ -185,14 +210,13 @@ To accept a range argument, declare it in the `parameters` array:
 MyCustomPlugin.implementedFunctions = {
   DOUBLE_RANGE: {
     method: 'doubleRange',
-    parameters: [
-      { argumentType: FunctionArgumentType.RANGE },
-    ],
-  }
+    parameters: [{ argumentType: FunctionArgumentType.RANGE }],
+  },
 };
 ```
 
-The range arguments are passed to the implementation method as instances of the [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
+The range arguments are passed to the implementation method as instances of the
+[`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
@@ -204,7 +228,7 @@ export class MyCustomPlugin extends FunctionPlugin {
       (range) => {
         const rangeData = range.data;
         // ...
-      },
+      }
     );
   }
 }
@@ -212,7 +236,8 @@ export class MyCustomPlugin extends FunctionPlugin {
 
 ### Return an array of data
 
-A function may return multiple values in the form of an [array](arrays.md). To do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
+A function may return multiple values in the form of an [array](arrays.md). To
+do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
@@ -230,8 +255,11 @@ export class MyCustomPlugin extends FunctionPlugin {
 }
 ```
 
-A function that returns an array will cause the `VALUE!` error unless you also declare a companion method for the array size.
-To do that, provide the `arraySizeMethod` that calculates the size of the result array based on the function arguments and returns an instance of the [`ArraySize` class](../api/classes/arraysize.md).
+A function that returns an array will cause the `VALUE!` error unless you also
+declare a companion method for the array size. To do that, provide the
+`arraySizeMethod` that calculates the size of the result array based on the
+function arguments and returns an instance of the
+[`ArraySize` class](../api/classes/arraysize.md).
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
@@ -253,41 +281,47 @@ MyCustomPlugin.implementedFunctions = {
   DOUBLE_RANGE: {
     method: 'doubleRange',
     arraySizeMethod: 'doubleRangeResultArraySize',
-    parameters: [
-      { argumentType: FunctionArgumentType.RANGE },
-    ],
-  }
+    parameters: [{ argumentType: FunctionArgumentType.RANGE }],
+  },
 };
 ```
 
 ### Validate the arguments and return an error
 
-To handle invalid inputs, the custom function should return an instance of the [`CellError` class](../api/classes/cellerror.md) with the relevant [error type](types-of-errors.md).
-Errors are localized according to your [language settings](localizing-functions.md).
+To handle invalid inputs, the custom function should return an instance of the
+[`CellError` class](../api/classes/cellerror.md) with the relevant
+[error type](types-of-errors.md). Errors are localized according to your
+[language settings](localizing-functions.md).
 
 ```js
-if (rangeData.some(row => row.some(val => typeof rawValue !== 'number'))) {
-  return new CellError('VALUE', 'Function DOUBLE_RANGE operates only on numbers.');
+if (rangeData.some((row) => row.some((val) => typeof rawValue !== 'number'))) {
+  return new CellError(
+    'VALUE',
+    'Function DOUBLE_RANGE operates only on numbers.'
+  );
 }
 ```
 
-::: tip
-All HyperFormula [error types](types-of-errors.md) support optional custom error messages. Put them to good use: let your users know what caused the error and how to avoid it in the future.
-:::
+::: tip All HyperFormula [error types](types-of-errors.md) support optional
+custom error messages. Put them to good use: let your users know what caused the
+error and how to avoid it in the future. :::
 
 ### Test your function
 
-To make sure your function works correctly, add unit tests. Use a JavaScript testing library of your choice.
+To make sure your function works correctly, add unit tests. Use a JavaScript
+testing library of your choice.
 
 ```js
 it('works for a range of numbers', () => {
-  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
+  HyperFormula.registerFunctionPlugin(
+    MyCustomPlugin,
+    MyCustomPluginTranslations
+  );
 
-  const engine = HyperFormula.buildFromArray([
-    [1, '=DOUBLE_RANGE(A1:A3)'],
-    [2],
-    [3],
-  ], { licenseKey: 'gpl-v3' });
+  const engine = HyperFormula.buildFromArray(
+    [[1, '=DOUBLE_RANGE(A1:A3)'], [2], [3]],
+    { licenseKey: 'gpl-v3' }
+  );
 
   expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 })).toEqual(2);
   expect(engine.getCellValue({ sheet: 0, row: 1, col: 1 })).toEqual(4);
@@ -295,22 +329,30 @@ it('works for a range of numbers', () => {
 });
 
 it('returns a VALUE error if the range argument contains a string', () => {
-  HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
+  HyperFormula.registerFunctionPlugin(
+    MyCustomPlugin,
+    MyCustomPluginTranslations
+  );
 
-  const engine = HyperFormula.buildFromArray([
-    [1, '=DOUBLE_RANGE(A1:A3)'],
-    ['I should not be here'],
-    [3],
-  ], { licenseKey: 'gpl-v3' });
+  const engine = HyperFormula.buildFromArray(
+    [[1, '=DOUBLE_RANGE(A1:A3)'], ['I should not be here'], [3]],
+    { licenseKey: 'gpl-v3' }
+  );
 
-  expect(engine.getCellValueType({ sheet: 0, row: 0, col: 1 })).toEqual('ERROR');
-  expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 }).value).toEqual('#VALUE!');
+  expect(engine.getCellValueType({ sheet: 0, row: 0, col: 1 })).toEqual(
+    'ERROR'
+  );
+  expect(engine.getCellValue({ sheet: 0, row: 0, col: 1 }).value).toEqual(
+    '#VALUE!'
+  );
 });
 ```
 
 ## Working demo
 
-This demo contains the implementation of both the [`GREET`](#add-a-simple-custom-function) and [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
+This demo contains the implementation of both the
+[`GREET`](#add-a-simple-custom-function) and
+[`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
 
 <iframe
   src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
@@ -325,7 +367,7 @@ This demo contains the implementation of both the [`GREET`](#add-a-simple-custom
 You can set the following options for your function:
 
 | Option                              | Type    | Description                                                                                                                                                                                                                                   |
-|-------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ----------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                                                                                                                 |
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
 | `arraySizeMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
@@ -338,15 +380,18 @@ You can set the following options for your function:
 | `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.<br/>Default: `false`                                                                                                             |
 | `vectorizationForbidden`            | Boolean | `true`: the function will never get [vectorized](arrays.md#passing-arrays-to-scalar-functions-vectorization).<br/>Default: `false`                                                                                                            |
 
-You can set the options in the static `implementedFunctions` property of your function plugin:
+You can set the options in the static `implementedFunctions` property of your
+function plugin:
 
 ```javascript
 MyCustomPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
-    parameters: [{
-      // your argument validation options
-    }],
+    parameters: [
+      {
+        // your argument validation options
+      },
+    ],
     arraySizeMethod: 'myArraySizeMethod',
     returnNumberType: 'NUMBER_RAW',
     repeatLastArgs: 0,
@@ -365,8 +410,8 @@ MyCustomPlugin.implementedFunctions = {
 You can set the following argument validation options:
 
 | Option                    | Type                                      | Description                                                                                                                                                                                                                                        |
-|---------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the argument. Possible values: `STRING`, `NUMBER`, `BOOLEAN`, `SCALAR`, `NOERROR`, `RANGE`, `INTEGER`, `COMPLEX`, `ANY`.                                                                                                                          |
+| ------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the function argument. See [possible values](#types-of-the-function-argument).                                                                                                                                                    |
 | `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                           |
 | `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                    |
 | `optionalArg`             | Boolean                                   | `true`: if an argument is missing, and no `defaultValue` is set, the argument defaults to `undefined` (instead of throwing an error).<br/>Default: `false`<br/>Setting this option to `true` is the same as setting `defaultValue` to `undefined`. |
@@ -375,55 +420,78 @@ You can set the following argument validation options:
 | `lessThan`                | Number                                    | If set: numerical argument needs to be less than `lessThan`.                                                                                                                                                                                       |
 | `greaterThan`             | Number                                    | If set: numerical argument needs to be greater than `greaterThan`.                                                                                                                                                                                 |
 
-In your function plugin, in the static `implementedFunctions` property, add an array called `parameters`:
+In your function plugin, in the static `implementedFunctions` property, add an
+array called `parameters`:
 
 ```js
 MyCustomPlugin.implementedFunctions = {
   MY_FUNCTION: {
     method: 'myFunctionMethod',
-    parameters: [{
-      argumentType: FunctionArgumentType.STRING,
-      defaultValue: 10,
-      passSubtype: false,
-      optionalArg: false,
-      minValue: 5,
-      maxValue: 15,
-      lessThan: 15,
-      greaterThan: 5,
-    }],
-  }
+    parameters: [
+      {
+        argumentType: FunctionArgumentType.STRING,
+        defaultValue: 10,
+        passSubtype: false,
+        optionalArg: false,
+        minValue: 5,
+        maxValue: 15,
+        lessThan: 15,
+        greaterThan: 5,
+      },
+    ],
+  },
 };
 ```
 
-#### Handling missing arguments
+### Types of the function argument
 
-Both the `defaultValue` and `optionalArg` options let you decide what happens when a user doesn't pass enough valid arguments to your custom function.
+| Type      | Description                                                                                              | Example                                      |
+| --------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `NUMBER`  | A general numeric value such as floating-point number, date/time value, currency value or percent value. | `3`, `3.14`, `$100`, `1939/09/01`, `4:45 AM` |
+| `INTEGER` | An integer.                                                                                              | `42`                                         |
+| `COMPLEX` | A text representing a complex value.                                                                     | `"-3+4i"`                                    |
+| `STRING`  | A text value.                                                                                            | `"aaa"`                                      |
+| `BOOLEAN` | A logical value.                                                                                         | `=TRUE()`                                    |
+| `NOERROR` | Any non-range and non-error value.                                                                       | All of the above                             |
+| `SCALAR`  | Any non-range value.                                                                                     | All of the above                             |
+| `RANGE`   | Multiple values as a range of cells or an inline array.                                                  | `A1:B100`, `{1, 2}`                          |
+| `ANY`     | Any value.                                                                                               | All of the above                             |
 
-Setting a `defaultValue` for an argument always makes that argument optional. But, the `defaultValue` option automatically replaces any missing arguments with `defaultValue`, so your custom function is unaware of the actual number of valid arguments passed.
+### Handling missing arguments
 
-If you don't want to set any `defaultValue` (because, for example, your function's behavior depends on the number of valid arguments passed), use the `optionalArg` setting instead.
+Both the `defaultValue` and `optionalArg` options let you decide what happens
+when a user doesn't pass enough valid arguments to your custom function.
+
+Setting a `defaultValue` for an argument always makes that argument optional.
+But, the `defaultValue` option automatically replaces any missing arguments with
+`defaultValue`, so your custom function is unaware of the actual number of valid
+arguments passed.
+
+If you don't want to set any `defaultValue` (because, for example, your
+function's behavior depends on the number of valid arguments passed), use the
+`optionalArg` setting instead.
 
 ## Function name translations
 
-You can add translations of your function's name in multiple languages.
-Your end users use the translated names to call your function inside formulas.
+You can add translations of your function's name in multiple languages. Your end
+users use the translated names to call your function inside formulas.
 
-::: tip
-If you support just one language, you still need to define the name of your function in that language.
-:::
+::: tip If you support just one language, you still need to define the name of
+your function in that language. :::
 
-In a separate object, define the translations of your custom functions' names in every language you want to support.
-Function names are case-insensitive, as they are all normalized to uppercase.
+In a separate object, define the translations of your custom functions' names in
+every language you want to support. Function names are case-insensitive, as they
+are all normalized to uppercase.
 
 ```js
 export const MyCustomPluginTranslations = {
   enGB: {
     // formula in English: `=MY_FUNCTION()`
-    'MY_FUNCTION': 'MY_FUNCTION'
+    MY_FUNCTION: 'MY_FUNCTION',
   },
   deDE: {
     // formula in German: `=MEINE_FUNKTION()`
-    'MY_FUNCTION': 'MEINE_FUNKTION'
+    MY_FUNCTION: 'MEINE_FUNKTION',
   },
   // repeat for all languages used in your system
 };
@@ -432,32 +500,33 @@ export const MyCustomPluginTranslations = {
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
-::: tip
-Before using a translated function name, remember to [register and set the language](localizing-functions.md).
-:::
+::: tip Before using a translated function name, remember to
+[register and set the language](localizing-functions.md). :::
 
 ## Function aliases
 
 You can also assign multiple aliases to a single custom function.
 
-In your function plugin, in the static `aliases` property, add aliases for your function:
+In your function plugin, in the static `aliases` property, add aliases for your
+function:
 
 ```js
 MyCustomPlugin.aliases = {
   // `=MY_ALIAS()` will work the same as `=MY_FUNCTION()`
-  'MY_ALIAS': 'MY_FUNCTION'
+  MY_ALIAS: 'MY_FUNCTION',
 };
 ```
 
-::: tip
-For each alias of your function, define a translation, even if you want to support only one language.
-```js
+::: tip For each alias of your function, define a translation, even if you want
+to support only one language.
 
+```js
 MyCustomPlugin.translations = {
   enGB: {
-    'MY_FUNCTION': 'MY_FUNCTION',
-    'MY_ALIAS': 'MY_ALIAS',
+    MY_FUNCTION: 'MY_FUNCTION',
+    MY_ALIAS: 'MY_ALIAS',
   },
 };
 ```
+
 :::

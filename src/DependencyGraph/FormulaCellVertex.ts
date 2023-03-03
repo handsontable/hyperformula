@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -207,7 +207,7 @@ export class ArrayVertex extends FormulaVertex {
 
   /**
    * No-op as array vertices are transformed eagerly.
-   * */
+   */
   ensureRecentData(_updatingService: LazilyTransformingAstService) {
   }
 

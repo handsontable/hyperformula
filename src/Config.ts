@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {
@@ -259,15 +259,15 @@ export interface ConfigParams {
    * @default 40.000
    *
    * @category Engine
-   * */
+   */
   maxRows: number,
   /**
    * Sets the maximum number of columns.
    *
-   * @default 18.278
+   * @default 18.278 (Columns A, B, ..., ZZZ)
    *
    * @category Engine
-   * */
+   */
   maxColumns: number,
   /**
    * Internally, each date is represented as a number of days that passed since `nullDate`.

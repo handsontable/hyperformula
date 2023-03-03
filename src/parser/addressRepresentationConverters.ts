@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {simpleCellRange, SimpleCellRange} from '../AbsoluteCellRange'
@@ -8,16 +8,16 @@ import {simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
-import {ABSOLUTE_OPERATOR, RANGE_OPERATOR, sheetNameRegexp, simpleSheetName} from './LexerConfig'
+import {ABSOLUTE_OPERATOR, RANGE_OPERATOR, SHEET_NAME_PATTERN, UNQUOTED_SHEET_NAME_PATTERN} from './parser-consts'
 import {RowAddress} from './RowAddress'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
 
-const addressRegex = new RegExp(`^(${sheetNameRegexp})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
-const columnRegex = new RegExp(`^(${sheetNameRegexp})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)$`)
-const rowRegex = new RegExp(`^(${sheetNameRegexp})?(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
-const simpleSheetNameRegex = new RegExp(`^${simpleSheetName}$`)
+const addressRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
+const columnRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)$`)
+const rowRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
+const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
 
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
@@ -150,7 +150,7 @@ export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAd
  * @param sheetIndexMapping - mapping function needed to change sheet index to sheet name
  * @param address - object representation of absolute address
  * @param sheetIndex - if is not equal with address sheet index, string representation will contain sheet name
- * */
+ */
 export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): Maybe<string> => {
   const column = columnIndexToLabel(address.col)
   const sheetName = sheetIndexToString(address.sheet, sheetIndexMapping)
@@ -181,7 +181,7 @@ export const simpleCellRangeToString = (sheetIndexMapping: SheetIndexMappingFn, 
  *
  * @param columnStringRepresentation - column label (e.g. 'AAB')
  * @returns column index
- * */
+ */
 function columnLabelToIndex(columnStringRepresentation: string): number {
   if (columnStringRepresentation.length === 1) {
     return columnStringRepresentation.toUpperCase().charCodeAt(0) - 65

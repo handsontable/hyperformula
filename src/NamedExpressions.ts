@@ -1,11 +1,16 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {Maybe} from './Maybe'
 import {Ast, AstNodeType} from './parser'
+import {
+  CELL_REFERENCE_PATTERN,
+  NAMED_EXPRESSION_PATTERN,
+  R1C1_CELL_REFERENCE_PATTERN
+} from './parser/parser-consts'
 
 export interface NamedExpression {
   name: string,
@@ -158,11 +163,27 @@ export class NamedExpressions {
     return this.worksheetStore(sheetId)?.has(expressionName) ?? false
   }
 
+  /**
+   * Checks the validity of a named-expression's name.
+   *
+   * The name:
+   * - Must start with a Unicode letter or with an underscore (`_`).
+   * - Can contain only Unicode letters, numbers, underscores, and periods (`.`).
+   * - Can't be the same as any possible reference in the A1 notation (`[A-Za-z]+[0-9]+`).
+   * - Can't be the same as any possible reference in the R1C1 notation (`[rR][0-9]*[cC][0-9]*`).
+   *
+   * The naming rules follow the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html#__RefHeading__1017964_715980110) standard.
+   */
   public isNameValid(expressionName: string): boolean {
-    if (/^[A-Za-z]+[0-9]+$/.test(expressionName)) {
+    const a1CellRefRegexp = new RegExp(`^${CELL_REFERENCE_PATTERN}$`)
+    const r1c1CellRefRegexp = new RegExp(`^${R1C1_CELL_REFERENCE_PATTERN}$`)
+    const namedExpRegexp = new RegExp(`^${NAMED_EXPRESSION_PATTERN}$`)
+
+    if (a1CellRefRegexp.test(expressionName) || r1c1CellRefRegexp.test(expressionName)) {
       return false
     }
-    return /^[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*$/.test(expressionName)
+
+    return namedExpRegexp.test(expressionName)
   }
 
   public addNamedExpression(expressionName: string, sheetId?: number, options?: NamedExpressionOptions): InternalNamedExpression {

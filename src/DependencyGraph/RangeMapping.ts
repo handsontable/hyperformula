@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -213,7 +213,7 @@ export class RangeMapping {
       const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
       const rowLessVertex = this.getRange(range.start, valuesRangeEndRowLess)
       if (rowLessVertex !== undefined) {
-        const restRange = new AbsoluteCellRange(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
+        const restRange = AbsoluteCellRange.fromSimpleCellAddresses(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
         return {
           smallerRangeVertex: rowLessVertex,
           restRange,

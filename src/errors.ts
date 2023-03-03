@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellAddress} from './Cell'
@@ -314,7 +314,7 @@ export class LanguageAlreadyRegisteredError extends Error {
  * @see [[registerFunctionPlugin]]
  * @see [[buildFromArray]]
  * @see [[buildFromSheets]]
- * */
+ */
 export class FunctionPluginValidationError extends Error {
   public static functionNotDeclaredInPlugin(functionId: string, pluginName: string): FunctionPluginValidationError {
     return new FunctionPluginValidationError(`Function with id ${functionId} not declared in plugin ${pluginName}`)
@@ -331,7 +331,7 @@ export class FunctionPluginValidationError extends Error {
  * @see [[registerFunctionPlugin]]
  * @see [[registerFunction]]
  * @see [[unregisterFunction]]
- * */
+ */
 export class ProtectedFunctionError extends Error {
   public static cannotRegisterFunctionWithId(functionId: string): ProtectedFunctionError {
     return new ProtectedFunctionError(`Cannot register function with id ${functionId}`)
@@ -376,7 +376,7 @@ export class TargetLocationHasArrayError extends Error {
  *
  * @see [[addNamedExpression]]
  * @see [[changeNamedExpression]]
- * */
+ */
 export class NoRelativeAddressesAllowedError extends Error {
   constructor() {
     super('Relative addresses not allowed in named expressions.')

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {ErrorType, SimpleCellAddress} from '../Cell'
@@ -17,13 +17,13 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {ILexerConfig} from './LexerConfig'
+import {LexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
-    private readonly lexerConfig: ILexerConfig,
+    private readonly lexerConfig: LexerConfig,
     private readonly sheetMappingFn: SheetIndexMappingFn,
     private readonly namedExpressions: NamedExpressions,
   ) {

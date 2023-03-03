@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {
@@ -53,6 +53,25 @@ export class AbsoluteCellRange implements SimpleCellRange {
 
   public get sheet() {
     return this.start.sheet
+  }
+
+  public static fromSimpleCellAddresses(start: SimpleCellAddress, end: SimpleCellAddress): AbsoluteCellRange {
+    if (start.sheet !== end.sheet) {
+      throw new SheetsNotEqual(start.sheet, end.sheet)
+    }
+
+    const width = end.col - start.col
+    const height = end.row - start.row
+
+    if (Number.isFinite(height) && Number.isFinite(width)) {
+      return new AbsoluteCellRange(start, end)
+    }
+
+    if (Number.isFinite(height)) {
+      return new AbsoluteRowRange(start.sheet, start.row, end.row)
+    }
+
+    return new AbsoluteColumnRange(start.sheet, start.col, end.col)
   }
 
   public static fromAst(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteCellRange {

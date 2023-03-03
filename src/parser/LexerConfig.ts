@@ -1,100 +1,75 @@
 /**
  * @license
- * Copyright (c) 2022 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {createToken, Lexer, TokenType} from 'chevrotain'
 import {ErrorType} from '../Cell'
 import {ParserConfig} from './ParserConfig'
+import {
+  ALL_WHITESPACE_PATTERN,
+  COLUMN_REFERENCE_PATTERN,
+  NON_RESERVED_CHARACTER_PATTERN,
+  ODFF_WHITESPACE_PATTERN,
+  RANGE_OPERATOR,
+  ROW_REFERENCE_PATTERN,
+  UNICODE_LETTER_PATTERN,
+} from './parser-consts'
+import {CellReferenceMatcher} from './CellReferenceMatcher'
+import {NamedExpressionMatcher} from './NamedExpressionMatcher'
 
-export const RANGE_OPERATOR = ':'
-export const ABSOLUTE_OPERATOR = '$'
-export const ALL_WHITESPACE_REGEXP = /\s+/
-export const ODFF_WHITESPACE_REGEXP = /[ \t\n\r]+/
-
-/* arithmetic */
-// abstract for + -
-export const AdditionOp = createToken({
-  name: 'AdditionOp',
-  pattern: Lexer.NA,
-})
+export const AdditionOp = createToken({ name: 'AdditionOp', pattern: Lexer.NA })
 export const PlusOp = createToken({name: 'PlusOp', pattern: /\+/, categories: AdditionOp})
 export const MinusOp = createToken({name: 'MinusOp', pattern: /-/, categories: AdditionOp})
-
-// abstract for * /
-export const MultiplicationOp = createToken({
-  name: 'MultiplicationOp',
-  pattern: Lexer.NA,
-})
+export const MultiplicationOp = createToken({ name: 'MultiplicationOp', pattern: Lexer.NA })
 export const TimesOp = createToken({name: 'TimesOp', pattern: /\*/, categories: MultiplicationOp})
 export const DivOp = createToken({name: 'DivOp', pattern: /\//, categories: MultiplicationOp})
-
 export const PowerOp = createToken({name: 'PowerOp', pattern: /\^/})
-
 export const PercentOp = createToken({name: 'PercentOp', pattern: /%/})
-
-export const BooleanOp = createToken({
-  name: 'BooleanOp',
-  pattern: Lexer.NA,
-})
+export const BooleanOp = createToken({ name: 'BooleanOp', pattern: Lexer.NA })
 export const EqualsOp = createToken({name: 'EqualsOp', pattern: /=/, categories: BooleanOp})
 export const NotEqualOp = createToken({name: 'NotEqualOp', pattern: /<>/, categories: BooleanOp})
 export const GreaterThanOp = createToken({name: 'GreaterThanOp', pattern: />/, categories: BooleanOp})
 export const LessThanOp = createToken({name: 'LessThanOp', pattern: /</, categories: BooleanOp})
 export const GreaterThanOrEqualOp = createToken({name: 'GreaterThanOrEqualOp', pattern: />=/, categories: BooleanOp})
 export const LessThanOrEqualOp = createToken({name: 'LessThanOrEqualOp', pattern: /<=/, categories: BooleanOp})
-
 export const ConcatenateOp = createToken({name: 'ConcatenateOp', pattern: /&/})
 
-/* addresses */
-export const simpleSheetName = '[A-Za-z0-9_\u00C0-\u02AF]+'
-export const quotedSheetName = "'(((?!').|'')*)'"
-export const sheetNameRegexp = `(${simpleSheetName}|${quotedSheetName})!`
-
-export const CellReference = createToken({
-  name: 'CellReference',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+\\${ABSOLUTE_OPERATOR}?[0-9]+`),
-})
-
-export const ColumnRange = createToken({
-  name: 'ColumnRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+${RANGE_OPERATOR}(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[A-Za-z]+`),
-})
-
-export const RowRange = createToken({
-  name: 'RowRange',
-  pattern: new RegExp(`(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+${RANGE_OPERATOR}(${sheetNameRegexp})?\\${ABSOLUTE_OPERATOR}?[0-9]+`),
-})
-
-export const RangeSeparator = createToken({name: 'RangeSeparator', pattern: `${RANGE_OPERATOR}`})
-
-/* parenthesis */
 export const LParen = createToken({name: 'LParen', pattern: /\(/})
 export const RParen = createToken({name: 'RParen', pattern: /\)/})
-
-/* array parenthesis */
 export const ArrayLParen = createToken({name: 'ArrayLParen', pattern: /{/})
 export const ArrayRParen = createToken({name: 'ArrayRParen', pattern: /}/})
 
-/* procedures */
-export const ProcedureName = createToken({
-  name: 'ProcedureName',
-  pattern: /([A-Za-z\u00C0-\u02AF][A-Za-z0-9\u00C0-\u02AF._]*)\(/
-})
-
-/* named expressions */
-export const NamedExpression = createToken({
-  name: 'NamedExpression',
-  pattern: /[A-Za-z\u00C0-\u02AF_][A-Za-z0-9\u00C0-\u02AF._]*/
-})
-
-/* string literal */
 export const StringLiteral = createToken({name: 'StringLiteral', pattern: /"([^"\\]*(\\.[^"\\]*)*)"/})
-
-/* error literal */
 export const ErrorLiteral = createToken({name: 'ErrorLiteral', pattern: /#[A-Za-z0-9\/]+[?!]?/})
 
-export interface ILexerConfig {
+export const RangeSeparator = createToken({ name: 'RangeSeparator', pattern: new RegExp(RANGE_OPERATOR) })
+export const ColumnRange = createToken({ name: 'ColumnRange', pattern: new RegExp(`${COLUMN_REFERENCE_PATTERN}${RANGE_OPERATOR}${COLUMN_REFERENCE_PATTERN}`) })
+export const RowRange = createToken({ name: 'RowRange', pattern: new RegExp(`${ROW_REFERENCE_PATTERN}${RANGE_OPERATOR}${ROW_REFERENCE_PATTERN}`) })
+
+export const ProcedureName = createToken({ name: 'ProcedureName', pattern: new RegExp(`([${UNICODE_LETTER_PATTERN}][${NON_RESERVED_CHARACTER_PATTERN}]*)\\(`) })
+
+const cellReferenceMatcher = new CellReferenceMatcher()
+export const CellReference = createToken({
+  name: 'CellReference',
+  pattern: cellReferenceMatcher.match.bind(cellReferenceMatcher),
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  start_chars_hint: cellReferenceMatcher.POSSIBLE_START_CHARACTERS,
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  line_breaks: false,
+})
+
+const namedExpressionMatcher = new NamedExpressionMatcher()
+export const NamedExpression = createToken({
+  name: 'NamedExpression',
+  pattern: namedExpressionMatcher.match.bind(namedExpressionMatcher),
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  start_chars_hint: namedExpressionMatcher.POSSIBLE_START_CHARACTERS,
+  // eslint-disable-next-line @typescript-eslint/camelcase
+  line_breaks: false,
+})
+
+export interface LexerConfig {
   ArgSeparator: TokenType,
   NumberLiteral: TokenType,
   OffsetProcedureName: TokenType,
@@ -109,18 +84,23 @@ export interface ILexerConfig {
   maxRows: number,
 }
 
-export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
+/**
+ * Builds the configuration object for the lexer
+ */
+export const buildLexerConfig = (config: ParserConfig): LexerConfig => {
   const offsetProcedureNameLiteral = config.translationPackage.getFunctionTranslation('OFFSET')
   const errorMapping = config.errorMapping
   const functionMapping = config.translationPackage.buildFunctionMapping()
-  const whitespaceTokenRegexp = config.ignoreWhiteSpace === 'standard' ? ODFF_WHITESPACE_REGEXP : ALL_WHITESPACE_REGEXP
+  const whitespaceTokenRegexp = new RegExp(config.ignoreWhiteSpace === 'standard' ? ODFF_WHITESPACE_PATTERN : ALL_WHITESPACE_PATTERN)
 
   const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: whitespaceTokenRegexp })
   const ArrayRowSeparator = createToken({name: 'ArrayRowSep', pattern: config.arrayRowSeparator})
   const ArrayColSeparator = createToken({name: 'ArrayColSep', pattern: config.arrayColumnSeparator})
+  const NumberLiteral = createToken({ name: 'NumberLiteral', pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`) })
+  const OffsetProcedureName = createToken({ name: 'OffsetProcedureName', pattern: new RegExp(offsetProcedureNameLiteral, 'i') })
 
-  /* configurable tokens */
-  let ArgSeparator, inject: TokenType[]
+  let ArgSeparator: TokenType
+  let inject: TokenType[]
   if (config.functionArgSeparator === config.arrayColumnSeparator) {
     ArgSeparator = ArrayColSeparator
     inject = []
@@ -131,14 +111,6 @@ export const buildLexerConfig = (config: ParserConfig): ILexerConfig => {
     ArgSeparator = createToken({name: 'ArgSeparator', pattern: config.functionArgSeparator})
     inject = [ArgSeparator]
   }
-  const NumberLiteral = createToken({
-    name: 'NumberLiteral',
-    pattern: new RegExp(`(([${config.decimalSeparator}]\\d+)|(\\d+([${config.decimalSeparator}]\\d*)?))(e[+-]?\\d+)?`)
-  })
-  const OffsetProcedureName = createToken({
-    name: 'OffsetProcedureName',
-    pattern: new RegExp(offsetProcedureNameLiteral, 'i')
-  })
 
   /* order is important, first pattern is used */
   const allTokens = [
