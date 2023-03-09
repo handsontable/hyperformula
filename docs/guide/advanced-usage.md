@@ -96,7 +96,7 @@ After setting everything up, you can add formulas:
 // add a sheet named 'Formulas'
 const sheetNameC = hfInstance.addSheet('Formulas');
 // get the new sheet ID for further API calls
-const sheetIdC = hfInstance.getSheetId(sheetNameA);
+const sheetIdC = hfInstance.getSheetId(sheetNameC);
 // add formulas to that sheet
 hfInstance.setSheetContent(sheetIdC, formulas);
 ```
