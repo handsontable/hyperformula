@@ -15,6 +15,7 @@ export enum Events {
   ValuesUpdated = 'valuesUpdated',
   EvaluationSuspended = 'evaluationSuspended',
   EvaluationResumed = 'evaluationResumed',
+  CellValueRead = 'cellValueRead',
 }
 
 export interface Listeners {
@@ -314,6 +315,8 @@ export interface Listeners {
    * @category Batch
    */
   evaluationResumed: (changes: ExportedChange[]) => any,
+
+  cellValueRead: () => any,
 }
 
 export interface TypedEmitter {

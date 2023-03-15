@@ -12,6 +12,7 @@ import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {buildLexerConfig, Unparser} from './parser'
+import {Emitter, Events} from './Emitter'
 
 export interface SerializedNamedExpression {
   name: string,
@@ -24,7 +25,8 @@ export class Serialization {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
     private readonly unparser: Unparser,
-    private readonly exporter: Exporter
+    private readonly exporter: Exporter,
+    private readonly emitter: Emitter,
   ) {
   }
 
@@ -55,6 +57,7 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
+    this.emitter.emit(Events.CellValueRead)
     return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
@@ -146,6 +149,6 @@ export class Serialization {
 
   public withNewConfig(newConfig: Config, namedExpressions: NamedExpressions): Serialization {
     const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping.fetchDisplayName, namedExpressions)
-    return new Serialization(this.dependencyGraph, newUnparser, this.exporter)
+    return new Serialization(this.dependencyGraph, newUnparser, this.exporter, this.emitter)
   }
 }

@@ -28,6 +28,7 @@ import {Serialization, SerializedNamedExpression} from './Serialization'
 import {findBoundaries, Sheet, Sheets, validateAsSheet} from './Sheet'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {UndoRedo} from './UndoRedo'
+import {Emitter} from './Emitter'
 
 export type EngineState = {
   config: Config,
@@ -44,6 +45,7 @@ export type EngineState = {
   namedExpressions: NamedExpressions,
   serialization: Serialization,
   functionRegistry: FunctionRegistry,
+  emitter: Emitter,
 }
 
 export class BuildEngineFactory {
@@ -76,6 +78,7 @@ export class BuildEngineFactory {
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
     const addressMapping = dependencyGraph.addressMapping
+    const emitter = new Emitter()
 
     for (const sheetName in sheets) {
       if (Object.prototype.hasOwnProperty.call(sheets, sheetName)) {
@@ -110,7 +113,7 @@ export class BuildEngineFactory {
     })
 
     const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName, lazilyTransformingAstService)
-    const serialization = new Serialization(dependencyGraph, unparser, exporter)
+    const serialization = new Serialization(dependencyGraph, unparser, exporter, emitter)
 
     const interpreter = new Interpreter(config, dependencyGraph, columnSearch, stats, arithmeticHelper, functionRegistry, namedExpressions, serialization, arraySizePredictor, dateTimeHelper)
 
@@ -139,6 +142,7 @@ export class BuildEngineFactory {
       namedExpressions,
       serialization,
       functionRegistry,
+      emitter,
     }
   }
 }

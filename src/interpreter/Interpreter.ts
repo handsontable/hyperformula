@@ -54,7 +54,7 @@ export class Interpreter {
     private readonly namedExpressions: NamedExpressions,
     public readonly serialization: Serialization,
     public readonly arraySizePredictor: ArraySizePredictor,
-    public readonly dateTimeHelper: DateTimeHelper
+    public readonly dateTimeHelper: DateTimeHelper,
   ) {
     this.functionRegistry.initializePlugins(this)
     this.criterionBuilder = new CriterionBuilder(config)

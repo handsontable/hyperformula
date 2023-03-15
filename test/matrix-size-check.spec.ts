@@ -27,7 +27,7 @@ describe('Matrix size check tests', () => {
     undefined as unknown as NamedExpressions,
     undefined as unknown as Serialization,
     arraySizePredictor,
-    undefined as unknown as DateTimeHelper
+    undefined as unknown as DateTimeHelper,
   )
 
   it('check', () => {
@@ -174,7 +174,7 @@ describe('Matrix size check tests, with different config', () => {
     undefined as unknown as NamedExpressions,
     undefined as unknown as Serialization,
     arraySizePredictor,
-    undefined as unknown as DateTimeHelper
+    undefined as unknown as DateTimeHelper,
   )
 
   it('check binary array arithmetic', () => {
