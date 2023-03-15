@@ -316,6 +316,30 @@ export interface Listeners {
    */
   evaluationResumed: (changes: ExportedChange[]) => any,
 
+  /**
+   * Fires on every operation that reads a value from the cell.
+   * A single API method call might trigger multiple cellValueRead events.
+   *
+   * @event
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *   ['1', '2', '=A1'],
+   * ]);
+   *
+   * // define a function to be called when the event occurs
+   * const handler = () => { console.log('cell value read') }
+   *
+   * // subscribe to the 'cellValueRead' event, pass the handler
+   * hfInstance.on('cellValueRead', handler);
+   *
+   * // read a cell value
+   * const changes = hfInstance.getCellValue({ col: 2, row: 0, sheet: 0 });
+   * ```
+   *
+   * @category Values
+   */
   cellValueRead: () => any,
 }
 
