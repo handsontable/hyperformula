@@ -130,7 +130,6 @@ export class ParserWithCaching {
       case AstNodeType.CELL_RANGE:
       case AstNodeType.COLUMN_RANGE:
       case AstNodeType.ROW_RANGE: {
-          // TBD: What about ast.end? not checking for that in other places? BUG?
           const absoluteRefTypes = [
             ReferenceType.ABSOLUTE,
             CellReferenceType.CELL_REFERENCE_ABSOLUTE,
