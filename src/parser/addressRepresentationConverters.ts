@@ -27,7 +27,7 @@ const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
  * @param baseAddress - base address for R0C0 conversion
  * @returns object representation of address
  */
-export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<CellAddress> => {
+export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, sheetContext?: number): Maybe<CellAddress> => {
   const result = addressRegex.exec(stringAddress)!
 
   const col = columnLabelToIndex(result[6])
@@ -39,6 +39,10 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
 
   if (sheet === null) {
     sheet = undefined
+  }
+
+  if ((sheet === undefined) && (sheetContext !== undefined)) {
+    sheet = sheetContext
   }
 
   const row = Number(result[8]) - 1
@@ -53,7 +57,7 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
   }
 }
 
-export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<ColumnAddress> => {
+export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, sheetContext?: number): Maybe<ColumnAddress> => {
   const result = columnRegex.exec(stringAddress)!
 
   let sheet = extractSheetNumber(result, sheetMapping)
@@ -65,6 +69,10 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
     sheet = undefined
   }
 
+  if ((sheet === undefined) && (sheetContext !== undefined)) {
+    sheet = sheetContext
+  }
+
   const col = columnLabelToIndex(result[6])
 
   if (result[5] === ABSOLUTE_OPERATOR) {
@@ -74,7 +82,7 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
   }
 }
 
-export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<RowAddress> => {
+export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress, sheetContext?: number): Maybe<RowAddress> => {
   const result = rowRegex.exec(stringAddress)!
 
   let sheet = extractSheetNumber(result, sheetMapping)
@@ -84,6 +92,10 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
 
   if (sheet === null) {
     sheet = undefined
+  }
+
+  if ((sheet === undefined) && (sheetContext !== undefined)) {
+    sheet = sheetContext
   }
 
   const row = Number(result[6]) - 1

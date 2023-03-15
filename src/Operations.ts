@@ -373,7 +373,7 @@ export class Operations {
 
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
-    this.storeNamedExpressionInCell(namedExpression.address, expression)
+    this.storeNamedExpressionInCell(namedExpression.address, expression, sheetId)
     this.adjustNamedExpressionEdges(namedExpression, expressionName, sheetId)
   }
 
@@ -825,10 +825,10 @@ export class Operations {
     }
   }
 
-  private storeNamedExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
+  private storeNamedExpressionInCell(address: SimpleCellAddress, expression: RawCellContent, sheetId?: number) {
     const parsedCellContent = this.cellContentParser.parse(expression)
     if (parsedCellContent instanceof CellContent.Formula) {
-      const parsingResult = this.parser.parse(parsedCellContent.formula, simpleCellAddress(-1, 0, 0))
+      const parsingResult = this.parser.parse(parsedCellContent.formula, simpleCellAddress(-1, 0, 0), sheetId)
       if (doesContainRelativeReferences(parsingResult.ast)) {
         throw new NoRelativeAddressesAllowedError()
       }

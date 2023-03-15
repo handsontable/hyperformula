@@ -26,6 +26,12 @@ describe('Named expressions - checking if its possible', () => {
     expect(engine.isItPossibleToAddNamedExpression('foo_bar', 1)).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('A...', 1)).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('B___', 1)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=$B$1', 0)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=CONCATENATE($A$1,".2")', 0)).toBe(true) 
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($B$1,$D$1)', 0)).toBe(true) 
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($B$1:$D$2)', 0)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($2:$2)', 0)).toBe(true)
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($B:$B)', 0)).toBe(true)
   })
 
   it('no if expression name invalid', () => {
@@ -1196,5 +1202,98 @@ describe('serialization', () => {
       {name: 'prettyName', expression: '=1', scope: 0, options: undefined},
       {name: 'alsoPrettyName', expression: '=3', scope: 1, options: undefined}
     ])
+  })
+})
+
+describe('Named expressions - absolute references in non-global scopes', () => {
+  it('should be able to use an absolute cell reference (without sheet!) provided the expression is defined for a specific sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['str1', '999', '321', '21', '=$A$1', '=foo']],
+      'Sheet2': [['str2', '888', '123', '12', '=$A$1', '=foo']],
+    })
+    engine.addNamedExpression('foo', '=$B$1', 0)
+    engine.addNamedExpression('foo', '=$B$1', 1)
+    expect(engine.getCellValue(adr('E1', 0))).toEqual('str1')
+    expect(engine.getCellValue(adr('F1', 0))).toEqual(999)
+    expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
+    expect(engine.getCellValue(adr('F1', 1))).toEqual(888)
+  })
+  it('should be able to use a arg of an absolute cell reference (without sheet!) provided the expression is defined for a specific sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['str1', '999', '321', '21', '=$A$1', '=foo']],
+      'Sheet2': [['str2', '888', '123', '12', '=$A$1', '=foo']],
+    })
+    engine.addNamedExpression('foo', '=CONCATENATE($A$1,".2")', 0)
+    engine.addNamedExpression('foo', '=CONCATENATE($A$1,".2")', 1)
+    expect(engine.getCellValue(adr('E1', 0))).toEqual('str1')
+    expect(engine.getCellValue(adr('F1', 0))).toEqual('str1.2')
+    expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
+    expect(engine.getCellValue(adr('F1', 1))).toEqual('str2.2')
+  })
+  it('should be able to use a vararg of absolute cell references (without sheet!) provided the expression is defined for a specific sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['str1', '999', '321', '21', '=$A$1', '=foo']],
+      'Sheet2': [['str2', '888', '123', '12', '=$A$1', '=foo']],
+    })
+    engine.addNamedExpression('foo', '=SUM($B$1,$D$1)', 0)
+    engine.addNamedExpression('foo', '=SUM($B$1,$D$1)', 1)
+    expect(engine.getCellValue(adr('E1', 0))).toEqual('str1')
+    expect(engine.getCellValue(adr('F1', 0))).toEqual(1020)
+    expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
+    expect(engine.getCellValue(adr('F1', 1))).toEqual(900)
+  })
+  it('should be able to use a an absolute cell range reference (without sheet!) provided the expression is defined for a specific sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['str1', '999', '321', '21', '=$A$1', '=foo'],
+        ['1243', '785', '-44', '58', '-8457', '9760'],
+      ],      
+      'Sheet2': [
+        ['str2', '888', '123', '12', '=$A$1', '=foo'],
+        ['5879', '578', '470', '-4', '-1025', '1000'],
+      ],      
+    })
+    engine.addNamedExpression('foo', '=SUM($B$1:$D$2)', 0)
+    engine.addNamedExpression('foo', '=SUM($B$1:$D$2)', 1)
+    expect(engine.getCellValue(adr('E1', 0))).toEqual('str1')
+    expect(engine.getCellValue(adr('F1', 0))).toEqual(2140)
+    expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
+    expect(engine.getCellValue(adr('F1', 1))).toEqual(2067)
+  })
+  it('should be able to use an absolute row range reference (without sheet!) provided the expression is defined for a specific sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['str1', '999', '321', '21', '=$A$1', '=foo'],
+        ['1243', '785', '-44', '58', '-8457', '9760']
+      ],
+      'Sheet2': [
+        ['str2', '888', '123', '12', '=$A$1', '=foo'],
+        ['5879', '578', '470', '-4', '-1025', '1000']
+      ],
+    })
+    engine.addNamedExpression('foo', '=SUM($2:$2)', 0)
+    engine.addNamedExpression('foo', '=SUM($2:$2)', 1)
+    expect(engine.getCellValue(adr('E1', 0))).toEqual('str1')
+    expect(engine.getCellValue(adr('F1', 0))).toEqual(3345)
+    expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
+    expect(engine.getCellValue(adr('F1', 1))).toEqual(6898)
+  })
+  it('should be able to use an absolute col range reference (without sheet!) provided the expression is defined for a specific sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['str1', '999', '321', '21', '=$A$1', '=foo'],
+        ['1243', '785', '-44', '58', '-8457', '9760']
+      ],
+      'Sheet2': [
+        ['str2', '888', '123', '12', '=$A$1', '=foo'],
+        ['5879', '578', '470', '-4', '-1025', '1000']
+      ],
+    })
+    engine.addNamedExpression('foo', '=SUM($B:$B)', 0)
+    engine.addNamedExpression('foo', '=SUM($B:$B)', 1)
+    expect(engine.getCellValue(adr('E1', 0))).toEqual('str1')
+    expect(engine.getCellValue(adr('F1', 0))).toEqual(1784)
+    expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
+    expect(engine.getCellValue(adr('F1', 1))).toEqual(1466)
   })
 })

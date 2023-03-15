@@ -402,7 +402,7 @@ export class CrudOperations {
   public ensureItIsPossibleToAddNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number): void {
     this.ensureScopeIdIsValid(sheetId)
     this.ensureNamedExpressionNameIsValid(expressionName, sheetId)
-    this.ensureNamedExpressionIsValid(expression)
+    this.ensureNamedExpressionIsValid(expression, sheetId)
   }
 
   public ensureItIsPossibleToChangeNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number): void {
@@ -633,10 +633,10 @@ export class CrudOperations {
     }
   }
 
-  private ensureNamedExpressionIsValid(expression: RawCellContent): void {
+  private ensureNamedExpressionIsValid(expression: RawCellContent, sheetId?: number): void {
     const parsedExpression = this.cellContentParser.parse(expression)
     if (parsedExpression instanceof CellContent.Formula) {
-      const parsingResult = this.parser.parse(parsedExpression.formula, simpleCellAddress(-1, 0, 0))
+      const parsingResult = this.parser.parse(parsedExpression.formula, simpleCellAddress(-1, 0, 0), sheetId)
       if (doesContainRelativeReferences(parsingResult.ast)) {
         throw new NoRelativeAddressesAllowedError()
       }

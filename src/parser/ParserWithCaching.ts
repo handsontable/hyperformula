@@ -3,6 +3,7 @@
  * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
+import {CellReferenceType} from './CellAddress'
 import {IToken, tokenMatcher, ILexingResult} from 'chevrotain'
 import {ErrorType, SimpleCellAddress} from '../Cell'
 import {FunctionRegistry} from '../interpreter/FunctionRegistry'
@@ -27,7 +28,7 @@ import {
 } from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
-import {ColumnAddress} from './ColumnAddress'
+import {ColumnAddress, ReferenceType} from './ColumnAddress'
 import {RowAddress} from './RowAddress'
 
 export interface ParsingResult {
@@ -66,7 +67,7 @@ export class ParserWithCaching {
    * @param text - formula to parse
    * @param formulaAddress - address with regard to which formula should be parsed. Impacts computed addresses in R0C0 format.
    */
-  public parse(text: string, formulaAddress: SimpleCellAddress): ParsingResult {
+  public parse(text: string, formulaAddress: SimpleCellAddress, sheetContext?: number): ParsingResult {
     this.formulaAddress = formulaAddress
     const lexerResult = this.tokenizeFormula(text)
 
@@ -86,7 +87,7 @@ export class ParserWithCaching {
       }
     }
 
-    const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress)
+    const hash = this.computeHashFromTokens(lexerResult.tokens, formulaAddress, sheetContext)
 
     let cacheResult = this.cache.get(hash)
     if (cacheResult !== undefined) {
@@ -104,10 +105,78 @@ export class ParserWithCaching {
 
     const {ast, hasVolatileFunction, hasStructuralChangeFunction } = cacheResult
     const astWithNoReversedRanges = this.convertReversedRangesToRegularRanges(ast)
+    this.addScopeToAbsoluteReferences(astWithNoReversedRanges, sheetContext)
     const dependencies = collectDependencies(astWithNoReversedRanges, this.functionRegistry)
 
     return {ast: astWithNoReversedRanges, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies }
   }
+
+  private addScopeToAbsoluteReferences(ast: Ast, sheetId?: number): boolean {
+    if (sheetId === undefined) {
+      return false
+    }
+    switch (ast.type) {
+      case AstNodeType.EMPTY:
+      case AstNodeType.NUMBER:
+      case AstNodeType.STRING:
+      case AstNodeType.ERROR:
+      case AstNodeType.ERROR_WITH_RAW_INPUT:
+        return false
+      case AstNodeType.CELL_REFERENCE:
+        if ((ast.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE) && (ast.reference.sheet === undefined)) {
+          ast.reference = ast.reference.withSheet(sheetId)
+        }
+        return !ast.reference.isAbsolute()
+      case AstNodeType.CELL_RANGE:
+      case AstNodeType.COLUMN_RANGE:
+      case AstNodeType.ROW_RANGE: {
+          // TBD: What about ast.end? not checking for that in other places? BUG?
+          const absoluteRefTypes = [
+            ReferenceType.ABSOLUTE,
+            CellReferenceType.CELL_REFERENCE_ABSOLUTE,
+            CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL,
+            CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW,         
+          ]
+          if (absoluteRefTypes.includes(ast.start.type) && (ast.start.sheet === undefined)) {
+            ast.start = ast.start.withSheet(sheetId)
+          }
+          if (absoluteRefTypes.includes(ast.end.type) && (ast.end.sheet === undefined)) {
+            ast.end = ast.end.withSheet(sheetId)
+          }
+          return !ast.start.isAbsolute()
+      }
+      case AstNodeType.NAMED_EXPRESSION:
+        return false
+      case AstNodeType.PERCENT_OP:
+      case AstNodeType.PLUS_UNARY_OP:
+      case AstNodeType.MINUS_UNARY_OP: {
+        return this.addScopeToAbsoluteReferences(ast.value, sheetId)
+      }
+      case AstNodeType.CONCATENATE_OP:
+      case AstNodeType.EQUALS_OP:
+      case AstNodeType.NOT_EQUAL_OP:
+      case AstNodeType.LESS_THAN_OP:
+      case AstNodeType.GREATER_THAN_OP:
+      case AstNodeType.LESS_THAN_OR_EQUAL_OP:
+      case AstNodeType.GREATER_THAN_OR_EQUAL_OP:
+      case AstNodeType.MINUS_OP:
+      case AstNodeType.PLUS_OP:
+      case AstNodeType.TIMES_OP:
+      case AstNodeType.DIV_OP:
+      case AstNodeType.POWER_OP:
+        return this.addScopeToAbsoluteReferences(ast.left, sheetId) || this.addScopeToAbsoluteReferences(ast.right, sheetId)
+      case AstNodeType.PARENTHESIS:
+        return this.addScopeToAbsoluteReferences(ast.expression, sheetId)
+      case AstNodeType.FUNCTION_CALL: {
+        return ast.args.some((arg) =>
+        this.addScopeToAbsoluteReferences(arg, sheetId)
+        )
+      }
+      case AstNodeType.ARRAY: {
+        return ast.args.some(row => row.some(arg => this.addScopeToAbsoluteReferences(arg, sheetId)))
+      }
+    }
+  } 
 
   private convertReversedRangesToRegularRanges(ast: Ast): Ast {
     switch (ast.type) {
@@ -226,13 +295,13 @@ export class ParserWithCaching {
     }
   }
 
-  public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {
+  public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress, sheetContext?: number): string {
     let hash = ''
     let idx = 0
     while (idx < tokens.length) {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
-        const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
+        const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress, sheetContext)
         if (cellAddress === undefined) {
           hash = hash.concat(token.image)
         } else {
@@ -244,8 +313,8 @@ export class ParserWithCaching {
         hash = hash.concat(canonicalProcedureName, '(')
       } else if (tokenMatcher(token, ColumnRange)) {
         const [start, end] = token.image.split(':')
-        const startAddress = columnAddressFromString(this.sheetMapping, start, baseAddress)
-        const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress)
+        const startAddress = columnAddressFromString(this.sheetMapping, start, baseAddress, sheetContext)
+        const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress, sheetContext)
         if (startAddress === undefined || endAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
@@ -253,8 +322,8 @@ export class ParserWithCaching {
         }
       } else if (tokenMatcher(token, RowRange)) {
         const [start, end] = token.image.split(':')
-        const startAddress = rowAddressFromString(this.sheetMapping, start, baseAddress)
-        const endAddress = rowAddressFromString(this.sheetMapping, end, baseAddress)
+        const startAddress = rowAddressFromString(this.sheetMapping, start, baseAddress, sheetContext)
+        const endAddress = rowAddressFromString(this.sheetMapping, end, baseAddress, sheetContext)
         if (startAddress === undefined || endAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
