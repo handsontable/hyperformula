@@ -22,7 +22,7 @@ export interface Listeners {
   /**
    * Occurs when a sheet is added anywhere inside the workbook.
    *
-   * @event
+   * @event sheetAdded
    *
    * @param {string} addedSheetDisplayName the name of added sheet
    *
@@ -50,12 +50,12 @@ export interface Listeners {
    *
    * @category Sheet
    */
-  sheetAdded: (addedSheetDisplayName: string) => any,
+  sheetAdded: (addedSheetDisplayName: string) => void,
 
   /**
    * Occurs when a sheet is removed from anywhere inside the workbook.
    *
-   * @event
+   * @event sheetRemoved
    *
    * @param {string} removedSheetDisplayName the name of removed sheet
    * @param {ExportedChange[]} changes the values and location of applied changes
@@ -87,12 +87,12 @@ export interface Listeners {
    *
    * @category Sheet
    */
-  sheetRemoved: (removedSheetDisplayName: string, changes: ExportedChange[]) => any,
+  sheetRemoved: (removedSheetDisplayName: string, changes: ExportedChange[]) => void,
 
   /**
    * Occurs when a sheet is renamed anywhere inside the workbook.
    *
-   * @event
+   * @event sheetRenamed
    *
    * @param {string} oldDisplayName the old name of a sheet before renaming
    * @param {string} newDisplayName the new name of the sheet after renaming
@@ -124,12 +124,12 @@ export interface Listeners {
    *
    * @category Sheet
    */
-  sheetRenamed: (oldDisplayName: string, newDisplayName: string) => any,
+  sheetRenamed: (oldDisplayName: string, newDisplayName: string) => void,
 
   /**
    * Occurs when a named expression with specified values and location is added.
    *
-   * @event
+   * @event namedExpressionAdded
    *
    * @param {string} namedExpressionName the name of added expression
    * @param {ExportedChange[]} changes the values and location of applied changes
@@ -160,12 +160,12 @@ export interface Listeners {
    *
    * @category Named Expression
    */
-  namedExpressionAdded: (namedExpressionName: string, changes: ExportedChange[]) => any,
+  namedExpressionAdded: (namedExpressionName: string, changes: ExportedChange[]) => void,
 
   /**
    * Occurs when a named expression with specified values is removed and from an indicated location.
    *
-   * @event
+   * @event namedExpressionRemoved
    *
    * @param {string} namedExpressionName the name of removed expression
    * @param {ExportedChange[]} changes the values and location of applied changes
@@ -200,12 +200,12 @@ export interface Listeners {
    *
    * @category Named Expression
    */
-  namedExpressionRemoved: (namedExpressionName: string, changes: ExportedChange[]) => any,
+  namedExpressionRemoved: (namedExpressionName: string, changes: ExportedChange[]) => void,
 
   /**
    * Occurs when values in a specified location are changed and cause recalculation.
    *
-   * @event
+   * @event valuesUpdated
    *
    * @param {ExportedChange[]} changes the values and location of applied changes
    *
@@ -235,12 +235,12 @@ export interface Listeners {
    *
    * @category Values
    */
-  valuesUpdated: (changes: ExportedChange[]) => any,
+  valuesUpdated: (changes: ExportedChange[]) => void,
 
   /**
    * Occurs when evaluation is suspended.
    *
-   * @event
+   * @event evaluationSuspended
    *
    * @example
    * ```js
@@ -272,12 +272,12 @@ export interface Listeners {
    *
    * @category Batch
    */
-  evaluationSuspended: () => any,
+  evaluationSuspended: () => void,
 
   /**
    * Occurs when evaluation is resumed.
    *
-   * @event
+   * @event evaluationResumed
    *
    * @param {ExportedChange[]} changes the values and location of applied changes
    *
@@ -314,13 +314,13 @@ export interface Listeners {
    *
    * @category Batch
    */
-  evaluationResumed: (changes: ExportedChange[]) => any,
+  evaluationResumed: (changes: ExportedChange[]) => void,
 
   /**
    * Fires on every operation that reads a value from the cell.
    * A single API method call might trigger multiple cellValueRead events.
    *
-   * @event
+   * @event cellValueRead
    *
    * @example
    * ```js
@@ -340,7 +340,7 @@ export interface Listeners {
    *
    * @category Values
    */
-  cellValueRead: () => any,
+  cellValueRead: () => void,
 }
 
 export interface TypedEmitter {
@@ -351,7 +351,13 @@ export interface TypedEmitter {
   once<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
 }
 
+/**
+ * A class responsible for dispatching events and calling listeners
+ */
 export class Emitter extends TinyEmitter implements TypedEmitter {
+  /**
+   * Emits an event which automatically causes all the listeners to be called.
+   */
   public emit<Event extends keyof Listeners>(event: Event, ...args: Parameters<Listeners[Event]>): this {
     super.emit(event, ...args)
     return this
