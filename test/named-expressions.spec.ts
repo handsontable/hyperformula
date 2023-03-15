@@ -1313,4 +1313,20 @@ describe('Named expressions - absolute references in non-global scopes', () => {
     expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
     expect(engine.getCellValue(adr('F1', 1))).toEqual(1466)
   })
+  it('should be able to use auto-scoped absolute cell references with a variety of operations (added for code cov) ', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['str1', '999', '321', '21', '=$A$1', '=foo'],
+        ['1243', '785', '-44', '58', '-8457', '9760']
+      ],
+      'Sheet2': [
+        ['str2', '888', '123', '12', '=$A$1', '=bar'],
+        ['5879', '578', '470', '-4', '-1025', '1000']
+      ],
+    })
+    engine.addNamedExpression('foo', '=$A$1&$B$1', 0)
+    engine.addNamedExpression('bar', '=($B$1+$C$1)/3', 1)
+    expect(engine.getCellValue(adr('F1', 0))).toEqual('str1999')
+    expect(engine.getCellValue(adr('F1', 1))).toEqual(337)
+  })
 })
