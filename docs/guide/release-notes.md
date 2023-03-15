@@ -561,7 +561,7 @@ HyperFormula adheres to
   HEX2DEC. [#497](https://github.com/handsontable/hyperformula/issues/497)
 - Added a configuration option to evaluate reference to an empty cells as a
   zero. [#476](https://github.com/handsontable/hyperformula/issues/476)
-- Added new error type: missing licence.
+- Added new error type: missing license.
   [#306](https://github.com/handsontable/hyperformula/issues/306)
 - Added detailed error messages for error values.
   [#506](https://github.com/handsontable/hyperformula/issues/506)

@@ -41,7 +41,7 @@ export enum ErrorType {
   /** Array spill error. */
   SPILL = 'SPILL',
 
-  /** Invalid/missing licence error. */
+  /** Invalid/missing license error. */
   LIC = 'LIC',
 
   /** Generic error */
