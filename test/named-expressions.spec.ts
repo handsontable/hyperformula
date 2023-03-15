@@ -29,6 +29,7 @@ describe('Named expressions - checking if its possible', () => {
     expect(engine.isItPossibleToAddNamedExpression('foo', '=$B$1', 0)).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('foo', '=CONCATENATE($A$1,".2")', 0)).toBe(true) 
     expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($B$1,$D$1)', 0)).toBe(true) 
+    expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($B$1,Sheet2!$D$1)', 0)).toBe(true) 
     expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($B$1:$D$2)', 0)).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($2:$2)', 0)).toBe(true)
     expect(engine.isItPossibleToAddNamedExpression('foo', '=SUM($B:$B)', 0)).toBe(true)
@@ -1241,6 +1242,22 @@ describe('Named expressions - absolute references in non-global scopes', () => {
     expect(engine.getCellValue(adr('F1', 0))).toEqual(1020)
     expect(engine.getCellValue(adr('E1', 1))).toEqual('str2')
     expect(engine.getCellValue(adr('F1', 1))).toEqual(900)
+  })
+  it('should be able to mix an absolute cell reference (without sheet!) with an absolute cell range reference (with sheet!) if the expression is defined for a specific sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['str1', '999', '321', '21', '=$A$1', '=foo'],
+        ['1243', '785', '-44', '58', '-8457', '9760'],
+      ],      
+      'Sheet2': [
+        ['str2', '888', '123', '12', '=$A$1', '=foo'],
+        ['5879', '578', '470', '-4', '-1025', '1000'],
+      ],      
+    })
+    engine.addNamedExpression('foo', '=SUM($B$1,Sheet2!$D$1)', 0)
+    engine.addNamedExpression('foo', '=SUM($B$1,Sheet1!$D$1)', 1)
+    expect(engine.getCellValue(adr('F1', 0))).toEqual(1011)
+    expect(engine.getCellValue(adr('F1', 1))).toEqual(909)
   })
   it('should be able to use a an absolute cell range reference (without sheet!) provided the expression is defined for a specific sheet', () => {
     const engine = HyperFormula.buildFromSheets({
