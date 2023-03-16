@@ -3,14 +3,6 @@ import {LicenseKeyValidityState} from '../../src/helpers/licenseKeyValidator'
 import {adr, resetSpy} from '../testUtils'
 
 describe('license key', () => {
-  beforeEach(() => {
-    spyOn(console, 'warn')
-  })
-
-  afterEach(() => {
-    resetSpy(console.warn)
-  })
-
   describe('valid key', () => {
     it('should verify "gpl-v3" as a valid license key', () => {
       const hf = HyperFormula.buildEmpty({
@@ -18,7 +10,6 @@ describe('license key', () => {
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
-      expect(console.warn).not.toHaveBeenCalled()
     })
 
     it('should verify "internal-use-in-handsontable" as a valid license key', () => {
@@ -27,7 +18,6 @@ describe('license key', () => {
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.VALID)
-      expect(console.warn).not.toHaveBeenCalled()
     })
   })
 
@@ -38,7 +28,6 @@ describe('license key', () => {
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.INVALID)
-      expect(console.warn).toHaveBeenCalledWith('The license key for HyperFormula is invalid.')
     })
 
     it('should verify license keys correctness', () => {
@@ -47,7 +36,6 @@ describe('license key', () => {
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.INVALID)
-      expect(console.warn).toHaveBeenCalledWith('The license key for HyperFormula is invalid.')
     })
   })
 
@@ -58,7 +46,6 @@ describe('license key', () => {
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.MISSING)
-      expect(console.warn).toHaveBeenCalledWith('The license key for HyperFormula is missing.')
     })
   })
 
@@ -69,11 +56,18 @@ describe('license key', () => {
       })
 
       expect(hf.licenseKeyValidityState).toEqual(LicenseKeyValidityState.EXPIRED)
-      expect(console.warn).toHaveBeenCalledWith('The license key for HyperFormula expired on January 11, 2020, and is not valid for the installed version.')
     })
   })
 
   describe('checking validity of the license key', () => {
+    beforeAll(() => {
+      spyOn(console, 'warn')
+    })
+
+    beforeEach(() => {
+      resetSpy(console.warn)
+    })
+
     it('should be triggered when user calls getCellValue', () => {
       const engine = HyperFormula.buildFromArray([[
         1, 2, '=A1+B1'

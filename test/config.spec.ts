@@ -364,11 +364,11 @@ describe('Config', () => {
   })
 
   describe('deprecated option warning messages', () => {
-    beforeEach(() => {
+    beforeAll(() => {
       spyOn(console, 'warn')
     })
 
-    afterEach(() => {
+    beforeEach(() => {
       resetSpy(console.warn)
     })
 
