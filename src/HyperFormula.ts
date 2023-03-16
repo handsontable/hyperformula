@@ -4028,7 +4028,7 @@ export class HyperFormula implements TypedEmitter {
       throw new NotAFormulaError()
     }
     const internalCellValue = this.evaluator.runAndForget(ast, address, dependencies)
-    this._emitter.emit(Events.CellValueRead)
+    this._emitter.emit(Events._CellValueRead)
     return this._exporter.exportScalarOrRange(internalCellValue)
   }
 

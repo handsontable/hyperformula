@@ -125,7 +125,7 @@ export class BuildEngineFactory {
     const evaluator = new Evaluator(config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)
     evaluator.run()
 
-    emitter.on(Events.CellValueRead, () => config.calculateLicenseKeyValidityState())
+    emitter.on(Events._CellValueRead, () => config.calculateLicenseKeyValidityState())
 
     stats.end(StatType.BUILD_ENGINE_TOTAL)
 

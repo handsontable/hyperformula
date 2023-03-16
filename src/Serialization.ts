@@ -57,7 +57,7 @@ export class Serialization {
   }
 
   public getCellValue(address: SimpleCellAddress): CellValue {
-    this.emitter.emit(Events.CellValueRead)
+    this.emitter.emit(Events._CellValueRead)
     return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 

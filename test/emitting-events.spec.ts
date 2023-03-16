@@ -207,14 +207,14 @@ describe('Events', () => {
     expect(handlerResumed).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 13)])
   })
 
-  describe('CellValueRead', () => {
+  describe('_CellValueRead', () => {
     it('fires when user calls getCellValue', () => {
       const engine = HyperFormula.buildFromArray([[
         1, 2, '=A1+B1'
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.getCellValue(adr('A1'))
       expect(onCellValueRead).toHaveBeenCalled()
@@ -226,7 +226,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.getSheetValues(0)
       expect(onCellValueRead).toHaveBeenCalled()
@@ -238,7 +238,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.getAllSheetsValues()
       expect(onCellValueRead).toHaveBeenCalled()
@@ -250,7 +250,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.copy(simpleCellRange(adr('A1'), adr('C1')))
       expect(onCellValueRead).toHaveBeenCalled()
@@ -262,7 +262,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.cut(simpleCellRange(adr('A1'), adr('C1')))
       expect(onCellValueRead).toHaveBeenCalled()
@@ -274,7 +274,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.getRangeValues(simpleCellRange(adr('A1'), adr('C1')))
       expect(onCellValueRead).toHaveBeenCalled()
@@ -286,7 +286,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.addNamedExpression('ABC', '=Sheet1!$A$1')
       engine.getNamedExpressionValue('ABC')
@@ -299,7 +299,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.calculateFormula('=A1', 0)
       expect(onCellValueRead).toHaveBeenCalled()
@@ -311,7 +311,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.addNamedExpression('ABC', '=Sheet1!$A$1')
       expect(onCellValueRead).not.toHaveBeenCalled()
@@ -323,7 +323,7 @@ describe('Events', () => {
       ]], { maxRows: 10 })
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.updateConfig({ maxRows: 100 })
       expect(onCellValueRead).not.toHaveBeenCalled()
@@ -335,7 +335,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.setCellContents(adr('A1'), 42)
       engine.setSheetContent(0, [[42]])
@@ -348,7 +348,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.addSheet('test')
       engine.addRows(0, [0, 1])
@@ -362,7 +362,7 @@ describe('Events', () => {
       ]])
 
       const onCellValueRead = jasmine.createSpy()
-      engine.on(Events.CellValueRead, onCellValueRead)
+      engine.on(Events._CellValueRead, onCellValueRead)
 
       engine.getSheetId('Sheet1')
       const adr = engine.simpleCellAddressFromString('A1', 0)
