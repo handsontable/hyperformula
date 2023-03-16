@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Delay license key validation to the first read operation. [#1181](https://github.com/handsontable/hyperformula/issues/1181)
+
 ## [2.3.1] - 2023-03-03
 
 ### Fixed
@@ -275,7 +279,7 @@ For more information on this release, see:
   [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before                | after                |
-| --------------------- | -------------------- |
+|-----------------------|----------------------|
 | matrixColumnSeparator | arrayColumnSeparator |
 | matrixRowSeparator    | arrayRowSeparator    |
 
@@ -285,7 +289,7 @@ For more information on this release, see:
   [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before             | after             |
-| ------------------ | ----------------- |
+|--------------------|-------------------|
 | matrixMapping      | arrrayMapping     |
 | isCellPartOfMatrix | isCellPartOfArray |
 
@@ -293,7 +297,7 @@ For more information on this release, see:
   [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before                       | after                       |
-| ---------------------------- | --------------------------- |
+|------------------------------|-----------------------------|
 | SourceLocationHasMatrixError | SourceLocationHasArrayError |
 | TargetLocationHasMatrixError | TargetLocationHasArrayError |
 

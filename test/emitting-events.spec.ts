@@ -366,8 +366,10 @@ describe('Events', () => {
 
       engine.getSheetId('Sheet1')
       const adr = engine.simpleCellAddressFromString('A1', 0)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       engine.simpleCellAddressToString(adr!, 0)
       const range = engine.simpleCellRangeFromString('A1:B2', 0)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       engine.simpleCellRangeToString(range!, 0)
       expect(onCellValueRead).not.toHaveBeenCalled()
     })

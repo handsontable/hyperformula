@@ -48,6 +48,7 @@ describe('Config', () => {
     expect(() => new Config({useColumnIndex: Symbol()})).toThrowError('Expected value of type: boolean for config parameter: useColumnIndex')
     // eslint-disable-next-line
     // @ts-ignore
+    // eslint-disable-next-line jsdoc/require-jsdoc
     expect(() => new Config({leapYear1900: () => 1})).toThrowError('Expected value of type: boolean for config parameter: leapYear1900')
   })
 
