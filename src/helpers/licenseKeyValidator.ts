@@ -40,8 +40,6 @@ const consoleMessages: ConsoleMessages = {
   missing: () => 'The license key for HyperFormula is missing.',
 }
 
-let _notified = false
-
 /**
  * Checks if the provided license key is grammatically valid or not expired.
  *
@@ -74,9 +72,8 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
     messageDescriptor.template = LicenseKeyValidityState.INVALID
   }
 
-  if (!_notified && messageDescriptor.template !== LicenseKeyValidityState.VALID) {
+  if (messageDescriptor.template !== LicenseKeyValidityState.VALID) {
     console.warn(consoleMessages[messageDescriptor.template](messageDescriptor.vars))
-    _notified = true
   }
 
   return messageDescriptor.template

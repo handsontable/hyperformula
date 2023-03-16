@@ -23,7 +23,7 @@ import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 
-const privatePool: WeakMap<Config, { licenseKeyValidityState: LicenseKeyValidityState }> = new WeakMap()
+const licenceKeyValidityMap: Map<string, LicenseKeyValidityState> = new Map()
 
 export interface ConfigParams {
   /**
@@ -560,7 +560,6 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly licenseKey: string
   /** @inheritDoc */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public readonly functionPlugins: FunctionPluginDefinition[]
   /** @inheritDoc */
   public readonly leapYear1900: boolean
@@ -710,10 +709,6 @@ export class Config implements ConfigParams, ParserConfig {
     this.currencySymbol = this.setupCurrencySymbol(currencySymbol)
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
 
-    privatePool.set(this, {
-      licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
-    })
-
     configCheckIfParametersNotInConflict(
       {value: this.decimalSeparator, name: 'decimalSeparator'},
       {value: this.functionArgSeparator, name: 'functionArgSeparator'},
@@ -749,7 +744,20 @@ export class Config implements ConfigParams, ParserConfig {
    * @internal
    */
   public get licenseKeyValidityState(): LicenseKeyValidityState {
-    return (privatePool.get(this) as Config).licenseKeyValidityState
+    return this.calculateLicenseKeyValidityState()
+  }
+
+  public calculateLicenseKeyValidityState(): LicenseKeyValidityState {
+    const licenseKey = this.licenseKey || ''
+    const validityStateFromMap = licenceKeyValidityMap.get(licenseKey)
+
+    if (validityStateFromMap) {
+      return validityStateFromMap
+    }
+
+    const calculatedValidityState = checkLicenseKeyValidity(licenseKey)
+    licenceKeyValidityMap.set(licenseKey, calculatedValidityState)
+    return calculatedValidityState
   }
 
   public getConfig(): ConfigParams {
