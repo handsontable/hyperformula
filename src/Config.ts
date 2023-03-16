@@ -486,6 +486,9 @@ export interface ConfigParams {
 
 export type ConfigParamsList = keyof ConfigParams
 
+/**
+ * A class that stores and manages the configuration parameters.
+ */
 export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
@@ -615,6 +618,9 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useWildcards: boolean
   public readonly matchWholeCell: boolean
 
+  /**
+   * Constructor
+   */
   constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
     const {
       accentSensitive,
@@ -738,8 +744,7 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   /**
-   * Proxied property to its private counterpart. This makes the property
-   * as accessible as the other Config options but without ability to change the value.
+   * Returns the validity state for the current license key.
    *
    * @internal
    */
@@ -747,6 +752,9 @@ export class Config implements ConfigParams, ParserConfig {
     return this.calculateLicenseKeyValidityState()
   }
 
+  /**
+   * Calculates the validity state for the current licenseKey and stores it in `licenceKeyValidityMap` for future use.
+   */
   public calculateLicenseKeyValidityState(): LicenseKeyValidityState {
     const licenseKey = this.licenseKey || ''
     const validityStateFromMap = licenceKeyValidityMap.get(licenseKey)

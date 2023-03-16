@@ -48,6 +48,9 @@ export type EngineState = {
   emitter: Emitter,
 }
 
+/**
+ * A class responsible for building the HyperFormula engine
+ */
 export class BuildEngineFactory {
   public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): EngineState {
     const config = new Config(configInput)
@@ -68,6 +71,9 @@ export class BuildEngineFactory {
     return this.buildEngine(config, sheets, namedExpressions, stats)
   }
 
+  /**
+   * The main method of this class. Creates all the objects required for the HyperFormula engine and returns them as a EngineState object.
+   */
   private static buildEngine(config: Config, sheets: Sheets = {}, inputNamedExpressions: SerializedNamedExpression[] = [], stats: Statistics = config.useStats ? new Statistics() : new EmptyStatistics()): EngineState {
     stats.start(StatType.BUILD_ENGINE_TOTAL)
 

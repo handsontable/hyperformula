@@ -115,6 +115,13 @@ export class HyperFormula implements TypedEmitter {
   private static registeredLanguages: Map<string, TranslationPackage> = new Map()
   private _evaluationSuspended: boolean = false
 
+  /**
+   * Constructor.
+   *
+   * To create a HyperFormula instance use one of the static methods.
+   *
+   * @internal
+   */
   protected constructor(
     private _config: Config,
     private _stats: Statistics,
@@ -475,7 +482,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    * @param {FunctionPluginDefinition} plugin - plugin class
-   * @param translations
+   * @param {FunctionTranslationsPackage} translations - optional package of function names translations
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exist in plugin or plugin class definition is not consistent with metadata
@@ -604,6 +611,11 @@ export class HyperFormula implements TypedEmitter {
     return FunctionRegistry.getPlugins()
   }
 
+  /**
+   * Builds HyperFormula instance from `EngineState` object
+   *
+   * @internal
+   */
   private static buildFromEngineState(engine: EngineState): HyperFormula {
     return new HyperFormula(
       engine.config,
@@ -3366,7 +3378,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {() => void} batchOperations
+   * @param {() => void} batchOperations - a function that runs all the operations that should be included in a batch
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * @fires [[evaluationSuspended]] always
@@ -4157,9 +4169,9 @@ export class HyperFormula implements TypedEmitter {
    * Interprets number as a date.
    *
    * @param {number} inputNumber - number of days since nullDate, should be non-negative, fractions are ignored.
-
+   *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
