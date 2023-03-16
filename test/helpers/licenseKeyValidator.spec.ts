@@ -88,9 +88,9 @@ describe('license key', () => {
         maxRows: 10,
       })
 
-      engine.addNamedExpression('ABC', '=Sheet1!$A$1')
+      engine.addNamedExpression('ABC', '=SUM(Sheet1!$A$1:Sheet1!$B$1)')
       engine.updateConfig({ maxRows: 100 })
-      engine.setCellContents(adr('A1'), 42)
+      engine.setCellContents(adr('A2'), '=TODAY()')
       engine.setSheetContent(0, [[42]])
       engine.addSheet('test')
       engine.addRows(0, [0, 1])
