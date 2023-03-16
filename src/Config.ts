@@ -620,6 +620,8 @@ export class Config implements ConfigParams, ParserConfig {
 
   /**
    * Constructor
+   *
+   * @internal
    */
   constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
     const {
@@ -754,6 +756,8 @@ export class Config implements ConfigParams, ParserConfig {
 
   /**
    * Calculates the validity state for the current licenseKey and stores it in `licenceKeyValidityMap` for future use.
+   *
+   * @internal
    */
   public calculateLicenseKeyValidityState(): LicenseKeyValidityState {
     const licenseKey = this.licenseKey || ''
