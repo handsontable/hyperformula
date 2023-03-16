@@ -10,13 +10,13 @@ describe('Matrix', () => {
 
   it('fill - zero sized rows', () => {
     expect(() => {
-      const matrix = new ArrayValue([])
+      new ArrayValue([])
     }).toThrowError('Incorrect array size')
   })
 
   it('fill - zero sized columns', () => {
     expect(() => {
-      const matrix = new ArrayValue([[], [], []])
+      new ArrayValue([[], [], []])
     }).toThrowError('Incorrect array size')
   })
 
