@@ -35,6 +35,9 @@ describe('RemoveRowsTransformer', () => {
       const astSumError = astSum.args[0] as ErrorAst
       expect(astSumError.type).toEqual(ErrorType.ERROR)
       expect(astSumError.error.type).toEqual(ErrorType.REF)
+      expect(cellAddress.sheet).toEqual(0)
+      expect(cellAddress.col).toEqual(0)
+      expect(cellAddress.row).toEqual(-3)
     }
 
   })

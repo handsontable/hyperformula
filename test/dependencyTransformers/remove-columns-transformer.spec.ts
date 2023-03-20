@@ -3,7 +3,7 @@ import { Config } from '../../src/Config'
 import { CellRangeAst } from '../../src/parser'
 import { buildEmptyParserWithCaching } from '../parser/common'
 import { adr } from '../testUtils'
-import { ParenthesisAst, ProcedureAst, ErrorAst } from '../../src/parser/Ast'
+import { ParenthesisAst, ProcedureAst } from '../../src/parser/Ast'
 import { ColumnsSpan } from '../../src/Span'
 import { RemoveColumnsTransformer } from '../../src/dependencyTransformers/RemoveColumnsTransformer'
 
@@ -28,7 +28,7 @@ describe('RemoveColumnsTransformer', () => {
     }
 
     expect(() => {
-      const [transformedAst, cellAddress] = transformer.transformSingleAst(ast, simpleCellAddress(0, 5, 5))
+      transformer.transformSingleAst(ast, simpleCellAddress(0, 5, 5))
     }).toThrowError('Cannot happen')
 
   })
