@@ -1,5 +1,18 @@
 # Built-in functions
 
+<!--
+The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress.
+It makes the page wider to accommodate large tables
+-->
+<div class="widePage"></div>
+<style>
+.page:has(.widePage) .theme-default-content:not(.custom), /* markdown content */
+.page:has(.widePage) .page-edit, /* footer containing the "Help us improve the page" link */
+.page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
+  max-width: 1200px !important; /* override default max-width of 740px for this page */
+}
+</style>
+
 ## Overview
 
 HyperFormula comes with an extensive library of pre-built functions. You can use
@@ -8,6 +21,8 @@ logic of function are similar to what is considered the standard in modern
 spreadsheet software. That is because a spreadsheet is probably the most
 universal software ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
+
+Each of HyperFormula's built-in function names is available in [17 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions) can be added.
 
 The latest version of HyperFormula has an extensive collection of
 **{{ $page.functionsCount }}** functions grouped into categories:
@@ -28,34 +43,9 @@ The latest version of HyperFormula has an extensive collection of
 _Some categories such as compatibility, cube, and database are yet to be
 supported._
 
-## Internationalization
-
-Each of HyperFormula's built-in function names (and
-[errors](types-of-errors.md)) is available in
-[17 language versions](localizing-functions.md#list-of-supported-languages).
-
-To support more languages or properties, create a
-[custom language pack](localizing-functions).
-
-## Custom functions
-
-One of the most valuable features of HyperFormula is its extensibility. All
-functions are implemented within the plugin architecture which means it is easy
-to remove or replace them. This means you are not limited by the current
-functionality of the engine. HyperFormula lets you design your own
-[custom functions](custom-functions).
-
-## Demo
-
-<iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/built-in-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-  title="handsontable/hyperformula-demos: built-in-functions"
-  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
-</iframe>
-
-<br><br>
+::: tip
+You can modify the built-in functions or create your own, by adding a [custom function](custom-functions).
+:::
 
 ## List of available functions
 
