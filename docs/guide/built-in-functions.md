@@ -31,7 +31,7 @@ _Some categories such as compatibility, cube, and database are yet to be
 supported._
 
 ::: tip
-You can use [custom functions](custom-functions) to overwrite the standard implementations or add your own functions.
+You can modify the built-in functions or create your own, by adding a [custom function](custom-functions).
 :::
 
 ## Demo
