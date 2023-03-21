@@ -1,5 +1,18 @@
 # Built-in functions
 
+<!--
+The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress.
+It makes the page wider to accommodate large tables
+-->
+<div class="widePage"></div>
+<style>
+.page:has(.widePage) .theme-default-content:not(.custom), /* markdown content */
+.page:has(.widePage) .page-edit, /* footer containing the "Help us improve the page" link */
+.page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
+  max-width: 1200px !important; /* override default max-width of 740px for this page */
+}
+</style>
+
 ## Overview
 
 HyperFormula comes with an extensive library of pre-built functions. You can use
