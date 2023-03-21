@@ -9,6 +9,8 @@ spreadsheet software. That is because a spreadsheet is probably the most
 universal software ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
+Each of HyperFormula's built-in function names is available in [17 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions) can be added.
+
 The latest version of HyperFormula has an extensive collection of
 **{{ $page.functionsCount }}** functions grouped into categories:
 
@@ -28,22 +30,9 @@ The latest version of HyperFormula has an extensive collection of
 _Some categories such as compatibility, cube, and database are yet to be
 supported._
 
-## Internationalization
-
-Each of HyperFormula's built-in function names (and
-[errors](types-of-errors.md)) is available in
-[17 language versions](localizing-functions.md#list-of-supported-languages).
-
-To support more languages or properties, create a
-[custom language pack](localizing-functions).
-
-## Custom functions
-
-One of the most valuable features of HyperFormula is its extensibility. All
-functions are implemented within the plugin architecture which means it is easy
-to remove or replace them. This means you are not limited by the current
-functionality of the engine. HyperFormula lets you design your own
-[custom functions](custom-functions).
+::: tip
+You can use [custom functions](custom-functions) to overwrite the standard implementations or add your own functions.
+:::
 
 ## Demo
 
