@@ -231,7 +231,7 @@ export class NamedExpressions {
     }
     const namedExpression = store?.get(expressionName)
     if (store === undefined || namedExpression === undefined || !namedExpression.added) {
-      throw 'Named expression does not exist'
+      throw Error('Named expression does not exist')
     }
     store.remove(expressionName)
     if (store instanceof WorksheetStore && store.mapping.size === 0) {

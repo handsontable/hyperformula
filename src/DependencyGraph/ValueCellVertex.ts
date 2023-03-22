@@ -39,6 +39,6 @@ export class ValueCellVertex {
   }
 
   public setCellValue(_cellValue: ValueCellVertexValue): never {
-    throw 'SetCellValue is deprecated for ValueCellVertex'
+    throw Error('SetCellValue is deprecated for ValueCellVertex')
   }
 }
