@@ -603,7 +603,13 @@ describe('DenseStrategy', () => {
       results.push(String(cellVertex.getCellValue()))
     }
 
+    const outOfRangeResults = []
+    for (const cellVertex of denseStratgey.verticesFromColumn(5)) {
+      outOfRangeResults.push(String(cellVertex.getCellValue()))
+    }
+
     expect(results).toEqual(['48', '49', '50'])
+    expect(outOfRangeResults).toEqual([])
   })
 
   it('get all vertices - from row', () => {
@@ -626,7 +632,13 @@ describe('DenseStrategy', () => {
       results.push(String(cellVertex.getCellValue()))
     }
 
+    const outOfRangeResults = []
+    for (const cellVertex of denseStratgey.verticesFromRow(5)) {
+      outOfRangeResults.push(String(cellVertex.getCellValue()))
+    }
+
     expect(results).toEqual(['43', '46', '49'])
+    expect(outOfRangeResults).toEqual([])
   })
 })
 
