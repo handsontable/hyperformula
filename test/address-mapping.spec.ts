@@ -483,7 +483,7 @@ describe('SparseStrategy', () => {
     ])
   })
 
-  it('get all vertices - from columns', () => {
+  it('get all vertices - from column', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
     mapping.addSheet(0, sparseStrategy)
@@ -512,7 +512,7 @@ describe('SparseStrategy', () => {
     expect(outOfRangeResults).toEqual([])
   })
 
-  it('get all vertices - from rows', () => {
+  it('get all vertices - from row', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
     mapping.addSheet(0, sparseStrategy)
@@ -532,7 +532,13 @@ describe('SparseStrategy', () => {
       results.push(String(cellVertex.getCellValue()))
     }
 
+    const outOfRangeResults = []
+    for (const cellVertex of sparseStrategy.verticesFromRow(5)) {
+      outOfRangeResults.push(String(cellVertex.getCellValue()))
+    }
+
     expect(results).toEqual(['43', '46', '49'])
+    expect(outOfRangeResults).toEqual([])
   })
 })
 
@@ -577,7 +583,7 @@ describe('DenseStrategy', () => {
     ])
   })
 
-  it('get all vertices - from columns', () => {
+  it('get all vertices - from column', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
     mapping.addSheet(0, denseStratgey)
@@ -600,7 +606,7 @@ describe('DenseStrategy', () => {
     expect(results).toEqual(['48', '49', '50'])
   })
 
-  it('get all vertices - from rows', () => {
+  it('get all vertices - from row', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
     mapping.addSheet(0, denseStratgey)
