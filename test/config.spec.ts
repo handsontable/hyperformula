@@ -102,7 +102,7 @@ describe('Config', () => {
     const functionName = '0123456ABCDEFGH'
     expect(() => {
       config.translationPackage.getFunctionTranslation(functionName)
-    }).toThrowError(new MissingTranslationError(`functions.${functionName}`))
+    }).toThrow(new MissingTranslationError(`functions.${functionName}`))
   })
 
   it('should throw error when Error Translation cannot be found', () => {
@@ -110,7 +110,7 @@ describe('Config', () => {
     const errorType = '0123456ABCDEFGH'
     expect(() => {
       config.translationPackage.getErrorTranslation(errorType as ErrorType)
-    }).toThrowError(new MissingTranslationError(`errors.${errorType}`))
+    }).toThrow(new MissingTranslationError(`errors.${errorType}`))
   })
 
   it('should throw error when UI Translation cannot be found', () => {
@@ -118,7 +118,7 @@ describe('Config', () => {
     const uiElement = '0123456ABCDEFGH'
     expect(() => {
       config.translationPackage.getUITranslation(uiElement as UIElement)
-    }).toThrowError(new MissingTranslationError(`ui.${uiElement}`))
+    }).toThrow(new MissingTranslationError(`ui.${uiElement}`))
   })
 
   it('should throw error when there is a conflict between separators', () => {
