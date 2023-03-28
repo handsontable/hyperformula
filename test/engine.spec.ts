@@ -120,6 +120,31 @@ describe('#buildFromArray', () => {
   })
 })
 
+describe('#getCellHyperlink', () => {
+  it('returns hyperlink url when present', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[`=HYPERLINK("${url}","${linkLabel}")`]])
+    expect(engine.getCellHyperlink(adr('A1'))).toEqual(url)
+  })
+
+  it('returns undefined when url not present', () => {
+    const engine = HyperFormula.buildFromArray([['=HYPERLINK()', '5', 's1', null]])
+    expect(engine.getCellHyperlink(adr('A1'))).toEqual(undefined)
+    expect(engine.getCellHyperlink(adr('B1'))).toEqual(undefined)
+    expect(engine.getCellHyperlink(adr('C1'))).toEqual(undefined)
+    expect(engine.getCellHyperlink(adr('D1'))).toEqual(undefined)
+  })
+
+  it('returns undefined when HYPERLINK not the root expression', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const prefix = 'Prefix: '
+    const engine = HyperFormula.buildFromArray([[`=CONCATENATE("${prefix}",HYPERLINK("${url}","${linkLabel}"))`]])
+    expect(engine.getCellHyperlink(adr('A1'))).toEqual(undefined)
+  })
+})
+
 describe('#getCellFormula', () => {
   it('returns formula when present', () => {
     const engine = HyperFormula.buildFromArray([

@@ -687,6 +687,36 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Returns the `HYPERLINK` url for a cell of a given address or `undefined` for an address that does not exist or a cell that is not `HYPERLINK`
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=HYPERLINK("https://hyperformula.handsontable.com/", "HyperFormula")', '0'],
+   * ]);
+   *
+   * // should return url of 'HYPERLINK': https://hyperformula.handsontable.com/
+   * const A1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'undefined' for a cell that is not 'HYPERLINK'
+   * const B1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellHyperlink(cellAddress: SimpleCellAddress): string | undefined {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    return this._serialization.getCellHyperlink(cellAddress)
+  }
+
+  /**
    * Returns [[RawCellContent]] with a serialized content of the cell of a given address: either a cell formula, an explicit value, or an error.
    *
    * @param {SimpleCellAddress} cellAddress - cell coordinates

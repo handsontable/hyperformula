@@ -101,6 +101,7 @@ const dictionary: RawTranslationPackage = {
     HEX2OCT: 'HEKSAOKT',
     HLOOKUP: 'VHAKU',
     HOUR: 'TUNNIT',
+    HYPERLINK: 'HYPERLINK',
     IF: 'JOS',
     IFERROR: 'JOSVIRHE',
     IFNA: 'JOSPUUTTUU',
