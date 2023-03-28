@@ -32,6 +32,7 @@ module.exports = {
     '@typescript-eslint/brace-style': 'error', // wtf
     '@typescript-eslint/no-unnecessary-boolean-literal-compare': ['error'],
     '@typescript-eslint/no-extra-non-null-assertion': ['error'],
+    '@typescript-eslint/no-throw-literal': ['error'],
     '@typescript-eslint/array-type': ['error'],
     '@typescript-eslint/space-before-function-paren': ["error", {
       "anonymous": "never",
