@@ -1,9 +1,10 @@
-import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType} from '../src'
+import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType, SimpleCellAddress} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
+import {ExpectedValueOfTypeError} from '../src//errors'
 
 describe('#buildFromArray', () => {
   it('load single value', () => {
@@ -645,6 +646,13 @@ describe('#getCellValueFormat', () => {
     expect(engine.getCellValueFormat(adr('A1'))).toEqual('₪')
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
+  })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildFromArray([[]])    
+    expect(() => {
+      engine.getCellValueFormat({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
   })
 })
 
