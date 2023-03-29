@@ -4056,7 +4056,7 @@ export class HyperFormula implements TypedEmitter {
     }
 
     if (ast.type === AstNodeType.ERROR && !ast.error) {
-      return false
+      return false // codecov note: could not identify a formulaString that would cause this condition
     }
 
     return true
