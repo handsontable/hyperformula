@@ -1,8 +1,8 @@
 # List of differences with other spreadsheets
 
-<!-- 
-The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress. 
-It makes the page wider to accommodate large tables  
+<!--
+The below dummy div uses a CSS class to alter the .page layout for the current page without any additional customization of VuePress.
+It makes the page wider to accommodate large tables
 -->
 <div class="widePage"></div>
 <style>

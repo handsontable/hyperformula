@@ -439,7 +439,7 @@ export class UndoRedo {
 
   public commitBatchMode() {
     if (this.batchUndoEntry === undefined) {
-      throw 'Batch mode wasn\'t started'
+      throw Error('Batch mode wasn\'t started')
     }
     this.addUndoEntry(this.batchUndoEntry)
     this.batchUndoEntry = undefined
@@ -472,7 +472,7 @@ export class UndoRedo {
   public undo() {
     const operation = this.undoStack.pop()
     if (!operation) {
-      throw 'Attempted to undo without operation on stack'
+      throw Error('Attempted to undo without operation on stack')
     }
 
     this.undoEntry(operation)
@@ -654,7 +654,7 @@ export class UndoRedo {
     const operation = this.redoStack.pop()
 
     if (!operation) {
-      throw 'Attempted to redo without operation on stack'
+      throw Error('Attempted to redo without operation on stack')
     }
 
     this.redoEntry(operation)
