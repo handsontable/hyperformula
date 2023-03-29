@@ -565,6 +565,13 @@ describe('#getCellType', () => {
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.FORMULA)
   })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
+    expect(() => {
+      engine.getCellType({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })    
 })
 
 describe('#getCellValueDetailedType', () => {
@@ -698,6 +705,13 @@ describe('#getCellValueType', () => {
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.ERROR)
     expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.ERROR)
   })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
+    expect(() => {
+      engine.getCellValueType({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })
 })
 
 describe('#doesCellHaveSimpleValue', () => {
@@ -713,6 +727,13 @@ describe('#doesCellHaveSimpleValue', () => {
     expect(engine.doesCellHaveSimpleValue(adr('B1'))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr('C1'))).toEqual(false)
   })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', null, '=TRANSPOSE(A1:A1)']])
+    expect(() => {
+      engine.doesCellHaveSimpleValue({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })   
 })
 
 describe('#doesCellHaveFormula', () => {
@@ -734,6 +755,13 @@ describe('#doesCellHaveFormula', () => {
     const engine = HyperFormula.buildFromArray([['=ARRAYFORMULA(ISEVEN(B1:B2*2))']])
     expect(engine.doesCellHaveFormula(adr('A1'))).toEqual(true)
   })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildFromArray([['=ARRAYFORMULA(ISEVEN(B1:B2*2))']])
+    expect(() => {
+      engine.doesCellHaveFormula({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })  
 })
 
 describe('#isCellEmpty', () => {
@@ -751,6 +779,13 @@ describe('#isCellEmpty', () => {
     expect(engine.isCellEmpty(adr('C1'))).toEqual(false)
     expect(engine.isCellEmpty(adr('D1'))).toEqual(false)
   })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildFromArray([['1', '=SUM(1, 2)', '{=TRANSPOSE(A1:A1)}', 'foo']])
+    expect(() => {
+      engine.isCellEmpty({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })  
 })
 
 describe('#isCellPartOfArray', () => {
@@ -766,6 +801,13 @@ describe('#isCellPartOfArray', () => {
     expect(engine.isCellPartOfArray(adr('C1'))).toEqual(false)
     expect(engine.isCellPartOfArray(adr('D1'))).toEqual(false)
   })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildFromArray([['1', '', '=SUM(1, 2)', 'foo']])
+    expect(() => {
+      engine.isCellPartOfArray({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })  
 })
 
 describe('dateTime', () => {
