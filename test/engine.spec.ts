@@ -143,6 +143,20 @@ describe('#getCellHyperlink', () => {
     const engine = HyperFormula.buildFromArray([[`=CONCATENATE("${prefix}",HYPERLINK("${url}","${linkLabel}"))`]])
     expect(engine.getCellHyperlink(adr('A1'))).toEqual(undefined)
   })
+
+  it('returns hyperlink when HYPERLINK does not use strings directly', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[url, linkLabel, `=HYPERLINK(A1,B1)`]])
+    expect(engine.getCellHyperlink(adr('C1'))).toEqual(url)
+  })
+
+  it('returns hyperlink when HYPERLINK uses complex params', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[url, linkLabel, `=HYPERLINK(INDEX(A:A,ROW()),B1)`]])
+    expect(engine.getCellHyperlink(adr('C1'))).toEqual(url)
+  })
 })
 
 describe('#getCellFormula', () => {

@@ -32,4 +32,18 @@ describe('Function HYPERLINK', () => {
     const engine = HyperFormula.buildFromArray([[`=CONCATENATE("${prefix}",HYPERLINK("${url}","${linkLabel}"))`]])
     expect(engine.getCellValue(adr('A1'))).toEqual(prefix + linkLabel)
   })
+
+  it('when arguments are simple references', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[url, linkLabel, `=HYPERLINK(A1,B1)`]])
+    expect(engine.getCellValue(adr('C1'))).toEqual(linkLabel)
+  })
+
+  it('when arguments are complex', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[url, linkLabel, `=HYPERLINK(INDEX(A:A,ROW()),B1)`]])
+    expect(engine.getCellValue(adr('C1'))).toEqual(linkLabel)
+  })
 })

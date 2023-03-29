@@ -33,10 +33,8 @@ export class Serialization {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof FormulaCellVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as ProcedureAst
-      if (('HYPERLINK' === formula.procedureName) && (formula.args.length > 0)) {
-        if (AstNodeType.STRING === formula.args[0].type) {
-          return formula.args[0].value
-        }
+       if ('HYPERLINK' === formula.procedureName) {
+        return formula.hyperlink
       }
     }
     return undefined

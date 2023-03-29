@@ -21,6 +21,7 @@ export class HyperlinkPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public hyperlink(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HYPERLINK'), (url, linkLabel) => {
+      ast.hyperlink = url
       return linkLabel ?? url
     })
   }
