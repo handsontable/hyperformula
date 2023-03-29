@@ -12,7 +12,6 @@ import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {buildLexerConfig, ProcedureAst, Unparser} from './parser'
-import {AstNodeType} from '../src/parser'
 
 export interface SerializedNamedExpression {
   name: string,
