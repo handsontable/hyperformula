@@ -1,10 +1,11 @@
 import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType, SimpleCellAddress, SimpleCellRange} from '../src'
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
+import {AbsoluteCellRange, simpleCellRange} from '../src/AbsoluteCellRange'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
-import {ExpectedValueOfTypeError} from '../src//errors'
+import {ExpectedValueOfTypeError} from '../src/errors'
+import {simpleCellAddress} from '../src/Cell'
 
 describe('#buildFromArray', () => {
   it('load single value', () => {
@@ -930,6 +931,26 @@ describe('#getFillRangeData', () => {
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2', 0), 1, 1), AbsoluteCellRange.spanFrom(adr('C3', 1), 1, 1))
     ).toEqual([[null]])
   })
+
+  it('should throw error if source is malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
+      'Sheet2': [],
+    })
+    expect(() => {
+      engine.getFillRangeData({} as SimpleCellRange, AbsoluteCellRange.spanFrom(adr('C3', 1), 3, 3))
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
+  })
+
+  it('should throw error if target is malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
+      'Sheet2': [],
+    })
+    expect(() => {
+      engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('C3', 1), 3, 3), {} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'target'))
+  })
 })
 
 describe('#simpleCellRangeToString', () => {
@@ -952,5 +973,19 @@ describe('#simpleCellAddressToString', () => {
     expect(() => {
       engine.simpleCellAddressToString({} as SimpleCellAddress, 0)
     }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
+})
+
+describe('#simpleCellAddressFromString', () => {
+  it('should convert a string to a simpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.simpleCellAddressFromString('C5', 2)).toEqual(simpleCellAddress(2, 2, 4))
+  })
+})
+
+describe('#simpleCellRangeFromString', () => {
+  it('should convert a string to a simpleCellRange', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.simpleCellRangeFromString('A1:C1', 0)).toEqual(simpleCellRange(adr('A1'), adr('C1')))
   })
 })
