@@ -93,7 +93,7 @@ describe('Moving rows - checking if its possible', () => {
     expect(engine.isItPossibleToMoveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))).toBe(true)
   })
 
-  it('should throw error if testing with a malformed source ', () => {
+  it('should throw error if testing with a source that is a malformed SimpleCellRange', () => {
     const engine = HyperFormula.buildFromArray([
       [null, null],
     ])
@@ -102,7 +102,7 @@ describe('Moving rows - checking if its possible', () => {
     }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 
-  it('should throw error if testing with a malformed target', () => {
+  it('should throw error if testing with a destinationLeftCorner that is a malformed SimpleCellAddress', () => {
     const engine = HyperFormula.buildFromArray([
       [null, null],
     ])
@@ -386,7 +386,7 @@ describe('Move cells', () => {
     expect(() => engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), cellInLastRow)).toThrow(new SheetSizeLimitExceededError())
   })
 
-  it('should throw error trying to move cells with a malformed source ', () => {
+  it('should throw error trying to move cells when source is a malformed SimpleCellRange', () => {
     const engine = HyperFormula.buildFromArray([
       [null, null],
     ])
@@ -395,7 +395,7 @@ describe('Move cells', () => {
     }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 
-  it('should throw error trying to move cells with a malformed target', () => {
+  it('should throw error trying to move cells when destinationLeftCorner is a malformed SimpleCellAddress', () => {
     const engine = HyperFormula.buildFromArray([
       [null, null],
     ])

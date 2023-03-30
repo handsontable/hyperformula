@@ -73,7 +73,7 @@ describe('Changing cell content - checking if its possible', () => {
     expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
   })
 
-  it('should throw error if testing with a malformed source ', () => {
+  it('should throw error if testing with a malformed address', () => {
     const engine = HyperFormula.buildEmpty()
     expect(() => {
       engine.isItPossibleToSetCellContents({} as SimpleCellAddress)

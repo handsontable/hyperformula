@@ -36,7 +36,7 @@ describe('Temporary formulas - normalization', () => {
     expect(engine.normalizeFormula(formula)).toBe('=ShEeT1!A1+10')
   })
 
-  it('throws an error if formula is malformed', () => {
+  it('throws an error if formulaString is malformed', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {

@@ -356,7 +356,7 @@ describe('moving ranges', () => {
     }).toThrowError('Cannot perform this operation, target location has an array inside.')
   })
 
-  it('should not be possible to cut using a malformed source SimpleCellRange', () => {
+  it('should not be possible to cut when source is a malformed SimpleCellRange', () => {
     const engine = HyperFormula.buildEmpty()
     expect(() => {
       engine.cut({} as SimpleCellRange)

@@ -414,7 +414,7 @@ describe('Copy - paste integration', () => {
     expect(() => engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
   })
 
-  it('should throw error when trying to paste when target is a malformed SimpleCellAddress', () => {
+  it('should throw error when trying to paste when targetLeftCorner is a malformed SimpleCellAddress', () => {
     const engine = HyperFormula.buildEmpty()
     expect(() => {
       engine.paste({} as SimpleCellAddress)

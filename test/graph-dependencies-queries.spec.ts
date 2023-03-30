@@ -43,7 +43,7 @@ describe('address queries', () => {
       expect(engine.getCellDependents(adr('D1', dataSheetId))).toEqual([])
     })
 
-    it('should throw error if malformed SimpleCellAddress is used', () => {
+    it('should throw error if address is a malformed SimpleCellAddress', () => {
       const engine = HyperFormula.buildFromArray([
         [1, 2, 3],
         ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
@@ -76,7 +76,7 @@ describe('address queries', () => {
       expect(engine.getCellPrecedents(simpleCellRange(adr('A3'), adr('B3')))).toEqual([])
     })
 
-    it('should throw error if malformed SimpleCellAddress is used', () => {
+    it('should throw error if address is a malformed SimpleCellAddress', () => {
       const engine = HyperFormula.buildFromArray([
         [1, 2, 3],
         ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
