@@ -182,6 +182,13 @@ describe('#getCellFormula', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=TRANSPOSE(')
   })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellFormula({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
 })
 
 describe('#getAllFormulas', () => {
@@ -290,6 +297,13 @@ describe('#getCellValue', () => {
     const error = engine.getCellValue(adr('A1')) as DetailedCellError
     expect(error).toEqualError(detailedError(ErrorType.VALUE, '', new Config({language: 'plPL'})))
     expect(error.value).toEqual('#ARG!')
+  })
+
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellValue({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
   })
 })
 
@@ -426,6 +440,13 @@ describe('#getCellSerialized', () => {
     ], {language: 'plPL'})
 
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#ARG!')
+  })
+
+  it('should throw error if malformed SimpleCellRange is used', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellSerialized({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
   })
 })
 
