@@ -1,4 +1,4 @@
-import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType, SimpleCellAddress} from '../src'
+import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType, SimpleCellAddress, SimpleCellRange} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
@@ -929,5 +929,28 @@ describe('#getFillRangeData', () => {
 
     expect(engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('B2', 0), 1, 1), AbsoluteCellRange.spanFrom(adr('C3', 1), 1, 1))
     ).toEqual([[null]])
+  })
+})
+
+describe('#simpleCellRangeToString', () => {
+  it('return a string for a cell range', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+    expect(engine.simpleCellRangeToString(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2), 0)).toBe('A1:B2')
+  })
+
+  it('should throw error if malformed SimpleCellRange is used', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.simpleCellRangeToString({} as SimpleCellRange, 0)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'cellRange'))
+  })
+})
+
+describe('#simpleCellAddressToString', () => {
+  it('should throw error if malformed SimpleCellAddress is used', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.simpleCellAddressToString({} as SimpleCellAddress, 0)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
   })
 })
