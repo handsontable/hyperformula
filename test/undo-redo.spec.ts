@@ -2,6 +2,20 @@ import {ErrorType, HyperFormula, NoOperationToRedoError, NoOperationToUndoError}
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {ErrorMessage} from '../src/error-message'
 import {adr, detailedError, expectEngineToBeTheSameAs} from './testUtils'
+import {UndoRedo, AddSheetUndoEntry} from '../src/UndoRedo'
+import {Config} from '../src/Config'
+import {DependencyGraph} from '../src/DependencyGraph'
+import {Statistics} from '../src/statistics'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
+import {NamedExpressions} from '../src/NamedExpressions'
+import {Operations} from '../src/Operations'
+import {buildColumnSearchStrategy} from '../src/Lookup/SearchStrategy'
+import {CellContentParser} from '../src/CellContentParser'
+import {DateTimeHelper} from '../src/DateTimeHelper'
+import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
+import {ParserWithCaching} from '../src/parser'
+import {ArraySizePredictor} from '../src/ArraySize'
 
 describe('Undo - removing rows', () => {
   it('works for empty row', () => {
@@ -957,6 +971,55 @@ describe('UndoRedo - #isThereSomethingToRedo', () => {
     expect(engine.isThereSomethingToRedo()).toBe(true)
     engine.clearRedoStack()
     expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+})
+
+describe('UndoRedo - at the Operations layer', () => {
+  let undoRedo: UndoRedo
+
+  beforeEach(() => {
+    const config = new Config()
+    const stats = new Statistics()
+    const namedExpressions = new NamedExpressions()
+    const functionRegistry = new FunctionRegistry(config)
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
+    const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
+    const sheetMapping = dependencyGraph.sheetMapping
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
+    const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
+    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
+    const operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
+    undoRedo = new UndoRedo(config, operations)
+ })
+
+  it('commitBatchMode should throw when a batch is not in progress', () => {
+    expect(() => {
+      undoRedo.commitBatchMode()
+    }).toThrowError("Batch mode wasn't started") 
+  })
+
+  it('clearUndoStack should clear out all undo entries', () => {
+    expect(undoRedo.isUndoStackEmpty()).toBe(true)
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 1'))
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 2'))
+    expect(undoRedo.isUndoStackEmpty()).toBe(false)
+    undoRedo.clearUndoStack()
+    expect(undoRedo.isUndoStackEmpty()).toBe(true)
+  })
+
+  it('undo should throw when there is nothing on the undo stack', () => {
+    expect(() => {
+      undoRedo.undo()
+    }).toThrowError('Attempted to undo without operation on stack') 
+  })
+
+  it('redo should throw when there is nothing on the redo stack', () => {
+    expect(() => {
+      undoRedo.redo()
+    }).toThrowError('Attempted to redo without operation on stack') 
   })
 })
 
