@@ -206,6 +206,13 @@ describe('#getRangeFormulas', () => {
 
     expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()', undefined], ['=SUM(', undefined, undefined]], out)
   })
+
+  it('should throw error if malformed SimpleCellRange is used', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(() => {
+      engine.getRangeFormulas({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
+  })
 })
 
 describe('#getSheetFormulas', () => {
@@ -331,6 +338,13 @@ describe('#getRangeValues', () => {
 
     expectArrayWithSameContent([[1, true, null]], out)
   })
+
+  it('should throw error if malformed SimpleCellRange is used', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(() => {
+      engine.getRangeValues({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
+  })
 })
 
 describe('#getSheetValues', () => {
@@ -450,6 +464,13 @@ describe('#getRangeSerialized', () => {
     const out = engine.getRangeSerialized(AbsoluteCellRange.spanFrom(adr('A1'), 6, 1))
 
     expectArrayWithSameContent([['=SUM(1, B1)', '2', '#VALUE!', null, '=#DIV/0!', '{=TRANSPOSE(A1:B1)}']], out)
+  })
+
+  it('should throw error if malformed SimpleCellRange is used', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(() => {
+      engine.getRangeSerialized({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 })
 
