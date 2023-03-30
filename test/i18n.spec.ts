@@ -1,11 +1,12 @@
-import {HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
+import {ErrorType, HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
 import {ProtectedFunctionTranslationError} from '../src'
-import {RawTranslationPackage, TranslationPackage} from '../src/i18n'
+import {ErrorTranslationSet, RawTranslationPackage, TranslationPackage} from '../src/i18n'
 import * as languages from '../src/i18n/languages'
 import {enGB, plPL, enUS} from '../src/i18n/languages'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
+import {MissingTranslationError} from '../src/errors'
 
 describe('i18n', () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
@@ -108,6 +109,18 @@ describe('i18n', () => {
     expect(() =>
       new TranslationPackage({'VERSION': 'FOO'}, plPL.errors, plPL.ui)
     ).toThrow(new ProtectedFunctionTranslationError('VERSION'))
+  })
+
+  it('should not be possible to construct TranslationPackage with untranslated memebrs of Error Type', () => {
+    const unknownErrorType = ErrorType.SPILL as string
+    const errorsMap: Record<string, string> = {}
+    for (const key of Object.values(ErrorType)) {
+      errorsMap[key] = ErrorType[key]
+    }
+    delete errorsMap[unknownErrorType]
+    expect(() =>
+      new TranslationPackage(plPL.functions, errorsMap as ErrorTranslationSet, plPL.ui)
+    ).toThrow(new MissingTranslationError(`errors.${unknownErrorType}`))
   })
 
   it('should not be possible to extend TranslationPackage with protected translation', () => {
