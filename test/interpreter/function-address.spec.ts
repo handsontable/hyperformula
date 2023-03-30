@@ -13,8 +13,8 @@ describe('ADDRESS', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual('$A$1')
     expect(engine.getCellValue(adr('A2'))).toEqual('$KN$77')
-    expect(engine.getCellValue(adr('A2'))).toEqual('$KN$77')
-    expect(engine.getCellValue(adr('A2'))).toEqual('$KN$77')
+    expect(engine.getCellValue(adr('A3'))).toEqual('$KN$3')
+    expect(engine.getCellValue(adr('A4'))).toEqual('$A$45')
   })
 
   it('with row, col, and abs', () => {
