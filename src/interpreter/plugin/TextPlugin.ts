@@ -274,7 +274,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         return new CellError(ErrorType.VALUE, ErrorMessage.LengthBounds)
       }
 
-      const normalizedText = text.substring(startIndex - 1).toLowerCase()
+      let normalizedText = text.substring(startIndex - 1)
+      if (!this.config.caseSensitive) {
+        normalizedText = normalizedText.toLowerCase()
+      }
 
       let index: number
       if (this.arithmeticHelper.requiresRegex(pattern)) {
@@ -283,7 +286,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         index = normalizedText.indexOf(pattern.toLowerCase())
       }
 
-      index = index + startIndex
+      if (index > -1) {
+        index = index + startIndex
+      }
+
       return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessage.PatternNotFound)
     })
   }

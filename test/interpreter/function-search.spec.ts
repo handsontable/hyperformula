@@ -65,13 +65,18 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(6)
   })
 
-  it('should work with regular expressions', () => {
+  it('should work with regular expressions - case insensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SEARCH(".*f", "foobarbaz")'],
       ['=SEARCH("b.*b", "foobarbaz")'],
       ['=SEARCH("b.z", "foobarbaz")'],
       ['=SEARCH("b.b", "foobarbaz")'],
       ['=SEARCH(".b", "foobarbaz", 5)'],
+      ['=SEARCH(".*F", "foobarbaz")'],
+      ['=SEARCH("b.*B", "foobarbaz")'],
+      ['=SEARCH("B.z", "foobarBaz")'],
+      ['=SEARCH("b.B", "foobarbaz")'],
+      ['=SEARCH(".b", "fooBarBaz", 5)'],
     ], {useRegularExpressions: true})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -79,6 +84,67 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
     expect(engine.getCellValue(adr('A5'))).toEqual(6)
+    expect(engine.getCellValue(adr('A6'))).toEqual(1)
+    expect(engine.getCellValue(adr('A7'))).toEqual(4)
+    expect(engine.getCellValue(adr('A8'))).toEqual(7)
+    expect(engine.getCellValue(adr('A9'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
+    expect(engine.getCellValue(adr('A10'))).toEqual(6)
+  })
+
+  it('should work with regular expressions - case sensitive', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SEARCH(".*f", "foobarbaz")'],
+      ['=SEARCH("b.*b", "foobarbaz")'],
+      ['=SEARCH("b.z", "foobarbaz")'],
+      ['=SEARCH("b.b", "foobarbaz")'],
+      ['=SEARCH(".b", "foobarbaz", 5)'],
+      ['=SEARCH(".*F", "foobarbaz")'],
+      ['=SEARCH("b.*B", "foobarBaz")'],
+      ['=SEARCH("B.z", "foobarBaz")'],
+      ['=SEARCH("b.B", "foobarbaz")'],
+      ['=SEARCH(".b", "fooBarBaz", 5)'],
+    ], {useRegularExpressions: true, caseSensitive: true})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(4)
+    expect(engine.getCellValue(adr('A3'))).toEqual(7)
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
+    expect(engine.getCellValue(adr('A5'))).toEqual(6)
+    expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
+    expect(engine.getCellValue(adr('A7'))).toEqual(4)
+    expect(engine.getCellValue(adr('A8'))).toEqualError(7)
+    expect(engine.getCellValue(adr('A9'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
+    expect(engine.getCellValue(adr('A10'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
+  })
+
+  it('bug', () => {
+    const engineCaseInsensistive = HyperFormula.buildFromArray(
+      [
+        ['=SEARCH(".B", "fooBarBaz")'],
+        ['=SEARCH(".B", "fooBarBaz", 5)'],
+        ['=SEARCH(".b", "fooBarBaz")'],
+        ['=SEARCH(".b", "fooBarBaz", 5)'],
+      ],
+      {useRegularExpressions: true, caseSensitive: false}
+    )
+    expect(engineCaseInsensistive.getCellValue(adr('A1'))).toEqual(3)
+    expect(engineCaseInsensistive.getCellValue(adr('A2'))).toEqual(6)
+    expect(engineCaseInsensistive.getCellValue(adr('A3'))).toEqual(3)
+    expect(engineCaseInsensistive.getCellValue(adr('A4'))).toEqual(6)
+
+    const engineCaseSensistive = HyperFormula.buildFromArray(
+      [
+        ['=SEARCH(".B", "fooBarBaz")'],
+        ['=SEARCH(".B", "fooBarBaz", 5)'],
+        ['=SEARCH(".b", "fooBarBaz")'],
+        ['=SEARCH(".b", "fooBarBaz", 5)'],
+      ],
+      {useRegularExpressions: true, caseSensitive: true}
+    )
+    expect(engineCaseSensistive.getCellValue(adr('A1'))).toEqual(3)
+    expect(engineCaseSensistive.getCellValue(adr('A2'))).toEqual(6)
+    expect(engineCaseSensistive.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound)) // getting 3
+    expect(engineCaseSensistive.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound)) // getting 6
   })
 
   it('should be case insensitive', () => {
