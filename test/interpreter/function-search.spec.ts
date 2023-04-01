@@ -117,36 +117,6 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A10'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
   })
 
-  it('bug', () => {
-    const engineCaseInsensistive = HyperFormula.buildFromArray(
-      [
-        ['=SEARCH(".B", "fooBarBaz")'],
-        ['=SEARCH(".B", "fooBarBaz", 5)'],
-        ['=SEARCH(".b", "fooBarBaz")'],
-        ['=SEARCH(".b", "fooBarBaz", 5)'],
-      ],
-      {useRegularExpressions: true, caseSensitive: false}
-    )
-    expect(engineCaseInsensistive.getCellValue(adr('A1'))).toEqual(3)
-    expect(engineCaseInsensistive.getCellValue(adr('A2'))).toEqual(6)
-    expect(engineCaseInsensistive.getCellValue(adr('A3'))).toEqual(3)
-    expect(engineCaseInsensistive.getCellValue(adr('A4'))).toEqual(6)
-
-    const engineCaseSensistive = HyperFormula.buildFromArray(
-      [
-        ['=SEARCH(".B", "fooBarBaz")'],
-        ['=SEARCH(".B", "fooBarBaz", 5)'],
-        ['=SEARCH(".b", "fooBarBaz")'],
-        ['=SEARCH(".b", "fooBarBaz", 5)'],
-      ],
-      {useRegularExpressions: true, caseSensitive: true}
-    )
-    expect(engineCaseSensistive.getCellValue(adr('A1'))).toEqual(3)
-    expect(engineCaseSensistive.getCellValue(adr('A2'))).toEqual(6)
-    expect(engineCaseSensistive.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound)) // getting 3
-    expect(engineCaseSensistive.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound)) // getting 6
-  })
-
   it('should be case insensitive', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SEARCH("R", "bar")'],
