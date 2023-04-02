@@ -1,4 +1,4 @@
-import {ErrorType, HyperFormula} from '../../src'
+import {ErrorType, HyperFormula, SimpleRangeValue} from '../../src'
 import {CellError} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
@@ -7,6 +7,7 @@ import {
   ArithmeticHelper,
   coerceBooleanToNumber,
   coerceScalarToBoolean,
+  coerceToRangeNumbersOrError,
   coerceScalarToString
 } from '../../src/interpreter/ArithmeticHelper'
 import {DateNumber, EmptyValue, TimeNumber} from '../../src/interpreter/InterpreterValue'
@@ -64,10 +65,22 @@ describe('#coerceScalarToComplex', () => {
   })
 })
 
+describe('#coerceToRangeNumbersOrError', () => {
+  it('works', () => {
+    const simpleRangeValueOnlyNumbers = SimpleRangeValue.onlyNumbers([[1, 2]])
+    const timeNumber = new TimeNumber(0, 'hh:mm:ss.ss')
+    expect(coerceToRangeNumbersOrError(simpleRangeValueOnlyNumbers)).toEqual(simpleRangeValueOnlyNumbers)
+    expect(coerceToRangeNumbersOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceToRangeNumbersOrError(999)).toEqual(SimpleRangeValue.onlyValues([[999]]))
+    expect(coerceToRangeNumbersOrError(timeNumber)).toEqual(SimpleRangeValue.onlyValues([[timeNumber]]))
+    expect(coerceToRangeNumbersOrError('foo')).toEqual(null)
+  })
+})
+
 describe('#coerceBooleanToNumber', () => {
   it('works', () => {
     expect(coerceBooleanToNumber(true)).toBe(1)
-    expect(coerceBooleanToNumber(false)).toBe(0)
+    expect(coerceBooleanToNumber(false)).toBe(0)    
   })
 
   it('behaves the same as more general coercion', () => {
