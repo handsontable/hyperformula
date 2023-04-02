@@ -327,3 +327,52 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('G1'))).toEqual(false)
   })
 })
+
+describe('#requiresRegex', () => {
+  it('config.useRegularExpressions = false && config.useWildcards = false)', () => {
+    const config = new Config({ useRegularExpressions: false, useWildcards: false })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(!config.matchWholeCell)
+  })
+
+  it('config.useRegularExpressions = false && config.useWildcards = true)', () => {
+    const config = new Config({ useRegularExpressions: false, useWildcards: true })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+  })
+
+  it('config.useRegularExpressions = true  && config.useWildcards = false)', () => {
+    const config = new Config({ useRegularExpressions: true, useWildcards: false })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+  })
+
+  it('config.useRegularExpressions = true  && config.useWildcards = true)', () => {
+    const config = new Config({ useRegularExpressions: true, useWildcards: true })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+  })
+})
