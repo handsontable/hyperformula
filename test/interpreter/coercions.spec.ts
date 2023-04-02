@@ -32,6 +32,7 @@ describe('#coerceNonDateScalarToMaybeNumber', () => {
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('')).toBe(0)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' ')).toEqual(undefined)
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(undefined)
   })
 })
 
