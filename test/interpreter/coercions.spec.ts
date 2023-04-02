@@ -62,6 +62,7 @@ describe('#coerceScalarToComplex', () => {
     expect(arithmeticHelper.coerceScalarToComplex('1+-i')).toEqual([1, -1])
     expect(arithmeticHelper.coerceScalarToComplex('0.1+.1 i')).toEqual([0.1, 0.1])
     expect(arithmeticHelper.coerceScalarToComplex(' - 1.0e+1 - - 1.0e+1j')).toEqual([-10, 10])
+    expect(arithmeticHelper.coerceScalarToComplex(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
   })
 })
 
