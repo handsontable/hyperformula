@@ -3,7 +3,7 @@ import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function COLUMN', () => {
-  it('should take one or zero arguments', () => {
+  it('requires zero or 1 args - fails when args greater than 1', () => {
     const engine = HyperFormula.buildFromArray([
       ['=COLUMN(B1, B2)'],
       ['=COLUMN(B1, B2, B3)'],
