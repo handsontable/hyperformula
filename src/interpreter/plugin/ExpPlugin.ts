@@ -6,10 +6,10 @@
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class ExpPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ExpPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions= {
     'EXP': {
       method: 'exp',
       parameters: [

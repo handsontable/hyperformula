@@ -31,13 +31,13 @@ import {
   RawScalarValue,
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions
  */
 export class DateTimePlugin extends FunctionPlugin implements FunctionPluginTypecheck<DateTimePlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'DATE': {
       method: 'date',
       parameters: [

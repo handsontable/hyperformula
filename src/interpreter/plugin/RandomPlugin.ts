@@ -8,10 +8,10 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class RandomPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RandomPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'RAND': {
       method: 'rand',
       parameters: [],
