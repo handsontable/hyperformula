@@ -41,14 +41,11 @@ export enum ErrorType {
   /** Array spill error. */
   SPILL = 'SPILL',
 
-  /** Invalid/missing license error. */
-  LIC = 'LIC',
-
   /** Generic error */
   ERROR = 'ERROR'
 }
 
-export type TranslatableErrorType = Exclude<ErrorType, ErrorType.LIC>
+export type TranslatableErrorType = ErrorType
 
 export enum CellType {
   FORMULA = 'FORMULA',

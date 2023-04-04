@@ -23,4 +23,3 @@ according to the language settings.
 | #VALUE! | Wrong type of argument | It occurs when a formula tries to improperly use different types of data. For example, you will see this error when you will try to add a string to a number. |
 | #CYCLE! | Circular reference | It occurs when a formula refers to its own cell, both directly and indirectly. |
 | #ERROR! | An error occurred | It indicates that there is an unknown error in a formula. |
-| #LIC! | Invalid license key | It occurs when the license key is invalid, expired, or missing. |
