@@ -2,6 +2,7 @@ import {
   ExportedCellChange,
   ExportedNamedExpressionChange,
   HyperFormula,
+  NamedExpressionDoesNotExistError,
   NoSheetWithIdError
 } from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
@@ -10,6 +11,19 @@ import {Vertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
 import {NoRelativeAddressesAllowedError} from '../src'
 import {adr, detailedError} from './testUtils'
+import {Config} from '../src/Config'
+import {DependencyGraph} from '../src/DependencyGraph'
+import {Statistics} from '../src/statistics'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
+import {NamedExpressions} from '../src/NamedExpressions'
+import {Operations} from '../src/Operations'
+import {buildColumnSearchStrategy} from '../src/Lookup/SearchStrategy'
+import {CellContentParser} from '../src/CellContentParser'
+import {DateTimeHelper} from '../src/DateTimeHelper'
+import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
+import {ParserWithCaching} from '../src/parser'
+import {ArraySizePredictor} from '../src/ArraySize'
 
 describe('Named expressions - checking if its possible', () => {
   it('should be possible to add named expression', () => {
@@ -1049,6 +1063,27 @@ describe('Named expressions - options', () => {
     })
   })
 
+  it('should return named expression with empty options - scope provided', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    engine.addNamedExpression('foo', '=foo', 0)
+
+    expect(engine.getNamedExpression('foo', 0)).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: 0,
+      options: undefined
+    })
+  })
+
+  it('should return undefined for non-existent named expression', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    engine.addNamedExpression('foo', '=foo')
+
+    expect(engine.getNamedExpression('foo-bar')).toEqual(undefined)
+  })
+
   it('should return named expression with options', () => {
     const engine = HyperFormula.buildEmpty()
 
@@ -1158,6 +1193,43 @@ describe('Named expressions - options', () => {
         comment: 'foo'
       }
     })
+  })
+})
+
+describe('Named expressions - actions at the Operations layer', () => {
+
+  let operations: Operations
+
+  beforeEach(() => {
+    const config = new Config()
+    const stats = new Statistics()
+    const namedExpressions = new NamedExpressions()
+    const functionRegistry = new FunctionRegistry(config)
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
+    const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
+    const sheetMapping = dependencyGraph.sheetMapping
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
+    const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
+    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
+    operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
+  })
+
+  it('should throw an error if you try and change an unknown named expression', () => {
+    operations.addNamedExpression('foo', 'foo')
+    const unknownNamedExpression = 'bar'
+    expect(() => {
+      operations.changeNamedExpressionExpression(unknownNamedExpression, '=125')
+    }).toThrow(new NamedExpressionDoesNotExistError(unknownNamedExpression))
+  })
+
+  it('should throw an error if you try and change the expression to one that contains relative references', () => {
+    operations.addNamedExpression('foo', 'foo')
+    expect(() => {
+      operations.changeNamedExpressionExpression('foo', '=A2')
+    }).toThrow(new NoRelativeAddressesAllowedError())
   })
 })
 

@@ -3881,7 +3881,7 @@ export class HyperFormula implements TypedEmitter {
       this._emitter.emit(Events.NamedExpressionRemoved, removedNamedExpression.displayName, changes)
       return changes
     } else {
-      return []
+      return [] // codecov note: this does not look possible - removeNamedExpression() will throw if the named expression cannot be found
     }
   }
 
@@ -4056,7 +4056,7 @@ export class HyperFormula implements TypedEmitter {
     }
 
     if (ast.type === AstNodeType.ERROR && !ast.error) {
-      return false
+      return false // codecov note: could not identify a formulaString that would cause this condition
     }
 
     return true
