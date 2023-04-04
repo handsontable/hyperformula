@@ -368,7 +368,7 @@ describe('Config', () => {
       spyOn(console, 'warn')
     })
 
-    beforeEach(() => {
+    afterEach(() => {
       resetSpy(console.warn)
     })
 

@@ -64,7 +64,7 @@ describe('license key', () => {
       spyOn(console, 'warn')
     })
 
-    beforeEach(() => {
+    afterEach(() => {
       resetSpy(console.warn)
     })
 
@@ -72,19 +72,36 @@ describe('license key', () => {
       const engine = HyperFormula.buildFromArray([[
         1, 2, '=A1+B1'
       ]], {
-        licenseKey: 'invalid-key',
+        licenseKey: 'invalid-key-1',
       })
 
       engine.getCellValue(adr('A1'))
 
-      expect(console.warn).toHaveBeenCalled()
+      expect(console.warn).toHaveBeenCalledTimes(1)
+    })
+
+    it('should display console warning only once', () => {
+      const engine = HyperFormula.buildFromArray([[
+        1, 2, '=A1+B1'
+      ]], {
+        licenseKey: 'invalid-key-2',
+      })
+
+      engine.getCellValue(adr('A1'))
+      engine.getCellValue(adr('B1'))
+      engine.getCellValue(adr('C1'))
+      engine.getCellValue(adr('A1'))
+      engine.getCellValue(adr('B1'))
+      engine.getCellValue(adr('C1'))
+
+      expect(console.warn).toHaveBeenCalledTimes(1)
     })
 
     it('should not be triggered in the configuration stage of the engine', () => {
       const engine = HyperFormula.buildFromArray([[
         1, 2, '=A1+B1'
       ]], {
-        licenseKey: 'invalid-key',
+        licenseKey: 'invalid-key-3',
         maxRows: 10,
       })
 
