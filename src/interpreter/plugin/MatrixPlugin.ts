@@ -10,7 +10,7 @@ import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export type KernelRunShortcut = (...args: any[]) => number[][]
 
@@ -38,7 +38,7 @@ function arraySizeForPoolFunction(inputArray: ArraySize, windowSize: number, str
 }
 
 export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'MMULT': {
       method: 'mmult',
       arraySizeMethod: 'mmultArraySize',
