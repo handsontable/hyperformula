@@ -14,7 +14,7 @@ import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {RangeVertex} from '../../DependencyGraph'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
@@ -76,7 +76,7 @@ class MomentsAggregate {
 }
 
 export class NumericAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<NumericAggregationPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'SUM': {
       method: 'sum',
       parameters: [
