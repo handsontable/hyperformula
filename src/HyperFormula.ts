@@ -423,7 +423,9 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Registers all functions in a given plugin with optional translations.
    *
-   * Note: This method does not affect the existing HyperFormula instances.
+   * Note: FunctionPlugins must be registered prior to the creation of HyperFormula instances in which they are used.
+   * HyperFormula instances created prior to the registration of a FunctionPlugin are unable to access the FunctionPlugin.
+   * Registering a FunctionPlugin with [[custom-functions]] requires the translations parameter.
    *
    * @param {FunctionPluginDefinition} plugin - plugin class
    * @param {FunctionTranslationsPackage} translations - optional package of function names translations

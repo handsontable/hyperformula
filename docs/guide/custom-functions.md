@@ -138,6 +138,15 @@ method:
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
+::: tip
+FunctionPlugins must be registered prior to the creation of HyperFormula instances in which they are used.
+HyperFormula instances created prior to the registration of a FunctionPlugin are unable to access the FunctionPlugin.
+:::
+
+::: tip
+FunctionPlugins must provide translations (even if only a single language is supported)
+:::
+
 ### 6. Use your custom function inside a formula
 
 Now, you can use your GREET function inside a formula:
