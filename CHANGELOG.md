@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed an `EmptyCellVertex` data integrity issue between `AddressMapping` and `DependencyGraph` objects. [#1188](https://github.com/handsontable/hyperformula/issues/1188)
+
 ## [2.3.1] - 2023-03-03
 
 ### Fixed
