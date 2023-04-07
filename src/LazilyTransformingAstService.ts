@@ -43,7 +43,7 @@ export class LazilyTransformingAstService {
 
   public commitCombinedMode(): number {
     if (this.combinedTransformer === undefined) {
-      throw 'Combined mode wasn\'t started'
+      throw Error('Combined mode wasn\'t started')
     }
     this.transformations.push(this.combinedTransformer)
     this.combinedTransformer = undefined

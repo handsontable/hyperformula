@@ -1,4 +1,4 @@
-import {ErrorType, HyperFormula} from '../../src'
+import {ErrorType, HyperFormula, SimpleRangeValue} from '../../src'
 import {CellError} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
@@ -7,6 +7,7 @@ import {
   ArithmeticHelper,
   coerceBooleanToNumber,
   coerceScalarToBoolean,
+  coerceToRangeNumbersOrError,
   coerceScalarToString
 } from '../../src/interpreter/ArithmeticHelper'
 import {DateNumber, EmptyValue, TimeNumber} from '../../src/interpreter/InterpreterValue'
@@ -31,6 +32,7 @@ describe('#coerceNonDateScalarToMaybeNumber', () => {
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('')).toBe(0)
     expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' ')).toEqual(undefined)
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(undefined)
   })
 })
 
@@ -61,6 +63,19 @@ describe('#coerceScalarToComplex', () => {
     expect(arithmeticHelper.coerceScalarToComplex('1+-i')).toEqual([1, -1])
     expect(arithmeticHelper.coerceScalarToComplex('0.1+.1 i')).toEqual([0.1, 0.1])
     expect(arithmeticHelper.coerceScalarToComplex(' - 1.0e+1 - - 1.0e+1j')).toEqual([-10, 10])
+    expect(arithmeticHelper.coerceScalarToComplex(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+  })
+})
+
+describe('#coerceToRangeNumbersOrError', () => {
+  it('works', () => {
+    const simpleRangeValueOnlyNumbers = SimpleRangeValue.onlyNumbers([[1, 2]])
+    const timeNumber = new TimeNumber(0, 'hh:mm:ss.ss')
+    expect(coerceToRangeNumbersOrError(simpleRangeValueOnlyNumbers)).toEqual(simpleRangeValueOnlyNumbers)
+    expect(coerceToRangeNumbersOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
+    expect(coerceToRangeNumbersOrError(999)).toEqual(SimpleRangeValue.onlyValues([[999]]))
+    expect(coerceToRangeNumbersOrError(timeNumber)).toEqual(SimpleRangeValue.onlyValues([[timeNumber]]))
+    expect(coerceToRangeNumbersOrError('foo')).toEqual(null)
   })
 })
 
@@ -310,5 +325,54 @@ describe('check if type coercions are applied', () => {
     expect(engine.getCellValue(adr('E1'))).toEqual(false)
     expect(engine.getCellValue(adr('F1'))).toEqual(true)
     expect(engine.getCellValue(adr('G1'))).toEqual(false)
+  })
+})
+
+describe('#requiresRegex', () => {
+  it('config.useRegularExpressions = false && config.useWildcards = false)', () => {
+    const config = new Config({ useRegularExpressions: false, useWildcards: false })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(!config.matchWholeCell)
+  })
+
+  it('config.useRegularExpressions = false && config.useWildcards = true)', () => {
+    const config = new Config({ useRegularExpressions: false, useWildcards: true })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+  })
+
+  it('config.useRegularExpressions = true  && config.useWildcards = false)', () => {
+    const config = new Config({ useRegularExpressions: true, useWildcards: false })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+  })
+
+  it('config.useRegularExpressions = true  && config.useWildcards = true)', () => {
+    const config = new Config({ useRegularExpressions: true, useWildcards: true })
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralsHelper = new NumberLiteralHelper(config)
+    const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(true)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
   })
 })

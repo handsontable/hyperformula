@@ -19,18 +19,18 @@ Dynamic ranges are supported through functions such as INDEX and OFFSET.
 Named ranges can overlap each other, e.g. it is possible to define the names as
 follows:
 
-- rangeOne: A1:D10
-- rangeTwo: A1:E1
+- rangeOne: Sheet1!$A$1:$D$10
+- rangeTwo: Sheet1!$A$1:$E$1
 
 ## Examples
 
 | Type                    | Custom name | Example expression        |
-| :---------------------- | :---------- | :------------------------ |
-| Named cell              | myCell      | =A1                       |
-| Named range of cells    | myRange     | =A1:D10                   |
+|:------------------------|:------------|:--------------------------|
+| Named cell              | myCell      | =Sheet1!$A$1              |
+| Named range of cells    | myRange     | =Sheet1!$A$1:Sheet1!$D$10 |
 | Named constant (number) | myNumber    | =10                       |
 | Named constant (string) | myText      | ="One Small Step for Man" |
-| Named formula           | myFormula   | =SUM(A1:D10)              |
+| Named formula           | myFormula   | =SUM(Sheet1!$A$1:$D$10)   |
 
 ## Naming rules
 

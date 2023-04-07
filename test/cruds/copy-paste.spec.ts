@@ -1,5 +1,5 @@
-import {ExportedCellChange, HyperFormula, NothingToPasteError} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {ExportedCellChange, HyperFormula, NothingToPasteError, SimpleCellAddress} from '../../src'
+import {AbsoluteCellRange, SimpleCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetSizeLimitExceededError} from '../../src/errors'
@@ -14,6 +14,20 @@ import {
   rowEnd,
   rowStart,
 } from '../testUtils'
+import { DependencyGraph } from '../../src/DependencyGraph'
+import { Statistics } from '../../src/statistics'
+import { FunctionRegistry } from '../../src/interpreter/FunctionRegistry'
+import { LazilyTransformingAstService } from '../../src/LazilyTransformingAstService'
+import { NamedExpressions } from '../../src/NamedExpressions'
+import { Operations } from '../../src/Operations'
+import { buildColumnSearchStrategy } from '../../src/Lookup/SearchStrategy'
+import { CellContentParser } from '../../src/CellContentParser'
+import { DateTimeHelper } from '../../src/DateTimeHelper'
+import { NumberLiteralHelper } from '../../src/NumberLiteralHelper'
+import { ParserWithCaching } from '../../src/parser'
+import { ArraySizePredictor } from '../../src/ArraySize'
+import { NoSheetWithIdError} from '../../src'
+import {ExpectedValueOfTypeError} from '../../src/errors'
 
 describe('Copy - paste integration', () => {
   it('copy should validate arguments', () => {
@@ -42,6 +56,10 @@ describe('Copy - paste integration', () => {
     expect(() => {
       engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 42, 3.14))
     }).toThrowError('Invalid arguments, expected height to be positive integer.')
+
+    expect(() => {
+      engine.copy({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 
   it('paste raise error when there is nothing in clipboard', () => {
@@ -407,6 +425,41 @@ describe('Copy - paste integration', () => {
 
     expect(() => engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).toThrow(new SheetSizeLimitExceededError())
     expect(() => engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
+  })
+
+  it('should throw error when trying to paste when targetLeftCorner is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.paste({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner'))
+  })
+})
+
+describe('Copy - paste integration - actions at the Operations layer', () => {
+  let operations: Operations
+
+  beforeEach(() => {
+    const config = new Config()
+    const stats = new Statistics()
+    const namedExpressions = new NamedExpressions()
+    const functionRegistry = new FunctionRegistry(config)
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
+    const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
+    const sheetMapping = dependencyGraph.sheetMapping
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
+    const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
+    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
+    operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
+  })
+
+  it('should throw an error if you try and copy from a sheet that does not exist', () => {
+    const sheetId = 5
+    expect(() => {
+      operations.getOldContent(simpleCellAddress(sheetId, 0, 0))
+    }).toThrow(new NoSheetWithIdError(sheetId))
   })
 })
 
