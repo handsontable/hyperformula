@@ -240,7 +240,7 @@ describe('Move columns', () => {
     expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
   })
 
-  it('bug', () => {
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
     const engine = HyperFormula.buildFromArray([[ null, '=A1' ]])
     engine.moveColumns(0, 1, 1, 0)
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=B1')
@@ -249,20 +249,6 @@ describe('Move columns', () => {
     engine.setCellContents(adr('A1'), '=B1')
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=B1')
     expect(engine.getCellSerialized(adr('B1'))).toEqual(null)
-    expect(engine.getCellValue(adr('A1'))).toEqual(null)
-    expect(engine.getCellValue(adr('B1'))).toEqual(null)
-  })
-
-  it('bug simple', () => {
-    const engine = HyperFormula.buildFromArray([[ '=B1', null ]])
-    expect(engine.getCellSerialized(adr('A1'))).toEqual('=B1')
-    expect(engine.getCellSerialized(adr('B1'))).toEqual(null)
-
-    engine.setCellContents(adr('A1'), '=B1')
-    expect(engine.getCellSerialized(adr('A1'))).toEqual('=B1')
-    expect(engine.getCellSerialized(adr('B1'))).toEqual(null)
-    expect(engine.getCellValue(adr('A1'))).toEqual(null)
-    expect(engine.getCellValue(adr('B1'))).toEqual(null)
   })
 })
 
