@@ -13,6 +13,11 @@ and this project adheres to
 - Exported the `CellError` class as a public API.
   [#1232](https://github.com/handsontable/hyperformula/issues/1232)
 
+### Fixed
+
+- Fixed build issue for developers using M1 and M2-chip MacBooks. 
+  [#1166](https://github.com/handsontable/hyperformula/issues/1166)
+
 ## [2.3.1] - 2023-03-03
 
 ### Fixed
