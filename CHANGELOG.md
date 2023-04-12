@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Exported the `CellError` class as a public API.
+  [#1232](https://github.com/handsontable/hyperformula/issues/1232)
+
 ## [2.3.1] - 2023-03-03
 
 ### Fixed
