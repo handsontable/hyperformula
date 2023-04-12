@@ -62,6 +62,7 @@ import {Sheet, SheetDimensions, Sheets} from './Sheet'
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static ErrorType = ErrorType
+  public static CellError = CellError
   public static CellType = CellType
   public static CellValueType = CellValueType
   public static CellValueDetailedType = CellValueDetailedType

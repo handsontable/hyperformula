@@ -69,8 +69,12 @@ MyCustomPlugin.implementedFunctions = {
 
 ### 3. Add your function's names
 
-In a separate object,
-[define your function's names in every language you want to support](#function-name-translations).
+In a separate object, define your function's names in every
+[language](#function-name-translations) that you want to support.
+
+::: tip
+Even if you support just a single language, you still need to define a translation for it.
+:::
 
 ```js
 export const MyCustomPluginTranslations = {
@@ -127,8 +131,8 @@ export class MyCustomPlugin extends FunctionPlugin {
 
 ### 5. Register your function plugin
 
-Register your function plugin (and its translations) so that HyperFormula can
-recognize it.
+Register your function plugin and its translations so that HyperFormula can
+recognize it. You need to do this **before** you create your HyperFormula instance.
 
 Use the
 [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin)
@@ -138,30 +142,18 @@ method:
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
-::: tip
-FunctionPlugins must be registered prior to the creation of HyperFormula instances in which they are used.
-HyperFormula instances created prior to the registration of a FunctionPlugin are unable to access the FunctionPlugin.
-:::
+### 6. Use your custom function in a formula
 
-::: tip
-FunctionPlugins must provide translations (even if only a single language is supported)
-:::
-
-### 6. Use your custom function inside a formula
-
-Now, you can use your GREET function inside a formula:
+Now, you're ready to use your GREET function in a formula.
 
 ```js
-// prepare spreadsheet data
-const data = [['Anthony', '=GREET(A1)']];
-
 // build a HyperFormula instance where you can use your function directly
-const hfInstance = HyperFormula.buildFromArray(data);
+const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']]);
 
-// read the value of cell A1
+// read the value of cell B1
 const result = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
 
-// open the browser's console to see the results
+// cell B1 should evaluate to 'Anthony'
 console.log(result);
 ```
 
@@ -487,14 +479,13 @@ function's behavior depends on the number of valid arguments passed), use the
 You can add translations of your function's name in multiple languages. Your end
 users use the translated names to call your function inside formulas.
 
-::: tip
-If you support just one language, you still need to define the name of
-your function in that language.
-:::
-
 In a separate object, define the translations of your custom functions' names in
 every language you want to support. Function names are case-insensitive, as they
 are all normalized to uppercase.
+
+::: tip
+Even if you support just a single language, you still need to define a translation for it.
+:::
 
 ```js
 export const MyCustomPluginTranslations = {
