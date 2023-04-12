@@ -132,7 +132,7 @@ export class MyCustomPlugin extends FunctionPlugin {
 ### 5. Register your function plugin
 
 Register your function plugin and its translations so that HyperFormula can
-recognize it.
+recognize it. You need to do this **before** you create your HyperFormula instance.
 
 Use the
 [`registerFunctionPlugin()`](../api/classes/hyperformula.md#registerfunctionplugin)
@@ -146,12 +146,7 @@ HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 
 Now, you're ready to use your GREET function in a formula.
 
-Don't forget to register your function plugin **before** you create your HyperFormula instance. Otherwise, HyperFormula won't recognize your plugin.
-
 ```js
-// register your function plugin and its translations
-HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
-
 // build a HyperFormula instance where you can use your function directly
 const hfInstance = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']]);
 
