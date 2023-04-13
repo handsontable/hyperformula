@@ -27,9 +27,7 @@ module.exports = {
     ['link', { rel: 'icon', sizes: '32x32', type: 'image/png', href: '/favicon/favicon-32x32.png' }],
     ['link', { rel: 'icon', sizes: '16x16', type: 'image/png', href: '/favicon/favicon-16x16.png' }],
     ['link', { rel: 'manifest', href: '/favicon/site.webmanifest' }],
-    ['link', { rel: 'mask-icon', color: '#5bbad5', href: '/favicon/safari-pinned-tab.svg' }],
-    ['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
-    ['meta', { name: 'theme-color', content: '#ffffff' }],
+    ['link', { rel: 'mask-icon', color: '#ffffff', href: '/favicon/safari-pinned-tab.svg' }],
   ],
   base: '/',
   plugins: [
