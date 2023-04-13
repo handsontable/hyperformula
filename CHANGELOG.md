@@ -12,7 +12,7 @@ and this project adheres to
 
 - Exported the `CellError` class as a public API.
   [#1232](https://github.com/handsontable/hyperformula/issues/1232)
-- Exported the `CellError` class as a public API.
+- Exported the `SimpleRangeValue` class as a public API.
   [#1178](https://github.com/handsontable/hyperformula/issues/1178)
 
 ### Fixed
