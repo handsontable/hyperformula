@@ -75,6 +75,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
   public static ArraySize = ArraySize
+  public static SimpleRangeValue = SimpleRangeValue
   public static FunctionPlugin = FunctionPlugin
   public static FunctionArgumentType = FunctionArgumentType
   public static FunctionPluginValidationError = FunctionPluginValidationError
