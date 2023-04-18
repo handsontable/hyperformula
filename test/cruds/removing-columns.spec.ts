@@ -947,18 +947,18 @@ describe('Removing columns - merge ranges', () => {
   })
 })
 
-  describe('Removing columns - changes', () => {
-    it('returns the same changes regardless of address mapping policy', () => {
-      const data = [
-        [1, 2, '=A2'],
-        [3, 4, '=B1'],
-      ]
+describe('Removing columns - changes', () => {
+  it('returns the same changes regardless of address mapping policy', () => {
+    const data = [
+      [1, 2, '=A2'],
+      [3, 4, '=B1'],
+    ]
 
-      const alwaysDenseEngine = HyperFormula.buildFromArray(data, { chooseAddressMappingPolicy: new AlwaysDense() })
-      const alwaysDenseChanges = alwaysDenseEngine.removeColumns(0, [0, 2])
-      const alwaysSparseEngine = HyperFormula.buildFromArray(data, { chooseAddressMappingPolicy: new AlwaysSparse() })
-      const alwaysSparseChanges = alwaysSparseEngine.removeColumns(0, [0, 2])
+    const alwaysDenseEngine = HyperFormula.buildFromArray(data, { chooseAddressMappingPolicy: new AlwaysDense() })
+    const alwaysDenseChanges = alwaysDenseEngine.removeColumns(0, [0, 2])
+    const alwaysSparseEngine = HyperFormula.buildFromArray(data, { chooseAddressMappingPolicy: new AlwaysSparse() })
+    const alwaysSparseChanges = alwaysSparseEngine.removeColumns(0, [0, 2])
 
-      expect(alwaysDenseChanges).toEqual(alwaysSparseChanges)
-    })
+    expect(alwaysDenseChanges).toEqual(alwaysSparseChanges)
   })
+})
