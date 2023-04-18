@@ -250,6 +250,13 @@ describe('Move columns', () => {
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=B1')
     expect(engine.getCellSerialized(adr('B1'))).toEqual(null)
   })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null, '=SUM(A1:C1)', 42]])
+    engine.moveColumns(0, 3, 1, 0)
+    engine.setCellContents(adr('A1'), '=SUM(B1:D1)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(B1:D1)', null, null, null, 42]])
+  })
 })
 
 describe('Move columns - column ranges', () => {
