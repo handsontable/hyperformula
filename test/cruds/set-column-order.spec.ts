@@ -286,7 +286,7 @@ describe('setColumnOrder', () => {
 
   it('leaves the engine in a valid state so other operations are possible afterwards', () => {
     const engine = HyperFormula.buildFromArray([[null, '=A1', 42]])
-    engine.setColumnOrder(0, [1, 0])
+    engine.setColumnOrder(0, [1, 0, 2])
     engine.setCellContents(adr('A1'), '=B1')
     expect(engine.getSheetSerialized(0)).toEqual([['=B1', null, 42]])
   })
