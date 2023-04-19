@@ -12,18 +12,18 @@ HyperFormula adheres to
 
 ### Added
 
-- Exported the `CellError` class as a public API.
+- Exported the [`CellError`](../api/classes/cellerror.md) class as a public API.
   [#1232](https://github.com/handsontable/hyperformula/issues/1232)
-- Exported the `SimpleRangeValue` class as a public API.
+- Exported the [`SimpleRangeValue`](../api/classes/simplerangevalue.md) class as a public API.
   [#1178](https://github.com/handsontable/hyperformula/issues/1178)
 
 ### Fixed
 
-- Fixed an `EmptyCellVertex` data integrity issue between `AddressMapping` and `DependencyGraph` objects.
+- Fixed an `EmptyCellVertex` data integrity issue between the `AddressMapping` and `DependencyGraph` objects.
   [#1188](https://github.com/handsontable/hyperformula/issues/1188)
-- Fixed a build issue for developers using M1 and M2-chip MacBooks.
+- Fixed a build issue with M1- and M2-chip MacBooks.
   [#1166](https://github.com/handsontable/hyperformula/issues/1166)
-- Fixed an issue where order of items in the result of `removeColumns()` method depended on the address mapping policy.
+- Fixed an issue where the order of items returned by [`removeColumns()`](../api/classes/hyperformula.md#removecolumns) depended on the address mapping policy.
   [#1205](https://github.com/handsontable/hyperformula/issues/1205)
 
 ## 2.3.1
