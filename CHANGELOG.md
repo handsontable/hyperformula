@@ -21,7 +21,7 @@ and this project adheres to
 
 - Fixed an `EmptyCellVertex` data integrity issue between `AddressMapping` and `DependencyGraph` objects.
   [#1188](https://github.com/handsontable/hyperformula/issues/1188)
-- Fixed build issue for developers using M1 and M2-chip MacBooks. 
+- Fixed a build issue for developers using M1 and M2-chip MacBooks. 
   [#1166](https://github.com/handsontable/hyperformula/issues/1166)
 - Fixed an issue where order of items in the result of `removeColumns()` method depended on the address mapping policy.
   [#1205](https://github.com/handsontable/hyperformula/issues/1205)
