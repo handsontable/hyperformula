@@ -3,7 +3,10 @@
  * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
-export type DependencyQuery<T> = (vertex: T) => T[]
+import {SimpleCellAddress} from '../Cell'
+import {SimpleCellRange} from '../AbsoluteCellRange'
+
+export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCellRange), T][]
 
 export interface TopSortResult<T> {
   sorted: T[],
@@ -130,7 +133,7 @@ export class Graph<T> {
     return result
   }
 
-  public removeNode(node: T): T[] {
+  public removeNode(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
     for (const adjacentNode of this.adjacentNodes(node).values()) {
       this.markNodeAsSpecialRecentlyChanged(adjacentNode)
     }
@@ -310,9 +313,9 @@ export class Graph<T> {
     return result
   }
 
-  private removeDependencies(node: T): T[] {
+  private removeDependencies(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
     const dependencies = this.dependencyQuery(node)
-    for (const dependency of dependencies) {
+    for (const [_, dependency] of dependencies) {
       this.softRemoveEdge(dependency, node)
     }
     return dependencies

@@ -235,6 +235,20 @@ describe('Move rows', () => {
 
     expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
   })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[null], ['=A1']])
+    engine.moveRows(0, 1, 1, 0)
+    engine.setCellContents(adr('A1'), '=A2')
+    expect(engine.getSheetSerialized(0)).toEqual([['=A2']])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null], ['=SUM(A1:C1)']])
+    engine.moveRows(0, 1, 1, 0)
+    engine.setCellContents(adr('A1'), '=SUM(A2:C2)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(A2:C2)']])
+  })
 })
 
 describe('Move rows - row ranges', () => {
