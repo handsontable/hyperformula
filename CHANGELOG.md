@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the `SEARCH` function to be case-insensitive regardless of the engine configuration.
+  [#1225](https://github.com/handsontable/hyperformula/issues/1225)
+
 ### Added
 
 - Exported the `CellError` class as a public API.
