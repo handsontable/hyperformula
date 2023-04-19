@@ -170,8 +170,8 @@ export class DenseStrategy implements IAddressMappingStrategy {
   }
 
   public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
-    for (let y = 0; y < this.height; ++y) {
-      for (let x = columnsSpan.columnStart; x <= columnsSpan.columnEnd; ++x) {
+    for (let x = columnsSpan.columnStart; x <= columnsSpan.columnEnd; ++x) {
+      for (let y = 0; y < this.height; ++y) {
         const vertex = this.getCellVertex(x, y)
         if (vertex) {
           yield [simpleCellAddress(columnsSpan.sheet, x, y), vertex]

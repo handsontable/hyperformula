@@ -21,6 +21,8 @@ and this project adheres to
   [#1188](https://github.com/handsontable/hyperformula/issues/1188)
 - Fixed build issue for developers using M1 and M2-chip MacBooks. 
   [#1166](https://github.com/handsontable/hyperformula/issues/1166)
+- Fixed an issue where order of items in the result of `removeColumns()` method depended on the address mapping policy.
+  [#1205](https://github.com/handsontable/hyperformula/issues/1205)
 
 ## [2.3.1] - 2023-03-03
 
