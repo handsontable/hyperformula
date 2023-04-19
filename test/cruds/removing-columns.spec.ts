@@ -1,4 +1,4 @@
-import {ExportedCellChange, HyperFormula} from '../../src'
+import {AlwaysDense, AlwaysSparse, ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ArrayVertex, RangeVertex} from '../../src/DependencyGraph'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
@@ -944,5 +944,21 @@ describe('Removing columns - merge ranges', () => {
     verifyRangesInSheet(engine, 0, ['C4:C6', 'C4:D6', 'D2:E3'])
 
     verifyValues(engine)
+  })
+})
+
+describe('Removing columns - changes', () => {
+  it('returns the same changes regardless of address mapping policy', () => {
+    const data = [
+      [1, 2, '=A2'],
+      [3, 4, '=B1'],
+    ]
+
+    const alwaysDenseEngine = HyperFormula.buildFromArray(data, { chooseAddressMappingPolicy: new AlwaysDense() })
+    const alwaysDenseChanges = alwaysDenseEngine.removeColumns(0, [0, 2])
+    const alwaysSparseEngine = HyperFormula.buildFromArray(data, { chooseAddressMappingPolicy: new AlwaysSparse() })
+    const alwaysSparseChanges = alwaysSparseEngine.removeColumns(0, [0, 2])
+
+    expect(alwaysDenseChanges).toEqual(alwaysSparseChanges)
   })
 })
