@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.4.0] - 2023-04-24
+
 ### Added
 
 - Exported the `CellError` class as a public API.

@@ -6,6 +6,26 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.4.0
+
+**Release date: April 24, 2023**
+
+### Added
+
+- Exported the `CellError` class as a public API.
+  [#1232](https://github.com/handsontable/hyperformula/issues/1232)
+- Exported the `SimpleRangeValue` class as a public API.
+  [#1178](https://github.com/handsontable/hyperformula/issues/1178)
+
+### Fixed
+
+- Fixed an `EmptyCellVertex` data integrity issue between `AddressMapping` and `DependencyGraph` objects.
+  [#1188](https://github.com/handsontable/hyperformula/issues/1188)
+- Fixed build issue for developers using M1 and M2-chip MacBooks.
+  [#1166](https://github.com/handsontable/hyperformula/issues/1166)
+- Fixed an issue where order of items in the result of `removeColumns()` method depended on the address mapping policy.
+  [#1205](https://github.com/handsontable/hyperformula/issues/1205)
+
 ## 2.3.1
 
 **Release date: March 3, 2023**
