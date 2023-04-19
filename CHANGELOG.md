@@ -8,6 +8,20 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Exported the `CellError` class as a public API.
+  [#1232](https://github.com/handsontable/hyperformula/issues/1232)
+- Exported the `SimpleRangeValue` class as a public API.
+  [#1178](https://github.com/handsontable/hyperformula/issues/1178)
+
+### Fixed
+
+- Fixed build issue for developers using M1 and M2-chip MacBooks. 
+  [#1166](https://github.com/handsontable/hyperformula/issues/1166)
+- Fixed an issue where order of items in the result of `removeColumns()` method depended on the address mapping policy.
+  [#1205](https://github.com/handsontable/hyperformula/issues/1205)
+
 ## [2.3.1] - 2023-03-03
 
 ### Fixed

@@ -9,14 +9,14 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
  */
 export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MedianPlugin> {
 
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'MEDIAN': {
       method: 'median',
       parameters: [

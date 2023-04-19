@@ -4,7 +4,8 @@ import {
   ExportedCellChange,
   HyperFormula,
   InvalidAddressError,
-  NoSheetWithIdError
+  NoSheetWithIdError,
+  SimpleCellAddress,
 } from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ArraySize} from '../../src/ArraySize'
@@ -26,6 +27,7 @@ import {
   rowEnd,
   rowStart
 } from '../testUtils'
+import {ExpectedValueOfTypeError} from '../../src/errors'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -69,6 +71,13 @@ describe('Changing cell content - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
+  })
+
+  it('should throw error if testing with a malformed address', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.isItPossibleToSetCellContents({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', 'address'))
   })
 })
 

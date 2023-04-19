@@ -1,9 +1,11 @@
-import {HyperFormula} from '../src'
+import {ErrorType, HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
 import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
 import {adr, resetSpy, unregisterAllLanguages} from './testUtils'
 import {CellValueNoNumber} from '../src/Cell'
+import {MissingTranslationError} from '../src/errors'
+import {UIElement} from '../src/i18n/index'
 
 describe('Config', () => {
   beforeEach(() => {
@@ -93,6 +95,30 @@ describe('Config', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => new Config({caseFirst: 'abcd'})).toThrowError('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
+  })
+
+  it('should throw error when Function Translation cannot be found', () => {
+    const config = new Config()
+    const functionName = '0123456ABCDEFGH'
+    expect(() => {
+      config.translationPackage.getFunctionTranslation(functionName)
+    }).toThrow(new MissingTranslationError(`functions.${functionName}`))
+  })
+
+  it('should throw error when Error Translation cannot be found', () => {
+    const config = new Config()
+    const errorType = '0123456ABCDEFGH'
+    expect(() => {
+      config.translationPackage.getErrorTranslation(errorType as ErrorType)
+    }).toThrow(new MissingTranslationError(`errors.${errorType}`))
+  })
+
+  it('should throw error when UI Translation cannot be found', () => {
+    const config = new Config()
+    const uiElement = '0123456ABCDEFGH'
+    expect(() => {
+      config.translationPackage.getUITranslation(uiElement as UIElement)
+    }).toThrow(new MissingTranslationError(`ui.${uiElement}`))
   })
 
   it('should throw error when there is a conflict between separators', () => {

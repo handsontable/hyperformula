@@ -4,6 +4,7 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
 import {enGB, plPL} from '../../src/i18n/languages'
+import {NoSheetWithNameError} from '../../src/errors'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -362,6 +363,18 @@ describe('cell references and ranges', () => {
     const ast = parser.parse('=Sheet2!D1', adr('A1')).ast
 
     expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(3, 0, 1)))
+  })
+
+  it('attempting to fetch an unknown sheet throws error', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+
+    const sheetName = 'Sheet3'
+
+    expect(() => {
+      sheetMapping.fetch('Sheet3')
+    }).toThrow(new NoSheetWithNameError(sheetName))
   })
 
   it('using unknown sheet gives REF', () => {

@@ -1,6 +1,7 @@
-import {HyperFormula} from '../src'
+import {HyperFormula, SimpleCellAddress} from '../src'
 import {simpleCellRange} from '../src/AbsoluteCellRange'
 import {adr} from './testUtils'
+import {ExpectedValueOfTypeError} from '../src/errors'
 
 describe('address queries', () => {
   describe('getCellDependents', () => {
@@ -41,6 +42,21 @@ describe('address queries', () => {
       expect(engine.getCellDependents(adr('C1', dataSheetId))).toEqual([])
       expect(engine.getCellDependents(adr('D1', dataSheetId))).toEqual([])
     })
+
+    it('should throw error if address is a malformed SimpleCellAddress', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2, 3],
+        ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
+        ['=A2+B2'],
+      ])
+      
+      const malformedAddress = {col: 0} as SimpleCellAddress
+      
+      expect(() => {
+        engine.getCellDependents(malformedAddress)
+      }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', malformedAddress.toString()))
+    })    
+
   })
 
   describe('getCellPrecedents', () => {
@@ -59,5 +75,17 @@ describe('address queries', () => {
       expect(engine.getCellPrecedents(simpleCellRange(adr('A1'), adr('B1')))).toEqual([adr('A1'), adr('B1')])
       expect(engine.getCellPrecedents(simpleCellRange(adr('A3'), adr('B3')))).toEqual([])
     })
+
+    it('should throw error if address is a malformed SimpleCellAddress', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2, 3],
+        ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
+        ['=A2+B2'],
+      ])
+      const malformedAddress = {col: 0} as SimpleCellAddress
+      expect(() => {
+        engine.getCellPrecedents(malformedAddress)
+      }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', malformedAddress.toString()))
+    })    
   })
 })
