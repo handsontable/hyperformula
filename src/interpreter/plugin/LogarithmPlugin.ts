@@ -1,33 +1,33 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LogarithmPlugin> {
 
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'LOG10': {
       method: 'log10',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
     'LOG': {
       method: 'log',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 10, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 10, greaterThan: 0},
       ]
     },
     'LN': {
       method: 'ln',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ]
     },
   }

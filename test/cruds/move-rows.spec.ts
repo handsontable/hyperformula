@@ -173,7 +173,7 @@ describe('Move rows', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1))
   })
 
   it('should adjust absolute references', () => {
@@ -184,7 +184,7 @@ describe('Move rows', () => {
     engine.moveRows(0, 0, 1, 2)
 
     expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.absolute(0, 0))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(-1, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(0, -1))
   })
 
   it('should adjust range', () => {
@@ -234,6 +234,20 @@ describe('Move rows', () => {
     engine.moveRows(0, 1, 1, 3)
 
     expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[null], ['=A1']])
+    engine.moveRows(0, 1, 1, 0)
+    engine.setCellContents(adr('A1'), '=A2')
+    expect(engine.getSheetSerialized(0)).toEqual([['=A2']])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null], ['=SUM(A1:C1)']])
+    engine.moveRows(0, 1, 1, 0)
+    engine.setCellContents(adr('A1'), '=SUM(A2:C2)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(A2:C2)']])
   })
 })
 

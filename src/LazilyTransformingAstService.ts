@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellAddress} from './Cell'
@@ -43,7 +43,7 @@ export class LazilyTransformingAstService {
 
   public commitCombinedMode(): number {
     if (this.combinedTransformer === undefined) {
-      throw 'Combined mode wasn\'t started'
+      throw Error('Combined mode wasn\'t started')
     }
     this.transformations.push(this.combinedTransformer)
     this.combinedTransformer = undefined

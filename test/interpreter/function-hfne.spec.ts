@@ -14,19 +14,19 @@ describe('Function HF.NE', () => {
 
   it('should calculate the correct value', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=HF.NE(1,0)'],
-      ['=HF.NE(1,1)'],
-      ['=HF.NE("1","0")'],
-      ['=HF.NE("1","1")'],
-      ['=HF.NE(TRUE(),FALSE())'],
-      ['=HF.NE(TRUE(),TRUE())'],
+      ['=HF.NE(1, 0)'],
+      ['=HF.NE(1, 1)'],
+      ['=HF.NE("1", "0")'],
+      ['=HF.NE("1", "1")'],
+      ['=HF.NE(TRUE(), FALSE())'],
+      ['=HF.NE(TRUE(), TRUE())'],
       ['=HF.NE(,)'],
       ['=HF.NE(1,)'],
       ['=HF.NE("1",)'],
       ['=HF.NE(TRUE(),)'],
-      ['=HF.NE("1",1)'],
-      ['=HF.NE(TRUE(),1)'],
-      ['=HF.NE(TRUE(),"1")'],
+      ['=HF.NE("1", 1)'],
+      ['=HF.NE(TRUE(), 1)'],
+      ['=HF.NE(TRUE(), "1")'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(true)

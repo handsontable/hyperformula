@@ -1,11 +1,19 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {DependencyGraph} from '../DependencyGraph'
-import {getRawValue, InternalScalarValue, RawInterpreterValue} from '../interpreter/InterpreterValue'
-import {SimpleRangeValue} from '../interpreter/SimpleRangeValue'
+import {
+  getRawValue,
+  InternalScalarValue,
+  RawInterpreterValue,
+  RawNoErrorScalarValue
+} from '../interpreter/InterpreterValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
+import {SearchOptions} from './SearchStrategy'
+import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
+import {findLastOccurrenceInOrderedRange} from '../interpreter/binarySearch'
 
 export abstract class AdvancedFind {
   protected constructor(
@@ -27,5 +35,35 @@ export abstract class AdvancedFind {
       }
     }
     return -1
+  }
+
+  /*
+   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
+   */
+  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, matchExactly }: SearchOptions): number {
+    const normalizedSearchKey = typeof searchKey === 'string' ? forceNormalizeString(searchKey) : searchKey
+    const range = rangeValue.range
+
+    if (range === undefined) {
+      return this.findNormalizedValue(normalizedSearchKey, rangeValue.valuesFromTopLeftCorner())
+    }
+
+    if (ordering === 'none') {
+      return this.findNormalizedValue(normalizedSearchKey, this.dependencyGraph.computeListOfValuesInRange(range))
+    }
+
+    return findLastOccurrenceInOrderedRange(
+      normalizedSearchKey,
+      range,
+      { searchCoordinate, orderingDirection: ordering, matchExactly },
+      this.dependencyGraph
+    )
+  }
+
+  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[]): number {
+    return searchArray
+    .map(getRawValue)
+    .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)
+    .indexOf(searchKey)
   }
 }

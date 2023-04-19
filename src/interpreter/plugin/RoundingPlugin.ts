@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
@@ -8,7 +8,7 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export function findNextOddNumber(arg: number): number {
   const ceiled = Math.ceil(arg)
@@ -21,88 +21,88 @@ export function findNextEvenNumber(arg: number): number {
 }
 
 export class RoundingPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RoundingPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'ROUNDUP': {
       method: 'roundup',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
     },
     'ROUNDDOWN': {
       method: 'rounddown',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
     },
     'ROUND': {
       method: 'round',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
     },
     'INT': {
       method: 'intFunc',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ],
     },
     'EVEN': {
       method: 'even',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ],
     },
     'ODD': {
       method: 'odd',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER}
+        {argumentType: FunctionArgumentType.NUMBER}
       ],
     },
     'CEILING.MATH': {
       method: 'ceilingmath',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
     },
     'CEILING': {
       method: 'ceiling',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'CEILING.PRECISE': {
       method: 'ceilingprecise',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ],
     },
     'FLOOR.MATH': {
       method: 'floormath',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
     },
     'FLOOR': {
       method: 'floor',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'FLOOR.PRECISE': {
       method: 'floorprecise',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ],
     },
   }

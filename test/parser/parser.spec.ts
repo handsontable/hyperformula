@@ -4,6 +4,7 @@ import {Config} from '../../src/Config'
 import {SheetMapping} from '../../src/DependencyGraph'
 import {buildTranslationPackage} from '../../src/i18n'
 import {enGB, plPL} from '../../src/i18n/languages'
+import {NoSheetWithNameError} from '../../src/errors'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -315,7 +316,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=B3', adr('B2')).ast
 
-    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(1, 0)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 1)))
   })
 
   it('absolute column cell reference', () => {
@@ -339,7 +340,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=d1', adr('A1')).ast
 
-    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(3, 0)))
   })
 
   it('cell reference by default has sheet from the sheet it is written', () => {
@@ -350,7 +351,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=D1', adr('A1', 1)).ast
 
-    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(3, 0)))
   })
 
   it('cell reference with sheet name', () => {
@@ -361,7 +362,19 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=Sheet2!D1', adr('A1')).ast
 
-    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 3, 1)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(3, 0, 1)))
+  })
+
+  it('attempting to fetch an unknown sheet throws error', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+
+    const sheetName = 'Sheet3'
+
+    expect(() => {
+      sheetMapping.fetch('Sheet3')
+    }).toThrow(new NoSheetWithNameError(sheetName))
   })
 
   it('using unknown sheet gives REF', () => {
@@ -911,7 +924,7 @@ describe('Matrices', () => {
   it('longer matrix with extras', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const ast = parser.parse('={SUM(1,2,3),2,{1,2,3}}', adr('A1')).ast as ArrayAst
+    const ast = parser.parse('={SUM(1, 2, 3), 2, {1,2,3}}', adr('A1')).ast as ArrayAst
     expect(ast.type).toBe(AstNodeType.ARRAY)
     expect(ast.args.length).toEqual(1)
     expect(ast.args[0].length).toEqual(3)
@@ -959,7 +972,7 @@ describe('Parsing errors', () => {
   it('parsing error - not all input parsed', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
-    const {errors} = parser.parse('=A1B1', adr('A1'))
+    const {errors} = parser.parse('=1A1', adr('A1'))
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
   })
 

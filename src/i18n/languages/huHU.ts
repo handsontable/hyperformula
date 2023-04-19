@@ -1,10 +1,9 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
-// import
 
 const dictionary: RawTranslationPackage = {
   errors: {
@@ -133,12 +132,14 @@ const dictionary: RawTranslationPackage = {
     MATCH: 'HOL.VAN',
     MAX: 'MAX',
     MAXA: 'MAXA',
+    MAXIFS: 'MAXHA',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'MEDIÁN',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'KÖZÉP',
     MIN: 'MIN',
     MINA: 'MINA',
+    MINIFS: 'MINHA',
     MINUTE: 'PERCEK',
     MIRR: 'MEGTÉRÜLÉS',
     MMULT: 'MSZORZAT',

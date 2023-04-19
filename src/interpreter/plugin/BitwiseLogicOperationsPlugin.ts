@@ -1,34 +1,34 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class BitwiseLogicOperationsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BitwiseLogicOperationsPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'BITAND': {
       method: 'bitand',
       parameters: [
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
       ]
     },
     'BITOR': {
       method: 'bitor',
       parameters: [
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
       ]
     },
     'BITXOR': {
       method: 'bitxor',
       parameters: [
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
       ]
     },
   }

@@ -32,8 +32,8 @@ describe('Function ROMAN', () => {
       ['=ROMAN(0)'],
       ['=ROMAN(4000)'],
       ['=ROMAN(-1)'],
-      ['=ROMAN(1,"a")'],
-      ['=ROMAN(1,5)'],
+      ['=ROMAN(1, "a")'],
+      ['=ROMAN(1, 5)'],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))

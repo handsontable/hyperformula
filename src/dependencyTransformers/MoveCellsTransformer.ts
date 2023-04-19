@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -95,7 +95,7 @@ export class MoveCellsTransformer extends Transformer {
   }
 }
 
-class DependentFormulaTransformer extends Transformer {
+export class DependentFormulaTransformer extends Transformer {
   constructor(
     public readonly sourceRange: AbsoluteCellRange,
     public readonly toRight: number,

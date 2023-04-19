@@ -12,6 +12,9 @@ import {
   extractMatrixRange,
   extractRange
 } from '../testUtils'
+import { ErrorType } from '../../src/Cell'
+import { ErrorMessage } from '../../src/error-message'
+import { detailedError } from '../testUtils'
 
 describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
@@ -112,6 +115,34 @@ describe('Adding column - matrix check', () => {
       ['3', '4', '=TRANSPOSE(A1:B3)'],
       ['5', '6']
     ]))
+  })
+
+  it('should result in cell errors when attempting to use nonscalars', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', 'foo', 'bar'],
+      ['3', '4', '=TRANSPOSE(A1:B3)'],
+      ['5', '=A2:A3']
+    ], { chooseAddressMappingPolicy: new AlwaysDense() })
+
+    engine.addColumns(0, [3, 1])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
+    expect(engine.getCellValue(adr('C1'))).toBe('foo')
+    expect(engine.getCellValue(adr('D1'))).toBe(null)
+    expect(engine.getCellValue(adr('E1'))).toBe('bar')
+
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
+    expect(engine.getCellValue(adr('B2'))).toBe(4)
+    expect(engine.getCellValue(adr('C2'))).toBe(1)
+    expect(engine.getCellValue(adr('D2'))).toBe(3)
+    expect(engine.getCellValue(adr('E2'))).toBe(5)
+
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('B3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    expect(engine.getCellValue(adr('C3'))).toBe(2)
+    expect(engine.getCellValue(adr('D3'))).toBe(4)
+    expect(engine.getCellValue(adr('E3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('should be possible to add row right before matrix', () => {

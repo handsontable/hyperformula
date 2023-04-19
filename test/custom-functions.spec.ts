@@ -1,14 +1,19 @@
-import {FunctionPluginValidationError, HyperFormula, SimpleRangeValue} from '../src'
-import {ArraySize} from '../src/ArraySize'
-import {ErrorType} from '../src/Cell'
+import {
+  CellError,
+  ErrorType,
+  FunctionArgumentType,
+  FunctionPluginValidationError,
+  HyperFormula,
+  SimpleRangeValue,
+  ArraySize,
+} from '../src'
 import {ErrorMessage} from '../src/error-message'
 import {AliasAlreadyExisting, ProtectedFunctionError, ProtectedFunctionTranslationError} from '../src/errors'
 import {plPL} from '../src/i18n/languages'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
 import {InternalScalarValue} from '../src/interpreter/InterpreterValue'
 import {FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
-import {NumericAggregationPlugin} from '../src/interpreter/plugin/NumericAggregationPlugin'
-import {SumifPlugin} from '../src/interpreter/plugin/SumifPlugin'
+import {ConditionalAggregationPlugin, NumericAggregationPlugin} from '../src/interpreter/plugin'
 import {VersionPlugin} from '../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
@@ -24,6 +29,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     'ARRAYFOO': {
       method: 'arrayfoo',
       arraySizeMethod: 'arraysizeFoo',
+      parameters: [{ argumentType: FunctionArgumentType.NUMBER }],
     },
   }
 
@@ -126,6 +132,93 @@ class ReservedNamePlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 }
 
+class SquarePlugin extends FunctionPlugin implements FunctionPluginTypecheck<SquarePlugin> {
+  public static implementedFunctions = {
+    // Key of the mapping describes which function will be used to compute it
+    'SQUARE': {
+      method: 'square',
+    },
+  }
+
+  public square(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
+    // Take ast of first argument from list of arguments
+    const arg = ast.args[0]
+
+    // If there was no argument, return NA error
+    if (!arg) {
+      return new CellError(ErrorType.NA)
+    }
+
+    // Compute value of argument
+    const argValue = this.evaluateAst(arg, state)
+
+    if (argValue instanceof CellError) {
+      // If the value is some error, return that error
+      return argValue
+    } else if (typeof argValue === 'number') {
+      // If it's a number, compute the result
+      return (argValue * argValue)
+    } else {
+      // If it's some other type which doesn't make sense in terms of square (string, boolean), return VALUE error
+      return new CellError(ErrorType.VALUE)
+    }
+  }
+}
+
+class GreetingsPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    GREET: {
+      method: 'greet',
+      parameters: [
+        { argumentType: FunctionArgumentType.STRING }
+      ],
+    },
+    EXAMPLE_ARRAY_FUNCTION: {
+      method: 'exampleArrayFunction',
+      parameters: [
+        { argumentType: FunctionArgumentType.NUMBER }
+      ],
+    }
+  }
+
+  public static translations = {
+    enGB: {
+      GREET: 'GREET',
+      EXAMPLE_ARRAY_FUNCTION: 'EXAMPLE_ARRAY_FUNCTION',
+    },
+    enUS: {
+      GREET: 'GREET',
+      EXAMPLE_ARRAY_FUNCTION: 'EXAMPLE_ARRAY_FUNCTION',
+    }
+  }
+  
+  greet(ast: ProcedureAst, state: InterpreterState) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('GREET'),
+      (username) => {
+        if (!username) {
+          return new CellError(ErrorType.VALUE)
+        }
+
+        return `👋 Hello, ${username}!`
+      },
+    )
+  }
+
+  exampleArrayFunction(ast: ProcedureAst, state: InterpreterState) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('EXAMPLE_ARRAY_FUNCTION'),
+      (val: number) => {
+        return SimpleRangeValue.onlyValues([[val, val], [val, val]])
+      },
+    )
+  }
+}
+
 describe('Register static custom plugin', () => {
   it('should register plugin with translations', () => {
     HyperFormula.registerLanguage('plPL', plPL)
@@ -144,14 +237,28 @@ describe('Register static custom plugin', () => {
     expect(engine.getCellValue(adr('A1'))).toEqual('foo')
   })
 
+  it('registerFunction should not affect the existing HyperFormula instances', () => {
+    const engine = HyperFormula.buildFromArray([['=FOO()']])
+    HyperFormula.registerFunction('FOO', FooPlugin, FooPlugin.translations)
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
+  })
+
+  it('registerFunctionPlugin should not affect the existing HyperFormula instances', () => {
+    const engine = HyperFormula.buildFromArray([['=FOO()']])
+    HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOO')))
+  })
+
   it('should return registered formula translations', () => {
     HyperFormula.unregisterAllFunctions()
     HyperFormula.registerLanguage('plPL', plPL)
-    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(ConditionalAggregationPlugin)
     HyperFormula.registerFunctionPlugin(FooPlugin, FooPlugin.translations)
     const formulaNames = HyperFormula.getRegisteredFunctionNames('plPL')
 
-    expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE'], formulaNames)
+    expectArrayWithSameContent(['FU', 'BAR', 'ARRAYFOO', 'SUMA.JEŻELI', 'LICZ.JEŻELI', 'ŚREDNIA.JEŻELI', 'SUMY.JEŻELI', 'LICZ.WARUNKI', 'VERSION', 'PRZESUNIĘCIE', 'MAKS.WARUNKÓW', 'MIN.WARUNKÓW'], formulaNames)
   })
 
   it('should register all formulas from plugin', () => {
@@ -182,7 +289,7 @@ describe('Register static custom plugin', () => {
   it('should register single array functions', () => {
     HyperFormula.registerFunction('ARRAYFOO', FooPlugin, FooPlugin.translations)
     const engine = HyperFormula.buildFromArray([
-      ['=ARRAYFOO()']
+      ['=ARRAYFOO(0)']
     ])
 
     expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
@@ -224,25 +331,25 @@ describe('Register static custom plugin', () => {
 
   it('should return registered plugins', () => {
     HyperFormula.unregisterAllFunctions()
-    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(ConditionalAggregationPlugin)
     HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
     HyperFormula.registerFunctionPlugin(SumWithExtra)
 
-    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [ConditionalAggregationPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should unregister whole plugin', () => {
     HyperFormula.unregisterAllFunctions()
     HyperFormula.registerFunctionPlugin(NumericAggregationPlugin)
-    HyperFormula.registerFunctionPlugin(SumifPlugin)
+    HyperFormula.registerFunctionPlugin(ConditionalAggregationPlugin)
 
     HyperFormula.unregisterFunctionPlugin(NumericAggregationPlugin)
 
-    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [SumifPlugin])
+    expectArrayWithSameContent(HyperFormula.getAllFunctionPlugins(), [ConditionalAggregationPlugin])
   })
 
   it('should return plugin for given functionId', () => {
-    expect(HyperFormula.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
+    expect(HyperFormula.getFunctionPlugin('SUMIF')).toBe(ConditionalAggregationPlugin)
   })
 
   it('should clear function registry', () => {
@@ -292,9 +399,9 @@ describe('Instance level formula registry', () => {
   })
 
   it('should return registered plugins', () => {
-    const engine = HyperFormula.buildFromArray([], {functionPlugins: [SumifPlugin, NumericAggregationPlugin, SumWithExtra]})
+    const engine = HyperFormula.buildFromArray([], {functionPlugins: [ConditionalAggregationPlugin, NumericAggregationPlugin, SumWithExtra]})
 
-    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [SumifPlugin, NumericAggregationPlugin, SumWithExtra])
+    expectArrayWithSameContent(engine.getAllFunctionPlugins(), [ConditionalAggregationPlugin, NumericAggregationPlugin, SumWithExtra])
   })
 
   it('should instantiate engine with additional plugin', () => {
@@ -312,7 +419,7 @@ describe('Instance level formula registry', () => {
     const engine = HyperFormula.buildFromArray([])
 
     let registeredPlugins = new Set(engine.getAllFunctionPlugins())
-    expect(registeredPlugins.has(SumifPlugin)).toBe(true)
+    expect(registeredPlugins.has(ConditionalAggregationPlugin)).toBe(true)
     expect(registeredPlugins.has(FooPlugin)).toBe(false)
 
     engine.updateConfig({functionPlugins: [FooPlugin]})
@@ -324,7 +431,7 @@ describe('Instance level formula registry', () => {
   it('should return plugin for given functionId', () => {
     const engine = HyperFormula.buildFromArray([])
 
-    expect(engine.getFunctionPlugin('SUMIF')).toBe(SumifPlugin)
+    expect(engine.getFunctionPlugin('SUMIF')).toBe(ConditionalAggregationPlugin)
   })
 })
 
@@ -377,5 +484,71 @@ describe('aliases', () => {
     expect(() => {
       HyperFormula.registerFunctionPlugin(OverloadedAliasPlugin)
     }).toThrow(new AliasAlreadyExisting('FOO', 'OverloadedAliasPlugin'))
+  })
+})
+
+describe('Argument validation implemented by hand (without call to runFunction)', () => {
+  it('works', () => {
+    HyperFormula.registerFunctionPlugin(SquarePlugin)
+    HyperFormula.getLanguage('enGB').extendFunctions({SQUARE: 'SQUARE'})
+
+    const engine = HyperFormula.buildFromArray([
+      ['=SQUARE(2)'],
+      ['=SQUARE()'],
+      ['=SQUARE(TRUE())'],
+      ['=SQUARE(1/0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA))
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE))
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+})
+
+describe('Custom function implemented with runFunction)', () => {
+  it('works for a non-empty string', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['Anthony', '=GREET(A1)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('👋 Hello, Anthony!')
+  })
+
+  it('returns #VALUE! error for empty string', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['', '=GREET(A1)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.VALUE))
+  })
+
+  it('propagates #DIV_BY_ZERO! error', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['=1/0', '=GREET(A1)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('propagates #CYCLE! error', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    const engine = HyperFormula.buildFromArray([['=B1', '=GREET(A1)']])
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.CYCLE))
+  })
+
+  it('function returning array throws error when user tries to vectorize it', () => {
+    HyperFormula.registerFunctionPlugin(GreetingsPlugin, GreetingsPlugin.translations)
+
+    expect(() => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2, 3],
+        ['=EXAMPLE_ARRAY_FUNCTION(A1:C1)'],
+      ], {useArrayArithmetic: true})
+
+      engine.getCellValue(adr('A2'))
+    }).toThrow(new Error('Function returning array cannot be vectorized.'))
   })
 })

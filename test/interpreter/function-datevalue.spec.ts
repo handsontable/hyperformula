@@ -1,5 +1,5 @@
 import {HyperFormula} from '../../src'
-import {CellValueDetailedType, ErrorType} from '../../src/Cell'
+import {CellValueDetailedType, ErrorType} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -42,5 +42,13 @@ describe('Function DATEVALUE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+  })
+
+  it('should return NUMBER_DATE', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DATEVALUE("25/02/1991")'],
+    ])
+
+    expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
   })
 })

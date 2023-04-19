@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {addressKey, SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export interface CellValueChange {
   address: SimpleCellAddress,

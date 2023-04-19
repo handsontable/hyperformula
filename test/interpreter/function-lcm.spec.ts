@@ -13,7 +13,7 @@ describe('Function LCM', () => {
 
   it('computes correct answer for two args', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LCM(2*3*5,3*5*7)', '=LCM(0,1)'],
+      ['=LCM(2*3*5, 3*5*7)', '=LCM(0, 1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(2 * 3 * 5 * 7)
@@ -22,7 +22,7 @@ describe('Function LCM', () => {
 
   it('computes correct answer for more than two args', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LCM(2*3*5,3*5*7, 2*5*7)', '=LCM(100,101,102,103, 104)'],
+      ['=LCM(2*3*5, 3*5*7, 2*5*7)', '=LCM(100, 101, 102, 103, 104)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(2 * 3 * 5 * 7)
@@ -31,7 +31,7 @@ describe('Function LCM', () => {
 
   it('works with zeroes', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LCM(2*3*5,3*5*7, 2*5*7, 0, 0, 0)', '=LCM(0, 0, 100,101,102,103,104, 0)'],
+      ['=LCM(2*3*5, 3*5*7, 2*5*7, 0, 0, 0)', '=LCM(0, 0, 100, 101, 102, 103, 104, 0)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe(0)
@@ -49,7 +49,7 @@ describe('Function LCM', () => {
 
   it('handles overflow', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LCM(1000000,1000001,1000002,1000003)'],
+      ['=LCM(1000000, 1000001, 1000002, 1000003)'],
     ])
 
     //inconsistency with product #1
@@ -92,7 +92,7 @@ describe('Function LCM', () => {
 
   it('checks bounds', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=LCM(-1,5)'],
+      ['=LCM(-1, 5)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))

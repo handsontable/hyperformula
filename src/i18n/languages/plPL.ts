@@ -1,10 +1,9 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
-// import
 
 const dictionary: RawTranslationPackage = {
   errors: {
@@ -133,12 +132,14 @@ const dictionary: RawTranslationPackage = {
     MATCH: 'PODAJ.POZYCJĘ',
     MAX: 'MAKS',
     MAXA: 'MAX.A',
+    MAXIFS: 'MAKS.WARUNKÓW',
     MAXPOOL: 'MAKS.Z.PULI',
     MEDIAN: 'MEDIANA',
     MEDIANPOOL: 'MEDIANA.Z.PULI',
     MID: 'FRAGMENT.TEKSTU',
     MIN: 'MIN',
     MINA: 'MIN.A',
+    MINIFS: 'MIN.WARUNKÓW',
     MINUTE: 'MINUTA',
     MIRR: 'MIRR',
     MMULT: 'MACIERZ.ILOCZYN',

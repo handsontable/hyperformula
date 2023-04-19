@@ -10,11 +10,13 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster"><img src="https://img.shields.io/github/workflow/status/handsontable/hyperformula/Test" alt="GitHub Workflow Status"></a>
-  <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield" alt="FOSSA Status"></a>
-  <a href="https://lgtm.com/projects/g/handsontable/hyperformula/context:javascript"><img src="https://img.shields.io/lgtm/grade/javascript/g/handsontable/hyperformula.svg?logo=lgtm&amp;logoWidth=18" alt="Language grade: JavaScript"></a>
-  <a href="https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json"><img src="https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json" alt="Known Vulnerabilities"></a>
+  <a href="https://npmjs.com/package/hyperformula"><img src="https://img.shields.io/npm/dt/hyperformula.svg" alt="npm total downloads"></a>
+  <a href="https://npmjs.com/package/hyperformula"><img src="https://img.shields.io/npm/dm/hyperformula.svg" alt="npm monthly downloads"></a>
   <a href="https://github.com/handsontable/hyperformula/graphs/contributors"><img src="https://img.shields.io/github/contributors/handsontable/hyperformula" alt="GitHub contributors"></a>
+  <a href="https://snyk.io/test/github/handsontable/hyperformula?targetFile=package.json"><img src="https://snyk.io/test/github/handsontable/hyperformula/badge.svg?targetFile=package.json" alt="Known Vulnerabilities"></a>
+  <br>
+  <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhandsontable%2Fhyperformula.svg?type=shield" alt="FOSSA Status"></a>
+  <a href="https://github.com/handsontable/hyperformula/actions?query=workflow%3ATest+branch%3Amaster"><img src="https://img.shields.io/github/actions/workflow/status/handsontable/hyperformula/test.yml?branch=master" alt="GitHub Workflow Status"></a>
   <a href="https://codecov.io/gh/handsontable/hyperformula"><img src="https://codecov.io/gh/handsontable/hyperformula/branch/master/graph/badge.svg?token=5k9ZQv8azO" alt="codecov"></a>
 </p>
 
@@ -22,9 +24,10 @@
 
 HyperFormula is a headless spreadsheet built on top of TypeScript. It is a parser and evaluator of Excel formulas for web applications. You can use it in a browser or as a service, with Node.js as your back-end technology.
 - High-speed Excel formula parsing and evaluating
-- A library of [380+ built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html) available in 16 languages
+- A library of nearly [400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
+- Support for [internationalization](https://hyperformula.handsontable.com/guide/i18n-features.html) with 17 built-in languages
 - Support for [custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
-- Function syntax [compatible with Excel and Google Sheets](https://hyperformula.handsontable.com/guide/known-limitations.html#google-sheets-and-microsoft-excel)
+- Function syntax compatible with [Microsoft Excel](https://hyperformula.handsontable.com/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/guide/compatibility-with-google-sheets.html)
 - [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)
 - Support for [undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
 - Support for [CRUD operations](https://hyperformula.handsontable.com/guide/basic-operations.html)
@@ -69,7 +72,7 @@ const options = {
 // define the data
 const data = [['10', '20', '30', '=SUM(A1:C1)']];
 
-// build an instance with defined options and data 
+// build an instance with defined options and data
 const hfInstance = HyperFormula.buildFromArray(data, options);
 
 // call getCellValue to get the calculation results
@@ -100,9 +103,9 @@ business web apps. Please read the [Contributing Guide](https://hyperformula.han
 
 ## License
 
-HyperFormula is available under the open source license ([GPLv3](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt)).
+HyperFormula is available under the open source license ([GPLv3](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt)).
 
 To buy a commercial license, please write to us at sales@handsontable.com
 
 ## Copyrights
-© 2022 [Handsoncode](https://handsontable.com)
+© 2023 [Handsoncode](https://handsontable.com)

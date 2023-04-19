@@ -1,66 +1,74 @@
-import {compare, lowerBound} from '../../src/interpreter/binarySearch'
+import {compare, findLastOccurrenceInOrderedArray} from '../../src/interpreter/binarySearch'
+import {EmptyValue} from '../../src/interpreter/InterpreterValue'
+import {CellError, ErrorType} from '../../src'
 
-describe('Binary search', () => {
-  const centerValueFn = (values: any[]) => (center: number) => values[center]
-
+describe('findLastOccurrenceInOrderedArray', () => {
   it('should return -1 when empty array', () => {
     const values: number[] = []
-    expect(lowerBound(centerValueFn(values), 1, 0, values.length - 1)).toBe(-1)
+    expect(findLastOccurrenceInOrderedArray(1, values)).toBe(-1)
   })
 
   it('should work for one element', () => {
     const values: number[] = [1]
-    expect(lowerBound(centerValueFn(values), 1, 0, values.length - 1)).toBe(0)
+    expect(findLastOccurrenceInOrderedArray(1, values)).toBe(0)
   })
 
   it('should return -1 when all elements are greater', () => {
     const values: number[] = [3, 5, 10]
-    expect(lowerBound(centerValueFn(values), 1, 0, values.length - 1)).toBe(-1)
+    expect(findLastOccurrenceInOrderedArray(1, values)).toBe(-1)
   })
 
   it('should find index of element in values of odd length', () => {
     const values: number[] = [3, 5, 10]
-    expect(lowerBound(centerValueFn(values), 3, 0, values.length - 1)).toBe(0)
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(1)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(2)
+    expect(findLastOccurrenceInOrderedArray(3, values)).toBe(0)
+    expect(findLastOccurrenceInOrderedArray(5, values)).toBe(1)
+    expect(findLastOccurrenceInOrderedArray(10, values)).toBe(2)
   })
 
   it('should find index of element in values of even length', () => {
     const values: number[] = [3, 5, 10, 11]
-    expect(lowerBound(centerValueFn(values), 3, 0, values.length - 1)).toBe(0)
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(1)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(2)
-    expect(lowerBound(centerValueFn(values), 11, 0, values.length - 1)).toBe(3)
+    expect(findLastOccurrenceInOrderedArray(3, values)).toBe(0)
+    expect(findLastOccurrenceInOrderedArray(5, values)).toBe(1)
+    expect(findLastOccurrenceInOrderedArray(10, values)).toBe(2)
+    expect(findLastOccurrenceInOrderedArray(11, values)).toBe(3)
   })
 
   it('should find index of lower bound', () => {
     const values: number[] = [1, 2, 3, 7]
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(2)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(3)
+    expect(findLastOccurrenceInOrderedArray(5, values)).toBe(2)
+    expect(findLastOccurrenceInOrderedArray(10, values)).toBe(3)
   })
 
   it('should work for strings', () => {
     const values: string[] = ['aaaa', 'bar', 'foo', 'xyz']
-    expect(lowerBound(centerValueFn(values), 'foo', 0, values.length - 1)).toBe(2)
+    expect(findLastOccurrenceInOrderedArray('foo', values)).toBe(2)
   })
 
   it('should work for bools', () => {
     const values: boolean[] = [false, false, false, true, true]
-    expect(lowerBound(centerValueFn(values), true, 0, values.length - 1)).toBe(3)
+    expect(findLastOccurrenceInOrderedArray(true, values)).toBe(4)
   })
 
   it('should work for different types in array', () => {
     const values = [3, 5, 7, 'aaaa', 'bar', 'foo', false, false, true]
-    expect(lowerBound(centerValueFn(values), 5, 0, values.length - 1)).toBe(1)
-    expect(lowerBound(centerValueFn(values), 'foo', 0, values.length - 1)).toBe(5)
-    expect(lowerBound(centerValueFn(values), false, 0, values.length - 1)).toBe(6)
-    expect(lowerBound(centerValueFn(values), 10, 0, values.length - 1)).toBe(2)
-    expect(lowerBound(centerValueFn(values), 'xyz', 0, values.length - 1)).toBe(5)
+    expect(findLastOccurrenceInOrderedArray(5, values)).toBe(1)
+    expect(findLastOccurrenceInOrderedArray('foo', values)).toBe(5)
+    expect(findLastOccurrenceInOrderedArray(false, values)).toBe(7)
+    expect(findLastOccurrenceInOrderedArray(10, values)).toBe(2)
+    expect(findLastOccurrenceInOrderedArray('xyz', values)).toBe(5)
   })
 
-  it('should return first occurence', () => {
+  it('should return the last occurence', () => {
     const values = [1, 2, 2, 2, 2, 2, 3, 3, 3]
-    expect(lowerBound(centerValueFn(values), 2, 0, values.length - 1)).toBe(1)
+    expect(findLastOccurrenceInOrderedArray(2, values)).toBe(5)
+  })
+
+  it('should work for arrays ordered descending', () => {
+    const values: number[] = [11, 10, 5, 3]
+    expect(findLastOccurrenceInOrderedArray(3, values, 'desc')).toBe(3)
+    expect(findLastOccurrenceInOrderedArray(5, values, 'desc')).toBe(2)
+    expect(findLastOccurrenceInOrderedArray(10, values, 'desc')).toBe(1)
+    expect(findLastOccurrenceInOrderedArray(11, values, 'desc')).toBe(0)
   })
 })
 
@@ -100,5 +108,15 @@ describe('compare', () => {
 
   it('string length', () => {
     expect(compare('a', 'aa')).toBe(-1)
+  })
+
+  it('empty value', () => {
+    expect(compare(EmptyValue, EmptyValue)).toBe(0)
+    expect(compare(EmptyValue, 'foo')).toBe(-1)
+    expect(compare('foo', EmptyValue)).toBe(1)
+  })
+
+  it('error', () => {
+    expect(compare('foo', new CellError(ErrorType.DIV_BY_ZERO))).toBe(-1)
   })
 })

@@ -27,7 +27,7 @@ describe('unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => HyperFormula.buildFromArray([[() => {}]]))
-      .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
+      .toThrowError(/^Unable to parse value\: "(\(\) => \{\s*\}|function \(\) \{\s*\})"$/)
   })
   it('should give parsing error #4', () => {
     expect(() => HyperFormula.buildFromSheets({
@@ -38,7 +38,7 @@ describe('unsupported types should result in error', () => {
       // @ts-ignore
       Sheet2: [[() => {}]]
     }))
-      .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
+      .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{\s*\}|function \(\) \{\s*\})"$/)
   })
   it('should give parsing error #5', () => {
     // eslint-disable-next-line
@@ -90,11 +90,11 @@ describe('unsupported types should result in error', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => engine.setCellContents(adr('A1'), () => {}))
-      .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
+      .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{\s*\}|function \(\) \{\s*\})"$/)
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => engine.setSheetContent(0, [[() => {}]]))
-      .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{ \}|function \(\) \{\})"$/)
+      .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{\s*\}|function \(\) \{\s*\})"$/)
   })
 
   it('should give error when not an array', () => {

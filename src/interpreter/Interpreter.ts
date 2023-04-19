@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
@@ -39,7 +39,7 @@ import {
   InterpreterValue,
   isExtendedNumber,
 } from './InterpreterValue'
-import {SimpleRangeValue} from './SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder

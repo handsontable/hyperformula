@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {ArraySize} from './ArraySize'
 import {CellError} from './Cell'
 import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export interface IArray {
   size: ArraySize,
@@ -134,13 +134,13 @@ export class ArrayValue implements IArray {
       this.addRows(this.height(), newSize.height - this.height())
     }
     if (this.height() > newSize.height) {
-      throw 'Resizing to smaller array'
+      throw Error('Resizing to smaller array')
     }
     if (this.width() < newSize.width && isFinite(newSize.width)) {
       this.addColumns(this.width(), newSize.width - this.width())
     }
     if (this.width() > newSize.width) {
-      throw 'Resizing to smaller array'
+      throw Error('Resizing to smaller array')
     }
   }
 

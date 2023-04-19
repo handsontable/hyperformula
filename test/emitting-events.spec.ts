@@ -1,7 +1,11 @@
-import {ExportedCellChange, ExportedNamedExpressionChange, HyperFormula} from '../src'
-import {ErrorType} from '../src/Cell'
+import {
+  ExportedCellChange,
+  ExportedNamedExpressionChange,
+  HyperFormula,
+  ErrorType,
+  NamedExpressionDoesNotExistError,
+} from '../src'
 import {Events} from '../src/Emitter'
-import {NamedExpressionDoesNotExistError} from '../src/errors'
 
 import {adr, detailedErrorWithOrigin} from './testUtils'
 
@@ -99,7 +103,7 @@ describe('Events', () => {
     }).toThrow(new NamedExpressionDoesNotExistError('myName'))
   })
 
-  it('namedExpressionRemoved contains actual named expression name', () => {
+  it('namedExpressionRemoved contains an actual named-expression name', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addNamedExpression('myName', 'foobarbaz')
     const handler = jasmine.createSpy()
@@ -122,6 +126,24 @@ describe('Events', () => {
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith([new ExportedCellChange(adr('A1'), 43)])
+  })
+
+  it('valuesUpdated works with named expressions', () => {
+    const engine = HyperFormula.buildFromArray(
+      [['42']],
+      {},
+      [{ name: 'NAMED_EXPR', expression: '=Sheet1!$A$1' }]
+    )
+    const handler = jasmine.createSpy()
+
+    engine.on(Events.ValuesUpdated, handler)
+    engine.setCellContents(adr('A1'), [['43']])
+
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith([
+      new ExportedCellChange(adr('A1'), 43),
+      new ExportedNamedExpressionChange('NAMED_EXPR', 43),
+    ])
   })
 
   it('valuesUpdated may sometimes be triggered even if nothing changed', () => {
@@ -150,14 +172,14 @@ describe('Events', () => {
     engine.on(Events.EvaluationResumed, handlerResumed)
 
     engine.suspendEvaluation()
-    expect(handlerUpdated).toHaveBeenCalledTimes(0)
+    expect(handlerUpdated).not.toHaveBeenCalled()
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
-    expect(handlerResumed).toHaveBeenCalledTimes(0)
+    expect(handlerResumed).not.toHaveBeenCalled()
 
     engine.setCellContents(adr('A1'), [['13']])
-    expect(handlerUpdated).toHaveBeenCalledTimes(0)
+    expect(handlerUpdated).not.toHaveBeenCalled()
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
-    expect(handlerResumed).toHaveBeenCalledTimes(0)
+    expect(handlerResumed).not.toHaveBeenCalled()
 
     engine.resumeEvaluation()
     expect(handlerUpdated).toHaveBeenCalledTimes(1)

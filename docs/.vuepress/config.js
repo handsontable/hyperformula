@@ -1,5 +1,6 @@
 const highlight = require('./highlight');
 const regexPlugin = require('markdown-it-regex').default;
+const footnotePlugin = require('markdown-it-footnote');
 const searchBoxPlugin = require('./plugins/search-box');
 const HyperFormula = require('../../dist/hyperformula.full');
 const fs = require('fs');
@@ -20,7 +21,13 @@ module.exports = {
       })(window,document,'script','dataLayer','GTM-N59TZXR');
     `],
     // Google Console
-    ['meta', { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' }]
+    ['meta', { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' }],
+    // Favicon
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' }],
+    ['link', { rel: 'icon', sizes: '32x32', type: 'image/png', href: '/favicon/favicon-32x32.png' }],
+    ['link', { rel: 'icon', sizes: '16x16', type: 'image/png', href: '/favicon/favicon-16x16.png' }],
+    ['link', { rel: 'manifest', href: '/favicon/site.webmanifest' }],
+    ['link', { rel: 'mask-icon', color: '#ffffff', href: '/favicon/safari-pinned-tab.svg' }],
   ],
   base: '/',
   plugins: [
@@ -74,6 +81,7 @@ module.exports = {
         regex: /(process\.env\.HT_RELEASE_DATE as string)/,
         replace: () => `'${HyperFormula.releaseDate}'`
       })
+      md.use(footnotePlugin)
     }
   },
   // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
@@ -161,7 +169,6 @@ module.exports = {
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
             ['/guide/license-key', 'License key'],
-            ['/guide/known-limitations', 'Known limitations'],
           ]
         },
         {
@@ -204,8 +211,18 @@ module.exports = {
           title: 'Internationalization',
           collapsable: false,
           children: [
+            ['/guide/i18n-features', 'Internationalization features'],
             ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
+          ]
+        },
+        {
+          title: 'Compatibility',
+          collapsable: false,
+          children: [
+            ['/guide/compatibility-with-microsoft-excel', 'Compatibility with Microsoft Excel'],
+            ['/guide/compatibility-with-google-sheets', 'Compatibility with Google Sheets'],
+            ['/guide/list-of-differences', 'Runtime differences with Microsoft Excel and Google Sheets'],
           ]
         },
         {
@@ -217,6 +234,8 @@ module.exports = {
             ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
+            ['/guide/known-limitations', 'Known limitations'],
+            ['/guide/file-import', 'File import'],
           ]
         },
         {

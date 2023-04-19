@@ -158,8 +158,8 @@ describe('Move columns', () => {
     expect(engine.getCellValue(adr('A2'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqual(1)
     expect(engine.getCellValue(adr('B2'))).toEqual(1)
-    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(0, 1))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(0, -1))
+    expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.relative(1, 0))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(-1, 0))
   })
 
   it('should adjust absolute references', () => {
@@ -171,7 +171,7 @@ describe('Move columns', () => {
     engine.moveColumns(0, 0, 1, 2)
 
     expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.absolute(0, 0))
-    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(0, -1))
+    expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.relative(-1, 0))
   })
 
   it('should adjust range', () => {
@@ -238,6 +238,24 @@ describe('Move columns', () => {
     engine.moveColumns(0, 1, 1, 3)
 
     expect(engine.lazilyTransformingAstService.version()).toEqual(version + 1)
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[ null, '=A1' ]])
+    engine.moveColumns(0, 1, 1, 0)
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=B1')
+    expect(engine.getCellSerialized(adr('B1'))).toEqual(null)
+
+    engine.setCellContents(adr('A1'), '=B1')
+    expect(engine.getCellSerialized(adr('A1'))).toEqual('=B1')
+    expect(engine.getCellSerialized(adr('B1'))).toEqual(null)
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null, '=SUM(A1:C1)', 42]])
+    engine.moveColumns(0, 3, 1, 0)
+    engine.setCellContents(adr('A1'), '=SUM(B1:D1)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(B1:D1)', null, null, null, 42]])
   })
 })
 

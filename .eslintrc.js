@@ -4,6 +4,7 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'license-header',
+    'jsdoc',
   ],
   parserOptions: {
     tsconfigRootDir: __dirname,
@@ -31,8 +32,13 @@ module.exports = {
     '@typescript-eslint/brace-style': 'error', // wtf
     '@typescript-eslint/no-unnecessary-boolean-literal-compare': ['error'],
     '@typescript-eslint/no-extra-non-null-assertion': ['error'],
+    '@typescript-eslint/no-throw-literal': ['error'],
     '@typescript-eslint/array-type': ['error'],
-    '@typescript-eslint/space-before-function-paren': ['error', 'never'],
+    '@typescript-eslint/space-before-function-paren': ["error", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
     '@typescript-eslint/quotes': ['error', 'single', { avoidEscape: true }],
     '@typescript-eslint/no-extra-semi': ['error'],
     '@typescript-eslint/comma-spacing': ['error'],
@@ -63,6 +69,39 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/interface-name-prefix': 'warn',
+
+    "jsdoc/check-access": 'warn',
+    "jsdoc/check-alignment": 'warn',
+    "jsdoc/check-param-names": 'warn',
+    "jsdoc/check-property-names": 'warn',
+    "jsdoc/check-tag-names": ['warn', {definedTags: ['category']}],
+    "jsdoc/check-types": 'warn',
+    "jsdoc/empty-tags": 'warn',
+    "jsdoc/implements-on-classes": 'warn',
+    "jsdoc/multiline-blocks": 'warn',
+    "jsdoc/newline-after-description": 'warn',
+    "jsdoc/no-multi-asterisks": 'warn',
+    "jsdoc/require-param-description": 'warn',
+    "jsdoc/require-param-name": 'warn',
+    "jsdoc/require-param-type": 'warn',
+    "jsdoc/require-property-description": 'warn',
+    "jsdoc/require-property-name": 'warn',
+    "jsdoc/require-property-type": 'warn',
+    "jsdoc/require-returns-check": 'warn',
+    "jsdoc/require-returns-description": 'warn',
+    "jsdoc/require-returns-type": 'warn',
+    "jsdoc/require-yields-check": 'warn',
+    "jsdoc/valid-types": 'warn',
+    "jsdoc/require-jsdoc": ['warn', {
+      require: {
+        ArrowFunctionExpression: true,
+        ClassDeclaration: true,
+        ClassExpression: true,
+        FunctionDeclaration: true,
+        FunctionExpression: true,
+        MethodDefinition: true,
+      }
+    }],
   },
   overrides: [
     {

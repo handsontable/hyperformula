@@ -1,12 +1,12 @@
 import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {ErrorType} from '../../src'
 import {SimpleDateTime} from '../../src/DateTimeHelper'
 import {ErrorMessage} from '../../src/error-message'
 import {defaultStringifyDateTime} from '../../src/format/format'
 import {Maybe} from '../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
-describe('Text', () => {
+describe('TEXT()', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([[
       '2',
@@ -144,16 +144,99 @@ describe('Text', () => {
   })
 
   it('works for number format', () => {
-    const engine = HyperFormula.buildFromArray([[
-      '12.45',
-      '=TEXT(A1, "###.###")',
-      '=TEXT(A1, "000.000")',
-    ]])
+    const engine = HyperFormula.buildFromArray([
+      ['12.45'],
+      ['=TEXT(A1, "###.###")'],
+      ['=TEXT(A1, "000.000")'],
+      ['=TEXT(A1, "$000.00")'],
+      ['=TEXT(A1, "$#.000")'],
+      ['=TEXT(A1, "$###.000")'],
+      ['=TEXT(A1, "000.00.00$")'],
+      ['=TEXT(A1, "###.##.##$")'],
+      ['=TEXT(A1, "$###,##0.00")'],
+    ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('12.45')
-    expect(engine.getCellValue(adr('C1'))).toEqual('012.450')
+    expect(engine.getCellValue(adr('A2'))).toEqual('12.45')
+    expect(engine.getCellValue(adr('A3'))).toEqual('012.450')
+    expect(engine.getCellValue(adr('A4'))).toEqual('$012.45')
+    expect(engine.getCellValue(adr('A5'))).toEqual('$12.450')
+    expect(engine.getCellValue(adr('A6'))).toEqual('$12.450')
+    expect(engine.getCellValue(adr('A7'))).toEqual('012.45.00$')
+    expect(engine.getCellValue(adr('A8'))).toEqual('12.45.##$')
+    expect(engine.getCellValue(adr('A9'))).toEqual('$12,##0.00')
   })
 
+  it('works with currency format "$#.00"', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TEXT(0.5, "$#.00")'],
+      ['=TEXT(10, "$#.00")'],
+      ['=TEXT(100, "$#.00")'],
+      ['=TEXT(1000, "$#.00")'],
+      ['=TEXT(10000, "$#.00")'],
+      ['=TEXT(100000, "$#.00")'],
+      ['=TEXT(1000000, "$#.00")'],
+      ['=TEXT(10000000, "$#.00")'],
+      ['=TEXT(10000000.99, "$#.00")'],
+      ['=TEXT(10000000.99999, "$#.00")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('$0.50')
+    expect(engine.getCellValue(adr('A2'))).toEqual('$10.00')
+    expect(engine.getCellValue(adr('A3'))).toEqual('$100.00')
+    expect(engine.getCellValue(adr('A4'))).toEqual('$1000.00')
+    expect(engine.getCellValue(adr('A5'))).toEqual('$10000.00')
+    expect(engine.getCellValue(adr('A6'))).toEqual('$100000.00')
+    expect(engine.getCellValue(adr('A7'))).toEqual('$1000000.00')
+    expect(engine.getCellValue(adr('A8'))).toEqual('$10000000.00')
+    expect(engine.getCellValue(adr('A9'))).toEqual('$10000000.99')
+    expect(engine.getCellValue(adr('A10'))).toEqual('$10000001.00')
+  })
+
+  it('date and time format', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1.100', '=TEXT(A1, "yyyy-mm-dd hh:mm:ss")'],
+      ['1.222', '=TEXT(A2, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.99999', '=TEXT(A3, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.999999', '=TEXT(A4, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.9999999', '=TEXT(A5, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.99999999', '=TEXT(A6, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.999999999', '=TEXT(A7, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.9999999999', '=TEXT(A8, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.99999999999', '=TEXT(A9, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.999999999999', '=TEXT(A10, "yyyy-mm-dd hh:mm:ss")']
+    ])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('1899-12-31 02:24:00')
+    expect(engine.getCellValue(adr('B2'))).toEqual('1899-12-31 05:19:40')
+    expect(engine.getCellValue(adr('B3'))).toEqual('1899-12-30 23:59:59')
+    expect(engine.getCellValue(adr('B4'))).toEqual('1899-12-30 23:59:59')
+    expect(engine.getCellValue(adr('B5'))).toEqual('1899-12-30 23:59:59')
+    expect(engine.getCellValue(adr('B6'))).toEqual('1899-12-30 23:59:59')
+    expect(engine.getCellValue(adr('B7'))).toEqual('1899-12-30 23:59:59')
+    expect(engine.getCellValue(adr('B8'))).toEqual('1899-12-30 23:59:59')
+    expect(engine.getCellValue(adr('B9'))).toEqual('1899-12-31 00:00:00')
+    expect(engine.getCellValue(adr('B10'))).toEqual('1899-12-31 00:00:00')
+  })
+
+  it('correct rounding', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['0.9999999999', '=TEXT(A1, "yyyy-mm-dd hh:mm:ss.sssss")'],
+      ['0.9999999999', '=TEXT(A2, "yyyy-mm-dd hh:mm:ss.ssss")'],
+      ['0.9999999999', '=TEXT(A3, "yyyy-mm-dd hh:mm:ss.sss")'],
+      ['0.9999999999', '=TEXT(A4, "yyyy-mm-dd hh:mm:ss.ss")'],
+      ['0.9999999999', '=TEXT(A5, "yyyy-mm-dd hh:mm:ss.s")'],
+      ['0.9999999999', '=TEXT(A6, "yyyy-mm-dd hh:mm:ss")'],
+      ['0.9999999999', '=TEXT(A7, "yyyy-mm-dd hh:mm")'],
+    ])
+
+    expect(engine.getCellValue(adr('B1'))).toEqual('1899-12-30 23:59:59.99999')
+    expect(engine.getCellValue(adr('B2'))).toEqual('1899-12-30 23:59:59.9999')
+    expect(engine.getCellValue(adr('B3'))).toEqual('1899-12-30 23:59:59.999')
+    expect(engine.getCellValue(adr('B4'))).toEqual('1899-12-30 23:59:59.99')
+    expect(engine.getCellValue(adr('B5'))).toEqual('1899-12-30 23:59:59.9')
+    expect(engine.getCellValue(adr('B6'))).toEqual('1899-12-30 23:59:59')
+    expect(engine.getCellValue(adr('B7'))).toEqual('1899-12-30 23:59')
+  })
 })
 
 describe('time duration', () => {
@@ -163,15 +246,23 @@ describe('time duration', () => {
       ['1.1', '=TEXT(A2, "[hh]:mm:ss")', ],
       ['0.1', '=TEXT(A3, "[mm]:ss")', ],
       ['1.1', '=TEXT(A4, "[mm]:ss")', ],
-      ['0.1111', '=TEXT(A5, "[mm]:ss.ss")', ],
-      ['0.1111', '=TEXT(A6, "[mm]:ss.00")', ],
+      ['1.1', '=TEXT(A5, "[hh]:m:ss")', ],
+      ['0.1111', '=TEXT(A6, "[mm]:ss.ss")', ],
+      ['0.1111', '=TEXT(A7, "[mm]:ss.00")', ],
+      ['0.1111', '=TEXT(A8, "hh:[mm]:s")', ],
+      ['0.1111', '=TEXT(A9, "h:[mm]")', ],
+      ['0.1111', '=TEXT(A10, "abc")', ],
     ])
     expect(engine.getCellValue(adr('B1'))).toEqual('02:24:00')
     expect(engine.getCellValue(adr('B2'))).toEqual('26:24:00')
     expect(engine.getCellValue(adr('B3'))).toEqual('144:00')
     expect(engine.getCellValue(adr('B4'))).toEqual('1584:00')
-    expect(engine.getCellValue(adr('B5'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B5'))).toEqual('26:24:00')
     expect(engine.getCellValue(adr('B6'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B7'))).toEqual('159:59.04')
+    expect(engine.getCellValue(adr('B8'))).toEqual('02:39:59')
+    expect(engine.getCellValue(adr('B9'))).toEqual('2:39')
+    expect(engine.getCellValue(adr('B10'))).toEqual('abc')
   })
 })
 
@@ -206,9 +297,9 @@ describe('Custom date printing', () => {
   })
 
   it('date printing, month and minutes', () => {
-    const enigne = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")'],
+    const engine = HyperFormula.buildFromArray([['1.1', '=TEXT(A1, "mm-dd mm:ss.sssss")'],
       ['1.222', '=TEXT(A2, "mm-dd mm:ss.sssss")']])
-    expect(enigne.getCellValue(adr('B1'))).toEqual('12-31 24:00')
-    expect(enigne.getCellValue(adr('B2'))).toEqual('12-31 19:40.8')
+    expect(engine.getCellValue(adr('B1'))).toEqual('12-31 24:00')
+    expect(engine.getCellValue(adr('B2'))).toEqual('12-31 19:40.79999')
   })
 })

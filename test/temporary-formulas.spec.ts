@@ -1,4 +1,5 @@
 import {HyperFormula} from '../src'
+import {NotAFormulaError} from '../src/errors'
 
 describe('Temporary formulas - normalization', () => {
   it('works', () => {
@@ -33,6 +34,14 @@ describe('Temporary formulas - normalization', () => {
     const formula = '=ShEeT1!A1+10'
 
     expect(engine.normalizeFormula(formula)).toBe('=ShEeT1!A1+10')
+  })
+
+  it('throws an error if formulaString is malformed', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => {
+      engine.normalizeFormula('=#FOO!')
+    }).toThrow(new NotAFormulaError())
   })
 })
 

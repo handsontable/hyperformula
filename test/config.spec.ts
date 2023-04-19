@@ -1,8 +1,11 @@
-import {HyperFormula} from '../src'
+import {ErrorType, HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
-import {EmptyValue} from '../src/interpreter/InterpreterValue'
-import {unregisterAllLanguages} from './testUtils'
+import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
+import {adr, resetSpy, unregisterAllLanguages} from './testUtils'
+import {CellValueNoNumber} from '../src/Cell'
+import {MissingTranslationError} from '../src/errors'
+import {UIElement} from '../src/i18n/index'
 
 describe('Config', () => {
   beforeEach(() => {
@@ -94,6 +97,30 @@ describe('Config', () => {
     expect(() => new Config({caseFirst: 'abcd'})).toThrowError('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
   })
 
+  it('should throw error when Function Translation cannot be found', () => {
+    const config = new Config()
+    const functionName = '0123456ABCDEFGH'
+    expect(() => {
+      config.translationPackage.getFunctionTranslation(functionName)
+    }).toThrow(new MissingTranslationError(`functions.${functionName}`))
+  })
+
+  it('should throw error when Error Translation cannot be found', () => {
+    const config = new Config()
+    const errorType = '0123456ABCDEFGH'
+    expect(() => {
+      config.translationPackage.getErrorTranslation(errorType as ErrorType)
+    }).toThrow(new MissingTranslationError(`errors.${errorType}`))
+  })
+
+  it('should throw error when UI Translation cannot be found', () => {
+    const config = new Config()
+    const uiElement = '0123456ABCDEFGH'
+    expect(() => {
+      config.translationPackage.getUITranslation(uiElement as UIElement)
+    }).toThrow(new MissingTranslationError(`ui.${uiElement}`))
+  })
+
   it('should throw error when there is a conflict between separators', () => {
     expect(() => {
       new Config({decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ' '})
@@ -120,7 +147,7 @@ describe('Config', () => {
 
   it('should throw error when currency symbol is not a string', () => {
     expect(() => {
-      new Config({currencySymbol: [42 as any]})
+      new Config({currencySymbol: [ 42 as unknown as string ]})
     }).toThrowError('Expected value of type: string[] for config parameter: currencySymbol')
   })
 
@@ -207,21 +234,167 @@ describe('Config', () => {
     expect(() => new Config({nullYear: 101})).toThrowError('Config parameter nullYear should be at most 100')
   })
 
+  describe('#dateFormats', () => {
+    it('should use the data formats provided in config param', () => {
+      const dateFormats = ['DD/MM/YYYY']
+      const engine = HyperFormula.buildFromArray([
+        ['1'],
+        ['01/03/2022'],
+        ['2022/01/01'],
+      ], { dateFormats })
+
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(CellValueNoNumber.STRING)
+    })
+
+    it('should parse the dates with different separators', () => {
+      const dateFormats = ['DD/MM/YYYY']
+      const engine = HyperFormula.buildFromArray([[
+        '01/03/2022',
+        '01-03-2022',
+        '01 03 2022',
+        '01.03.2022',
+        '01/03-2022',
+        '01 03.2022',
+        '01 03/2022',
+        '01.03-2022',
+      ]], { dateFormats })
+
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('A1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('B1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('B1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('C1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('C1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('D1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('D1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('E1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('E1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('F1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('F1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('G1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('G1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueDetailedType(adr('H1'))).toEqual(NumberType.NUMBER_DATE)
+      expect(engine.getCellValueFormat(adr('H1'))).toEqual('DD/MM/YYYY')
+    })
+  })
+
+  describe('#timeFormats', () => {
+    it('should work with the "hh:mm" format', () => {
+      const timeFormats = ['hh:mm']
+      const engine = HyperFormula.buildFromArray([
+        ['13.33'],
+        ['13:33'],
+        ['01:33'],
+        ['1:33'],
+        ['13:33:33'],
+      ], { timeFormats })
+
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_RAW)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(CellValueNoNumber.STRING)
+    })
+
+    it('should accept "AM/PM" designator', () => {
+      const timeFormats = ['hh:mm']
+      const engine = HyperFormula.buildFromArray([
+        ['1:33 AM'],
+        ['1:33 PM'],
+        ['01:33 am'],
+        ['1:33 pm'],
+        ['1:33AM'],
+        ['1:33PM'],
+        ['1:33          AM'],
+        ['1:33          PM'],
+        ['13:33 AM'],
+      ], { timeFormats })
+
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A6'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A7'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A8'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A9'))).toEqual(CellValueNoNumber.STRING)
+    })
+
+    it('should work with the "hh:mm:ss" format', () => {
+      const timeFormats = ['hh:mm:ss']
+      const engine = HyperFormula.buildFromArray([
+        ['13:33'],
+        ['1:33:33'],
+        ['1:33:33 AM'],
+        ['1:33:33 PM'],
+        ['1:33:33 am'],
+        ['1:33:33 pm'],
+        ['1:33:33 a'],
+        ['1:33:33 p'],
+        ['1:33:33 A'],
+        ['1:33:33 P'],
+        ['13:33:33'],
+        ['01:33:33'],
+        ['1:33:33.3'],
+        ['1:33:33.33'],
+        ['1:33:33.333'],
+        ['1:33:33.3333'],
+        ['1:33:33.333333333333333333333333333333333333333333333333333333'],
+      ], { timeFormats })
+
+      expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueNoNumber.STRING)
+      expect(engine.getCellValueDetailedType(adr('A2'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A3'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A4'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A5'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A6'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A7'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A8'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A9'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A10'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A11'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A12'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A13'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A14'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A15'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A16'))).toEqual(NumberType.NUMBER_TIME)
+      expect(engine.getCellValueDetailedType(adr('A17'))).toEqual(NumberType.NUMBER_TIME)
+    })
+
+    it('the parsing result should be the same regardless of decimal places specified in format string', () => {
+      const dateAsString = '13:33:33.33333'
+      const dateAsNumber = 0.564969131944444
+
+      let engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.s'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ssss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+
+      engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sssss'] })
+      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+    })
+  })
+
   describe('deprecated option warning messages', () => {
     beforeEach(() => {
       spyOn(console, 'warn')
     })
 
     afterEach(() => {
-      try {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.mockClear() // clears mock in Jest env
-      } catch {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.calls.reset() // clears mock in Jasmine env
-      }
+      resetSpy(console.warn)
     })
 
     it('should log usage of deprecated options when they are passed while engine initialization', () => {
@@ -248,20 +421,11 @@ describe('Config', () => {
       const config = new Config({
         binarySearchThreshold: 20,
       })
-
-      try {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.mockClear() // clears mock in Jest env
-      } catch {
-        // eslint-disable-next-line
-        // @ts-ignore
-        console.warn.calls.reset() // clears mock in Jasmine env
-      }
+      resetSpy(console.warn)
 
       config.mergeConfig({})
 
-      expect(console.warn).toHaveBeenCalledTimes(0)
+      expect(console.warn).not.toHaveBeenCalled()
     })
   })
 })
