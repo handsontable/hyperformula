@@ -178,6 +178,7 @@ module.exports = {
             ['/guide/integration-with-react', 'Integration with React'],
             ['/guide/integration-with-vue', 'Integration with Vue'],
             ['/guide/integration-with-angular', 'Integration with Angular'],
+            ['/guide/integration-with-svelte', 'Integration with Svelte'],
           ]
         },
         {
