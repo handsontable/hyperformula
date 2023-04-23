@@ -16,11 +16,13 @@ describe('Function FV', () => {
   it('should calculate the correct value with correct arguments and defaults', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FV(2%, 24, 100)', '=FV(2%, 24, 100, 400)', '=FV(2%, 24, 100, 400, 1)'],
+      ['=FV(0, 24, 100)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-3042.18624737613)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-3685.56114716622)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-3746.40487211374)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-2400)
   })
 })
