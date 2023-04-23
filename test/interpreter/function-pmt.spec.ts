@@ -23,6 +23,6 @@ describe('Function PMT', () => {
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-103.147385661805)
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-102.126124417629)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-27.777777777777)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-27.78)
   })
 })
