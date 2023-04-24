@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula, NoSheetWithIdError} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {AbsoluteCellRange, SimpleCellRange} from '../../src/AbsoluteCellRange'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {EmptyValue} from '../../src/interpreter/InterpreterValue'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
@@ -13,6 +13,7 @@ import {
   extractRange,
   extractReference,
 } from '../testUtils'
+import {ExpectedValueOfTypeError} from '../../src/errors'
 
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {
@@ -353,6 +354,13 @@ describe('moving ranges', () => {
       engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1))
       engine.paste(adr('A2'))
     }).toThrowError('Cannot perform this operation, target location has an array inside.')
+  })
+
+  it('should not be possible to cut when source is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.cut({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 
   it('should adjust edges when moving part of range', () => {

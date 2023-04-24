@@ -8,14 +8,14 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 const MAX_48BIT_INTEGER = 281474976710655
 const SHIFT_MIN_POSITIONS = -53
 const SHIFT_MAX_POSITIONS = 53
 
 export class BitShiftPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BitShiftPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'BITLSHIFT': {
       method: 'bitlshift',
       parameters: [

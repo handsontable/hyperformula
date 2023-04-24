@@ -310,6 +310,20 @@ describe('reorder base case', () => {
     engine.setRowOrder(0, fillValues([1, 2, 0], 15))
     expect(engine.getSheetSerialized(0)).toEqual([['=SUM(#REF!)', 8, 9], ['=A3', '=SUM(B3:B4)', 3], ['=A11', '=SUM(B11:B16)', 6]])
   })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[null], ['=A1']])
+    engine.setRowOrder(0, [1, 0])
+    engine.setCellContents(adr('A1'), '=A2')
+    expect(engine.getSheetSerialized(0)).toEqual([['=A2']])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null], ['=SUM(A1:C1)']])
+    engine.setRowOrder(0, [1, 0])
+    engine.setCellContents(adr('A1'), '=SUM(A2:C2)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(A2:C2)']])
+  })
 })
 
 describe('reorder working with undo', () => {

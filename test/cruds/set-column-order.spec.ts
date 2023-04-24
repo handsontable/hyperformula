@@ -283,6 +283,20 @@ describe('setColumnOrder', () => {
     engine.setColumnOrder(0, [1, 2, 0, 3])
     expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=#REF!', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
   })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[null, '=A1', 42]])
+    engine.setColumnOrder(0, [1, 0, 2])
+    engine.setCellContents(adr('A1'), '=B1')
+    expect(engine.getSheetSerialized(0)).toEqual([['=B1', null, 42]])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null, '=SUM(A1:C1)', 42]])
+    engine.setColumnOrder(0, [1, 2, 3, 0, 4])
+    engine.setCellContents(adr('A1'), '=SUM(B1:D1)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(B1:D1)', null, null, null, 42]])
+  })
 })
 
 describe('reorder working with undo', () => {
