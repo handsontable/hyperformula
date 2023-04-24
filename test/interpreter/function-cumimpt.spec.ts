@@ -22,4 +22,12 @@ describe('Function CUMIPMT', () => {
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-3.4895523854812)
   })
+
+  it('should return error when args are incorrect', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=CUMIPMT(1.1%, 12, 100, 5, 1, 0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.EndStartPeriod))
+  })
 })
