@@ -957,8 +957,13 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public updateConfig(newParams: Partial<ConfigParams>): void {
-    const newConfig = this._config.mergeConfig(newParams)
+    const isNewConfigTheSame = Object.entries(newParams).every(([key, value]) => this._config[key as keyof ConfigParams] === value)
 
+    if (isNewConfigTheSame) {
+      return
+    }
+
+    const newConfig = this._config.mergeConfig(newParams)
     const configNewLanguage = this._config.mergeConfig({language: newParams.language})
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
     const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
