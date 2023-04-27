@@ -3,6 +3,7 @@ import {ErrorType} from '../src/Cell'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError} from './testUtils'
+import {BuildEngineFactory} from '../src/BuildEngineFactory'
 
 describe('update config', () => {
   it('simple reload preserves all values', () => {
@@ -66,5 +67,24 @@ describe('update config', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
+  })
+
+  it('doesn\'t rebuild the engine when new config is the same as the old one', () => {
+    const rebuildEngineSpy = spyOn(BuildEngineFactory, 'rebuildWithConfig')
+    const config = { useArrayArithmetic: true }
+    const engine = HyperFormula.buildFromArray([[]], config)
+
+    engine.updateConfig(config)
+
+    expect(rebuildEngineSpy).not.toHaveBeenCalled()
+  })
+
+  it('doesn\'t rebuild the engine when new config contains only the default config values', () => {
+    const rebuildEngineSpy = spyOn(BuildEngineFactory, 'rebuildWithConfig')
+    const engine = HyperFormula.buildFromArray([[]], {})
+
+    engine.updateConfig({ useColumnIndex: false, functionArgSeparator: ',', undoLimit: 20 })
+
+    expect(rebuildEngineSpy).not.toHaveBeenCalled()
   })
 })
