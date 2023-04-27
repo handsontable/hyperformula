@@ -936,7 +936,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Updates the config with given new metadata.
+   * Updates the config with given new metadata. It is an expensive operation, as it might trigger rebuilding the engine and recalculation of all formulas.
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
