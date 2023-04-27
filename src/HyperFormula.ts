@@ -963,27 +963,7 @@ export class HyperFormula implements TypedEmitter {
       return
     }
 
-    const newConfig = this._config.mergeConfig(newParams)
-    const configNewLanguage = this._config.mergeConfig({language: newParams.language})
-    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
-    const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
-
-    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
-
-    this._config = newEngine.config
-    this._stats = newEngine.stats
-    this._dependencyGraph = newEngine.dependencyGraph
-    this._columnSearch = newEngine.columnSearch
-    this._parser = newEngine.parser
-    this._unparser = newEngine.unparser
-    this._cellContentParser = newEngine.cellContentParser
-    this._evaluator = newEngine.evaluator
-    this._lazilyTransformingAstService = newEngine.lazilyTransformingAstService
-    this._crudOperations = newEngine.crudOperations
-    this._exporter = newEngine.exporter
-    this._namedExpressions = newEngine.namedExpressions
-    this._serialization = newEngine.serialization
-    this._functionRegistry = newEngine.functionRegistry
+    this.rebuildWithConfig(newParams)
   }
 
   /**
@@ -1012,7 +992,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public rebuildAndRecalculate(): void {
-    this.updateConfig({})
+    this.rebuildWithConfig({})
   }
 
   /**
@@ -4325,6 +4305,30 @@ export class HyperFormula implements TypedEmitter {
     }
 
     return {ast, address, dependencies}
+  }
+
+  private rebuildWithConfig(newParams: Partial<ConfigParams>): void {
+    const newConfig = this._config.mergeConfig(newParams)
+    const configNewLanguage = this._config.mergeConfig({language: newParams.language})
+    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
+    const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
+
+    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
+
+    this._config = newEngine.config
+    this._stats = newEngine.stats
+    this._dependencyGraph = newEngine.dependencyGraph
+    this._columnSearch = newEngine.columnSearch
+    this._parser = newEngine.parser
+    this._unparser = newEngine.unparser
+    this._cellContentParser = newEngine.cellContentParser
+    this._evaluator = newEngine.evaluator
+    this._lazilyTransformingAstService = newEngine.lazilyTransformingAstService
+    this._crudOperations = newEngine.crudOperations
+    this._exporter = newEngine.exporter
+    this._namedExpressions = newEngine.namedExpressions
+    this._serialization = newEngine.serialization
+    this._functionRegistry = newEngine.functionRegistry
   }
 
   /**
