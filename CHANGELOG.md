@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Optimized method `updateConfig` to rebuild the engine only when new config is different from the old one.
+  [#1251](https://github.com/handsontable/hyperformula/issues/1251)
+
 ## [2.4.0] - 2023-04-24
 
 ### Added
