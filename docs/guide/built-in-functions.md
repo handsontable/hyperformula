@@ -211,19 +211,20 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 ### Lookup and reference
 
-| Function ID | Description                                                                                                         | Syntax                                              |
-| :---------- | :------------------------------------------------------------------------------------------------------------------ | :-------------------------------------------------- |
-| CHOOSE      | Uses an index to return a value from a list of up to 30 values.                                                     | CHOOSE(Index, Value1, ..., Value30)                 |
-| COLUMN      | Returns column number of a given reference or formula reference if argument not provided.                           | COLUMNS([Reference])                                |
-| COLUMNS     | Returns the number of columns in the given reference.                                                               | COLUMNS(Array)                                      |
-| FORMULATEXT | Returns a formula in a given cell as a string.                                                                      | FORMULATEXT(Reference)                              |
-| HLOOKUP     | Searches horizontally with reference to adjacent cells to the bottom.                                               | HLOOKUP(Search_Criterion, Array, Index, Sort_Order) |
-| INDEX       | Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1. | INDEX(Range, Row [, Column])                        |
-| MATCH       | Returns the relative position of an item in an array that matches a specified value.                                | MATCH(Searchcriterion, Lookuparray [, MatchType])   |
-| OFFSET      | Returns the value of a cell offset by a certain number of rows and columns from a given reference point.            | OFFSET(Reference, Rows, Columns, Height, Width)     |
-| ROW         | Returns row number of a given reference or formula reference if argument not provided.                              | ROW([Reference])                                    |
-| ROWS        | Returns the number of rows in the given reference.                                                                  | ROWS(Array)                                         |
-| VLOOKUP     | Searches vertically with reference to adjacent cells to the right.                                                  | VLOOKUP(Search_Criterion, Array, Index, Sort_Order) |
+| Function ID | Description                                                                                                         | Syntax                                                                 |
+| :---------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------- |
+| ADDRESS     | Returns a cell reference as a string.                                                                               | ADDRESS(Row, Column[, AbsoluteRelativeMode[, UseA1Notation[, Sheet]]]) |
+| CHOOSE      | Uses an index to return a value from a list of up to 30 values.                                                     | CHOOSE(Index, Value1, ..., Value30)                                    |
+| COLUMN      | Returns column number of a given reference or formula reference if argument not provided.                           | COLUMNS([Reference])                                                   |
+| COLUMNS     | Returns the number of columns in the given reference.                                                               | COLUMNS(Array)                                                         |
+| FORMULATEXT | Returns a formula in a given cell as a string.                                                                      | FORMULATEXT(Reference)                                                 |
+| HLOOKUP     | Searches horizontally with reference to adjacent cells to the bottom.                                               | HLOOKUP(Search_Criterion, Array, Index, Sort_Order)                    |
+| INDEX       | Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1. | INDEX(Range, Row [, Column])                                           |
+| MATCH       | Returns the relative position of an item in an array that matches a specified value.                                | MATCH(Searchcriterion, Lookuparray [, MatchType])                      |
+| OFFSET      | Returns the value of a cell offset by a certain number of rows and columns from a given reference point.            | OFFSET(Reference, Rows, Columns, Height, Width)                        |
+| ROW         | Returns row number of a given reference or formula reference if argument not provided.                              | ROW([Reference])                                                       |
+| ROWS        | Returns the number of rows in the given reference.                                                                  | ROWS(Array)                                                            |
+| VLOOKUP     | Searches vertically with reference to adjacent cells to the right.                                                  | VLOOKUP(Search_Criterion, Array, Index, Sort_Order)                    |
 
 ### Math and trigonometry
 
