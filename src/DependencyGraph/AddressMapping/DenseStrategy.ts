@@ -7,14 +7,14 @@ import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell
 import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
-import {IAddressMappingStrategy} from './IAddressMappingStrategy'
+import {AddressMappingStrategy} from './AddressMappingStrategy'
 
 /**
  * Mapping from cell addresses to vertices
  *
  * Uses Array to store addresses, having minimal memory usage for dense sheets and constant set/lookup.
  */
-export class DenseStrategy implements IAddressMappingStrategy {
+export class DenseStrategy implements AddressMappingStrategy {
   /**
    * Array in which actual data is stored.
    *

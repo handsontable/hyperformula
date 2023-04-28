@@ -1,15 +1,14 @@
 import {ErrorType, HyperFormula, LanguageAlreadyRegisteredError, LanguageNotRegisteredError} from '../src'
-import {ProtectedFunctionTranslationError} from '../src'
+import {ProtectedFunctionTranslationError, MissingTranslationError} from '../src'
 import {ErrorTranslationSet, RawTranslationPackage, TranslationPackage} from '../src/i18n'
 import * as languages from '../src/i18n/languages'
 import {enGB, plPL, enUS} from '../src/i18n/languages'
 import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
 import {CellAddress} from '../src/parser'
 import {adr, extractReference} from './testUtils'
-import {MissingTranslationError} from '../src/errors'
 
 describe('i18n', () => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const allLanguages: RawTranslationPackage[] = Object.getOwnPropertyNames(languages).filter(lang => !lang.startsWith('_')).map(lang => languages[lang])
 
@@ -62,9 +61,9 @@ describe('i18n', () => {
   it('all function translation keys has to be upper cased', () => {
     for (const lang of Object.getOwnPropertyNames(languages)) {
       if (!lang.startsWith('_')) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const translationPackage = languages[lang]
+        const translationPackage: RawTranslationPackage = languages[lang]
         for (const translationKey in translationPackage.functions) {
           expect(translationPackage.functions[translationKey]).toEqual(translationPackage.functions[translationKey].toUpperCase())
         }
