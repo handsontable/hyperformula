@@ -218,6 +218,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | COLUMNS     | Returns the number of columns in the given reference.                                                               | COLUMNS(Array)                                      |
 | FORMULATEXT | Returns a formula in a given cell as a string.                                                                      | FORMULATEXT(Reference)                              |
 | HLOOKUP     | Searches horizontally with reference to adjacent cells to the bottom.                                               | HLOOKUP(Search_Criterion, Array, Index, Sort_Order) |
+| HYPERLINK   | Creates a hyperlink inside a cell.                                                                                  | HYPERLINK(Url[, LinkLabel])                         |
 | INDEX       | Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1. | INDEX(Range, Row [, Column])                        |
 | MATCH       | Returns the relative position of an item in an array that matches a specified value.                                | MATCH(Searchcriterion, Lookuparray [, MatchType])   |
 | OFFSET      | Returns the value of a cell offset by a certain number of rows and columns from a given reference point.            | OFFSET(Reference, Rows, Columns, Height, Width)     |
