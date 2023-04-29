@@ -3,13 +3,13 @@
  * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ProcedureAst} from '../../parser'
 
 export class HyperlinkPlugin extends FunctionPlugin implements FunctionPluginTypecheck<HyperlinkPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'HYPERLINK': {
       method: 'hyperlink',
       parameters: [
