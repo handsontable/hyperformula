@@ -34,9 +34,6 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
 
   public address(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ADDRESS'), (row: number, col: number, abs: number, useA1Style: boolean, sheetName: string): InterpreterValue => {
-      if (!useA1Style) {
-        return new CellError(ErrorType.NA, ErrorMessage.ArgumentMustEqual('useA1Style', 'TRUE'))
-      }
 
       const colLetter = columnIndexToLabel(col-1)
       let sheetPrefix = ''
@@ -44,20 +41,14 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
         sheetPrefix = `${sheetName}!`
       }
 
-      switch (abs) {
-        default:
-        case AbsStyle.FullyAbsolute: {
-          return `${sheetPrefix}$${colLetter}$${row}`
-        }
-        case AbsStyle.RowAbsoluteColRelative: {
-          return `${sheetPrefix}${colLetter}$${row}`
-        }
-        case AbsStyle.RowRelativeColAbsolute: {
-          return `${sheetPrefix}$${colLetter}${row}`
-        }
-        case AbsStyle.FullyRelative: {
-          return `${sheetPrefix}${colLetter}${row}`
-        }
+      if (AbsStyle.FullyRelative == abs) {
+        return useA1Style ? `${sheetPrefix}${colLetter}${row}` : `${sheetPrefix}R[${row}]C[${col}]`
+      } else if (AbsStyle.RowRelativeColAbsolute == abs) {
+        return useA1Style ? `${sheetPrefix}$${colLetter}${row}` : `${sheetPrefix}R[${row}]C${col}`
+      } else if (AbsStyle.RowAbsoluteColRelative == abs) {
+        return useA1Style ? `${sheetPrefix}${colLetter}$${row}` : `${sheetPrefix}R${row}C[${col}]`
+      } else {
+        return useA1Style ? `${sheetPrefix}$${colLetter}$${row}` : `${sheetPrefix}R${row}C${col}`
       }
     })
   }
