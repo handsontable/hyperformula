@@ -41,6 +41,7 @@ describe('Function DDB', () => {
         '=DDB(10000, 50, 10, 2.5, 2.5)',
         '=DDB(10000, 10010, 10, 2.1, 2.5)',
         '=DDB(2, 1, 20, 10.9, 60)',
+        '=DDB(2, 1, 20, 1, 60)',
       ],
     ])
 
@@ -50,5 +51,14 @@ describe('Function DDB', () => {
     expect(engine.getCellValue(adr('D1'))).toBeCloseTo(1623.797632, 6)
     expect(engine.getCellValue(adr('E1'))).toBeCloseTo(0)
     expect(engine.getCellValue(adr('F1'))).toBeCloseTo(0)
+    expect(engine.getCellValue(adr('G1'))).toEqual(1)
+  })
+
+  it('should return error when args are incorrect', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DDB(10000, 50, 2, 10, 1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
   })
 })

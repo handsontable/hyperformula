@@ -17,6 +17,7 @@ describe('Function PV', () => {
     const engine = HyperFormula.buildFromArray([
       ['=PV(2%, 24, 100)', '=PV(2%, 24, 100, 400)', '=PV(2%, 24, 100, 400, 1)'],
       ['=PV(-99%, 24, 100)', '=PV(-1, 24, 100, 400)', '=PV(-2, 24, 100, 400, 1)'],
+      ['=PV(0, 24, 100)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-1891.39256, 6)
@@ -26,5 +27,14 @@ describe('Function PV', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-1.01010101010099e+50, 6)
     expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('C2'))).toBeCloseTo(-400, 6)
+    expect(engine.getCellValue(adr('A3'))).toEqual(-2400)
+  })
+
+  it('should return error when args are incorrect', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=PV(-1, 0, 100, 400)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
   })
 })

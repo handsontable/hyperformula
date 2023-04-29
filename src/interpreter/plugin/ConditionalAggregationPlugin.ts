@@ -18,7 +18,7 @@ import {
   RawScalarValue
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 class AverageResult {
   public static empty = new AverageResult(0, 0)
@@ -75,7 +75,7 @@ function mapToRawScalarValue(arg: InternalScalarValue): Maybe<CellError | RawSca
 }
 
 export class ConditionalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ConditionalAggregationPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     SUMIF: {
       method: 'sumif',
       parameters: [

@@ -403,6 +403,20 @@ describe('Move cells', () => {
       engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), {} as SimpleCellAddress)
     }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner'))
   })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[null, '=A1', 42]])
+    engine.moveCells({ start: adr('B1'), end: adr('B1')}, adr('A1'))
+    engine.setCellContents(adr('A1'), '=A2')
+    expect(engine.getSheetSerialized(0)).toEqual([['=A2', null, 42]])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null, '=SUM(A1:C1)', 42]])
+    engine.moveCells({ start: adr('D1'), end: adr('D1')}, adr('A1'))
+    engine.setCellContents(adr('A1'), '=SUM(B1:D1)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(B1:D1)', null, null, null, 42]])
+  })
 })
 
 describe('moving ranges', () => {
