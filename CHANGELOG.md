@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added ADDRESS function.
+  [#1221](https://github.com/handsontable/hyperformula/issues/1221)
+
 ## [2.3.1] - 2023-03-03
 
 ### Fixed
