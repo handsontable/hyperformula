@@ -95,7 +95,7 @@ export class MoveCellsTransformer extends Transformer {
   }
 }
 
-class DependentFormulaTransformer extends Transformer {
+export class DependentFormulaTransformer extends Transformer {
   constructor(
     public readonly sourceRange: AbsoluteCellRange,
     public readonly toRight: number,

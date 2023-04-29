@@ -10,7 +10,7 @@
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "keywords": [
     "formula",
     "spreadsheet",
@@ -115,7 +115,6 @@
     "as-table": "^1.0.55",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
-    "canvas": "^2.6.1",
     "core-js": "^3.23.0",
     "cross-env": "^7.0.0",
     "env-cmd": "^10.1.0",

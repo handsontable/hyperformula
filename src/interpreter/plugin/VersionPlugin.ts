@@ -8,7 +8,7 @@ import {HyperFormula} from '../../HyperFormula'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 const LICENSE_STATUS_MAP = new Map([
   ['gpl-v3', 1],
@@ -18,7 +18,7 @@ const LICENSE_STATUS_MAP = new Map([
 ])
 
 export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<VersionPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'VERSION': {
       method: 'version',
       parameters: [],

@@ -19,18 +19,18 @@ Dynamic ranges are supported through functions such as INDEX and OFFSET.
 Named ranges can overlap each other, e.g. it is possible to define the names as
 follows:
 
-- rangeOne: A1:D10
-- rangeTwo: A1:E1
+- rangeOne: Sheet1!$A$1:$D$10
+- rangeTwo: Sheet1!$A$1:$E$1
 
 ## Examples
 
 | Type                    | Custom name | Example expression        |
-| :---------------------- | :---------- | :------------------------ |
-| Named cell              | myCell      | =A1                       |
-| Named range of cells    | myRange     | =A1:D10                   |
+|:------------------------|:------------|:--------------------------|
+| Named cell              | myCell      | =Sheet1!$A$1              |
+| Named range of cells    | myRange     | =Sheet1!$A$1:Sheet1!$D$10 |
 | Named constant (number) | myNumber    | =10                       |
 | Named constant (string) | myText      | ="One Small Step for Man" |
-| Named formula           | myFormula   | =SUM(A1:D10)              |
+| Named formula           | myFormula   | =SUM(Sheet1!$A$1:$D$10)   |
 
 ## Naming rules
 
@@ -155,7 +155,7 @@ described in [that section](basic-operations#isitpossibleto-methods).
 ## Demo
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.3.x/named-expressions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.4.x/named-expressions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: named-expressions"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"

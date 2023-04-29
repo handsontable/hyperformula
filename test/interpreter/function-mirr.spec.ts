@@ -55,4 +55,13 @@ describe('Function MIRR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.161201673643132, 6)
   })
+
+  it('should return contained error if one exists', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MIRR(B1:E1,-1,0.1)', -1, 1, '=CONCATENATE(FOO)', -1],
+      ['=MIRR(B2:E2,0.2,-1)', 1, '=FIND("h","bar")', 1, 1],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FOO')))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
+  })
 })
