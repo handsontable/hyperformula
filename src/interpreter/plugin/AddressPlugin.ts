@@ -7,7 +7,7 @@ import {columnIndexToLabel} from '../../parser/addressRepresentationConverters'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 enum AbsStyle {
   FullyAbsolute = 1,
@@ -17,7 +17,7 @@ enum AbsStyle {
 }
 
 export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AddressPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'ADDRESS': {
       method: 'address',
       parameters: [
