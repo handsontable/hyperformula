@@ -159,6 +159,13 @@ describe('#getCellHyperlink', () => {
     const engine = HyperFormula.buildFromArray([[url, linkLabel, '=HYPERLINK(INDEX(A:A,ROW()),B1)']])
     expect(engine.getCellHyperlink(adr('C1'))).toEqual(url)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellHyperlink({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
 })
 
 describe('#getCellFormula', () => {
