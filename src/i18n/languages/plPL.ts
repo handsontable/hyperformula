@@ -101,7 +101,7 @@ const dictionary: RawTranslationPackage = {
     HEX2OCT: 'SZESN.NA.ÓSM',
     HLOOKUP: 'WYSZUKAJ.POZIOMO',
     HOUR: 'GODZINA',
-    HYPERLINK: 'HYPERLINK',
+    HYPERLINK: 'HIPERŁĄCZE',
     IF: 'JEŻELI',
     IFERROR: 'JEŻELI.BŁĄD',
     IFNA: 'JEŻELI.ND',
