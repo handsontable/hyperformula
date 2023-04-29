@@ -10,17 +10,17 @@ import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing information functions
  */
 export class InformationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<InformationPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'COLUMN': {
       method: 'column',
       parameters: [
-        {argumentType: FunctionArgumentType.NOERROR, optional: true}
+        {argumentType: FunctionArgumentType.NOERROR, optionalArg: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -119,7 +119,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ROW': {
       method: 'row',
       parameters: [
-        {argumentType: FunctionArgumentType.NOERROR, optional: true}
+        {argumentType: FunctionArgumentType.NOERROR, optionalArg: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,

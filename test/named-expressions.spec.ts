@@ -1063,6 +1063,27 @@ describe('Named expressions - options', () => {
     })
   })
 
+  it('should return named expression with empty options - scope provided', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    engine.addNamedExpression('foo', '=foo', 0)
+
+    expect(engine.getNamedExpression('foo', 0)).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: 0,
+      options: undefined
+    })
+  })
+
+  it('should return undefined for non-existent named expression', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    engine.addNamedExpression('foo', '=foo')
+
+    expect(engine.getNamedExpression('foo-bar')).toEqual(undefined)
+  })
+
   it('should return named expression with options', () => {
     const engine = HyperFormula.buildEmpty()
 

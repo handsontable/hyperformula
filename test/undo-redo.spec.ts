@@ -939,6 +939,14 @@ describe('UndoRedo - #isThereSomethingToUndo', () => {
 
     expect(engine.isThereSomethingToUndo()).toBe(true)
   })
+
+  it('when the undo stack has been cleared', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.removeRows(0, [1, 1])
+    expect(engine.isThereSomethingToUndo()).toBe(true)
+    engine.clearUndoStack()
+    expect(engine.isThereSomethingToUndo()).toBe(false)
+  })
 })
 
 describe('UndoRedo - #isThereSomethingToRedo', () => {
@@ -954,6 +962,15 @@ describe('UndoRedo - #isThereSomethingToRedo', () => {
     engine.undo()
 
     expect(engine.isThereSomethingToRedo()).toBe(true)
+  })
+
+  it('when the redo stack has been cleared', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.removeRows(0, [1, 1])
+    engine.undo()
+    expect(engine.isThereSomethingToRedo()).toBe(true)
+    engine.clearRedoStack()
+    expect(engine.isThereSomethingToRedo()).toBe(false)
   })
 })
 

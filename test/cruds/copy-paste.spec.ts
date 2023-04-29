@@ -1,5 +1,5 @@
-import {ExportedCellChange, HyperFormula, NothingToPasteError} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {ExportedCellChange, HyperFormula, NothingToPasteError, SimpleCellAddress} from '../../src'
+import {AbsoluteCellRange, SimpleCellRange} from '../../src/AbsoluteCellRange'
 import {ErrorType, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {SheetSizeLimitExceededError} from '../../src/errors'
@@ -27,6 +27,7 @@ import { NumberLiteralHelper } from '../../src/NumberLiteralHelper'
 import { ParserWithCaching } from '../../src/parser'
 import { ArraySizePredictor } from '../../src/ArraySize'
 import { NoSheetWithIdError} from '../../src'
+import {ExpectedValueOfTypeError} from '../../src/errors'
 
 describe('Copy - paste integration', () => {
   it('copy should validate arguments', () => {
@@ -55,6 +56,10 @@ describe('Copy - paste integration', () => {
     expect(() => {
       engine.copy(AbsoluteCellRange.spanFrom(adr('A1'), 42, 3.14))
     }).toThrowError('Invalid arguments, expected height to be positive integer.')
+
+    expect(() => {
+      engine.copy({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 
   it('paste raise error when there is nothing in clipboard', () => {
@@ -420,6 +425,13 @@ describe('Copy - paste integration', () => {
 
     expect(() => engine.paste(simpleCellAddress(0, Config.defaultConfig.maxColumns, 0))).toThrow(new SheetSizeLimitExceededError())
     expect(() => engine.paste(simpleCellAddress(0, 0, Config.defaultConfig.maxRows))).toThrow(new SheetSizeLimitExceededError())
+  })
+
+  it('should throw error when trying to paste when targetLeftCorner is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.paste({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner'))
   })
 })
 

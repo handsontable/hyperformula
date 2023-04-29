@@ -1,4 +1,4 @@
-import {ErrorType, HyperFormula} from '../../src'
+import {ErrorType, HyperFormula, SimpleCellAddress, SimpleCellRange} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
@@ -22,6 +22,7 @@ import {
   rowEnd,
   rowStart,
 } from '../testUtils'
+import {ExpectedValueOfTypeError} from '../../src/errors'
 
 describe('Moving rows - checking if its possible', () => {
   it('source top left corner should have valid coordinates', () => {
@@ -90,6 +91,24 @@ describe('Moving rows - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToMoveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))).toBe(true)
+  })
+
+  it('should throw error if testing with a source that is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+    ])
+    expect(() => {
+      engine.isItPossibleToMoveCells({} as SimpleCellRange, adr('A2'))
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
+  })
+
+  it('should throw error if testing with a destinationLeftCorner that is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+    ])
+    expect(() => {
+      engine.isItPossibleToMoveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), {} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner'))
   })
 })
 
@@ -365,6 +384,38 @@ describe('Move cells', () => {
 
     expect(() => engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), cellInLastColumn)).toThrow(new SheetSizeLimitExceededError())
     expect(() => engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), cellInLastRow)).toThrow(new SheetSizeLimitExceededError())
+  })
+
+  it('should throw error trying to move cells when source is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+    ])
+    expect(() => {
+      engine.moveCells({} as SimpleCellRange, adr('A2'))
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
+  })
+
+  it('should throw error trying to move cells when destinationLeftCorner is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([
+      [null, null],
+    ])
+    expect(() => {
+      engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), {} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner'))
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[null, '=A1', 42]])
+    engine.moveCells({ start: adr('B1'), end: adr('B1')}, adr('A1'))
+    engine.setCellContents(adr('A1'), '=A2')
+    expect(engine.getSheetSerialized(0)).toEqual([['=A2', null, 42]])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null, '=SUM(A1:C1)', 42]])
+    engine.moveCells({ start: adr('D1'), end: adr('D1')}, adr('A1'))
+    engine.setCellContents(adr('A1'), '=SUM(B1:D1)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(B1:D1)', null, null, null, 42]])
   })
 })
 
