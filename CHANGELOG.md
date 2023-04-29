@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added HYPERLINK function.
+  [#1215](https://github.com/handsontable/hyperformula/issues/1215)
+
 ## [2.4.0] - 2023-04-24
 
 ### Added
