@@ -8,8 +8,6 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
-import {CellError, ErrorType} from '../../Cell'
-import {ErrorMessage} from '../../error-message'
 
 enum AbsStyle {
   FullyAbsolute = 1,
