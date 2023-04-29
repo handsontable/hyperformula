@@ -48,6 +48,91 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
   })
 
+  it('get all entries', () => {
+    const mapping = builder(1, 2)
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+
+    const results = []
+    for (const [simpleCellAddress, cellVertex] of mapping.sheetEntries(0)) {
+      results.push([
+        simpleCellAddress.sheet,
+        simpleCellAddress.row,
+        simpleCellAddress.col,
+        String(cellVertex.getCellValue()),
+      ])
+    }
+
+    expect(results).toEqual([
+      [0, 0, 0, String(42)],
+      [0, 1, 0, String(43)],
+    ])
+  })
+
+  it('get all entries - from rows span', () => {
+    const mapping = builder(3, 3)
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const [simpleCellAddress, cellVertex] of mapping.entriesFromRowsSpan(new RowsSpan(0, 1, 2))) {
+      results.push([
+        simpleCellAddress.sheet,
+        simpleCellAddress.row,
+        simpleCellAddress.col,
+        String(cellVertex.getCellValue()),
+      ])
+    }
+
+    expect(results).toEqual([
+      [0, 1, 0, String(43)],
+      [0, 2, 0, String(44)],
+      [0, 1, 1, String(46)],
+      [0, 2, 1, String(47)],
+      [0, 1, 2, String(49)],
+      [0, 2, 2, String(50)],
+    ])
+  })
+
+  it('get all entries - from columns span', () => {
+    const mapping = builder(3, 3)
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const [simpleCellAddress, cellVertex] of mapping.entriesFromColumnsSpan(new ColumnsSpan(0, 1, 2))) {
+      results.push([
+        simpleCellAddress.sheet,
+        simpleCellAddress.row,
+        simpleCellAddress.col,
+        String(cellVertex.getCellValue()),
+      ])
+    }
+
+    expect(results).toEqual([
+      [0, 0, 1, String(45)],
+      [0, 1, 1, String(46)],
+      [0, 2, 1, String(47)],
+      [0, 0, 2, String(48)],
+      [0, 1, 2, String(49)],
+      [0, 2, 2, String(50)],
+    ])
+  })
+
   it("set when there's already something in that column", () => {
     const mapping = builder(1, 2)
     const vertex0 = new ValueCellVertex(42, 42)
@@ -306,13 +391,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('should expand columns when adding cell', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('C1'), new EmptyCellVertex({sheet: 0, row: 0, col: 0}))
+    mapping.setCell(adr('C1'), new EmptyCellVertex())
     expect(mapping.getWidth(0)).toBe(3)
   })
 
   it('should expand rows when adding cell', () => {
     const mapping = builder(2, 2)
-    mapping.setCell(adr('A3'), new EmptyCellVertex({sheet: 0, row: 0, col: 0}))
+    mapping.setCell(adr('A3'), new EmptyCellVertex())
     expect(mapping.getHeight(0)).toBe(3)
   })
 
@@ -353,6 +438,50 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     expect(() => mapping.moveCell(adr('A1', 3), adr('A2', 3))).toThrowError('Sheet not initialized.')
   })
+
+  it('entriesFromColumnsSpan returns the same result regardless of the strategy', () => {
+    const denseMapping = new AddressMapping(new AlwaysDense())
+    denseMapping.addSheet(0, new DenseStrategy(5, 5))
+
+    const sparseMapping = new AddressMapping(new AlwaysSparse())
+    sparseMapping.addSheet(0, new SparseStrategy(5, 5))
+
+    const mappingsAndResults: { mapping: AddressMapping, results: String[][] }[] = [
+      {
+        mapping: denseMapping,
+        results: [],
+      },
+      {
+        mapping: sparseMapping,
+        results: [],
+      }
+    ]
+
+    mappingsAndResults.forEach((item) => {
+      item.mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+      item.mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+      item.mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+      item.mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+      item.mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+      item.mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+      item.mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+      item.mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+      item.mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+    })
+
+    mappingsAndResults.forEach((item) => {
+      for (const [simpleCellAddress, cellVertex] of item.mapping.entriesFromColumnsSpan(new ColumnsSpan(0, 1, 2))) {
+        item.results.push([
+          String(simpleCellAddress.sheet),
+          String(simpleCellAddress.row),
+          String(simpleCellAddress.col),
+          String(cellVertex.getCellValue()),
+        ])
+      }
+    })
+
+    expect(mappingsAndResults[0].results).toEqual(mappingsAndResults[1].results)
+  })
 }
 
 describe('SparseStrategy', () => {
@@ -372,6 +501,89 @@ describe('SparseStrategy', () => {
     expect(mapping.getHeight(0)).toEqual(16)
     expect(mapping.getWidth(0)).toEqual(4)
   })
+
+  it('get all vertices', () => {
+    const mapping = new AddressMapping(new AlwaysSparse())
+    const sparseStrategy = new SparseStrategy(3, 3)
+    mapping.addSheet(0, sparseStrategy)
+
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const cellVertex of sparseStrategy.vertices()) {
+      results.push(String(cellVertex.getCellValue()))
+    }
+
+    expect(results).toEqual([
+      '42', '43', '44', '45', '46', '47', '48', '49', '50'
+    ])
+  })
+
+  it('get all vertices - from column', () => {
+    const mapping = new AddressMapping(new AlwaysSparse())
+    const sparseStrategy = new SparseStrategy(3, 3)
+    mapping.addSheet(0, sparseStrategy)
+
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const cellVertex of sparseStrategy.verticesFromColumn(2)) {
+      results.push(String(cellVertex.getCellValue()))
+    }
+
+    const outOfRangeResults = []
+    for (const cellVertex of sparseStrategy.verticesFromColumn(5)) {
+      outOfRangeResults.push(String(cellVertex.getCellValue()))
+    }
+
+    expect(results).toEqual(['48', '49', '50'])
+    expect(outOfRangeResults).toEqual([])
+  })
+
+  it('get all vertices - from row', () => {
+    const mapping = new AddressMapping(new AlwaysSparse())
+    const sparseStrategy = new SparseStrategy(3, 3)
+    mapping.addSheet(0, sparseStrategy)
+
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const cellVertex of sparseStrategy.verticesFromRow(1)) {
+      results.push(String(cellVertex.getCellValue()))
+    }
+
+    const outOfRangeResults = []
+    for (const cellVertex of sparseStrategy.verticesFromRow(5)) {
+      outOfRangeResults.push(String(cellVertex.getCellValue()))
+    }
+
+    expect(results).toEqual(['43', '46', '49'])
+    expect(outOfRangeResults).toEqual([])
+  })
 })
 
 describe('DenseStrategy', () => {
@@ -388,6 +600,89 @@ describe('DenseStrategy', () => {
 
     expect(mapping.getHeight(0)).toEqual(2)
     expect(mapping.getWidth(0)).toEqual(1)
+  })
+
+  it('get all vertices', () => {
+    const mapping = new AddressMapping(new AlwaysDense())
+    const denseStratgey = new DenseStrategy(3, 3)
+    mapping.addSheet(0, denseStratgey)
+
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const cellVertex of denseStratgey.vertices()) {
+      results.push(String(cellVertex.getCellValue()))
+    }
+
+    expect(results).toEqual([
+      '42', '45', '48', '43', '46', '49', '44', '47', '50'
+    ])
+  })
+
+  it('get all vertices - from column', () => {
+    const mapping = new AddressMapping(new AlwaysDense())
+    const denseStratgey = new DenseStrategy(3, 3)
+    mapping.addSheet(0, denseStratgey)
+
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const cellVertex of denseStratgey.verticesFromColumn(2)) {
+      results.push(String(cellVertex.getCellValue()))
+    }
+
+    const outOfRangeResults = []
+    for (const cellVertex of denseStratgey.verticesFromColumn(5)) {
+      outOfRangeResults.push(String(cellVertex.getCellValue()))
+    }
+
+    expect(results).toEqual(['48', '49', '50'])
+    expect(outOfRangeResults).toEqual([])
+  })
+
+  it('get all vertices - from row', () => {
+    const mapping = new AddressMapping(new AlwaysDense())
+    const denseStratgey = new DenseStrategy(3, 3)
+    mapping.addSheet(0, denseStratgey)
+
+    mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
+    mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
+    mapping.setCell(adr('A3', 0), new ValueCellVertex(44, 44))
+    mapping.setCell(adr('B1', 0), new ValueCellVertex(45, 45))
+    mapping.setCell(adr('B2', 0), new ValueCellVertex(46, 46))
+    mapping.setCell(adr('B3', 0), new ValueCellVertex(47, 47))
+    mapping.setCell(adr('C1', 0), new ValueCellVertex(48, 48))
+    mapping.setCell(adr('C2', 0), new ValueCellVertex(49, 49))
+    mapping.setCell(adr('C3', 0), new ValueCellVertex(50, 50))
+
+    const results = []
+    for (const cellVertex of denseStratgey.verticesFromRow(1)) {
+      results.push(String(cellVertex.getCellValue()))
+    }
+
+    const outOfRangeResults = []
+    for (const cellVertex of denseStratgey.verticesFromRow(5)) {
+      outOfRangeResults.push(String(cellVertex.getCellValue()))
+    }
+
+    expect(results).toEqual(['43', '46', '49'])
+    expect(outOfRangeResults).toEqual([])
   })
 })
 

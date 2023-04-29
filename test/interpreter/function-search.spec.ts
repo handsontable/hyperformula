@@ -56,6 +56,7 @@ describe('Function SEARCH', () => {
       ['=SEARCH("b?z", "foobarbaz")'],
       ['=SEARCH("b?b", "foobarbaz")'],
       ['=SEARCH("?b", "foobarbaz", 5)'],
+      ['=SEARCH("?b~", "foobarb~az", 5)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -63,6 +64,7 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
     expect(engine.getCellValue(adr('A5'))).toEqual(6)
+    expect(engine.getCellValue(adr('A6'))).toEqual(6)
   })
 
   it('should work with regular expressions', () => {

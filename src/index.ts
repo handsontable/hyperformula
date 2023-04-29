@@ -62,6 +62,7 @@ import {Sheet, SheetDimensions, Sheets} from './Sheet'
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static ErrorType = ErrorType
+  public static CellError = CellError
   public static CellType = CellType
   public static CellValueType = CellValueType
   public static CellValueDetailedType = CellValueDetailedType
@@ -74,6 +75,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
   public static ArraySize = ArraySize
+  public static SimpleRangeValue = SimpleRangeValue
   public static FunctionPlugin = FunctionPlugin
   public static FunctionArgumentType = FunctionArgumentType
   public static FunctionPluginValidationError = FunctionPluginValidationError

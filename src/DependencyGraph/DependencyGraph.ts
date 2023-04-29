@@ -41,7 +41,7 @@ import {AddressMapping} from './AddressMapping/AddressMapping'
 import {ArrayMapping} from './ArrayMapping'
 import {collectAddressesDependentToRange} from './collectAddressesDependentToRange'
 import {FormulaVertex} from './FormulaCellVertex'
-import {Graph, TopSortResult} from './Graph'
+import {DependencyQuery, Graph, TopSortResult} from './Graph'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
@@ -135,7 +135,7 @@ export class DependencyGraph {
       return ContentChanges.empty()
     }
     if (this.graph.adjacentNodes(vertex).size > 0) {
-      const emptyVertex = new EmptyCellVertex(address)
+      const emptyVertex = new EmptyCellVertex()
       this.exchangeGraphNode(vertex, emptyVertex)
       if (this.graph.adjacentNodesCount(emptyVertex) === 0) {
         this.removeVertex(emptyVertex)
@@ -244,7 +244,7 @@ export class DependencyGraph {
   public fetchCellOrCreateEmpty(address: SimpleCellAddress): CellVertex {
     let vertex = this.addressMapping.getCell(address)
     if (vertex === undefined) {
-      vertex = new EmptyCellVertex(address)
+      vertex = new EmptyCellVertex()
       this.graph.addNode(vertex)
       this.addressMapping.setCell(address, vertex)
     }
@@ -689,21 +689,21 @@ export class DependencyGraph {
     }
   }
 
-  public dependencyQueryVertices: (vertex: Vertex) => Vertex[] = (vertex: Vertex) => {
+  public dependencyQueryVertices: DependencyQuery<Vertex> = (vertex: Vertex) => {
     if (vertex instanceof RangeVertex) {
-      return this.rangeDependencyQuery(vertex).map(([_, v]) => v)
+      return this.rangeDependencyQuery(vertex)
     } else {
       const dependenciesResult = this.formulaDependencyQuery(vertex)
       if (dependenciesResult !== undefined) {
         const [address, dependencies] = dependenciesResult
         return dependencies.map((dependency: CellDependency) => {
           if (dependency instanceof AbsoluteCellRange) {
-            return this.rangeMapping.fetchRange(dependency.start, dependency.end)
+            return [dependency.start, this.rangeMapping.fetchRange(dependency.start, dependency.end)]
           } else if (dependency instanceof NamedExpressionDependency) {
             const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
-            return this.addressMapping.fetchCell(namedExpression.address)
+            return [namedExpression.address, this.addressMapping.fetchCell(namedExpression.address)]
           } else {
-            return this.addressMapping.fetchCell(dependency)
+            return [dependency, this.addressMapping.fetchCell(dependency)]
           }
         })
       } else {
@@ -835,21 +835,18 @@ export class DependencyGraph {
     }
   }
 
-  private rangeDependencyQuery = (vertex: RangeVertex) => {
+  private rangeDependencyQuery: DependencyQuery<Vertex> = (vertex: Vertex) => {
     const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
-    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange(vertex.range) //checking whether this range was splitted by bruteForce or not
+    const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange((vertex as RangeVertex).range) //checking whether this range was splitted by bruteForce or not
     let range
     if (smallerRangeVertex !== undefined && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
       range = restRange
       allDeps.push([new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end), smallerRangeVertex])
     } else { //did we ever need to use full range
-      range = vertex.range
+      range = (vertex as RangeVertex).range
     }
     for (const address of range.addresses(this)) {
       const cell = this.addressMapping.getCell(address)
-      if (cell instanceof EmptyCellVertex) {
-        cell.address = address
-      }
       if (cell !== undefined) {
         allDeps.push([address, cell])
       }
@@ -1104,8 +1101,9 @@ export class DependencyGraph {
   private removeVertexAndCleanupDependencies(inputVertex: Vertex) {
     const dependencies = new Set(this.graph.removeNode(inputVertex))
     while (dependencies.size > 0) {
-      const vertex: Vertex = dependencies.values().next().value
-      dependencies.delete(vertex)
+      const dependency = dependencies.values().next().value
+      dependencies.delete(dependency)
+      const [address, vertex] = dependency
       if (this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
         if (vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
           this.graph.removeNode(vertex).forEach((candidate) => dependencies.add(candidate))
@@ -1113,7 +1111,7 @@ export class DependencyGraph {
         if (vertex instanceof RangeVertex) {
           this.rangeMapping.removeRange(vertex)
         } else if (vertex instanceof EmptyCellVertex) {
-          this.addressMapping.removeCell(vertex.address)
+          this.addressMapping.removeCell(address)
         }
       }
     }
