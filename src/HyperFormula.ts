@@ -715,6 +715,7 @@ export class HyperFormula implements TypedEmitter {
     if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
+    this.ensureEvaluationIsNotSuspended()
     return this._serialization.getCellHyperlink(cellAddress)
   }
 
