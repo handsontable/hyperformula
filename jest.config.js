@@ -8,6 +8,8 @@ module.exports = {
     '!**/node_modules/**',
   ],
 
+  testRunner: 'jest-jasmine2',
+
   coverageProvider: 'babel',
 
   // The directory where Jest should output its coverage files
