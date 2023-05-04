@@ -13,6 +13,11 @@ and this project adheres to
 - Added ADDRESS function.
   [#1221](https://github.com/handsontable/hyperformula/issues/1221)
 
+### Fixed
+
+- Fixed the `SEARCH` function to be case-insensitive regardless of the engine configuration.
+  [#1225](https://github.com/handsontable/hyperformula/issues/1225)
+
 ## [2.4.0] - 2023-04-24
 
 ### Added
