@@ -262,6 +262,11 @@ declare a companion method for the array size. To do that, provide the
 function arguments and returns an instance of the
 [`ArraySize` class](../api/classes/arraysize.md).
 
+::: tip
+The `arraySizeMethod` is called everytime the cell formula changes, but not when its dependencies change.
+This may cause unexpected behavior when the size of the result array depends on the values of the cells referenced in the formula.
+:::
+
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
   doubleRangeResultArraySize(ast, state) {
@@ -370,7 +375,7 @@ This demo contains the implementation of both the
 You can set the following options for your function:
 
 | Option                              | Type    | Description                                                                                                                                                                                                                                   |
-| ----------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|-------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                                                                                                                 |
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
 | `arraySizeMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
@@ -413,7 +418,7 @@ MyCustomPlugin.implementedFunctions = {
 You can set the following argument validation options:
 
 | Option                    | Type                                      | Description                                                                                                                                                                                                                                        |
-| ------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the function argument. See [possible values](#types-of-the-function-argument).                                                                                                                                                    |
 | `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                           |
 | `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                    |
@@ -449,7 +454,7 @@ MyCustomPlugin.implementedFunctions = {
 ### Types of the function argument
 
 | Type      | Description                                                                                              | Example                                      |
-| --------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+|-----------|----------------------------------------------------------------------------------------------------------|----------------------------------------------|
 | `NUMBER`  | A general numeric value such as floating-point number, date/time value, currency value or percent value. | `3`, `3.14`, `$100`, `1939/09/01`, `4:45 AM` |
 | `INTEGER` | An integer.                                                                                              | `42`                                         |
 | `COMPLEX` | A text representing a complex value.                                                                     | `"-3+4i"`                                    |
