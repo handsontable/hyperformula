@@ -58,12 +58,12 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
     sheet: 0,
     col: Math.min(x1, x2),
     row: Math.min(y1, y2),
-  }, 0)
+  }, 0) as string
   const endAddress = engine.simpleCellAddressToString({
     sheet: 0,
     col: Math.max(x1, x2),
     row: Math.max(y1, y2)
-  }, 0)
+  }, 0) as string
   return '=SUM(' + startAddress + ':' + endAddress + ')'
 }
 

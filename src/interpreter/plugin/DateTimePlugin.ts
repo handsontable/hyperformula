@@ -567,13 +567,13 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         const month = arg % 12
         const year = Math.trunc(arg / 12)
 
-        return 'P' + ((year > 0) ? year + 'Y' : '')
-          + ((month > 0) ? month + 'M' : '')
-          + ((day > 0) ? day + 'D' : '')
+        return 'P' + ((year > 0) ? `${year}Y` : '')
+          + ((month > 0) ? `${month}M` : '')
+          + ((day > 0) ? `${day}D` : '')
           + 'T'
-          + ((hour > 0) ? hour + 'H' : '')
-          + ((minute > 0) ? minute + 'M' : '')
-          + ((second > 0) ? second + 'S' : '')
+          + ((hour > 0) ? `${hour}H` : '')
+          + ((minute > 0) ? `${minute}M` : '')
+          + ((second > 0) ? `${second}S` : '')
       }
     )
   }

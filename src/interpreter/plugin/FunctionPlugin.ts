@@ -31,7 +31,7 @@ import {
   InternalScalarValue,
   InterpreterValue,
   isExtendedNumber,
-  NumberType,
+  NumberType, RawInterpreterValue,
   RawNoErrorScalarValue,
   RawScalarValue
 } from '../InterpreterValue'
@@ -372,9 +372,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     state: InterpreterState,
     metadata: FunctionMetadata,
     functionImplementation: (...arg: any) => InterpreterValue,
-  ) => {
+  ): RawInterpreterValue => {
     const evaluatedArguments: [InterpreterValue, boolean][] = this.evaluateArguments(args, state, metadata)
-    const argumentValues = evaluatedArguments.map(([value, _]) => value)
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    const argumentValues: InterpreterValue[] = evaluatedArguments.map(([value, _]: [InterpreterValue, boolean]) => value as InterpreterValue)
     const argumentIgnorableFlags = evaluatedArguments.map(([_, ignorable]) => ignorable)
     const argumentMetadata = this.buildMetadataForEachArgumentValue(argumentValues.length, metadata)
     const isVectorizationOn = state.arraysFlag && !metadata.vectorizationForbidden
@@ -413,15 +414,15 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     argumentIgnorableFlags: boolean[],
     functionImplementation: (...arg: any) => InterpreterValue,
     returnNumberType: NumberType | undefined,
-  ): InternalScalarValue | SimpleRangeValue {
+  ): RawInterpreterValue {
     const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags)
 
     if (coercedArguments instanceof CellError) {
       return coercedArguments
     }
 
-    const functionCalculationResult = functionImplementation(...coercedArguments)
-    return this.returnNumberWrapper(functionCalculationResult, returnNumberType)
+    const functionCalculationResult = functionImplementation(...(coercedArguments as any[]))
+    return this.returnNumberWrapper(functionCalculationResult, returnNumberType) as RawInterpreterValue
   }
 
   protected coerceArgumentsToRequiredTypes(
@@ -519,7 +520,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
 
     return argumentValue instanceof SimpleRangeValue
-      && ![ FunctionArgumentType.RANGE, FunctionArgumentType.ANY ].includes(argumentMetadata.argumentType)
+      && !([ FunctionArgumentType.RANGE, FunctionArgumentType.ANY ] as FunctionArgumentType[]).includes(argumentMetadata.argumentType)
   }
 
   protected runFunctionWithReferenceArgument = (

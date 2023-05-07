@@ -22,7 +22,7 @@ export function enrichStatistics(stats: Stats): Stats {
 }
 
 export function measureCruds(engine: HyperFormula, name: string, func: (engine: HyperFormula) => void): Stats {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   engine._stats.reset()
 

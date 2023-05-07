@@ -5,7 +5,7 @@
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {ArraySize} from '../ArraySize'
-import {ArrayValue, ErroredArray, IArray, NotComputedArray} from '../ArrayValue'
+import {ArrayValue, ErroredArray, CellArray, NotComputedArray} from '../ArrayValue'
 import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
@@ -80,7 +80,7 @@ export abstract class FormulaVertex {
 }
 
 export class ArrayVertex extends FormulaVertex {
-  array: IArray
+  array: CellArray
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, size: ArraySize, version: number = 0) {
     super(formula, cellAddress, version)

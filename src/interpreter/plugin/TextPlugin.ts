@@ -269,7 +269,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   public search(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SEARCH'), (pattern, text: string, startIndex: number) => {
+    return this.runFunction(ast.args, state, this.metadata('SEARCH'), (pattern: string, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LengthBounds)
       }
