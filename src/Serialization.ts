@@ -11,7 +11,7 @@ import {ArrayVertex, DependencyGraph, FormulaCellVertex, ParsingErrorVertex} fro
 import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
-import {buildLexerConfig, Unparser} from './parser'
+import {buildLexerConfig, ProcedureAst, Unparser} from './parser'
 
 export interface SerializedNamedExpression {
   name: string,
@@ -26,6 +26,17 @@ export class Serialization {
     private readonly unparser: Unparser,
     private readonly exporter: Exporter
   ) {
+  }
+
+  public getCellHyperlink(address: SimpleCellAddress): Maybe<string> {
+    const formulaVertex = this.dependencyGraph.getCell(address)
+    if (formulaVertex instanceof FormulaCellVertex) {
+      const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as ProcedureAst
+       if ('HYPERLINK' === formula.procedureName) {
+        return formula.hyperlink
+      }
+    }
+    return undefined
   }
 
   public getCellFormula(address: SimpleCellAddress, targetAddress?: SimpleCellAddress): Maybe<string> {

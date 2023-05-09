@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added HYPERLINK function.
+  [#1215](https://github.com/handsontable/hyperformula/issues/1215)
+
 ### Fixed
 
 - Fixed the `SEARCH` function to be case-insensitive regardless of the engine configuration.
