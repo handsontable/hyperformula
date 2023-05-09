@@ -237,7 +237,7 @@ export class MyCustomPlugin extends FunctionPlugin {
 
 ### Return an array of data
 
-A function may return multiple values in the form of an [array](arrays.md). To
+A function can return multiple values in the form of an [array](arrays.md). To
 do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
 ```js
@@ -263,8 +263,8 @@ function arguments and returns an instance of the
 [`ArraySize` class](../api/classes/arraysize.md).
 
 ::: tip
-The `arraySizeMethod` is called everytime the cell formula changes, but not when its dependencies change.
-This may cause unexpected behavior when the size of the result array depends on the values of the cells referenced in the formula.
+When you use your custom function in a formula, `arraySizeMethod` is triggered every time the formula changes, but not when the dependencies of the formula change.
+This can cause unexpected behavior if the size of the result array depends on the values in the referenced cells.
 :::
 
 ```js
