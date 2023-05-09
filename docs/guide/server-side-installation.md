@@ -25,7 +25,7 @@ $ npm install hyperformula
 **Yarn:**
 
 ```bash
-$ npm install hyperformula
+$ yarn add hyperformula
 ```
 
 The package will be added to your `package.json` file and installed in
