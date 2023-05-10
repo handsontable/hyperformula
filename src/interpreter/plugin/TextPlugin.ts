@@ -274,17 +274,14 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         return new CellError(ErrorType.VALUE, ErrorMessage.LengthBounds)
       }
 
+      const normalizedPattern = pattern.toLowerCase()
       const normalizedText = text.substring(startIndex - 1).toLowerCase()
 
-      let index: number
-      if (this.arithmeticHelper.requiresRegex(pattern)) {
-        index = this.arithmeticHelper.searchString(pattern, normalizedText)
-      } else {
-        index = normalizedText.indexOf(pattern.toLowerCase())
-      }
+      const index = this.arithmeticHelper.requiresRegex(normalizedPattern)
+        ? this.arithmeticHelper.searchString(normalizedPattern, normalizedText)
+        : normalizedText.indexOf(normalizedPattern)
 
-      index = index + startIndex
-      return index > 0 ? index : new CellError(ErrorType.VALUE, ErrorMessage.PatternNotFound)
+      return index > -1 ? index + startIndex : new CellError(ErrorType.VALUE, ErrorMessage.PatternNotFound)
     })
   }
 
