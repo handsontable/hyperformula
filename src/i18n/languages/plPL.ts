@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'JEŻELI',
     IFERROR: 'JEŻELI.BŁĄD',
     IFNA: 'JEŻELI.ND',
+    IFS: 'WARUNKI',
     INDEX: 'INDEKS',
     INT: 'ZAOKR.DO.CAŁK',
     INTERVAL: 'INTERVAL', //FIXME

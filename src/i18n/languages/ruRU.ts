@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'ЕСЛИ',
     IFERROR: 'ЕСЛИОШИБКА',
     IFNA: 'ЕСНД',
+    IFS: 'УСЛОВИЯ',
     INDEX: 'ИНДЕКС',
     INT: 'ЦЕЛОЕ',
     INTERVAL: 'INTERVAL', //FIXME

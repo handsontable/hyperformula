@@ -8,6 +8,10 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+- Added IFS function.
+  [#1157](https://github.com/handsontable/hyperformula/issues/1157)
+
 ## [2.4.0] - 2023-04-24
 
 ### Added

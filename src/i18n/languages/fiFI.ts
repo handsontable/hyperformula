@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'JOS',
     IFERROR: 'JOSVIRHE',
     IFNA: 'JOSPUUTTUU',
+    IFS: 'JOSS',
     INDEX: 'INDEKSI',
     INT: 'KOKONAISLUKU',
     INTERVAL: 'INTERVAL', //FIXME

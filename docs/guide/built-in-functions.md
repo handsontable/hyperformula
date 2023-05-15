@@ -196,18 +196,19 @@ Total number of functions: **{{ $page.functionsCount }}**
 
 ### Logical
 
-| Function ID | Description                                                                                                                      | Syntax                                                                         |
-| :---------- | :------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
-| AND         | Returns TRUE if all arguments are TRUE.                                                                                          | AND(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                            |
-| FALSE       | Returns the logical value FALSE.                                                                                                 | FALSE()                                                                        |
-| IF          | Specifies a logical test to be performed.                                                                                        | IF(Test, Then value, Otherwisevalue)                                           |
-| IFNA        | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value, Alternate_value)                                                   |
-| IFERROR     | Returns the value if the cell does not contains an error value, or the alternative value if it does.                             | IFERROR(Value, Alternate_value)                                                |
-| NOT         | Complements (inverts) a logical value.                                                                                           | NOT(Logicalvalue)                                                              |
-| SWITCH      | Evaluates a list of arguments, consisting of an expression followed by a value.                                                  | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]]) |
-| OR          | Returns TRUE if at least one argument is TRUE.                                                                                   | OR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                             |
-| TRUE        | The logical value is set to TRUE.                                                                                                | TRUE()                                                                         |
-| XOR         | Returns true if an odd number of arguments evaluates to TRUE.                                                                    | XOR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                            |
+| Function ID | Description                                                                                                                      | Syntax                                                                            |
+| :---------- | :------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------- |
+| AND         | Returns TRUE if all arguments are TRUE.                                                                                          | AND(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                               |
+| FALSE       | Returns the logical value FALSE.                                                                                                 | FALSE()                                                                           |
+| IF          | Specifies a logical test to be performed.                                                                                        | IF(Test, Then value, Otherwisevalue)                                              |
+| IFS         | Evaluates multiple logical tests and returns a value that corresponds to the first true condition.                               | IFS(Logicalvalue1, Value1[, Logicalvalue2, Value2[..., Logicalvalue_n, Value_n]]) |
+| IFNA        | Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does. | IFNA(Value, Alternate_value)                                                      |
+| IFERROR     | Returns the value if the cell does not contains an error value, or the alternative value if it does.                             | IFERROR(Value, Alternate_value)                                                   |
+| NOT         | Complements (inverts) a logical value.                                                                                           | NOT(Logicalvalue)                                                                 |
+| SWITCH      | Evaluates a list of arguments, consisting of an expression followed by a value.                                                  | SWITCH(Expression1, Value1[, Expression2, Value2[..., Expression_n, Value_n]])    |
+| OR          | Returns TRUE if at least one argument is TRUE.                                                                                   | OR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                                |
+| TRUE        | The logical value is set to TRUE.                                                                                                | TRUE()                                                                            |
+| XOR         | Returns true if an odd number of arguments evaluates to TRUE.                                                                    | XOR(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                               |
 
 ### Lookup and reference
 

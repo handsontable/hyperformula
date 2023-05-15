@@ -31,6 +31,13 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, passSubtype: true},
       ],
     },
+    'IFS': {
+      method: 'ifs',
+      parameters: [
+        {argumentType: FunctionArgumentType.NOERROR},
+      ],
+      repeatLastArgs: 1,
+    },
     'AND': {
       method: 'and',
       parameters: [
@@ -222,6 +229,20 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         return new CellError(ErrorType.NUM, ErrorMessage.Selector)
       }
       return args[selector - 1]
+    })
+  }
+
+  public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
+      if (args.length % 2 !== 0) {
+        return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+      }
+      for (let idx = 0; idx < args.length; idx += 2) {
+        if (args[idx]) {
+          return args[idx+1]
+        }
+      }
+      return new CellError(ErrorType.NA, ErrorMessage.NoMatch)
     })
   }
 }

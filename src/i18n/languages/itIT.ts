@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'SE',
     IFERROR: 'SE.ERRORE',
     IFNA: 'SE.NON.DISP.',
+    IFS: 'PIÙ.SE',
     INDEX: 'INDICE',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME

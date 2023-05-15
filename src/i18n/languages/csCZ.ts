@@ -104,6 +104,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'KDYŽ',
     IFERROR: 'IFERROR',
     IFNA: 'IFNA',
+    IFS: 'IFS',
     INDEX: 'INDEX',
     INT: 'CELÁ.ČÁST',
     INTERVAL: 'INTERVAL', //FIXME
