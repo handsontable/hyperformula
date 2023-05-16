@@ -29,11 +29,20 @@ describe('Function SUMX2PY2', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.EqualLength))
   })
 
-  it('should propagate errors', () => {
+  it('should propagate errors (from array 1)', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUMX2PY2(A2:E2, A3:E3)'],
       [1, 2, 3, '=NA()', 5, 6],
       [5, 4, 2, 1, 5, 10],
+    ])
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
+  })
+
+  it('should propagate errors (from array 2)', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUMX2PY2(A2:E2, A3:E3)'],
+      [5, 4, 2, 1, 5, 10],
+      [1, 2, 3, '=NA()', 5, 6],
     ])
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })

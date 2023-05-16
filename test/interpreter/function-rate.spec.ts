@@ -206,20 +206,28 @@ describe('Function RATE', () => {
         ['=RATE(12, 100, 400, -1000, 0, -0.07)', ],
         ['=RATE(12, 100, 400, -2000, 1, 0.01)', ],
         ['=RATE(12, 100, 400, -1000, 1, -0.01)', ],
+        ['=RATE(12, 100, 400, -1000, 1, -0.0000001)', ],
+        ['=RATE(12, 100, 400, -1000, 1, -0.00000001)', ],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.030711, requiredFinancialPrecision)
       expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-0.069686, requiredFinancialPrecision)
       expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.028023, requiredFinancialPrecision)
       expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.061540, requiredFinancialPrecision)
+      expect(engine.getCellValue(adr('A5'))).toBeCloseTo(-0.061540, requiredFinancialPrecision)
+      expect(engine.getCellValue(adr('A6'))).toBeCloseTo(-0.061540, requiredFinancialPrecision)
     })
 
     it('(0.9, -100, 400)', () => {
       const engine = HyperFormula.buildFromArray([
         ['=RATE(0.9, -100, 400, 0, 0, -0.8)', ],
+        ['=RATE(0.9, -100, 400, 0, 0, -0.0000001)', ],
+        ['=RATE(0.9, -100, 400, 0, 0, -0.00000001)', ],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.796172, requiredFinancialPrecision)
+      expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-0.796172, requiredFinancialPrecision)
+      expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.796172, requiredFinancialPrecision)
     })
   })
 })
