@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "lib": ["es2019"],
     "module": "commonjs",
     "outDir": "./test-jasmine",
     /* Make sure proper types are used */

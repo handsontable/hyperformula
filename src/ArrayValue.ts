@@ -8,7 +8,7 @@ import {CellError} from './Cell'
 import {EmptyValue, InternalScalarValue, InterpreterValue} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 
-export interface IArray {
+export interface CellArray {
   size: ArraySize,
 
   width(): number,
@@ -20,7 +20,7 @@ export interface IArray {
   simpleRangeValue(): SimpleRangeValue | CellError,
 }
 
-export class NotComputedArray implements IArray {
+export class NotComputedArray implements CellArray {
   constructor(public readonly size: ArraySize) {
   }
 
@@ -42,7 +42,7 @@ export class NotComputedArray implements IArray {
   }
 }
 
-export class ArrayValue implements IArray {
+export class ArrayValue implements CellArray {
   public size: ArraySize
   private readonly array: InternalScalarValue[][]
 
@@ -149,7 +149,7 @@ export class ArrayValue implements IArray {
   }
 }
 
-export class ErroredArray implements IArray {
+export class ErroredArray implements CellArray {
   constructor(
     private readonly error: CellError,
     public readonly size: ArraySize,

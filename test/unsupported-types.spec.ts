@@ -1,7 +1,7 @@
 import {HyperFormula} from '../src'
 import {adr} from './testUtils'
 
-const BigIntSupported = (function(): boolean {
+const bigIntSupported = (function(): boolean {
   try {
     const bigint = BigInt(1)
     return typeof bigint === 'bigint'
@@ -75,7 +75,7 @@ describe('unsupported types should result in error', () => {
       ']')
   })
   it('should give parsing error #11', () => {
-    if (BigIntSupported) {
+    if (bigIntSupported) {
       // eslint-disable-next-line
       // @ts-ignore
       expect(() => HyperFormula.buildFromArray([[BigInt(9007199254740991)]])

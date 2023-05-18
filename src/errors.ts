@@ -131,11 +131,11 @@ export class NothingToPasteError extends Error {
   }
 }
 
-function replacer(key: any, val: any): any {
+function replacer(key: string, val: any): any {
   switch (typeof val) {
     case 'function':
     case 'symbol':
-      return val.toString()
+      return (val as symbol).toString()
     case 'bigint':
       return 'BigInt(' + val.toString() + ')'
     default: {

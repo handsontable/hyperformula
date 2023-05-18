@@ -1,4 +1,4 @@
-import {CellValue, DetailedCellError, ErrorType, HyperFormula, Sheet, SheetDimensions} from '../src'
+import {CellValue, DetailedCellError, ErrorType, HyperFormula, RawCellContent, Sheet, SheetDimensions} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
 import {CellError, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
@@ -93,7 +93,7 @@ export const expectArrayWithSameContent = (actualArray: any[], expectedArray: an
 }
 
 export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, expected: string, precision?: number) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
   const actualVal: complex = coerce(engine.getCellValue(adr(cell)))
@@ -222,13 +222,13 @@ export function columnIndexToSheet(columnIndex: ColumnIndex, width: number, heig
   return normalizeSheet(result, {width, height})
 }
 
-function normalizeSheet(sheet: any[][], dimensions: SheetDimensions): any[][] {
+function normalizeSheet(sheet: RawCellContent[][], dimensions: SheetDimensions): any[][] {
   return Array.from(sheet, row => {
     if (row) {
       row.length = dimensions.width
       return Array.from(row, v => v || null)
     }
-    return Array(dimensions.width).fill(null)
+    return Array(dimensions.width).fill(null) as RawCellContent[]
   })
 }
 
@@ -240,14 +240,12 @@ export function expectColumnIndexToMatchSheet(expected: Sheet, engine: HyperForm
   expectArrayWithSameContent(normalizeSheet(expected, dimensions), normalizeSheet(exportedColumnIndex, dimensions))
 }
 
-export function resetSpy(spy: jasmine.Spy | unknown): void {
+export function resetSpy(spy: any): void {
   try {
-    // eslint-disable-next-line
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     spy.mockClear() // clears mock in Jest env
   } catch {
-    // eslint-disable-next-line
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     spy.calls.reset() // clears mock in Jasmine env
   }
 }

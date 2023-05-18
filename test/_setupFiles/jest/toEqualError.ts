@@ -14,11 +14,13 @@ export const toEqualError: ExpectExtendMap = {
     let result = false
 
     if (typeof received === 'object' && typeof expected === 'object') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       result = this.equals(
         {...received, root: undefined, address: undefined},
         {...expected, root: undefined, address: undefined}
       )
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       result = this.equals(received, expected)
     }
     return {

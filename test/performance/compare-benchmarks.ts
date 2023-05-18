@@ -54,7 +54,7 @@ function readResultsFromFile(filename: string): { name: string, totalTime: numbe
     const rawFileContent = fs.readFileSync(filename)
     return JSON.parse(rawFileContent.toString())
   } catch (err) {
-    throw new Error(`Cannot read results from ${filename}\n${err}`)
+    throw new Error(`Cannot read results from ${filename}\n${err as string}`)
   }
 }
 
@@ -66,7 +66,8 @@ function buildBenchmarkTable(resultSuites: ResultSuite[]): { [key: string]: stri
 function buildBenchmarkTableRow(testName: string, resultSuites: ResultSuite[]): { [key: string]: string | number } {
   const testResultsEntries = resultSuites.map(resultSuite => findTestResultInSuite(testName, resultSuite))
   const changeEntries = calculateChangeFromBase(testResultsEntries)
-  const testResultsObj = (Object as any).fromEntries([ ...testResultsEntries, ...changeEntries ])
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const testResultsObj = Object.fromEntries([ ...testResultsEntries, ...changeEntries ])
   return { testName, ...testResultsObj }
 }
 

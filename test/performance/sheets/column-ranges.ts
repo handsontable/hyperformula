@@ -8,7 +8,7 @@ export function sheet(cols: number = 50) {
 
   for (let i = 1; i < cols; ++i) {
     const adr = simpleCellAddressToString(() => '', {sheet: 0, row: 0, col: i - 1}, 0)
-    firstRow.push(`=${adr} + 1`)
+    firstRow.push(`=${adr as string} + 1`)
   }
 
   sheet.push(firstRow)

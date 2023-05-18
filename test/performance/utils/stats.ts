@@ -9,6 +9,7 @@ export enum ExtStatType {
   CRUDS_TOTAL = 'CRUDS_TOTAL',
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const EnrichedStatType = {...StatType, ...ExtStatType}
 export type EnrichedStatType = StatType | ExtStatType
 
@@ -22,7 +23,7 @@ export function enrichStatistics(stats: Stats): Stats {
 }
 
 export function measureCruds(engine: HyperFormula, name: string, func: (engine: HyperFormula) => void): Stats {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   engine._stats.reset()
 
