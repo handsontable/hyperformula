@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added HYPERLINK function.
+  [#1215](https://github.com/handsontable/hyperformula/issues/1215)
+  
 ### Changed
 
 - Optimized method `updateConfig` to rebuild the engine only when new config is different from the old one.

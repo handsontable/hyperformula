@@ -18,7 +18,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
 
   public foo(ast: ProcedureAst, state: InterpreterState) {
     return this.runFunction(ast.args, state, this.metadata('FOO'),
-      (arg1, arg2) => arg1 + '+' + arg2
+      (arg1: string, arg2: string) => arg1 + '+' + arg2
     )
   }
 }

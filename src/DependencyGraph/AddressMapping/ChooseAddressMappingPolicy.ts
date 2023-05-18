@@ -4,7 +4,7 @@
  */
 
 import {DenseStrategy} from './DenseStrategy'
-import {AddressMappingStrategyConstructor} from './IAddressMappingStrategy'
+import {AddressMappingStrategyConstructor} from './AddressMappingStrategy'
 import {SparseStrategy} from './SparseStrategy'
 
 export interface ChooseAddressMapping {
