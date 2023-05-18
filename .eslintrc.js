@@ -85,7 +85,7 @@ module.exports = {
     'jsdoc/check-alignment': 'warn',
     'jsdoc/check-param-names': 'warn',
     'jsdoc/check-property-names': 'warn',
-    'jsdoc/check-tag-names': ['warn', { definedTags: ['category'] }],
+    'jsdoc/check-tag-names': ['warn', { definedTags: ['category', 'internal'] }],
     'jsdoc/check-types': 'warn',
     'jsdoc/empty-tags': 'warn',
     'jsdoc/implements-on-classes': 'warn',

@@ -1,8 +1,8 @@
-import {HyperFormula} from '../src'
-import {ErrorType} from '../src/Cell'
+import {HyperFormula, ErrorType} from '../src'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
-import {adr, detailedError} from './testUtils'
+import {adr, detailedError, resetSpy} from './testUtils'
+import {BuildEngineFactory} from '../src/BuildEngineFactory'
 
 describe('update config', () => {
   it('simple reload preserves all values', () => {
@@ -66,5 +66,50 @@ describe('update config', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(false)
+  })
+
+  it('doesn\'t rebuild the engine when new config is the same as the old one', () => {
+    const config = { useArrayArithmetic: true }
+    const engine = HyperFormula.buildFromArray([[]], config)
+
+    const rebuildEngineSpy = spyOn(BuildEngineFactory, 'rebuildWithConfig')
+    resetSpy(rebuildEngineSpy)
+
+    engine.updateConfig(config)
+    expect(rebuildEngineSpy).not.toHaveBeenCalled()
+  })
+
+  it('rebuilds the engine when new config adds new timeFormat to the same instance of timeFormats array', () => {
+    const config = { timeFormats: ['hh:mm:ss.sss'] }
+    const engine = HyperFormula.buildFromArray([[]], config)
+
+    const rebuildEngineSpy = spyOn(BuildEngineFactory, 'rebuildWithConfig')
+    resetSpy(rebuildEngineSpy)
+
+    config.timeFormats.push('hh:mm:ss')
+    engine.updateConfig(config)
+    expect(rebuildEngineSpy).toHaveBeenCalled()
+  })
+
+  it('rebuilds the engine when new config adds new currencySymbol to the same instance of currencySymbol array', () => {
+    const config = { currencySymbol: ['$'] }
+    const engine = HyperFormula.buildFromArray([[]], config)
+
+    const rebuildEngineSpy = spyOn(BuildEngineFactory, 'rebuildWithConfig')
+    resetSpy(rebuildEngineSpy)
+
+    config.currencySymbol.push('€')
+    engine.updateConfig(config)
+    expect(rebuildEngineSpy).toHaveBeenCalled()
+  })
+
+  it('doesn\'t rebuild the engine when new config contains only the default config values', () => {
+    const engine = HyperFormula.buildFromArray([[]], {})
+
+    const rebuildEngineSpy = spyOn(BuildEngineFactory, 'rebuildWithConfig')
+    resetSpy(rebuildEngineSpy)
+
+    engine.updateConfig({ useColumnIndex: false, functionArgSeparator: ',', undoLimit: 20 })
+    expect(rebuildEngineSpy).not.toHaveBeenCalled()
   })
 })
