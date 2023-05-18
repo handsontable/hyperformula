@@ -35,12 +35,12 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
 
   private verifyAddressArguments(row: number, col: number, abs: number, useA1Style: boolean): Maybe<CellError> {
     if (useA1Style) {
-      if ((row < 1) || (col < 1)) {
+      if (row < 1 || col < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
     } else {
       if (AbsStyle.FullyAbsolute == abs) {
-        if ((row < 1) || (col < 1)) {
+        if (row < 1 || col < 1) {
           return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
         }
       } else if (AbsStyle.RowAbsoluteColRelative == abs) {
