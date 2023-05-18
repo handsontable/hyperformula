@@ -8,12 +8,12 @@ import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
 
-export type AddressMappingStrategyConstructor = new (width: number, height: number) => IAddressMappingStrategy
+export type AddressMappingStrategyConstructor = new (width: number, height: number) => AddressMappingStrategy
 
 /**
  * Interface for mapping from sheet addresses to vertices.
  */
-export interface IAddressMappingStrategy {
+export interface AddressMappingStrategy {
   /**
    * Returns cell content
    *

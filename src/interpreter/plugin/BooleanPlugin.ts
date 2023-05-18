@@ -142,7 +142,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public and(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AND'),
-      (...args) => args.filter((arg: boolean | undefined) => arg !== undefined).every((arg: boolean) => !!arg)
+      (...args: (boolean | undefined)[]) => args.filter(arg => arg !== undefined).every(arg => !!arg)
     )
   }
 
@@ -156,7 +156,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public or(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OR'),
-      (...args) => args.filter((arg: boolean | undefined) => arg !== undefined).some((arg: boolean) => arg)
+      (...args: (boolean | undefined)[]) => args.filter(arg => arg !== undefined).some(arg => arg)
     )
   }
 
@@ -165,9 +165,9 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public xor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XOR'), (...args) => {
+    return this.runFunction(ast.args, state, this.metadata('XOR'), (...args: (boolean | undefined)[]) => {
       let cnt = 0
-      args.filter((arg: boolean | undefined) => arg !== undefined).forEach((arg: boolean) => {
+      args.filter(arg => arg !== undefined).forEach(arg => {
         if (arg) {
           cnt++
         }

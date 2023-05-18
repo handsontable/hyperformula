@@ -30,6 +30,7 @@ export abstract class RichNumber {
   }
 
   public fromNumber(val: number): this {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return new (this.constructor as any)(val)
   }
 
