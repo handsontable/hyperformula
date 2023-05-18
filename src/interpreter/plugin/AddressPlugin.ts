@@ -51,8 +51,6 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
         if (col < 1) {
           return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
         }
-      } else if (AbsStyle.FullyRelative == abs) {
-        // no range checks needed for AbsStyle.FullyRelative
       }
     }
     return undefined
@@ -60,16 +58,16 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
 
   public address(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ADDRESS'), (row: number, col: number, abs: number, useA1Style: boolean, sheetName: string): InterpreterValue => {
-
       const argumentError = this.verifyAddressArguments(row, col, abs, useA1Style)
-      if (undefined !== argumentError) {
+
+      if (argumentError !== undefined) {
         return argumentError
       }
 
-      const colLetter = columnIndexToLabel(col-1)
-
+      const colLetter = columnIndexToLabel(col - 1)
       let sheetPrefix = ''
-      if ((undefined !== sheetName) && (null !== sheetName)) {
+
+      if (sheetName !== undefined && sheetName !== null) {
         sheetPrefix = `${sheetName}!`
       }
 
@@ -82,9 +80,9 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
         return useA1Style ? `${sheetPrefix}$${colLetter}${row}` : `${sheetPrefix}${r1c1RowSegment}C${col}`
       } else if (AbsStyle.RowAbsoluteColRelative == abs) {
         return useA1Style ? `${sheetPrefix}${colLetter}$${row}` : `${sheetPrefix}R${row}${r1c1ColSegment}`
-      } else {
-        return useA1Style ? `${sheetPrefix}$${colLetter}$${row}` : `${sheetPrefix}R${row}C${col}`
       }
+
+      return useA1Style ? `${sheetPrefix}$${colLetter}$${row}` : `${sheetPrefix}R${row}C${col}`
     })
   }
 }
