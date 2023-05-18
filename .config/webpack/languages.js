@@ -8,7 +8,6 @@ const path = require('path');
 const WebpackOnBuildPlugin = require('on-build-webpack');
 const fs  = require('fs');
 const fsExtra  = require('fs-extra');
-require('string-replace-loader');
 
 function getEntryJsFiles() {
   const entryObject = {};
