@@ -17,6 +17,7 @@ a circular reference.
 * There is no data validation against named ranges. For example,
 you can't compare the arguments in a formula like this:
 =IF(firstRange>secondRange, TRUE, FALSE).
+* [Custom functions](custom-functions.md) don't automatically recalculate the size of their [result arrays](custom-functions.md#return-an-array-of-data) when the formula dependencies change.
 * There is no relative referencing in named ranges.
 * The library doesn't offer (at least not yet) the following features:
   * 3D references

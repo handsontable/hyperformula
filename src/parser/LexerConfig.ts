@@ -53,9 +53,7 @@ const cellReferenceMatcher = new CellReferenceMatcher()
 export const CellReference = createToken({
   name: 'CellReference',
   pattern: cellReferenceMatcher.match.bind(cellReferenceMatcher),
-  // eslint-disable-next-line @typescript-eslint/camelcase
   start_chars_hint: cellReferenceMatcher.POSSIBLE_START_CHARACTERS,
-  // eslint-disable-next-line @typescript-eslint/camelcase
   line_breaks: false,
 })
 
@@ -63,9 +61,7 @@ const namedExpressionMatcher = new NamedExpressionMatcher()
 export const NamedExpression = createToken({
   name: 'NamedExpression',
   pattern: namedExpressionMatcher.match.bind(namedExpressionMatcher),
-  // eslint-disable-next-line @typescript-eslint/camelcase
   start_chars_hint: namedExpressionMatcher.POSSIBLE_START_CHARACTERS,
-  // eslint-disable-next-line @typescript-eslint/camelcase
   line_breaks: false,
 })
 

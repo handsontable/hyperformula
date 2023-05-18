@@ -2,12 +2,11 @@
  * This script file presents you the opportunity of running some code immediately
  * after the test framework has been installed in the environment.
  */
-import {HyperFormula} from '../../src'
+import {HyperFormula, AlwaysSparse} from '../../src'
 import {Config} from '../../src/Config'
-import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {enGB} from '../../src/i18n/languages'
 import * as plugins from '../../src/interpreter/plugin'
-import {unregisterAllLanguages} from './../testUtils'
+import {unregisterAllLanguages} from '../testUtils'
 import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from './matchers'
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
@@ -28,9 +27,7 @@ const jestPresent = (() => {
 
 beforeEach(() => {
   if (!jestPresent) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    jasmine.setDefaultSpyStrategy((and: unknown) => and.callThrough())
+    (jasmine as any).setDefaultSpyStrategy((and: any) => and.callThrough())
   }
 
   unregisterAllLanguages()
@@ -43,16 +40,14 @@ beforeEach(() => {
 
   for (const pluginName of Object.getOwnPropertyNames(plugins)) {
     if (!pluginName.startsWith('_')) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      HyperFormula.registerFunctionPlugin(plugins[pluginName])
+      HyperFormula.registerFunctionPlugin(plugins[pluginName as keyof typeof plugins])
     }
   }
 })
 
 beforeAll(() => {
   if (!jestPresent) {
-    jasmine.addMatchers({
+    (jasmine as any).addMatchers({
       ...toContainEqualMatcher,
       ...toMatchObjectMatcher,
       ...toEqualErrorMatcher,
