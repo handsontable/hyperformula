@@ -10,6 +10,9 @@ and this project adheres to
 
 ### Added
 
+- Added ADDRESS function.
+  [#1221](https://github.com/handsontable/hyperformula/issues/1221)
+
 - Added HYPERLINK function.
   [#1215](https://github.com/handsontable/hyperformula/issues/1215)
   
