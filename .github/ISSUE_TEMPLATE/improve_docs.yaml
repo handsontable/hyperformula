@@ -1,5 +1,6 @@
 name: Documentation improvement
 description: Suggest an improvement to the docs.
+labels: [docs]
 body:
   - type: input
     id: link
