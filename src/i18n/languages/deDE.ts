@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'WENN',
     IFERROR: 'WENNFEHLER',
     IFNA: 'WENNNV',
+    IFS: 'WENNS',
     INDEX: 'INDEX',
     INT: 'GANZZAHL',
     INTERVAL: 'INTERVAL', //FIXME

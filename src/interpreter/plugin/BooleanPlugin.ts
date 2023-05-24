@@ -31,6 +31,14 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, passSubtype: true},
       ],
     },
+    'IFS': {
+      method: 'ifs',
+      parameters: [
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+      ],
+      repeatLastArgs: 2,
+    },
     'AND': {
       method: 'and',
       parameters: [
@@ -129,6 +137,23 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   public conditionalIf(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IF'), (condition, arg2, arg3) => {
       return condition ? arg2 : arg3
+    })
+  }
+
+  /**
+   * Implementation for the IFS function. Returns the value that corresponds to the first true condition.
+   *
+   * @param ast
+   * @param state
+   */
+  public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
+      for (let idx = 0; idx < args.length; idx += 2) {
+        if (args[idx]) {
+          return args[idx+1]
+        }
+      }
+      return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
     })
   }
 

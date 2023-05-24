@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'EĞER',
     IFERROR: 'EĞERHATA',
     IFNA: 'EĞERYOKSA',
+    IFS: 'ÇOKEĞER',
     INDEX: 'İNDİS',
     INT: 'TAMSAYI',
     INTERVAL: 'INTERVAL', //FIXME

@@ -60,6 +60,7 @@ export class ErrorMessage {
   public static LengthBounds = 'Length out of bounds.'
   public static NegativeTime = 'Time cannot be negative.'
   public static NoDefault = 'No default option.'
+  public static NoConditionMet = 'None of the conditions were met.'
   public static Selector = 'Selector cannot exceed the number of arguments.'
   public static StartEndDate = 'Start date needs to be earlier than end date.'
   public static IncorrectDateTime = 'String does not represent correct DateTime.'
