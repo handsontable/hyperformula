@@ -141,6 +141,23 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   /**
+   * Implementation for the IFS function.
+   *
+   * @param ast
+   * @param state
+   */
+  public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
+      for (let idx = 0; idx < args.length; idx += 2) {
+        if (args[idx]) {
+          return args[idx+1]
+        }
+      }
+      return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
+    })
+  }
+
+  /**
    * Corresponds to AND(expression1, [expression2, ...])
    *
    * Returns true if all of the provided arguments are logically true, and false if any of it is logically false
@@ -230,17 +247,6 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         return new CellError(ErrorType.NUM, ErrorMessage.Selector)
       }
       return args[selector - 1]
-    })
-  }
-
-  public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
-      for (let idx = 0; idx < args.length; idx += 2) {
-        if (args[idx]) {
-          return args[idx+1]
-        }
-      }
-      return new CellError(ErrorType.NA, ErrorMessage.NoMatch)
     })
   }
 }

@@ -41,6 +41,6 @@ describe('Function IFS', () => {
     const engine = HyperFormula.buildFromArray([
       [10, '=IFS(A1>90, "A", A1>80, "B", A1>70, "C")']
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.NoMatch))
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.NoConditionMet))
   })
 })
