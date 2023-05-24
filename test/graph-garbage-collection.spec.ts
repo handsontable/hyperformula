@@ -140,12 +140,12 @@ describe('larger tests', () => {
             sheet: 0,
             row: Math.min(row1, row2),
             col: Math.min(col1, col2)
-          }, 0)
+          }, 0) as string
           const endAddress = engine.simpleCellAddressToString({
             sheet: 0,
             row: Math.max(row1, row2),
             col: Math.max(col1, col2)
-          }, 0)
+          }, 0) as string
           const formula = '=SUM(' + startAddress + ':' + endAddress + ')'
           engine.setCellContents({sheet: 0, col: x, row: y}, formula)
         }

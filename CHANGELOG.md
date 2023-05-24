@@ -10,8 +10,16 @@ and this project adheres to
 
 ### Added
 
+- Added ADDRESS function.
+  [#1221](https://github.com/handsontable/hyperformula/issues/1221)
+
 - Added HYPERLINK function.
   [#1215](https://github.com/handsontable/hyperformula/issues/1215)
+  
+### Changed
+
+- Optimized method `updateConfig` to rebuild the engine only when new config is different from the old one.
+  [#1251](https://github.com/handsontable/hyperformula/issues/1251)
 
 - Added IFS function.
   [#1157](https://github.com/handsontable/hyperformula/issues/1157)

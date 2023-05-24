@@ -770,7 +770,7 @@ function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: Exte
   }
   if (leftType === NumberType.NUMBER_TIME) {
     if (rightType === NumberType.NUMBER_DATE) {
-      return {type: NumberType.NUMBER_DATETIME, format: rightFormat + ' ' + leftFormat}
+      return {type: NumberType.NUMBER_DATETIME, format: `${rightFormat} ${leftFormat}`}
     }
     if (rightType === NumberType.NUMBER_DATETIME) {
       return {type: NumberType.NUMBER_DATETIME, format: rightFormat}
@@ -778,7 +778,7 @@ function inferExtendedNumberTypeAdditive(leftArg: ExtendedNumber, rightArg: Exte
   }
   if (rightType === NumberType.NUMBER_TIME) {
     if (leftType === NumberType.NUMBER_DATE) {
-      return {type: NumberType.NUMBER_DATETIME, format: leftFormat + ' ' + rightFormat}
+      return {type: NumberType.NUMBER_DATETIME, format: `${leftFormat} ${rightFormat}`}
     }
     if (leftType === NumberType.NUMBER_DATETIME) {
       return {type: NumberType.NUMBER_DATETIME, format: leftFormat}

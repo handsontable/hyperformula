@@ -1,5 +1,6 @@
 module.exports = {
   root: true,
+  ignorePatterns: ['.eslintrc.js'],
   parser: '@typescript-eslint/parser',
   plugins: [
     '@typescript-eslint',
@@ -27,17 +28,21 @@ module.exports = {
         delimiter: 'comma',
       },
     }],
-    '@typescript-eslint/camelcase': 'error',
+    '@typescript-eslint/naming-convention': [
+      'error',
+      { 'selector': 'variableLike', 'format': ['camelCase', 'UPPER_CASE', 'PascalCase'], 'leadingUnderscore': 'allow' },
+      { 'selector': 'interface', 'format': ['PascalCase'], 'custom': { 'regex': '^I[A-Z]', 'match': false } },
+    ],
     '@typescript-eslint/semi': ['error', 'never'],
-    '@typescript-eslint/brace-style': 'error', // wtf
+    '@typescript-eslint/brace-style': 'error',
     '@typescript-eslint/no-unnecessary-boolean-literal-compare': ['error'],
     '@typescript-eslint/no-extra-non-null-assertion': ['error'],
     '@typescript-eslint/no-throw-literal': ['error'],
     '@typescript-eslint/array-type': ['error'],
-    '@typescript-eslint/space-before-function-paren': ["error", {
-      "anonymous": "never",
-      "named": "never",
-      "asyncArrow": "always"
+    '@typescript-eslint/space-before-function-paren': ['error', {
+      'anonymous': 'never',
+      'named': 'never',
+      'asyncArrow': 'always'
     }],
     '@typescript-eslint/quotes': ['error', 'single', { avoidEscape: true }],
     '@typescript-eslint/no-extra-semi': ['error'],
@@ -64,35 +69,41 @@ module.exports = {
     'no-useless-escape': 'off',
     'no-inner-declarations': 'off',
 
+    // Overrides
     '@typescript-eslint/no-non-null-assertion': 'warn',
     '@typescript-eslint/prefer-regexp-exec': 'warn',
     '@typescript-eslint/no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
     '@typescript-eslint/no-explicit-any': 'warn',
-    '@typescript-eslint/interface-name-prefix': 'warn',
+    '@typescript-eslint/no-unsafe-argument': 'warn',
+    '@typescript-eslint/no-unsafe-return': 'warn',
+    '@typescript-eslint/no-unsafe-member-access': 'warn',
+    '@typescript-eslint/no-unsafe-assignment': 'warn',
+    '@typescript-eslint/restrict-template-expressions': 'warn',
+    '@typescript-eslint/no-unsafe-call': 'warn',
 
-    "jsdoc/check-access": 'warn',
-    "jsdoc/check-alignment": 'warn',
-    "jsdoc/check-param-names": 'warn',
-    "jsdoc/check-property-names": 'warn',
-    "jsdoc/check-tag-names": ['warn', {definedTags: ['category']}],
-    "jsdoc/check-types": 'warn',
-    "jsdoc/empty-tags": 'warn',
-    "jsdoc/implements-on-classes": 'warn',
-    "jsdoc/multiline-blocks": 'warn',
-    "jsdoc/newline-after-description": 'warn',
-    "jsdoc/no-multi-asterisks": 'warn',
-    "jsdoc/require-param-description": 'warn',
-    "jsdoc/require-param-name": 'warn',
-    "jsdoc/require-param-type": 'warn',
-    "jsdoc/require-property-description": 'warn',
-    "jsdoc/require-property-name": 'warn',
-    "jsdoc/require-property-type": 'warn',
-    "jsdoc/require-returns-check": 'warn',
-    "jsdoc/require-returns-description": 'warn',
-    "jsdoc/require-returns-type": 'warn',
-    "jsdoc/require-yields-check": 'warn',
-    "jsdoc/valid-types": 'warn',
-    "jsdoc/require-jsdoc": ['warn', {
+    'jsdoc/check-access': 'warn',
+    'jsdoc/check-alignment': 'warn',
+    'jsdoc/check-param-names': 'warn',
+    'jsdoc/check-property-names': 'warn',
+    'jsdoc/check-tag-names': ['warn', { definedTags: ['category', 'internal'] }],
+    'jsdoc/check-types': 'warn',
+    'jsdoc/empty-tags': 'warn',
+    'jsdoc/implements-on-classes': 'warn',
+    'jsdoc/multiline-blocks': 'warn',
+    'jsdoc/tag-lines': 'warn',
+    'jsdoc/no-multi-asterisks': 'warn',
+    'jsdoc/require-param-description': 'warn',
+    'jsdoc/require-param-name': 'warn',
+    'jsdoc/require-param-type': 'warn',
+    'jsdoc/require-property-description': 'warn',
+    'jsdoc/require-property-name': 'warn',
+    'jsdoc/require-property-type': 'warn',
+    'jsdoc/require-returns-check': 'warn',
+    'jsdoc/require-returns-description': 'warn',
+    'jsdoc/require-returns-type': 'warn',
+    'jsdoc/require-yields-check': 'warn',
+    'jsdoc/valid-types': 'warn',
+    'jsdoc/require-jsdoc': ['warn', {
       require: {
         ArrowFunctionExpression: true,
         ClassDeclaration: true,
@@ -117,4 +128,4 @@ module.exports = {
       }
     },
   ],
-};
+}

@@ -1,12 +1,10 @@
 /**
  * Config responsible for building not minified Handsontable `languages/` files.
  */
-const NEW_LINE_CHAR = '\n';
 const SOURCE_LANGUAGES_DIRECTORY = 'lib/i18n/languages';
 const OUTPUT_LANGUAGES_DIRECTORY = 'languages';
 
 const path = require('path');
-const StringReplacePlugin  = require('string-replace-webpack-plugin');
 const WebpackOnBuildPlugin = require('on-build-webpack');
 const fs  = require('fs');
 const fsExtra  = require('fs-extra');
@@ -34,31 +32,23 @@ function getEntryJsFiles() {
 
 const ruleForSnippetsInjection = {
   test: /\.js$/,
-  loader: StringReplacePlugin.replace({
-    replacements: [
-      {
-        pattern: /\/\/.import/,
-        replacement: function() {
-          const snippet1 = `import HyperFormula from '../..';`;
-
-          return `${snippet1}${NEW_LINE_CHAR.repeat(2)}`;
+  loader: 'string-replace-loader',
+  options: {
+    multiple: [
+      { search: 'export default dictionary', replace: `
+        if (!HyperFormula.languages) {
+          HyperFormula.languages = {};
         }
-      },
-      {
-        pattern: /export default dictionary/,
-        replacement: function(matchingPhrase) {
-          const snippet = `
-            if (!HyperFormula.languages) {
-              HyperFormula.languages = {};
-            }
-            HyperFormula.languages[dictionary.langCode] = dictionary;
-          `;
-
-          return `${snippet}${NEW_LINE_CHAR.repeat(2)}${matchingPhrase}`;
-        }
-      }
+        HyperFormula.languages[dictionary.langCode] = dictionary;
+        
+        export default dictionary
+      `},
+      { search: /\/\/.import/, replace: `
+        import HyperFormula from '../..';
+        
+      `}
     ]
-  })
+  }
 };
 
 module.exports.create = function create() {
