@@ -31,7 +31,7 @@ body:
   - type: input
     id: framework
     attributes:
-      label: Framework version
+      label: Framework version (e.g. React, Angular, Vue, etc)
   - type: input
     id: environment
     attributes:
