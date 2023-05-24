@@ -141,7 +141,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   /**
-   * Implementation for the IFS function.
+   * Implementation for the IFS function. Returns the value that corresponds to the first true condition.
    *
    * @param ast
    * @param state
