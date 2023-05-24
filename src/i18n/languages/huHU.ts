@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'HA',
     IFERROR: 'HAHIBA',
     IFNA: 'HAHIÁNYZIK',
+    IFS: 'HAELSŐIGAZ',
     INDEX: 'INDEX',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME

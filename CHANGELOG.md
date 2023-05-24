@@ -21,6 +21,9 @@ and this project adheres to
 - Optimized method `updateConfig` to rebuild the engine only when new config is different from the old one.
   [#1251](https://github.com/handsontable/hyperformula/issues/1251)
 
+- Added IFS function.
+  [#1157](https://github.com/handsontable/hyperformula/issues/1157)
+
 ### Fixed
 
 - Fixed the `SEARCH` function to be case-insensitive regardless of the engine configuration.

@@ -106,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'HVIS',
     IFERROR: 'HVISFEIL',
     IFNA: 'HVIS.IT',
+    IFS: 'HVIS.SETT',
     INDEX: 'INDEKS',
     INT: 'HELTALL',
     INTERVAL: 'INTERVAL', //FIXME
