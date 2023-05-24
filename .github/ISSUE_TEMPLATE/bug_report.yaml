@@ -22,6 +22,8 @@ body:
     attributes:
       label: Provide a link to the demo with the bug reproduction
       description: Use StackBlitz, CodeSandbox, CodePen, JSFiddle, or any other online sandbox.
+    validations:
+      required: true
   - type: input
     id: hf-version
     attributes:
