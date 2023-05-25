@@ -6,6 +6,29 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.5.0
+
+**Release date: May 29, 2023**
+
+### Added
+
+- Added ADDRESS function.
+  [#1221](https://github.com/handsontable/hyperformula/issues/1221)
+- Added HYPERLINK function.
+  [#1215](https://github.com/handsontable/hyperformula/issues/1215)
+- Added IFS function.
+  [#1157](https://github.com/handsontable/hyperformula/issues/1157)
+
+### Changed
+
+- Optimized method `updateConfig` to rebuild the engine only when new config is different from the old one.
+  [#1251](https://github.com/handsontable/hyperformula/issues/1251)
+
+### Fixed
+
+- Fixed the `SEARCH` function to be case-insensitive regardless of the engine configuration.
+  [#1225](https://github.com/handsontable/hyperformula/issues/1225)
+
 ## 2.4.0
 
 **Release date: April 24, 2023**

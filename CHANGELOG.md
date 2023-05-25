@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [2.5.0] - 2023-05-29
+
 ### Added
 
 - Added ADDRESS function.
