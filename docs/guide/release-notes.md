@@ -12,21 +12,21 @@ HyperFormula adheres to
 
 ### Added
 
-- Added ADDRESS function.
+- Added a new function: ADDRESS.
   [#1221](https://github.com/handsontable/hyperformula/issues/1221)
-- Added HYPERLINK function.
+- Added a new function: HYPERLINK.
   [#1215](https://github.com/handsontable/hyperformula/issues/1215)
-- Added IFS function.
+- Added a new function: IFS.
   [#1157](https://github.com/handsontable/hyperformula/issues/1157)
 
 ### Changed
 
-- Optimized method `updateConfig` to rebuild the engine only when new config is different from the old one.
+- Optimized the [`updateConfig()`](../api/classes/hyperformula.md#updateconfig) method to rebuild HyperFormula only when the new configuration is different from the old one.
   [#1251](https://github.com/handsontable/hyperformula/issues/1251)
 
 ### Fixed
 
-- Fixed the `SEARCH` function to be case-insensitive regardless of the engine configuration.
+- Fixed the SEARCH function to be case-insensitive regardless of HyperFormula's configuration.
   [#1225](https://github.com/handsontable/hyperformula/issues/1225)
 
 ## 2.4.0
