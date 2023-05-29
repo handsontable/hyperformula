@@ -387,7 +387,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public dollarde(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARDE'),
-      (dollar, fraction) => {
+      (dollar: number, fraction: number) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
@@ -403,7 +403,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public dollarfr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARFR'),
-      (dollar, fraction) => {
+      (dollar: number, fraction: number) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
@@ -448,7 +448,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public nper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NPER'),
-      (rate, payment, present, future, type) => {
+      (rate: number, payment: number, present: number, future: number, type: number) => {
         if (rate === 0) {
           if (payment === 0) {
             return new CellError(ErrorType.DIV_BY_ZERO)
@@ -466,7 +466,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public rate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     // Newton's method: https://en.wikipedia.org/wiki/Newton%27s_method
     return this.runFunction(ast.args, state, this.metadata('RATE'),
-      (periods, payment, present, future, type, guess) => {
+      (periods: number, payment: number, present: number, future: number, type: number, guess: number) => {
         if (guess <= -1) {
           return new CellError(ErrorType.VALUE)
         }
@@ -508,7 +508,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public pv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PV'),
-      (rate, periods, payment, future, type) => {
+      (rate: number, periods: number, payment: number, future: number, type: number) => {
         type = type ? 1 : 0
         if (rate === -1) {
           if (periods === 0) {
@@ -551,7 +551,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public syd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SYD'),
-      (cost, salvage, life, period) => {
+      (cost: number, salvage: number, life: number, period: number) => {
         if (period > life) {
           return new CellError(ErrorType.NUM)
         }
@@ -562,7 +562,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public tbilleq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLEQ'),
-      (settlement, maturity, discount) => {
+      (settlement: number, maturity: number, discount: number) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {
@@ -588,7 +588,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public tbillprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLPRICE'),
-      (settlement, maturity, discount) => {
+      (settlement: number, maturity: number, discount: number) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {
@@ -614,7 +614,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public tbillyield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLYIELD'),
-      (settlement, maturity, price) => {
+      (settlement: number, maturity: number, price: number) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {

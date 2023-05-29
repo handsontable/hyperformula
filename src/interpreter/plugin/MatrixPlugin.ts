@@ -223,7 +223,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (strideArg.type === AstNodeType.NUMBER) {
         stride = strideArg.value
       } else {
-        stride = 1
+        stride = 1 // codecov: unreachable - strideArg is always type AstNodeType.NUMBER due to FunctionPlugin argument checking+coersion
       }
     }
 
