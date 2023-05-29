@@ -1,45 +1,47 @@
-name: Bug Report
-description: Something is broken? Create a report to help us improve.
+name: Bug report
+description: Is something not working? Report a bug to help us improve.
 title: "[Bug]: "
 labels: [bug]
 body:
   - type: textarea
     id: describe-bug
     attributes:
-      label: Describe the bug
-      description: Describe what happens and the steps to recreate the problem. Issues that we can't reproduced will be closed.
+      label: Description
+      description: Describe what happens, and specify the exact steps to reproduce the problem. If we can't recreate the issue, we'll close it down.
     validations:
       required: true
   - type: textarea
     id: screenshots
     attributes:
-      label: Video/Screenshots
-      description: Please provide a screenshot or a short video presenting the issue
+      label: Video or screenshots
+      description: Add a screenshot or a short video that clearly illustrates the problem.
   - type: input
     id: demo
     attributes:
-      label: Provide a link to the demo with the bug reproduction
-      description: Use StackBlitz, CodeSandbox, CodePen, JSFiddle, or any other online sandbox.
+      label: Demo
+      description: Add a link to a demo that will let us reproduce the bug. Use StackBlitz, CodeSandbox, CodePen, JSFiddle, or any other online sandbox.
     validations:
       required: true
   - type: input
     id: hf-version
     attributes:
-      label: Hyperformula version
+      label: HyperFormula version
+      description: Which version of HyperFormula are you using?
     validations:
       required: true
   - type: input
     id: framework
     attributes:
-      label: Framework version (e.g. React, Angular, Vue, etc)
+      label: Your framework
+      description: What framework are you using? For example, React 16.0, Angular v15 or Vue 3.
   - type: input
     id: environment
     attributes:
       label: Your environment
-      description: What browser and operating system are you using?
+      description: What's your browser and operating system? For example, Chrome 90 on macOS 11.3.
     validations:
       required: true
   - type: markdown
     attributes:
       value: |
-        Thank you for contributing by creating this issue! ❤️
+        Thank you for taking the time to report the issue! ❤️
