@@ -3,6 +3,7 @@
  * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
+export {AddressPlugin} from './AddressPlugin'
 export {ArrayPlugin} from './ArrayPlugin'
 export {AbsPlugin} from './AbsPlugin'
 export {BitShiftPlugin} from './BitShiftPlugin'

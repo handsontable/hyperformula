@@ -31,6 +31,14 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
         {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, passSubtype: true},
       ],
     },
+    'IFS': {
+      method: 'ifs',
+      parameters: [
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+      ],
+      repeatLastArgs: 2,
+    },
     'AND': {
       method: 'and',
       parameters: [
@@ -133,6 +141,23 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   /**
+   * Implementation for the IFS function. Returns the value that corresponds to the first true condition.
+   *
+   * @param ast
+   * @param state
+   */
+  public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
+      for (let idx = 0; idx < args.length; idx += 2) {
+        if (args[idx]) {
+          return args[idx+1]
+        }
+      }
+      return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
+    })
+  }
+
+  /**
    * Corresponds to AND(expression1, [expression2, ...])
    *
    * Returns true if all of the provided arguments are logically true, and false if any of it is logically false
@@ -142,7 +167,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public and(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AND'),
-      (...args) => args.filter((arg: boolean | undefined) => arg !== undefined).every((arg: boolean) => !!arg)
+      (...args: (boolean | undefined)[]) => args.filter(arg => arg !== undefined).every(arg => !!arg)
     )
   }
 
@@ -156,7 +181,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public or(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OR'),
-      (...args) => args.filter((arg: boolean | undefined) => arg !== undefined).some((arg: boolean) => arg)
+      (...args: (boolean | undefined)[]) => args.filter(arg => arg !== undefined).some(arg => arg)
     )
   }
 
@@ -165,9 +190,9 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public xor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XOR'), (...args) => {
+    return this.runFunction(ast.args, state, this.metadata('XOR'), (...args: (boolean | undefined)[]) => {
       let cnt = 0
-      args.filter((arg: boolean | undefined) => arg !== undefined).forEach((arg: boolean) => {
+      args.filter(arg => arg !== undefined).forEach(arg => {
         if (arg) {
           cnt++
         }

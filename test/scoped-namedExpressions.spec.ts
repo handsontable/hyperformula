@@ -5,11 +5,11 @@ describe('scoped named expressions', () => {
   it('should be removed when sheet is removed', () => {
     const engine = HyperFormula.buildFromSheets({'Sheet1': [[]], 'Sheet2': [[]]})
     engine.addNamedExpression('TRUE', true, 0)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(engine._namedExpressions.getAllNamedExpressionsNames()).toEqual(['TRUE'])
     engine.removeSheet(0)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     expect(engine._namedExpressions.getAllNamedExpressionsNames()).toEqual([])
   })

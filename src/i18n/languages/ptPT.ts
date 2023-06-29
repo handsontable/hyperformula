@@ -19,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    ADDRESS: 'ENDEREÇO',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
@@ -105,6 +106,7 @@ const dictionary: RawTranslationPackage = {
     IF: 'SE',
     IFERROR: 'SEERRO',
     IFNA: 'SENA',
+    IFS: 'SE.S',
     INDEX: 'ÍNDICE',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
