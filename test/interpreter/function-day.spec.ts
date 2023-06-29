@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {HyperFormula, ErrorType} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -225,5 +224,24 @@ describe('Function DAY', () => {
     expect(engine.getCellValue(adr('A10'))).toEqual(1)
     expect(engine.getCellValue(adr('A11'))).toEqual(1)
     expect(engine.getCellValue(adr('A12'))).toEqual(1)
+  })
+
+  it('returns 30 when its argument is a reference to an empty cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAY(B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(30)
+  })
+
+  it('returns 31 when its argument is a reference to an empty cell and the engine is configured to use 1899-12-31 as a null year', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAY(B1)'],
+    ], {
+      leapYear1900: true,
+      nullDate: { year: 1899, month: 12, day: 31 },
+    })
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(31)
   })
 })
