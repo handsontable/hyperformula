@@ -12,44 +12,42 @@ const TIME_SEPARATOR = ':'
 
 export function defaultParseToDateTime(dateTimeString: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
   dateTimeString = dateTimeString.replace(WHITESPACE_REGEXP, ' ').trim().toLowerCase()
-
-  const ampmToken: Maybe<string> = extractAmpmToken(dateTimeString)
-  if (ampmToken !== undefined) {
-    dateTimeString = dateTimeString.substring(0, dateTimeString.length - ampmToken.length).trim()
-    dateTimeString = dateTimeString + TIME_SEPARATOR + ampmToken
+  let ampmtoken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
+  if (ampmtoken === 'am' || ampmtoken === 'pm') {
+    dateTimeString = dateTimeString.substring(0, dateTimeString.length - 2).trim()
+  } else {
+    ampmtoken = dateTimeString.substring(dateTimeString.length - 1)
+    if (ampmtoken === 'a' || ampmtoken === 'p') {
+      dateTimeString = dateTimeString.substring(0, dateTimeString.length - 1).trim()
+    } else {
+      ampmtoken = undefined
+    }
   }
-
   const dateItems = dateTimeString.split(DATE_SEPARATOR_REGEXP)
-  if (dateItems.length >= 2 && doesLookLikeATimeString(dateItems[dateItems.length - 2])) {
+  if (dateItems.length >= 2 && dateItems[dateItems.length - 2].includes(TIME_SEPARATOR)) {
     dateItems[dateItems.length - 2] = dateItems[dateItems.length - 2] + '.' + dateItems[dateItems.length - 1]
     dateItems.pop()
   }
-
-  let parsedTime: Maybe<SimpleTime> = undefined
-  if (doesLookLikeATimeString(dateItems[dateItems.length - 1])) {
-    const timeItems = dateItems[dateItems.length - 1].split(TIME_SEPARATOR)
-    dateItems.pop()
-
-    parsedTime = defaultParseToTime(timeItems, timeFormat)
-    if (parsedTime === undefined) {
-      return undefined
-    }
+  const timeItems = dateItems[dateItems.length - 1].split(TIME_SEPARATOR)
+  if (ampmtoken !== undefined) {
+    timeItems.push(ampmtoken)
   }
 
-  let parsedDate: Maybe<SimpleDate> = undefined
-  if (dateItems.length > 0) {
-    parsedDate = defaultParseToDate(dateItems, dateFormat)
-
-    if (parsedDate === undefined) {
-      return undefined
-    }
+  if (dateItems.length === 1) {
+    return defaultParseToTime(timeItems, timeFormat)
   }
-
-  if (parsedDate && parsedTime) {
+  if (timeItems.length === 1) {
+    return defaultParseToDate(dateItems, dateFormat)
+  }
+  const parsedDate = defaultParseToDate(dateItems.slice(0, dateItems.length - 1), dateFormat)
+  const parsedTime = defaultParseToTime(timeItems, timeFormat)
+  if (parsedDate === undefined) {
+    return undefined
+  } else if (parsedTime === undefined) {
+    return undefined
+  } else {
     return {...parsedDate, ...parsedTime}
   }
-
-  return parsedDate === undefined ? parsedTime : parsedDate
 }
 
 export const secondsExtendedRegexp = /^ss(\.(s+|0+))?$/
@@ -167,22 +165,4 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
   }
   const day = Number(dayString)
   return {year, month, day}
-}
-
-function doesLookLikeATimeString(s: string): boolean {
-  return s.includes(TIME_SEPARATOR)
-}
-
-function extractAmpmToken(s: string): Maybe<string> {
-  let ampmtoken: Maybe<string> = s.substring(s.length - 2)
-  if (ampmtoken === 'am' || ampmtoken === 'pm') {
-    return ampmtoken
-  }
-
-  ampmtoken = s.substring(s.length - 1)
-  if (ampmtoken === 'a' || ampmtoken === 'p') {
-    return ampmtoken
-  }
-
-  return undefined
 }
