@@ -1,4 +1,5 @@
 import {Graph} from '../src/DependencyGraph'
+import {HyperFormula} from '../src'
 
 const identifiableString = (id: number, str: string) => ({id, str})
 
@@ -421,5 +422,14 @@ describe('Graph cruds', () => {
 
     graph.removeIncomingEdges(node0)
     expect(graph.edgesCount()).toEqual(0)
+  })
+
+  it('tmp', () => {
+    const hf = HyperFormula.buildFromArray([], {
+      licenseKey: 'gpl-v3',
+    })
+
+    const data = Array(5).fill(0).map(() => Array(1).fill(0).map(() => 'A500000'))
+    hf.setSheetContent(0, data)
   })
 })

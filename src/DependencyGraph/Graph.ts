@@ -200,7 +200,7 @@ export class Graph<T> {
     const entranceTime: Map<T, number> = new Map()
     const low: Map<T, number> = new Map()
     const parent: Map<T, T> = new Map()
-    const inSCC: Set<T> = new Set()
+    const inSCC: Set<T> = new Set() // do we need these data structures? logarithmic factor?
 
     // node status life cycle:
     // undefined -> ON_STACK -> PROCESSED -> POPPED
@@ -242,7 +242,7 @@ export class Graph<T> {
             let uLow: number
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             uLow = entranceTime.get(u)!
-            this.adjacentNodes(u).forEach((t: T) => {
+            this.adjacentNodes(u).forEach((t: T) => { // Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[parent]
               if (!inSCC.has(t)) {
                 if (parent.get(t) === u) {
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
