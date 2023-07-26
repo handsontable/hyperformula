@@ -13,6 +13,11 @@ export interface TopSortResult<T> {
   cycled: T[],
 }
 
+// interface GraphNode<T> {
+//   id: number,
+//   data: T,
+// }
+
 enum NodeVisitStatus {
   ON_STACK,
   PROCESSED,
@@ -28,9 +33,10 @@ enum NodeVisitStatus {
  * - this.edges(node) is subset of this.nodes (i.e. it does not contain nodes not present in graph) -- this invariant DOES NOT HOLD right now
  */
 export class Graph<T> {
-  /** Set with nodes in graph. */
-  public nodes: Set<T> = new Set()
+  // private _nodes: Set<GraphNode<T>> = new Set()
+  // private nextId = 0
 
+  public nodes: Set<T> = new Set()
   public specialNodes: Set<T> = new Set()
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
@@ -175,7 +181,7 @@ export class Graph<T> {
    * @param toNode - node to which edge is incoming
    */
   public existsEdge(fromNode: T, toNode: T): boolean {
-    return this.edges.get(fromNode)?.has(toNode) ?? false
+    return this.adjacentNodes(fromNode)?.has(toNode) ?? false
   }
 
   /*
@@ -288,15 +294,16 @@ export class Graph<T> {
     const cycled: T[] = []
     order.reverse()
     order.forEach((t: T) => {
+      const adjacentNodes = this.adjacentNodes(t)
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
+      if (sccNonSingletons.has(t) || adjacentNodes.has(t)) {
         cycled.push(t)
         onCycle(t)
-        this.adjacentNodes(t).forEach((s: T) => shouldBeUpdatedMapping.add(s))
+        adjacentNodes.forEach((s: T) => shouldBeUpdatedMapping.add(s))
       } else {
         sorted.push(t)
         if (shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
-          this.adjacentNodes(t).forEach((s: T) => shouldBeUpdatedMapping.add(s))
+          adjacentNodes.forEach((s: T) => shouldBeUpdatedMapping.add(s))
         }
       }
     })
