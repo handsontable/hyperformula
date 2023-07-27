@@ -41,10 +41,11 @@ import {AddressMapping} from './AddressMapping/AddressMapping'
 import {ArrayMapping} from './ArrayMapping'
 import {collectAddressesDependentToRange} from './collectAddressesDependentToRange'
 import {FormulaVertex} from './FormulaCellVertex'
-import {DependencyQuery, Graph, TopSortResult} from './Graph'
+import {DependencyQuery, Graph} from './Graph'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
+import {TopSortResult} from './TopSort'
 
 export class DependencyGraph {
   public readonly graph: Graph<Vertex>
