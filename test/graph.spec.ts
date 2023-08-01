@@ -429,7 +429,7 @@ describe('Graph cruds', () => {
       licenseKey: 'gpl-v3',
     })
 
-    const data = Array(5).fill(0).map(() => Array(1).fill(0).map(() => 'A500000'))
+    const data = Array(5).fill(0).map(() => Array(5).fill(0).map(() => 'A500000'))
     hf.setSheetContent(0, data)
   })
 })

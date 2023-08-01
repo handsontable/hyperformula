@@ -18,27 +18,54 @@ enum NodeVisitStatus {
  * An algorithm class. Provides topological sorting of a graph.
  */
 export class TopSort<T> {
-  private entranceTime: Map<T, number> = new Map()
-  private low: Map<T, number> = new Map()
-  private parent: Map<T, T> = new Map()
-  private inSCC: Set<T> = new Set() // do we need these data structures? logarithmic factor?
+  private nodes: T[] = []
+  private edges: number[][] = []
+  private mapping: Map<T, number> = new Map()
+
+  private entranceTime: number[] = []
+  private low: number[] = []
+  private parent: number[] = []
+  private inSCC: boolean[] = []
 
   // node status life cycle:
   // undefined -> ON_STACK -> PROCESSED -> POPPED
-  private nodeStatus: Map<T, NodeVisitStatus> = new Map()
-  private order: T[] = []
+  private nodeStatus: NodeVisitStatus[] = []
+  private order: number[] = []
 
   private time: number = 0
 
-  private sccNonSingletons: Set<T> = new Set()
+  private sccNonSingletons: boolean[] = []
 
   constructor(
-    private edges: Map<T, Set<T>> = new Map()
-  ) {}
+    edges: Map<T, Set<T>> = new Map()
+  ) {
+    edges.forEach((_, node: T) => {
+      this.nodes.push(node)
+      this.mapping.set(node, this.nodes.length - 1)
+    })
 
-  public adjacentNodes(node: T): Set<T> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.edges.get(node)!
+    edges.forEach((neighbours: Set<T>, node: T) => {
+      const nodeId = this.mapping.get(node)
+
+      if (nodeId === undefined) {
+        throw Error(`Unknown node ${nodeId}`)
+      }
+
+      this.edges[nodeId] = []
+      neighbours.forEach((neighbour: T) => {
+        const neighbourId = this.mapping.get(neighbour)
+
+        if (neighbourId === undefined) {
+          throw Error(`Unknown neighbour ${neighbour}`)
+        }
+
+        this.edges[nodeId].push(neighbourId)
+      })
+    })
+  }
+
+  public adjacentNodes(nodeId: number): number[] {
+    return this.edges[nodeId]
   }
 
   /**
@@ -50,24 +77,24 @@ export class TopSort<T> {
    * @param onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
-    modifiedNodes.reverse()
-    modifiedNodes.forEach((v: T) => this.runDFS(v))
-    return this.postprocess(modifiedNodes, onCycle, operatingFunction)
+    const modifiedNodeIds = modifiedNodes.map(node => this.mapping.get(node)!).reverse()
+    modifiedNodeIds.forEach((id: number) => this.runDFS(id))
+    return this.postprocess(modifiedNodeIds, onCycle, operatingFunction)
   }
 
-  private runDFS(v: T) {
-    if (this.nodeStatus.get(v) !== undefined) {
+  private runDFS(v: number) {
+    if (this.nodeStatus[v] !== undefined) {
       return
     }
 
-    const DFSstack: T[] = [v]
-    const SCCstack: T[] = []
+    const DFSstack: number[] = [v]
+    const SCCstack: number[] = []
 
-    this.nodeStatus.set(v, NodeVisitStatus.ON_STACK)
+    this.nodeStatus[v] = NodeVisitStatus.ON_STACK
     while (DFSstack.length > 0) {
       const u = DFSstack[DFSstack.length - 1]
 
-      switch (this.nodeStatus.get(u)!) {
+      switch (this.nodeStatus[u]) {
         case NodeVisitStatus.ON_STACK: {
           this.handleOnStack(u, SCCstack, DFSstack)
           break
@@ -84,76 +111,85 @@ export class TopSort<T> {
     }
   }
 
-  private handleOnStack(u: T, SCCstack: T[], DFSstack: T[]) {
-    this.entranceTime.set(u, this.time)
-    this.low.set(u, this.time)
+  private handleOnStack(u: number, SCCstack: number[], DFSstack: number[]) {
+    this.entranceTime[u] = this.time
+    this.low[u] = this.time
     SCCstack.push(u)
     this.time++
-    this.adjacentNodes(u).forEach((t: T) => {
-      if (this.entranceTime.get(t) === undefined) {
+    this.adjacentNodes(u).forEach((t: number) => {
+      if (this.entranceTime[t] === undefined) {
         DFSstack.push(t)
-        this.parent.set(t, u)
-        this.nodeStatus.set(t, NodeVisitStatus.ON_STACK)
+        this.parent[t] = u
+        this.nodeStatus[t] = NodeVisitStatus.ON_STACK
       }
     })
-    this.nodeStatus.set(u, NodeVisitStatus.PROCESSED)
+    this.nodeStatus[u] = NodeVisitStatus.PROCESSED
   }
 
-  private handleProcessed(u: T, SCCstack: T[], DFSstack: T[]) {
+  private handleProcessed(u: number, SCCstack: number[], DFSstack: number[]) {
     let uLow: number
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    uLow = this.entranceTime.get(u)!
-    this.adjacentNodes(u).forEach((t: T) => { // Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[this.parent]
-      if (!this.inSCC.has(t)) {
-        if (this.parent.get(t) === u) {
+    uLow = this.entranceTime[u]
+    this.adjacentNodes(u).forEach((t: number) => { // Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[this.parent]
+      if (!this.inSCC[t]) {
+        if (this.parent[t] === u) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          uLow = Math.min(uLow, this.low.get(t)!)
+          uLow = Math.min(uLow, this.low[t])
         } else {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          uLow = Math.min(uLow, this.entranceTime.get(t)!)
+          uLow = Math.min(uLow, this.entranceTime[t])
         }
       }
     })
-    this.low.set(u, uLow)
-    if (uLow === this.entranceTime.get(u)) {
-      const currentSCC: T[] = []
+    this.low[u] = uLow
+    if (uLow === this.entranceTime[u]) {
+      const currentSCC: number[] = []
       do {
         currentSCC.push(SCCstack[SCCstack.length - 1])
         SCCstack.pop()
       } while (currentSCC[currentSCC.length - 1] !== u)
       currentSCC.forEach((t) => {
-        this.inSCC.add(t)
+        this.inSCC[t] = true
       })
       this.order.push(...currentSCC)
       if (currentSCC.length > 1) {
         currentSCC.forEach((t) => {
-          this.sccNonSingletons.add(t)
+          this.sccNonSingletons[t] = true
         })
       }
     }
     DFSstack.pop()
-    this.nodeStatus.set(u, NodeVisitStatus.POPPED)
+    this.nodeStatus[u] = NodeVisitStatus.POPPED
   }
 
-  private postprocess(modifiedNodes: T[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
-    const shouldBeUpdatedMapping = new Set(modifiedNodes)
+  private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
+    const shouldBeUpdatedMapping: boolean[] = []
+    modifiedNodeIds.forEach((t: number) => {
+      shouldBeUpdatedMapping[t] = true
+    })
+
     const sorted: T[] = []
     const cycled: T[] = []
     this.order.reverse()
-    this.order.forEach((t: T) => {
+    this.order.forEach((t: number) => {
       const adjacentNodes = this.adjacentNodes(t)
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (this.sccNonSingletons.has(t) || adjacentNodes.has(t)) {
-        cycled.push(t)
-        onCycle(t)
-        adjacentNodes.forEach((s: T) => shouldBeUpdatedMapping.add(s))
+      if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) { // TODO: to jest potencjalnie czas kwadratowy
+        cycled.push(this.nodes[t])
+        onCycle(this.nodes[t])
+        adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
       } else {
-        sorted.push(t)
-        if (shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
-          adjacentNodes.forEach((s: T) => shouldBeUpdatedMapping.add(s))
+        sorted.push(this.nodes[t])
+        if (shouldBeUpdatedMapping[t] && operatingFunction(this.nodes[t])) {
+          adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
         }
       }
     })
     return {sorted, cycled}
   }
 }
+
+
+// TODO:
+// 1. experiment with ids -> 15% speedup
+// 2. focus on parsing date-time
