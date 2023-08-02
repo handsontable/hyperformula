@@ -205,4 +205,5 @@ describe('Evaluation suspension', () => {
     expect(changes).toContainEqual({address: adr('A3'), value: 3})
     expect(changes).toContainEqual({address: adr('B1'), value: 4})
     expect(changes).toContainEqual({address: adr('C1'), value: 5})
+  })
 })
