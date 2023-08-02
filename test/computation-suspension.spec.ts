@@ -194,9 +194,9 @@ describe('Evaluation suspension', () => {
     const engine = HyperFormula.buildFromArray([[null, null, null]], { useArrayArithmetic: true })
     engine.suspendEvaluation()
 
-    engine.setCellContents(adr('A1'), "={1;2;3}")
-    engine.setCellContents(adr('B1'), "4")
-    engine.setCellContents(adr('C1'), "5")
+    engine.setCellContents(adr('A1'), '={1;2;3}')
+    engine.setCellContents(adr('B1'), '4')
+    engine.setCellContents(adr('C1'), '5')
 
     const changes = engine.resumeEvaluation()
     expect(changes.length).toEqual(5)
