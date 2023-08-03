@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed a bug where neighboring exported changes of an array formula were missing.
+  [#1291](https://github.com/handsontable/hyperformula/issues/1291)
+
 ## [2.5.0] - 2023-05-29
 
 ### Added
