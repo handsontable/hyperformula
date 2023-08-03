@@ -260,7 +260,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     if (ast.args.length !== 1) {
       return ArraySize.error()
     }
-    const metadata = this.metadata('MMULT')
+    const metadata = this.metadata('TRANSPOSE')
     const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
 
     const [size] = subChecks
