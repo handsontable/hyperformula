@@ -8,6 +8,11 @@ and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Exported the `EmptyValue` symbol as a public API. This allows custom functions to filter for empty values.
+  [#1232](https://github.com/handsontable/hyperformula/issues/1265)
+
 ### Fixed
 
 - Fixed a bug where neighboring exported changes of an array formula were missing.
