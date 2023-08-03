@@ -189,4 +189,21 @@ describe('Evaluation suspension', () => {
 
     expect(engine.getCellFormula(adr('C1'))).toEqual('=A2+42')
   })
+
+  it('#1291 - neighboring cell changes of an array formula should be emitted', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null]], { useArrayArithmetic: true })
+    engine.suspendEvaluation()
+
+    engine.setCellContents(adr('A1'), '={1;2;3}')
+    engine.setCellContents(adr('B1'), '4')
+    engine.setCellContents(adr('C1'), '5')
+
+    const changes = engine.resumeEvaluation()
+    expect(changes.length).toEqual(5)
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), 1))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 2))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('A3'), 3))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B1'), 4))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('C1'), 5))
+  })
 })
