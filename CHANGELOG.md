@@ -10,7 +10,7 @@ and this project adheres to
 
 ### Added
 
-- Exported the `EmptyValue` symbol as a public API. This allows custom functions to filter for empty values.
+- Exported the `EmptyValue` symbol as a public API. This allows custom functions to handle empty cell values.
   [#1232](https://github.com/handsontable/hyperformula/issues/1265)
 
 ### Fixed
