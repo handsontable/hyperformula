@@ -13,7 +13,20 @@ const WHITESPACE_REGEXP = new RegExp('\\s+')
 const DATE_SEPARATOR_REGEXP = new RegExp('[ /.-]')
 const TIME_SEPARATOR = ':'
 const SECONDS_PRECISION = 1000
+const memoizedParseTimeFormat = memoize(parseTimeFormat)
+const memoizedParseDateFormat = memoize(parseDateFormat)
 
+/**
+ * Parses a DateTime value from a string if the string matches the given date format and time format.
+ *
+ * Idea for more readable implementation:
+ *   - divide string into parts by a regexp [date_regexp]? [time_regexp]? [ampm_regexp]?
+ *   - start by finding the time part, because it is unambiguous '([0-9]+:[0-9:.]+ ?[ap]?m?)$', before it is the date part
+ *   - OR split by spaces - last segment is ampm token, second to last is time (with or without ampm), rest is date
+ * If applied:
+ *   - date parsing might work differently after these changes but still according to the docs
+ *   - make sure to test edge cases like timeFormats: ['hh', 'ss.ss'] etc, string: '01-01-2019 AM', 'PM'
+ */
 export function defaultParseToDateTime(text: string, dateFormat: Maybe<string>, timeFormat: Maybe<string>): Maybe<DateTime> {
   if (dateFormat === undefined && timeFormat === undefined) {
     return undefined
@@ -21,9 +34,9 @@ export function defaultParseToDateTime(text: string, dateFormat: Maybe<string>, 
 
   let dateTimeString = text.replace(WHITESPACE_REGEXP, ' ').trim().toLowerCase()
 
-  // if (!doesItLookLikeADateTimeQuickCheck(dateTimeString)) {
-  //   return undefined
-  // }
+  if (!doesItLookLikeADateTimeQuickCheck(dateTimeString)) {
+    return undefined
+  }
 
   let ampmToken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
   if (ampmToken === 'am' || ampmToken === 'pm') {
@@ -63,6 +76,9 @@ export function defaultParseToDateTime(text: string, dateFormat: Maybe<string>, 
   }
 }
 
+/**
+ * Parses a time value from a string if the string matches the given time format.
+ */
 function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): Maybe<SimpleTime> {
   if (timeFormat === undefined) {
     return undefined
@@ -118,18 +134,9 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
   return { hours, minutes, seconds }
 }
 
-function parseDateFormat(dateFormat: string) {
-  const items = dateFormat.toLowerCase().trim().split(DATE_SEPARATOR_REGEXP)
-
-  return {
-    itemsCount: items.length,
-    dayItem: items.indexOf('dd'),
-    monthItem: items.indexOf('mm'),
-    shortYearItem: items.indexOf('yy'),
-    longYearItem: items.indexOf('yyyy'),
-  }
-}
-
+/**
+ * Parses a date value from a string if the string matches the given date format.
+ */
 function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): Maybe<SimpleDate> {
   if (dateFormat === undefined) {
     return undefined
@@ -187,10 +194,9 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
   return {year, month, day}
 }
 
-function doesItLookLikeADateTimeQuickCheck(text: string): boolean {
-  return QUICK_CHECK_REGEXP.test(text)
-}
-
+/**
+ * Parses a time format string into a format object.
+ */
 function parseTimeFormat(timeFormat: string): { itemsCount: number, hourItem: number, minuteItem: number, secondItem: number } {
   const formatLowercase = timeFormat.toLowerCase().trim()
   const formatWithoutAmPmItem = formatLowercase.endsWith('am/pm')
@@ -208,9 +214,33 @@ function parseTimeFormat(timeFormat: string): { itemsCount: number, hourItem: nu
   }
 }
 
-const memoizedParseTimeFormat = memoize(parseTimeFormat)
-const memoizedParseDateFormat = memoize(parseDateFormat)
+/**
+ * Parses a date format string into a format object.
+ */
+function parseDateFormat(dateFormat: string): { itemsCount: number, dayItem: number, monthItem: number, shortYearItem: number, longYearItem: number } {
+  const items = dateFormat.toLowerCase().trim().split(DATE_SEPARATOR_REGEXP)
 
+  return {
+    itemsCount: items.length,
+    dayItem: items.indexOf('dd'),
+    monthItem: items.indexOf('mm'),
+    shortYearItem: items.indexOf('yy'),
+    longYearItem: items.indexOf('yyyy'),
+  }
+}
+
+/**
+ * If this function returns false, the string is not parsable as a date time. Otherwise, it might be.
+ * This is a quick check that is used to avoid running the more expensive parsing operations.
+ */
+function doesItLookLikeADateTimeQuickCheck(text: string): boolean {
+  return QUICK_CHECK_REGEXP.test(text)
+}
+
+
+/**
+ * Function memoization for improved performance.
+ */
 function memoize<T>(fn: (arg: string) => T) {
   const memoizedResults: {[key: string]: T} = {}
 
@@ -225,12 +255,3 @@ function memoize<T>(fn: (arg: string) => T) {
     return result
   }
 }
-
-// Ideas:
-// - quick check -> 10% speedup
-// - parse formats only once
-// - divide string into parts by a regexp [date_regexp]? [time_regexp]? [ampm_regexp]?
-//   - start by finding the time part, because it is unambiguous '([0-9]+:[0-9:.]+ ?[ap]?m?)$', before it is the date part
-//   - OR split by spaces - last segment is ampm token, second to last is time (with or without ampm), rest is date
-// - date parsing might work differently after these changes but still according to the docs
-// - test edge cases like timeFormats: ['hh', 'ss.ss'] etc, string: '01-01-2019 AM', 'PM'
