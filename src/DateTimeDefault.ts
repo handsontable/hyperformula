@@ -6,7 +6,7 @@
 import {DateTime, SimpleDate, SimpleTime} from './DateTimeHelper'
 import {Maybe} from './Maybe'
 
-export const TIME_FORMAT_SECONDS_ITEM_REGEXP = new RegExp('^ss(\.(s+|0+))?$')
+export const TIME_FORMAT_SECONDS_ITEM_REGEXP = new RegExp('^ss(\\.(s+|0+))?$')
 
 const QUICK_CHECK_REGEXP = new RegExp('^[0-9/.\\-: ]+[ap]?m?$')
 const WHITESPACE_REGEXP = new RegExp('\\s+')
