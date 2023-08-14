@@ -10,13 +10,15 @@ and this project adheres to
 
 ### Added
 
-- Exported the `EmptyValue` symbol as a public API. This allows custom functions to handle empty cell values.
-  [#1232](https://github.com/handsontable/hyperformula/issues/1265)
+- Exported the `EmptyValue` symbol as a public API. This allows custom functions to handle empty cell values. [#1232](https://github.com/handsontable/hyperformula/issues/1265)
+
+### Changed
+
+- Improve efficiency of the default date/time parsing methods. [#876](https://github.com/handsontable/hyperformula/issues/876)
 
 ### Fixed
 
-- Fixed a bug where neighboring exported changes of an array formula were missing.
-  [#1291](https://github.com/handsontable/hyperformula/issues/1291)
+- Fixed a bug where neighboring exported changes of an array formula were missing. [#1291](https://github.com/handsontable/hyperformula/issues/1291)
 
 ## [2.5.0] - 2023-05-29
 
