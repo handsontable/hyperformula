@@ -6,21 +6,28 @@
 import {DateTime, SimpleDate, SimpleTime} from './DateTimeHelper'
 import {Maybe} from './Maybe'
 
+//const QUICK_CHECK_REGEXP = new RegExp('^[0-9/.\\-:\\s]+[ap]?m?\\s*$', '')
+const QUICK_CHECK_REGEXP = new RegExp('^[0-9/.\\-: ]+[ap]?m?$', '')
 const WHITESPACE_REGEXP = new RegExp('\\s+')
 const DATE_SEPARATOR_REGEXP = new RegExp('[ /.-]')
 const TIME_SEPARATOR = ':'
 
-export function defaultParseToDateTime(dateTimeString: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
-  dateTimeString = dateTimeString.replace(WHITESPACE_REGEXP, ' ').trim().toLowerCase()
-  let ampmtoken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
-  if (ampmtoken === 'am' || ampmtoken === 'pm') {
+export function defaultParseToDateTime(text: string, dateFormat?: string, timeFormat?: string): Maybe<DateTime> {
+  let dateTimeString = text.replace(WHITESPACE_REGEXP, ' ').trim().toLowerCase()
+
+  if (!doesItLookLikeADateTimeQuickCheck(dateTimeString)) {
+    return undefined
+  }
+
+  let ampmToken: Maybe<string> = dateTimeString.substring(dateTimeString.length - 2)
+  if (ampmToken === 'am' || ampmToken === 'pm') {
     dateTimeString = dateTimeString.substring(0, dateTimeString.length - 2).trim()
   } else {
-    ampmtoken = dateTimeString.substring(dateTimeString.length - 1)
-    if (ampmtoken === 'a' || ampmtoken === 'p') {
+    ampmToken = dateTimeString.substring(dateTimeString.length - 1)
+    if (ampmToken === 'a' || ampmToken === 'p') {
       dateTimeString = dateTimeString.substring(0, dateTimeString.length - 1).trim()
     } else {
-      ampmtoken = undefined
+      ampmToken = undefined
     }
   }
   const dateItems = dateTimeString.split(DATE_SEPARATOR_REGEXP)
@@ -29,8 +36,8 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat?: stri
     dateItems.pop()
   }
   const timeItems = dateItems[dateItems.length - 1].split(TIME_SEPARATOR)
-  if (ampmtoken !== undefined) {
-    timeItems.push(ampmtoken)
+  if (ampmToken !== undefined) {
+    timeItems.push(ampmToken)
   }
 
   if (dateItems.length === 1) {
@@ -48,6 +55,10 @@ export function defaultParseToDateTime(dateTimeString: string, dateFormat?: stri
   } else {
     return {...parsedDate, ...parsedTime}
   }
+}
+
+function doesItLookLikeADateTimeQuickCheck(text: string): boolean {
+  return QUICK_CHECK_REGEXP.test(text)
 }
 
 export const secondsExtendedRegexp = /^ss(\.(s+|0+))?$/
@@ -166,3 +177,12 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
   const day = Number(dayString)
   return {year, month, day}
 }
+
+// Ideas:
+// - quick check -> 10% speedup
+// - parse formats only once
+// - divide string into parts by a regexp [date_regexp]? [time_regexp]? [ampm_regexp]?
+//   - start by finding the time part, because it is unambiguous '([0-9]+:[0-9:.]+ ?[ap]?m?)$', before it is the date part
+//   - OR split by spaces - last segment is ampm token, second to last is time (with or without ampm), rest is date
+// - date parsing might work differently after these changes but still according to the docs
+// - test edge cases like timeFormats: ['hh', 'ss.ss'] etc, string: '01-01-2019 AM', 'PM'
