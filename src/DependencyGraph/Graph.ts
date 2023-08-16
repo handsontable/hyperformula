@@ -6,6 +6,7 @@
 import {SimpleCellAddress} from '../Cell'
 import {SimpleCellRange} from '../AbsoluteCellRange'
 import {TopSort, TopSortResult} from './TopSort'
+import {ArrayVertex} from './FormulaCellVertex'
 
 export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCellRange), T][]
 
@@ -18,7 +19,9 @@ export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCell
  * - this.edges(node) is subset of this.nodes (i.e. it does not contain nodes not present in graph) -- this invariant DOES NOT HOLD right now
  */
 export class Graph<T> {
-  public nodes: Set<T> = new Set()
+  private nodes: Set<T> = new Set()
+
+  // also convert?
   public specialNodes: Set<T> = new Set()
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
@@ -30,6 +33,13 @@ export class Graph<T> {
   constructor(
     private readonly dependencyQuery: DependencyQuery<T>
   ) {
+  }
+
+  /**
+   * Iterate over all nodes the in graph
+   */
+  public getNodes(): IterableIterator<T> {
+    return [ ...this.nodes ].values()
   }
 
   /**

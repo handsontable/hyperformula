@@ -159,7 +159,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [[null]])
     expect(engine.getCellValue(adr('B1'))).toBe(null)
-    expect(engine.graph.nodes).not.toContain(b1)
+    expect([ ...engine.graph.getNodes() ]).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
 

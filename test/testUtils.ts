@@ -71,7 +71,7 @@ export const verifyRangesInSheet = (engine: HyperFormula, sheet: number, ranges:
   const rangeVerticesInMapping = Array.from(engine.rangeMapping.rangesInSheet(sheet))
     .map((vertex) => rangeAddr(vertex.range))
 
-  const rangeVerticesInGraph = Array.from(engine.graph.nodes.values()).filter(vertex => vertex instanceof RangeVertex)
+  const rangeVerticesInGraph = [ ...engine.graph.getNodes()].filter(vertex => vertex instanceof RangeVertex)
     .map(vertex => rangeAddr((vertex as RangeVertex).range))
 
   expectNoDuplicates(rangeVerticesInGraph)

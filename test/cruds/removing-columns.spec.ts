@@ -657,18 +657,18 @@ describe('Removing columns - graph', function() {
       ['1', '2', '3', '4'],
       ['1', '2', '3', '4'],
     ])
-    expect(engine.graph.nodes.size).toBe(8)
+    expect(engine.graph.nodesCount()).toBe(8)
     engine.removeColumns(0, [0, 2])
-    expect(engine.graph.nodes.size).toBe(4) // left two vertices in first column, two in last
+    expect(engine.graph.nodesCount()).toBe(4) // left two vertices in first column, two in last
   })
 
   it('works if there are empty cells removed', function() {
     const engine = HyperFormula.buildFromArray([
       ['1', null, '3'],
     ])
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.nodesCount()).toBe(2)
     engine.removeColumns(0, [1, 1])
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.nodesCount()).toBe(2)
   })
 })
 

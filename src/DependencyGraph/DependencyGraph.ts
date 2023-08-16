@@ -528,7 +528,7 @@ export class DependencyGraph {
   }
 
   public* arrayFormulaNodes(): IterableIterator<ArrayVertex> {
-    for (const vertex of this.graph.nodes) {
+    for (const vertex of this.graph.getNodes()) {
       if (vertex instanceof ArrayVertex) {
         yield vertex
       }
@@ -612,7 +612,7 @@ export class DependencyGraph {
   }
 
   public forceApplyPostponedTransformations() {
-    for (const vertex of this.graph.nodes.values()) {
+    for (const vertex of this.graph.getNodes()) {
       if (vertex instanceof FormulaCellVertex) {
         vertex.ensureRecentData(this.lazilyTransformingAstService)
       }
