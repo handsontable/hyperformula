@@ -76,12 +76,6 @@ export class Graph<T> {
     this.edges.get(fromNode)?.delete(toNode)
   }
 
-  public removeIncomingEdges(toNode: T) {
-    this.edges.forEach((nodeEdges) => {
-      nodeEdges.delete(toNode)
-    })
-  }
-
   /**
    * Returns nodes adjacent to given node
    *
@@ -188,7 +182,7 @@ export class Graph<T> {
     return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodes, operatingFunction, onCycle)
   }
 
-  public getDependencies(vertex: T): T[] {
+  public reversedAdjacentNodes(vertex: T): T[] {
     const result: T[] = []
     this.edges.forEach((adjacentNodes, sourceNode) => {
       if (adjacentNodes.has(vertex)) {
