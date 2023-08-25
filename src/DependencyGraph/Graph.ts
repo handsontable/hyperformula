@@ -19,7 +19,11 @@ export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCell
  * - this.edges(node) is subset of this.nodes (i.e. it does not contain nodes not present in graph) -- this invariant DOES NOT HOLD right now
  */
 export class Graph<T> {
-  private nodes: Set<T> = new Set()
+  private nodesSparseArray: T[] = []
+  private edgesSparseArray: number[][] = [] // may contain removed nodes // try using Set<T>[]
+  private nodesIds: Map<T, number> = new Map()
+  private _nodesCount: number = 0
+  private nextId: number = 0
 
   // also convert?
   public specialNodes: Set<T> = new Set()
@@ -27,19 +31,103 @@ export class Graph<T> {
   public specialNodesRecentlyChanged: Set<T> = new Set()
   public infiniteRanges: Set<T> = new Set()
 
-  /** Nodes adjacency mapping. */
-  private edges: Map<T, Set<T>> = new Map()
-
   constructor(
     private readonly dependencyQuery: DependencyQuery<T>
-  ) {
+  ) {}
+
+  /**
+   * Returns number of nodes in graph
+   *
+   * @internal
+   */
+  public nodesCount(): number {
+    return this._nodesCount
   }
 
   /**
    * Iterate over all nodes the in graph
    */
-  public getNodes(): IterableIterator<T> {
-    return [ ...this.nodes ].values()
+  public getNodes(): T[] {
+    return this.nodesSparseArray.filter((node: T) => node !== undefined)
+  }
+
+  /**
+   * Checks whether a node is present in graph
+   *
+   * @param node - node to check
+   */
+  public hasNode(node: T): boolean {
+    return this.nodesIds.has(node)
+  }
+
+  /**
+   * Returns number of edges in graph
+   *
+   * @internal
+   */
+  public edgesCount(): number {
+    return this.nodesSparseArray.reduce((acc, node, id) =>
+        node ? acc + this.cleanupAdjacentNodeIds(id).length : acc
+      , 0)
+  }
+
+  /**
+   * Checks whether exists edge between nodes. If one or both of nodes are not present in graph, returns false.
+   *
+   * @param fromNode - node from which edge is outcoming
+   * @param toNode - node to which edge is incoming
+   */
+  public existsEdge(fromNode: T, toNode: T): boolean {
+    const fromId = this.nodesIds.get(fromNode)
+    const toId = this.nodesIds.get(toNode)
+
+    if (fromId === undefined || toId === undefined) {
+      return false
+    }
+
+    return this.edgesSparseArray[fromId].includes(toId)
+  }
+
+  /**
+   * Returns nodes adjacent to given node. May contain removed nodes.
+   *
+   * @param node - node to which adjacent nodes we want to retrieve
+   */
+  public adjacentNodes(node: T): Set<T> { // TODO: return array
+    const id = this.nodesIds.get(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
+    }
+
+    return new Set(this.edgesSparseArray[id].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]))
+  }
+
+  /**
+   * @internal
+   */
+  public reversedAdjacentNodes(node: T): T[] {
+    const id = this.nodesIds.get(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
+    }
+
+    return this.nodesSparseArray.reduce((acc: number[], sourceNode, sourceId) =>
+      sourceNode && this.edgesSparseArray[sourceId].includes(id)
+      ? [ ...acc, sourceId ]
+      : acc
+    , []).map(resultId => this.nodesSparseArray[resultId])
+  }
+
+  public adjacentNodesCount(node: T): number {
+    const id = this.nodesIds.get(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
+    }
+
+    return this.cleanupAdjacentNodeIds(id).length
   }
 
   /**
@@ -47,11 +135,16 @@ export class Graph<T> {
    *
    * @param node - a node to be added
    */
-  public addNode(node: T) {
-    this.nodes.add(node)
-    if (!this.edges.has(node)) {
-      this.edges.set(node, new Set())
+  public addNode(node: T): void {
+    if (this.hasNode(node)) {
+      return
     }
+
+    this.nodesSparseArray[this.nextId] = node
+    this.edgesSparseArray[this.nextId] = []
+    this.nodesIds.set(node, this.nextId)
+    this._nodesCount++
+    this.nextId++
   }
 
   /**
@@ -62,119 +155,98 @@ export class Graph<T> {
    * @param fromNode - node from which edge is outcoming
    * @param toNode - node to which edge is incoming
    */
-  public addEdge(fromNode: T, toNode: T) {
-    if (!this.nodes.has(fromNode)) {
-      throw new Error(`Unknown node ${fromNode}`)
+  public addEdge(fromNode: T, toNode: T): void {
+    const fromId = this.nodesIds.get(fromNode)
+    const toId = this.nodesIds.get(toNode)
+
+    if (fromId === undefined) {
+      throw this.missingNodeError(fromNode)
     }
-    if (!this.nodes.has(toNode)) {
-      throw new Error(`Unknown node ${toNode}`)
+
+    if (toId === undefined) {
+      throw this.missingNodeError(toNode)
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.edges.get(fromNode)!.add(toNode)
-  }
 
-  public removeEdge(fromNode: T, toNode: T) {
-    if (this.existsEdge(fromNode, toNode)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.edges.get(fromNode)!.delete(toNode)
-    } else {
-      throw new Error('Edge does not exist')
+    if (this.edgesSparseArray[fromId].includes(toId)) {
+      return
     }
-  }
 
-  public softRemoveEdge(fromNode: T, toNode: T) {
-    this.edges.get(fromNode)?.delete(toNode)
-  }
-
-  /**
-   * Returns nodes adjacent to given node
-   *
-   * @param node - node to which adjacent nodes we want to retrieve
-   */
-  public adjacentNodes(node: T): Set<T> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.edges.get(node)!
-  }
-
-  public adjacentNodesCount(node: T): number {
-    return this.adjacentNodes(node).size
-  }
-
-  /**
-   * Checks whether a node is present in graph
-   *
-   * @param node - node to check
-   */
-  public hasNode(node: T): boolean {
-    return this.nodes.has(node)
-  }
-
-  /**
-   * Returns number of nodes in graph
-   */
-  public nodesCount(): number {
-    return this.nodes.size
-  }
-
-  /**
-   * Returns number of edges in graph
-   */
-  public edgesCount(): number {
-    let result = 0
-    this.edges.forEach((edgesForNode) => (result += edgesForNode.size))
-    return result
+    this.edgesSparseArray[fromId].push(toId)
   }
 
   public removeNode(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
-    for (const adjacentNode of this.adjacentNodes(node).values()) {
-      this.markNodeAsSpecialRecentlyChanged(adjacentNode)
+    const id = this.nodesIds.get(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
     }
-    this.edges.delete(node)
-    this.nodes.delete(node)
+
+    this.edgesSparseArray[id]
+      .filter(adjacentId => adjacentId !== undefined)
+      .map(adjacentId => this.nodesSparseArray[adjacentId])
+      .forEach(adjacentNode => this.markNodeAsSpecialRecentlyChanged(adjacentNode))
+
+    const dependencies = this.removeDependencies(node)
+
+    delete this.nodesSparseArray[id]
+    delete this.edgesSparseArray[id]
+    this.nodesIds.delete(node)
+    this._nodesCount--
+
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
     this.infiniteRanges.delete(node)
-    return this.removeDependencies(node)
+    return dependencies
   }
 
-  public markNodeAsSpecial(node: T) {
-    this.specialNodes.add(node)
-  }
+  public removeEdge(fromNode: T, toNode: T): void {
+    const fromId = this.nodesIds.get(fromNode)
+    const toId = this.nodesIds.get(toNode)
 
-  public markNodeAsSpecialRecentlyChanged(node: T) {
-    if (this.nodes.has(node)) {
-      this.specialNodesRecentlyChanged.add(node)
+    if (fromId === undefined) {
+      throw this.missingNodeError(fromNode)
     }
+
+    if (toId === undefined) {
+      throw this.missingNodeError(toNode)
+    }
+
+    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
+
+    if (indexOfToId === -1) {
+      throw new Error('Edge does not exist')
+    }
+
+    delete this.edgesSparseArray[fromId][indexOfToId]
   }
 
-  public markNodeAsChangingWithStructure(node: T) {
-    this.specialNodesStructuralChanges.add(node)
-  }
+  public removeEdgeIfExists(fromNode: T, toNode: T): void {
+    const fromId = this.nodesIds.get(fromNode)
+    const toId = this.nodesIds.get(toNode)
 
-  public clearSpecialNodesRecentlyChanged() {
-    this.specialNodesRecentlyChanged.clear()
-  }
+    if (fromId === undefined) {
+      return
+    }
 
-  public markNodeAsInfiniteRange(node: T) {
-    this.infiniteRanges.add(node)
-  }
+    if (toId === undefined) {
+      return
+    }
 
-  /**
-   * Checks whether exists edge between nodes
-   *
-   * @param fromNode - node from which edge is outcoming
-   * @param toNode - node to which edge is incoming
-   */
-  public existsEdge(fromNode: T, toNode: T): boolean {
-    return this.adjacentNodes(fromNode)?.has(toNode) ?? false
+    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
+
+    if (indexOfToId === -1) {
+      return
+    }
+
+    delete this.edgesSparseArray[fromId][indexOfToId]
   }
 
   /*
    * return a topological sort order, but separates vertices that exist in some cycle
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {
+    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => {
     })
   }
 
@@ -188,25 +260,62 @@ export class Graph<T> {
    * @param onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
-    const topSortAlgorithm = new TopSort<T>(this.edges)
-    return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodes, operatingFunction, onCycle)
+    const topSortAlgorithm = new TopSort<T>(this.nodesSparseArray, this.edgesSparseArray)
+    const modifiedNodesIds = modifiedNodes.map(node => this.nodesIds.get(node)).filter(id => id !== undefined) as number[]
+    return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
   }
 
-  public reversedAdjacentNodes(vertex: T): T[] {
-    const result: T[] = []
-    this.edges.forEach((adjacentNodes, sourceNode) => {
-      if (adjacentNodes.has(vertex)) {
-        result.push(sourceNode)
-      }
-    })
-    return result
+  public markNodeAsSpecial(node: T): void {
+    if (!this.hasNode(node)) {
+      return
+    }
+
+    this.specialNodes.add(node)
+  }
+
+  public markNodeAsSpecialRecentlyChanged(node: T): void {
+    if (!this.hasNode(node)) {
+      return
+    }
+
+    this.specialNodesRecentlyChanged.add(node)
+  }
+
+  public markNodeAsChangingWithStructure(node: T): void {
+    if (!this.hasNode(node)) {
+      return
+    }
+
+    this.specialNodesStructuralChanges.add(node)
+  }
+
+  public markNodeAsInfiniteRange(node: T): void {
+    if (!this.hasNode(node)) {
+      return
+    }
+
+    this.infiniteRanges.add(node)
+  }
+
+  public clearSpecialNodesRecentlyChanged(): void {
+    this.specialNodesRecentlyChanged.clear()
+  }
+
+  private cleanupAdjacentNodeIds(id: number): number[] {
+    const adjacentNodeIds = this.edgesSparseArray[id]
+    this.edgesSparseArray[id] = adjacentNodeIds.filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
+    return this.edgesSparseArray[id]
   }
 
   private removeDependencies(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
     const dependencies = this.dependencyQuery(node)
     for (const [_, dependency] of dependencies) {
-      this.softRemoveEdge(dependency, node)
+      this.removeEdgeIfExists(dependency, node)
     }
     return dependencies
+  }
+
+  private missingNodeError(node: T): Error {
+    return new Error(`Unknown node ${node}`)
   }
 }

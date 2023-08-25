@@ -112,6 +112,7 @@ export class DependencyGraph {
     if (vertex instanceof ArrayVertex) {
       this.arrayMapping.removeArray(vertex.getRange())
     }
+
     if (vertex instanceof ValueCellVertex) {
       const oldValues = vertex.getValues()
       if (oldValues.rawValue !== value.rawValue) {
@@ -1091,7 +1092,7 @@ export class DependencyGraph {
     const adjNodesStored = this.graph.adjacentNodes(newVertex)
 
     this.removeVertexAndCleanupDependencies(newVertex)
-    this.graph.softRemoveEdge(existingVertex, newVertex)
+    this.graph.removeEdgeIfExists(existingVertex, newVertex)
     adjNodesStored.forEach((adjacentNode) => {
       if (this.graph.hasNode(adjacentNode)) {
         this.graph.addEdge(existingVertex, adjacentNode)

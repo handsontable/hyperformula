@@ -248,7 +248,7 @@ export class Operations {
   public addSheet(name?: string) {
     const sheetId = this.sheetMapping.addSheet(name)
     const sheet: Sheet = []
-    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, sheet, findBoundaries(sheet))
+    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries(sheet))
     return this.sheetMapping.fetchDisplayName(sheetId)
   }
 
@@ -883,7 +883,7 @@ export class Operations {
         : this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex, addedGlobalNamedExpressions)
 
       if (targetScopeExpressionVertex !== sourceVertex) {
-        this.dependencyGraph.graph.softRemoveEdge(sourceVertex, vertex)
+        this.dependencyGraph.graph.removeEdgeIfExists(sourceVertex, vertex)
         this.dependencyGraph.graph.addEdge(targetScopeExpressionVertex, vertex)
       }
     }

@@ -86,7 +86,7 @@ export class BuildEngineFactory {
           throw new SheetSizeLimitExceededError()
         }
         const sheetId = sheetMapping.addSheet(sheetName)
-        addressMapping.autoAddSheet(sheetId, sheet, boundaries)
+        addressMapping.autoAddSheet(sheetId, boundaries)
       }
     }
 

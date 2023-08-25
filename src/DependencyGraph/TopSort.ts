@@ -18,10 +18,6 @@ enum NodeVisitStatus {
  * An algorithm class. Provides topological sorting of a graph.
  */
 export class TopSort<T> {
-  private nodes: T[] = []
-  private edges: number[][] = []
-  private mapping: Map<T, number> = new Map()
-
   private entranceTime: number[] = []
   private low: number[] = []
   private parent: number[] = []
@@ -37,37 +33,9 @@ export class TopSort<T> {
   private sccNonSingletons: boolean[] = []
 
   constructor(
-    edges: Map<T, Set<T>> = new Map()
-  ) {
-    edges.forEach((_, node: T) => {
-      this.nodes.push(node)
-      this.mapping.set(node, this.nodes.length - 1)
-    })
-
-    edges.forEach((neighbours: Set<T>, node: T) => {
-      const nodeId = this.mapping.get(node)
-
-      if (nodeId === undefined) {
-        throw Error(`Unknown node ${nodeId}`)
-      }
-
-      this.edges[nodeId] = []
-      neighbours.forEach((neighbour: T) => {
-        const neighbourId = this.mapping.get(neighbour)
-
-        if (neighbourId === undefined) {
-          throw Error(`Unknown neighbour ${neighbour}`)
-        }
-
-        this.edges[nodeId].push(neighbourId)
-      })
-    })
-  }
-
-  public adjacentNodes(nodeId: number): number[] {
-    return this.edges[nodeId]
-  }
-
+    private nodesSparseArray: T[] = [],
+    private edgesSparseArray: number[][] = [], // may contain removed nodes
+  ) {}
   /**
    * An iterative implementation of Tarjan's algorithm for finding strongly connected components.
    * Returns vertices in order of topological sort, but vertices that are on cycles are kept separate.
@@ -76,10 +44,14 @@ export class TopSort<T> {
    * @param operatingFunction - recomputes value of a node, and returns whether a change occured
    * @param onCycle - action to be performed when node is on cycle
    */
-  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
-    const modifiedNodeIds = modifiedNodes.map(node => this.mapping.get(node)!).reverse()
-    modifiedNodeIds.forEach((id: number) => this.runDFS(id))
-    return this.postprocess(modifiedNodeIds, onCycle, operatingFunction)
+  public getTopSortedWithSccSubgraphFrom(modifiedNodeIds: number[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
+    const modifiedNodeIdsReversed = modifiedNodeIds.reverse()
+    modifiedNodeIdsReversed.forEach((id: number) => this.runDFS(id))
+    return this.postprocess(modifiedNodeIdsReversed, onCycle, operatingFunction)
+  }
+
+  private getAdjacentNodeIds(id: number): number[] {
+    return this.edgesSparseArray[id].filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
   }
 
   private runDFS(v: number) {
@@ -116,7 +88,7 @@ export class TopSort<T> {
     this.low[u] = this.time
     SCCstack.push(u)
     this.time++
-    this.adjacentNodes(u).forEach((t: number) => {
+    this.getAdjacentNodeIds(u).forEach((t: number) => {
       if (this.entranceTime[t] === undefined) {
         DFSstack.push(t)
         this.parent[t] = u
@@ -130,7 +102,7 @@ export class TopSort<T> {
     let uLow: number
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     uLow = this.entranceTime[u]
-    this.adjacentNodes(u).forEach((t: number) => { // Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[this.parent]
+    this.getAdjacentNodeIds(u).forEach((t: number) => { // Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[this.parent]
       if (!this.inSCC[t]) {
         if (this.parent[t] === u) {
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -172,15 +144,15 @@ export class TopSort<T> {
     const cycled: T[] = []
     this.order.reverse()
     this.order.forEach((t: number) => {
-      const adjacentNodes = this.adjacentNodes(t)
+      const adjacentNodes = this.getAdjacentNodeIds(t)
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) { // TODO: to jest potencjalnie czas kwadratowy
-        cycled.push(this.nodes[t])
-        onCycle(this.nodes[t])
+        cycled.push(this.nodesSparseArray[t])
+        onCycle(this.nodesSparseArray[t])
         adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
       } else {
-        sorted.push(this.nodes[t])
-        if (shouldBeUpdatedMapping[t] && operatingFunction(this.nodes[t])) {
+        sorted.push(this.nodesSparseArray[t])
+        if (shouldBeUpdatedMapping[t] && operatingFunction(this.nodesSparseArray[t])) {
           adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
         }
       }
