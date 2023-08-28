@@ -237,7 +237,6 @@ function doesItLookLikeADateTimeQuickCheck(text: string): boolean {
   return QUICK_CHECK_REGEXP.test(text)
 }
 
-
 /**
  * Function memoization for improved performance.
  */

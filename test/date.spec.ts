@@ -215,6 +215,58 @@ describe('Date helpers, other zero date', () => {
   })
 })
 
+describe('By default function parseDateTimeFromConfigFormats', () => {
+  it('returns {} when dateFormats=[] and timeFormats=[]', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: [], timeFormats: [] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('01/01/2019')
+    expect(parsedDate).toEqual({})
+  })
+
+  it('returns {} when trying to parse date but dateFormats=[]', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: [] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('01/01/2019')
+    expect(parsedDate).toEqual({})
+  })
+
+  it('returns {} when trying to parse time but timeFormats=[]', () => {
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: [] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('01:01')
+    expect(parsedDate).toEqual({})
+  })
+
+  it('returns {} when trying to parse time but timeFormats=[]', () => {
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: [] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('01:01')
+    expect(parsedDate).toEqual({})
+  })
+
+  it('parses a time value with AM/PM postfix', () => {
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm am'] }))
+    const { dateTime: dateTimeWithPrefix } = dateHelper.parseDateTimeFromConfigFormats('01:01 pm')
+    const { dateTime: dateTimeWithOutPrefix } = dateHelper.parseDateTimeFromConfigFormats('13:01')
+    expect(dateTimeWithPrefix).toEqual(dateTimeWithOutPrefix)
+  })
+
+  it('parses a time value with A/P postfix', () => {
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm a'] }))
+    const { dateTime: dateTimeWithPrefix } = dateHelper.parseDateTimeFromConfigFormats('01:01 p')
+    const { dateTime: dateTimeWithOutPrefix } = dateHelper.parseDateTimeFromConfigFormats('13:01')
+    expect(dateTimeWithPrefix).toEqual(dateTimeWithOutPrefix)
+  })
+
+  it('returns the matching dateFormat', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: ['DD/MM/YY', 'DD/MM/YYYY'], timeFormats: ['hh:mm:ss', 'hh:mm'] }))
+    const { dateFormat } = dateHelper.parseDateTimeFromConfigFormats('01/01/2019')
+    expect(dateFormat).toEqual('DD/MM/YYYY')
+  })
+
+  it('returns the matching timeFormat', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: ['DD/MM/YY', 'DD/MM/YYYY'], timeFormats: ['hh:mm:ss', 'hh:mm'] }))
+    const { timeFormat } = dateHelper.parseDateTimeFromConfigFormats('01:01')
+    expect(timeFormat).toEqual('hh:mm')
+  })
+})
+
 describe('Custom date parsing', () => {
   function customParseDate(dateString: string, dateFormat?: string): Maybe<SimpleDate> {
     const momentDate = moment(dateString, dateFormat, true)
