@@ -240,15 +240,39 @@ describe('By default function parseDateTimeFromConfigFormats', () => {
     expect(parsedDate).toEqual({})
   })
 
+  it('returns {} when time format contains no day term', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: ['MM/YY'] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('12/12')
+    expect(parsedDate).toEqual({})
+  })
+
+  it('returns {} when time format contains no month term', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: ['DD/YY'] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('12/12')
+    expect(parsedDate).toEqual({})
+  })
+
+  it('returns {} when time format contains no year term', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: ['DD/MM'] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('12/12')
+    expect(parsedDate).toEqual({})
+  })
+
+  it('returns {} when time format contains both long year and short year term', () => {
+    const dateHelper = new DateTimeHelper(new Config({ dateFormats: ['DD/MM/YY/YYYY'] }))
+    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('12/12/12/12')
+    expect(parsedDate).toEqual({})
+  })
+
   it('parses a time value with AM/PM postfix', () => {
-    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm am'] }))
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm am/pm'] }))
     const { dateTime: dateTimeWithPrefix } = dateHelper.parseDateTimeFromConfigFormats('01:01 pm')
     const { dateTime: dateTimeWithOutPrefix } = dateHelper.parseDateTimeFromConfigFormats('13:01')
     expect(dateTimeWithPrefix).toEqual(dateTimeWithOutPrefix)
   })
 
   it('parses a time value with A/P postfix', () => {
-    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm a'] }))
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm a/p'] }))
     const { dateTime: dateTimeWithPrefix } = dateHelper.parseDateTimeFromConfigFormats('01:01 p')
     const { dateTime: dateTimeWithOutPrefix } = dateHelper.parseDateTimeFromConfigFormats('13:01')
     expect(dateTimeWithPrefix).toEqual(dateTimeWithOutPrefix)

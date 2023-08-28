@@ -152,15 +152,20 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
   if (dateItems.length !== itemsCount) {
     return undefined
   }
-  if (!(monthItem in dateItems) || !(dayItem in dateItems) ||
-    (!(longYearItem in dateItems) && !(shortYearItem in dateItems))) {
+
+  if (!dateItems[monthItem]
+    || !dateItems[dayItem]
+    || (!dateItems[longYearItem] && !dateItems[shortYearItem])
+  ) {
     return undefined
   }
-  if (longYearItem in dateItems && shortYearItem in dateItems) {
+
+  if (dateItems[longYearItem] && dateItems[shortYearItem]) {
     return undefined
   }
+
   let year
-  if (longYearItem in dateItems) {
+  if (dateItems[longYearItem]) {
     const yearString = dateItems[longYearItem]
     if (/^\d+$/.test(yearString)) {
       year = Number(yearString)
@@ -181,15 +186,18 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
       return undefined
     }
   }
+
   const monthString = dateItems[monthItem]
   if (!/^\d+$/.test(monthString)) {
     return undefined
   }
+
   const month = Number(monthString)
   const dayString = dateItems[dayItem]
   if (!/^\d+$/.test(dayString)) {
     return undefined
   }
+
   const day = Number(dayString)
   return {year, month, day}
 }
