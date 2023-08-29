@@ -80,7 +80,7 @@ describe('GraphBuilder', () => {
     expect(engine.graph.existsEdge(b1, a1b2)).toBe(true)
     expect(engine.graph.existsEdge(a1b2, a2)).toBe(true)
     expect(engine.graph.existsEdge(a1b2, a3)).toBe(true)
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       4 + // for cells above
       1,  // for both ranges (reuse same ranges)
     )
@@ -111,7 +111,7 @@ describe('GraphBuilder', () => {
       ['1', '0', '=SUM(A1:B2)'],
     ])
 
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       3 + // for cells above
       1 + // for range vertex
       2,  // for 2 EmptyCellVertex instances

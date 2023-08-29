@@ -12,6 +12,6 @@ describe('Graph with Vertex', () => {
     graph.addNode(v1)
     graph.addNode(v2)
 
-    expect(graph.nodesCount()).toBe(2)
+    expect(graph.getNodes().length).toBe(2)
   })
 })

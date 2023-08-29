@@ -746,9 +746,9 @@ describe('Removing rows - graph', function() {
       ['1', '2'],
       ['3', '4'],
     ])
-    expect(engine.graph.nodesCount()).toBe(4)
+    expect(engine.graph.getNodes().length).toBe(4)
     engine.removeRows(0, [0, 2])
-    expect(engine.graph.nodesCount()).toBe(0)
+    expect(engine.graph.getNodes().length).toBe(0)
   })
 
   it('works if there are empty cells removed', function() {
@@ -757,9 +757,9 @@ describe('Removing rows - graph', function() {
       [null],
       ['3'],
     ])
-    expect(engine.graph.nodesCount()).toBe(2)
+    expect(engine.graph.getNodes().length).toBe(2)
     engine.removeRows(0, [1, 1])
-    expect(engine.graph.nodesCount()).toBe(2)
+    expect(engine.graph.getNodes().length).toBe(2)
   })
 })
 
@@ -1027,7 +1027,7 @@ describe('Removing rows - merge ranges', () => {
 
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 

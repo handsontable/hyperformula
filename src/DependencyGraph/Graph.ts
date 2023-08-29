@@ -12,19 +12,19 @@ export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCell
 /**
  * Provides graph directed structure
  *
- * Invariants:
- * - this.edges(node) exists if and only if node is in the graph
- * - this.specialNodes* are always subset of this.nodes
- * - this.edges(node) is subset of this.nodes (i.e. it does not contain nodes not present in graph) -- this invariant DOES NOT HOLD right now
+ * - nodesSparseArray is a sparse array. nodesSparseArray[n] exists if and only if node n is in the graph
+ * - nodesIds is a mapping from node to its id. nodesIds.get(node) exists if and only if node is in the graph
+ * - edgesSparseArray is a sparse array. edgesSparseArray[n] exists if and only if node n is in the graph
+ * - edgesSparseArray[n] is a sparse array. edgesSparseArray[n] may contain removed nodes. To make sure check nodesSparseArray.
+ *
  */
 export class Graph<T> {
   private nodesSparseArray: T[] = []
-  private edgesSparseArray: number[][] = [] // may contain removed nodes // try using Set<T>[]
+  private edgesSparseArray: number[][] = [] // TODO: try using Set<T>[]
   private nodesIds: Map<T, number> = new Map()
-  private _nodesCount: number = 0
   private nextId: number = 0
 
-  // also convert?
+  // TODO: try using number[] for these collections
   public specialNodes: Set<T> = new Set()
   public specialNodesStructuralChanges: Set<T> = new Set()
   public specialNodesRecentlyChanged: Set<T> = new Set()
@@ -33,15 +33,6 @@ export class Graph<T> {
   constructor(
     private readonly dependencyQuery: DependencyQuery<T>
   ) {}
-
-  /**
-   * Returns number of nodes in graph
-   *
-   * @internal
-   */
-  public nodesCount(): number {
-    return this._nodesCount
-  }
 
   /**
    * Iterate over all nodes the in graph
@@ -142,7 +133,6 @@ export class Graph<T> {
     this.nodesSparseArray[this.nextId] = node
     this.edgesSparseArray[this.nextId] = []
     this.nodesIds.set(node, this.nextId)
-    this._nodesCount++
     this.nextId++
   }
 
@@ -190,7 +180,6 @@ export class Graph<T> {
     delete this.nodesSparseArray[id]
     delete this.edgesSparseArray[id]
     this.nodesIds.delete(node)
-    this._nodesCount--
 
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)

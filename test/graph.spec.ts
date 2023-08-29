@@ -1,5 +1,4 @@
 import {Graph} from '../src/DependencyGraph'
-import {HyperFormula} from '../src'
 import {DependencyQuery} from '../src/DependencyGraph/Graph'
 
 class IdentifiableString {
@@ -10,14 +9,14 @@ class IdentifiableString {
 
 const dummyDependencyQuery: DependencyQuery<any> = () => []
 
-describe('Basic Graph manipulation', () => {
+describe('Graph class', () => {
   it('#addNode', () => {
     const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
     const node = new IdentifiableString(0, 'foo')
     graph.addNode(node)
 
-    expect(graph.nodesCount()).toBe(1)
+    expect(graph.getNodes().length).toBe(1)
   })
 
   it('#addNode for the second time', () => {
@@ -27,7 +26,7 @@ describe('Basic Graph manipulation', () => {
     graph.addNode(node)
     graph.addNode(node)
 
-    expect(graph.nodesCount()).toBe(1)
+    expect(graph.getNodes().length).toBe(1)
   })
 
   it('#addNode for the second time does not reset adjacent nodes', () => {
@@ -259,9 +258,35 @@ describe('Basic Graph manipulation', () => {
     expect(graph.topSortWithScc().sorted).toEqual([])
     expect(graph.topSortWithScc().cycled).toEqual([node])
   })
-})
 
-describe('Graph#getTopologicallySortedSubgraphFrom', () => {
+  it('#removeEdge not existing edge', () => {
+    const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+    const node0 = new IdentifiableString(0, 'x0')
+    const node1 = new IdentifiableString(1, 'x1')
+    graph.addNode(node0)
+    graph.addNode(node1)
+
+    expect(() => graph.removeEdge(node0, node1)).toThrowError('Edge does not exist')
+  })
+
+  it('#removeEdge removes edge from graph', () => {
+    const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+    const node0 = new IdentifiableString(0, 'x0')
+    const node1 = new IdentifiableString(1, 'x1')
+
+    graph.addNode(node0)
+    graph.addNode(node1)
+
+    graph.addEdge(node0, node1)
+    expect(graph.edgesCount()).toEqual(1)
+    expect(graph.existsEdge(node0, node1)).toBe(true)
+
+    graph.removeEdge(node0, node1)
+    expect(graph.edgesCount()).toEqual(0)
+    expect(graph.existsEdge(node0, node1)).toBe(false)
+  })
+
+describe('getTopSortedWithSccSubgraphFrom', () => {
   it('case without edges', () => {
     const graph = new Graph<string>(dummyDependencyQuery)
     const node0 = 'foo'
@@ -383,41 +408,4 @@ describe('Graph#getTopologicallySortedSubgraphFrom', () => {
     expect(cycled).toEqual(['c0', 'c1', 'c2'])
   })
 })
-
-describe('Graph cruds', () => {
-  it('#removeEdge not existing edge', () => {
-    const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
-    const node0 = new IdentifiableString(0, 'x0')
-    const node1 = new IdentifiableString(1, 'x1')
-    graph.addNode(node0)
-    graph.addNode(node1)
-
-    expect(() => graph.removeEdge(node0, node1)).toThrowError('Edge does not exist')
-  })
-
-  it('#removeEdge removes edge from graph', () => {
-    const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
-    const node0 = new IdentifiableString(0, 'x0')
-    const node1 = new IdentifiableString(1, 'x1')
-
-    graph.addNode(node0)
-    graph.addNode(node1)
-
-    graph.addEdge(node0, node1)
-    expect(graph.edgesCount()).toEqual(1)
-    expect(graph.existsEdge(node0, node1)).toBe(true)
-
-    graph.removeEdge(node0, node1)
-    expect(graph.edgesCount()).toEqual(0)
-    expect(graph.existsEdge(node0, node1)).toBe(false)
-  })
-
-  it('tmp', () => {
-    const hf = HyperFormula.buildFromArray([], {
-      licenseKey: 'gpl-v3',
-    })
-
-    const data = Array(5).fill(0).map(() => Array(5).fill(0).map(() => 'A500000'))
-    hf.setSheetContent(0, data)
-  })
 })

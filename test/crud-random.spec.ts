@@ -271,7 +271,7 @@ describe('large psuedo-random test', () => {
       verifyValues(engine)
     }
     randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, 2 * (n + 1) * sideX, 2 * sideY))
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 })
