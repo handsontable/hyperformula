@@ -1,5 +1,6 @@
 import {Graph} from '../src/DependencyGraph'
 import {DependencyQuery} from '../src/DependencyGraph/Graph'
+import {graphEdgesCount} from './testUtils'
 
 class IdentifiableString {
   constructor(
@@ -131,29 +132,6 @@ describe('Graph class', () => {
     expect(graph.existsEdge(new IdentifiableString(0, 'foo'), new IdentifiableString(1, 'bar'))).toBe(false)
   })
 
-  it('#edgesCount when there is no nodes', () => {
-    const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
-
-    expect(graph.edgesCount()).toBe(0)
-  })
-
-  it('#edgesCount counts edges from all nodes', () => {
-    const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
-    const node0 = new IdentifiableString(0, 'bar1')
-    const node1 = new IdentifiableString(1, 'bar2')
-    graph.addNode(node0)
-    graph.addNode(node1)
-    const node2 = new IdentifiableString(2, 'first')
-    graph.addNode(node2)
-    graph.addEdge(node2, node0)
-    const node3 = new IdentifiableString(2, 'second')
-    graph.addNode(node3)
-    graph.addEdge(node3, node0)
-    graph.addEdge(node3, node1)
-
-    expect(graph.edgesCount()).toBe(3)
-  })
-
   it('#topologicalSort for empty graph', () => {
     const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
@@ -278,11 +256,11 @@ describe('Graph class', () => {
     graph.addNode(node1)
 
     graph.addEdge(node0, node1)
-    expect(graph.edgesCount()).toEqual(1)
+    expect(graphEdgesCount(graph)).toEqual(1)
     expect(graph.existsEdge(node0, node1)).toBe(true)
 
     graph.removeEdge(node0, node1)
-    expect(graph.edgesCount()).toEqual(0)
+    expect(graphEdgesCount(graph)).toEqual(0)
     expect(graph.existsEdge(node0, node1)).toBe(false)
   })
 

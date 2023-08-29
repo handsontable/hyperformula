@@ -51,17 +51,6 @@ export class Graph<T> {
   }
 
   /**
-   * Returns number of edges in graph
-   *
-   * @internal
-   */
-  public edgesCount(): number {
-    return this.nodesSparseArray.reduce((acc, node, id) =>
-        node ? acc + this.cleanupAdjacentNodeIds(id).length : acc
-      , 0)
-  }
-
-  /**
    * Checks whether exists edge between nodes. If one or both of nodes are not present in graph, returns false.
    *
    * @param fromNode - node from which edge is outcoming

@@ -2,7 +2,7 @@ import {HyperFormula} from '../src'
 import {Config} from '../src/Config'
 import {EmptyCellVertex, ValueCellVertex} from '../src/DependencyGraph'
 import {SheetSizeLimitExceededError} from '../src/errors'
-import {adr, colEnd, colStart} from './testUtils'
+import {adr, colEnd, colStart, graphEdgesCount} from './testUtils'
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -99,7 +99,7 @@ describe('GraphBuilder', () => {
 
     expect(engine.graph.existsEdge(a3, a1a3)).toBe(true)
     expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(true)
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       2 + // from cells to range(A1:A2)
       2 + // from A3 and range(A1:A2) to range(A1:A3)
       2, // from range vertexes to formulas
@@ -116,7 +116,7 @@ describe('GraphBuilder', () => {
       1 + // for range vertex
       2,  // for 2 EmptyCellVertex instances
     )
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       2 + // from cells to range vertex
       2 + // from EmptyCellVertex instances to range vertices
       1,  // from range to cell with SUM
@@ -136,7 +136,7 @@ describe('GraphBuilder', () => {
     expect(engine.graph.existsEdge(a2, a1a3)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(false)
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       3 + // from 3 cells to range(A1:A2)
       2 + // from 2 cells to range(A1:A2)
       2, // from range vertexes to formulas

@@ -3,7 +3,7 @@ import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/A
 import {CellError, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
-import {ArrayVertex, FormulaCellVertex, RangeVertex} from '../src/DependencyGraph'
+import {ArrayVertex, FormulaCellVertex, Graph, RangeVertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
 import {defaultStringifyDateTime} from '../src/format/format'
 import {complex} from '../src/interpreter/ArithmeticHelper'
@@ -257,4 +257,14 @@ export function resetSpy(spy: any): void {
  */
 export function expectCellValueToEqualDate(engine: HyperFormula, cellAddress: SimpleCellAddress, expectedDateString: string) {
   expect(dateNumberToString(engine.getCellValue(cellAddress), new Config())).toEqual(expectedDateString)
+}
+
+/**
+ * Returns number of edges in graph
+ *
+ */
+export function graphEdgesCount<T>(graph: Graph<T>): number {
+  return (graph as any).nodesSparseArray.reduce((acc: number, node: T, id: number) =>
+    node ? acc + (graph as any).cleanupAdjacentNodeIds(id).length : acc
+  , 0)
 }
