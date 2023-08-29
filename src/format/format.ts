@@ -4,7 +4,7 @@
  */
 
 import {Config} from '../Config'
-import {secondsExtendedRegexp} from '../DateTimeDefault'
+import {TIME_FORMAT_SECONDS_ITEM_REGEXP} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
@@ -130,7 +130,7 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       }
 
       default: {
-        if (secondsExtendedRegexp.test(token.value)) {
+        if (TIME_FORMAT_SECONDS_ITEM_REGEXP.test(token.value)) {
           const fractionOfSecondPrecision = Math.max(token.value.length - 3, 0)
           result += `${time.seconds < 10 ? '0' : ''}${Math.floor(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)}`
           continue
@@ -217,7 +217,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
         break
       }
       default: {
-        if (secondsExtendedRegexp.test(token.value)) {
+        if (TIME_FORMAT_SECONDS_ITEM_REGEXP.test(token.value)) {
           const fractionOfSecondPrecision = token.value.length - 3
           result += `${dateTime.seconds < 10 ? '0' : ''}${Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)}`
           continue
