@@ -10,13 +10,12 @@ import {TopSort, TopSortResult} from './TopSort'
 export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCellRange), T][]
 
 /**
- * Provides graph directed structure
+ * Provides directed graph structure.
  *
  * - nodesSparseArray is a sparse array. nodesSparseArray[n] exists if and only if node n is in the graph
  * - nodesIds is a mapping from node to its id. nodesIds.get(node) exists if and only if node is in the graph
  * - edgesSparseArray is a sparse array. edgesSparseArray[n] exists if and only if node n is in the graph
  * - edgesSparseArray[n] is a sparse array. edgesSparseArray[n] may contain removed nodes. To make sure check nodesSparseArray.
- *
  */
 export class Graph<T> {
   private nodesSparseArray: T[] = []
