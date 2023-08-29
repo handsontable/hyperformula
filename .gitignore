@@ -17,6 +17,7 @@
 /test-jest/
 node_modules/
 /typings/
+/storage/
 
 *.iml
 dev*.html

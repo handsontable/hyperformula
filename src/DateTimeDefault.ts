@@ -104,32 +104,29 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
     return undefined
   }
 
-  const hourString = hourItem !== -1 ? timeItems[hourItem] : '0'
-  if (!/^\d+$/.test(hourString)) {
+  const secondsParsed = Number(timeItems[secondItem] ?? '0')
+  if (!Number.isFinite(secondsParsed)) {
     return undefined
   }
-  let hours = Number(hourString)
-  if (ampm !== undefined) {
-    if (hours < 0 || hours > 12) {
-      return undefined
-    }
-    hours = hours % 12
-    if (ampm) {
-      hours = hours + 12
-    }
+  const seconds = Math.round(secondsParsed * SECONDS_PRECISION) / SECONDS_PRECISION
+
+  const minutes = Number(timeItems[minuteItem] ?? '0')
+  if (!(Number.isFinite(minutes) && Number.isInteger(minutes))) {
+    return undefined
   }
 
-  const minuteString = minuteItem !== -1 ? timeItems[minuteItem] : '0'
-  if (!/^\d+$/.test(minuteString)) {
+  const hoursParsed = Number(timeItems[hourItem] ?? '0')
+  if (!(Number.isFinite(hoursParsed) && Number.isInteger(hoursParsed))) {
     return undefined
   }
-  const minutes = Number(minuteString)
 
-  const secondString = secondItem !== -1 ? timeItems[secondItem] : '0'
-  if (!/^\d+(\.\d+)?$/.test(secondString)) {
+  if (ampm !== undefined && (hoursParsed < 0 || hoursParsed > 12)) {
     return undefined
   }
-  const seconds = Math.round(Number(secondString) * SECONDS_PRECISION) / SECONDS_PRECISION
+
+  const hours = ampm !== undefined
+    ? hoursParsed % 12 + (ampm ? 12 : 0)
+    : hoursParsed
 
   return { hours, minutes, seconds }
 }
@@ -152,46 +149,35 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
   if (dateItems.length !== itemsCount) {
     return undefined
   }
-  if (!(monthItem in dateItems) || !(dayItem in dateItems) ||
-    (!(longYearItem in dateItems) && !(shortYearItem in dateItems))) {
+
+  const day = Number(dateItems[dayItem])
+  if (!(Number.isFinite(day) && Number.isInteger(day))) {
     return undefined
   }
-  if (longYearItem in dateItems && shortYearItem in dateItems) {
+
+  const month = Number(dateItems[monthItem])
+  if (!(Number.isFinite(month) && Number.isInteger(month))) {
     return undefined
   }
-  let year
-  if (longYearItem in dateItems) {
-    const yearString = dateItems[longYearItem]
-    if (/^\d+$/.test(yearString)) {
-      year = Number(yearString)
-      if (year < 1000 || year > 9999) {
-        return undefined
-      }
-    } else {
-      return undefined
-    }
-  } else {
-    const yearString = dateItems[shortYearItem]
-    if (/^\d+$/.test(yearString)) {
-      year = Number(yearString)
-      if (year < 0 || year > 99) {
-        return undefined
-      }
-    } else {
-      return undefined
-    }
-  }
-  const monthString = dateItems[monthItem]
-  if (!/^\d+$/.test(monthString)) {
+
+  if (dateItems[longYearItem] && dateItems[shortYearItem]) {
     return undefined
   }
-  const month = Number(monthString)
-  const dayString = dateItems[dayItem]
-  if (!/^\d+$/.test(dayString)) {
+
+  const year = Number(dateItems[longYearItem] ?? dateItems[shortYearItem])
+  if (!(Number.isFinite(year) && Number.isInteger(year))) {
     return undefined
   }
-  const day = Number(dayString)
-  return {year, month, day}
+
+  if (dateItems[longYearItem] && (year < 1000 || year > 9999)) {
+    return undefined
+  }
+
+  if (dateItems[shortYearItem] && (year < 0 || year > 99)) {
+    return undefined
+  }
+
+  return { year, month, day }
 }
 
 /**
@@ -236,7 +222,6 @@ function parseDateFormat(dateFormat: string): { itemsCount: number, dayItem: num
 function doesItLookLikeADateTimeQuickCheck(text: string): boolean {
   return QUICK_CHECK_REGEXP.test(text)
 }
-
 
 /**
  * Function memoization for improved performance.
