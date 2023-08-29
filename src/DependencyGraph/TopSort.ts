@@ -8,6 +8,7 @@ export interface TopSortResult<T> {
   cycled: T[],
 }
 
+// node status life cycle: undefined -> ON_STACK -> PROCESSED -> POPPED
 enum NodeVisitStatus {
   ON_STACK,
   PROCESSED,
@@ -22,20 +23,16 @@ export class TopSort<T> {
   private low: number[] = []
   private parent: number[] = []
   private inSCC: boolean[] = []
-
-  // node status life cycle:
-  // undefined -> ON_STACK -> PROCESSED -> POPPED
   private nodeStatus: NodeVisitStatus[] = []
   private order: number[] = []
-
-  private time: number = 0
-
   private sccNonSingletons: boolean[] = []
+  private timeCounter: number = 0
 
   constructor(
     private nodesSparseArray: T[] = [],
     private edgesSparseArray: number[][] = [],
-  ) {}
+  ) {
+  }
 
   /**
    * An iterative implementation of Tarjan's algorithm for finding strongly connected components.
@@ -45,7 +42,11 @@ export class TopSort<T> {
    * @param operatingFunction - recomputes value of a node, and returns whether a change occured
    * @param onCycle - action to be performed when node is on cycle
    */
-  public getTopSortedWithSccSubgraphFrom(modifiedNodeIds: number[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
+  public getTopSortedWithSccSubgraphFrom(
+    modifiedNodeIds: number[],
+    operatingFunction: (node: T) => boolean,
+    onCycle: (node: T) => void
+  ): TopSortResult<T> {
     const modifiedNodeIdsReversed = modifiedNodeIds.reverse()
     modifiedNodeIdsReversed.forEach((id: number) => this.runDFS(id))
     return this.postprocess(modifiedNodeIdsReversed, onCycle, operatingFunction)
@@ -66,10 +67,10 @@ export class TopSort<T> {
       return
     }
 
+    this.nodeStatus[v] = NodeVisitStatus.ON_STACK
     const DFSstack: number[] = [v]
     const SCCstack: number[] = []
 
-    this.nodeStatus[v] = NodeVisitStatus.ON_STACK
     while (DFSstack.length > 0) {
       const u = DFSstack[DFSstack.length - 1]
 
@@ -94,10 +95,11 @@ export class TopSort<T> {
    * Handles a node that is on stack.
    */
   private handleOnStack(u: number, SCCstack: number[], DFSstack: number[]) {
-    this.entranceTime[u] = this.time
-    this.low[u] = this.time
+    this.entranceTime[u] = this.timeCounter
+    this.low[u] = this.timeCounter
+    this.timeCounter++
     SCCstack.push(u)
-    this.time++
+
     this.getAdjacentNodeIds(u).forEach((t: number) => {
       if (this.entranceTime[t] === undefined) {
         DFSstack.push(t)
@@ -105,6 +107,7 @@ export class TopSort<T> {
         this.nodeStatus[t] = NodeVisitStatus.ON_STACK
       }
     })
+
     this.nodeStatus[u] = NodeVisitStatus.PROCESSED
   }
 
@@ -112,37 +115,40 @@ export class TopSort<T> {
    * Handles a node that is already processed.
    */
   private handleProcessed(u: number, SCCstack: number[], DFSstack: number[]) {
-    let uLow: number
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    uLow = this.entranceTime[u]
-    this.getAdjacentNodeIds(u).forEach((t: number) => { // Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[this.parent]
-      if (!this.inSCC[t]) {
-        if (this.parent[t] === u) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          uLow = Math.min(uLow, this.low[t])
-        } else {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          uLow = Math.min(uLow, this.entranceTime[t])
-        }
+    let uLow = this.entranceTime[u]
+
+    // TODO: Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[this.parent]
+    this.getAdjacentNodeIds(u).forEach((t: number) => {
+      if (this.inSCC[t]) {
+        return
       }
+
+      uLow = this.parent[t] === u ? Math.min(uLow, this.low[t]) : Math.min(uLow, this.entranceTime[t])
     })
+
     this.low[u] = uLow
+
     if (uLow === this.entranceTime[u]) {
       const currentSCC: number[] = []
+
       do {
         currentSCC.push(SCCstack[SCCstack.length - 1])
         SCCstack.pop()
       } while (currentSCC[currentSCC.length - 1] !== u)
+
       currentSCC.forEach((t) => {
         this.inSCC[t] = true
       })
+
       this.order.push(...currentSCC)
+
       if (currentSCC.length > 1) {
         currentSCC.forEach((t) => {
           this.sccNonSingletons[t] = true
         })
       }
     }
+
     DFSstack.pop()
     this.nodeStatus[u] = NodeVisitStatus.POPPED
   }
@@ -152,6 +158,7 @@ export class TopSort<T> {
    */
   private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
     const shouldBeUpdatedMapping: boolean[] = []
+
     modifiedNodeIds.forEach((t: number) => {
       shouldBeUpdatedMapping[t] = true
     })
@@ -159,9 +166,10 @@ export class TopSort<T> {
     const sorted: T[] = []
     const cycled: T[] = []
     this.order.reverse()
+
     this.order.forEach((t: number) => {
       const adjacentNodes = this.getAdjacentNodeIds(t)
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) { // TODO: to jest potencjalnie czas kwadratowy
         cycled.push(this.nodesSparseArray[t])
         onCycle(this.nodesSparseArray[t])
@@ -173,6 +181,7 @@ export class TopSort<T> {
         }
       }
     })
+
     return {sorted, cycled}
   }
 }

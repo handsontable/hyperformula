@@ -138,7 +138,7 @@ export class Graph<T> {
 
     this.edgesSparseArray[fromId].push(toId)
   }
-  
+
   /**
    * Removes node from graph
    */
@@ -150,20 +150,20 @@ export class Graph<T> {
     }
 
     this.edgesSparseArray[id]
-      .filter(adjacentId => adjacentId !== undefined)
-      .map(adjacentId => this.nodesSparseArray[adjacentId])
-      .forEach(adjacentNode => this.markNodeAsSpecialRecentlyChanged(adjacentNode))
+    .filter(adjacentId => adjacentId !== undefined)
+    .map(adjacentId => this.nodesSparseArray[adjacentId])
+    .forEach(adjacentNode => this.markNodeAsSpecialRecentlyChanged(adjacentNode))
 
     const dependencies = this.removeDependencies(node)
 
     delete this.nodesSparseArray[id]
     delete this.edgesSparseArray[id]
     this.nodesIds.delete(node)
-
     this.specialNodes.delete(node)
     this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
     this.infiniteRanges.delete(node)
+
     return dependencies
   }
 
@@ -219,8 +219,7 @@ export class Graph<T> {
    * Sorts the whole graph topologically. Nodes that are on cycles are kept separate.
    */
   public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => {
-    })
+    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => {})
   }
 
   /**
@@ -230,7 +229,11 @@ export class Graph<T> {
    * @param operatingFunction - recomputes value of a node, and returns whether a change occurred
    * @param onCycle - action to be performed when node is on cycle
    */
-  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
+  public getTopSortedWithSccSubgraphFrom(
+    modifiedNodes: T[],
+    operatingFunction: (node: T) => boolean,
+    onCycle: (node: T) => void
+  ): TopSortResult<T> {
     const topSortAlgorithm = new TopSort<T>(this.nodesSparseArray, this.edgesSparseArray)
     const modifiedNodesIds = modifiedNodes.map(node => this.nodesIds.get(node)).filter(id => id !== undefined) as number[]
     return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
@@ -301,9 +304,11 @@ export class Graph<T> {
    */
   private removeDependencies(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
     const dependencies = this.dependencyQuery(node)
-    for (const [_, dependency] of dependencies) {
+
+    dependencies.forEach(([_, dependency]) => {
       this.removeEdgeIfExists(dependency, node)
-    }
+    })
+
     return dependencies
   }
 

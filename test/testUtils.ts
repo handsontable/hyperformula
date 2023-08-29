@@ -272,7 +272,6 @@ export function graphEdgesCount<T>(graph: Graph<T>): number {
 export function graphReversedAdjacentNodes<T>(graph: Graph<T>, node: T): T[] {
   const id = (graph as any).nodesIds.get(node)
 
-
   return (graph as any).nodesSparseArray.reduce((acc: number[], sourceNode: T, sourceId: number) =>
     sourceNode && (graph as any).edgesSparseArray[sourceId].includes(id)
       ? [ ...acc, sourceId ]
