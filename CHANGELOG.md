@@ -15,6 +15,7 @@ and this project adheres to
 ### Changed
 
 - Improve efficiency of the default date/time parsing methods. [#876](https://github.com/handsontable/hyperformula/issues/876)
+- Improve efficiency of the operations on the dependency graph. [#876](https://github.com/handsontable/hyperformula/issues/876)
 
 ### Fixed
 
