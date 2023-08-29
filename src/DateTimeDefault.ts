@@ -167,22 +167,22 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
   let year
   if (dateItems[longYearItem]) {
     const yearString = dateItems[longYearItem]
-    if (/^\d+$/.test(yearString)) {
-      year = Number(yearString)
-      if (year < 1000 || year > 9999) {
+    if (!/^\d+$/.test(yearString)) {
         return undefined
-      }
-    } else {
+    }
+
+    year = Number(yearString)
+    if (year < 1000 || year > 9999) {
       return undefined
     }
   } else {
     const yearString = dateItems[shortYearItem]
-    if (/^\d+$/.test(yearString)) {
-      year = Number(yearString)
-      if (year < 0 || year > 99) {
-        return undefined
-      }
-    } else {
+    if (!/^\d+$/.test(yearString)) {
+      return undefined
+    }
+
+    year = Number(yearString)
+    if (year < 0 || year > 99) {
       return undefined
     }
   }
@@ -191,14 +191,14 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
   if (!/^\d+$/.test(monthString)) {
     return undefined
   }
-
   const month = Number(monthString)
+
   const dayString = dateItems[dayItem]
   if (!/^\d+$/.test(dayString)) {
     return undefined
   }
-
   const day = Number(dayString)
+
   return {year, month, day}
 }
 

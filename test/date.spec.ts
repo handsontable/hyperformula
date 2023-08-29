@@ -265,14 +265,14 @@ describe('By default function parseDateTimeFromConfigFormats', () => {
   })
 
   it('parses a time value with AM/PM postfix', () => {
-    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm am/pm'] }))
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm am/pm'] }))
     const { dateTime: dateTimeWithPrefix } = dateHelper.parseDateTimeFromConfigFormats('01:01 pm')
     const { dateTime: dateTimeWithOutPrefix } = dateHelper.parseDateTimeFromConfigFormats('13:01')
     expect(dateTimeWithPrefix).toEqual(dateTimeWithOutPrefix)
   })
 
   it('parses a time value with A/P postfix', () => {
-    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm', 'hh:mm a/p'] }))
+    const dateHelper = new DateTimeHelper(new Config({ timeFormats: ['hh:mm a/p'] }))
     const { dateTime: dateTimeWithPrefix } = dateHelper.parseDateTimeFromConfigFormats('01:01 p')
     const { dateTime: dateTimeWithOutPrefix } = dateHelper.parseDateTimeFromConfigFormats('13:01')
     expect(dateTimeWithPrefix).toEqual(dateTimeWithOutPrefix)
