@@ -153,10 +153,13 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
     return undefined
   }
 
-  if (!dateItems[monthItem]
-    || !dateItems[dayItem]
-    || (!dateItems[longYearItem] && !dateItems[shortYearItem])
-  ) {
+  const day = Number(dateItems[dayItem])
+  if (!(Number.isFinite(day) && Number.isInteger(day))) {
+    return undefined
+  }
+
+  const month = Number(dateItems[monthItem])
+  if (!(Number.isFinite(month) && Number.isInteger(month))) {
     return undefined
   }
 
@@ -164,42 +167,22 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
     return undefined
   }
 
-  let year
-  if (dateItems[longYearItem]) {
-    const yearString = dateItems[longYearItem]
-    if (!/^\d+$/.test(yearString)) {
-        return undefined
-    }
+  const yearString = dateItems[longYearItem] ?? dateItems[shortYearItem]
 
-    year = Number(yearString)
-    if (year < 1000 || year > 9999) {
-      return undefined
-    }
-  } else {
-    const yearString = dateItems[shortYearItem]
-    if (!/^\d+$/.test(yearString)) {
-      return undefined
-    }
-
-    year = Number(yearString)
-    if (year < 0 || year > 99) {
-      return undefined
-    }
-  }
-
-  const monthString = dateItems[monthItem]
-  if (!/^\d+$/.test(monthString)) {
+  const year = Number(yearString)
+  if (!(Number.isFinite(year) && Number.isInteger(year))) {
     return undefined
   }
-  const month = Number(monthString)
 
-  const dayString = dateItems[dayItem]
-  if (!/^\d+$/.test(dayString)) {
+  if (dateItems[longYearItem] && (year < 1000 || year > 9999)) {
     return undefined
   }
-  const day = Number(dayString)
 
-  return {year, month, day}
+  if (dateItems[shortYearItem] && (year < 0 || year > 99)) {
+    return undefined
+  }
+
+  return { year, month, day }
 }
 
 /**
