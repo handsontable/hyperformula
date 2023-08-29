@@ -140,6 +140,24 @@ describe('Graph class', () => {
   })
 
   describe('removeEdge', () => {
+    it('throws error when source node does not exist', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node0 = new IdentifiableString(0, 'x0')
+      const node1 = new IdentifiableString(1, 'x1')
+      graph.addNode(node1)
+
+      expect(() => graph.removeEdge(node0, node1)).toThrowError(/Unknown node/)
+    })
+
+    it('throws error when target node does not exist', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node0 = new IdentifiableString(0, 'x0')
+      const node1 = new IdentifiableString(1, 'x1')
+      graph.addNode(node0)
+
+      expect(() => graph.removeEdge(node0, node1)).toThrowError(/Unknown node/)
+    })
+
     it('throws error when edge does not exist', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'x0')
@@ -209,6 +227,44 @@ describe('Graph class', () => {
       graph.addEdge(node0, node1)
 
       expect(graph.adjacentNodes(node0)).toEqual(new Set([node1]))
+    })
+
+    it('throws error if the source node is not present in the graph', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+
+      const node0 = new IdentifiableString(0, 'foo')
+      const node1 = new IdentifiableString(1, 'bar')
+      graph.addNode(node0)
+      graph.addNode(node1)
+      graph.addEdge(node0, node1)
+
+      expect(() => graph.adjacentNodes(new IdentifiableString(42, 'baz'))).toThrowError(/Unknown node/)
+    })
+  })
+
+  describe('adjacentNodesCount', () => {
+    it('returns number of outgoing edges from a given node', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+
+      const node0 = new IdentifiableString(0, 'foo')
+      const node1 = new IdentifiableString(1, 'bar')
+      graph.addNode(node0)
+      graph.addNode(node1)
+      graph.addEdge(node0, node1)
+
+      expect(graph.adjacentNodesCount(node0)).toEqual(1)
+    })
+
+    it('throws error if the source node is not present in the graph', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+
+      const node0 = new IdentifiableString(0, 'foo')
+      const node1 = new IdentifiableString(1, 'bar')
+      graph.addNode(node0)
+      graph.addNode(node1)
+      graph.addEdge(node0, node1)
+
+      expect(() => graph.adjacentNodesCount(new IdentifiableString(42, 'baz'))).toThrowError(/Unknown node/)
     })
   })
 
@@ -430,6 +486,67 @@ describe('Graph class', () => {
 
       expect(operatingFunction).toHaveBeenCalledTimes(1)
       expect(cycled).toEqual(['c0', 'c1', 'c2'])
+    })
+  })
+
+  describe('markNodeAsSpecial', () => {
+    it('adds a node to special nodes array', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString(0, 'foo')
+
+      graph.addNode(node)
+      graph.markNodeAsSpecial(node)
+
+      expect(graph.specialNodes).toEqual(new Set([node]))
+    })
+
+    it('does nothing if node is not in a graph', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString(0, 'foo')
+
+      graph.markNodeAsSpecial(node)
+      expect(graph.specialNodes).toEqual(new Set([]))
+
+    })
+  })
+
+  describe('markNodeAsChangingWithStructure', () => {
+    it('adds a node to special nodes structural changes array', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString(0, 'foo')
+
+      graph.addNode(node)
+      graph.markNodeAsChangingWithStructure(node)
+
+      expect(graph.specialNodesStructuralChanges).toEqual(new Set([node]))
+    })
+
+    it('does nothing if node is not in a graph', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString(0, 'foo')
+
+      graph.markNodeAsChangingWithStructure(node)
+      expect(graph.specialNodesStructuralChanges).toEqual(new Set([]))
+    })
+  })
+
+  describe('markNodeAsInfiniteRange', () => {
+    it('adds a node to infiniteRanges array', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString(0, 'foo')
+
+      graph.addNode(node)
+      graph.markNodeAsInfiniteRange(node)
+
+      expect(graph.infiniteRanges).toEqual(new Set([node]))
+    })
+
+    it('does nothing if node is not in a graph', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString(0, 'foo')
+
+      graph.markNodeAsInfiniteRange(node)
+      expect(graph.infiniteRanges).toEqual(new Set([]))
     })
   })
 })

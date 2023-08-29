@@ -34,8 +34,9 @@ export class TopSort<T> {
 
   constructor(
     private nodesSparseArray: T[] = [],
-    private edgesSparseArray: number[][] = [], // may contain removed nodes
+    private edgesSparseArray: number[][] = [],
   ) {}
+
   /**
    * An iterative implementation of Tarjan's algorithm for finding strongly connected components.
    * Returns vertices in order of topological sort, but vertices that are on cycles are kept separate.
@@ -50,10 +51,16 @@ export class TopSort<T> {
     return this.postprocess(modifiedNodeIdsReversed, onCycle, operatingFunction)
   }
 
+  /**
+   * Returns adjacent nodes of a given node.
+   */
   private getAdjacentNodeIds(id: number): number[] {
     return this.edgesSparseArray[id].filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
   }
 
+  /**
+   * Runs DFS starting from a given node.
+   */
   private runDFS(v: number) {
     if (this.nodeStatus[v] !== undefined) {
       return
@@ -83,6 +90,9 @@ export class TopSort<T> {
     }
   }
 
+  /**
+   * Handles a node that is on stack.
+   */
   private handleOnStack(u: number, SCCstack: number[], DFSstack: number[]) {
     this.entranceTime[u] = this.time
     this.low[u] = this.time
@@ -98,6 +108,9 @@ export class TopSort<T> {
     this.nodeStatus[u] = NodeVisitStatus.PROCESSED
   }
 
+  /**
+   * Handles a node that is already processed.
+   */
   private handleProcessed(u: number, SCCstack: number[], DFSstack: number[]) {
     let uLow: number
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -134,6 +147,9 @@ export class TopSort<T> {
     this.nodeStatus[u] = NodeVisitStatus.POPPED
   }
 
+  /**
+   * Postprocesses the result of Tarjan's algorithm.
+   */
   private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
     const shouldBeUpdatedMapping: boolean[] = []
     modifiedNodeIds.forEach((t: number) => {
