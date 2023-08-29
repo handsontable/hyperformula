@@ -72,7 +72,7 @@ export class Graph<T> {
    *
    * @param node - node to which adjacent nodes we want to retrieve
    */
-  public adjacentNodes(node: T): Set<T> { // TODO: return array
+  public adjacentNodes(node: T): Set<T> { // TODO: try returning array
     const id = this.nodesIds.get(node)
 
     if (id === undefined) {
@@ -83,22 +83,10 @@ export class Graph<T> {
   }
 
   /**
-   * @internal
+   * Returns number of nodes adjacent to given node. Contrary to adjacentNodes(), this method returns only nodes that are present in graph.
+   *
+   * @param node - node to which adjacent nodes we want to retrieve
    */
-  public reversedAdjacentNodes(node: T): T[] {
-    const id = this.nodesIds.get(node)
-
-    if (id === undefined) {
-      throw this.missingNodeError(node)
-    }
-
-    return this.nodesSparseArray.reduce((acc: number[], sourceNode, sourceId) =>
-      sourceNode && this.edgesSparseArray[sourceId].includes(id)
-      ? [ ...acc, sourceId ]
-      : acc
-    , []).map(resultId => this.nodesSparseArray[resultId])
-  }
-
   public adjacentNodesCount(node: T): number {
     const id = this.nodesIds.get(node)
 

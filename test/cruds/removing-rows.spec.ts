@@ -11,7 +11,7 @@ import {
   expectReferenceToHaveRefError,
   extractMatrixRange,
   extractRange,
-  extractReference,
+  extractReference, graphReversedAdjacentNodes,
   noSpace,
   verifyRangesInSheet,
   verifyValues,
@@ -815,11 +815,11 @@ describe('Removing rows - range mapping', function() {
     ])
 
     const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
-    expect(engine.graph.reversedAdjacentNodes(a1a3).length).toBe(2)
+    expect(graphReversedAdjacentNodes(engine.graph, a1a3).length).toBe(2)
     engine.removeRows(0, [0, 2])
     const a1a1 = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     expect(a1a1).toBe(a1a3)
-    expect(engine.graph.reversedAdjacentNodes(a1a1).length).toBe(1)
+    expect(graphReversedAdjacentNodes(engine.graph, a1a1).length).toBe(1)
   })
 })
 
