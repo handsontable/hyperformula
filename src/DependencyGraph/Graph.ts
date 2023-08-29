@@ -6,7 +6,6 @@
 import {SimpleCellAddress} from '../Cell'
 import {SimpleCellRange} from '../AbsoluteCellRange'
 import {TopSort, TopSortResult} from './TopSort'
-import {ArrayVertex} from './FormulaCellVertex'
 
 export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCellRange), T][]
 

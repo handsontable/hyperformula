@@ -160,8 +160,3 @@ export class TopSort<T> {
     return {sorted, cycled}
   }
 }
-
-
-// TODO:
-// 1. experiment with ids -> 15% speedup
-// 2. focus on parsing date-time
