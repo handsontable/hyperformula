@@ -15,7 +15,7 @@ enum NodeVisitStatus {
 }
 
 /**
- * An algorithm class. Provides topological sorting of a graph.
+ * An algorithm class. Provides an iterative implementation of Tarjan's algorithm for finding strongly connected components
  */
 export class TopSort<T> {
   private entranceTime: number[] = []

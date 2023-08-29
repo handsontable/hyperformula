@@ -265,7 +265,7 @@ export function expectCellValueToEqualDate(engine: HyperFormula, cellAddress: Si
  */
 export function graphEdgesCount<T>(graph: Graph<T>): number {
   return (graph as any).nodesSparseArray.reduce((acc: number, node: T, id: number) =>
-    node ? acc + (graph as any).cleanupAdjacentNodeIds(id).length : acc
+    node ? acc + ((graph as any).fixEdgesArrayForNode(id) as number[]).length : acc
   , 0)
 }
 

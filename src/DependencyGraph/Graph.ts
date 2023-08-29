@@ -94,7 +94,7 @@ export class Graph<T> {
       throw this.missingNodeError(node)
     }
 
-    return this.cleanupAdjacentNodeIds(id).length
+    return this.fixEdgesArrayForNode(id).length
   }
 
   /**
@@ -139,7 +139,10 @@ export class Graph<T> {
 
     this.edgesSparseArray[fromId].push(toId)
   }
-
+  
+  /**
+   * Removes node from graph
+   */
   public removeNode(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
     const id = this.nodesIds.get(node)
 
@@ -165,6 +168,9 @@ export class Graph<T> {
     return dependencies
   }
 
+  /**
+   * Removes edge between nodes.
+   */
   public removeEdge(fromNode: T, toNode: T): void {
     const fromId = this.nodesIds.get(fromNode)
     const toId = this.nodesIds.get(toNode)
@@ -186,6 +192,9 @@ export class Graph<T> {
     delete this.edgesSparseArray[fromId][indexOfToId]
   }
 
+  /**
+   * Removes edge between nodes if it exists.
+   */
   public removeEdgeIfExists(fromNode: T, toNode: T): void {
     const fromId = this.nodesIds.get(fromNode)
     const toId = this.nodesIds.get(toNode)
@@ -207,8 +216,8 @@ export class Graph<T> {
     delete this.edgesSparseArray[fromId][indexOfToId]
   }
 
-  /*
-   * return a topological sort order, but separates vertices that exist in some cycle
+  /**
+   * Sorts the whole graph topologically. Nodes that are on cycles are kept separate.
    */
   public topSortWithScc(): TopSortResult<T> {
     return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => {
@@ -216,12 +225,10 @@ export class Graph<T> {
   }
 
   /**
+   * Sorts the graph topologically. Nodes that are on cycles are kept separate.
    *
-   * an iterative implementation of Tarjan's algorithm for finding strongly connected compontents
-   * returns vertices in order of topological sort, but vertices that are on cycles are kept separate
-   *
-   * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
-   * @param operatingFunction - recomputes value of a node, and returns whether a change occured
+   * @param modifiedNodes - seed for computation. The algorithm assumes that only these nodes have changed since the last run.
+   * @param operatingFunction - recomputes value of a node, and returns whether a change occurred
    * @param onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
@@ -230,6 +237,9 @@ export class Graph<T> {
     return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
   }
 
+  /**
+   * Marks node as special.
+   */
   public markNodeAsSpecial(node: T): void {
     if (!this.hasNode(node)) {
       return
@@ -238,6 +248,9 @@ export class Graph<T> {
     this.specialNodes.add(node)
   }
 
+  /**
+   * Marks node as specialRecentlyChanged.
+   */
   public markNodeAsSpecialRecentlyChanged(node: T): void {
     if (!this.hasNode(node)) {
       return
@@ -246,6 +259,9 @@ export class Graph<T> {
     this.specialNodesRecentlyChanged.add(node)
   }
 
+  /**
+   * Marks node as changingWithStructure.
+   */
   public markNodeAsChangingWithStructure(node: T): void {
     if (!this.hasNode(node)) {
       return
@@ -254,6 +270,9 @@ export class Graph<T> {
     this.specialNodesStructuralChanges.add(node)
   }
 
+  /**
+   * Marks node as infiniteRange.
+   */
   public markNodeAsInfiniteRange(node: T): void {
     if (!this.hasNode(node)) {
       return
@@ -262,16 +281,25 @@ export class Graph<T> {
     this.infiniteRanges.add(node)
   }
 
+  /**
+   * Clears specialNodesRecentlyChanged.
+   */
   public clearSpecialNodesRecentlyChanged(): void {
     this.specialNodesRecentlyChanged.clear()
   }
 
-  private cleanupAdjacentNodeIds(id: number): number[] {
+  /**
+   * Removes invalid neighbors of a given node from the edges array and returns adjacent nodes for the input node.
+   */
+  private fixEdgesArrayForNode(id: number): number[] {
     const adjacentNodeIds = this.edgesSparseArray[id]
     this.edgesSparseArray[id] = adjacentNodeIds.filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
     return this.edgesSparseArray[id]
   }
 
+  /**
+   * Removes edges from the given node to its dependencies based on the dependencyQuery function.
+   */
   private removeDependencies(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
     const dependencies = this.dependencyQuery(node)
     for (const [_, dependency] of dependencies) {
@@ -280,6 +308,9 @@ export class Graph<T> {
     return dependencies
   }
 
+  /**
+   * Returns error for missing node.
+   */
   private missingNodeError(node: T): Error {
     return new Error(`Unknown node ${node}`)
   }
