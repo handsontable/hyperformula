@@ -104,32 +104,29 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
     return undefined
   }
 
-  const hourString = hourItem !== -1 ? timeItems[hourItem] : '0'
-  if (!/^\d+$/.test(hourString)) {
+  const secondsParsed = Number(timeItems[secondItem] ?? '0')
+  if (!Number.isFinite(secondsParsed)) {
     return undefined
   }
-  let hours = Number(hourString)
-  if (ampm !== undefined) {
-    if (hours < 0 || hours > 12) {
-      return undefined
-    }
-    hours = hours % 12
-    if (ampm) {
-      hours = hours + 12
-    }
+  const seconds = Math.round(secondsParsed * SECONDS_PRECISION) / SECONDS_PRECISION
+
+  const minutes = Number(timeItems[minuteItem] ?? '0')
+  if (!(Number.isFinite(minutes) && Number.isInteger(minutes))) {
+    return undefined
   }
 
-  const minuteString = minuteItem !== -1 ? timeItems[minuteItem] : '0'
-  if (!/^\d+$/.test(minuteString)) {
+  const hoursParsed = Number(timeItems[hourItem] ?? '0')
+  if (!(Number.isFinite(hoursParsed) && Number.isInteger(hoursParsed))) {
     return undefined
   }
-  const minutes = Number(minuteString)
 
-  const secondString = secondItem !== -1 ? timeItems[secondItem] : '0'
-  if (!/^\d+(\.\d+)?$/.test(secondString)) {
+  if (ampm !== undefined && (hoursParsed < 0 || hoursParsed > 12)) {
     return undefined
   }
-  const seconds = Math.round(Number(secondString) * SECONDS_PRECISION) / SECONDS_PRECISION
+
+  const hours = ampm !== undefined
+  ? hoursParsed % 12 + (ampm ? 12 : 0)
+  : hoursParsed
 
   return { hours, minutes, seconds }
 }
@@ -167,9 +164,7 @@ function defaultParseToDate(dateItems: string[], dateFormat: Maybe<string>): May
     return undefined
   }
 
-  const yearString = dateItems[longYearItem] ?? dateItems[shortYearItem]
-
-  const year = Number(yearString)
+  const year = Number(dateItems[longYearItem] ?? dateItems[shortYearItem])
   if (!(Number.isFinite(year) && Number.isInteger(year))) {
     return undefined
   }
