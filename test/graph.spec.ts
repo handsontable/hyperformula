@@ -489,24 +489,23 @@ describe('Graph class', () => {
     })
   })
 
-  describe('markNodeAsSpecial', () => {
-    it('adds a node to special nodes array', () => {
+  describe('markNodeAsVolatile', () => {
+    it('adds a node to volatile nodes array', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'foo')
 
       graph.addNode(node)
-      graph.markNodeAsSpecial(node)
+      graph.markNodeAsVolatile(node)
 
-      expect(graph.specialNodes).toEqual(new Set([node]))
+      expect(graph.getRecentlyChangedAndVolatile()).toEqual([node])
     })
 
     it('does nothing if node is not in a graph', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'foo')
 
-      graph.markNodeAsSpecial(node)
-      expect(graph.specialNodes).toEqual(new Set([]))
-
+      graph.markNodeAsVolatile(node)
+      expect(graph.getRecentlyChangedAndVolatile()).toEqual([])
     })
   })
 
