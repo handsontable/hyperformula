@@ -497,7 +497,7 @@ describe('Graph class', () => {
       graph.addNode(node)
       graph.markNodeAsVolatile(node)
 
-      expect(graph.getRecentlyChangedAndVolatile()).toEqual([node])
+      expect(graph.getDirtyAndVolatileNodes()).toEqual([node])
     })
 
     it('does nothing if node is not in a graph', () => {
@@ -505,7 +505,7 @@ describe('Graph class', () => {
       const node = new IdentifiableString(0, 'foo')
 
       graph.markNodeAsVolatile(node)
-      expect(graph.getRecentlyChangedAndVolatile()).toEqual([])
+      expect(graph.getDirtyAndVolatileNodes()).toEqual([])
     })
   })
 
@@ -516,8 +516,9 @@ describe('Graph class', () => {
 
       graph.addNode(node)
       graph.markNodeAsChangingWithStructure(node)
+      graph.markChangingWithStructureNodesAsDirty()
 
-      expect(graph.specialNodesStructuralChanges).toEqual(new Set([node]))
+      expect(graph.getDirtyAndVolatileNodes()).toEqual([node])
     })
 
     it('does nothing if node is not in a graph', () => {
@@ -525,19 +526,21 @@ describe('Graph class', () => {
       const node = new IdentifiableString(0, 'foo')
 
       graph.markNodeAsChangingWithStructure(node)
-      expect(graph.specialNodesStructuralChanges).toEqual(new Set([]))
+      graph.markChangingWithStructureNodesAsDirty()
+
+      expect(graph.getDirtyAndVolatileNodes()).toEqual([])
     })
   })
 
   describe('markNodeAsInfiniteRange', () => {
-    it('adds a node to infiniteRanges array', () => {
+    it('adds a node to the infinite ranges array', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'foo')
 
       graph.addNode(node)
       graph.markNodeAsInfiniteRange(node)
 
-      expect(graph.infiniteRanges).toEqual(new Set([node]))
+      expect(graph.getInfiniteRanges()).toEqual([node])
     })
 
     it('does nothing if node is not in a graph', () => {
@@ -545,7 +548,7 @@ describe('Graph class', () => {
       const node = new IdentifiableString(0, 'foo')
 
       graph.markNodeAsInfiniteRange(node)
-      expect(graph.infiniteRanges).toEqual(new Set([]))
+      expect(graph.getInfiniteRanges()).toEqual([])
     })
   })
 })

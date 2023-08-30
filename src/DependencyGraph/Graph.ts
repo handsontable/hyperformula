@@ -17,8 +17,10 @@ export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCell
  * - edgesSparseArray is a sparse array. edgesSparseArray[n] exists if and only if node n is in the graph
  * - edgesSparseArray[n] is a sparse array. edgesSparseArray[n] may contain removed nodes. To make sure check nodesSparseArray.
  *
- * - recentlyChangedNodeIds is a dense array; it may contain duplicates and removed nodes.
+ * - dirtyNodeIds is a dense array; it may contain duplicates and removed nodes.
  * - volatileNodeIds is a dense array; it may contain duplicates and removed nodes.
+ * - infiniteRangeIds is a dense array; it may contain duplicates and removed nodes.
+ * - changingWithStructureNodeIds is a dense array; it may contain duplicates and removed nodes.
  */
 export class Graph<T> {
   private nodesSparseArray: T[] = []
@@ -26,12 +28,10 @@ export class Graph<T> {
   private nodesIds: Map<T, number> = new Map()
   private nextId: number = 0
 
-  private recentlyChangedNodeIds: number[] = []
+  private dirtyNodeIds: number[] = []
   private volatileNodeIds: number[] = []
-
-  // TODO: try using number[] for these collections
-  public specialNodesStructuralChanges: Set<T> = new Set()
-  public infiniteRanges: Set<T> = new Set()
+  private infiniteRangeIds: number[] = []
+  private changingWithStructureNodeIds: number[] = []
 
   constructor(
     private readonly dependencyQuery: DependencyQuery<T>
@@ -153,15 +153,13 @@ export class Graph<T> {
       throw this.missingNodeError(node)
     }
 
-    this.edgesSparseArray[id].forEach(adjacentId => this.recentlyChangedNodeIds.push(adjacentId))
+    this.edgesSparseArray[id].forEach(adjacentId => this.dirtyNodeIds.push(adjacentId))
 
     const dependencies = this.removeDependencies(node)
 
     delete this.nodesSparseArray[id]
     delete this.edgesSparseArray[id]
     this.nodesIds.delete(node)
-    this.specialNodesStructuralChanges.delete(node)
-    this.infiniteRanges.delete(node)
 
     return dependencies
   }
@@ -252,54 +250,74 @@ export class Graph<T> {
   }
 
   /**
-   * Marks node as recently changed.
+   * Marks node as dirty.
    */
-  public markNodeAsRecentlyChanged(node: T): void {
+  public markNodeAsDirty(node: T): void {
     const id = this.nodesIds.get(node)
 
     if (id === undefined) {
       return
     }
 
-    this.recentlyChangedNodeIds.push(id)
+    this.dirtyNodeIds.push(id)
   }
 
   /**
-   * Returns an array of nodes that are marked as recently changed and/or volatile
+   * Returns an array of nodes that are marked as dirty and/or volatile.
    */
-  public getRecentlyChangedAndVolatile(): T[] {
-    const withoutDuplicates = new Set([ ...this.recentlyChangedNodeIds, ...this.volatileNodeIds ])
+  public getDirtyAndVolatileNodes(): T[] {
+    const withoutDuplicates = new Set([ ...this.dirtyNodeIds, ...this.volatileNodeIds ])
     const mappedToNodes = [ ...withoutDuplicates ].map(id => this.nodesSparseArray[id]).filter(node => node !== undefined)
     return mappedToNodes
   }
 
   /**
-   * Clears recently changed nodes.
+   * Clears dirty nodes.
    */
-  public clearRecentlyChangedNodes(): void {
-    this.recentlyChangedNodeIds = []
+  public clearDirtyNodes(): void {
+    this.dirtyNodeIds = []
   }
 
   /**
    * Marks node as changingWithStructure.
    */
   public markNodeAsChangingWithStructure(node: T): void {
-    if (!this.hasNode(node)) {
+    const id = this.nodesIds.get(node)
+
+    if (id === undefined) {
       return
     }
 
-    this.specialNodesStructuralChanges.add(node)
+    this.changingWithStructureNodeIds.push(id)
   }
 
   /**
-   * Marks node as infiniteRange.
+   * Marks all nodes marked as changingWithStructure as dirty.
+   */
+  public markChangingWithStructureNodesAsDirty(): void {
+    this.dirtyNodeIds = [ ...this.dirtyNodeIds, ...this.changingWithStructureNodeIds ]
+  }
+
+  /**
+   * Marks node as infinite range.
    */
   public markNodeAsInfiniteRange(node: T): void {
-    if (!this.hasNode(node)) {
+    const id = this.nodesIds.get(node)
+
+    if (id === undefined) {
       return
     }
 
-    this.infiniteRanges.add(node)
+    this.infiniteRangeIds.push(id)
+  }
+
+  /**
+   * Returns an array of nodes marked as infinite ranges
+   */
+  public getInfiniteRanges(): T[] {
+    const withoutDuplicates = new Set(this.infiniteRangeIds)
+    const mappedToNodes = [ ...withoutDuplicates ].map(id => this.nodesSparseArray[id]).filter(node => node !== undefined)
+    return mappedToNodes
   }
 
   /**

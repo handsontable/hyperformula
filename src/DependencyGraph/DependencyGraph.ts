@@ -86,7 +86,7 @@ export class DependencyGraph {
     const newVertex = FormulaVertex.fromAst(ast, address, size, this.lazilyTransformingAstService.version())
     this.exchangeOrAddFormulaVertex(newVertex)
     this.processCellDependencies(dependencies, newVertex)
-    this.graph.markNodeAsRecentlyChanged(newVertex)
+    this.graph.markNodeAsDirty(newVertex)
     if (hasVolatileFunction) {
       this.markAsVolatile(newVertex)
     }
@@ -101,7 +101,7 @@ export class DependencyGraph {
     const vertex = this.shrinkPossibleArrayAndGetCell(address)
     this.exchangeOrAddGraphNode(vertex, errorVertex)
     this.addressMapping.setCell(address, errorVertex)
-    this.graph.markNodeAsRecentlyChanged(errorVertex)
+    this.graph.markNodeAsDirty(errorVertex)
     this.correctInfiniteRangesDependency(address)
     return this.getAndClearContentChanges()
   }
@@ -117,13 +117,13 @@ export class DependencyGraph {
       const oldValues = vertex.getValues()
       if (oldValues.rawValue !== value.rawValue) {
         vertex.setValues(value)
-        this.graph.markNodeAsRecentlyChanged(vertex)
+        this.graph.markNodeAsDirty(vertex)
       }
     } else {
       const newVertex = new ValueCellVertex(value.parsedValue, value.rawValue)
       this.exchangeOrAddGraphNode(vertex, newVertex)
       this.addressMapping.setCell(address, newVertex)
-      this.graph.markNodeAsRecentlyChanged(newVertex)
+      this.graph.markNodeAsDirty(newVertex)
     }
 
     this.correctInfiniteRangesDependency(address)
@@ -143,7 +143,7 @@ export class DependencyGraph {
         this.removeVertex(emptyVertex)
         this.addressMapping.removeCell(address)
       } else {
-        this.graph.markNodeAsRecentlyChanged(emptyVertex)
+        this.graph.markNodeAsDirty(emptyVertex)
         this.addressMapping.setCell(address, emptyVertex)
       }
     } else {
@@ -160,12 +160,12 @@ export class DependencyGraph {
     }
   }
 
-  public clearRecentlyChangedVertices() {
-    this.graph.clearRecentlyChangedNodes()
+  public clearDirtyVertices() {
+    this.graph.clearDirtyNodes()
   }
 
   public verticesToRecompute(): Vertex[] {
-    return this.graph.getRecentlyChangedAndVolatile()
+    return this.graph.getDirtyAndVolatileNodes()
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
@@ -233,14 +233,14 @@ export class DependencyGraph {
   }
 
   public correctInfiniteRangesDependency(address: SimpleCellAddress) {
-    let vertex: Maybe<Vertex> = undefined
-    for (const range of this.graph.infiniteRanges) {
-      const infiniteRangeVertex = (range as RangeVertex)
-      if (infiniteRangeVertex.range.addressInRange(address)) {
+    let vertex: Maybe<Vertex> = undefined;
+
+    (this.graph.getInfiniteRanges() as RangeVertex[])
+      .filter((infiniteRangeVertex: RangeVertex) => infiniteRangeVertex.range.addressInRange(address))
+      .forEach((infiniteRangeVertex: RangeVertex) => {
         vertex = vertex ?? this.fetchCellOrCreateEmpty(address)
         this.graph.addEdge(vertex, infiniteRangeVertex)
-      }
-    }
+      })
   }
 
   public fetchCellOrCreateEmpty(address: SimpleCellAddress): CellVertex {
@@ -257,7 +257,7 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const [address, vertex] of this.addressMapping.entriesFromRowsSpan(removedRows)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
-          this.graph.markNodeAsRecentlyChanged(adjacentNode)
+          this.graph.markNodeAsDirty(adjacentNode)
         }
         if (vertex instanceof ArrayVertex) {
           if (vertex.isLeftCorner(address)) {
@@ -297,7 +297,7 @@ export class DependencyGraph {
 
     for (const [adr, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
-        this.graph.markNodeAsRecentlyChanged(adjacentNode)
+        this.graph.markNodeAsDirty(adjacentNode)
       }
       this.removeVertex(vertex)
       this.addressMapping.removeCell(adr)
@@ -336,7 +336,7 @@ export class DependencyGraph {
     this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
       for (const [address, vertex] of this.addressMapping.entriesFromColumnsSpan(removedColumns)) {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
-          this.graph.markNodeAsRecentlyChanged(adjacentNode)
+          this.graph.markNodeAsDirty(adjacentNode)
         }
         if (vertex instanceof ArrayVertex) {
           if (vertex.isLeftCorner(address)) {
@@ -387,7 +387,7 @@ export class DependencyGraph {
     })
 
     for (const vertex of this.addressMapping.verticesFromRowsSpan(addedRows)) {
-      this.graph.markNodeAsRecentlyChanged(vertex)
+      this.graph.markNodeAsDirty(vertex)
     }
 
     this.addStructuralNodesToChangeSet()
@@ -411,7 +411,7 @@ export class DependencyGraph {
     })
 
     for (const vertex of this.addressMapping.verticesFromColumnsSpan(addedColumns)) {
-      this.graph.markNodeAsRecentlyChanged(vertex)
+      this.graph.markNodeAsDirty(vertex)
     }
 
     this.addStructuralNodesToChangeSet()
@@ -448,7 +448,7 @@ export class DependencyGraph {
       this.addressMapping.removeCell(sourceAddress)
 
       if (sourceVertex !== undefined) {
-        this.graph.markNodeAsRecentlyChanged(sourceVertex)
+        this.graph.markNodeAsDirty(sourceVertex)
         this.addressMapping.setCell(targetAddress, sourceVertex)
         let emptyVertex = undefined
         for (const adjacentNode of this.graph.adjacentNodes(sourceVertex)) {
@@ -459,7 +459,7 @@ export class DependencyGraph {
           }
         }
         if (emptyVertex) {
-          this.graph.markNodeAsRecentlyChanged(emptyVertex)
+          this.graph.markNodeAsDirty(emptyVertex)
           this.addressMapping.setCell(sourceAddress, emptyVertex)
         }
       }
@@ -471,7 +471,7 @@ export class DependencyGraph {
         for (const adjacentNode of this.graph.adjacentNodes(targetVertex)) {
           sourceVertex = sourceVertex ?? this.fetchCellOrCreateEmpty(targetAddress)
           this.graph.addEdge(sourceVertex, adjacentNode)
-          this.graph.markNodeAsRecentlyChanged(sourceVertex)
+          this.graph.markNodeAsDirty(sourceVertex)
         }
         this.removeVertex(targetVertex)
       }
@@ -486,7 +486,7 @@ export class DependencyGraph {
             const newEmptyVertex = this.fetchCellOrCreateEmpty(address)
             this.graph.addEdge(newEmptyVertex, adjacentNode)
             this.addressMapping.setCell(address, newEmptyVertex)
-            this.graph.markNodeAsRecentlyChanged(newEmptyVertex)
+            this.graph.markNodeAsDirty(newEmptyVertex)
           }
         }
       }
@@ -510,7 +510,7 @@ export class DependencyGraph {
         this.graph.addEdge(vertex, adjacentNode)
       }
       if (nodeDependencies.length > 0) {
-        this.graph.markNodeAsRecentlyChanged(adjacentNode)
+        this.graph.markNodeAsDirty(adjacentNode)
       }
     }
 
@@ -608,7 +608,7 @@ export class DependencyGraph {
     this.graph.markNodeAsVolatile(vertex)
   }
 
-  public markAsDependentOnStructureChange(vertex: Vertex) {
+  public markAsDependentOnStructureChange(vertex: Vertex): void {
     this.graph.markNodeAsChangingWithStructure(vertex)
   }
 
@@ -734,13 +734,13 @@ export class DependencyGraph {
           dependentToCorner = true
         }
         this.graph.addEdge(vertex, adjacentVertex)
-        this.graph.markNodeAsRecentlyChanged(vertex)
+        this.graph.markNodeAsDirty(vertex)
       }
       if (!dependentToCorner) {
         this.graph.removeEdge(array, adjacentVertex)
       }
     }
-    this.graph.markNodeAsRecentlyChanged(array)
+    this.graph.markNodeAsDirty(array)
   }
 
   public isArrayInternalCell(address: SimpleCellAddress): boolean {
@@ -769,16 +769,18 @@ export class DependencyGraph {
   }
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
-    for (const range of this.graph.infiniteRanges) {
-      const infiniteRangeVertex = (range as RangeVertex)
-      const intersection = vertex.range.intersectionWith(infiniteRangeVertex.range)
-      if (intersection === undefined) {
-        continue
-      }
-      for (const address of intersection.addresses(this)) {
-        this.graph.addEdge(this.fetchCellOrCreateEmpty(address), range)
-      }
-    }
+    (this.graph.getInfiniteRanges() as RangeVertex[])
+      .forEach((infiniteRangeVertex: RangeVertex) => {
+        const intersection = vertex.range.intersectionWith(infiniteRangeVertex.range)
+
+        if (intersection === undefined) {
+          return
+        }
+
+        intersection.addresses(this).forEach((address: SimpleCellAddress) => {
+          this.graph.addEdge(this.fetchCellOrCreateEmpty(address), infiniteRangeVertex)
+        })
+      })
   }
 
   private cleanAddressMappingUnderArray(vertex: ArrayVertex) {
@@ -865,10 +867,8 @@ export class DependencyGraph {
     return [address, absolutizeDependencies(deps, address)]
   }
 
-  private addStructuralNodesToChangeSet() {
-    for (const vertex of this.graph.specialNodesStructuralChanges) {
-      this.graph.markNodeAsRecentlyChanged(vertex)
-    }
+  private addStructuralNodesToChangeSet(): void {
+    this.graph.markChangingWithStructureNodesAsDirty()
   }
 
   private fixRangesWhenAddingRows(sheet: number, row: number, numberOfRows: number): void {
