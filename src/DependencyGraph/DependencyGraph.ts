@@ -165,7 +165,7 @@ export class DependencyGraph {
   }
 
   public verticesToRecompute() {
-    return new Set([...this.graph.specialNodesRecentlyChanged, ...this.volatileVertices()])
+    return new Set([...this.graph.getSpecialRecentlyChangedNodes(), ...this.volatileVertices()])
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {

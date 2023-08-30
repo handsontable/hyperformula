@@ -23,10 +23,11 @@ export class Graph<T> {
   private nodesIds: Map<T, number> = new Map()
   private nextId: number = 0
 
+  private specialRecentlyChangedIds: number[] = [] // may contain duplicates, may contain removed nodes
+
   // TODO: try using number[] for these collections
   public specialNodes: Set<T> = new Set()
   public specialNodesStructuralChanges: Set<T> = new Set()
-  public specialNodesRecentlyChanged: Set<T> = new Set()
   public infiniteRanges: Set<T> = new Set()
 
   constructor(
@@ -160,7 +161,6 @@ export class Graph<T> {
     delete this.edgesSparseArray[id]
     this.nodesIds.delete(node)
     this.specialNodes.delete(node)
-    this.specialNodesRecentlyChanged.delete(node)
     this.specialNodesStructuralChanges.delete(node)
     this.infiniteRanges.delete(node)
 
@@ -254,11 +254,27 @@ export class Graph<T> {
    * Marks node as specialRecentlyChanged.
    */
   public markNodeAsSpecialRecentlyChanged(node: T): void {
-    if (!this.hasNode(node)) {
+    const id = this.nodesIds.get(node)
+
+    if (id === undefined) {
       return
     }
 
-    this.specialNodesRecentlyChanged.add(node)
+    this.specialRecentlyChangedIds.push(id)
+  }
+
+  /**
+   * Returns special recently changed nodes. May contain duplicates.
+   */
+  public getSpecialRecentlyChangedNodes(): T[] {
+    return this.specialRecentlyChangedIds.map(id => this.nodesSparseArray[id]).filter(node => node !== undefined)
+  }
+
+  /**
+   * Clears special recently changed nodes.
+   */
+  public clearSpecialNodesRecentlyChanged(): void {
+    this.specialRecentlyChangedIds = []
   }
 
   /**
@@ -281,13 +297,6 @@ export class Graph<T> {
     }
 
     this.infiniteRanges.add(node)
-  }
-
-  /**
-   * Clears specialNodesRecentlyChanged.
-   */
-  public clearSpecialNodesRecentlyChanged(): void {
-    this.specialNodesRecentlyChanged.clear()
   }
 
   /**

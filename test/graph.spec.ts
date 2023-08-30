@@ -64,7 +64,7 @@ describe('Graph class', () => {
     it('throws error when node does not exist', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
-      expect(() => graph.removeNode(new IdentifiableString(0, 'foo'))).toThrow(/Unknown node/)
+      expect(() => graph.removeNode(new IdentifiableString(0, 'foo'))).toThrowError(/Unknown node/)
     })
   })
 
