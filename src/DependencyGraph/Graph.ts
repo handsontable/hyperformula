@@ -12,26 +12,54 @@ export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCell
 /**
  * Provides directed graph structure.
  *
- * - nodesSparseArray is a sparse array. nodesSparseArray[n] exists if and only if node n is in the graph
- * - nodesIds is a mapping from node to its id. nodesIds.get(node) exists if and only if node is in the graph
- * - edgesSparseArray is a sparse array. edgesSparseArray[n] exists if and only if node n is in the graph
- * - edgesSparseArray[n] is a sparse array. edgesSparseArray[n] may contain removed nodes. To make sure check nodesSparseArray.
- *
- * - dirtyNodeIds is a dense array; it may contain duplicates and removed nodes.
- * - volatileNodeIds is a dense array; it may contain duplicates and removed nodes.
- * - infiniteRangeIds is a dense array; it may contain duplicates and removed nodes.
- * - changingWithStructureNodeIds is a dense array; it may contain duplicates and removed nodes.
+ * Idea for performance improvement:
+ * - use Set<T>[] instead of number[][] for edgesSparseArray
  */
 export class Graph<T> {
+  /**
+   * A sparse array. The value nodesSparseArray[n] exists if and only if node n is in the graph.
+   * @private
+   */
   private nodesSparseArray: T[] = []
-  private edgesSparseArray: number[][] = [] // TODO: try using Set<T>[]
-  private nodesIds: Map<T, number> = new Map()
-  private nextId: number = 0
 
+  /**
+   * A sparse array. The value edgesSparseArray[n] exists if and only if node n is in the graph.
+   * The edgesSparseArray[n] is also a sparse array. It may contain removed nodes. To make sure check nodesSparseArray.
+   * @private
+   */
+  private edgesSparseArray: number[][] = []
+
+  /**
+   * A mapping from node to its id. The value nodesIds.get(node) exists if and only if node is in the graph.
+   * @private
+   */
+  private nodesIds: Map<T, number> = new Map()
+
+  /**
+   * A dense array. It may contain duplicates and removed nodes.
+   * @private
+   */
   private dirtyNodeIds: number[] = []
+
+  /**
+   * A dense array. It may contain duplicates and removed nodes.
+   * @private
+   */
   private volatileNodeIds: number[] = []
+
+  /**
+   * A dense array. It may contain duplicates and removed nodes.
+   * @private
+   */
   private infiniteRangeIds: number[] = []
+
+  /**
+   * A dense array. It may contain duplicates and removed nodes.
+   * @private
+   */
   private changingWithStructureNodeIds: number[] = []
+
+  private nextId: number = 0
 
   constructor(
     private readonly dependencyQuery: DependencyQuery<T>
@@ -74,8 +102,11 @@ export class Graph<T> {
    * Returns nodes adjacent to given node. May contain removed nodes.
    *
    * @param node - node to which adjacent nodes we want to retrieve
+   *
+   * Idea for performance improvement:
+   * - return an array instead of set
    */
-  public adjacentNodes(node: T): Set<T> { // TODO: try returning array
+  public adjacentNodes(node: T): Set<T> {
     const id = this.nodesIds.get(node)
 
     if (id === undefined) {

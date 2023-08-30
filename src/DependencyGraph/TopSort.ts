@@ -117,7 +117,6 @@ export class TopSort<T> {
   private handleProcessed(u: number, SCCstack: number[], DFSstack: number[]) {
     let uLow = this.entranceTime[u]
 
-    // TODO: Ta petla chyba jest niepotrzebna. Chiecko mogloby updatowac low[this.parent]
     this.getAdjacentNodeIds(u).forEach((t: number) => {
       if (this.inSCC[t]) {
         return
@@ -170,7 +169,10 @@ export class TopSort<T> {
     this.order.forEach((t: number) => {
       const adjacentNodes = this.getAdjacentNodeIds(t)
 
-      if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) { // TODO: to jest potencjalnie czas kwadratowy
+      // The following line is a potential performance bottleneck.
+      // Array.includes() is O(n) operation, which makes the whole algorithm O(n^2).
+      // Idea for improvement: use Set<T>[] instead of number[][] for edgesSparseArray.
+      if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) {
         cycled.push(this.nodesSparseArray[t])
         onCycle(this.nodesSparseArray[t])
         adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
