@@ -6,6 +6,7 @@
 import {SimpleCellAddress} from '../Cell'
 import {SimpleCellRange} from '../AbsoluteCellRange'
 import {TopSort, TopSortResult} from './TopSort'
+import {ProcessableValue} from './ProcessableValue'
 
 export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCellRange), T][]
 
@@ -36,22 +37,22 @@ export class Graph<T> {
   private nodesIds: Map<T, number> = new Map()
 
   /**
-   * A dense array. It may contain duplicates and removed nodes.
+   * A ProcessableValue object.
    * @private
    */
-  private dirtyNodeIds: number[] = []
+  private dirtyAndVolatileNodeIds = new ProcessableValue<{ dirty: number[], volatile: number[] }, T[]>(
+    { dirty: [], volatile: [] },
+    r => this.processDirtyAndVolatileNodeIds(r),
+  )
 
   /**
-   * A dense array. It may contain duplicates and removed nodes.
+   * A ProcessableValue object.
    * @private
    */
-  private volatileNodeIds: number[] = []
-
-  /**
-   * A dense array. It may contain duplicates and removed nodes.
-   * @private
-   */
-  private infiniteRangeIds: number[] = []
+  private infiniteRangeIds = new ProcessableValue<number[], T[]>(
+    [],
+    r => this.processInfiniteRangeIds(r),
+  )
 
   /**
    * A dense array. It may contain duplicates and removed nodes.
@@ -184,7 +185,10 @@ export class Graph<T> {
       throw this.missingNodeError(node)
     }
 
-    this.edgesSparseArray[id].forEach(adjacentId => this.dirtyNodeIds.push(adjacentId))
+    if (this.edgesSparseArray[id].length > 0) {
+      this.edgesSparseArray[id].forEach(adjacentId => this.dirtyAndVolatileNodeIds.rawValue.dirty.push(adjacentId))
+      this.dirtyAndVolatileNodeIds.markAsModified()
+    }
 
     const dependencies = this.removeDependencies(node)
 
@@ -277,7 +281,8 @@ export class Graph<T> {
       return
     }
 
-    this.volatileNodeIds.push(id)
+    this.dirtyAndVolatileNodeIds.rawValue.volatile.push(id)
+    this.dirtyAndVolatileNodeIds.markAsModified()
   }
 
   /**
@@ -290,23 +295,23 @@ export class Graph<T> {
       return
     }
 
-    this.dirtyNodeIds.push(id)
+    this.dirtyAndVolatileNodeIds.rawValue.dirty.push(id)
+    this.dirtyAndVolatileNodeIds.markAsModified()
   }
 
   /**
    * Returns an array of nodes that are marked as dirty and/or volatile.
    */
   public getDirtyAndVolatileNodes(): T[] {
-    const withoutDuplicates = new Set([ ...this.dirtyNodeIds, ...this.volatileNodeIds ])
-    const mappedToNodes = [ ...withoutDuplicates ].map(id => this.nodesSparseArray[id]).filter(node => node !== undefined)
-    return mappedToNodes
+    return this.dirtyAndVolatileNodeIds.getProcessedValue()
   }
 
   /**
    * Clears dirty nodes.
    */
   public clearDirtyNodes(): void {
-    this.dirtyNodeIds = []
+    this.dirtyAndVolatileNodeIds.rawValue.dirty = []
+    this.dirtyAndVolatileNodeIds.markAsModified()
   }
 
   /**
@@ -326,7 +331,12 @@ export class Graph<T> {
    * Marks all nodes marked as changingWithStructure as dirty.
    */
   public markChangingWithStructureNodesAsDirty(): void {
-    this.dirtyNodeIds = [ ...this.dirtyNodeIds, ...this.changingWithStructureNodeIds ]
+    if (this.changingWithStructureNodeIds.length <= 0) {
+      return
+    }
+
+    this.dirtyAndVolatileNodeIds.rawValue.dirty = [ ...this.dirtyAndVolatileNodeIds.rawValue.dirty, ...this.changingWithStructureNodeIds ]
+    this.dirtyAndVolatileNodeIds.markAsModified()
   }
 
   /**
@@ -339,16 +349,15 @@ export class Graph<T> {
       return
     }
 
-    this.infiniteRangeIds.push(id)
+    this.infiniteRangeIds.rawValue.push(id)
+    this.infiniteRangeIds.markAsModified()
   }
 
   /**
    * Returns an array of nodes marked as infinite ranges
    */
   public getInfiniteRanges(): T[] {
-    const withoutDuplicates = new Set(this.infiniteRangeIds)
-    const mappedToNodes = [ ...withoutDuplicates ].map(id => this.nodesSparseArray[id]).filter(node => node !== undefined)
-    return mappedToNodes
+    return this.infiniteRangeIds.getProcessedValue()
   }
 
   /**
@@ -371,6 +380,26 @@ export class Graph<T> {
     })
 
     return dependencies
+  }
+
+  /**
+   * processFn for infiniteRangeIds ProcessableValue instance
+   * @private
+   */
+  private processInfiniteRangeIds(ids: number[]): T[] {
+    return [ ...new Set(ids) ]
+      .map(id => this.nodesSparseArray[id])
+      .filter(node => node !== undefined)
+  }
+
+  /**
+   * processFn for dirtyAndVolatileNodeIds ProcessableValue instance
+   * @private
+   */
+  private processDirtyAndVolatileNodeIds({ dirty, volatile }: { dirty: number[], volatile: number[] }): T[] {
+    return [ ...new Set([ ...dirty, ...volatile]) ]
+    .map(id => this.nodesSparseArray[id])
+    .filter(node => node !== undefined)
   }
 
   /**
