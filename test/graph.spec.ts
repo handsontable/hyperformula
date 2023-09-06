@@ -12,7 +12,7 @@ class IdentifiableString {
 const dummyDependencyQuery: DependencyQuery<any> = () => []
 
 describe('Graph class', () => {
-  describe('addNode', () => {
+  describe('addNodeAndReturnId', () => {
     it('adds a node to the empty graph', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 

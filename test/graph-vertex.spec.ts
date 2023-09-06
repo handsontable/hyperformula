@@ -3,7 +3,7 @@ import {Graph, ValueCellVertex, Vertex} from '../src/DependencyGraph'
 const dummyGetDependenciesQuery: () => any[] = () => []
 
 describe('Graph with Vertex', () => {
-  it('#addNode works correctly with Vertex instances', () => {
+  it('#addNodeAndReturnId works correctly with Vertex instances', () => {
     const graph = new Graph<Vertex>(dummyGetDependenciesQuery)
 
     const v1 = new ValueCellVertex("1'", "1'")
