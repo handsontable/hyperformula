@@ -807,9 +807,13 @@ export class Operations {
     if (sheetId === undefined) {
       return
     }
-    const localVertex = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
+    const { vertex: localVertex, id: maybeLocalVertexId } = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
+    const localVertexId = maybeLocalVertexId ?? this.dependencyGraph.graph.getNodeId(localVertex)!
+
     const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
-    const globalVertex = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
+    const { vertex: globalVertex, id: maybeGlobalVertexId } = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
+    const globalVertexId = maybeGlobalVertexId ?? this.dependencyGraph.graph.getNodeId(globalVertex)!
+
     for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
       if (adjacentNode instanceof FormulaCellVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
         const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
@@ -817,8 +821,8 @@ export class Operations {
         const {dependencies} = this.parser.fetchCachedResultForAst(ast)
         for (const dependency of absolutizeDependencies(dependencies, formulaAddress)) {
           if (dependency instanceof NamedExpressionDependency && dependency.name.toLowerCase() === namedExpression.displayName.toLowerCase()) {
-            this.dependencyGraph.graph.removeEdge(globalVertex, adjacentNode)
-            this.dependencyGraph.graph.addEdge(localVertex, adjacentNode)
+            this.dependencyGraph.graph.removeEdge(globalVertexId, adjacentNode)
+            this.dependencyGraph.graph.addEdge(localVertexId, adjacentNode)
           }
         }
       }
@@ -875,11 +879,11 @@ export class Operations {
       }
 
       const expressionName = namedExpressionDependency.name
-      const sourceVertex = this.dependencyGraph.fetchNamedExpressionVertex(expressionName, sourceSheet)
+      const sourceVertex = this.dependencyGraph.fetchNamedExpressionVertex(expressionName, sourceSheet).vertex
       const namedExpressionInTargetScope = this.namedExpressions.isExpressionInScope(expressionName, targetAddress.sheet)
 
       const targetScopeExpressionVertex = namedExpressionInTargetScope
-        ? this.dependencyGraph.fetchNamedExpressionVertex(expressionName, targetAddress.sheet)
+        ? this.dependencyGraph.fetchNamedExpressionVertex(expressionName, targetAddress.sheet).vertex
         : this.copyOrFetchGlobalNamedExpressionVertex(expressionName, sourceVertex, addedGlobalNamedExpressions)
 
       if (targetScopeExpressionVertex !== sourceVertex) {
@@ -910,7 +914,7 @@ export class Operations {
         this.setValueToCell(sourceVertex.getValues(), expression.address)
       }
     }
-    return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address)
+    return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address).vertex
   }
 }
 

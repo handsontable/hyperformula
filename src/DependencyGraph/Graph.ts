@@ -8,39 +8,41 @@ import {SimpleCellRange} from '../AbsoluteCellRange'
 import {TopSort, TopSortResult} from './TopSort'
 import {ProcessableValue} from './ProcessableValue'
 
-export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCellRange), T][]
+export type NodeId = number
+export type NodeAndId<Node> = { node: Node, id: NodeId }
+export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | SimpleCellRange), Node][]
 
 /**
  * Provides directed graph structure.
  *
  * Idea for performance improvement:
- * - use Set<T>[] instead of number[][] for edgesSparseArray
+ * - use Set<Node>[] instead of NodeId[][] for edgesSparseArray
  */
-export class Graph<T> {
+export class Graph<Node> {
   /**
    * A sparse array. The value nodesSparseArray[n] exists if and only if node n is in the graph.
    * @private
    */
-  private nodesSparseArray: T[] = []
+  private nodesSparseArray: Node[] = []
 
   /**
    * A sparse array. The value edgesSparseArray[n] exists if and only if node n is in the graph.
    * The edgesSparseArray[n] is also a sparse array. It may contain removed nodes. To make sure check nodesSparseArray.
    * @private
    */
-  private edgesSparseArray: number[][] = []
+  private edgesSparseArray: NodeId[][] = []
 
   /**
    * A mapping from node to its id. The value nodesIds.get(node) exists if and only if node is in the graph.
    * @private
    */
-  private nodesIds: Map<T, number> = new Map()
+  private nodesIds: Map<Node, NodeId> = new Map()
 
   /**
    * A ProcessableValue object.
    * @private
    */
-  private dirtyAndVolatileNodeIds = new ProcessableValue<{ dirty: number[], volatile: number[] }, T[]>(
+  private dirtyAndVolatileNodeIds = new ProcessableValue<{ dirty: NodeId[], volatile: NodeId[] }, Node[]>(
     { dirty: [], volatile: [] },
     r => this.processDirtyAndVolatileNodeIds(r),
   )
@@ -49,7 +51,7 @@ export class Graph<T> {
    * A ProcessableValue object.
    * @private
    */
-  private infiniteRangeIds = new ProcessableValue<number[], T[]>(
+  private infiniteRangeIds = new ProcessableValue<NodeId[], NodeAndId<Node>[]>(
     [],
     r => this.processInfiniteRangeIds(r),
   )
@@ -58,19 +60,19 @@ export class Graph<T> {
    * A dense array. It may contain duplicates and removed nodes.
    * @private
    */
-  private changingWithStructureNodeIds: number[] = []
+  private changingWithStructureNodeIds: NodeId[] = []
 
-  private nextId: number = 0
+  private nextId: NodeId = 0
 
   constructor(
-    private readonly dependencyQuery: DependencyQuery<T>
+    private readonly dependencyQuery: DependencyQuery<Node>
   ) {}
 
   /**
    * Iterate over all nodes the in graph
    */
-  public getNodes(): T[] {
-    return this.nodesSparseArray.filter((node: T) => node !== undefined)
+  public getNodes(): Node[] {
+    return this.nodesSparseArray.filter((node: Node) => node !== undefined)
   }
 
   /**
@@ -78,7 +80,7 @@ export class Graph<T> {
    *
    * @param node - node to check
    */
-  public hasNode(node: T): boolean {
+  public hasNode(node: Node): boolean {
     return this.nodesIds.has(node)
   }
 
@@ -88,9 +90,9 @@ export class Graph<T> {
    * @param fromNode - node from which edge is outcoming
    * @param toNode - node to which edge is incoming
    */
-  public existsEdge(fromNode: T, toNode: T): boolean {
-    const fromId = this.nodesIds.get(fromNode)
-    const toId = this.nodesIds.get(toNode)
+  public existsEdge(fromNode: Node, toNode: Node): boolean {
+    const fromId = this.getNodeId(fromNode)
+    const toId = this.getNodeId(toNode)
 
     if (fromId === undefined || toId === undefined) {
       return false
@@ -107,8 +109,8 @@ export class Graph<T> {
    * Idea for performance improvement:
    * - return an array instead of set
    */
-  public adjacentNodes(node: T): Set<T> {
-    const id = this.nodesIds.get(node)
+  public adjacentNodes(node: Node): Set<Node> {
+    const id = this.getNodeId(node)
 
     if (id === undefined) {
       throw this.missingNodeError(node)
@@ -122,8 +124,8 @@ export class Graph<T> {
    *
    * @param node - node to which adjacent nodes we want to retrieve
    */
-  public adjacentNodesCount(node: T): number {
-    const id = this.nodesIds.get(node)
+  public adjacentNodesCount(node: Node): number {
+    const id = this.getNodeId(node)
 
     if (id === undefined) {
       throw this.missingNodeError(node)
@@ -137,15 +139,20 @@ export class Graph<T> {
    *
    * @param node - a node to be added
    */
-  public addNode(node: T): void {
-    if (this.hasNode(node)) {
-      return
+  public addNodeAndReturnId(node: Node): NodeId {
+    const idOfExistingNode = this.nodesIds.get(node)
+
+    if (idOfExistingNode !== undefined) {
+      return idOfExistingNode
     }
 
-    this.nodesSparseArray[this.nextId] = node
-    this.edgesSparseArray[this.nextId] = []
-    this.nodesIds.set(node, this.nextId)
+    const newId = this.nextId
     this.nextId++
+
+    this.nodesSparseArray[newId] = node
+    this.edgesSparseArray[newId] = []
+    this.nodesIds.set(node, newId)
+    return newId
   }
 
   /**
@@ -156,16 +163,16 @@ export class Graph<T> {
    * @param fromNode - node from which edge is outcoming
    * @param toNode - node to which edge is incoming
    */
-  public addEdge(fromNode: T, toNode: T): void {
-    const fromId = this.nodesIds.get(fromNode)
-    const toId = this.nodesIds.get(toNode)
+  public addEdge(fromNode: Node | NodeId, toNode: Node | NodeId): void {
+    const fromId = this.getNodeIdIfNotNumber(fromNode)
+    const toId = this.getNodeIdIfNotNumber(toNode)
 
     if (fromId === undefined) {
-      throw this.missingNodeError(fromNode)
+      throw this.missingNodeError(fromNode as Node)
     }
 
     if (toId === undefined) {
-      throw this.missingNodeError(toNode)
+      throw this.missingNodeError(toNode as Node)
     }
 
     if (this.edgesSparseArray[fromId].includes(toId)) {
@@ -178,8 +185,8 @@ export class Graph<T> {
   /**
    * Removes node from graph
    */
-  public removeNode(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
-    const id = this.nodesIds.get(node)
+  public removeNode(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
+    const id = this.getNodeId(node)
 
     if (id === undefined) {
       throw this.missingNodeError(node)
@@ -202,16 +209,16 @@ export class Graph<T> {
   /**
    * Removes edge between nodes.
    */
-  public removeEdge(fromNode: T, toNode: T): void {
-    const fromId = this.nodesIds.get(fromNode)
-    const toId = this.nodesIds.get(toNode)
+  public removeEdge(fromNode: Node | NodeId, toNode: Node | NodeId): void {
+    const fromId = this.getNodeIdIfNotNumber(fromNode)
+    const toId = this.getNodeIdIfNotNumber(toNode)
 
     if (fromId === undefined) {
-      throw this.missingNodeError(fromNode)
+      throw this.missingNodeError(fromNode as Node)
     }
 
     if (toId === undefined) {
-      throw this.missingNodeError(toNode)
+      throw this.missingNodeError(toNode as Node)
     }
 
     const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
@@ -226,9 +233,9 @@ export class Graph<T> {
   /**
    * Removes edge between nodes if it exists.
    */
-  public removeEdgeIfExists(fromNode: T, toNode: T): void {
-    const fromId = this.nodesIds.get(fromNode)
-    const toId = this.nodesIds.get(toNode)
+  public removeEdgeIfExists(fromNode: Node, toNode: Node): void {
+    const fromId = this.getNodeId(fromNode)
+    const toId = this.getNodeId(toNode)
 
     if (fromId === undefined) {
       return
@@ -250,7 +257,7 @@ export class Graph<T> {
   /**
    * Sorts the whole graph topologically. Nodes that are on cycles are kept separate.
    */
-  public topSortWithScc(): TopSortResult<T> {
+  public topSortWithScc(): TopSortResult<Node> {
     return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => {})
   }
 
@@ -262,20 +269,20 @@ export class Graph<T> {
    * @param onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(
-    modifiedNodes: T[],
-    operatingFunction: (node: T) => boolean,
-    onCycle: (node: T) => void
-  ): TopSortResult<T> {
-    const topSortAlgorithm = new TopSort<T>(this.nodesSparseArray, this.edgesSparseArray)
-    const modifiedNodesIds = modifiedNodes.map(node => this.nodesIds.get(node)).filter(id => id !== undefined) as number[]
+    modifiedNodes: Node[],
+    operatingFunction: (node: Node) => boolean,
+    onCycle: (node: Node) => void
+  ): TopSortResult<Node> {
+    const topSortAlgorithm = new TopSort<Node>(this.nodesSparseArray, this.edgesSparseArray)
+    const modifiedNodesIds = modifiedNodes.map(node => this.getNodeId(node)).filter(id => id !== undefined) as NodeId[]
     return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
   }
 
   /**
    * Marks node as volatile.
    */
-  public markNodeAsVolatile(node: T): void {
-    const id = this.nodesIds.get(node)
+  public markNodeAsVolatile(node: Node): void {
+    const id = this.getNodeId(node)
 
     if (id === undefined) {
       return
@@ -288,8 +295,8 @@ export class Graph<T> {
   /**
    * Marks node as dirty.
    */
-  public markNodeAsDirty(node: T): void {
-    const id = this.nodesIds.get(node)
+  public markNodeAsDirty(node: Node): void {
+    const id = this.getNodeId(node)
 
     if (id === undefined) {
       return
@@ -302,7 +309,7 @@ export class Graph<T> {
   /**
    * Returns an array of nodes that are marked as dirty and/or volatile.
    */
-  public getDirtyAndVolatileNodes(): T[] {
+  public getDirtyAndVolatileNodes(): Node[] {
     return this.dirtyAndVolatileNodeIds.getProcessedValue()
   }
 
@@ -317,8 +324,8 @@ export class Graph<T> {
   /**
    * Marks node as changingWithStructure.
    */
-  public markNodeAsChangingWithStructure(node: T): void {
-    const id = this.nodesIds.get(node)
+  public markNodeAsChangingWithStructure(node: Node): void {
+    const id = this.getNodeId(node)
 
     if (id === undefined) {
       return
@@ -342,8 +349,8 @@ export class Graph<T> {
   /**
    * Marks node as infinite range.
    */
-  public markNodeAsInfiniteRange(node: T): void {
-    const id = this.nodesIds.get(node)
+  public markNodeAsInfiniteRange(node: Node | NodeId): void {
+    const id = this.getNodeIdIfNotNumber(node)
 
     if (id === undefined) {
       return
@@ -356,14 +363,28 @@ export class Graph<T> {
   /**
    * Returns an array of nodes marked as infinite ranges
    */
-  public getInfiniteRanges(): T[] {
+  public getInfiniteRanges(): NodeAndId<Node>[] {
     return this.infiniteRangeIds.getProcessedValue()
+  }
+
+  /**
+   * Returns the internal id of a node.
+   */
+  public getNodeId(node: Node): NodeId | undefined {
+    return this.nodesIds.get(node)
+  }
+
+  /**
+   *
+   */
+  private getNodeIdIfNotNumber(node: Node | NodeId): NodeId | undefined {
+    return typeof node === 'number' ? node : this.getNodeId(node)
   }
 
   /**
    * Removes invalid neighbors of a given node from the edges array and returns adjacent nodes for the input node.
    */
-  private fixEdgesArrayForNode(id: number): number[] {
+  private fixEdgesArrayForNode(id: NodeId): NodeId[] {
     const adjacentNodeIds = this.edgesSparseArray[id]
     this.edgesSparseArray[id] = adjacentNodeIds.filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
     return this.edgesSparseArray[id]
@@ -372,7 +393,7 @@ export class Graph<T> {
   /**
    * Removes edges from the given node to its dependencies based on the dependencyQuery function.
    */
-  private removeDependencies(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
+  private removeDependencies(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
     const dependencies = this.dependencyQuery(node)
 
     dependencies.forEach(([_, dependency]) => {
@@ -386,17 +407,17 @@ export class Graph<T> {
    * processFn for infiniteRangeIds ProcessableValue instance
    * @private
    */
-  private processInfiniteRangeIds(ids: number[]): T[] {
+  private processInfiniteRangeIds(ids: NodeId[]): NodeAndId<Node>[] {
     return [ ...new Set(ids) ]
-      .map(id => this.nodesSparseArray[id])
-      .filter(node => node !== undefined)
+      .map(id => ({ id, node: this.nodesSparseArray[id] }))
+      .filter(({ node }) => node !== undefined)
   }
 
   /**
    * processFn for dirtyAndVolatileNodeIds ProcessableValue instance
    * @private
    */
-  private processDirtyAndVolatileNodeIds({ dirty, volatile }: { dirty: number[], volatile: number[] }): T[] {
+  private processDirtyAndVolatileNodeIds({ dirty, volatile }: { dirty: NodeId[], volatile: NodeId[] }): Node[] {
     return [ ...new Set([ ...dirty, ...volatile]) ]
     .map(id => this.nodesSparseArray[id])
     .filter(node => node !== undefined)
@@ -405,7 +426,7 @@ export class Graph<T> {
   /**
    * Returns error for missing node.
    */
-  private missingNodeError(node: T): Error {
+  private missingNodeError(node: Node): Error {
     return new Error(`Unknown node ${node}`)
   }
 }

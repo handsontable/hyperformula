@@ -8,9 +8,9 @@ describe('Graph with Vertex', () => {
 
     const v1 = new ValueCellVertex("1'", "1'")
     const v2 = new ValueCellVertex('2', '2')
-    graph.addNode(v1)
-    graph.addNode(v1)
-    graph.addNode(v2)
+    graph.addNodeAndReturnId(v1)
+    graph.addNodeAndReturnId(v1)
+    graph.addNodeAndReturnId(v2)
 
     expect(graph.getNodes().length).toBe(2)
   })

@@ -17,7 +17,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
       const node = new IdentifiableString(0, 'foo')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
 
       expect(graph.getNodes().length).toBe(1)
     })
@@ -26,8 +26,8 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
       const node = new IdentifiableString(0, 'foo')
-      graph.addNode(node)
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
+      graph.addNodeAndReturnId(node)
 
       expect(graph.getNodes().length).toBe(1)
     })
@@ -37,14 +37,14 @@ describe('Graph class', () => {
 
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       expect(graph.adjacentNodes(node0)).toEqual(new Set([]))
 
       graph.addEdge(node0, node1)
       expect(graph.adjacentNodes(node0)).toEqual(new Set([node1]))
 
-      graph.addNode(node0)
+      graph.addNodeAndReturnId(node0)
 
       expect(graph.adjacentNodes(node0)).toEqual(new Set([node1]))
     })
@@ -55,7 +55,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
       const node = new IdentifiableString(0, 'foo')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
       graph.removeNode(node)
 
       expect(graph.getNodes().length).toBe(0)
@@ -79,7 +79,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
       const node = new IdentifiableString(0, 'foo')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
 
       expect(graph.hasNode(node)).toBe(true)
     })
@@ -88,7 +88,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
       const node = new IdentifiableString(0, 'foo')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
 
       expect(graph.hasNode(new IdentifiableString(1, 'foo'))).toBe(false)
     })
@@ -97,7 +97,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
 
       const node = new IdentifiableString(0, 'foo')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
       graph.removeNode(node)
 
       expect(graph.hasNode(node)).toBe(false)
@@ -110,8 +110,8 @@ describe('Graph class', () => {
 
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
       graph.addEdge(node0, node1)
 
@@ -121,7 +121,7 @@ describe('Graph class', () => {
     it('throws error when the origin node is not present', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(1, 'target')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
 
       expect(() => {
         graph.addEdge(new IdentifiableString(0, 'origin'), node)
@@ -131,7 +131,7 @@ describe('Graph class', () => {
     it('throws error when the target node is not present', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'origin')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
 
       expect(() => {
         graph.addEdge(node, new IdentifiableString(1, 'target'))
@@ -144,7 +144,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'x0')
       const node1 = new IdentifiableString(1, 'x1')
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node1)
 
       expect(() => graph.removeEdge(node0, node1)).toThrowError(/Unknown node/)
     })
@@ -153,7 +153,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'x0')
       const node1 = new IdentifiableString(1, 'x1')
-      graph.addNode(node0)
+      graph.addNodeAndReturnId(node0)
 
       expect(() => graph.removeEdge(node0, node1)).toThrowError(/Unknown node/)
     })
@@ -162,8 +162,8 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'x0')
       const node1 = new IdentifiableString(1, 'x1')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
 
       expect(() => graph.removeEdge(node0, node1)).toThrowError('Edge does not exist')
     })
@@ -173,8 +173,8 @@ describe('Graph class', () => {
       const node0 = new IdentifiableString(0, 'x0')
       const node1 = new IdentifiableString(1, 'x1')
 
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       expect(graphEdgesCount(graph)).toEqual(0)
 
       graph.addEdge(node0, node1)
@@ -192,8 +192,8 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
       expect(graph.existsEdge(node0, node1)).toBe(true)
@@ -203,8 +203,8 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
 
       expect(graph.existsEdge(node0, node1)).toBe(false)
     })
@@ -222,8 +222,8 @@ describe('Graph class', () => {
 
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
       expect(graph.adjacentNodes(node0)).toEqual(new Set([node1]))
@@ -234,8 +234,8 @@ describe('Graph class', () => {
 
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
       expect(() => graph.adjacentNodes(new IdentifiableString(42, 'baz'))).toThrowError(/Unknown node/)
@@ -248,8 +248,8 @@ describe('Graph class', () => {
 
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
       expect(graph.adjacentNodesCount(node0)).toEqual(1)
@@ -260,8 +260,8 @@ describe('Graph class', () => {
 
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
       expect(() => graph.adjacentNodesCount(new IdentifiableString(42, 'baz'))).toThrowError(/Unknown node/)
@@ -279,7 +279,7 @@ describe('Graph class', () => {
     it('returns isolated vertices', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'foo')
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
 
       expect(graph.topSortWithScc().sorted).toEqual([node])
       expect(graph.topSortWithScc().cycled).toEqual([])
@@ -289,8 +289,8 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'foo')
       const node1 = new IdentifiableString(1, 'bar')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node1, node0)
 
       expect(graph.topSortWithScc().sorted).toEqual([node1, node0])
@@ -304,11 +304,11 @@ describe('Graph class', () => {
       const node2 = new IdentifiableString(2, 'x2')
       const node3 = new IdentifiableString(3, 'x3')
       const node4 = new IdentifiableString(4, 'x4')
-      graph.addNode(node0)
-      graph.addNode(node1)
-      graph.addNode(node2)
-      graph.addNode(node3)
-      graph.addNode(node4)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
+      graph.addNodeAndReturnId(node2)
+      graph.addNodeAndReturnId(node3)
+      graph.addNodeAndReturnId(node4)
       graph.addEdge(node0, node2)
       graph.addEdge(node1, node2)
       graph.addEdge(node2, node3)
@@ -324,10 +324,10 @@ describe('Graph class', () => {
       const node1 = new IdentifiableString(1, 'x1')
       const node2 = new IdentifiableString(2, 'x2')
       const node3 = new IdentifiableString(3, 'x3')
-      graph.addNode(node0)
-      graph.addNode(node1)
-      graph.addNode(node2)
-      graph.addNode(node3)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
+      graph.addNodeAndReturnId(node2)
+      graph.addNodeAndReturnId(node3)
       graph.addEdge(node0, node2)
       graph.addEdge(node1, node3)
 
@@ -339,8 +339,8 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node0 = new IdentifiableString(0, 'x0')
       const node1 = new IdentifiableString(1, 'x1')
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
       graph.addEdge(node1, node0)
 
@@ -353,9 +353,9 @@ describe('Graph class', () => {
       const node0 = new IdentifiableString(0, 'x0')
       const node1 = new IdentifiableString(1, 'x1')
       const node2 = new IdentifiableString(2, 'x2')
-      graph.addNode(node0)
-      graph.addNode(node1)
-      graph.addNode(node2)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
+      graph.addNodeAndReturnId(node2)
       graph.addEdge(node0, node1)
       graph.addEdge(node1, node2)
       graph.addEdge(node1, node1)
@@ -370,8 +370,8 @@ describe('Graph class', () => {
       const graph = new Graph<string>(dummyDependencyQuery)
       const node0 = 'foo'
       const node1 = 'bar'
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
 
       const operatingFunction = jasmine.createSpy().and.returnValue(true)
       const onCycle = jasmine.createSpy()
@@ -387,8 +387,8 @@ describe('Graph class', () => {
       const node0 = 'foo'
       const node1 = 'bar'
 
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
       const operatingFunction = jasmine.createSpy().and.returnValue(true)
@@ -406,8 +406,8 @@ describe('Graph class', () => {
       const node0 = 'foo'
       const node1 = 'bar'
 
-      graph.addNode(node0)
-      graph.addNode(node1)
+      graph.addNodeAndReturnId(node0)
+      graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
       const operatingFunction = jasmine.createSpy().and.returnValue(false)
@@ -423,7 +423,7 @@ describe('Graph class', () => {
       const graph = new Graph<string>(dummyDependencyQuery)
       const nodes = ['foo', 'bar', 'baz']
 
-      nodes.forEach((n) => graph.addNode(n))
+      nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[2])
       graph.addEdge(nodes[1], nodes[2])
 
@@ -440,7 +440,7 @@ describe('Graph class', () => {
       const graph = new Graph<string>(dummyDependencyQuery)
       const nodes = ['foo', 'c0', 'c1', 'c2']
 
-      nodes.forEach((n) => graph.addNode(n))
+      nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[1])
       graph.addEdge(nodes[1], nodes[2])
       graph.addEdge(nodes[2], nodes[3])
@@ -458,7 +458,7 @@ describe('Graph class', () => {
     it('does not call operatingFunction callback for nodes that are on cycle', () => {
       const graph = new Graph<string>(dummyDependencyQuery)
       const nodes = ['c0', 'c1', 'c2']
-      nodes.forEach((n) => graph.addNode(n))
+      nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[1])
       graph.addEdge(nodes[1], nodes[2])
       graph.addEdge(nodes[2], nodes[0])
@@ -474,7 +474,7 @@ describe('Graph class', () => {
     it('detects a cycle consisting of nodes not included but reachable from the "modifiedNodes" array', () => {
       const graph = new Graph<string>(dummyDependencyQuery)
       const nodes = ['foo', 'c0', 'c1', 'c2']
-      nodes.forEach((n) => graph.addNode(n))
+      nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[1])
       graph.addEdge(nodes[1], nodes[2])
       graph.addEdge(nodes[2], nodes[3])
@@ -494,7 +494,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'foo')
 
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
       graph.markNodeAsVolatile(node)
 
       expect(graph.getDirtyAndVolatileNodes()).toEqual([node])
@@ -514,7 +514,7 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'foo')
 
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
       graph.markNodeAsChangingWithStructure(node)
       graph.markChangingWithStructureNodesAsDirty()
 
@@ -537,10 +537,10 @@ describe('Graph class', () => {
       const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
       const node = new IdentifiableString(0, 'foo')
 
-      graph.addNode(node)
+      graph.addNodeAndReturnId(node)
       graph.markNodeAsInfiniteRange(node)
 
-      expect(graph.getInfiniteRanges()).toEqual([node])
+      expect(graph.getInfiniteRanges().map(({ node }) => node)).toEqual([node])
     })
 
     it('does nothing if node is not in a graph', () => {
