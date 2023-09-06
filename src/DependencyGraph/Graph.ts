@@ -48,13 +48,10 @@ export class Graph<Node> {
   )
 
   /**
-   * A ProcessableValue object.
+   * A set of node ids. The value infiniteRangeIds.get(nodeId) exists if and only if node is in the graph.
    * @private
    */
-  private infiniteRangeIds = new ProcessableValue<NodeId[], NodeAndId<Node>[]>(
-    [],
-    r => this.processInfiniteRangeIds(r),
-  )
+  private infiniteRangeIds: Set<NodeId> = new Set()
 
   /**
    * A dense array. It may contain duplicates and removed nodes.
@@ -201,6 +198,7 @@ export class Graph<Node> {
 
     delete this.nodesSparseArray[id]
     delete this.edgesSparseArray[id]
+    this.infiniteRangeIds.delete(id)
     this.nodesIds.delete(node)
 
     return dependencies
@@ -356,15 +354,14 @@ export class Graph<Node> {
       return
     }
 
-    this.infiniteRangeIds.rawValue.push(id)
-    this.infiniteRangeIds.markAsModified()
+    this.infiniteRangeIds.add(id)
   }
 
   /**
    * Returns an array of nodes marked as infinite ranges
    */
   public getInfiniteRanges(): NodeAndId<Node>[] {
-    return this.infiniteRangeIds.getProcessedValue()
+    return [ ...this.infiniteRangeIds].map(id => ({ node: this.nodesSparseArray[id], id }))
   }
 
   /**
@@ -378,7 +375,7 @@ export class Graph<Node> {
    *
    */
   private getNodeIdIfNotNumber(node: Node | NodeId): NodeId | undefined {
-    return typeof node === 'number' ? node : this.getNodeId(node)
+    return typeof node === 'number' ? node : this.nodesIds.get(node)
   }
 
   /**
@@ -401,16 +398,6 @@ export class Graph<Node> {
     })
 
     return dependencies
-  }
-
-  /**
-   * processFn for infiniteRangeIds ProcessableValue instance
-   * @private
-   */
-  private processInfiniteRangeIds(ids: NodeId[]): NodeAndId<Node>[] {
-    return [ ...new Set(ids) ]
-      .map(id => ({ id, node: this.nodesSparseArray[id] }))
-      .filter(({ node }) => node !== undefined)
   }
 
   /**
