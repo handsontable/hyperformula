@@ -11,7 +11,7 @@ import {
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
-  extractReference,
+  extractReference, graphEdgesCount,
 } from '../testUtils'
 import {ExpectedValueOfTypeError} from '../../src/errors'
 
@@ -201,8 +201,8 @@ describe('Move cells', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
-    expect(engine.graph.edgesCount()).toBe(0)
-    expect(engine.graph.nodesCount()).toBe(1)
+    expect(graphEdgesCount(engine.graph)).toBe(0)
+    expect(engine.graph.getNodes().length).toBe(1)
     expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
@@ -260,10 +260,10 @@ describe('Move cells', () => {
     const source = engine.addressMapping.getCell(adr('A1'))
     const target = engine.addressMapping.fetchCell(adr('A2'))
 
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       2, // A2 -> B1, A2 -> B2
     )
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       +2 // formulas
       + 1, // A2
     )
@@ -380,13 +380,13 @@ describe('moving ranges', () => {
 
     expect(source).toBeInstanceOf(EmptyCellVertex)
     expect(source.getCellValue()).toBe(EmptyValue)
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       +2 // formulas
       + 1 // A2
       + 1 // A1 (Empty)
       + 1, // A1:A2 range
     )
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       +2 // A1 (Empty) -> A1:A2, A2 -> A1:A2
       + 1 // A1:A2 -> B1
       + 1, // A2 -> B2
@@ -422,12 +422,12 @@ describe('moving ranges', () => {
     expect(a1).toBe(undefined)
     expect(a2).toBe(undefined)
 
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       +2 // formulas
       + 2 // C1, C2
       + 1, // C1:C2 range
     )
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       +2 // C1 -> C1:C2, C2 -> C1:C2
       + 1 // C1:C2 -> B1
       + 1, // C2 -> B2

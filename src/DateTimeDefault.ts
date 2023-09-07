@@ -125,8 +125,8 @@ function defaultParseToTime(timeItems: string[], timeFormat: Maybe<string>): May
   }
 
   const hours = ampm !== undefined
-  ? hoursParsed % 12 + (ampm ? 12 : 0)
-  : hoursParsed
+    ? hoursParsed % 12 + (ampm ? 12 : 0)
+    : hoursParsed
 
   return { hours, minutes, seconds }
 }

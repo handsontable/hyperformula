@@ -695,7 +695,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.setCellContents(adr('A1'), '=FOO+10')
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(52)
@@ -716,7 +716,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.addNamedExpression('FOO', '=42')
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(42)
@@ -739,7 +739,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.setCellContents(adr('A1'), null)
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
   })
 
@@ -761,7 +761,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.setCellContents(adr('A1'), '=FOO+10')
 
-    const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)!
+    const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.namedExpressionForScope('FOO')!.address)
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
@@ -938,8 +938,8 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
-    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
-    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0).vertex
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1).vertex
     const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
     expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
     expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
@@ -963,8 +963,8 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
-    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
-    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0).vertex
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1).vertex
     const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
     expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
     expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
@@ -988,8 +988,8 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 0))).toEqual('foo')
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
-    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
-    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0).vertex
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1).vertex
     const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
     expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
     expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)

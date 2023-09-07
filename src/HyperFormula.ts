@@ -4380,8 +4380,8 @@ export class HyperFormula implements TypedEmitter {
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
     if (!this._evaluationSuspended) {
       const changes = this._crudOperations.getAndClearContentChanges()
-      const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
-      this.dependencyGraph.clearRecentlyChangedVertices()
+      const verticesToRecomputeFrom = this.dependencyGraph.verticesToRecompute()
+      this.dependencyGraph.clearDirtyVertices()
 
       if (verticesToRecomputeFrom.length > 0) {
         changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
