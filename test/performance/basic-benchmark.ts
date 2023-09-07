@@ -12,13 +12,13 @@ export function runBasicBenchmark(): BenchmarkResult[] {
 
   const result: BenchmarkResult[] = []
   batch(result,
-    () => benchmark('Sheet A', sheetA, expectedValuesA(sheetA), {numberOfRuns: 10}),
-    () => benchmark('Sheet B', sheetB, expectedValuesB(sheetB), {numberOfRuns: 10}),
-    () => benchmark('Sheet T', sheetT, expectedValuesT(sheetT), {numberOfRuns: 10}),
+    () => benchmark('Sheet A', sheetA, expectedValuesA(sheetA), {numberOfRuns: 100}),
+    () => benchmark('Sheet B', sheetB, expectedValuesB(sheetB), {numberOfRuns: 100}),
+    () => benchmark('Sheet T', sheetT, expectedValuesT(sheetT), {numberOfRuns: 100}),
     () => benchmark('Column ranges', infiniteRanges, [{
       address: 'AX50',
       value: 1.04519967355127e+63
-    }], {expectedTime: 1000, numberOfRuns: 10})
+    }], {expectedTime: 1000, numberOfRuns: 100})
   )
 
   return result
