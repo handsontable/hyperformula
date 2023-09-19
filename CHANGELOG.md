@@ -25,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed a bug where neighboring exported changes of an array formula were
   missing. [#1291](https://github.com/handsontable/hyperformula/issues/1291)
+- Fixed a typo in the source code of the `MatrixPlugin`. [#1306](https://github.com/handsontable/hyperformula/issues/1306)
 
 ## [2.5.0] - 2023-05-29
 
