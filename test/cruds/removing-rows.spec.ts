@@ -11,7 +11,7 @@ import {
   expectReferenceToHaveRefError,
   extractMatrixRange,
   extractRange,
-  extractReference,
+  extractReference, graphReversedAdjacentNodes,
   noSpace,
   verifyRangesInSheet,
   verifyValues,
@@ -746,9 +746,9 @@ describe('Removing rows - graph', function() {
       ['1', '2'],
       ['3', '4'],
     ])
-    expect(engine.graph.nodes.size).toBe(4)
+    expect(engine.graph.getNodes().length).toBe(4)
     engine.removeRows(0, [0, 2])
-    expect(engine.graph.nodes.size).toBe(0)
+    expect(engine.graph.getNodes().length).toBe(0)
   })
 
   it('works if there are empty cells removed', function() {
@@ -757,9 +757,9 @@ describe('Removing rows - graph', function() {
       [null],
       ['3'],
     ])
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.getNodes().length).toBe(2)
     engine.removeRows(0, [1, 1])
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.getNodes().length).toBe(2)
   })
 })
 
@@ -815,11 +815,11 @@ describe('Removing rows - range mapping', function() {
     ])
 
     const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
-    expect(engine.graph.getDependencies(a1a3).length).toBe(2)
+    expect(graphReversedAdjacentNodes(engine.graph, a1a3).length).toBe(2)
     engine.removeRows(0, [0, 2])
     const a1a1 = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
     expect(a1a1).toBe(a1a3)
-    expect(engine.graph.getDependencies(a1a1).length).toBe(1)
+    expect(graphReversedAdjacentNodes(engine.graph, a1a1).length).toBe(1)
   })
 })
 
@@ -1027,7 +1027,7 @@ describe('Removing rows - merge ranges', () => {
 
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 

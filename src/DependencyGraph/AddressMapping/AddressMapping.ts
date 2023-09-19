@@ -61,7 +61,7 @@ export class AddressMapping {
     this.mapping.set(sheetId, strategy)
   }
 
-  public autoAddSheet(sheetId: number, sheet: Sheet, sheetBoundaries: SheetBoundaries) {
+  public autoAddSheet(sheetId: number, sheetBoundaries: SheetBoundaries) {
     const {height, width, fill} = sheetBoundaries
     const strategyConstructor = this.policy.call(fill)
     this.addSheet(sheetId, new strategyConstructor(width, height))

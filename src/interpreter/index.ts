@@ -12,6 +12,7 @@ import {
   ImplementedFunctions,
   FunctionArgumentType,
 } from './plugin/FunctionPlugin'
+import {EmptyValue} from './InterpreterValue'
 
 export {
   FunctionPluginDefinition,
@@ -21,4 +22,5 @@ export {
   FunctionMetadata,
   FunctionTranslationsPackage,
   FunctionArgumentType,
+  EmptyValue,
 }

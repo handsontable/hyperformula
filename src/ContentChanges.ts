@@ -62,10 +62,10 @@ export class ContentChanges {
     const value = change.value
     if (value instanceof SimpleRangeValue) {
       for (const cellAddress of value.effectiveAddressesFromData(address)) {
-        this.changes.delete(`${cellAddress.sheet},${cellAddress.col},${cellAddress.row}`)
+        this.changes.delete(addressKey(cellAddress))
       }
     }
-    this.changes.set(addressKey((address)), change)
+    this.changes.set(addressKey(address), change)
   }
 
   private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: InterpreterValue) {

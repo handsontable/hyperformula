@@ -5,43 +5,130 @@
 
 import {SimpleCellAddress} from '../Cell'
 import {SimpleCellRange} from '../AbsoluteCellRange'
+import {TopSort, TopSortResult} from './TopSort'
+import {ProcessableValue} from './ProcessableValue'
 
-export type DependencyQuery<T> = (vertex: T) => [(SimpleCellAddress | SimpleCellRange), T][]
-
-export interface TopSortResult<T> {
-  sorted: T[],
-  cycled: T[],
-}
-
-enum NodeVisitStatus {
-  ON_STACK,
-  PROCESSED,
-  POPPED,
-}
+export type NodeId = number
+export type NodeAndId<Node> = { node: Node, id: NodeId }
+export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | SimpleCellRange), Node][]
 
 /**
- * Provides graph directed structure
+ * Provides directed graph structure.
  *
- * Invariants:
- * - this.edges(node) exists if and only if node is in the graph
- * - this.specialNodes* are always subset of this.nodes
- * - this.edges(node) is subset of this.nodes (i.e. it does not contain nodes not present in graph) -- this invariant DOES NOT HOLD right now
+ * Idea for performance improvement:
+ * - use Set<Node>[] instead of NodeId[][] for edgesSparseArray
  */
-export class Graph<T> {
-  /** Set with nodes in graph. */
-  public nodes: Set<T> = new Set()
+export class Graph<Node> {
+  /**
+   * A sparse array. The value nodesSparseArray[n] exists if and only if node n is in the graph.
+   * @private
+   */
+  private nodesSparseArray: Node[] = []
 
-  public specialNodes: Set<T> = new Set()
-  public specialNodesStructuralChanges: Set<T> = new Set()
-  public specialNodesRecentlyChanged: Set<T> = new Set()
-  public infiniteRanges: Set<T> = new Set()
+  /**
+   * A sparse array. The value edgesSparseArray[n] exists if and only if node n is in the graph.
+   * The edgesSparseArray[n] is also a sparse array. It may contain removed nodes. To make sure check nodesSparseArray.
+   * @private
+   */
+  private edgesSparseArray: NodeId[][] = []
 
-  /** Nodes adjacency mapping. */
-  private edges: Map<T, Set<T>> = new Map()
+  /**
+   * A mapping from node to its id. The value nodesIds.get(node) exists if and only if node is in the graph.
+   * @private
+   */
+  private nodesIds: Map<Node, NodeId> = new Map()
+
+  /**
+   * A ProcessableValue object.
+   * @private
+   */
+  private dirtyAndVolatileNodeIds = new ProcessableValue<{ dirty: NodeId[], volatile: NodeId[] }, Node[]>(
+    { dirty: [], volatile: [] },
+    r => this.processDirtyAndVolatileNodeIds(r),
+  )
+
+  /**
+   * A set of node ids. The value infiniteRangeIds.get(nodeId) exists if and only if node is in the graph.
+   * @private
+   */
+  private infiniteRangeIds: Set<NodeId> = new Set()
+
+  /**
+   * A dense array. It may contain duplicates and removed nodes.
+   * @private
+   */
+  private changingWithStructureNodeIds: NodeId[] = []
+
+  private nextId: NodeId = 0
 
   constructor(
-    private readonly dependencyQuery: DependencyQuery<T>
-  ) {
+    private readonly dependencyQuery: DependencyQuery<Node>
+  ) {}
+
+  /**
+   * Iterate over all nodes the in graph
+   */
+  public getNodes(): Node[] {
+    return this.nodesSparseArray.filter((node: Node) => node !== undefined)
+  }
+
+  /**
+   * Checks whether a node is present in graph
+   *
+   * @param node - node to check
+   */
+  public hasNode(node: Node): boolean {
+    return this.nodesIds.has(node)
+  }
+
+  /**
+   * Checks whether exists edge between nodes. If one or both of nodes are not present in graph, returns false.
+   *
+   * @param fromNode - node from which edge is outcoming
+   * @param toNode - node to which edge is incoming
+   */
+  public existsEdge(fromNode: Node, toNode: Node): boolean {
+    const fromId = this.getNodeId(fromNode)
+    const toId = this.getNodeId(toNode)
+
+    if (fromId === undefined || toId === undefined) {
+      return false
+    }
+
+    return this.edgesSparseArray[fromId].includes(toId)
+  }
+
+  /**
+   * Returns nodes adjacent to given node. May contain removed nodes.
+   *
+   * @param node - node to which adjacent nodes we want to retrieve
+   *
+   * Idea for performance improvement:
+   * - return an array instead of set
+   */
+  public adjacentNodes(node: Node): Set<Node> {
+    const id = this.getNodeId(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
+    }
+
+    return new Set(this.edgesSparseArray[id].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]))
+  }
+
+  /**
+   * Returns number of nodes adjacent to given node. Contrary to adjacentNodes(), this method returns only nodes that are present in graph.
+   *
+   * @param node - node to which adjacent nodes we want to retrieve
+   */
+  public adjacentNodesCount(node: Node): number {
+    const id = this.getNodeId(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
+    }
+
+    return this.fixEdgesArrayForNode(id).length
   }
 
   /**
@@ -49,11 +136,20 @@ export class Graph<T> {
    *
    * @param node - a node to be added
    */
-  public addNode(node: T) {
-    this.nodes.add(node)
-    if (!this.edges.has(node)) {
-      this.edges.set(node, new Set())
+  public addNodeAndReturnId(node: Node): NodeId {
+    const idOfExistingNode = this.nodesIds.get(node)
+
+    if (idOfExistingNode !== undefined) {
+      return idOfExistingNode
     }
+
+    const newId = this.nextId
+    this.nextId++
+
+    this.nodesSparseArray[newId] = node
+    this.edgesSparseArray[newId] = []
+    this.nodesIds.set(node, newId)
+    return newId
   }
 
   /**
@@ -64,260 +160,260 @@ export class Graph<T> {
    * @param fromNode - node from which edge is outcoming
    * @param toNode - node to which edge is incoming
    */
-  public addEdge(fromNode: T, toNode: T) {
-    if (!this.nodes.has(fromNode)) {
-      throw new Error(`Unknown node ${fromNode}`)
+  public addEdge(fromNode: Node | NodeId, toNode: Node | NodeId): void {
+    const fromId = this.getNodeIdIfNotNumber(fromNode)
+    const toId = this.getNodeIdIfNotNumber(toNode)
+
+    if (fromId === undefined) {
+      throw this.missingNodeError(fromNode as Node)
     }
-    if (!this.nodes.has(toNode)) {
-      throw new Error(`Unknown node ${toNode}`)
+
+    if (toId === undefined) {
+      throw this.missingNodeError(toNode as Node)
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.edges.get(fromNode)!.add(toNode)
+
+    if (this.edgesSparseArray[fromId].includes(toId)) {
+      return
+    }
+
+    this.edgesSparseArray[fromId].push(toId)
   }
 
-  public removeEdge(fromNode: T, toNode: T) {
-    if (this.existsEdge(fromNode, toNode)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.edges.get(fromNode)!.delete(toNode)
-    } else {
+  /**
+   * Removes node from graph
+   */
+  public removeNode(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
+    const id = this.getNodeId(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
+    }
+
+    if (this.edgesSparseArray[id].length > 0) {
+      this.edgesSparseArray[id].forEach(adjacentId => this.dirtyAndVolatileNodeIds.rawValue.dirty.push(adjacentId))
+      this.dirtyAndVolatileNodeIds.markAsModified()
+    }
+
+    const dependencies = this.removeDependencies(node)
+
+    delete this.nodesSparseArray[id]
+    delete this.edgesSparseArray[id]
+    this.infiniteRangeIds.delete(id)
+    this.nodesIds.delete(node)
+
+    return dependencies
+  }
+
+  /**
+   * Removes edge between nodes.
+   */
+  public removeEdge(fromNode: Node | NodeId, toNode: Node | NodeId): void {
+    const fromId = this.getNodeIdIfNotNumber(fromNode)
+    const toId = this.getNodeIdIfNotNumber(toNode)
+
+    if (fromId === undefined) {
+      throw this.missingNodeError(fromNode as Node)
+    }
+
+    if (toId === undefined) {
+      throw this.missingNodeError(toNode as Node)
+    }
+
+    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
+
+    if (indexOfToId === -1) {
       throw new Error('Edge does not exist')
     }
-  }
 
-  public softRemoveEdge(fromNode: T, toNode: T) {
-    this.edges.get(fromNode)?.delete(toNode)
-  }
-
-  public removeIncomingEdges(toNode: T) {
-    this.edges.forEach((nodeEdges) => {
-      nodeEdges.delete(toNode)
-    })
+    delete this.edgesSparseArray[fromId][indexOfToId]
   }
 
   /**
-   * Returns nodes adjacent to given node
-   *
-   * @param node - node to which adjacent nodes we want to retrieve
+   * Removes edge between nodes if it exists.
    */
-  public adjacentNodes(node: T): Set<T> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.edges.get(node)!
-  }
+  public removeEdgeIfExists(fromNode: Node, toNode: Node): void {
+    const fromId = this.getNodeId(fromNode)
+    const toId = this.getNodeId(toNode)
 
-  public adjacentNodesCount(node: T): number {
-    return this.adjacentNodes(node).size
-  }
-
-  /**
-   * Checks whether a node is present in graph
-   *
-   * @param node - node to check
-   */
-  public hasNode(node: T): boolean {
-    return this.nodes.has(node)
-  }
-
-  /**
-   * Returns number of nodes in graph
-   */
-  public nodesCount(): number {
-    return this.nodes.size
-  }
-
-  /**
-   * Returns number of edges in graph
-   */
-  public edgesCount(): number {
-    let result = 0
-    this.edges.forEach((edgesForNode) => (result += edgesForNode.size))
-    return result
-  }
-
-  public removeNode(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
-    for (const adjacentNode of this.adjacentNodes(node).values()) {
-      this.markNodeAsSpecialRecentlyChanged(adjacentNode)
+    if (fromId === undefined) {
+      return
     }
-    this.edges.delete(node)
-    this.nodes.delete(node)
-    this.specialNodes.delete(node)
-    this.specialNodesRecentlyChanged.delete(node)
-    this.specialNodesStructuralChanges.delete(node)
-    this.infiniteRanges.delete(node)
-    return this.removeDependencies(node)
-  }
 
-  public markNodeAsSpecial(node: T) {
-    this.specialNodes.add(node)
-  }
-
-  public markNodeAsSpecialRecentlyChanged(node: T) {
-    if (this.nodes.has(node)) {
-      this.specialNodesRecentlyChanged.add(node)
+    if (toId === undefined) {
+      return
     }
-  }
 
-  public markNodeAsChangingWithStructure(node: T) {
-    this.specialNodesStructuralChanges.add(node)
-  }
+    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
 
-  public clearSpecialNodesRecentlyChanged() {
-    this.specialNodesRecentlyChanged.clear()
-  }
+    if (indexOfToId === -1) {
+      return
+    }
 
-  public markNodeAsInfiniteRange(node: T) {
-    this.infiniteRanges.add(node)
+    delete this.edgesSparseArray[fromId][indexOfToId]
   }
 
   /**
-   * Checks whether exists edge between nodes
-   *
-   * @param fromNode - node from which edge is outcoming
-   * @param toNode - node to which edge is incoming
+   * Sorts the whole graph topologically. Nodes that are on cycles are kept separate.
    */
-  public existsEdge(fromNode: T, toNode: T): boolean {
-    return this.edges.get(fromNode)?.has(toNode) ?? false
-  }
-
-  /*
-   * return a topological sort order, but separates vertices that exist in some cycle
-   */
-  public topSortWithScc(): TopSortResult<T> {
-    return this.getTopSortedWithSccSubgraphFrom(Array.from(this.nodes), () => true, () => {
-    })
+  public topSortWithScc(): TopSortResult<Node> {
+    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => {})
   }
 
   /**
+   * Sorts the graph topologically. Nodes that are on cycles are kept separate.
    *
-   * an iterative implementation of Tarjan's algorithm for finding strongly connected compontents
-   * returns vertices in order of topological sort, but vertices that are on cycles are kept separate
-   *
-   * @param modifiedNodes - seed for computation. During engine init run, all of the vertices of grap. In recomputation run, changed vertices.
-   * @param operatingFunction - recomputes value of a node, and returns whether a change occured
+   * @param modifiedNodes - seed for computation. The algorithm assumes that only these nodes have changed since the last run.
+   * @param operatingFunction - recomputes value of a node, and returns whether a change occurred
    * @param onCycle - action to be performed when node is on cycle
    */
-  public getTopSortedWithSccSubgraphFrom(modifiedNodes: T[], operatingFunction: (node: T) => boolean, onCycle: (node: T) => void): TopSortResult<T> {
-
-    const entranceTime: Map<T, number> = new Map()
-    const low: Map<T, number> = new Map()
-    const parent: Map<T, T> = new Map()
-    const inSCC: Set<T> = new Set()
-
-    // node status life cycle:
-    // undefined -> ON_STACK -> PROCESSED -> POPPED
-    const nodeStatus: Map<T, NodeVisitStatus> = new Map()
-    const order: T[] = []
-
-    let time: number = 0
-
-    const sccNonSingletons: Set<T> = new Set()
-
-    modifiedNodes.reverse()
-    modifiedNodes.forEach((v: T) => {
-      if (nodeStatus.get(v) !== undefined) {
-        return
-      }
-      const DFSstack: T[] = [v]
-      const SCCstack: T[] = []
-      nodeStatus.set(v, NodeVisitStatus.ON_STACK)
-      while (DFSstack.length > 0) {
-        const u = DFSstack[DFSstack.length - 1]
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        switch (nodeStatus.get(u)!) {
-          case NodeVisitStatus.ON_STACK: {
-            entranceTime.set(u, time)
-            low.set(u, time)
-            SCCstack.push(u)
-            time++
-            this.adjacentNodes(u).forEach((t: T) => {
-              if (entranceTime.get(t) === undefined) {
-                DFSstack.push(t)
-                parent.set(t, u)
-                nodeStatus.set(t, NodeVisitStatus.ON_STACK)
-              }
-            })
-            nodeStatus.set(u, NodeVisitStatus.PROCESSED)
-            break
-          }
-          case NodeVisitStatus.PROCESSED: { // leaving this DFS subtree
-            let uLow: number
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            uLow = entranceTime.get(u)!
-            this.adjacentNodes(u).forEach((t: T) => {
-              if (!inSCC.has(t)) {
-                if (parent.get(t) === u) {
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  uLow = Math.min(uLow, low.get(t)!)
-                } else {
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  uLow = Math.min(uLow, entranceTime.get(t)!)
-                }
-              }
-            })
-            low.set(u, uLow)
-            if (uLow === entranceTime.get(u)) {
-              const currentSCC: T[] = []
-              do {
-                currentSCC.push(SCCstack[SCCstack.length - 1])
-                SCCstack.pop()
-              } while (currentSCC[currentSCC.length - 1] !== u)
-              currentSCC.forEach((t) => {
-                inSCC.add(t)
-              })
-              order.push(...currentSCC)
-              if (currentSCC.length > 1) {
-                currentSCC.forEach((t) => {
-                  sccNonSingletons.add(t)
-                })
-              }
-            }
-            DFSstack.pop()
-            nodeStatus.set(u, NodeVisitStatus.POPPED)
-            break
-          }
-          case NodeVisitStatus.POPPED: { // it's a 'shadow' copy, we already processed this vertex and can ignore it
-            DFSstack.pop()
-            break
-          }
-        }
-      }
-    })
-
-    const shouldBeUpdatedMapping = new Set(modifiedNodes)
-
-    const sorted: T[] = []
-    const cycled: T[] = []
-    order.reverse()
-    order.forEach((t: T) => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      if (sccNonSingletons.has(t) || this.adjacentNodes(t).has(t)) {
-        cycled.push(t)
-        onCycle(t)
-        this.adjacentNodes(t).forEach((s: T) => shouldBeUpdatedMapping.add(s))
-      } else {
-        sorted.push(t)
-        if (shouldBeUpdatedMapping.has(t) && operatingFunction(t)) {
-          this.adjacentNodes(t).forEach((s: T) => shouldBeUpdatedMapping.add(s))
-        }
-      }
-    })
-    return {sorted, cycled}
+  public getTopSortedWithSccSubgraphFrom(
+    modifiedNodes: Node[],
+    operatingFunction: (node: Node) => boolean,
+    onCycle: (node: Node) => void
+  ): TopSortResult<Node> {
+    const topSortAlgorithm = new TopSort<Node>(this.nodesSparseArray, this.edgesSparseArray)
+    const modifiedNodesIds = modifiedNodes.map(node => this.getNodeId(node)).filter(id => id !== undefined) as NodeId[]
+    return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
   }
 
-  public getDependencies(vertex: T): T[] {
-    const result: T[] = []
-    this.edges.forEach((adjacentNodes, sourceNode) => {
-      if (adjacentNodes.has(vertex)) {
-        result.push(sourceNode)
-      }
-    })
-    return result
-  }
+  /**
+   * Marks node as volatile.
+   */
+  public markNodeAsVolatile(node: Node): void {
+    const id = this.getNodeId(node)
 
-  private removeDependencies(node: T): [(SimpleCellAddress | SimpleCellRange), T][] {
-    const dependencies = this.dependencyQuery(node)
-    for (const [_, dependency] of dependencies) {
-      this.softRemoveEdge(dependency, node)
+    if (id === undefined) {
+      return
     }
+
+    this.dirtyAndVolatileNodeIds.rawValue.volatile.push(id)
+    this.dirtyAndVolatileNodeIds.markAsModified()
+  }
+
+  /**
+   * Marks node as dirty.
+   */
+  public markNodeAsDirty(node: Node): void {
+    const id = this.getNodeId(node)
+
+    if (id === undefined) {
+      return
+    }
+
+    this.dirtyAndVolatileNodeIds.rawValue.dirty.push(id)
+    this.dirtyAndVolatileNodeIds.markAsModified()
+  }
+
+  /**
+   * Returns an array of nodes that are marked as dirty and/or volatile.
+   */
+  public getDirtyAndVolatileNodes(): Node[] {
+    return this.dirtyAndVolatileNodeIds.getProcessedValue()
+  }
+
+  /**
+   * Clears dirty nodes.
+   */
+  public clearDirtyNodes(): void {
+    this.dirtyAndVolatileNodeIds.rawValue.dirty = []
+    this.dirtyAndVolatileNodeIds.markAsModified()
+  }
+
+  /**
+   * Marks node as changingWithStructure.
+   */
+  public markNodeAsChangingWithStructure(node: Node): void {
+    const id = this.getNodeId(node)
+
+    if (id === undefined) {
+      return
+    }
+
+    this.changingWithStructureNodeIds.push(id)
+  }
+
+  /**
+   * Marks all nodes marked as changingWithStructure as dirty.
+   */
+  public markChangingWithStructureNodesAsDirty(): void {
+    if (this.changingWithStructureNodeIds.length <= 0) {
+      return
+    }
+
+    this.dirtyAndVolatileNodeIds.rawValue.dirty = [ ...this.dirtyAndVolatileNodeIds.rawValue.dirty, ...this.changingWithStructureNodeIds ]
+    this.dirtyAndVolatileNodeIds.markAsModified()
+  }
+
+  /**
+   * Marks node as infinite range.
+   */
+  public markNodeAsInfiniteRange(node: Node | NodeId): void {
+    const id = this.getNodeIdIfNotNumber(node)
+
+    if (id === undefined) {
+      return
+    }
+
+    this.infiniteRangeIds.add(id)
+  }
+
+  /**
+   * Returns an array of nodes marked as infinite ranges
+   */
+  public getInfiniteRanges(): NodeAndId<Node>[] {
+    return [ ...this.infiniteRangeIds].map(id => ({ node: this.nodesSparseArray[id], id }))
+  }
+
+  /**
+   * Returns the internal id of a node.
+   */
+  public getNodeId(node: Node): NodeId | undefined {
+    return this.nodesIds.get(node)
+  }
+
+  /**
+   *
+   */
+  private getNodeIdIfNotNumber(node: Node | NodeId): NodeId | undefined {
+    return typeof node === 'number' ? node : this.nodesIds.get(node)
+  }
+
+  /**
+   * Removes invalid neighbors of a given node from the edges array and returns adjacent nodes for the input node.
+   */
+  private fixEdgesArrayForNode(id: NodeId): NodeId[] {
+    const adjacentNodeIds = this.edgesSparseArray[id]
+    this.edgesSparseArray[id] = adjacentNodeIds.filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
+    return this.edgesSparseArray[id]
+  }
+
+  /**
+   * Removes edges from the given node to its dependencies based on the dependencyQuery function.
+   */
+  private removeDependencies(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
+    const dependencies = this.dependencyQuery(node)
+
+    dependencies.forEach(([_, dependency]) => {
+      this.removeEdgeIfExists(dependency, node)
+    })
+
     return dependencies
+  }
+
+  /**
+   * processFn for dirtyAndVolatileNodeIds ProcessableValue instance
+   * @private
+   */
+  private processDirtyAndVolatileNodeIds({ dirty, volatile }: { dirty: NodeId[], volatile: NodeId[] }): Node[] {
+    return [ ...new Set([ ...dirty, ...volatile]) ]
+    .map(id => this.nodesSparseArray[id])
+    .filter(node => node !== undefined)
+  }
+
+  /**
+   * Returns error for missing node.
+   */
+  private missingNodeError(node: Node): Error {
+    return new Error(`Unknown node ${node}`)
   }
 }

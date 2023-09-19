@@ -657,18 +657,18 @@ describe('Removing columns - graph', function() {
       ['1', '2', '3', '4'],
       ['1', '2', '3', '4'],
     ])
-    expect(engine.graph.nodes.size).toBe(8)
+    expect(engine.graph.getNodes().length).toBe(8)
     engine.removeColumns(0, [0, 2])
-    expect(engine.graph.nodes.size).toBe(4) // left two vertices in first column, two in last
+    expect(engine.graph.getNodes().length).toBe(4) // left two vertices in first column, two in last
   })
 
   it('works if there are empty cells removed', function() {
     const engine = HyperFormula.buildFromArray([
       ['1', null, '3'],
     ])
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.getNodes().length).toBe(2)
     engine.removeColumns(0, [1, 1])
-    expect(engine.graph.nodes.size).toBe(2)
+    expect(engine.graph.getNodes().length).toBe(2)
   })
 })
 
@@ -884,7 +884,7 @@ describe('Removing columns - merge ranges', () => {
 
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 

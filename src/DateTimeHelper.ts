@@ -229,10 +229,10 @@ export class DateTimeHelper {
   }
 
   private parseDateTimeFromFormats(dateTimeString: string, dateFormats: string[], timeFormats: string[]): Partial<{ dateTime: DateTime, dateFormat: string, timeFormat: string }> {
-    const dateFormatsIterate = dateFormats.length === 0 ? [undefined] : dateFormats
-    const timeFormatsIterate = timeFormats.length === 0 ? [undefined] : timeFormats
-    for (const dateFormat of dateFormatsIterate) {
-      for (const timeFormat of timeFormatsIterate) {
+    const dateFormatsArray = dateFormats.length === 0 ? [undefined] : dateFormats
+    const timeFormatsArray = timeFormats.length === 0 ? [undefined] : timeFormats
+    for (const dateFormat of dateFormatsArray) {
+      for (const timeFormat of timeFormatsArray) {
         const dateTime = this.parseSingleFormat(dateTimeString, dateFormat, timeFormat)
         if (dateTime !== undefined) {
           return {dateTime, timeFormat, dateFormat}
@@ -319,4 +319,3 @@ export function timeToNumber(time: SimpleTime): number {
 export function toBasisEU(date: SimpleDate): SimpleDate {
   return {year: date.year, month: date.month, day: Math.min(30, date.day)}
 }
-
