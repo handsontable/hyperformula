@@ -14,7 +14,8 @@ export class ParsingErrorVertex {
   }
 
   public getCellValue(): CellError {
-    return CellError.parsingError()
+    const firstNonemptyMessage = this.errors.map(error => error.message).find((msg) => msg)
+    return CellError.parsingError(firstNonemptyMessage)
   }
 
   public getFormula(): string {

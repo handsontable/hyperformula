@@ -56,6 +56,7 @@ export enum ParsingErrorType {
   StaticOffsetError = 'StaticOffsetError',
   StaticOffsetOutOfRangeError = 'StaticOffsetOutOfRangeError',
   RangeOffsetNotAllowed = 'RangeOffsetNotAllowed',
+  InvalidRangeSize = 'InvalidRangeSize',
 }
 
 export enum AstNodeType {

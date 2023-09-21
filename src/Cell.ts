@@ -154,8 +154,8 @@ export class CellError {
   ) {
   }
 
-  public static parsingError() {
-    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
+  public static parsingError(detailedMessage?: string): CellError {
+    return new CellError(ErrorType.ERROR, `${ErrorMessage.ParseError}${detailedMessage ? ' ' + detailedMessage : ''}`)
   }
 
   public attachRootVertex(vertex: FormulaVertex): CellError {
