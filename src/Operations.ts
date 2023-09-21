@@ -50,7 +50,7 @@ import {
   NamedExpressionOptions,
   NamedExpressions
 } from './NamedExpressions'
-import {NamedExpressionDependency, ParserWithCaching, RelativeDependency} from './parser'
+import {NamedExpressionDependency, ParserWithCaching, ParsingErrorType, RelativeDependency} from './parser'
 import {ParsingError} from './parser/Ast'
 import {ParsingResult} from './parser/ParserWithCaching'
 import {findBoundaries, Sheet} from './Sheet'
@@ -555,8 +555,18 @@ export class Operations {
       if (errors.length > 0) {
         this.setParsingErrorToCell(parsedCellContent.formula, errors, address)
       } else {
-        const size = this.arraySizePredictor.checkArraySize(ast, address)
-        this.setFormulaToCell(address, size, parserResult)
+        try {
+          const size = this.arraySizePredictor.checkArraySize(ast, address)
+          this.setFormulaToCell(address, size, parserResult)
+        } catch (error) {
+
+          if (!error.message) {
+            throw error
+          }
+
+          const parsingError: ParsingError = { type: ParsingErrorType.InvalidRangeSize, message: 'Invalid range size.' }
+          this.setParsingErrorToCell(parsedCellContent.formula, [parsingError], address)
+        }
       }
     } else if (parsedCellContent instanceof CellContent.Empty) {
       this.setCellEmpty(address)
