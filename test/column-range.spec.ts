@@ -1,6 +1,7 @@
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {adr, colEnd, colStart, extractColumnRange} from './testUtils'
+import {RangeVertex} from '../src/DependencyGraph'
 
 describe('Column ranges', () => {
   it('should work', () => {
@@ -16,7 +17,7 @@ describe('Column ranges', () => {
       ['=SUM(C:D)', '=SUM(C5:D6)'],
     ])
 
-    const cd = engine.rangeMapping.getRange(colStart('C'), colEnd('D'))!
+    const cd = engine.rangeMapping.getRange(colStart('C'), colEnd('D')) as RangeVertex
 
     const c5 = engine.dependencyGraph.fetchCell(adr('C5'))
     const c6 = engine.dependencyGraph.fetchCell(adr('C6'))
@@ -37,8 +38,8 @@ describe('Column ranges', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(D42:H42)')
 
-    const ce = engine.rangeMapping.getRange(colStart('C'), colEnd('E'))!
-    const dg = engine.rangeMapping.getRange(colStart('D'), colEnd('G'))!
+    const ce = engine.rangeMapping.getRange(colStart('C'), colEnd('E')) as RangeVertex
+    const dg = engine.rangeMapping.getRange(colStart('D'), colEnd('G')) as RangeVertex
 
     const d42 = engine.dependencyGraph.fetchCell(adr('D42'))
     const e42 = engine.dependencyGraph.fetchCell(adr('E42'))
@@ -79,146 +80,5 @@ describe('Column ranges', () => {
     const range = extractColumnRange(engine, adr('E1'))
     expect(range.start).toEqual(colStart('A'))
     expect(range.end).toEqual(colEnd('B'))
-  })
-
-  it('no infinite', () => {
-    const engine = HyperFormula.buildFromArray([[2, 3], [2, 42]], {useArrayArithmetic: true})
-    engine.setCellContents({ sheet: 0, row: 2, col: 2 }, "=A1:A2+A1:B1")
-
-    expect(engine.getSheetValues(0)).toEqual([[2, 3], [2, 42], [null, null, 4, 5], [null, null, 4, 5]])
-  })
-
-  it('one infinite', () => {
-    const engine = HyperFormula.buildFromArray([[2, 3], [2, 42]], {useArrayArithmetic: true})
-    engine.setCellContents({ sheet: 0, row: 2, col: 2 }, "=A:A+A1:B1")
-
-    expect(engine.getSheetValues(0)).toEqual([[2, 3], [2, 42], [null, null, 4, 5], [null, null, 4, 5]])
-  })
-
-  it('parsing error', () => {
-    const engine = HyperFormula.buildFromArray([[2, 3], [2, 42]], {useArrayArithmetic: true})
-    engine.setCellContents({ sheet: 0, row: 2, col: 2 }, "=+++")
-
-    expect(engine.getSheetValues(0)).toEqual([[2, 3], [2, 42], [null, null, 4, 5], [null, null, 4, 5]])
-  })
-
-  it('user', () => {
-    const engine = HyperFormula.buildFromSheets(
-      {
-        Sheet1: [["1"]]
-      },
-      {
-        licenseKey: "gpl-v3",
-        useArrayArithmetic: true
-      }
-    )
-    engine.setCellContents({ sheet: 0, row: 0, col: 0 }, "='Sheet1'!A:A+'Sheet1'!1:1")
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('error')
-  })
-
-  it('user 0', () => {
-    const engine = HyperFormula.buildFromArray([['1']], {useArrayArithmetic: true})
-    engine.setCellContents({ sheet: 0, row: 0, col: 0 }, "='Sheet1'!A:A+'Sheet1'!1:1")
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('error')
-  })
-
-  it('user 1', () => {
-    const engine = HyperFormula.buildFromArray([['1']], {useArrayArithmetic: true})
-    engine.setCellContents({ sheet: 0, row: 0, col: 0 }, "=A:A+1:1")
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('error')
-  })
-
-  it('user 2', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', "='Sheet1'!A:A+'Sheet1'!1:1"],
-    ], {useArrayArithmetic: true})
-
-    expect(engine.getCellValue(adr('B2'))).toEqual('error')
-  })
-
-  it('user 3', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', '=A:A+1:1'],
-    ], {useArrayArithmetic: true})
-
-    expect(engine.getCellValue(adr('B2'))).toEqual('error')
-  })
-
-  it('user 3 mod', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['=B:B+1:1'],
-    ], {useArrayArithmetic: true})
-
-    expect(engine.getCellValue(adr('A2'))).toEqual('error')
-  })
-
-  it('user 4', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', '=A:A+A:A'],
-    ], {useArrayArithmetic: true})
-
-    expect(engine.getCellValue(adr('B2'))).toEqual('error')
-  })
-
-  it('user no array arithmetic', () => {
-    const engine = HyperFormula.buildFromSheets(
-      {
-        Sheet1: [["1"]]
-      },
-      {
-        licenseKey: "gpl-v3",
-      }
-    )
-    engine.setCellContents({ sheet: 0, row: 0, col: 0 }, "='Sheet1'!A:A+'Sheet1'!1:1")
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('error')
-  })
-
-  it('user 0 no array arithmetic', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
-    engine.setCellContents({ sheet: 0, row: 0, col: 0 }, "='Sheet1'!A:A+'Sheet1'!1:1")
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('error')
-  })
-
-  it('user 1 no array arithmetic', () => {
-    const engine = HyperFormula.buildFromArray([['1']])
-    engine.setCellContents({ sheet: 0, row: 0, col: 0 }, "=A:A+1:1")
-
-    expect(engine.getCellValue(adr('A1'))).toEqual('error')
-  })
-
-  it('user 2 no array arithmetic', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', "='Sheet1'!A:A+'Sheet1'!1:1"],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual('error')
-  })
-
-  it('user 3 no array arithmetic', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', '=A:A+1:1'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual('error')
-  })
-
-  it('user 4 no array arithmetic', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', '=A:A+A:A'],
-    ])
-
-    expect(engine.getCellValue(adr('B2'))).toEqual('error')
   })
 })

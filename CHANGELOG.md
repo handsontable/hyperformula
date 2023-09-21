@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- Fix an issue where operation on ranges of incompatible sizes resulted in runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
+- Fix an issue where operation on ranges with incompatible sizes resulted in a runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
 
 ## [2.6.0] - 2023-09-19
 

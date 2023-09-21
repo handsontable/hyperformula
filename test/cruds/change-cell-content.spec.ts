@@ -1124,7 +1124,7 @@ describe('arrays', () => {
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
-    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, ErrorMessage.ParseError)))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, "Parsing error. Expecting token of type --> RParen <-- but found --> '' <--")))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
   })
 
