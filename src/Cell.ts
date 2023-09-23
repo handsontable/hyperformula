@@ -154,6 +154,10 @@ export class CellError {
   ) {
   }
 
+  /**
+   * Returns a CellError with a given message.
+   * @param {string} detailedMessage - message to be displayed
+   */
   public static parsingError(detailedMessage?: string): CellError {
     return new CellError(ErrorType.ERROR, `${ErrorMessage.ParseError}${detailedMessage ? ' ' + detailedMessage : ''}`)
   }
@@ -199,8 +203,13 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
 
 export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
-export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
+/**
+ * Checks if given object is a simple cell address.
+ */
+export function isSimpleCellAddress(obj: unknown): obj is SimpleCellAddress {
   if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
   } else {
     return false

@@ -281,7 +281,7 @@ For more information on this release, see:
 - **Breaking change**: Changed config options [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before                | after                |
-| --------------------- | -------------------- |
+|-----------------------|----------------------|
 | matrixColumnSeparator | arrayColumnSeparator |
 | matrixRowSeparator    | arrayRowSeparator    |
 
@@ -290,14 +290,14 @@ For more information on this release, see:
 - **Breaking change**: Changed API methods [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before             | after             |
-| ------------------ | ----------------- |
+|--------------------|-------------------|
 | matrixMapping      | arrrayMapping     |
 | isCellPartOfMatrix | isCellPartOfArray |
 
 - **Breaking change**: Changed Exceptions [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before                       | after                       |
-| ---------------------------- | --------------------------- |
+|------------------------------|-----------------------------|
 | SourceLocationHasMatrixError | SourceLocationHasArrayError |
 | TargetLocationHasMatrixError | TargetLocationHasArrayError |
 

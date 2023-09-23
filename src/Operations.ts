@@ -156,8 +156,8 @@ export interface MoveCellsResult {
 
 export class Operations {
   private changes: ContentChanges = ContentChanges.empty()
-  private maxRows: number
-  private maxColumns: number
+  private readonly maxRows: number
+  private readonly maxColumns: number
 
   constructor(
     config: Config,
@@ -220,7 +220,7 @@ export class Operations {
   public removeSheet(sheetId: number) {
     this.dependencyGraph.removeSheet(sheetId)
 
-    let version: number
+    let version = 0
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new RemoveSheetTransformer(sheetId)
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
@@ -230,9 +230,9 @@ export class Operations {
     this.sheetMapping.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
     const scopedNamedExpressions = this.namedExpressions.getAllNamedExpressionsForScope(sheetId).map(
-      (namedexpression) => this.removeNamedExpression(namedexpression.normalizeExpressionName(), sheetId)
+      (namedExpression) => this.removeNamedExpression(namedExpression.normalizeExpressionName(), sheetId)
     )
-    return {version: version!, scopedNamedExpressions}
+    return {version: version, scopedNamedExpressions}
   }
 
   public removeSheetByName(sheetName: string) {
@@ -311,7 +311,7 @@ export class Operations {
     const valuesToMove = this.dependencyGraph.rawValuesFromRange(sourceRange)
     this.columnSearch.moveValues(valuesToMove, toRight, toBottom, toSheet)
 
-    let version: number
+    let version = 0
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new MoveCellsTransformer(sourceRange, toRight, toBottom, toSheet)
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
@@ -323,7 +323,7 @@ export class Operations {
     const addedGlobalNamedExpressions = this.updateNamedExpressionsForMovedCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
     return {
-      version: version!,
+      version: version,
       overwrittenCellsData: currentDataAtTarget,
       addedGlobalNamedExpressions: addedGlobalNamedExpressions
     }
@@ -456,7 +456,13 @@ export class Operations {
     return addedNamedExpressions
   }
 
-  public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell) {
+  
+  /**
+   * Restores a single cell.
+   * @param {SimpleCellAddress} address
+   * @param {ClipboardCell} clipboardCell
+   */
+  public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell): void {
     switch (clipboardCell.type) {
       case ClipboardCellType.VALUE: {
         this.setValueToCell(clipboardCell, address)
@@ -525,9 +531,9 @@ export class Operations {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
 
-    const arr: ClipboardCell[][] = new Array(sheetHeight)
+    const arr: ClipboardCell[][] = new Array<ClipboardCell[]>(sheetHeight)
     for (let i = 0; i < sheetHeight; i++) {
-      arr[i] = new Array(sheetWidth)
+      arr[i] = new Array<ClipboardCell>(sheetWidth)
 
       for (let j = 0; j < sheetWidth; j++) {
         const address = simpleCellAddress(sheet, j, i)
@@ -560,7 +566,7 @@ export class Operations {
           this.setFormulaToCell(address, size, parserResult)
         } catch (error) {
 
-          if (!error.message) {
+          if (!(error as Error).message) {
             throw error
           }
 
@@ -648,9 +654,8 @@ export class Operations {
 
   /**
    * Returns true if row number is outside of given sheet.
-   *
-   * @param row - row number
-   * @param sheet - sheet id number
+   * @param {number} row - row number
+   * @param {number} sheet - sheet id number
    */
   public rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.dependencyGraph.addressMapping.getHeight(sheet)
@@ -670,10 +675,7 @@ export class Operations {
   /**
    * Removes multiple rows from sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which rows will be removed
-   * @param rowStart - number of the first row to be deleted
-   * @param rowEnd - number of the last row to be deleted
+   * @param {RowsSpan} rowsToRemove - rows to remove
    */
   private doRemoveRows(rowsToRemove: RowsSpan): RowsRemoval | undefined {
     if (this.rowEffectivelyNotInSheet(rowsToRemove.rowStart, rowsToRemove.sheet)) {
@@ -689,7 +691,7 @@ export class Operations {
 
     this.columnSearch.applyChanges(contentChanges.getChanges())
 
-    let version: number
+    let version = 0
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new RemoveRowsTransformer(rowsToRemove)
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
@@ -698,16 +700,13 @@ export class Operations {
 
     this.rewriteAffectedArrays(affectedArrays)
 
-    return {version: version!, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
+    return {version: version, removedCells, rowFrom: rowsToRemove.rowStart, rowCount: rowsToRemove.numberOfRows}
   }
 
   /**
    * Removes multiple columns from sheet. </br>
    * Does nothing if columns are outside of effective sheet size.
-   *
-   * @param sheet - sheet id from which columns will be removed
-   * @param columnStart - number of the first column to be deleted
-   * @param columnEnd - number of the last row to be deleted
+   * @param {ColumnsSpan} columnsToRemove - columns to remove
    */
   private doRemoveColumns(columnsToRemove: ColumnsSpan): ColumnsRemoval | undefined {
     if (this.columnEffectivelyNotInSheet(columnsToRemove.columnStart, columnsToRemove.sheet)) {
@@ -723,7 +722,7 @@ export class Operations {
     this.columnSearch.applyChanges(contentChanges.getChanges())
     this.columnSearch.removeColumns(columnsToRemove)
 
-    let version: number
+    let version = 0
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
       const transformation = new RemoveColumnsTransformer(columnsToRemove)
       transformation.performEagerTransformations(this.dependencyGraph, this.parser)
@@ -733,7 +732,7 @@ export class Operations {
     this.rewriteAffectedArrays(affectedArrays)
 
     return {
-      version: version!,
+      version: version,
       removedCells,
       columnFrom: columnsToRemove.columnStart,
       columnCount: columnsToRemove.numberOfColumns
@@ -743,10 +742,7 @@ export class Operations {
   /**
    * Add multiple rows to sheet. </br>
    * Does nothing if rows are outside of effective sheet size.
-   *
-   * @param sheet - sheet id in which rows will be added
-   * @param row - row number above which the rows will be added
-   * @param numberOfRowsToAdd - number of rows to add
+   * @param {RowsSpan} addedRows - rows to add
    */
   private doAddRows(addedRows: RowsSpan) {
     if (this.rowEffectivelyNotInSheet(addedRows.rowStart, addedRows.sheet)) {
@@ -779,10 +775,7 @@ export class Operations {
   /**
    * Add multiple columns to sheet </br>
    * Does nothing if columns are outside of effective sheet size
-   *
-   * @param sheet - sheet id in which columns will be added
-   * @param column - column number above which the columns will be added
-   * @param numberOfColumns - number of columns to add
+   * @param {ColumnsSpan} addedColumns - object containing information about columns to add
    */
   private doAddColumns(addedColumns: ColumnsSpan): void {
     if (this.columnEffectivelyNotInSheet(addedColumns.columnStart, addedColumns.sheet)) {
@@ -804,9 +797,8 @@ export class Operations {
 
   /**
    * Returns true if row number is outside of given sheet.
-   *
-   * @param column - row number
-   * @param sheet - sheet id number
+   * @param {number} column - row number
+   * @param {number} sheet - sheet id number
    */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.dependencyGraph.addressMapping.getWidth(sheet)
@@ -818,11 +810,11 @@ export class Operations {
       return
     }
     const { vertex: localVertex, id: maybeLocalVertexId } = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
-    const localVertexId = maybeLocalVertexId ?? this.dependencyGraph.graph.getNodeId(localVertex)!
+    const localVertexId = maybeLocalVertexId ?? this.dependencyGraph.graph.getNodeId(localVertex)
 
     const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
     const { vertex: globalVertex, id: maybeGlobalVertexId } = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
-    const globalVertexId = maybeGlobalVertexId ?? this.dependencyGraph.graph.getNodeId(globalVertex)!
+    const globalVertexId = maybeGlobalVertexId ?? this.dependencyGraph.graph.getNodeId(globalVertex)
 
     for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
       if (adjacentNode instanceof FormulaCellVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
@@ -831,8 +823,8 @@ export class Operations {
         const {dependencies} = this.parser.fetchCachedResultForAst(ast)
         for (const dependency of absolutizeDependencies(dependencies, formulaAddress)) {
           if (dependency instanceof NamedExpressionDependency && dependency.name.toLowerCase() === namedExpression.displayName.toLowerCase()) {
-            this.dependencyGraph.graph.removeEdge(globalVertexId, adjacentNode)
-            this.dependencyGraph.graph.addEdge(localVertexId, adjacentNode)
+            this.dependencyGraph.graph.removeEdge(globalVertexId as number, adjacentNode)
+            this.dependencyGraph.graph.addEdge(localVertexId as number, adjacentNode)
           }
         }
       }
@@ -987,8 +979,8 @@ export function normalizeAddedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex
   return merged
 }
 
-function isPositiveInteger(x: number): boolean {
-  return Number.isInteger(x) && x > 0
+function isPositiveInteger(n: number): boolean {
+  return Number.isInteger(n) && n > 0
 }
 
 function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
