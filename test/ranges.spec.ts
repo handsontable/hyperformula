@@ -13,7 +13,7 @@ describe('Ranges', () => {
       })
 
       it('returns a cell error, when operation results in a range with infinite width and infinite height (setCellContents)', () => {
-        const engine = HyperFormula.buildFromArray([['1']], { useArrayArithmetic: true })
+        const engine = HyperFormula.buildFromArray([[1]], { useArrayArithmetic: true })
         engine.setCellContents(adr('B2'), '=A:A+1:1')
 
         expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.ERROR, 'Invalid range size'))
@@ -33,27 +33,27 @@ describe('Ranges', () => {
     })
 
     describe('with array arithmetic off', () => {
-      it('???, when operation results in an infinite column range not starting on index 0 (setCellContents)', () => {
-        const engine = HyperFormula.buildFromArray([[1, 2]], { useArrayArithmetic: false })
+      it('calculates the value according to the rules for array arithmetic mode disabled, when evaluating an operation on a column range and a single element (setCellContents)', () => {
+        const engine = HyperFormula.buildFromArray([[1, 2], [3]], { useArrayArithmetic: false })
         engine.setCellContents(adr('B2'), '=A:A+B1')
 
-        expect(engine.getSheetValues(0)).toEqual([[1, 2], [null, 'wtf?']])
+        expect(engine.getSheetValues(0)).toEqual([[1, 2], [3, 5]])
       })
 
-      it('???, when operation results in a range with infinite width and infinite height (setCellContents)', () => {
-        const engine = HyperFormula.buildFromArray([['1']], { useArrayArithmetic: false })
+      it('calculates the value according to the rules for array arithmetic mode disabled, when evaluating an operation on a column range and a row range (setCellContents)', () => {
+        const engine = HyperFormula.buildFromArray([[1, 2], [3]], { useArrayArithmetic: false })
         engine.setCellContents(adr('B2'), '=A:A+1:1')
 
-        expect(engine.getSheetValues(0)).toEqual([[1], [null, 'wtf?']])
+        expect(engine.getSheetValues(0)).toEqual([[1, 2], [3, 5]])
       })
 
-      it('returns a #SPILL error, when operation results in an infinite column range not starting on index 0', () => {
+      it('returns a #SPILL error, when evaluating an operation on a column range and a single element', () => {
         const engine = HyperFormula.buildFromArray([[1, 2], [null, '=A:A+B1']], { useArrayArithmetic: true })
 
         expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
       })
 
-      it('returns a #SPILL error, when operation results in a range with infinite width and infinite height', () => {
+      it('returns a #SPILL error, when evaluating an operation on a column range and a row range', () => {
         const engine = HyperFormula.buildFromArray([[], [null, '=A:A+1:1']], { useArrayArithmetic: true })
 
         expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
