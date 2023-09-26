@@ -1,6 +1,7 @@
 import {HyperFormula} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {adr, colEnd, colStart, extractColumnRange} from './testUtils'
+import {RangeVertex} from '../src/DependencyGraph'
 
 describe('Column ranges', () => {
   it('should work', () => {
@@ -16,7 +17,7 @@ describe('Column ranges', () => {
       ['=SUM(C:D)', '=SUM(C5:D6)'],
     ])
 
-    const cd = engine.rangeMapping.getRange(colStart('C'), colEnd('D'))!
+    const cd = engine.rangeMapping.getRange(colStart('C'), colEnd('D')) as RangeVertex
 
     const c5 = engine.dependencyGraph.fetchCell(adr('C5'))
     const c6 = engine.dependencyGraph.fetchCell(adr('C6'))
@@ -37,8 +38,8 @@ describe('Column ranges', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(D42:H42)')
 
-    const ce = engine.rangeMapping.getRange(colStart('C'), colEnd('E'))!
-    const dg = engine.rangeMapping.getRange(colStart('D'), colEnd('G'))!
+    const ce = engine.rangeMapping.getRange(colStart('C'), colEnd('E')) as RangeVertex
+    const dg = engine.rangeMapping.getRange(colStart('D'), colEnd('G')) as RangeVertex
 
     const d42 = engine.dependencyGraph.fetchCell(adr('D42'))
     const e42 = engine.dependencyGraph.fetchCell(adr('E42'))
