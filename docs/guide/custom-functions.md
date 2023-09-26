@@ -237,7 +237,7 @@ export class MyCustomPlugin extends FunctionPlugin {
 
 ### Return an array of data
 
-A function may return multiple values in the form of an [array](arrays.md). To
+A function can return multiple values in the form of an [array](arrays.md). To
 do that, use [`SimpleRangeValue` class](../api/classes/simplerangevalue.md):
 
 ```js
@@ -261,6 +261,11 @@ declare a companion method for the array size. To do that, provide the
 `arraySizeMethod` that calculates the size of the result array based on the
 function arguments and returns an instance of the
 [`ArraySize` class](../api/classes/arraysize.md).
+
+::: tip
+When you use your custom function in a formula, `arraySizeMethod` is triggered every time the formula changes, but not when the dependencies of the formula change.
+This can cause unexpected behavior if the size of the result array depends on the values in the referenced cells.
+:::
 
 ```js
 export class MyCustomPlugin extends FunctionPlugin {
@@ -358,7 +363,7 @@ This demo contains the implementation of both the
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
 
 <iframe
-  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.4.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.6.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
   style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: custom-functions"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
@@ -370,7 +375,7 @@ This demo contains the implementation of both the
 You can set the following options for your function:
 
 | Option                              | Type    | Description                                                                                                                                                                                                                                   |
-| ----------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|-------------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `method` (required)                 | String  | Name of the method that implements the custom function logic.                                                                                                                                                                                 |
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
 | `arraySizeMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
@@ -413,7 +418,7 @@ MyCustomPlugin.implementedFunctions = {
 You can set the following argument validation options:
 
 | Option                    | Type                                      | Description                                                                                                                                                                                                                                        |
-| ------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|---------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `argumentType` (required) | `FunctionArgumentType`                    | Expected type of the function argument. See [possible values](#types-of-the-function-argument).                                                                                                                                                    |
 | `defaultValue`            | `InternalScalarValue` or `RawScalarValue` | If set: if an argument is missing, its value defaults to `defaultValue`.                                                                                                                                                                           |
 | `passSubtype`             | Boolean                                   | `true`: arguments are passed with full type information (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`).<br/>Default: `false`                                                                                    |
@@ -449,7 +454,7 @@ MyCustomPlugin.implementedFunctions = {
 ### Types of the function argument
 
 | Type      | Description                                                                                              | Example                                      |
-| --------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+|-----------|----------------------------------------------------------------------------------------------------------|----------------------------------------------|
 | `NUMBER`  | A general numeric value such as floating-point number, date/time value, currency value or percent value. | `3`, `3.14`, `$100`, `1939/09/01`, `4:45 AM` |
 | `INTEGER` | An integer.                                                                                              | `42`                                         |
 | `COMPLEX` | A text representing a complex value.                                                                     | `"-3+4i"`                                    |

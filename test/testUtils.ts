@@ -1,9 +1,9 @@
-import {CellValue, DetailedCellError, ErrorType, HyperFormula, Sheet, SheetDimensions} from '../src'
+import {CellValue, DetailedCellError, ErrorType, HyperFormula, RawCellContent, Sheet, SheetDimensions} from '../src'
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../src/AbsoluteCellRange'
 import {CellError, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 import {Config} from '../src/Config'
 import {DateTimeHelper} from '../src/DateTimeHelper'
-import {ArrayVertex, FormulaCellVertex, RangeVertex} from '../src/DependencyGraph'
+import {ArrayVertex, FormulaCellVertex, Graph, RangeVertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
 import {defaultStringifyDateTime} from '../src/format/format'
 import {complex} from '../src/interpreter/ArithmeticHelper'
@@ -71,7 +71,7 @@ export const verifyRangesInSheet = (engine: HyperFormula, sheet: number, ranges:
   const rangeVerticesInMapping = Array.from(engine.rangeMapping.rangesInSheet(sheet))
     .map((vertex) => rangeAddr(vertex.range))
 
-  const rangeVerticesInGraph = Array.from(engine.graph.nodes.values()).filter(vertex => vertex instanceof RangeVertex)
+  const rangeVerticesInGraph = [ ...engine.graph.getNodes()].filter(vertex => vertex instanceof RangeVertex)
     .map(vertex => rangeAddr((vertex as RangeVertex).range))
 
   expectNoDuplicates(rangeVerticesInGraph)
@@ -93,7 +93,7 @@ export const expectArrayWithSameContent = (actualArray: any[], expectedArray: an
 }
 
 export const expectToBeCloseForComplex = (engine: HyperFormula, cell: string, expected: string, precision?: number) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const coerce = (arg: CellValue): complex => engine.evaluator.interpreter.arithmeticHelper.coerceScalarToComplex(arg)
   const actualVal: complex = coerce(engine.getCellValue(adr(cell)))
@@ -222,13 +222,13 @@ export function columnIndexToSheet(columnIndex: ColumnIndex, width: number, heig
   return normalizeSheet(result, {width, height})
 }
 
-function normalizeSheet(sheet: any[][], dimensions: SheetDimensions): any[][] {
+function normalizeSheet(sheet: RawCellContent[][], dimensions: SheetDimensions): any[][] {
   return Array.from(sheet, row => {
     if (row) {
       row.length = dimensions.width
       return Array.from(row, v => v || null)
     }
-    return Array(dimensions.width).fill(null)
+    return Array(dimensions.width).fill(null) as RawCellContent[]
   })
 }
 
@@ -240,14 +240,12 @@ export function expectColumnIndexToMatchSheet(expected: Sheet, engine: HyperForm
   expectArrayWithSameContent(normalizeSheet(expected, dimensions), normalizeSheet(exportedColumnIndex, dimensions))
 }
 
-export function resetSpy(spy: jasmine.Spy | unknown): void {
+export function resetSpy(spy: any): void {
   try {
-    // eslint-disable-next-line
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     spy.mockClear() // clears mock in Jest env
   } catch {
-    // eslint-disable-next-line
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     spy.calls.reset() // clears mock in Jasmine env
   }
 }
@@ -259,4 +257,24 @@ export function resetSpy(spy: jasmine.Spy | unknown): void {
  */
 export function expectCellValueToEqualDate(engine: HyperFormula, cellAddress: SimpleCellAddress, expectedDateString: string) {
   expect(dateNumberToString(engine.getCellValue(cellAddress), new Config())).toEqual(expectedDateString)
+}
+
+/**
+ * Returns number of edges in graph
+ *
+ */
+export function graphEdgesCount<T>(graph: Graph<T>): number {
+  return (graph as any).nodesSparseArray.reduce((acc: number, node: T, id: number) =>
+    node ? acc + ((graph as any).fixEdgesArrayForNode(id) as number[]).length : acc
+  , 0)
+}
+
+export function graphReversedAdjacentNodes<T>(graph: Graph<T>, node: T): T[] {
+  const id = (graph as any).nodesIds.get(node)
+
+  return (graph as any).nodesSparseArray.reduce((acc: number[], sourceNode: T, sourceId: number) =>
+    sourceNode && (graph as any).edgesSparseArray[sourceId].includes(id)
+      ? [ ...acc, sourceId ]
+      : acc
+  , []).map((resultId: number) => (graph as any).nodesSparseArray[resultId])
 }

@@ -6,14 +6,15 @@ import {
   InvalidAddressError,
   NoSheetWithIdError,
   SimpleCellAddress,
+  SheetSizeLimitExceededError,
+  ArraySize,
+  ExpectedValueOfTypeError,
 } from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {ArraySize} from '../../src/ArraySize'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
-import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {
   adr,
@@ -27,7 +28,6 @@ import {
   rowEnd,
   rowStart
 } from '../testUtils'
-import {ExpectedValueOfTypeError} from '../../src/errors'
 
 describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
@@ -159,7 +159,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [[null]])
     expect(engine.getCellValue(adr('B1'))).toBe(null)
-    expect(engine.graph.nodes).not.toContain(b1)
+    expect([ ...engine.graph.getNodes() ]).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
 
@@ -498,7 +498,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
-  it('update dependecy value cell to parsing error ', () => {
+  it('update dependency value cell to parsing error ', () => {
     const sheet = [
       ['1', '=SUM(A1)'],
     ]
@@ -1124,7 +1124,7 @@ describe('arrays', () => {
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
-    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, ErrorMessage.ParseError)))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, "Parsing error. Expecting token of type --> RParen <-- but found --> '' <--")))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
   })
 

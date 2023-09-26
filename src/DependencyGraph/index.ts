@@ -6,6 +6,7 @@
 export {DependencyGraph} from './DependencyGraph'
 export {AddressMapping} from './AddressMapping/AddressMapping'
 export {Graph} from './Graph'
+export {TopSort} from './TopSort'
 export {RangeMapping} from './RangeMapping'
 export {SheetMapping} from './SheetMapping'
 export {ArrayMapping} from './ArrayMapping'

@@ -74,6 +74,10 @@ describe('Function SEARCH', () => {
       ['=SEARCH("b.z", "foobarbaz")'],
       ['=SEARCH("b.b", "foobarbaz")'],
       ['=SEARCH(".b", "foobarbaz", 5)'],
+      ['=SEARCH(".B", "fooBarBaz")'],
+      ['=SEARCH(".B", "fooBarBaz", 5)'],
+      ['=SEARCH(".b", "fooBarBaz")'],
+      ['=SEARCH(".b", "fooBarBaz", 5)'],
     ], {useRegularExpressions: true})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -81,6 +85,34 @@ describe('Function SEARCH', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(7)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
     expect(engine.getCellValue(adr('A5'))).toEqual(6)
+    expect(engine.getCellValue(adr('A6'))).toEqual(3)
+    expect(engine.getCellValue(adr('A7'))).toEqual(6)
+    expect(engine.getCellValue(adr('A8'))).toEqual(3)
+    expect(engine.getCellValue(adr('A9'))).toEqual(6)
+  })
+
+  it('should work with regular expressions also when "caseSensitive: true" is set', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SEARCH(".*f", "foobarbaz")'],
+      ['=SEARCH("b.*b", "foobarbaz")'],
+      ['=SEARCH("b.z", "foobarbaz")'],
+      ['=SEARCH("b.b", "foobarbaz")'],
+      ['=SEARCH(".b", "foobarbaz", 5)'],
+      ['=SEARCH(".B", "fooBarBaz")'],
+      ['=SEARCH(".B", "fooBarBaz", 5)'],
+      ['=SEARCH(".b", "fooBarBaz")'],
+      ['=SEARCH(".b", "fooBarBaz", 5)'],
+    ], { useRegularExpressions: true, caseSensitive: true })
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(4)
+    expect(engine.getCellValue(adr('A3'))).toEqual(7)
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
+    expect(engine.getCellValue(adr('A5'))).toEqual(6)
+    expect(engine.getCellValue(adr('A6'))).toEqual(3)
+    expect(engine.getCellValue(adr('A7'))).toEqual(6)
+    expect(engine.getCellValue(adr('A8'))).toEqual(3)
+    expect(engine.getCellValue(adr('A9'))).toEqual(6)
   })
 
   it('should be case insensitive', () => {
@@ -90,6 +122,20 @@ describe('Function SEARCH', () => {
       ['=SEARCH("?R", "bar")'],
       ['=SEARCH("*r", "baR")'],
     ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+  })
+
+  it('should be case insensitive even when "caseSensitive: true" is set', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SEARCH("R", "bar")'],
+      ['=SEARCH("r", "baR")'],
+      ['=SEARCH("?R", "bar")'],
+      ['=SEARCH("*r", "baR")'],
+    ], { caseSensitive: true })
 
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
     expect(engine.getCellValue(adr('A2'))).toEqual(3)

@@ -58,12 +58,12 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
     sheet: 0,
     col: Math.min(x1, x2),
     row: Math.min(y1, y2),
-  }, 0)
+  }, 0) as string
   const endAddress = engine.simpleCellAddressToString({
     sheet: 0,
     col: Math.max(x1, x2),
     row: Math.max(y1, y2)
-  }, 0)
+  }, 0) as string
   return '=SUM(' + startAddress + ':' + endAddress + ')'
 }
 
@@ -271,7 +271,7 @@ describe('large psuedo-random test', () => {
       verifyValues(engine)
     }
     randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, 2 * (n + 1) * sideX, 2 * sideY))
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 })

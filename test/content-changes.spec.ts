@@ -24,6 +24,7 @@ class SpreadRangeExporter implements ChangeExporter<CellValueChange> {
 
 describe('ContentChanges', () => {
   const simpleChangeExporter = new SimpleChangeExporter()
+  const spreadRangeExporter = new SpreadRangeExporter()
 
   it('should be empty', () => {
     const contentChanges = ContentChanges.empty()
@@ -83,12 +84,30 @@ describe('ContentChanges', () => {
     const contentChanges = ContentChanges.empty()
     contentChanges.addChange(SimpleRangeValue.onlyValues([[1, 2], ['foo', 'bar']]), adr('A1'))
 
-    const exportedChanges = contentChanges.exportChanges(new SpreadRangeExporter())
+    const exportedChanges = contentChanges.exportChanges(spreadRangeExporter)
 
     expect(exportedChanges.length).toEqual(4)
     expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
     expect(exportedChanges).toContainEqual({address: adr('B1'), value: 2})
     expect(exportedChanges).toContainEqual({address: adr('A2'), value: 'foo'})
     expect(exportedChanges).toContainEqual({address: adr('B2'), value: 'bar'})
+  })
+
+  it('#1291 - array change should not delete neighboring non-overlapping changes', () => {
+    const contentChanges = ContentChanges.empty()
+    contentChanges.addChange(4, adr('B1'))
+    contentChanges.addChange(5, adr('C1'))
+
+    const otherChanges = ContentChanges.empty()
+    otherChanges.addChange(SimpleRangeValue.onlyValues([[1], [2], [3]]), adr('A1'))
+    contentChanges.addAll(otherChanges)
+
+    const exportedChanges = contentChanges.exportChanges(spreadRangeExporter)
+    expect(exportedChanges.length).toEqual(5)
+    expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
+    expect(exportedChanges).toContainEqual({address: adr('A2'), value: 2})
+    expect(exportedChanges).toContainEqual({address: adr('A3'), value: 3})
+    expect(exportedChanges).toContainEqual({address: adr('B1'), value: 4})
+    expect(exportedChanges).toContainEqual({address: adr('C1'), value: 5})
   })
 })

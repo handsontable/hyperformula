@@ -1,6 +1,7 @@
 import {ErrorType, HyperFormula} from '../src'
 import {ErrorMessage} from '../src/error-message'
-import {adr, detailedError} from './testUtils'
+import {adr, detailedError, resetSpy} from './testUtils'
+import {BuildEngineFactory} from '../src/BuildEngineFactory'
 
 describe('Rebuilding engine', () => {
   it('should preserve absolute named expression', () => {
@@ -40,5 +41,16 @@ describe('Rebuilding engine', () => {
     engine.removeSheet(0)
     engine.rebuildAndRecalculate()
     expect(engine.getCellValue(adr('B1'))).toEqual(false)
+  })
+
+  it('rebuildAndRecalculate rebuilds the engine if the config is empty', () => {
+    const engine = HyperFormula.buildFromArray([[]], {})
+
+    const rebuildEngineSpy = spyOn(BuildEngineFactory, 'rebuildWithConfig')
+    resetSpy(rebuildEngineSpy)
+
+    engine.rebuildAndRecalculate()
+
+    expect(rebuildEngineSpy).toHaveBeenCalled()
   })
 })

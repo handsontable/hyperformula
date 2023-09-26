@@ -19,6 +19,7 @@ export const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    ADDRESS: 'DIRECCION',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
@@ -101,9 +102,11 @@ export const dictionary: RawTranslationPackage = {
     HEX2OCT: 'HEX.A.OCT',
     HLOOKUP: 'BUSCARH',
     HOUR: 'HORA',
+    HYPERLINK: 'HIPERVINCULO',
     IF: 'SI',
     IFERROR: 'SI.ERROR',
     IFNA: 'IFNA',
+    IFS: 'SI.CONJUNTO',
     INDEX: 'INDICE',
     INT: 'ENTERO',
     INTERVAL: 'INTERVAL', //FIXME

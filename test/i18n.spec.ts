@@ -9,7 +9,7 @@ import {adr, extractReference} from './testUtils'
 import {MissingTranslationError} from '../src/errors'
 
 describe('i18n', () => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const allLanguages: RawTranslationPackage[] = Object.getOwnPropertyNames(languages).filter(lang => !lang.startsWith('_')).map(lang => languages[lang])
 
@@ -62,7 +62,7 @@ describe('i18n', () => {
   it('all function translation keys has to be upper cased', () => {
     for (const lang of Object.getOwnPropertyNames(languages)) {
       if (!lang.startsWith('_')) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const translationPackage = languages[lang]
         for (const translationKey in translationPackage.functions) {

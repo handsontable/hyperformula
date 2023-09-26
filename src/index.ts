@@ -48,7 +48,7 @@ import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from 
 import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
-import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata} from './interpreter'
+import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata, EmptyValue} from './interpreter'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
 import {SimpleRangeValue} from './SimpleRangeValue'
@@ -76,6 +76,7 @@ class HyperFormulaNS extends HyperFormula {
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
   public static ArraySize = ArraySize
   public static SimpleRangeValue = SimpleRangeValue
+  public static EmptyValue = EmptyValue
   public static FunctionPlugin = FunctionPlugin
   public static FunctionArgumentType = FunctionArgumentType
   public static FunctionPluginValidationError = FunctionPluginValidationError
@@ -109,7 +110,7 @@ HyperFormula.languages[enGB.langCode] = enGB
 
 for (const pluginName of Object.getOwnPropertyNames(plugins)) {
   if (!pluginName.startsWith('_')) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     HyperFormula.registerFunctionPlugin(plugins[pluginName])
   }
@@ -175,6 +176,7 @@ export {
   NothingToPasteError,
   ProtectedFunctionTranslationError,
   SimpleRangeValue,
+  EmptyValue,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
   SourceLocationHasArrayError,

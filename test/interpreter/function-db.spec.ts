@@ -44,6 +44,13 @@ describe('Function DB', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(15845.10)
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.PeriodLong))
+  })
 
+  it('should return zero if salvage >= cost', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DB(10000, 10000, 10, 2, 12)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(0)
   })
 })

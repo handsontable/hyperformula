@@ -13,10 +13,10 @@ import {ColumnsSpan, RowsSpan} from '../../Span'
 import {ArrayVertex, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
-import {IAddressMappingStrategy} from './IAddressMappingStrategy'
+import {AddressMappingStrategy} from './AddressMappingStrategy'
 
 export class AddressMapping {
-  private mapping: Map<number, IAddressMappingStrategy> = new Map()
+  private mapping: Map<number, AddressMappingStrategy> = new Map()
 
   constructor(
     private readonly policy: ChooseAddressMapping
@@ -44,7 +44,7 @@ export class AddressMapping {
     return vertex
   }
 
-  public strategyFor(sheetId: number): IAddressMappingStrategy {
+  public strategyFor(sheetId: number): AddressMappingStrategy {
     const strategy = this.mapping.get(sheetId)
     if (strategy === undefined) {
       throw new NoSheetWithIdError(sheetId)
@@ -53,7 +53,7 @@ export class AddressMapping {
     return strategy
   }
 
-  public addSheet(sheetId: number, strategy: IAddressMappingStrategy) {
+  public addSheet(sheetId: number, strategy: AddressMappingStrategy) {
     if (this.mapping.has(sheetId)) {
       throw Error('Sheet already added')
     }
@@ -61,7 +61,7 @@ export class AddressMapping {
     this.mapping.set(sheetId, strategy)
   }
 
-  public autoAddSheet(sheetId: number, sheet: Sheet, sheetBoundaries: SheetBoundaries) {
+  public autoAddSheet(sheetId: number, sheetBoundaries: SheetBoundaries) {
     const {height, width, fill} = sheetBoundaries
     const strategyConstructor = this.policy.call(fill)
     this.addSheet(sheetId, new strategyConstructor(width, height))

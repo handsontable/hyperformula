@@ -50,12 +50,16 @@ export const parsingError = (type: ParsingErrorType, message: string) => ({
   type, message
 })
 
+/**
+ * Represents types of parsing errors.
+ */
 export enum ParsingErrorType {
   LexingError = 'LexingError',
   ParserError = 'ParsingError',
   StaticOffsetError = 'StaticOffsetError',
   StaticOffsetOutOfRangeError = 'StaticOffsetOutOfRangeError',
   RangeOffsetNotAllowed = 'RangeOffsetNotAllowed',
+  InvalidRangeSize = 'InvalidRangeSize',
 }
 
 export enum AstNodeType {
@@ -386,14 +390,16 @@ export interface ProcedureAst extends AstWithInternalWhitespace {
   type: AstNodeType.FUNCTION_CALL,
   procedureName: string,
   args: Ast[],
+  hyperlink?: string,
 }
 
-export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhitespace?: IToken, internalWhitespace?: IToken): ProcedureAst => ({
+export const buildProcedureAst = (procedureName: string, args: Ast[], leadingWhitespace?: IToken, internalWhitespace?: IToken, hyperlink?: string): ProcedureAst => ({
   type: AstNodeType.FUNCTION_CALL,
   procedureName,
   args,
   leadingWhitespace: leadingWhitespace?.image,
   internalWhitespace: internalWhitespace?.image,
+  hyperlink
 })
 
 export interface ArrayAst extends AstWithInternalWhitespace {

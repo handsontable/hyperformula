@@ -6,7 +6,11 @@
 import {CellError} from '../Cell'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 
+/**
+ * A symbol representing an empty cell value.
+ */
 export const EmptyValue = Symbol('Empty value')
+
 export type EmptyValueType = typeof EmptyValue
 export type InternalNoErrorScalarValue = RichNumber | RawNoErrorScalarValue
 export type InternalScalarValue = RichNumber | RawScalarValue
@@ -30,6 +34,7 @@ export abstract class RichNumber {
   }
 
   public fromNumber(val: number): this {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return new (this.constructor as any)(val)
   }
 

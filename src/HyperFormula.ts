@@ -116,6 +116,11 @@ export class HyperFormula implements TypedEmitter {
   private readonly _emitter: Emitter = new Emitter()
   private _evaluationSuspended: boolean = false
 
+  /**
+   * Constructor
+   *
+   * @internal
+   */
   protected constructor(
     private _config: Config,
     private _stats: Statistics,
@@ -477,7 +482,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - function id, e.g. 'SUMIF'
    * @param {FunctionPluginDefinition} plugin - plugin class
-   * @param translations
+   * @param {FunctionTranslationsPackage} translations - translations for the function name
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[FunctionPluginValidationError]] when function with a given id does not exist in plugin or plugin class definition is not consistent with metadata
@@ -686,6 +691,37 @@ export class HyperFormula implements TypedEmitter {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     return this._serialization.getCellFormula(cellAddress)
+  }
+
+  /**
+   * Returns the `HYPERLINK` url for a cell of a given address or `undefined` for an address that does not exist or a cell that is not `HYPERLINK`
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=HYPERLINK("https://hyperformula.handsontable.com/", "HyperFormula")', '0'],
+   * ]);
+   *
+   * // should return url of 'HYPERLINK': https://hyperformula.handsontable.com/
+   * const A1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 0, row: 0 });
+   *
+   * // should return 'undefined' for a cell that is not 'HYPERLINK'
+   * const B1Hyperlink = hfInstance.getCellHyperlink({ sheet: 0, col: 1, row: 0 });
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellHyperlink(cellAddress: SimpleCellAddress): string | undefined {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getCellHyperlink(cellAddress)
   }
 
   /**
@@ -936,7 +972,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Updates the config with given new metadata.
+   * Updates the config with given new metadata. It is an expensive operation, as it might trigger rebuilding the engine and recalculation of all formulas.
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
@@ -957,28 +993,13 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public updateConfig(newParams: Partial<ConfigParams>): void {
-    const newConfig = this._config.mergeConfig(newParams)
+    const isNewConfigTheSame = Object.entries(newParams).every(([key, value]) => this._config[key as keyof ConfigParams] === value)
 
-    const configNewLanguage = this._config.mergeConfig({language: newParams.language})
-    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
-    const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
+    if (isNewConfigTheSame) {
+      return
+    }
 
-    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
-
-    this._config = newEngine.config
-    this._stats = newEngine.stats
-    this._dependencyGraph = newEngine.dependencyGraph
-    this._columnSearch = newEngine.columnSearch
-    this._parser = newEngine.parser
-    this._unparser = newEngine.unparser
-    this._cellContentParser = newEngine.cellContentParser
-    this._evaluator = newEngine.evaluator
-    this._lazilyTransformingAstService = newEngine.lazilyTransformingAstService
-    this._crudOperations = newEngine.crudOperations
-    this._exporter = newEngine.exporter
-    this._namedExpressions = newEngine.namedExpressions
-    this._serialization = newEngine.serialization
-    this._functionRegistry = newEngine.functionRegistry
+    this.rebuildWithConfig(newParams)
   }
 
   /**
@@ -1007,7 +1028,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Instance
    */
   public rebuildAndRecalculate(): void {
-    this.updateConfig({})
+    this.rebuildWithConfig({})
   }
 
   /**
@@ -3367,7 +3388,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note that this method may trigger dependency graph recalculation.
    *
-   * @param {() => void} batchOperations
+   * @param {() => void} batchOperations - a function with operations to be performed
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * @fires [[evaluationSuspended]] always
@@ -4157,9 +4178,9 @@ export class HyperFormula implements TypedEmitter {
    * Interprets number as a date.
    *
    * @param {number} inputNumber - number of days since nullDate, should be non-negative, fractions are ignored.
-
+   *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -4305,7 +4326,7 @@ export class HyperFormula implements TypedEmitter {
       throw new EvaluationSuspendedError()
     }
   }
-
+  
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
     const parsedCellContent = this._cellContentParser.parse(formulaString)
     const address = {sheet: sheetId, col: 0, row: 0}
@@ -4323,6 +4344,33 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Rebuilds the engine with new configuration.
+   */
+  private rebuildWithConfig(newParams: Partial<ConfigParams>): void {
+    const newConfig = this._config.mergeConfig(newParams)
+    const configNewLanguage = this._config.mergeConfig({language: newParams.language})
+    const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
+    const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
+
+    const newEngine = BuildEngineFactory.rebuildWithConfig(newConfig, serializedSheets, serializedNamedExpressions, this._stats)
+
+    this._config = newEngine.config
+    this._stats = newEngine.stats
+    this._dependencyGraph = newEngine.dependencyGraph
+    this._columnSearch = newEngine.columnSearch
+    this._parser = newEngine.parser
+    this._unparser = newEngine.unparser
+    this._cellContentParser = newEngine.cellContentParser
+    this._evaluator = newEngine.evaluator
+    this._lazilyTransformingAstService = newEngine.lazilyTransformingAstService
+    this._crudOperations = newEngine.crudOperations
+    this._exporter = newEngine.exporter
+    this._namedExpressions = newEngine.namedExpressions
+    this._serialization = newEngine.serialization
+    this._functionRegistry = newEngine.functionRegistry
+  }
+
+  /**
    * Runs a recomputation starting from recently changed vertices.
    *
    * Note that this method may trigger dependency graph recalculation.
@@ -4332,8 +4380,8 @@ export class HyperFormula implements TypedEmitter {
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
     if (!this._evaluationSuspended) {
       const changes = this._crudOperations.getAndClearContentChanges()
-      const verticesToRecomputeFrom = Array.from(this.dependencyGraph.verticesToRecompute())
-      this.dependencyGraph.clearRecentlyChangedVertices()
+      const verticesToRecomputeFrom = this.dependencyGraph.verticesToRecompute()
+      this.dependencyGraph.clearDirtyVertices()
 
       if (verticesToRecomputeFrom.length > 0) {
         changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
