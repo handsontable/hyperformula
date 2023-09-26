@@ -207,13 +207,11 @@ export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${ad
  * Checks if given object is a simple cell address.
  */
 export function isSimpleCellAddress(obj: unknown): obj is SimpleCellAddress {
-  if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
-  } else {
-    return false
-  }
+  return obj
+    && (typeof obj === 'object' || typeof obj === 'function')
+    && typeof (obj as SimpleCellAddress)?.sheet === 'number'
+    && typeof (obj as SimpleCellAddress)?.col === 'number'
+    && typeof (obj as SimpleCellAddress)?.row === 'number'
 }
 
 export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
