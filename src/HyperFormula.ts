@@ -2751,8 +2751,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Computes simple (absolute) address of a cell address based on its string representation.
-   * If sheet name present in string representation but is not present in sheet mapping, returns `undefined`.
-   * If sheet name is not present in string representation, returns {@param contextSheetId} as sheet number.
+   * If sheet name is present in the string representation but is not present in the engine, returns `undefined`.
+   * If sheet name is not present in the string representation, returns {@param contextSheetId} as sheet number.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} contextSheetId - context used in case of missing sheet in the first argument
