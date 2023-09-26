@@ -2751,8 +2751,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Computes simple (absolute) address of a cell address based on its string representation.
-   * If sheet name is present in the string representation but is not present in the engine, returns `undefined`.
-   * If sheet name is not present in the string representation, returns {@param contextSheetId} as sheet number.
+   * - If sheet name is present in the string representation but is not present in the engine, returns `undefined`.
+   * - If sheet name is not present in the string representation, returns `contextSheetId` as sheet number.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} contextSheetId - context used in case of missing sheet in the first argument
@@ -2768,13 +2768,13 @@ export class HyperFormula implements TypedEmitter {
    * const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 0);
    *
    * // returns { sheet: 0, col: 0, row: 5 }
-   * const simpleCellAddressTwo = hfInstance.simpleCellAddressFromString('Sheet1!A6');
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet1!A6');
    *
    * // returns { sheet: 0, col: 0, row: 5 }
-   * const simpleCellAddressTwo = hfInstance.simpleCellAddressFromString('Sheet1!$A$6');
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet1!$A$6');
    *
    * // returns 'undefined', as there's no 'Sheet 2' in the HyperFormula instance
-   * const simpleCellAddressTwo = hfInstance.simpleCellAddressFromString('Sheet2!A6');
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet2!A6');
    * ```
    *
    * @category Helpers
