@@ -15,24 +15,24 @@ describe('simpleCellAddressFromString', () => {
     return index > 0 ? index : undefined
   }
 
-  it('should return simple cell address', () => {
+  it('should return a simple cell address when called with a valid string address', () => {
     expect(simpleCellAddressFromString(sheetMappingFunction, 'A1', 0)).toEqual(adr('A1'))
     expect(simpleCellAddressFromString(sheetMappingFunction, 'AY7', 0)).toEqual(simpleCellAddress(0, 50, 6))
   })
 
-  it('should return undefined', () => {
+  it('should return undefined when sheet does not exist', () => {
     expect(simpleCellAddressFromString(sheetMappingFunction, 'Sheet4!A1', 0)).toBeUndefined()
   })
 
-  it('should return address with overridden sheet', () => {
+  it('should return address with context sheet when string address does not contain a sheet name', () => {
     expect(simpleCellAddressFromString(sheetMappingFunction, 'A1', 1)).toEqual(adr('A1', 1))
   })
 
-  it('should return address with sheet number from sheet mapping', () => {
+  it('should return a valid address when called with a valid sheet name', () => {
     expect(simpleCellAddressFromString(sheetMappingFunction, 'Sheet2!A1', 1)).toEqual(adr('A1', 1))
   })
 
-  it('should return address with sheet number from sheet mapping regardless of override parameter', () => {
+  it('should return address with sheet number from sheet mapping regardless of context sheet parameter', () => {
     expect(simpleCellAddressFromString(sheetMappingFunction, 'Sheet3!A1', 1)).toEqual(adr('A1', 2))
   })
 })

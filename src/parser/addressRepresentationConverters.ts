@@ -97,39 +97,43 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
 
 /**
  * Computes simple (absolute) address of a cell address based on its string representation.
- * If sheet name present in string representation but is not present in sheet mapping, returns undefined.
- * If sheet name is not present in string representation, returns {@param sheetContext} as sheet number
+ * - If sheet name is present in the string representation but is not present in sheet mapping, returns `undefined`.
+ * - If sheet name is not present in the string representation, returns {@param contextSheetId} as sheet number.
  *
  * @param sheetMapping - mapping function needed to change name of a sheet to index
  * @param stringAddress - string representation of cell address, e.g. 'C64'
- * @param sheetContext - sheet in context of which we should parse the address
+ * @param contextSheetId - sheet in context of which we should parse the address
  * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
  */
-export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): Maybe<SimpleCellAddress> => {
-  const result = addressRegex.exec(stringAddress)!
+export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellAddress> => {
+  const regExpExecArray = addressRegex.exec(stringAddress)!
 
-  const col = columnLabelToIndex(result[6])
+  if (!regExpExecArray) {
+    return undefined
+  }
 
-  let sheet = extractSheetNumber(result, sheetMapping)
+  const col = columnLabelToIndex(regExpExecArray[6])
+
+  let sheet = extractSheetNumber(regExpExecArray, sheetMapping)
   if (sheet === undefined) {
     return undefined
   }
 
   if (sheet === null) {
-    sheet = sheetContext
+    sheet = contextSheetId
   }
 
-  const row = Number(result[8]) - 1
+  const row = Number(regExpExecArray[8]) - 1
   return simpleCellAddress(sheet, col, row)
 }
 
-export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAddress: string, sheetContext: number): Maybe<SimpleCellRange> => {
+export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellRange> => {
   const split = stringAddress.split(RANGE_OPERATOR)
   if (split.length !== 2) {
     return undefined
   }
   const [startString, endString] = split
-  const start = simpleCellAddressFromString(sheetMapping, startString, sheetContext)
+  const start = simpleCellAddressFromString(sheetMapping, startString, contextSheetId)
   if (start === undefined) {
     return undefined
   }
