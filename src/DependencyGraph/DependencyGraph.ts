@@ -636,14 +636,17 @@ export class DependencyGraph {
   }
 
   public getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayVertex> {
-    const arrayVertices = ranges.map(range => {
+    const arrayVertices = new Set<ArrayVertex>()
+    for (const range of ranges) {
       if (this.graph.hasNode(range)) {
-        return Array.from(this.graph.adjacentNodes(range)).filter(node => node instanceof ArrayVertex)
-      } else {
-        return []
+        for (const adjacentVertex of this.graph.adjacentNodes(range)) {
+          if (adjacentVertex instanceof ArrayVertex) {
+            arrayVertices.add(adjacentVertex)
+          }
+        }
       }
-    }) as ArrayVertex[][]
-    return new Set(...arrayVertices)
+    }
+    return arrayVertices
   }
 
   public* rawValuesFromRange(range: AbsoluteCellRange): IterableIterator<[RawScalarValue, SimpleCellAddress]> {
