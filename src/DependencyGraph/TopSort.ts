@@ -57,12 +57,12 @@ export class TopSort<T> {
   /**
    * Returns adjacent nodes of a given node.
    */
-  private getAdjacentNodeIds(id: string | number) {
+  private getAdjacentNodeIds(id: id) {
     const edges = this.edges.get(id)
     if (edges === undefined) {
-      throw new Error(`Edge set missing for node ${id}`)
+      throw new Error(`Edge set missing for node ${id}: ${Array.from(this.nodes.keys())}`)
     }
-    return edges
+    return new Set(Array.from(edges.values()).filter(id => this.nodes.has(id)))
   }
 
   /**

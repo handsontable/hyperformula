@@ -14,9 +14,6 @@ export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | Simp
 
 /**
  * Provides directed graph structure.
- *
- * Idea for performance improvement:
- * - use Set<Node>[] instead of NodeId[][] for edges
  */
 export class Graph<Node> {
   /**
@@ -61,9 +58,7 @@ export class Graph<Node> {
 
   private getNextId: () => NodeId = (function incrementId() {
     let i = 0
-    return function increment() {
-      return i++
-    }
+    return () => i++
   })()
 
   constructor(
@@ -127,7 +122,7 @@ export class Graph<Node> {
     if (edges === undefined) {
       throw new Error(`Edge set missing for node ${id}`)
     }
-    return new Set(Array.from(edges.values()).map(id => this.nodes.get(id)).filter(Boolean) as Node[])
+    return new Set(Array.from(edges.values()).map(id => this.nodes.get(id)).filter(node => node !== undefined) as Node[])
   }
 
   /**
@@ -158,7 +153,6 @@ export class Graph<Node> {
     }
 
     const newId = this.getNextId()
-    console.log('creating edge set for', node)
     this.nodes.set(newId, node)
     this.edges.set(newId, new Set())
     this.nodesIds.set(node, newId)
@@ -417,7 +411,7 @@ export class Graph<Node> {
     if (edges === undefined) {
       throw new Error(`Edge set missing for node ${id}`)
     }
-    const adjacentNodeIds = Array.from(edges.values()).filter(adjacentId => this.nodes.has(adjacentId))
+    const adjacentNodeIds = Array.from(edges.values()).filter(id => this.nodes.has(id))
     this.edges.set(id, new Set(adjacentNodeIds))
     return adjacentNodeIds
   }
@@ -442,7 +436,7 @@ export class Graph<Node> {
   private processDirtyAndVolatileNodeIds({ dirty, volatile }: { dirty: NodeId[], volatile: NodeId[] }): Node[] {
     return [ ...new Set([ ...dirty, ...volatile]) ]
     .map(id => this.nodes.get(id))
-    .filter(Boolean) as Node[]
+    .filter(node => node !== undefined) as Node[]
   }
 
   /**

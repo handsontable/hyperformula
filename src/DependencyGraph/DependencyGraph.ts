@@ -41,7 +41,7 @@ import {AddressMapping} from './AddressMapping/AddressMapping'
 import {ArrayMapping} from './ArrayMapping'
 import {collectAddressesDependentToRange} from './collectAddressesDependentToRange'
 import {FormulaVertex} from './FormulaCellVertex'
-import {DependencyQuery, Graph} from './Graph'
+import {DependencyQuery, Graph, NodeId} from './Graph'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
@@ -226,7 +226,7 @@ export class DependencyGraph {
     })
   }
 
-  public fetchNamedExpressionVertex(expressionName: string, sheetId: number): { vertex: CellVertex, id: Maybe<number>} {
+  public fetchNamedExpressionVertex(expressionName: string, sheetId: number): { vertex: CellVertex, id: Maybe<NodeId>} {
     const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(expressionName, sheetId)
     return this.fetchCellOrCreateEmpty(namedExpression.address)
   }
@@ -254,7 +254,7 @@ export class DependencyGraph {
     })
   }
 
-  public fetchCellOrCreateEmpty(address: SimpleCellAddress): { vertex: CellVertex, id: Maybe<number> } {
+  public fetchCellOrCreateEmpty(address: SimpleCellAddress): { vertex: CellVertex, id: Maybe<NodeId> } {
     const existingVertex = this.addressMapping.getCell(address)
 
     if (existingVertex !== undefined) {
