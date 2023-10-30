@@ -15,22 +15,24 @@ enum NodeVisitStatus {
   POPPED,
 }
 
+type id = string | number
+
 /**
  * An algorithm class. Provides an iterative implementation of Tarjan's algorithm for finding strongly connected components
  */
 export class TopSort<T> {
-  private entranceTime: number[] = []
-  private low: number[] = []
-  private parent: number[] = []
-  private inSCC: boolean[] = []
-  private nodeStatus: NodeVisitStatus[] = []
-  private order: number[] = []
-  private sccNonSingletons: boolean[] = []
+  private entranceTime: Map<id, number> = new Map()
+  private low: Map<id, number> = new Map()
+  private parent: Map<id, id> = new Map()
+  private inSCC: Map<id, boolean> = new Map()
+  private nodeStatus: Map<id, NodeVisitStatus> = new Map()
+  private order: id[] = []
+  private sccNonSingletons: Map<id, boolean> = new Map()
   private timeCounter: number = 0
 
   constructor(
-    private nodesSparseArray: T[] = [],
-    private edgesSparseArray: number[][] = [],
+    private nodes: Map<id, T> = new Map(),
+    private edges: Map<id, Set<id>> = new Map(),
   ) {
   }
 
@@ -43,38 +45,42 @@ export class TopSort<T> {
    * @param onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(
-    modifiedNodeIds: number[],
+    modifiedNodeIds: id[],
     operatingFunction: (node: T) => boolean,
     onCycle: (node: T) => void
   ): TopSortResult<T> {
     const modifiedNodeIdsReversed = modifiedNodeIds.reverse()
-    modifiedNodeIdsReversed.forEach((id: number) => this.runDFS(id))
+    modifiedNodeIdsReversed.forEach(id => this.runDFS(id))
     return this.postprocess(modifiedNodeIdsReversed, onCycle, operatingFunction)
   }
 
   /**
    * Returns adjacent nodes of a given node.
    */
-  private getAdjacentNodeIds(id: number): number[] {
-    return this.edgesSparseArray[id].filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
+  private getAdjacentNodeIds(id: string | number) {
+    const edges = this.edges.get(id)
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${id}`)
+    }
+    return edges
   }
 
   /**
    * Runs DFS starting from a given node.
    */
-  private runDFS(v: number) {
-    if (this.nodeStatus[v] !== undefined) {
+  private runDFS(v: id) {
+    if (this.nodeStatus.has(v)) {
       return
     }
 
-    this.nodeStatus[v] = NodeVisitStatus.ON_STACK
-    const DFSstack: number[] = [v]
-    const SCCstack: number[] = []
+    this.nodeStatus.set(v, NodeVisitStatus.ON_STACK)
+    const DFSstack: id[] = [v]
+    const SCCstack: id[] = []
 
     while (DFSstack.length > 0) {
       const u = DFSstack[DFSstack.length - 1]
 
-      switch (this.nodeStatus[u]) {
+      switch (this.nodeStatus.get(u)) {
         case NodeVisitStatus.ON_STACK: {
           this.handleOnStack(u, SCCstack, DFSstack)
           break
@@ -94,41 +100,41 @@ export class TopSort<T> {
   /**
    * Handles a node that is on stack.
    */
-  private handleOnStack(u: number, SCCstack: number[], DFSstack: number[]) {
-    this.entranceTime[u] = this.timeCounter
-    this.low[u] = this.timeCounter
+  private handleOnStack(u: id, SCCstack: id[], DFSstack: id[]) {
+    this.entranceTime.set(u, this.timeCounter)
+    this.low.set(u, this.timeCounter)
     this.timeCounter++
     SCCstack.push(u)
 
-    this.getAdjacentNodeIds(u).forEach((t: number) => {
-      if (this.entranceTime[t] === undefined) {
+    this.getAdjacentNodeIds(u).forEach(t => {
+      if (!this.entranceTime.has(t)) {
         DFSstack.push(t)
-        this.parent[t] = u
-        this.nodeStatus[t] = NodeVisitStatus.ON_STACK
+        this.parent.set(t, u)
+        this.nodeStatus.set(t, NodeVisitStatus.ON_STACK)
       }
     })
 
-    this.nodeStatus[u] = NodeVisitStatus.PROCESSED
+    this.nodeStatus.set(u, NodeVisitStatus.PROCESSED)
   }
 
   /**
    * Handles a node that is already processed.
    */
-  private handleProcessed(u: number, SCCstack: number[], DFSstack: number[]) {
-    let uLow = this.entranceTime[u]
+  private handleProcessed(u: id, SCCstack: id[], DFSstack: id[]) {
+    let uLow = this.entranceTime.get(u) as number
 
-    this.getAdjacentNodeIds(u).forEach((t: number) => {
-      if (this.inSCC[t]) {
+    this.getAdjacentNodeIds(u).forEach(t => {
+      if (this.inSCC.get(t)) {
         return
       }
 
-      uLow = this.parent[t] === u ? Math.min(uLow, this.low[t]) : Math.min(uLow, this.entranceTime[t])
+      uLow = this.parent.get(t) === u ? Math.min(uLow, this.low.get(t)!) : Math.min(uLow, this.entranceTime.get(t)!)
     })
 
-    this.low[u] = uLow
+    this.low.set(u, uLow)
 
-    if (uLow === this.entranceTime[u]) {
-      const currentSCC: number[] = []
+    if (uLow === this.entranceTime.get(u)) {
+      const currentSCC: id[] = []
 
       do {
         currentSCC.push(SCCstack[SCCstack.length - 1])
@@ -136,50 +142,45 @@ export class TopSort<T> {
       } while (currentSCC[currentSCC.length - 1] !== u)
 
       currentSCC.forEach((t) => {
-        this.inSCC[t] = true
+        this.inSCC.set(t, true)
       })
 
       this.order.push(...currentSCC)
 
       if (currentSCC.length > 1) {
         currentSCC.forEach((t) => {
-          this.sccNonSingletons[t] = true
+          this.sccNonSingletons.set(t, true)
         })
       }
     }
 
     DFSstack.pop()
-    this.nodeStatus[u] = NodeVisitStatus.POPPED
+    this.nodeStatus.set(u, NodeVisitStatus.POPPED)
   }
 
   /**
    * Postprocesses the result of Tarjan's algorithm.
    */
-  private postprocess(modifiedNodeIds: number[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
-    const shouldBeUpdatedMapping: boolean[] = []
+  private postprocess(modifiedNodeIds: id[], onCycle: (node: T) => void, operatingFunction: (node: T) => boolean) {
+    const shouldBeUpdatedMapping: Map<id, boolean> = new Map()
 
-    modifiedNodeIds.forEach((t: number) => {
-      shouldBeUpdatedMapping[t] = true
-    })
+    modifiedNodeIds.forEach(t => shouldBeUpdatedMapping.set(t, true))
 
     const sorted: T[] = []
     const cycled: T[] = []
     this.order.reverse()
 
-    this.order.forEach((t: number) => {
+    this.order.forEach(t => {
       const adjacentNodes = this.getAdjacentNodeIds(t)
-
-      // The following line is a potential performance bottleneck.
-      // Array.includes() is O(n) operation, which makes the whole algorithm O(n^2).
-      // Idea for improvement: use Set<T>[] instead of number[][] for edgesSparseArray.
-      if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) {
-        cycled.push(this.nodesSparseArray[t])
-        onCycle(this.nodesSparseArray[t])
-        adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
+      const node = this.nodes.get(t) as T
+      if (this.sccNonSingletons.get(t) || adjacentNodes.has(t)) {
+        cycled.push(node)
+        onCycle(node)
+        adjacentNodes.forEach(s => shouldBeUpdatedMapping.set(s, true))
       } else {
-        sorted.push(this.nodesSparseArray[t])
-        if (shouldBeUpdatedMapping[t] && operatingFunction(this.nodesSparseArray[t])) {
-          adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)
+        sorted.push(node)
+        if (shouldBeUpdatedMapping.get(t) && operatingFunction(node)) {
+          adjacentNodes.forEach(s => shouldBeUpdatedMapping.set(s, true))
         }
       }
     })

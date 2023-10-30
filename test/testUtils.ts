@@ -264,17 +264,17 @@ export function expectCellValueToEqualDate(engine: HyperFormula, cellAddress: Si
  *
  */
 export function graphEdgesCount<T>(graph: Graph<T>): number {
-  return (graph as any).nodesSparseArray.reduce((acc: number, node: T, id: number) =>
-    node ? acc + ((graph as any).fixEdgesArrayForNode(id) as number[]).length : acc
+  return Array.from((graph as any).nodes.keys()).reduce((acc: number, id) =>
+    acc + ((graph as any).fixEdgesArrayForNode(id) as number[]).length
   , 0)
 }
 
 export function graphReversedAdjacentNodes<T>(graph: Graph<T>, node: T): T[] {
-  const id = (graph as any).nodesIds.get(node)
+  const id = (graph as any).nodesIds.get(node) as string | number
 
-  return (graph as any).nodesSparseArray.reduce((acc: number[], sourceNode: T, sourceId: number) =>
-    sourceNode && (graph as any).edgesSparseArray[sourceId].includes(id)
+  return Array.from((graph as any).nodes.keys()).reduce((acc: any[], sourceId: any) =>
+    graph.existsEdge(sourceId, id)
       ? [ ...acc, sourceId ]
       : acc
-  , []).map((resultId: number) => (graph as any).nodesSparseArray[resultId])
+  , []).map((resultId: number) => (graph as any).nodes.get(resultId))
 }

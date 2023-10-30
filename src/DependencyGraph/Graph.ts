@@ -8,7 +8,7 @@ import {SimpleCellRange} from '../AbsoluteCellRange'
 import {TopSort, TopSortResult} from './TopSort'
 import {ProcessableValue} from './ProcessableValue'
 
-export type NodeId = number
+export type NodeId = string | number
 export type NodeAndId<Node> = { node: Node, id: NodeId }
 export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | SimpleCellRange), Node][]
 
@@ -16,21 +16,21 @@ export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | Simp
  * Provides directed graph structure.
  *
  * Idea for performance improvement:
- * - use Set<Node>[] instead of NodeId[][] for edgesSparseArray
+ * - use Set<Node>[] instead of NodeId[][] for edges
  */
 export class Graph<Node> {
   /**
-   * A sparse array. The value nodesSparseArray[n] exists if and only if node n is in the graph.
+   * A sparse array. The value nodes[n] exists if and only if node n is in the graph.
    * @private
    */
-  private nodesSparseArray: Node[] = []
+  private nodes: Map<NodeId, Node> = new Map()
 
   /**
-   * A sparse array. The value edgesSparseArray[n] exists if and only if node n is in the graph.
-   * The edgesSparseArray[n] is also a sparse array. It may contain removed nodes. To make sure check nodesSparseArray.
+   * A sparse array. The value edges[n] exists if and only if node n is in the graph.
+   * The edges[n] is also a sparse array. It may contain removed nodes. To make sure check nodes.
    * @private
    */
-  private edgesSparseArray: NodeId[][] = []
+  private edges: Map<NodeId, Set<NodeId>> = new Map()
 
   /**
    * A mapping from node to its id. The value nodesIds.get(node) exists if and only if node is in the graph.
@@ -59,7 +59,12 @@ export class Graph<Node> {
    */
   private changingWithStructureNodeIds: NodeId[] = []
 
-  private nextId: NodeId = 0
+  private getNextId: () => NodeId = (function incrementId() {
+    let i = 0
+    return function increment() {
+      return i++
+    }
+  })()
 
   constructor(
     private readonly dependencyQuery: DependencyQuery<Node>
@@ -69,7 +74,7 @@ export class Graph<Node> {
    * Iterate over all nodes the in graph
    */
   public getNodes(): Node[] {
-    return this.nodesSparseArray.filter((node: Node) => node !== undefined)
+    return Array.from(this.nodes.values())
   }
 
   /**
@@ -87,15 +92,20 @@ export class Graph<Node> {
    * @param fromNode - node from which edge is outcoming
    * @param toNode - node to which edge is incoming
    */
-  public existsEdge(fromNode: Node, toNode: Node): boolean {
-    const fromId = this.getNodeId(fromNode)
-    const toId = this.getNodeId(toNode)
+  public existsEdge(fromNode: Node | NodeId, toNode: Node | NodeId): boolean {
+    const fromId = this.getNodeIdIfNode(fromNode)
+    const toId = this.getNodeIdIfNode(toNode)
 
     if (fromId === undefined || toId === undefined) {
       return false
     }
 
-    return this.edgesSparseArray[fromId].includes(toId)
+    const edges = this.edges.get(fromId)
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${fromId}`)
+    }
+
+    return edges.has(toId)
   }
 
   /**
@@ -113,7 +123,11 @@ export class Graph<Node> {
       throw this.missingNodeError(node)
     }
 
-    return new Set(this.edgesSparseArray[id].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]))
+    const edges = this.edges.get(id)
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${id}`)
+    }
+    return new Set(Array.from(edges.values()).map(id => this.nodes.get(id)).filter(Boolean) as Node[])
   }
 
   /**
@@ -143,11 +157,10 @@ export class Graph<Node> {
       return idOfExistingNode
     }
 
-    const newId = this.nextId
-    this.nextId++
-
-    this.nodesSparseArray[newId] = node
-    this.edgesSparseArray[newId] = []
+    const newId = this.getNextId()
+    console.log('creating edge set for', node)
+    this.nodes.set(newId, node)
+    this.edges.set(newId, new Set())
     this.nodesIds.set(node, newId)
     return newId
   }
@@ -161,8 +174,8 @@ export class Graph<Node> {
    * @param toNode - node to which edge is incoming
    */
   public addEdge(fromNode: Node | NodeId, toNode: Node | NodeId): void {
-    const fromId = this.getNodeIdIfNotNumber(fromNode)
-    const toId = this.getNodeIdIfNotNumber(toNode)
+    const fromId = this.getNodeIdIfNode(fromNode)
+    const toId = this.getNodeIdIfNode(toNode)
 
     if (fromId === undefined) {
       throw this.missingNodeError(fromNode as Node)
@@ -172,11 +185,16 @@ export class Graph<Node> {
       throw this.missingNodeError(toNode as Node)
     }
 
-    if (this.edgesSparseArray[fromId].includes(toId)) {
+    const edges = this.edges.get(fromId)
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${fromId}`)
+    }
+
+    if (edges.has(toId)) {
       return
     }
 
-    this.edgesSparseArray[fromId].push(toId)
+    edges.add(toId)
   }
 
   /**
@@ -189,15 +207,20 @@ export class Graph<Node> {
       throw this.missingNodeError(node)
     }
 
-    if (this.edgesSparseArray[id].length > 0) {
-      this.edgesSparseArray[id].forEach(adjacentId => this.dirtyAndVolatileNodeIds.rawValue.dirty.push(adjacentId))
+    const edges = this.edges.get(id)
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${id}`)
+    }
+
+    if (edges.size) {
+      edges.forEach(adjacentId => this.dirtyAndVolatileNodeIds.rawValue.dirty.push(adjacentId))
       this.dirtyAndVolatileNodeIds.markAsModified()
     }
 
     const dependencies = this.removeDependencies(node)
 
-    delete this.nodesSparseArray[id]
-    delete this.edgesSparseArray[id]
+    this.nodes.delete(id)
+    this.edges.delete(id)
     this.infiniteRangeIds.delete(id)
     this.nodesIds.delete(node)
 
@@ -208,8 +231,8 @@ export class Graph<Node> {
    * Removes edge between nodes.
    */
   public removeEdge(fromNode: Node | NodeId, toNode: Node | NodeId): void {
-    const fromId = this.getNodeIdIfNotNumber(fromNode)
-    const toId = this.getNodeIdIfNotNumber(toNode)
+    const fromId = this.getNodeIdIfNode(fromNode)
+    const toId = this.getNodeIdIfNode(toNode)
 
     if (fromId === undefined) {
       throw this.missingNodeError(fromNode as Node)
@@ -219,13 +242,17 @@ export class Graph<Node> {
       throw this.missingNodeError(toNode as Node)
     }
 
-    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
+    const edges = this.edges.get(fromId)
 
-    if (indexOfToId === -1) {
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${fromId}`)
+    }
+
+    if (!edges.has(toId)) {
       throw new Error('Edge does not exist')
     }
 
-    delete this.edgesSparseArray[fromId][indexOfToId]
+    edges.delete(toId)
   }
 
   /**
@@ -243,13 +270,13 @@ export class Graph<Node> {
       return
     }
 
-    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
+    const edges = this.edges.get(fromId)
 
-    if (indexOfToId === -1) {
-      return
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${fromId}`)
     }
 
-    delete this.edgesSparseArray[fromId][indexOfToId]
+    edges.delete(toId)
   }
 
   /**
@@ -271,7 +298,7 @@ export class Graph<Node> {
     operatingFunction: (node: Node) => boolean,
     onCycle: (node: Node) => void
   ): TopSortResult<Node> {
-    const topSortAlgorithm = new TopSort<Node>(this.nodesSparseArray, this.edgesSparseArray)
+    const topSortAlgorithm = new TopSort<Node>(this.nodes, this.edges)
     const modifiedNodesIds = modifiedNodes.map(node => this.getNodeId(node)).filter(id => id !== undefined) as NodeId[]
     return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
   }
@@ -314,9 +341,13 @@ export class Graph<Node> {
   /**
    * Clears dirty nodes.
    */
-  public clearDirtyNodes(): void {
+  public clearDirtyNodes(): Node[] {
+    const dirtyNodes = this.dirtyAndVolatileNodeIds.rawValue.dirty
     this.dirtyAndVolatileNodeIds.rawValue.dirty = []
     this.dirtyAndVolatileNodeIds.markAsModified()
+    return dirtyNodes
+    .map(id => this.nodes.get(id))
+    .filter(node => node !== undefined) as Node[]
   }
 
   /**
@@ -348,7 +379,7 @@ export class Graph<Node> {
    * Marks node as infinite range.
    */
   public markNodeAsInfiniteRange(node: Node | NodeId): void {
-    const id = this.getNodeIdIfNotNumber(node)
+    const id = this.getNodeIdIfNode(node)
 
     if (id === undefined) {
       return
@@ -361,7 +392,7 @@ export class Graph<Node> {
    * Returns an array of nodes marked as infinite ranges
    */
   public getInfiniteRanges(): NodeAndId<Node>[] {
-    return [ ...this.infiniteRangeIds].map(id => ({ node: this.nodesSparseArray[id], id }))
+    return [ ...this.infiniteRangeIds].map(id => ({ node: this.nodes.get(id) as Node, id }))
   }
 
   /**
@@ -372,19 +403,23 @@ export class Graph<Node> {
   }
 
   /**
-   *
+   * Doesn't work if overlap between nodeId and node.
    */
-  private getNodeIdIfNotNumber(node: Node | NodeId): NodeId | undefined {
-    return typeof node === 'number' ? node : this.nodesIds.get(node)
+  private getNodeIdIfNode(node: Node | NodeId): NodeId | undefined {
+    return (typeof node === 'number' || typeof node === 'string') ? node : this.nodesIds.get(node)
   }
 
   /**
    * Removes invalid neighbors of a given node from the edges array and returns adjacent nodes for the input node.
    */
   private fixEdgesArrayForNode(id: NodeId): NodeId[] {
-    const adjacentNodeIds = this.edgesSparseArray[id]
-    this.edgesSparseArray[id] = adjacentNodeIds.filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
-    return this.edgesSparseArray[id]
+    const edges = this.edges.get(id)
+    if (edges === undefined) {
+      throw new Error(`Edge set missing for node ${id}`)
+    }
+    const adjacentNodeIds = Array.from(edges.values()).filter(adjacentId => this.nodes.has(adjacentId))
+    this.edges.set(id, new Set(adjacentNodeIds))
+    return adjacentNodeIds
   }
 
   /**
@@ -406,8 +441,8 @@ export class Graph<Node> {
    */
   private processDirtyAndVolatileNodeIds({ dirty, volatile }: { dirty: NodeId[], volatile: NodeId[] }): Node[] {
     return [ ...new Set([ ...dirty, ...volatile]) ]
-    .map(id => this.nodesSparseArray[id])
-    .filter(node => node !== undefined)
+    .map(id => this.nodes.get(id))
+    .filter(Boolean) as Node[]
   }
 
   /**

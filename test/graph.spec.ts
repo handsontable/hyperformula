@@ -367,9 +367,9 @@ describe('Graph class', () => {
 
   describe('getTopSortedWithSccSubgraphFrom', () => {
     it('calls the operatingFunction callback for sorted nodes', () => {
-      const graph = new Graph<string>(dummyDependencyQuery)
-      const node0 = 'foo'
-      const node1 = 'bar'
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node0 = new IdentifiableString(0, 'foo')
+      const node1 = new IdentifiableString(1, 'bar')
       graph.addNodeAndReturnId(node0)
       graph.addNodeAndReturnId(node1)
 
@@ -383,9 +383,9 @@ describe('Graph class', () => {
     })
 
     it('works for graph with an edge', () => {
-      const graph = new Graph<string>(dummyDependencyQuery)
-      const node0 = 'foo'
-      const node1 = 'bar'
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node0 = new IdentifiableString(0, 'foo')
+      const node1 = new IdentifiableString(1, 'bar')
 
       graph.addNodeAndReturnId(node0)
       graph.addNodeAndReturnId(node1)
@@ -402,9 +402,9 @@ describe('Graph class', () => {
     })
 
     it('omits nodes not reachable from the "modifiedNodes" array', () => {
-      const graph = new Graph<string>(dummyDependencyQuery)
-      const node0 = 'foo'
-      const node1 = 'bar'
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node0 = new IdentifiableString(0, 'foo')
+      const node1 = new IdentifiableString(1, 'bar')
 
       graph.addNodeAndReturnId(node0)
       graph.addNodeAndReturnId(node1)
@@ -420,14 +420,14 @@ describe('Graph class', () => {
     })
 
     it('calls the operatingFunction for a node not included but reachable from the "modifiedNodes" array', () => {
-      const graph = new Graph<string>(dummyDependencyQuery)
-      const nodes = ['foo', 'bar', 'baz']
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const nodes = ['foo', 'bar', 'baz'].map((s, i) => new IdentifiableString(i, s))
 
       nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[2])
       graph.addEdge(nodes[1], nodes[2])
 
-      const operatingFunction = jasmine.createSpy().and.callFake((node: string) => node === nodes[0])
+      const operatingFunction = jasmine.createSpy().and.callFake(node => node === nodes[0])
       const onCycle = jasmine.createSpy()
 
       graph.getTopSortedWithSccSubgraphFrom([nodes[0], nodes[1]], operatingFunction, onCycle)
@@ -437,8 +437,8 @@ describe('Graph class', () => {
     })
 
     it('calls onCycle callback for nodes that are on cycle', () => {
-      const graph = new Graph<string>(dummyDependencyQuery)
-      const nodes = ['foo', 'c0', 'c1', 'c2']
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const nodes = ['foo', 'c0', 'c1', 'c2'].map((s, i) => new IdentifiableString(i, s))
 
       nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[1])
@@ -452,12 +452,12 @@ describe('Graph class', () => {
 
       expect(operatingFunction).toHaveBeenCalledTimes(1)
       expect(onCycle).toHaveBeenCalledTimes(3)
-      expect(cycled).toEqual(['c0', 'c1', 'c2'])
+      expect(cycled).toEqual(nodes.slice(1))
     })
 
     it('does not call operatingFunction callback for nodes that are on cycle', () => {
-      const graph = new Graph<string>(dummyDependencyQuery)
-      const nodes = ['c0', 'c1', 'c2']
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const nodes = ['c0', 'c1', 'c2'].map((s, i) => new IdentifiableString(i, s))
       nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[1])
       graph.addEdge(nodes[1], nodes[2])
@@ -468,12 +468,12 @@ describe('Graph class', () => {
       const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], operatingFunction, onCycle).cycled
 
       expect(operatingFunction).not.toHaveBeenCalled()
-      expect(cycled).toEqual(['c0', 'c1', 'c2'])
+      expect(cycled).toEqual(nodes)
     })
 
     it('detects a cycle consisting of nodes not included but reachable from the "modifiedNodes" array', () => {
-      const graph = new Graph<string>(dummyDependencyQuery)
-      const nodes = ['foo', 'c0', 'c1', 'c2']
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const nodes = ['foo', 'c0', 'c1', 'c2'].map((s, i) => new IdentifiableString(i, s))
       nodes.forEach((n) => graph.addNodeAndReturnId(n))
       graph.addEdge(nodes[0], nodes[1])
       graph.addEdge(nodes[1], nodes[2])
@@ -485,7 +485,7 @@ describe('Graph class', () => {
       const cycled = graph.getTopSortedWithSccSubgraphFrom([nodes[0]], operatingFunction, onCycle).cycled
 
       expect(operatingFunction).toHaveBeenCalledTimes(1)
-      expect(cycled).toEqual(['c0', 'c1', 'c2'])
+      expect(cycled).toEqual(nodes.slice(1))
     })
   })
 
