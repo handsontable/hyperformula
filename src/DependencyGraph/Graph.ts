@@ -104,12 +104,13 @@ export class Graph<Node> {
   }
 
   /**
-   * Returns nodes adjacent to given node. May contain removed nodes.
+   * Returns nodes adjacent to given node.
    *
    * @param node - node to which adjacent nodes we want to retrieve
    *
    * Idea for performance improvement:
    * - return an array instead of set
+   * - cache set if edge array is constant
    */
   public adjacentNodes(node: Node): Set<Node> {
     const id = this.getNodeId(node)
@@ -122,22 +123,17 @@ export class Graph<Node> {
     if (edges === undefined) {
       throw new Error(`Edge set missing for node ${id}`)
     }
-    return new Set(Array.from(edges.values()).map(id => this.nodes.get(id)).filter(node => node !== undefined) as Node[])
+    const adjacentNodeIds = this.fixEdgesArrayForNode(id)
+    return new Set(adjacentNodeIds.map(id => this.nodes.get(id)) as Node[])
   }
 
   /**
-   * Returns number of nodes adjacent to given node. Contrary to adjacentNodes(), this method returns only nodes that are present in graph.
+   * Returns number of nodes adjacent to given node.
    *
    * @param node - node to which adjacent nodes we want to retrieve
    */
   public adjacentNodesCount(node: Node): number {
-    const id = this.getNodeId(node)
-
-    if (id === undefined) {
-      throw this.missingNodeError(node)
-    }
-
-    return this.fixEdgesArrayForNode(id).length
+    return this.adjacentNodes(node).size
   }
 
   /**
