@@ -181,8 +181,7 @@ export class DependencyGraph {
           this.rangeMapping.setRange(rangeVertex)
         }
 
-        this.graph.addNodeAndReturnId(rangeVertex)
-        const rangeVertexId = this.graph.getNodeId(rangeVertex)!
+        const rangeVertexId = this.graph.addNodeAndReturnId(rangeVertex)
 
         if (!range.isFinite()) {
           this.graph.markNodeAsInfiniteRange(rangeVertexId)
