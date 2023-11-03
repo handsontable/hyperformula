@@ -8,7 +8,7 @@ import {SimpleCellRange} from '../AbsoluteCellRange'
 import {TopSort, TopSortResult} from './TopSort'
 import {ProcessableValue} from './ProcessableValue'
 
-export type NodeId = string | number
+export type NodeId = number
 export type NodeAndId<Node> = { node: Node, id: NodeId }
 export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | SimpleCellRange), Node][]
 
@@ -288,7 +288,7 @@ export class Graph<Node> {
     operatingFunction: (node: Node) => boolean,
     onCycle: (node: Node) => void
   ): TopSortResult<Node> {
-    const topSortAlgorithm = new TopSort<Node>(this.nodes, this.edges)
+    const topSortAlgorithm = new TopSort<Node, NodeId>(this.nodes, this.edges)
     const modifiedNodesIds = modifiedNodes.map(node => this.getNodeId(node)).filter(id => id !== undefined) as NodeId[]
     return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
   }
@@ -396,7 +396,7 @@ export class Graph<Node> {
    * Doesn't work if overlap between nodeId and node.
    */
   private getNodeIdIfNode(node: Node | NodeId): NodeId | undefined {
-    return (typeof node === 'number' || typeof node === 'string') ? node : this.nodesIds.get(node)
+    return typeof node === 'number' ? node : this.nodesIds.get(node)
   }
 
   /**

@@ -15,12 +15,10 @@ enum NodeVisitStatus {
   POPPED,
 }
 
-type id = string | number
-
 /**
  * An algorithm class. Provides an iterative implementation of Tarjan's algorithm for finding strongly connected components
  */
-export class TopSort<T> {
+export class TopSort<T, id> {
   private entranceTime: Map<id, number> = new Map()
   private low: Map<id, number> = new Map()
   private parent: Map<id, id> = new Map()
@@ -60,7 +58,7 @@ export class TopSort<T> {
   private getAdjacentNodeIds(id: id) {
     const edges = this.edges.get(id)
     if (edges === undefined) {
-      throw new Error(`Edge set missing for node ${id}: ${Array.from(this.nodes.keys())}`)
+      throw new Error(`Edge set missing for node ${id}`)
     }
     return new Set(Array.from(edges.values()).filter(id => this.nodes.has(id)))
   }
