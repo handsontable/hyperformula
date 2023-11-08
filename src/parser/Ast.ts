@@ -50,12 +50,16 @@ export const parsingError = (type: ParsingErrorType, message: string) => ({
   type, message
 })
 
+/**
+ * Represents types of parsing errors.
+ */
 export enum ParsingErrorType {
   LexingError = 'LexingError',
   ParserError = 'ParsingError',
   StaticOffsetError = 'StaticOffsetError',
   StaticOffsetOutOfRangeError = 'StaticOffsetOutOfRangeError',
   RangeOffsetNotAllowed = 'RangeOffsetNotAllowed',
+  InvalidRangeSize = 'InvalidRangeSize',
 }
 
 export enum AstNodeType {

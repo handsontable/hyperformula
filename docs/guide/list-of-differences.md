@@ -56,6 +56,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | DAYS          | =DAYS(0, -1)                                                   |          NUM |        1.0000 |             NUM |
 | DATEDIF       | =DATEDIF(-1, 0, "Y")                                           |          NUM |        0.0000 |             NUM |
 | RATE          | =RATE(12, -100, 400, 0, 1)                                     |      -1.0000 |           NUM |             NUM |
+| PV            | =PV(-1, 0, 100, 400)                                           |          NUM |          -400 |             NUM |
 | LCMP          | =LCM(1000000, 1000001, 1000002, 1000003)                       |          NUM |   5.00003E+23 |             NUM |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 1.9)                                       |       5.0000 |           NUM |          5.0000 |
 | TBILLPRICE    | =TBILLPRICE(0, 180, 2)                                         |       0.0000 |           NUM |          0.0000 |
@@ -96,4 +97,4 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | BINOM.INV     | =BINOM.INV(10, 1, 0.5)                                         |      10.0000 |           NUM |             NUM |
 | DEVSQ         | =DEVSQ(A2, A3)                                                 |       0.0000 |        0.0000 |             NUM |
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
-| ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |        ''!A1  |             !A1 |
+| ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
