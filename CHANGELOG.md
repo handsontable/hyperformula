@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed an issue where operation on ranges with incompatible sizes resulted in a runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
 - Fixed an issue where `simpleCellAddressFromString` method was crashing when called with a non-ASCII character in an unquoted sheet name. [#1312](https://github.com/handsontable/hyperformula/issues/1312)
-- Fixed a bug where adding a row to the very large spreadsheet resulted in `Maximum call stack size exceeded` error. [#1332](https://github.com/handsontable/hyperformula/pull/1332)
+- Fixed a bug where adding a row to the very large spreadsheet resulted in `Maximum call stack size exceeded` error. [#1332](https://github.com/handsontable/hyperformula/issues/1332)
 
 ## [2.6.0] - 2023-09-19
 
