@@ -211,7 +211,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
   it('insert row, formula vertex address shifted', () => {
     const engine = HyperFormula.buildFromArray([
       // new row
-      ['=SUM(1,2)'],
+      ['=SUM(1, 2)'],
     ])
 
     let vertex = engine.addressMapping.fetchCell(adr('A1')) as FormulaCellVertex
@@ -256,6 +256,22 @@ describe('Adding row - address mapping', () => {
       width: 1,
       height: 3,
     })
+  })
+
+  it('addRows() leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const hfInstance = HyperFormula.buildFromArray([['=A1+B5']])
+    hfInstance.addRows(0, [1, 1])
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 1 }, '=A1+B5')
+    hfInstance.setSheetContent(0, [['=A1+B5'], ['=A1+B5']])
+    expect(hfInstance.getSheetSerialized(0)).toEqual([['=A1+B5'], ['=A1+B5']])
+  })
+
+  it('addRows() leaves the engine in a valid state so other operations are possible afterwards (2)', () => {
+    const hfInstance = HyperFormula.buildFromArray([['=A1+B5']])
+    hfInstance.addRows(0, [1, 1])
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 1 }, '=A1+B5')
+    hfInstance.setSheetContent(0, [['=A1+B5'], ['=A1+B5']])
+    expect(hfInstance.getSheetSerialized(0)).toEqual([['=A1+B5'], ['=A1+B5']])
   })
 })
 

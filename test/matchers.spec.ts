@@ -25,7 +25,7 @@ describe('Matchers', () => {
     expect(
       new CellError(ErrorType.ERROR, 'a', dummyFormulaVertex())
     ).not.toEqualError(
-      new CellError(ErrorType.ERROR, '', dummyFormulaVertex())
+      new CellError(ErrorType.ERROR, 'b', dummyFormulaVertex())
     )
 
     expect(

@@ -135,6 +135,17 @@ describe('Matrix plugin', () => {
     expect(engine.getCellValue(adr('B4'))).toBeCloseTo(26)
   })
 
+  it('matrix maxpool non-numeric values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', 'bar', '3', '4', '5', '6'],
+      ['11', '12', '13', 'foo', '15', '16'],
+      ['21', '22', '23', '24', '25', '26'],
+      ['=maxpool(A1:F3,3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
+  })
+
   it('matrix maxpool, custom stride', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '4', '5', '6'],
@@ -182,6 +193,16 @@ describe('Matrix plugin', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+  })
+
+  it('medianpool non-numeric values', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', 'foo', '2', '1', '5'],
+      ['3', 'bar', '3', '7', '6', '7'],
+      ['=medianpool(A1:F2,2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberRange))
   })
 
   it('matrix medianpool on odd square', () => {

@@ -1,12 +1,13 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 export {default as csCZ} from './csCZ'
 export {default as daDK} from './daDK'
 export {default as deDE} from './deDE'
 export {default as enGB} from './enGB'
+export {default as enUS} from './enUS'
 export {default as esES} from './esES'
 export {default as fiFI} from './fiFI'
 export {default as frFR} from './frFR'

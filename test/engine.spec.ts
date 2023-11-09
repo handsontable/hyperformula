@@ -1,10 +1,10 @@
-import {DetailedCellError, ErrorType, HyperFormula} from '../src'
-import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {CellType, CellValueDetailedType, CellValueType} from '../src/Cell'
+import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType, SimpleCellAddress, SimpleCellRange, ExpectedValueOfTypeError} from '../src'
+import {AbsoluteCellRange, simpleCellRange} from '../src/AbsoluteCellRange'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
+import {simpleCellAddress} from '../src/Cell'
 
 describe('#buildFromArray', () => {
   it('load single value', () => {
@@ -66,7 +66,7 @@ describe('#buildFromArray', () => {
   })
 
   it('parsing error', () => {
-    const engine = HyperFormula.buildFromArray([['=A1B1']])
+    const engine = HyperFormula.buildFromArray([['=1A1']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
@@ -118,6 +118,52 @@ describe('#buildFromArray', () => {
 
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('B1'))).toEqual('=A1')
+  })
+})
+
+describe('#getCellHyperlink', () => {
+  it('returns hyperlink url when present', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[`=HYPERLINK("${url}","${linkLabel}")`]])
+    expect(engine.getCellHyperlink(adr('A1'))).toEqual(url)
+  })
+
+  it('returns undefined when url not present', () => {
+    const engine = HyperFormula.buildFromArray([['=HYPERLINK()', '5', 's1', null]])
+    expect(engine.getCellHyperlink(adr('A1'))).toEqual(undefined)
+    expect(engine.getCellHyperlink(adr('B1'))).toEqual(undefined)
+    expect(engine.getCellHyperlink(adr('C1'))).toEqual(undefined)
+    expect(engine.getCellHyperlink(adr('D1'))).toEqual(undefined)
+  })
+
+  it('returns undefined when HYPERLINK not the root expression', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const prefix = 'Prefix: '
+    const engine = HyperFormula.buildFromArray([[`=CONCATENATE("${prefix}",HYPERLINK("${url}","${linkLabel}"))`]])
+    expect(engine.getCellHyperlink(adr('A1'))).toEqual(undefined)
+  })
+
+  it('returns hyperlink when HYPERLINK does not use strings directly', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[url, linkLabel, '=HYPERLINK(A1,B1)']])
+    expect(engine.getCellHyperlink(adr('C1'))).toEqual(url)
+  })
+
+  it('returns hyperlink when HYPERLINK uses complex params', () => {
+    const url = 'https://hyperformula.handsontable.com/'
+    const linkLabel = 'HyperFormula'
+    const engine = HyperFormula.buildFromArray([[url, linkLabel, '=HYPERLINK(INDEX(A:A,ROW()),B1)']])
+    expect(engine.getCellHyperlink(adr('C1'))).toEqual(url)
+  })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellHyperlink({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
   })
 })
 
@@ -181,6 +227,13 @@ describe('#getCellFormula', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellFormula(adr('A1'))).toEqual('=TRANSPOSE(')
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellFormula({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
 })
 
 describe('#getAllFormulas', () => {
@@ -204,6 +257,13 @@ describe('#getRangeFormulas', () => {
     const out = engine.getRangeFormulas(AbsoluteCellRange.spanFrom(adr('A1'), 3, 2))
 
     expectArrayWithSameContent([['=SUM(1, A2)', '=TRUE()', undefined], ['=SUM(', undefined, undefined]], out)
+  })
+
+  it('should throw error if source is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(() => {
+      engine.getRangeFormulas({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 })
 
@@ -283,6 +343,13 @@ describe('#getCellValue', () => {
     expect(error).toEqualError(detailedError(ErrorType.VALUE, '', new Config({language: 'plPL'})))
     expect(error.value).toEqual('#ARG!')
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellValue({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
 })
 
 describe('#getSheetDimensions', () => {
@@ -329,6 +396,13 @@ describe('#getRangeValues', () => {
     const out = engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A1'), 3, 1))
 
     expectArrayWithSameContent([[1, true, null]], out)
+  })
+
+  it('should throw error if source is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(() => {
+      engine.getRangeValues({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 })
 
@@ -412,6 +486,13 @@ describe('#getCellSerialized', () => {
 
     expect(engine.getCellSerialized(adr('A1'))).toEqual('=#ARG!')
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.getCellSerialized({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
 })
 
 describe('#getAllSheetsSerialized', () => {
@@ -449,6 +530,13 @@ describe('#getRangeSerialized', () => {
     const out = engine.getRangeSerialized(AbsoluteCellRange.spanFrom(adr('A1'), 6, 1))
 
     expectArrayWithSameContent([['=SUM(1, B1)', '2', '#VALUE!', null, '=#DIV/0!', '{=TRANSPOSE(A1:B1)}']], out)
+  })
+
+  it('should throw error if source is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromArray([])
+    expect(() => {
+      engine.getRangeSerialized({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
   })
 })
 
@@ -565,6 +653,13 @@ describe('#getCellType', () => {
 
     expect(engine.getCellType(adr('A1'))).toBe(CellType.FORMULA)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([['=TRANSPOSE(C1:C2)']])
+    expect(() => {
+      engine.getCellType({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })    
 })
 
 describe('#getCellValueDetailedType', () => {
@@ -626,6 +721,13 @@ describe('#getCellValueDetailedType', () => {
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.ERROR)
     expect(engine.getCellValueDetailedType(adr('B1'))).toBe(CellValueDetailedType.ERROR)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
+    expect(() => {
+      engine.getCellValueDetailedType({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
 })
 
 describe('#getCellValueFormat', () => {
@@ -646,6 +748,13 @@ describe('#getCellValueFormat', () => {
     expect(engine.getCellValueFormat(adr('A1'))).toEqual('₪')
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
+  })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([[]])    
+    expect(() => {
+      engine.getCellValueFormat({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
   })
 })
 
@@ -684,6 +793,13 @@ describe('#getCellValueType', () => {
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.ERROR)
     expect(engine.getCellValueType(adr('B1'))).toBe(CellValueType.ERROR)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([['=B1:B2', '=C:D']])
+    expect(() => {
+      engine.getCellValueType({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })
 })
 
 describe('#doesCellHaveSimpleValue', () => {
@@ -699,6 +815,13 @@ describe('#doesCellHaveSimpleValue', () => {
     expect(engine.doesCellHaveSimpleValue(adr('B1'))).toEqual(false)
     expect(engine.doesCellHaveSimpleValue(adr('C1'))).toEqual(false)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([['=SUM(1, 2)', null, '=TRANSPOSE(A1:A1)']])
+    expect(() => {
+      engine.doesCellHaveSimpleValue({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })   
 })
 
 describe('#doesCellHaveFormula', () => {
@@ -720,6 +843,13 @@ describe('#doesCellHaveFormula', () => {
     const engine = HyperFormula.buildFromArray([['=ARRAYFORMULA(ISEVEN(B1:B2*2))']])
     expect(engine.doesCellHaveFormula(adr('A1'))).toEqual(true)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([['=ARRAYFORMULA(ISEVEN(B1:B2*2))']])
+    expect(() => {
+      engine.doesCellHaveFormula({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })  
 })
 
 describe('#isCellEmpty', () => {
@@ -737,6 +867,13 @@ describe('#isCellEmpty', () => {
     expect(engine.isCellEmpty(adr('C1'))).toEqual(false)
     expect(engine.isCellEmpty(adr('D1'))).toEqual(false)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([['1', '=SUM(1, 2)', '{=TRANSPOSE(A1:A1)}', 'foo']])
+    expect(() => {
+      engine.isCellEmpty({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })  
 })
 
 describe('#isCellPartOfArray', () => {
@@ -752,6 +889,13 @@ describe('#isCellPartOfArray', () => {
     expect(engine.isCellPartOfArray(adr('C1'))).toEqual(false)
     expect(engine.isCellPartOfArray(adr('D1'))).toEqual(false)
   })
+
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildFromArray([['1', '', '=SUM(1, 2)', 'foo']])
+    expect(() => {
+      engine.isCellPartOfArray({col: 0} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))  
+  })  
 })
 
 describe('dateTime', () => {
@@ -875,4 +1019,83 @@ describe('#getFillRangeData', () => {
     ).toEqual([[null]])
   })
 
+  it('should throw error if source is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
+      'Sheet2': [],
+    })
+    expect(() => {
+      engine.getFillRangeData({} as SimpleCellRange, AbsoluteCellRange.spanFrom(adr('C3', 1), 3, 3))
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
+  })
+
+  it('should throw error if target is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [[], [undefined, 1, '=A1'], [undefined, '=$A$1', '2']],
+      'Sheet2': [],
+    })
+    expect(() => {
+      engine.getFillRangeData(AbsoluteCellRange.spanFrom(adr('C3', 1), 3, 3), {} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'target'))
+  })
+})
+
+describe('#simpleCellRangeToString', () => {
+  it('return a string for a cell range', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+    expect(engine.simpleCellRangeToString(AbsoluteCellRange.spanFrom(adr('A1'), 2, 2), 0)).toBe('A1:B2')
+  })
+
+  it('should throw error if cellRange is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.simpleCellRangeToString({} as SimpleCellRange, 0)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'cellRange'))
+  })
+})
+
+describe('#simpleCellAddressToString', () => {
+  it('should throw error if cellAddress is a malformed SimpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.simpleCellAddressToString({} as SimpleCellAddress, 0)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
+})
+
+describe('#simpleCellAddressFromString', () => {
+  it('should convert a string to a simpleCellAddress', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.simpleCellAddressFromString('C5', 2)).toEqual(simpleCellAddress(2, 2, 4))
+  })
+
+  it('should work for address with sheet name', () => {
+    const engine = HyperFormula.buildFromSheets({
+        Sheet1: [],
+    })
+    expect(engine.simpleCellAddressFromString('Sheet1!C5', 2)).toEqual(simpleCellAddress(0, 2, 4))
+  })
+
+  it('should work when sheet name contains unicode characters (sheet name in single quotes)', () => {
+    // noinspection NonAsciiCharacters
+    const engine = HyperFormula.buildFromSheets({
+      あは: [],
+    })
+    expect(engine.simpleCellAddressFromString("'あは'!C5", 2)).toEqual(simpleCellAddress(0, 2, 4))
+  })
+
+  it('should return undefined when sheet name contains unicode characters (unquoted sheet name)', () => {
+    // noinspection NonAsciiCharacters
+    const engine = HyperFormula.buildFromSheets({
+      あは: [],
+    })
+    expect(engine.simpleCellAddressFromString('あは!C5', 2)).toBe(undefined)
+  })
+})
+
+describe('#simpleCellRangeFromString', () => {
+  it('should convert a string to a simpleCellRange', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(engine.simpleCellRangeFromString('A1:C1', 0)).toEqual(simpleCellRange(adr('A1'), adr('C1')))
+  })
 })

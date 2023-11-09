@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellAddress} from './Cell'
@@ -131,11 +131,11 @@ export class NothingToPasteError extends Error {
   }
 }
 
-function replacer(key: any, val: any): any {
+function replacer(key: string, val: any): any {
   switch (typeof val) {
     case 'function':
     case 'symbol':
-      return val.toString()
+      return (val as symbol).toString()
     case 'bigint':
       return 'BigInt(' + val.toString() + ')'
     default: {
@@ -262,8 +262,6 @@ export class EvaluationSuspendedError extends Error {
 
 /**
  * Error thrown when translation is missing in translation package.
- *
- * TODO
  */
 export class MissingTranslationError extends Error {
   constructor(key: string) {
@@ -314,7 +312,7 @@ export class LanguageAlreadyRegisteredError extends Error {
  * @see [[registerFunctionPlugin]]
  * @see [[buildFromArray]]
  * @see [[buildFromSheets]]
- * */
+ */
 export class FunctionPluginValidationError extends Error {
   public static functionNotDeclaredInPlugin(functionId: string, pluginName: string): FunctionPluginValidationError {
     return new FunctionPluginValidationError(`Function with id ${functionId} not declared in plugin ${pluginName}`)
@@ -331,7 +329,7 @@ export class FunctionPluginValidationError extends Error {
  * @see [[registerFunctionPlugin]]
  * @see [[registerFunction]]
  * @see [[unregisterFunction]]
- * */
+ */
 export class ProtectedFunctionError extends Error {
   public static cannotRegisterFunctionWithId(functionId: string): ProtectedFunctionError {
     return new ProtectedFunctionError(`Cannot register function with id ${functionId}`)
@@ -376,7 +374,7 @@ export class TargetLocationHasArrayError extends Error {
  *
  * @see [[addNamedExpression]]
  * @see [[changeNamedExpression]]
- * */
+ */
 export class NoRelativeAddressesAllowedError extends Error {
   constructor() {
     super('Relative addresses not allowed in named expressions.')

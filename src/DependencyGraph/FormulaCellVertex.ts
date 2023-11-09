@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {ArraySize} from '../ArraySize'
-import {ArrayValue, ErroredArray, IArray, NotComputedArray} from '../ArrayValue'
+import {ArrayValue, ErroredArray, CellArray, NotComputedArray} from '../ArrayValue'
 import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
@@ -80,7 +80,7 @@ export abstract class FormulaVertex {
 }
 
 export class ArrayVertex extends FormulaVertex {
-  array: IArray
+  array: CellArray
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, size: ArraySize, version: number = 0) {
     super(formula, cellAddress, version)
@@ -207,7 +207,7 @@ export class ArrayVertex extends FormulaVertex {
 
   /**
    * No-op as array vertices are transformed eagerly.
-   * */
+   */
   ensureRecentData(_updatingService: LazilyTransformingAstService) {
   }
 

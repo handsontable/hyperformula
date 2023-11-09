@@ -66,7 +66,7 @@ describe('Interpreter', () => {
   })
 
   it('errors - parsing errors', () => {
-    const engine = HyperFormula.buildFromArray([['=A1C1', '=foo(', '=)(asdf']])
+    const engine = HyperFormula.buildFromArray([['=1A1', '=foo(', '=)(asdf']])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))

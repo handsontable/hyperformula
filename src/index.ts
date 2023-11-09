@@ -1,9 +1,10 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellRange} from './AbsoluteCellRange'
+import {ArraySize} from './ArraySize'
 import {CellError, CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
@@ -47,18 +48,21 @@ import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from 
 import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
-import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition} from './interpreter'
+import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata, EmptyValue} from './interpreter'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 
-/** @internal */
+/**
+ * Aggregate class for default export
+ */
 class HyperFormulaNS extends HyperFormula {
   public static HyperFormula = HyperFormula
   public static ErrorType = ErrorType
+  public static CellError = CellError
   public static CellType = CellType
   public static CellValueType = CellValueType
   public static CellValueDetailedType = CellValueDetailedType
@@ -70,7 +74,11 @@ class HyperFormulaNS extends HyperFormula {
   public static EvaluationSuspendedError = EvaluationSuspendedError
   public static ExpectedOneOfValuesError = ExpectedOneOfValuesError
   public static ExpectedValueOfTypeError = ExpectedValueOfTypeError
+  public static ArraySize = ArraySize
+  public static SimpleRangeValue = SimpleRangeValue
+  public static EmptyValue = EmptyValue
   public static FunctionPlugin = FunctionPlugin
+  public static FunctionArgumentType = FunctionArgumentType
   public static FunctionPluginValidationError = FunctionPluginValidationError
   public static InvalidAddressError = InvalidAddressError
   public static InvalidArgumentsError = InvalidArgumentsError
@@ -102,7 +110,7 @@ HyperFormula.languages[enGB.langCode] = enGB
 
 for (const pluginName of Object.getOwnPropertyNames(plugins)) {
   if (!pluginName.startsWith('_')) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     HyperFormula.registerFunctionPlugin(plugins[pluginName])
   }
@@ -145,7 +153,11 @@ export {
   EvaluationSuspendedError,
   ExpectedOneOfValuesError,
   ExpectedValueOfTypeError,
+  ArraySize,
   FunctionPlugin,
+  ImplementedFunctions,
+  FunctionMetadata,
+  FunctionArgumentType,
   FunctionPluginValidationError,
   InvalidAddressError,
   InvalidArgumentsError,
@@ -164,6 +176,7 @@ export {
   NothingToPasteError,
   ProtectedFunctionTranslationError,
   SimpleRangeValue,
+  EmptyValue,
   SheetNameAlreadyTakenError,
   SheetSizeLimitExceededError,
   SourceLocationHasArrayError,

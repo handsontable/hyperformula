@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
@@ -30,121 +30,121 @@ import {
   RawNoErrorScalarValue,
   RawScalarValue,
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing date-specific functions
  */
 export class DateTimePlugin extends FunctionPlugin implements FunctionPluginTypecheck<DateTimePlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'DATE': {
       method: 'date',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       returnNumberType: NumberType.NUMBER_DATE
     },
     'TIME': {
       method: 'time',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       returnNumberType: NumberType.NUMBER_TIME
     },
     'MONTH': {
       method: 'month',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'YEAR': {
       method: 'year',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'HOUR': {
       method: 'hour',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'MINUTE': {
       method: 'minute',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'SECOND': {
       method: 'second',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'TEXT': {
       method: 'text',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.STRING},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.STRING},
       ]
     },
     'EOMONTH': {
       method: 'eomonth',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       returnNumberType: NumberType.NUMBER_DATE
     },
     'DAY': {
       method: 'day',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'DAYS': {
       method: 'days',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'WEEKDAY': {
       method: 'weekday',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'WEEKNUM': {
       method: 'weeknum',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'ISOWEEKNUM': {
       method: 'isoweeknum',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ]
     },
     'DATEVALUE': {
       method: 'datevalue',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
+        {argumentType: FunctionArgumentType.STRING},
       ],
       returnNumberType: NumberType.NUMBER_DATE
     },
     'TIMEVALUE': {
       method: 'timevalue',
       parameters: [
-        {argumentType: ArgumentTypes.STRING},
+        {argumentType: FunctionArgumentType.STRING},
       ],
       returnNumberType: NumberType.NUMBER_TIME
     },
@@ -163,73 +163,73 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     'EDATE': {
       method: 'edate',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       returnNumberType: NumberType.NUMBER_DATE
     },
     'DAYS360': {
       method: 'days360',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.BOOLEAN, defaultValue: false},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: false},
       ],
     },
     'DATEDIF': {
       method: 'datedif',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.STRING},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.STRING},
       ],
     },
     'YEARFRAC': {
       method: 'yearfrac',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, defaultValue: 0, minValue: 0, maxValue: 4},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, defaultValue: 0, minValue: 0, maxValue: 4},
       ],
     },
     'INTERVAL': {
       method: 'interval',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ],
     },
     'NETWORKDAYS': {
       method: 'networkdays',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.RANGE, optionalArg: true}
       ],
     },
     'NETWORKDAYS.INTL': {
       method: 'networkdaysintl',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
-        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NOERROR, defaultValue: 1},
+        {argumentType: FunctionArgumentType.RANGE, optionalArg: true}
       ],
     },
     'WORKDAY': {
       method: 'workday',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.RANGE, optionalArg: true}
       ],
     },
     'WORKDAY.INTL': {
       method: 'workdayintl',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NOERROR, defaultValue: 1},
-        {argumentType: ArgumentTypes.RANGE, optionalArg: true}
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NOERROR, defaultValue: 1},
+        {argumentType: FunctionArgumentType.RANGE, optionalArg: true}
       ],
     },
   }
@@ -279,6 +279,9 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  /**
+   * Implementation for the EOMONTH function
+   */
   public eomonth(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EOMONTH'), (dateNumber, numberOfMonthsToShift) => {
       const date = this.dateTimeHelper.numberToSimpleDate(dateNumber)
@@ -564,13 +567,13 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         const month = arg % 12
         const year = Math.trunc(arg / 12)
 
-        return 'P' + ((year > 0) ? year + 'Y' : '')
-          + ((month > 0) ? month + 'M' : '')
-          + ((day > 0) ? day + 'D' : '')
+        return 'P' + ((year > 0) ? `${year}Y` : '')
+          + ((month > 0) ? `${month}M` : '')
+          + ((day > 0) ? `${day}D` : '')
           + 'T'
-          + ((hour > 0) ? hour + 'H' : '')
-          + ((minute > 0) ? minute + 'M' : '')
-          + ((second > 0) ? second + 'S' : '')
+          + ((hour > 0) ? `${hour}H` : '')
+          + ((minute > 0) ? `${minute}M` : '')
+          + ((second > 0) ? `${second}S` : '')
       }
     )
   }

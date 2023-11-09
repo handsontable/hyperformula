@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {HyperFormula, ErrorType} from '../../src'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
@@ -49,18 +48,18 @@ describe('Function DAY', () => {
 
   it('test for days in month, start of month', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DAY(DATE(2021,1,1))'],
-      ['=DAY(DATE(2021,2,1))'],
-      ['=DAY(DATE(2021,3,1))'],
-      ['=DAY(DATE(2021,4,1))'],
-      ['=DAY(DATE(2021,5,1))'],
-      ['=DAY(DATE(2021,6,1))'],
-      ['=DAY(DATE(2021,7,1))'],
-      ['=DAY(DATE(2021,8,1))'],
-      ['=DAY(DATE(2021,9,1))'],
-      ['=DAY(DATE(2021,10,1))'],
-      ['=DAY(DATE(2021,11,1))'],
-      ['=DAY(DATE(2021,12,1))'],
+      ['=DAY(DATE(2021, 1, 1))'],
+      ['=DAY(DATE(2021, 2, 1))'],
+      ['=DAY(DATE(2021, 3, 1))'],
+      ['=DAY(DATE(2021, 4, 1))'],
+      ['=DAY(DATE(2021, 5, 1))'],
+      ['=DAY(DATE(2021, 6, 1))'],
+      ['=DAY(DATE(2021, 7, 1))'],
+      ['=DAY(DATE(2021, 8, 1))'],
+      ['=DAY(DATE(2021, 9, 1))'],
+      ['=DAY(DATE(2021, 10, 1))'],
+      ['=DAY(DATE(2021, 11, 1))'],
+      ['=DAY(DATE(2021, 12, 1))'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -79,18 +78,18 @@ describe('Function DAY', () => {
 
   it('test for days in month, end of month', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DAY(DATE(2021,1,31))'],
-      ['=DAY(DATE(2021,2,28))'],
-      ['=DAY(DATE(2021,3,31))'],
-      ['=DAY(DATE(2021,4,30))'],
-      ['=DAY(DATE(2021,5,31))'],
-      ['=DAY(DATE(2021,6,30))'],
-      ['=DAY(DATE(2021,7,31))'],
-      ['=DAY(DATE(2021,8,31))'],
-      ['=DAY(DATE(2021,9,30))'],
-      ['=DAY(DATE(2021,10,31))'],
-      ['=DAY(DATE(2021,11,30))'],
-      ['=DAY(DATE(2021,12,31))'],
+      ['=DAY(DATE(2021, 1, 31))'],
+      ['=DAY(DATE(2021, 2, 28))'],
+      ['=DAY(DATE(2021, 3, 31))'],
+      ['=DAY(DATE(2021, 4, 30))'],
+      ['=DAY(DATE(2021, 5, 31))'],
+      ['=DAY(DATE(2021, 6, 30))'],
+      ['=DAY(DATE(2021, 7, 31))'],
+      ['=DAY(DATE(2021, 8, 31))'],
+      ['=DAY(DATE(2021, 9, 30))'],
+      ['=DAY(DATE(2021, 10, 31))'],
+      ['=DAY(DATE(2021, 11, 30))'],
+      ['=DAY(DATE(2021, 12, 31))'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(31)
@@ -109,18 +108,18 @@ describe('Function DAY', () => {
 
   it('test for days in month, end of month+1', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DAY(DATE(2021,1,31)+1)'],
-      ['=DAY(DATE(2021,2,28)+1)'],
-      ['=DAY(DATE(2021,3,31)+1)'],
-      ['=DAY(DATE(2021,4,30)+1)'],
-      ['=DAY(DATE(2021,5,31)+1)'],
-      ['=DAY(DATE(2021,6,30)+1)'],
-      ['=DAY(DATE(2021,7,31)+1)'],
-      ['=DAY(DATE(2021,8,31)+1)'],
-      ['=DAY(DATE(2021,9,30)+1)'],
-      ['=DAY(DATE(2021,10,31)+1)'],
-      ['=DAY(DATE(2021,11,30)+1)'],
-      ['=DAY(DATE(2021,12,31)+1)'],
+      ['=DAY(DATE(2021, 1, 31)+1)'],
+      ['=DAY(DATE(2021, 2, 28)+1)'],
+      ['=DAY(DATE(2021, 3, 31)+1)'],
+      ['=DAY(DATE(2021, 4, 30)+1)'],
+      ['=DAY(DATE(2021, 5, 31)+1)'],
+      ['=DAY(DATE(2021, 6, 30)+1)'],
+      ['=DAY(DATE(2021, 7, 31)+1)'],
+      ['=DAY(DATE(2021, 8, 31)+1)'],
+      ['=DAY(DATE(2021, 9, 30)+1)'],
+      ['=DAY(DATE(2021, 10, 31)+1)'],
+      ['=DAY(DATE(2021, 11, 30)+1)'],
+      ['=DAY(DATE(2021, 12, 31)+1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -139,18 +138,18 @@ describe('Function DAY', () => {
 
   it('test for days in month, start of month, leap year', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DAY(DATE(2020,1,1))'],
-      ['=DAY(DATE(2020,2,1))'],
-      ['=DAY(DATE(2020,3,1))'],
-      ['=DAY(DATE(2020,4,1))'],
-      ['=DAY(DATE(2020,5,1))'],
-      ['=DAY(DATE(2020,6,1))'],
-      ['=DAY(DATE(2020,7,1))'],
-      ['=DAY(DATE(2020,8,1))'],
-      ['=DAY(DATE(2020,9,1))'],
-      ['=DAY(DATE(2020,10,1))'],
-      ['=DAY(DATE(2020,11,1))'],
-      ['=DAY(DATE(2020,12,1))'],
+      ['=DAY(DATE(2020, 1, 1))'],
+      ['=DAY(DATE(2020, 2, 1))'],
+      ['=DAY(DATE(2020, 3, 1))'],
+      ['=DAY(DATE(2020, 4, 1))'],
+      ['=DAY(DATE(2020, 5, 1))'],
+      ['=DAY(DATE(2020, 6, 1))'],
+      ['=DAY(DATE(2020, 7, 1))'],
+      ['=DAY(DATE(2020, 8, 1))'],
+      ['=DAY(DATE(2020, 9, 1))'],
+      ['=DAY(DATE(2020, 10, 1))'],
+      ['=DAY(DATE(2020, 11, 1))'],
+      ['=DAY(DATE(2020, 12, 1))'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -169,18 +168,18 @@ describe('Function DAY', () => {
 
   it('test for days in month, end of month, leap year', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DAY(DATE(2020,1,31))'],
-      ['=DAY(DATE(2020,2,29))'],
-      ['=DAY(DATE(2020,3,31))'],
-      ['=DAY(DATE(2020,4,30))'],
-      ['=DAY(DATE(2020,5,31))'],
-      ['=DAY(DATE(2020,6,30))'],
-      ['=DAY(DATE(2020,7,31))'],
-      ['=DAY(DATE(2020,8,31))'],
-      ['=DAY(DATE(2020,9,30))'],
-      ['=DAY(DATE(2020,10,31))'],
-      ['=DAY(DATE(2020,11,30))'],
-      ['=DAY(DATE(2020,12,31))'],
+      ['=DAY(DATE(2020, 1, 31))'],
+      ['=DAY(DATE(2020, 2, 29))'],
+      ['=DAY(DATE(2020, 3, 31))'],
+      ['=DAY(DATE(2020, 4, 30))'],
+      ['=DAY(DATE(2020, 5, 31))'],
+      ['=DAY(DATE(2020, 6, 30))'],
+      ['=DAY(DATE(2020, 7, 31))'],
+      ['=DAY(DATE(2020, 8, 31))'],
+      ['=DAY(DATE(2020, 9, 30))'],
+      ['=DAY(DATE(2020, 10, 31))'],
+      ['=DAY(DATE(2020, 11, 30))'],
+      ['=DAY(DATE(2020, 12, 31))'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(31)
@@ -199,18 +198,18 @@ describe('Function DAY', () => {
 
   it('test for days in month, end of month+1, leap year', () => {
     const engine = HyperFormula.buildFromArray([
-      ['=DAY(DATE(2020,1,31)+1)'],
-      ['=DAY(DATE(2020,2,29)+1)'],
-      ['=DAY(DATE(2020,3,31)+1)'],
-      ['=DAY(DATE(2020,4,30)+1)'],
-      ['=DAY(DATE(2020,5,31)+1)'],
-      ['=DAY(DATE(2020,6,30)+1)'],
-      ['=DAY(DATE(2020,7,31)+1)'],
-      ['=DAY(DATE(2020,8,31)+1)'],
-      ['=DAY(DATE(2020,9,30)+1)'],
-      ['=DAY(DATE(2020,10,31)+1)'],
-      ['=DAY(DATE(2020,11,30)+1)'],
-      ['=DAY(DATE(2020,12,31)+1)'],
+      ['=DAY(DATE(2020, 1, 31)+1)'],
+      ['=DAY(DATE(2020, 2, 29)+1)'],
+      ['=DAY(DATE(2020, 3, 31)+1)'],
+      ['=DAY(DATE(2020, 4, 30)+1)'],
+      ['=DAY(DATE(2020, 5, 31)+1)'],
+      ['=DAY(DATE(2020, 6, 30)+1)'],
+      ['=DAY(DATE(2020, 7, 31)+1)'],
+      ['=DAY(DATE(2020, 8, 31)+1)'],
+      ['=DAY(DATE(2020, 9, 30)+1)'],
+      ['=DAY(DATE(2020, 10, 31)+1)'],
+      ['=DAY(DATE(2020, 11, 30)+1)'],
+      ['=DAY(DATE(2020, 12, 31)+1)'],
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
@@ -225,5 +224,24 @@ describe('Function DAY', () => {
     expect(engine.getCellValue(adr('A10'))).toEqual(1)
     expect(engine.getCellValue(adr('A11'))).toEqual(1)
     expect(engine.getCellValue(adr('A12'))).toEqual(1)
+  })
+
+  it('returns 30 when its argument is a reference to an empty cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAY(B1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(30)
+  })
+
+  it('returns 31 when its argument is a reference to an empty cell and the engine is configured to use 1899-12-31 as a null year', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=DAY(B1)'],
+    ], {
+      leapYear1900: true,
+      nullDate: { year: 1899, month: 12, day: 31 },
+    })
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(31)
   })
 })

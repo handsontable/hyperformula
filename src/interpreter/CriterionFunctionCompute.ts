@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -12,7 +12,7 @@ import {Maybe} from '../Maybe'
 import {CriterionLambda, CriterionPackage} from './Criterion'
 import {Interpreter} from './Interpreter'
 import {getRawValue, InternalScalarValue, RawScalarValue} from './InterpreterValue'
-import {SimpleRangeValue} from './SimpleRangeValue'
+import {SimpleRangeValue} from '../SimpleRangeValue'
 
 const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRanges: AbsoluteCellRange[], valuesRange: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restConditionRanges: AbsoluteCellRange[], restValuesRange: AbsoluteCellRange } => {
   if (valuesRange.end.row > valuesRange.start.row) {
@@ -157,7 +157,7 @@ function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables:
     if (!conditionalSplits.every((cs) => Object.prototype.hasOwnProperty.call(cs, 'value'))) {
       return
     }
-    const conditionalFirsts = conditionalSplits.map((cs) => (cs.value as RawScalarValue))
+    const conditionalFirsts = conditionalSplits.map((cs) => getRawValue(cs.value) as RawScalarValue)
     if (zip(conditionalFirsts, criterionLambdas).every(([conditionalFirst, criterionLambda]) => criterionLambda(conditionalFirst))) {
       yield computable
     }

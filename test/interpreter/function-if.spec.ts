@@ -10,6 +10,7 @@ describe('Function IF', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
+
   it('when value is true', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes", "no")']])
 
@@ -102,5 +103,37 @@ describe('Function IF', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+  })
+
+  it('works when condition contains a reference', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=TRUE()', '=IF(A1, "yes", "no")'],
+      ['=FALSE()', '=IF(A2, "yes", "no")']
+    ])
+    expect(engine.getCellValue(adr('B1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('B2'))).toEqual('no')
+  })
+
+  it('works when condition is an expression', () => {
+    const engine = HyperFormula.buildFromArray([['=IF(1<100, "yes", "no")', '=IF(1000<100, "yes", "no")']])
+    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('B1'))).toEqual('no')
+  })
+
+  it('works when condition is an expression with cell references', () => {
+    const engine = HyperFormula.buildFromArray([['10', '=IF(A1<100, "yes", "no")', '=IF(A1<1, "yes", "no")']])
+    expect(engine.getCellValue(adr('B1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('C1'))).toEqual('no')
+  })
+
+  it('works when condition references a cell with formula inside', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['100'],
+      ['300'],
+      ['=AVERAGE(A1,A2)'],
+      ['=IF(A3<100,"True","False")']
+    ])
+    expect(engine.getCellValue(adr('A3'))).toEqual(200)
+    expect(engine.getCellValue(adr('A4'))).toEqual('False')
   })
 })

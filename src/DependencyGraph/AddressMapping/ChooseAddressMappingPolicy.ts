@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {DenseStrategy} from './DenseStrategy'
-import {AddressMappingStrategyConstructor} from './IAddressMappingStrategy'
+import {AddressMappingStrategyConstructor} from './AddressMappingStrategy'
 import {SparseStrategy} from './SparseStrategy'
 
 export interface ChooseAddressMapping {

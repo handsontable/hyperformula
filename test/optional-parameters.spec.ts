@@ -1,7 +1,7 @@
 import {ErrorType, HyperFormula} from '../src'
 import {ErrorMessage} from '../src/error-message'
 import {InterpreterState} from '../src/interpreter/InterpreterState'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from '../src/interpreter/plugin/FunctionPlugin'
 import {ProcedureAst} from '../src/parser'
 import {adr, detailedError} from './testUtils'
 
@@ -10,15 +10,15 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     'FOO': {
       method: 'foo',
       parameters: [
-        {argumentType: ArgumentTypes.STRING, defaultValue: 'default1'},
-        {argumentType: ArgumentTypes.STRING, defaultValue: 'default2'},
+        {argumentType: FunctionArgumentType.STRING, defaultValue: 'default1'},
+        {argumentType: FunctionArgumentType.STRING, defaultValue: 'default2'},
       ],
     },
   }
 
   public foo(ast: ProcedureAst, state: InterpreterState) {
     return this.runFunction(ast.args, state, this.metadata('FOO'),
-      (arg1, arg2) => arg1 + '+' + arg2
+      (arg1: string, arg2: string) => arg1 + '+' + arg2
     )
   }
 }

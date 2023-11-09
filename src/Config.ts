@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {
@@ -84,22 +84,33 @@ export interface ConfigParams {
   /**
    * Sets symbols that denote currency numbers.
    *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
+   *
    * @default ['$']
    *
    * @category Number
    */
   currencySymbol: string[],
   /**
-   * Sets date formats that are supported by date-parsing functions.
+   * Sets the date formats accepted by the date-parsing function.
    *
-   * The separator is ignored and can be any of the following:
-   * - `-` (dash)
-   * - ` ` (empty space)
+   * A format must be specified as a string consisting of tokens and separators.
+   *
+   * Supported tokens:
+   * - `DD` (day of month)
+   * - `MM` (month as a number)
+   * - `YYYY` (year as a 4-digit number)
+   * - `YY` (year as a 2-digit number)
+   *
+   * Supported separators:
    * - `/` (slash)
+   * - `-` (dash)
+   * - `.` (dot)
+   * - ` ` (empty space)
    *
-   * `YY` can be replaced with `YYYY`.
+   * Regardless of the separator specified in the format string, all of the above are accepted by the date-parsing function.
    *
-   * Any order of `YY`, `MM`, and `DD` is accepted as a date.
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default ['DD/MM/YYYY', 'DD/MM/YY']
    *
@@ -110,6 +121,8 @@ export interface ConfigParams {
    * Sets a separator character that separates procedure arguments in formulas.
    *
    * Must be different from [[decimalSeparator]] and [[thousandSeparator]].
+   *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default ','
    *
@@ -124,6 +137,8 @@ export interface ConfigParams {
    * - `,` (comma)
    *
    * Must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
    * @default '.'
    *
@@ -157,6 +172,8 @@ export interface ConfigParams {
   ignorePunctuation: boolean,
   /**
    * Sets a translation package for function and error names.
+   *
+   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
    *
    * @default 'enGB'
    *
@@ -194,7 +211,7 @@ export interface ConfigParams {
    *
    * To use HyperFormula with your commercial license, set this option to your valid license key string.
    *
-   * For more information, go [here](/guide/license-key.html).
+   * For more information, go [here](/guide/license-key.md).
    *
    * @default undefined
    *
@@ -206,6 +223,8 @@ export interface ConfigParams {
    *
    * Accepts **IETF BCP 47** language tags.
    *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
+   *
    * @default 'en'
    *
    * @category String
@@ -214,7 +233,7 @@ export interface ConfigParams {
   /**
    * When set to `true`, function criteria require whole cells to match the pattern.
    *
-   * When set to `false`, function criteria require just a subword to match the pattern.
+   * When set to `false`, function criteria require just a sub-word to match the pattern.
    *
    * @default true
    * @category String
@@ -237,23 +256,25 @@ export interface ConfigParams {
   /**
    * Sets the maximum number of rows.
    *
-   * @default 40,000
+   * @default 40.000
    *
    * @category Engine
-   * */
+   */
   maxRows: number,
   /**
    * Sets the maximum number of columns.
    *
-   * @default 18,278
+   * @default 18.278 (Columns A, B, ..., ZZZ)
    *
    * @category Engine
-   * */
+   */
   maxColumns: number,
   /**
    * Internally, each date is represented as a number of days that passed since `nullDate`.
    *
    * This option sets a specific date from which that number of days is counted.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default {year: 1899, month: 12, day: 30}
    *
@@ -275,7 +296,11 @@ export interface ConfigParams {
    */
   nullYear: number,
   /**
-   * Sets a function that parses strings representing date-time into actual date-time.
+   * Sets a function that parses strings representing date-time into actual date-time values.
+   *
+   * The function should return a [DateTime](../globals.md#datetime) object or undefined.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default defaultParseToDateTime
    *
@@ -317,7 +342,11 @@ export interface ConfigParams {
    */
   precisionRounding: number,
   /**
-   * Sets a function that converts date-time into strings.
+   * Sets a function that converts date-time values into strings.
+   *
+   * The function should return a string or undefined.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default defaultStringifyDateTime
    *
@@ -325,7 +354,11 @@ export interface ConfigParams {
    */
   stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
   /**
-   * Sets a function that converts time duration into strings.
+   * Sets a function that converts time duration values into strings.
+   *
+   * The function should return a string or undefined.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @default defaultStringifyDuration
    *
@@ -343,7 +376,7 @@ export interface ConfigParams {
    */
   smartRounding: boolean,
   /**
-   * Sets a thousand separator symbol for parsing numerical literals.
+   * Sets the thousands' separator symbol for parsing numerical literals.
    *
    * Can be one of the following:
    * - empty
@@ -352,20 +385,41 @@ export interface ConfigParams {
    *
    * Must be different from [[decimalSeparator]] and [[functionArgSeparator]].
    *
+   * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
+   *
    * @default ''
    *
    * @category Number
    */
   thousandSeparator: '' | ',' | ' ' | '.',
   /**
-   * Sets time formats that will be supported by time-parsing functions.
+   * Sets the time formats accepted by the time-parsing function.
    *
-   * The separator is `:` (colon).
+   * A format must be specified as a string consisting of at least two tokens separated by `:` (a colon).
    *
-   * Accepts any configuration of at least two of the following, in any order:
-   * - `hh`: hours
-   * - `mm`: minutes
-   * - `ss`: seconds
+   * Supported tokens:
+   * - `hh` (hours)
+   * - `mm` (minutes)
+   * - `ss`, `ss.s`, `ss.ss`, `ss.sss`, `ss.ssss`, etc. (seconds)
+   *
+   * The number of decimal places in the seconds token does not matter. All versions of the seconds token are equivalent in the context of parsing time values.
+   * Regardless of the time format specified, the hours-minutes-seconds value may be followed by the AM/PM designator.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
+   *
+   * @example
+   * E.g. for `timeFormats = ['hh:mm:ss.sss']`, valid time strings include:
+   * - `1:33:33`
+   * - `1:33:33.3`
+   * - `1:33:33.33`
+   * - `1:33:33.333`
+   * - `01:33:33`
+   * - `1:33:33 AM`
+   * - `1:33:33 PM`
+   * - `1:33:33 am`
+   * - `1:33:33 pm`
+   * - `1:33:33AM`
+   * - `1:33:33PM`
    *
    * @default ['hh:mm', 'hh:mm:ss.sss']
    *
@@ -377,7 +431,7 @@ export interface ConfigParams {
    *
    * When set to `false`, array arithmetic is enabled only inside array functions (`ARRAYFORMULA`, `FILTER`, and `ARRAY_CONSTRAIN`).
    *
-   * For more information, see the [Arrays guide](/guide/arrays.html).
+   * For more information, see the [Arrays guide](/guide/arrays.md).
    *
    * @default false
    *
@@ -519,7 +573,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly nullYear: number
   /** @inheritDoc */
-  public readonly parseDateTime: (dateString: string, dateFormat?: string, timeFormat?: string) => Maybe<SimpleDateTime>
+  public readonly parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>
   /** @inheritDoc */
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */

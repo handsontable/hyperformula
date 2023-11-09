@@ -8,9 +8,9 @@ describe('vertex counting', () => {
       ['1', '2'],
       ['3', '4']
     ])
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
     engine.calculateFormula('=SUM(A1:B2)', 0)
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
   })
 
   it('cruds', () => {
@@ -18,11 +18,11 @@ describe('vertex counting', () => {
       ['1', '2'],
       ['3', '4']
     ])
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
     engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(5)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(5)
     engine.setCellContents(adr('A1'), 1)
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(4)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
   })
 })
 
@@ -75,7 +75,7 @@ describe('larger tests', () => {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -92,7 +92,7 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -106,7 +106,7 @@ describe('larger tests', () => {
 
     engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -123,7 +123,7 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -140,12 +140,12 @@ describe('larger tests', () => {
             sheet: 0,
             row: Math.min(row1, row2),
             col: Math.min(col1, col2)
-          }, 0)
+          }, 0) as string
           const endAddress = engine.simpleCellAddressToString({
             sheet: 0,
             row: Math.max(row1, row2),
             col: Math.max(col1, col2)
-          }, 0)
+          }, 0) as string
           const formula = '=SUM(' + startAddress + ':' + endAddress + ')'
           engine.setCellContents({sheet: 0, col: x, row: y}, formula)
         }
@@ -156,7 +156,7 @@ describe('larger tests', () => {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 })
@@ -175,7 +175,7 @@ describe('cruds', () => {
     engine.removeRows(0, [0, 2])
     engine.removeRows(0, [2, 2])
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -192,7 +192,7 @@ describe('cruds', () => {
     engine.removeRows(0, [0, 2])
     engine.removeRows(0, [2, 2])
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -208,7 +208,7 @@ describe('cruds', () => {
 
     engine.removeRows(0, [4, 2])
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -229,7 +229,7 @@ describe('cruds', () => {
 
     engine.removeRows(0, [0, 6])
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -250,7 +250,7 @@ describe('cruds', () => {
 
     engine.removeRows(0, [0, 6])
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -269,7 +269,7 @@ describe('cruds', () => {
 
     engine.removeRows(0, [0, 6])
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -292,7 +292,7 @@ describe('cruds', () => {
 
     engine.removeRows(0, [0, 6])
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 
@@ -329,7 +329,7 @@ describe('cruds', () => {
     engine.setCellContents(adr('A5'), null)
     engine.setCellContents(adr('A6'), null)
 
-    expect(engine.dependencyGraph.graph.nodesCount()).toBe(0)
+    expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
   })
 

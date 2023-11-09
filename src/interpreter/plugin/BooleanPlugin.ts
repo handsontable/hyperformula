@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
@@ -8,13 +8,13 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing boolean functions
  */
 export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BooleanPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'TRUE': {
       method: 'literalTrue',
       parameters: [],
@@ -26,15 +26,23 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'IF': {
       method: 'conditionalIf',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, defaultValue: false, passSubtype: true},
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, defaultValue: false, passSubtype: true},
       ],
+    },
+    'IFS': {
+      method: 'ifs',
+      parameters: [
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+      ],
+      repeatLastArgs: 2,
     },
     'AND': {
       method: 'and',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -42,7 +50,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'OR': {
       method: 'or',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -50,7 +58,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'XOR': {
       method: 'xor',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -58,37 +66,37 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     'NOT': {
       method: 'not',
       parameters: [
-        {argumentType: ArgumentTypes.BOOLEAN},
+        {argumentType: FunctionArgumentType.BOOLEAN},
       ]
     },
     'SWITCH': {
       method: 'switch',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.NOERROR},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ],
       repeatLastArgs: 1,
     },
     'IFERROR': {
       method: 'iferror',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ]
     },
     'IFNA': {
       method: 'ifna',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ]
     },
     'CHOOSE': {
       method: 'choose',
       parameters: [
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-        {argumentType: ArgumentTypes.SCALAR, passSubtype: true},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.SCALAR, passSubtype: true},
       ],
       repeatLastArgs: 1,
     },
@@ -133,6 +141,23 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   /**
+   * Implementation for the IFS function. Returns the value that corresponds to the first true condition.
+   *
+   * @param ast
+   * @param state
+   */
+  public ifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IFS'), (...args) => {
+      for (let idx = 0; idx < args.length; idx += 2) {
+        if (args[idx]) {
+          return args[idx+1]
+        }
+      }
+      return new CellError(ErrorType.NA, ErrorMessage.NoConditionMet)
+    })
+  }
+
+  /**
    * Corresponds to AND(expression1, [expression2, ...])
    *
    * Returns true if all of the provided arguments are logically true, and false if any of it is logically false
@@ -142,7 +167,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public and(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('AND'),
-      (...args) => !args.some((arg: boolean) => !arg)
+      (...args: (boolean | undefined)[]) => args.filter(arg => arg !== undefined).every(arg => !!arg)
     )
   }
 
@@ -156,7 +181,7 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    */
   public or(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OR'),
-      (...args) => args.some((arg: boolean) => arg)
+      (...args: (boolean | undefined)[]) => args.filter(arg => arg !== undefined).some(arg => arg)
     )
   }
 
@@ -165,9 +190,9 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
   }
 
   public xor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XOR'), (...args) => {
+    return this.runFunction(ast.args, state, this.metadata('XOR'), (...args: (boolean | undefined)[]) => {
       let cnt = 0
-      args.forEach((arg: boolean) => {
+      args.filter(arg => arg !== undefined).forEach(arg => {
         if (arg) {
           cnt++
         }

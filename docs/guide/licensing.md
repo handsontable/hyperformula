@@ -6,15 +6,16 @@ To make HyperFormula a better fit for different types of projects, the source co
 
 HyperFormula is available under the following licenses:
 
-| Name | Type |
-| :--- | :--- |
-| [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) | Open source |
-| Commercial license | Proprietary |
+
+| Name                                                                                  | Type        |
+|:--------------------------------------------------------------------------------------|:------------|
+| [GPLv3 license](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt) | Open source |
+| Commercial license                                                                    | Proprietary |
 
 ## Non-commercial and open-source use
 
 To use HyperFormula in a non-commercial or open-source
-project, use the [GNU General Public License v3.0](https://github.com/handsontable/hyperformula/blob/master/gpl-3.0.txt) (GPLv3).
+project, use the [GNU General Public License v3.0](https://github.com/handsontable/hyperformula/blob/master/LICENSE.txt) (GPLv3).
 
 To learn how to use the GPLv3 license, see the [License key](license-key.md#gplv3-license) page.
 

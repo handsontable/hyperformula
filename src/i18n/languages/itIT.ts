@@ -1,10 +1,9 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
-// import
 
 const dictionary: RawTranslationPackage = {
   errors: {
@@ -20,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    ADDRESS: 'INDIRIZZO',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ASS',
@@ -102,9 +102,11 @@ const dictionary: RawTranslationPackage = {
     HEX2OCT: 'HEX.OCT',
     HLOOKUP: 'CERCA.ORIZZ',
     HOUR: 'ORA',
+    HYPERLINK: 'COLLEG.IPERTESTUALE',
     IF: 'SE',
     IFERROR: 'SE.ERRORE',
     IFNA: 'SE.NON.DISP.',
+    IFS: 'PIÙ.SE',
     INDEX: 'INDICE',
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
@@ -133,12 +135,14 @@ const dictionary: RawTranslationPackage = {
     MATCH: 'CONFRONTA',
     MAX: 'MAX',
     MAXA: 'MAX.VALORI',
+    MAXIFS: 'MAX.PIÙ.SE',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'MEDIANA',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'STRINGA.ESTRAI',
     MIN: 'MIN',
     MINA: 'MIN.VALORI',
+    MINIFS: 'MIN.PIÙ.SE',
     MINUTE: 'MINUTO',
     MIRR: 'TIR.VAR',
     MMULT: 'MATR.PRODOTTO',

@@ -1,8 +1,9 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
+export {AddressPlugin} from './AddressPlugin'
 export {ArrayPlugin} from './ArrayPlugin'
 export {AbsPlugin} from './AbsPlugin'
 export {BitShiftPlugin} from './BitShiftPlugin'
@@ -18,6 +19,7 @@ export {DeltaPlugin} from './DeltaPlugin'
 export {ExpPlugin} from './ExpPlugin'
 export {FinancialPlugin} from './FinancialPlugin'
 export {FormulaTextPlugin} from './FormulaTextPlugin'
+export {HyperlinkPlugin} from './HyperlinkPlugin'
 export {InformationPlugin} from './InformationPlugin'
 export {IsEvenPlugin} from './IsEvenPlugin'
 export {IsOddPlugin} from './IsOddPlugin'
@@ -33,7 +35,7 @@ export {RadixConversionPlugin} from './RadixConversionPlugin'
 export {RandomPlugin} from './RandomPlugin'
 export {RoundingPlugin} from './RoundingPlugin'
 export {SqrtPlugin} from './SqrtPlugin'
-export {SumifPlugin} from './SumifPlugin'
+export {ConditionalAggregationPlugin} from './ConditionalAggregationPlugin'
 export {SumprodPlugin} from './SumprodPlugin'
 export {TextPlugin} from './TextPlugin'
 export {TrigonometryPlugin} from './TrigonometryPlugin'

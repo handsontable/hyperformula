@@ -1,5 +1,7 @@
 const highlight = require('./highlight');
 const regexPlugin = require('markdown-it-regex').default;
+const footnotePlugin = require('markdown-it-footnote');
+const searchBoxPlugin = require('./plugins/search-box');
 const HyperFormula = require('../../dist/hyperformula.full');
 const fs = require('fs');
 const path = require('path');
@@ -19,10 +21,17 @@ module.exports = {
       })(window,document,'script','dataLayer','GTM-N59TZXR');
     `],
     // Google Console
-    ['meta', { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' }]
+    ['meta', { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' }],
+    // Favicon
+    ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' }],
+    ['link', { rel: 'icon', sizes: '32x32', type: 'image/png', href: '/favicon/favicon-32x32.png' }],
+    ['link', { rel: 'icon', sizes: '16x16', type: 'image/png', href: '/favicon/favicon-16x16.png' }],
+    ['link', { rel: 'manifest', href: '/favicon/site.webmanifest' }],
+    ['link', { rel: 'mask-icon', color: '#ffffff', href: '/favicon/safari-pinned-tab.svg' }],
   ],
-  base: '/hyperformula/',
+  base: '/',
   plugins: [
+    searchBoxPlugin,
     // [
     //   'vuepress-plugin-clean-urls',
     //   {
@@ -72,6 +81,7 @@ module.exports = {
         regex: /(process\.env\.HT_RELEASE_DATE as string)/,
         replace: () => `'${HyperFormula.releaseDate}'`
       })
+      md.use(footnotePlugin)
     }
   },
   // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
@@ -85,16 +95,14 @@ module.exports = {
     repo: 'handsontable/hyperformula',
     docsRepo: 'handsontable/hyperformula',
     docsDir: 'docs',
-    docsBranch: 'develop',
+    docsBranch: 'master',
     editLinks: true,
     editLinkText: 'Help us improve this page',
     lastUpdated: false,
     smoothScroll: false,
     searchPlaceholder: 'Search...',
-    // algolia: {
-    //   apiKey: '<API_KEY>',
-    //   indexName: '<INDEX_NAME>'
-    // },
+    searchLimitApi: 10,
+    searchLimitGuide: 10,
     nav: [
       { text: 'Guide', link: '/' },
       { text: 'API Reference', link: '/api/' },
@@ -161,7 +169,6 @@ module.exports = {
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
             ['/guide/license-key', 'License key'],
-            ['/guide/known-limitations', 'Known limitations'],
           ]
         },
         {
@@ -169,7 +176,8 @@ module.exports = {
           collapsable: false,
           children: [
             ['/guide/integration-with-react', 'Integration with React'],
-            ['/guide/integration-with-vue', 'Integration with Vue'],
+            ['/guide/integration-with-vue', 'Integration with Vue 3'],
+            ['/guide/integration-with-vue-2', 'Integration with Vue 2'],
             ['/guide/integration-with-angular', 'Integration with Angular'],
           ]
         },
@@ -204,8 +212,18 @@ module.exports = {
           title: 'Internationalization',
           collapsable: false,
           children: [
+            ['/guide/i18n-features', 'Internationalization features'],
             ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
+          ]
+        },
+        {
+          title: 'Compatibility',
+          collapsable: false,
+          children: [
+            ['/guide/compatibility-with-microsoft-excel', 'Compatibility with Microsoft Excel'],
+            ['/guide/compatibility-with-google-sheets', 'Compatibility with Google Sheets'],
+            ['/guide/list-of-differences', 'Runtime differences with Microsoft Excel and Google Sheets'],
           ]
         },
         {
@@ -213,10 +231,12 @@ module.exports = {
           collapsable: false,
           children: [
             ['/guide/key-concepts', 'Key concepts'],
-            ['/guide/building', 'Building'],
-            ['/guide/testing', 'Testing'],
+            ['/guide/dependency-graph', 'Dependency graph'],
+            ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],
+            ['/guide/known-limitations', 'Known limitations'],
+            ['/guide/file-import', 'File import'],
           ]
         },
         {
@@ -235,7 +255,6 @@ module.exports = {
             ['/guide/contributing', 'Contributing'],
             ['/guide/code-of-conduct.md', 'Code of conduct'],
             ['/guide/branding', 'Branding'],
-            ['/guide/acknowledgements', 'Acknowledgments'],
             ['/guide/contact', 'Contact'],
           ]
         },

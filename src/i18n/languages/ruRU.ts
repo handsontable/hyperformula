@@ -1,10 +1,9 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
-// import
 
 const dictionary: RawTranslationPackage = {
   errors: {
@@ -20,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    ADDRESS: 'АДРЕС',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'ABS',
@@ -102,9 +102,11 @@ const dictionary: RawTranslationPackage = {
     HEX2OCT: 'ШЕСТН.В.ВОСЬМ',
     HLOOKUP: 'ГПР',
     HOUR: 'ЧАС',
+    HYPERLINK: 'ГИПЕРССЫЛКА',
     IF: 'ЕСЛИ',
     IFERROR: 'ЕСЛИОШИБКА',
     IFNA: 'ЕСНД',
+    IFS: 'УСЛОВИЯ',
     INDEX: 'ИНДЕКС',
     INT: 'ЦЕЛОЕ',
     INTERVAL: 'INTERVAL', //FIXME
@@ -133,12 +135,14 @@ const dictionary: RawTranslationPackage = {
     MATCH: 'ПОИСКПОЗ',
     MAX: 'МАКС',
     MAXA: 'МАКСА',
+    MAXIFS: 'МАКСЕСЛИ',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'МЕДИАНА',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'ПСТР',
     MIN: 'МИН',
     MINA: 'МИНА',
+    MINIFS: 'МИНЕСЛИ',
     MINUTE: 'МИНУТЫ',
     MIRR: 'МВСД',
     MMULT: 'МУМНОЖ',

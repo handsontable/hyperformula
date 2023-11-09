@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
@@ -9,14 +9,14 @@ import {ProcedureAst} from '../../parser'
 import {FunctionPlugin} from '../index'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class FormulaTextPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FormulaTextPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'FORMULATEXT': {
       method: 'formulatext',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR}
+        {argumentType: FunctionArgumentType.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       isDependentOnSheetStructureChange: true,

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {FunctionTranslationsPackage} from './FunctionRegistry'
@@ -9,8 +9,10 @@ import {
   FunctionMetadata,
   FunctionPlugin,
   FunctionPluginDefinition,
-  ImplementedFunctions
+  ImplementedFunctions,
+  FunctionArgumentType,
 } from './plugin/FunctionPlugin'
+import {EmptyValue} from './InterpreterValue'
 
 export {
   FunctionPluginDefinition,
@@ -18,5 +20,7 @@ export {
   FunctionPlugin,
   ImplementedFunctions,
   FunctionMetadata,
-  FunctionTranslationsPackage
+  FunctionTranslationsPackage,
+  FunctionArgumentType,
+  EmptyValue,
 }

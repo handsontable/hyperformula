@@ -1,11 +1,11 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {addressKey, SimpleCellAddress} from './Cell'
 import {InterpreterValue} from './interpreter/InterpreterValue'
-import {SimpleRangeValue} from './interpreter/SimpleRangeValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
 
 export interface CellValueChange {
   address: SimpleCellAddress,
@@ -62,10 +62,10 @@ export class ContentChanges {
     const value = change.value
     if (value instanceof SimpleRangeValue) {
       for (const cellAddress of value.effectiveAddressesFromData(address)) {
-        this.changes.delete(`${cellAddress.sheet},${cellAddress.col},${cellAddress.row}`)
+        this.changes.delete(addressKey(cellAddress))
       }
     }
-    this.changes.set(addressKey((address)), change)
+    this.changes.set(addressKey(address), change)
   }
 
   private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: InterpreterValue) {

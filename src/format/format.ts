@@ -1,10 +1,10 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {Config} from '../Config'
-import {secondsExtendedRegexp} from '../DateTimeDefault'
+import {TIME_FORMAT_SECONDS_ITEM_REGEXP} from '../DateTimeDefault'
 import {DateTimeHelper, numberToSimpleTime, SimpleDateTime, SimpleTime} from '../DateTimeHelper'
 import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
@@ -27,7 +27,7 @@ export function format(value: number, formatArg: string, config: Config, dateHel
 }
 
 export function padLeft(number: number | string, size: number) {
-  let result = number + ''
+  let result = `${number}`
   while (result.length < size) {
     result = '0' + result
   }
@@ -35,7 +35,7 @@ export function padLeft(number: number | string, size: number) {
 }
 
 export function padRight(number: number | string, size: number) {
-  let result = number + ''
+  let result = `${number}`
   while (result.length < size) {
     result = result + '0'
   }
@@ -94,12 +94,6 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       continue
     }
 
-    if (secondsExtendedRegexp.test(token.value)) {
-      const fractionOfSecondPrecision = token.value.length - 3
-      result += (time.seconds < 10 ? '0' : '') + Math.round(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
-      continue
-    }
-
     switch (token.value.toLowerCase()) {
       case 'h':
       case 'hh': {
@@ -131,11 +125,16 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
       /* seconds */
       case 's':
       case 'ss': {
-        result += padLeft(time.seconds, token.value.length)
+        result += padLeft(Math.floor(time.seconds), token.value.length)
         break
       }
 
       default: {
+        if (TIME_FORMAT_SECONDS_ITEM_REGEXP.test(token.value)) {
+          const fractionOfSecondPrecision = Math.max(token.value.length - 3, 0)
+          result += `${time.seconds < 10 ? '0' : ''}${Math.floor(time.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)}`
+          continue
+        }
         return undefined
       }
     }
@@ -162,12 +161,6 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       continue
     }
 
-    if (secondsExtendedRegexp.test(token.value)) {
-      const fractionOfSecondPrecision = token.value.length - 3
-      result += (dateTime.seconds < 10 ? '0' : '') + Math.round(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)
-      continue
-    }
-
     switch (token.value.toLowerCase()) {
       /* hours*/
       case 'h':
@@ -187,7 +180,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
       /* seconds */
       case 's':
       case 'ss': {
-        result += padLeft(Math.round(dateTime.seconds), token.value.length)
+        result += padLeft(Math.floor(dateTime.seconds), token.value.length)
         break
       }
 
@@ -224,6 +217,11 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
         break
       }
       default: {
+        if (TIME_FORMAT_SECONDS_ITEM_REGEXP.test(token.value)) {
+          const fractionOfSecondPrecision = token.value.length - 3
+          result += `${dateTime.seconds < 10 ? '0' : ''}${Math.floor(dateTime.seconds * Math.pow(10, fractionOfSecondPrecision)) / Math.pow(10, fractionOfSecondPrecision)}`
+          continue
+        }
         return undefined
       }
     }

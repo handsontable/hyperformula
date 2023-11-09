@@ -1,23 +1,23 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValueType, InterpreterValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing COUNTUNIQUE function
  */
 export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountUniquePlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'COUNTUNIQUE': {
       method: 'countunique',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR},
+        {argumentType: FunctionArgumentType.SCALAR},
       ],
       repeatLastArgs: 1,
       expandRanges: true,

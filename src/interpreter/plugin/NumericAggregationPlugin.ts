@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../../AbsoluteCellRange'
@@ -13,8 +13,9 @@ import {ColumnRangeAst, RowRangeAst} from '../../parser/Ast'
 import {coerceBooleanToNumber} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, ExtendedNumber, getRawValue, InternalScalarValue, isExtendedNumber} from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import {RangeVertex} from '../../DependencyGraph'
 
 export type BinaryOperation<T> = (left: T, right: T) => T
 
@@ -75,145 +76,145 @@ class MomentsAggregate {
 }
 
 export class NumericAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<NumericAggregationPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'SUM': {
       method: 'sum',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'SUMSQ': {
       method: 'sumsq',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'MAX': {
       method: 'max',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'MIN': {
       method: 'min',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'MAXA': {
       method: 'maxa',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'MINA': {
       method: 'mina',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'COUNT': {
       method: 'count',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'COUNTA': {
       method: 'counta',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'AVERAGE': {
       method: 'average',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'AVERAGEA': {
       method: 'averagea',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'PRODUCT': {
       method: 'product',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'VAR.S': {
       method: 'vars',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'VAR.P': {
       method: 'varp',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'VARA': {
       method: 'vara',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'VARPA': {
       method: 'varpa',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'STDEV.S': {
       method: 'stdevs',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'STDEV.P': {
       method: 'stdevp',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'STDEVA': {
       method: 'stdeva',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'STDEVPA': {
       method: 'stdevpa',
       parameters: [
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     },
     'SUBTOTAL': {
       method: 'subtotal',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.ANY}
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.ANY}
       ],
       repeatLastArgs: 1,
     }
@@ -376,7 +377,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     if (ast.args.length < 2) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
     }
-    const functionType = this.coerceToType(this.evaluateAst(ast.args[0], state), {argumentType: ArgumentTypes.NUMBER}, state)
+    const functionType = this.coerceToType(this.evaluateAst(ast.args[0], state), {argumentType: FunctionArgumentType.NUMBER}, state)
     const args = ast.args.slice(1)
     switch (functionType) {
       case 1:
@@ -542,7 +543,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * @param reducingFunction - reducing function
    * @param mapFunction
    * @param coercionFunction
-   * */
+   */
   private reduce<T>(args: Ast[], state: InterpreterState, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): CellError | T {
     if (args.length < 1) {
       return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
@@ -551,6 +552,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       if (acc instanceof CellError) {
         return acc
       }
+
       if (arg.type === AstNodeType.CELL_RANGE || arg.type === AstNodeType.COLUMN_RANGE || arg.type === AstNodeType.ROW_RANGE) {
         const val = this.evaluateRange(arg, state, initialAccValue, functionName, reducingFunction, mapFunction, coercionFunction)
         if (val instanceof CellError) {
@@ -558,6 +560,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
         }
         return reducingFunction(val, acc)
       }
+
       let value
       value = this.evaluateAst(arg, state)
       if (value instanceof SimpleRangeValue) {
@@ -626,9 +629,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       }
     }
 
-    const rangeStart = range.start
-    const rangeEnd = range.end
-    const rangeVertex = this.dependencyGraph.getRange(rangeStart, rangeEnd)!
+    const rangeVertex = this.dependencyGraph.getRange(range.start, range.end)
 
     if (rangeVertex === undefined) {
       throw new Error('Range does not exists in graph')
@@ -636,7 +637,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
 
     let value = rangeVertex.getFunctionValue(functionName) as (T | CellError | undefined)
     if (value === undefined) {
-      const rangeValues = this.getRangeValues(functionName, range, mapFunction, coercionFunction)
+      const rangeValues = this.getRangeValues(functionName, range, rangeVertex, mapFunction, coercionFunction)
       value = rangeValues.reduce((arg1, arg2) => {
         if (arg1 instanceof CellError) {
           return arg1
@@ -660,15 +661,15 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    *
    * @param functionName - function name (e.g. SUM)
    * @param range - cell range
+   * @param rangeVertex
    * @param mapFunction
    * @param coercionFunction
    */
-  private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): (T | CellError)[] {
+  private getRangeValues<T>(functionName: string, range: AbsoluteCellRange, rangeVertex: RangeVertex, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): (T | CellError)[] {
     const rangeResult: (T | CellError)[] = []
     const {smallerRangeVertex, restRange} = this.dependencyGraph.rangeMapping.findSmallerRange(range)
-    const currentRangeVertex = this.dependencyGraph.getRange(range.start, range.end)!
     let actualRange: AbsoluteCellRange
-    if (smallerRangeVertex !== undefined && this.dependencyGraph.existsEdge(smallerRangeVertex, currentRangeVertex)) {
+    if (smallerRangeVertex !== undefined && this.dependencyGraph.existsEdge(smallerRangeVertex, rangeVertex)) {
       const cachedValue: Maybe<T> = smallerRangeVertex.getFunctionValue(functionName)
       if (cachedValue !== undefined) {
         rangeResult.push(cachedValue)

@@ -1,5 +1,4 @@
-import {HyperFormula} from '../../src'
-import {AlwaysSparse} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {HyperFormula, AlwaysSparse} from '../../src'
 import {adr} from '../testUtils'
 
 describe('swapping columns - checking if it is possible', () => {
@@ -11,7 +10,7 @@ describe('swapping columns - checking if it is possible', () => {
     ).toThrowError('Invalid arguments, expected column numbers to be nonnegative integers and less than sheet width.')
   })
 
-  it('should validate sources for noninteger values', () => {
+  it('should validate sources for non-integer values', () => {
     const engine = HyperFormula.buildFromArray([[]])
     expect(engine.isItPossibleToSwapColumnIndexes(0, [[1, 1], [0.5, 0]])).toEqual(false)
     expect(() =>
@@ -112,7 +111,7 @@ describe('swapping columns should correctly work', () => {
   })
 })
 
-describe('swapping rows working with undo', () => {
+describe('swapping columns working with undo', () => {
   it('should work on static engine', () => {
     const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     engine.swapColumnIndexes(0, [[0, 1], [1, 2], [2, 0]])
@@ -135,7 +134,7 @@ describe('swapping rows working with undo', () => {
   })
 })
 
-describe('swapping rows working with redo', () => {
+describe('swapping columns working with redo', () => {
   it('should work on static engine', () => {
     const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     engine.swapColumnIndexes(0, [[0, 1], [1, 2], [2, 0]])
@@ -184,7 +183,7 @@ describe('setting column order - checking if it is possible', () => {
     ).toThrowError('Invalid arguments, expected number of columns provided to be sheet width.')
   })
 
-  it('should validate sources for noninteger values', () => {
+  it('should validate sources for non-integer values', () => {
     const engine = HyperFormula.buildFromArray([[]])
     expect(engine.isItPossibleToSetColumnOrder(0, [0, 0.5])).toEqual(false)
     expect(() =>
@@ -225,7 +224,7 @@ describe('setting column order - checking if it is possible', () => {
   })
 })
 
-describe('reorder base case', () => {
+describe('setColumnOrder', () => {
   it('should work on static engine', () => {
     const engine = HyperFormula.buildFromArray([[1, 'abcd'], [3, 3], [5, true]])
     expect(engine.isItPossibleToSetColumnOrder(0, [1, 0])).toEqual(true)
@@ -254,6 +253,15 @@ describe('reorder base case', () => {
     expect(engine.getSheetSerialized(0)).toEqual([[3, 1, 2], [6, 4, 5], [9, 7, 8]])
   })
 
+  it('should work with strings', () => {
+    const hfInstance = HyperFormula.buildFromArray([
+      ['A', 'B', 'C', 'D']
+    ])
+
+    hfInstance.setColumnOrder(0, [0, 3, 2, 1])
+    expect(hfInstance.getSheetSerialized(0)).toEqual([['A', 'D', 'C', 'B']])
+  })
+
   it('should not move values unnecessarily', () => {
     const engine = HyperFormula.buildFromArray([[1, 2, 3], [4, 5, 6]])
     expect(engine.isItPossibleToSetColumnOrder(0, [0, 1, 2])).toEqual(true)
@@ -274,6 +282,20 @@ describe('reorder base case', () => {
     expect(engine.isItPossibleToSetColumnOrder(0, [1, 2, 0, 3])).toEqual(true)
     engine.setColumnOrder(0, [1, 2, 0, 3])
     expect(engine.getSheetSerialized(0)).toEqual([[3, '=B2', '=SUM(C2:C3)'], ['=#REF!', 1, '=SUM(C10:C15)'], [9, '=SUM(E1:E10)', 8]])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards', () => {
+    const engine = HyperFormula.buildFromArray([[null, '=A1', 42]])
+    engine.setColumnOrder(0, [1, 0, 2])
+    engine.setCellContents(adr('A1'), '=B1')
+    expect(engine.getSheetSerialized(0)).toEqual([['=B1', null, 42]])
+  })
+
+  it('leaves the engine in a valid state so other operations are possible afterwards (with a range)', () => {
+    const engine = HyperFormula.buildFromArray([[null, null, null, '=SUM(A1:C1)', 42]])
+    engine.setColumnOrder(0, [1, 2, 3, 0, 4])
+    engine.setCellContents(adr('A1'), '=SUM(B1:D1)')
+    expect(engine.getSheetSerialized(0)).toEqual([['=SUM(B1:D1)', null, null, null, 42]])
   })
 })
 

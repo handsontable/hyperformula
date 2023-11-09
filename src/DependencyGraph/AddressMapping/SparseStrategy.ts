@@ -1,20 +1,20 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {CellVertex} from '../Vertex'
-import {IAddressMappingStrategy} from './IAddressMappingStrategy'
+import {AddressMappingStrategy} from './AddressMappingStrategy'
 
 /**
  * Mapping from cell addresses to vertices
  *
  * Uses Map to store addresses, having minimal memory usage for sparse sheets but not necessarily constant set/lookup.
  */
-export class SparseStrategy implements IAddressMappingStrategy {
+export class SparseStrategy implements AddressMappingStrategy {
   /**
    * Map of Maps in which actual data is stored.
    *

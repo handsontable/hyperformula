@@ -1,11 +1,20 @@
-import {ErrorType, ExportedCellChange, HyperFormula, InvalidAddressError, NoSheetWithIdError} from '../../src'
+import {
+  CellValueDetailedType,
+  ErrorType,
+  ExportedCellChange,
+  HyperFormula,
+  InvalidAddressError,
+  NoSheetWithIdError,
+  SimpleCellAddress,
+  SheetSizeLimitExceededError,
+  ArraySize,
+  ExpectedValueOfTypeError,
+} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {ArraySize} from '../../src/ArraySize'
 import {simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
-import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {
   adr,
@@ -62,6 +71,13 @@ describe('Changing cell content - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
     expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
+  })
+
+  it('should throw error if testing with a malformed address', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.isItPossibleToSetCellContents({} as SimpleCellAddress)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', 'address'))
   })
 })
 
@@ -143,7 +159,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [[null]])
     expect(engine.getCellValue(adr('B1'))).toBe(null)
-    expect(engine.graph.nodes).not.toContain(b1)
+    expect([ ...engine.graph.getNodes() ]).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
 
@@ -482,7 +498,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
-  it('update dependecy value cell to parsing error ', () => {
+  it('update dependency value cell to parsing error ', () => {
     const sheet = [
       ['1', '=SUM(A1)'],
     ]
@@ -557,6 +573,18 @@ describe('changing cell content', () => {
     ]
     const engine = HyperFormula.buildFromArray(sheet)
     engine.setCellContents(adr('C1'), '=MMULT(A1:B2,A1:B2)')
+  })
+
+  it('should set the cell value type based on the format of the input value', () => {
+    const engine = HyperFormula.buildFromArray([])
+
+    engine.setCellContents({ sheet: 0, col: 0, row: 0 }, '42')
+    engine.setCellContents({ sheet: 0, col: 0, row: 1 }, '$42')
+    engine.setCellContents({ sheet: 0, col: 0, row: 2 }, '42%')
+
+    expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 0 })).toEqual(CellValueDetailedType.NUMBER_RAW)
+    expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 1 })).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
+    expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 2 })).toEqual(CellValueDetailedType.NUMBER_PERCENT)
   })
 })
 
@@ -1096,7 +1124,7 @@ describe('arrays', () => {
 
     expect(changes.length).toEqual(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
-    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, ErrorMessage.ParseError)))
+    expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, "Parsing error. Expecting token of type --> RParen <-- but found --> '' <--")))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
   })
 

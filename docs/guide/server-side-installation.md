@@ -18,14 +18,14 @@ following command:
   
 **npm:**
 
-```
+```bash
 $ npm install hyperformula
 ```
 
 **Yarn:**
 
-```
-$ npm install hyperformula
+```bash
+$ yarn add hyperformula
 ```
 
 The package will be added to your `package.json` file and installed in

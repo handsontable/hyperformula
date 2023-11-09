@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
@@ -9,18 +9,18 @@ import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing information functions
  */
 export class InformationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<InformationPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'COLUMN': {
       method: 'column',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR, optional: true}
+        {argumentType: FunctionArgumentType.NOERROR, optionalArg: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -29,7 +29,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'COLUMNS': {
       method: 'columns',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE}
+        {argumentType: FunctionArgumentType.RANGE}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -38,19 +38,19 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ISBINARY': {
       method: 'isbinary',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'ISERR': {
       method: 'iserr',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISFORMULA': {
       method: 'isformula',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR}
+        {argumentType: FunctionArgumentType.NOERROR}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
@@ -58,58 +58,58 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ISNA': {
       method: 'isna',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISREF': {
       method: 'isref',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ],
       vectorizationForbidden: true,
     },
     'ISERROR': {
       method: 'iserror',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISBLANK': {
       method: 'isblank',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISNUMBER': {
       method: 'isnumber',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISLOGICAL': {
       method: 'islogical',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISTEXT': {
       method: 'istext',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'ISNONTEXT': {
       method: 'isnontext',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
     'INDEX': {
       method: 'index',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
       ]
     },
     'NA': {
@@ -119,7 +119,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ROW': {
       method: 'row',
       parameters: [
-        {argumentType: ArgumentTypes.NOERROR, optional: true}
+        {argumentType: FunctionArgumentType.NOERROR, optionalArg: true}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -128,7 +128,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'ROWS': {
       method: 'rows',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE}
+        {argumentType: FunctionArgumentType.RANGE}
       ],
       isDependentOnSheetStructureChange: true,
       doesNotNeedArgumentsToBeComputed: true,
@@ -137,7 +137,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'SHEET': {
       method: 'sheet',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
@@ -145,7 +145,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'SHEETS': {
       method: 'sheets',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
@@ -329,7 +329,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * Returns number of columns in provided range of cells
    *
    * @param ast
-   * @param _state
+   * @param state
    */
   public columns(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
@@ -381,7 +381,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * Returns number of rows in provided range of cells
    *
    * @param ast
-   * @param _state
+   * @param state
    */
   public rows(ast: ProcedureAst, state: InterpreterState): InternalScalarValue {
     if (ast.args.length !== 1) {
@@ -413,7 +413,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   /**
-   * Corresponds to INDEX(range;)
+   * Corresponds to INDEX
    *
    * Returns specific position in 2d array.
    *
@@ -451,7 +451,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    *
    * @param ast
    * @param state
-   * */
+   */
   public sheet(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEET'),
       () => state.formulaAddress.sheet + 1,
@@ -475,7 +475,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    *
    * @param ast
    * @param state
-   * */
+   */
   public sheets(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunctionWithReferenceArgument(ast.args, state, this.metadata('SHEETS'),
       () => this.dependencyGraph.sheetMapping.numberOfSheets(), // return number of sheets if no argument

@@ -32,8 +32,8 @@ describe('Interpreter - function RAND', () => {
 
     engine.setCellContents(adr('A1'), '=RAND()')
 
-    const a1 = engine.addressMapping.getCell(adr('A1'))
-    expect(engine.dependencyGraph.volatileVertices()).toEqual(new Set([a1]))
+    const a1 = engine.addressMapping.getCell(adr('A1'))!
+    expect(engine.dependencyGraph.verticesToRecompute()).toEqual([a1])
   })
 
   it('volatile vertices should not be recomputed after removing from graph', () => {
@@ -43,7 +43,7 @@ describe('Interpreter - function RAND', () => {
 
     engine.setCellContents(adr('A1'), '35')
 
-    expect(engine.dependencyGraph.verticesToRecompute()).toEqual(new Set())
+    expect(engine.dependencyGraph.verticesToRecompute()).toEqual([])
   })
 
   it('volatile formula after moving is still volatile', () => {
@@ -53,7 +53,7 @@ describe('Interpreter - function RAND', () => {
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
-    const a2 = engine.addressMapping.getCell(adr('A2'))
-    expect(engine.dependencyGraph.volatileVertices()).toEqual(new Set([a2]))
+    const a2 = engine.addressMapping.getCell(adr('A2'))!
+    expect(engine.dependencyGraph.verticesToRecompute()).toEqual([a2])
   })
 })

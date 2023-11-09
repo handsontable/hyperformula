@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
@@ -15,243 +15,243 @@ import {
   NumberType,
   RawInterpreterValue
 } from '../InterpreterValue'
-import {SimpleRangeValue} from '../SimpleRangeValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FinancialPlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'PMT': {
       method: 'pmt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'IPMT': {
       method: 'ipmt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'PPMT': {
       method: 'ppmt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'FV': {
       method: 'fv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'CUMIPMT': {
       method: 'cumipmt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0, maxValue: 1},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'CUMPRINC': {
       method: 'cumprinc',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0, maxValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0, maxValue: 1},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DB': {
       method: 'db',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1, maxValue: 12, defaultValue: 12},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DDB': {
       method: 'ddb',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.INTEGER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0, defaultValue: 2},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, defaultValue: 2},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'DOLLARDE': {
       method: 'dollarde',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ],
     },
     'DOLLARFR': {
       method: 'dollarfr',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
       ],
     },
     'EFFECT': {
       method: 'effect',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
       returnNumberType: NumberType.NUMBER_PERCENT
     },
     'ISPMT': {
       method: 'ispmt',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'NOMINAL': {
       method: 'nominal',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 1},
       ],
       returnNumberType: NumberType.NUMBER_PERCENT
     },
     'NPER': {
       method: 'nper',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
     },
     'PV': {
       method: 'pv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'RATE': {
       method: 'rate',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, defaultValue: 0.1},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0.1},
       ],
       returnNumberType: NumberType.NUMBER_PERCENT
     },
     'RRI': {
       method: 'rri',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       returnNumberType: NumberType.NUMBER_PERCENT
     },
     'SLN': {
       method: 'sln',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'SYD': {
       method: 'syd',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'TBILLEQ': {
       method: 'tbilleq',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ],
       returnNumberType: NumberType.NUMBER_PERCENT
     },
     'TBILLPRICE': {
       method: 'tbillprice',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'TBILLYIELD': {
       method: 'tbillyield',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, minValue: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, minValue: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ],
       returnNumberType: NumberType.NUMBER_PERCENT
     },
     'FVSCHEDULE': {
       method: 'fvschedule',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
       returnNumberType: NumberType.NUMBER_CURRENCY
     },
     'NPV': {
       method: 'npv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.ANY},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.ANY},
       ],
       repeatLastArgs: 1,
       returnNumberType: NumberType.NUMBER_CURRENCY
@@ -259,26 +259,26 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     'MIRR': {
       method: 'mirr',
       parameters: [
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.NUMBER},
-        {argumentType: ArgumentTypes.NUMBER},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER},
       ],
       returnNumberType: NumberType.NUMBER_PERCENT
     },
     'PDURATION': {
       method: 'pduration',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0},
       ],
     },
     'XNPV': {
       method: 'xnpv',
       parameters: [
-        {argumentType: ArgumentTypes.NUMBER, greaterThan: -1},
-        {argumentType: ArgumentTypes.RANGE},
-        {argumentType: ArgumentTypes.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, greaterThan: -1},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
       ],
     },
   }
@@ -387,7 +387,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public dollarde(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARDE'),
-      (dollar, fraction) => {
+      (dollar: number, fraction: number) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
@@ -403,7 +403,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public dollarfr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARFR'),
-      (dollar, fraction) => {
+      (dollar: number, fraction: number) => {
         if (fraction < 1) {
           return new CellError(ErrorType.DIV_BY_ZERO)
         }
@@ -448,7 +448,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public nper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NPER'),
-      (rate, payment, present, future, type) => {
+      (rate: number, payment: number, present: number, future: number, type: number) => {
         if (rate === 0) {
           if (payment === 0) {
             return new CellError(ErrorType.DIV_BY_ZERO)
@@ -466,7 +466,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public rate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     // Newton's method: https://en.wikipedia.org/wiki/Newton%27s_method
     return this.runFunction(ast.args, state, this.metadata('RATE'),
-      (periods, payment, present, future, type, guess) => {
+      (periods: number, payment: number, present: number, future: number, type: number, guess: number) => {
         if (guess <= -1) {
           return new CellError(ErrorType.VALUE)
         }
@@ -508,7 +508,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public pv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PV'),
-      (rate, periods, payment, future, type) => {
+      (rate: number, periods: number, payment: number, future: number, type: number) => {
         type = type ? 1 : 0
         if (rate === -1) {
           if (periods === 0) {
@@ -551,7 +551,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public syd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SYD'),
-      (cost, salvage, life, period) => {
+      (cost: number, salvage: number, life: number, period: number) => {
         if (period > life) {
           return new CellError(ErrorType.NUM)
         }
@@ -562,7 +562,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public tbilleq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLEQ'),
-      (settlement, maturity, discount) => {
+      (settlement: number, maturity: number, discount: number) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {
@@ -588,7 +588,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public tbillprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLPRICE'),
-      (settlement, maturity, discount) => {
+      (settlement: number, maturity: number, discount: number) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {
@@ -614,7 +614,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
 
   public tbillyield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLYIELD'),
-      (settlement, maturity, price) => {
+      (settlement: number, maturity: number, price: number) => {
         settlement = Math.round(settlement)
         maturity = Math.round(maturity)
         if (settlement >= maturity) {

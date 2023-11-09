@@ -1,24 +1,30 @@
 ### Context
-<!--- Why is this change required? What problem does it solve? -->
+<!--- Why are your changes required? What problem do they solve? -->
 
-### How has this been tested?
-<!--- Please describe in detail how you tested your changes (doesn't apply to translations). -->
+### How did you test your changes?
+<!--- Describe in detail how you tested your changes. -->
 
 ### Types of changes
-<!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature or improvement (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Additional language file or change to the existing one (translations)
+<!--- What types of changes does your code introduce? Put an `x` in each box that applies. -->
+- [ ] Breaking change (a fix or a feature because of which an existing functionality doesn't work as expected anymore)
+- [ ] New feature or improvement (a non-breaking change that adds functionality)
+- [ ] Bug fix (a non-breaking change that fixes an issue)
+- [ ] Additional language file, or a change to an existing language file (translations)
+- [ ] Change to the documentation
 
-### Related issue(s):
-1.
+### Related issues:
+1. Fixes #...
 2.
 3.
 
 ### Checklist:
-<!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
-<!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
-- [ ] My code follows the code style of this project,
-- [ ] My change requires a change to the documentation,
-- [ ] I described the modification in the CHANGELOG.md file.
+<!--- Go through the points below, and put an `x` in each box that applies. -->
+<!--- If you're unsure about any of these, contact us. We're always glad to help! -->
+- [ ] I have reviewed the guidelines about [Contributing to HyperFormula](https://hyperformula.handsontable.com/guide/contributing.html) and I confirm that my code follows the code style of this project.
+- [ ] I have signed the [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2).
+- [ ] My change is compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard.
+- [ ] My change is compatible with Microsoft Excel.
+- [ ] My change is compatible with Google Sheets.
+- [ ] I described my changes in the [CHANGELOG.md](https://github.com/handsontable/hyperformula/blob/master/CHANGELOG.md) file.
+- [ ] My changes require a documentation update.
+- [ ] My changes require a migration guide.

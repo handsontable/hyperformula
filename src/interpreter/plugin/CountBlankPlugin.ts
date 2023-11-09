@@ -1,23 +1,23 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing MEDIAN function
  */
 export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CountBlankPlugin> {
 
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'COUNTBLANK': {
       method: 'countblank',
       parameters: [
-        {argumentType: ArgumentTypes.SCALAR}
+        {argumentType: FunctionArgumentType.SCALAR}
       ],
       repeatLastArgs: 1,
       expandRanges: true,

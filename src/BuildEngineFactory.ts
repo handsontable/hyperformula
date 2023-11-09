@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {ArraySizePredictor} from './ArraySize'
@@ -86,7 +86,7 @@ export class BuildEngineFactory {
           throw new SheetSizeLimitExceededError()
         }
         const sheetId = sheetMapping.addSheet(sheetName)
-        addressMapping.autoAddSheet(sheetId, sheet, boundaries)
+        addressMapping.autoAddSheet(sheetId, boundaries)
       }
     }
 

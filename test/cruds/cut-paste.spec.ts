@@ -1,5 +1,5 @@
 import {ErrorType, HyperFormula, NoSheetWithIdError} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {AbsoluteCellRange, SimpleCellRange} from '../../src/AbsoluteCellRange'
 import {EmptyCellVertex} from '../../src/DependencyGraph'
 import {EmptyValue} from '../../src/interpreter/InterpreterValue'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
@@ -11,8 +11,9 @@ import {
   expectEngineToBeTheSameAs,
   extractMatrixRange,
   extractRange,
-  extractReference,
+  extractReference, graphEdgesCount,
 } from '../testUtils'
+import {ExpectedValueOfTypeError} from '../../src/errors'
 
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {
@@ -27,7 +28,7 @@ describe('Address dependencies, moved formulas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 1, 4))
     engine.paste(adr('B1'))
 
-    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(0, -1))
+    expect(extractReference(engine, adr('B1'))).toEqual(CellAddress.relative(-1, 0))
     expect(extractReference(engine, adr('B2'))).toEqual(CellAddress.absoluteCol(0, -1))
     expect(extractReference(engine, adr('B3'))).toEqual(CellAddress.absoluteRow(-1, 0))
     expect(extractReference(engine, adr('B4'))).toEqual(CellAddress.absolute(0, 0))
@@ -91,7 +92,7 @@ describe('Address dependencies, moved formulas', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 2, 4))
     engine.paste(adr('B2'))
 
-    expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(0, -1))
+    expect(extractReference(engine, adr('C2'))).toEqual(CellAddress.relative(-1, 0))
     expect(extractReference(engine, adr('C3'))).toEqual(CellAddress.absoluteCol(1, 0))
     expect(extractReference(engine, adr('C4'))).toEqual(CellAddress.absoluteRow(-1, 3))
     expect(extractReference(engine, adr('C5'))).toEqual(CellAddress.absolute(1, 4))
@@ -141,7 +142,7 @@ describe('Move cells', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1))
     engine.paste(adr('B1', 1))
 
-    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(0, -1))
+    expect(extractReference(engine, adr('B1', 1))).toEqual(CellAddress.relative(-1, 0))
   })
 
   it('should update reference', () => {
@@ -156,7 +157,7 @@ describe('Move cells', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('B1'))
 
-    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(-1, 1))
+    expect(extractReference(engine, adr('A2'))).toEqual(CellAddress.relative(1, -1))
     expect(extractReference(engine, adr('A3'))).toEqual(CellAddress.absoluteCol(1, -2))
     expect(extractReference(engine, adr('A4'))).toEqual(CellAddress.absoluteRow(1, 0))
     expect(extractReference(engine, adr('A5'))).toEqual(CellAddress.absolute(1, 0))
@@ -188,7 +189,7 @@ describe('Move cells', () => {
     engine.paste(adr('B1', 1))
 
     const reference = extractReference(engine, adr('A2'))
-    expect(reference).toEqual(CellAddress.relative(-1, 1))
+    expect(reference).toEqual(CellAddress.relative(1, -1))
   })
 
   it('should override and remove formula', () => {
@@ -200,8 +201,8 @@ describe('Move cells', () => {
     engine.cut(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))
     engine.paste(adr('A2'))
 
-    expect(engine.graph.edgesCount()).toBe(0)
-    expect(engine.graph.nodesCount()).toBe(1)
+    expect(graphEdgesCount(engine.graph)).toBe(0)
+    expect(engine.graph.getNodes().length).toBe(1)
     expect(engine.getCellValue(adr('A1'))).toBe(null)
     expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
@@ -259,10 +260,10 @@ describe('Move cells', () => {
     const source = engine.addressMapping.getCell(adr('A1'))
     const target = engine.addressMapping.fetchCell(adr('A2'))
 
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       2, // A2 -> B1, A2 -> B2
     )
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       +2 // formulas
       + 1, // A2
     )
@@ -355,6 +356,13 @@ describe('moving ranges', () => {
     }).toThrowError('Cannot perform this operation, target location has an array inside.')
   })
 
+  it('should not be possible to cut when source is a malformed SimpleCellRange', () => {
+    const engine = HyperFormula.buildEmpty()
+    expect(() => {
+      engine.cut({} as SimpleCellRange)
+    }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'source'))
+  })
+
   it('should adjust edges when moving part of range', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A2)'],
@@ -372,13 +380,13 @@ describe('moving ranges', () => {
 
     expect(source).toBeInstanceOf(EmptyCellVertex)
     expect(source.getCellValue()).toBe(EmptyValue)
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       +2 // formulas
       + 1 // A2
       + 1 // A1 (Empty)
       + 1, // A1:A2 range
     )
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       +2 // A1 (Empty) -> A1:A2, A2 -> A1:A2
       + 1 // A1:A2 -> B1
       + 1, // A2 -> B2
@@ -414,12 +422,12 @@ describe('moving ranges', () => {
     expect(a1).toBe(undefined)
     expect(a2).toBe(undefined)
 
-    expect(engine.graph.nodesCount()).toBe(
+    expect(engine.graph.getNodes().length).toBe(
       +2 // formulas
       + 2 // C1, C2
       + 1, // C1:C2 range
     )
-    expect(engine.graph.edgesCount()).toBe(
+    expect(graphEdgesCount(engine.graph)).toBe(
       +2 // C1 -> C1:C2, C2 -> C1:C2
       + 1 // C1:C2 -> B1
       + 1, // C2 -> B2

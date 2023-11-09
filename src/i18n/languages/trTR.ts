@@ -1,10 +1,9 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
-// import
 
 const dictionary: RawTranslationPackage = {
   errors: {
@@ -20,6 +19,7 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    ADDRESS: 'ADRES',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
     ABS: 'MUTLAK',
@@ -102,9 +102,11 @@ const dictionary: RawTranslationPackage = {
     HEX2OCT: 'HEX2OCT',
     HLOOKUP: 'YATAYARA',
     HOUR: 'SAAT',
+    HYPERLINK: 'KÖPRÜ',
     IF: 'EĞER',
     IFERROR: 'EĞERHATA',
     IFNA: 'EĞERYOKSA',
+    IFS: 'ÇOKEĞER',
     INDEX: 'İNDİS',
     INT: 'TAMSAYI',
     INTERVAL: 'INTERVAL', //FIXME
@@ -133,12 +135,14 @@ const dictionary: RawTranslationPackage = {
     MATCH: 'KAÇINCI',
     MAX: 'MAK',
     MAXA: 'MAKA',
+    MAXIFS: 'ÇOKEĞERMAK',
     MAXPOOL: 'MAXPOOL',
     MEDIAN: 'ORTANCA',
     MEDIANPOOL: 'MEDIANPOOL',
     MID: 'PARÇAAL',
     MIN: 'MİN',
     MINA: 'MİNA',
+    MINIFS: 'ÇOKEĞERMİN',
     MINUTE: 'DAKİKA',
     MIRR: 'D_İÇ_VERİM_ORANI',
     MMULT: 'DÇARP',

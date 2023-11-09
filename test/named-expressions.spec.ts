@@ -1,10 +1,29 @@
-import {ExportedCellChange, ExportedNamedExpressionChange, HyperFormula, NoSheetWithIdError} from '../src'
+import {
+  ExportedCellChange,
+  ExportedNamedExpressionChange,
+  HyperFormula,
+  NamedExpressionDoesNotExistError,
+  NoSheetWithIdError
+} from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
-import {ErrorType} from '../src/Cell'
-import {Vertex} from '../src/DependencyGraph/Vertex'
+import {ErrorType} from '../src'
+import {Vertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
-import {NoRelativeAddressesAllowedError} from '../src/errors'
+import {NoRelativeAddressesAllowedError} from '../src'
 import {adr, detailedError} from './testUtils'
+import {Config} from '../src/Config'
+import {DependencyGraph} from '../src/DependencyGraph'
+import {Statistics} from '../src/statistics'
+import {FunctionRegistry} from '../src/interpreter/FunctionRegistry'
+import {LazilyTransformingAstService} from '../src/LazilyTransformingAstService'
+import {NamedExpressions} from '../src/NamedExpressions'
+import {Operations} from '../src/Operations'
+import {buildColumnSearchStrategy} from '../src/Lookup/SearchStrategy'
+import {CellContentParser} from '../src/CellContentParser'
+import {DateTimeHelper} from '../src/DateTimeHelper'
+import {NumberLiteralHelper} from '../src/NumberLiteralHelper'
+import {ParserWithCaching} from '../src/parser'
+import {ArraySizePredictor} from '../src/ArraySize'
 
 describe('Named expressions - checking if its possible', () => {
   it('should be possible to add named expression', () => {
@@ -84,6 +103,193 @@ describe('Named expressions - checking if its possible', () => {
   it('no if trying to change not existing expression', () => {
     const engine = HyperFormula.buildFromArray([])
     expect(engine.isItPossibleToChangeNamedExpression('foo', 'foo')).toBe(false)
+  })
+})
+
+describe('Named expressions - name validity', () => {
+  it('name made of letters works', () => {
+    const name = 'ABC'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that starts with a valid cell reference works', () => {
+    const name = 'A9IOP'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains a valid cell reference works', () => {
+    const name = '___C42___'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that ends with a valid cell reference works', () => {
+    const name = '___C42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains an underscore works', () => {
+    const name = 'HF2_2'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that contains a dot character works', () => {
+    const name = 'EXPR.2'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name starts with an underscore works', () => {
+    const name = '___'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name consisting of a underscore nad many dots works', () => {
+    const name = '_.......'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name with unicode characters works', () => {
+    const name = 'ąęļćłó'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('a one-character name works', () => {
+    const name = 'A'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('a 1000-character name works', () => {
+    const name = 'A'.repeat(1000)
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).not.toThrowError()
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(42)
+  })
+
+  it('name that starts with a digit does not work', () => {
+    const name = '1definitelyIncorrectName'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that starts with a dot character does not work', () => {
+    const name = '.EXPR'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that contains a single quote character does not work', () => {
+    const name = "NAMED'EXPR"
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that contains an exclamation mark does not work', () => {
+    const name = 'NAMED!EXPR'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a valid cell reference does not work', () => {
+    const name = 'D42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a valid cell reference with 4-letter column address does not work', () => {
+    const name = 'ABCD42'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]], { maxColumns: 500000 })
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a valid R1C1-style reference does not work', () => {
+    const name = 'R5C17'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a R1C1-style reference with empty row number does not work', () => {
+    const name = 'RC17'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqual(null) // not error bc it is treated as a regular cell ref
+  })
+
+  it('name that is a R1C1-style reference with empty column number does not work', () => {
+    const name = 'R5C'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('name that is a R1C1-style reference with empty row and column numbers does not work', () => {
+    const name = 'RC'
+    const engine = HyperFormula.buildFromArray([[`=${name}`]])
+
+    expect(() => engine.addNamedExpression(name, '=42')).toThrowError(/Name .* is invalid/)
+    expect(engine.getCellValue(adr('A1', 0))).toEqualError(detailedError(ErrorType.ERROR, 'Parsing error.'))
+  })
+
+  it('validates characters which are allowed in name', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(() => engine.addNamedExpression('1CantStartWithNumber', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('Spaces Are Not Allowed', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('.CantStartWithDot', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('_CanStartWithUnderscore', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('dots.are.fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('underscores_are_fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('A100.Reference_Like_Substrings_In_The_Beginning_Are_Also_Fine', '=42')).not.toThrowError()
+    expect(() => engine.addNamedExpression('A100', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('$A$50', '=42')).toThrowError(/Name .* is invalid/)
+    expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
   })
 })
 
@@ -238,14 +444,6 @@ describe('Named expressions - store manipulation', () => {
     }).toThrowError('Name of Named Expression \'myName\' is already present')
   })
 
-  it('named expressions is validated when added', () => {
-    const engine = HyperFormula.buildEmpty()
-
-    expect(() => {
-      engine.addNamedExpression('1definitelyIncorrectName', '=42')
-    }).toThrowError('Name of Named Expression \'1definitelyIncorrectName\' is invalid')
-  })
-
   it('when adding named expression, matrix formulas are not accepted', () => {
     const engine = HyperFormula.buildEmpty()
 
@@ -395,22 +593,6 @@ describe('Named expressions - store manipulation', () => {
     }).not.toThrowError()
   })
 
-  it('validates characters which are allowed in name', () => {
-    const engine = HyperFormula.buildEmpty()
-
-    expect(() => engine.addNamedExpression('1CantStartWithNumber', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('Spaces Are Not Allowed', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('.CantStartWithDot', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('_CanStartWithUnderscore', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('dots.are.fine', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('underscores_are_fine', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('ś.zażółć.gęślą.jaźń.unicode.is.fine', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('If.It.Only.Has.Something.Like.Reference.Not.In.Beginning.Then.Its.Ok.A100', '=42')).not.toThrowError()
-    expect(() => engine.addNamedExpression('A100', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('$A$50', '=42')).toThrowError(/Name .* is invalid/)
-    expect(() => engine.addNamedExpression('SheetName!$A$50', '=42')).toThrowError(/Name .* is invalid/)
-  })
-
   it('#getNamedExpressionFormula when it exists', () => {
     const engine = HyperFormula.buildFromArray([])
 
@@ -466,6 +648,9 @@ describe('Named expressions - store manipulation', () => {
   })
 })
 
+/**
+ * A mock object for testing the dependency graph for the existence of the named expression vertex.
+ */
 const namedExpressionVertex = (engine: HyperFormula, expressionName: string, sheetId?: number): Vertex => {
   let namedExpression
   if (sheetId === undefined) {
@@ -510,7 +695,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.setCellContents(adr('A1'), '=FOO+10')
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(52)
@@ -531,7 +716,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.addNamedExpression('FOO', '=42')
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(42)
@@ -554,7 +739,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.setCellContents(adr('A1'), null)
 
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)
+    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
   })
 
@@ -576,7 +761,7 @@ describe('Named expressions - evaluation', () => {
 
     engine.setCellContents(adr('A1'), '=FOO+10')
 
-    const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0)!
+    const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
     const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.namedExpressionForScope('FOO')!.address)
     const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
     expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
@@ -753,8 +938,8 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
-    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
-    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0).vertex
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1).vertex
     const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
     expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
     expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
@@ -778,8 +963,8 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 0))).toBe(null)
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
-    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
-    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0).vertex
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1).vertex
     const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
     expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
     expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
@@ -803,8 +988,8 @@ describe('Named expressions - cross scope', () => {
     expect(engine.getCellValue(adr('B1', 0))).toEqual('foo')
     expect(engine.getCellValue(adr('B1', 1))).toEqual('bar')
     // ensure edges are correct
-    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0)
-    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1)
+    const sourceScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 0).vertex
+    const targetScopeNEVertex = engine.dependencyGraph.fetchNamedExpressionVertex('expr', 1).vertex
     const targetFormulaVertex = engine.dependencyGraph.getCell(adr('B1', 1))!
     expect(engine.dependencyGraph.existsEdge(sourceScopeNEVertex, targetFormulaVertex)).toBe(false)
     expect(engine.dependencyGraph.existsEdge(targetScopeNEVertex, targetFormulaVertex)).toBe(true)
@@ -830,10 +1015,13 @@ describe('Named expressions - named ranges', () => {
       ['3'],
     ])
 
-    engine.addNamedExpression('fooo', '=Sheet1!$A:Sheet1!$A')
-    engine.setCellContents(adr('B1'), [['=SUM(fooo)']])
+    engine.addNamedExpression('foo', '=Sheet1!$A:Sheet1!$A')
+    engine.addNamedExpression('bar', '=Sheet1!$A:$A')
+    engine.setCellContents(adr('B1'), [['=SUM(foo)']])
+    engine.setCellContents(adr('B2'), [['=SUM(bar)']])
 
     expect(engine.getCellValue(adr('B1'))).toEqual(4)
+    expect(engine.getCellValue(adr('B2'))).toEqual(4)
   })
 
   it('should recalculate when named range changes definition', () => {
@@ -873,6 +1061,27 @@ describe('Named expressions - options', () => {
       scope: undefined,
       options: undefined
     })
+  })
+
+  it('should return named expression with empty options - scope provided', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    engine.addNamedExpression('foo', '=foo', 0)
+
+    expect(engine.getNamedExpression('foo', 0)).toEqual({
+      name: 'foo',
+      expression: '=foo',
+      scope: 0,
+      options: undefined
+    })
+  })
+
+  it('should return undefined for non-existent named expression', () => {
+    const engine = HyperFormula.buildFromArray([[]])
+
+    engine.addNamedExpression('foo', '=foo')
+
+    expect(engine.getNamedExpression('foo-bar')).toEqual(undefined)
   })
 
   it('should return named expression with options', () => {
@@ -984,6 +1193,43 @@ describe('Named expressions - options', () => {
         comment: 'foo'
       }
     })
+  })
+})
+
+describe('Named expressions - actions at the Operations layer', () => {
+
+  let operations: Operations
+
+  beforeEach(() => {
+    const config = new Config()
+    const stats = new Statistics()
+    const namedExpressions = new NamedExpressions()
+    const functionRegistry = new FunctionRegistry(config)
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
+    const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
+    const sheetMapping = dependencyGraph.sheetMapping
+    const dateTimeHelper = new DateTimeHelper(config)
+    const numberLiteralHelper = new NumberLiteralHelper(config)
+    const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
+    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
+    operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
+  })
+
+  it('should throw an error if you try and change an unknown named expression', () => {
+    operations.addNamedExpression('foo', 'foo')
+    const unknownNamedExpression = 'bar'
+    expect(() => {
+      operations.changeNamedExpressionExpression(unknownNamedExpression, '=125')
+    }).toThrow(new NamedExpressionDoesNotExistError(unknownNamedExpression))
+  })
+
+  it('should throw an error if you try and change the expression to one that contains relative references', () => {
+    operations.addNamedExpression('foo', 'foo')
+    expect(() => {
+      operations.changeNamedExpressionExpression('foo', '=A2')
+    }).toThrow(new NoRelativeAddressesAllowedError())
   })
 })
 

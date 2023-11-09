@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2021 Handsoncode. All rights reserved.
+ * Copyright (c) 2023 Handsoncode. All rights reserved.
  */
 
 import {CellError, ErrorType} from '../../Cell'
@@ -8,20 +8,20 @@ import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
-import {ArgumentTypes, FunctionPlugin, FunctionPluginTypecheck} from './FunctionPlugin'
+import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class CodePlugin extends FunctionPlugin implements FunctionPluginTypecheck<CodePlugin> {
-  public static implementedFunctions = {
+  public static implementedFunctions: ImplementedFunctions = {
     'CODE': {
       method: 'code',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
     'UNICODE': {
       method: 'unicode',
       parameters: [
-        {argumentType: ArgumentTypes.STRING}
+        {argumentType: FunctionArgumentType.STRING}
       ]
     },
   }

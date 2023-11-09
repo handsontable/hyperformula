@@ -16,6 +16,20 @@ describe('string comparison', () => {
     expect(engine.getCellValue(adr('C4'))).toBe(false)
   })
 
+  it('works with localeLang = "en-US"', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['a', 'A', '=A1>B1'],
+      ['aa', 'AA', '=A2>B2'],
+      ['aA', 'aa', '=A3>B3'],
+      ['Aa', 'aa', '=A4>B4'],
+    ], { localeLang: 'en-US' })
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('C2'))).toBe(false)
+    expect(engine.getCellValue(adr('C3'))).toBe(false)
+    expect(engine.getCellValue(adr('C4'))).toBe(false)
+  })
+
   it('accents default', () => {
     const engine = HyperFormula.buildFromArray([
       ['a', 'ä', '=A1>B1'],
