@@ -1,10 +1,10 @@
 # Volatile functions
 
-If you work with spreadsheet software regularly then you've probably
+If you work with spreadsheet software regularly, then you've probably
 heard about Volatile Functions. They are distinctive because they
-affect the way the calculation engine works. **Every cell that is
+affect the way the calculation engine works. **Every cell
 dependent on a volatile function is recalculated upon every worksheet
-change triggered by the operations listed further below
+change triggered by the operations listed below
 (volatile actions).**
 
 HyperFormula uses a dependency tree to keep track of all related
@@ -12,20 +12,18 @@ cells and ranges of cells. On top of that, it constructs a
 calculation chain which determines the order in which the recalculation
 process should be done.
 
-Normally only cells that are marked as "dirty" are calculated
+Usually, only cells marked as "dirty" are calculated
 selectively. However, this is not the case when a volatile function
 exists somewhere within the workbook. Volatile functions are always
-treated as "dirty" so they are recalculated whenever a certain
-action is triggered.
+treated as "dirty" and recalculated on most actions.
 
 Depending on how many cells are dependent directly or indirectly on
-the volatile function, it may have an impact on the performance of
-the engine. Use them with caution, especially in large workbooks.
+the volatile function, it may impact the engine's performance. Use them with caution, especially in large workbooks.
 
 ## Volatile functions
 
 Volatile functions are recalculated on every volatile action, regardless of the arguments passed in the function call.
-Functions that depend on the structure of the sheet act as if they were volatile but only on operations on the sheet structure such as adding or removing rows or columns.
+Functions that depend on the structure of the sheet act as if they were volatile but only on operations on the sheet structure, such as adding or removing rows or columns.
 
 #### Built-in volatile functions:
  - RAND
@@ -75,18 +73,16 @@ These actions trigger the recalculation process of volatile functions:
 ## Tweaking performance
 
 The extensive use of volatile functions may cause a performance drop.
-To reduce the negative effect you can try
+To reduce the negative effect, you can try
 [batching these operations](batch-operations.md).
 
 ## Volatile custom functions
 
-There is a way to designate a custom function as being volatile.
-To do so, when you implement your own function you need to define it as
-volatile:
+There is a way to mark a custom function as volatile:
 
 ```javascript
 // this is an example of how the RAND function is implemented
-// you can do the same with your own custom function
+// you can do the same with a custom function
   'RAND': {
       method: 'rand',
       isVolatile: true,
