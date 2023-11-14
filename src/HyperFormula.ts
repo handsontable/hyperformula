@@ -68,7 +68,7 @@ import {Statistics, StatType} from './statistics'
 
 /**
  * This is a class for creating HyperFormula instance, all the following public methods
- * ale related to this class.
+ * are related to this class.
  *
  * The instance can be created only by calling one of the static methods
  * `buildFromArray`, `buildFromSheets` or `buildEmpty` and should be disposed of with the
