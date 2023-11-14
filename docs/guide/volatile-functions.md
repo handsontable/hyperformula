@@ -24,16 +24,21 @@ the engine. Use them with caution, especially in large workbooks.
 
 ## Volatile functions
 
-HyperFormula supports the RAND function, which is always volatile. This means it triggers the recalculation of the cells across the entire calculation chain, regardless of the arguments passed in the formula. There are two other functions: COLUMNS and ROWS. They are usually non-volatile, unless you perform an action on columns or rows like adding or removing them. In such cases, they behave like volatile functions.
+Volatile functions are recalculated on every volatile action, regardless of the arguments passed in the function call.
+Functions that depend on the structure of the sheet act as if they were volatile but only on operations on the sheet structure such as adding or removing rows or columns.
 
-The table below presents a list of volatile functions supported by HyperFormula that might be volatile:
+#### Built-in volatile functions:
+ - RAND
+ - RANDBETWEEN
+ - NOW
+ - TODAY
 
-| Function ID | Description |
-| :--- | :--- |
-| RAND | Returns a random number between 0 and 1. Always volatile. |
-| RANDBETWEEN | Returns a random integer between two numbers. Always volatile. |
-| COLUMNS | Returns the number of columns in the given reference. |
-| ROWS | Returns the number of rows in the given reference. |
+#### Built-in functions that depend on the structure of the sheet:
+- COLUMN
+- ROW
+- COLUMNS
+- ROWS
+- FORMULATEXT
 
 See the complete [list of functions](built-in-functions.md) available.
 
@@ -41,31 +46,31 @@ See the complete [list of functions](built-in-functions.md) available.
 
 These actions trigger the recalculation process of volatile functions:
 
-| Description | Related method |
-| :--- | :--- |
-| Recalculate on demand | `rebuildAndRecalculate` |
-| Resume an automatic recalculation mode | `resumeEvaluation` |
-| Batch operations | `batch` |
-| Modify cell content | `setCellContents` |
-| Modify sheet content | `setSheetContent` |
-| Clear sheet content | `clearSheet` |
-| Insert a row | `addRows` |
-| Remove a row | `removeRows` |
-| Insert a column | `addColumns` |
-| Remove a column | `removeColumns` |
-| Move a cell | `moveCells` |
-| Move a row | `moveRows` |
-| Move a column | `moveColumns` |
-| Add a defined name | `addNamedExpression` |
-| Modify a defined name | `changeNamedExpression` |
-| Remove a defined name | `removeNamedExpression` |
-| Add a sheet | `addSheet` |
-| Remove a sheet | `removeSheet` |
-| Rename a sheet | `renameSheet` |
-| Undo | `undo` |
-| Redo | `redo` |
-| Cut | `cut` |
-| Paste | `paste` |
+| Description                            | Related method          |
+|:---------------------------------------|:------------------------|
+| Recalculate on demand                  | `rebuildAndRecalculate` |
+| Resume an automatic recalculation mode | `resumeEvaluation`      |
+| Batch operations                       | `batch`                 |
+| Modify cell content                    | `setCellContents`       |
+| Modify sheet content                   | `setSheetContent`       |
+| Clear sheet content                    | `clearSheet`            |
+| Insert a row                           | `addRows`               |
+| Remove a row                           | `removeRows`            |
+| Insert a column                        | `addColumns`            |
+| Remove a column                        | `removeColumns`         |
+| Move a cell                            | `moveCells`             |
+| Move a row                             | `moveRows`              |
+| Move a column                          | `moveColumns`           |
+| Add a defined name                     | `addNamedExpression`    |
+| Modify a defined name                  | `changeNamedExpression` |
+| Remove a defined name                  | `removeNamedExpression` |
+| Add a sheet                            | `addSheet`              |
+| Remove a sheet                         | `removeSheet`           |
+| Rename a sheet                         | `renameSheet`           |
+| Undo                                   | `undo`                  |
+| Redo                                   | `redo`                  |
+| Cut                                    | `cut`                   |
+| Paste                                  | `paste`                 |
 
 ## Tweaking performance
 
@@ -90,4 +95,3 @@ volatile:
 
 You can find more information about creating custom functions in
 [this section](custom-functions).
-
