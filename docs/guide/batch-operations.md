@@ -8,16 +8,16 @@ especially when your app requires doing a large number of operations.
 
 ::: tip
 It's not possible to include read operations in a batch.
-Methods such as [getCellValue](../api/classes/hyperformula.md#getcellvalue), [getSheetSerialized](../api/classes/hyperformula.md#getsheetserialized) or [getFillRangeData](../api/classes/hyperformula.md#getfillrangedata) will result in error when called inside a batch callback or when the evaluation is suspended.
+Methods such as [getCellValue](../api/classes/hyperformula.md#getcellvalue), [getSheetSerialized](../api/classes/hyperformula.md#getsheetserialized) or [getFillRangeData](../api/classes/hyperformula.md#getfillrangedata) will result in error when called inside a [batch callback](#using-the-batch-method) or when the evaluation is [suspended](#using-the-suspendevaluation-and-resumeevaluation-methods).
 
 Note: [paste](../api/classes/hyperformula.md#paste) method also cannot be called when batching as it reads the contents of the copied cells.
 :::
 
 ## How to batch
 
-### Using the `batch` method
+### Using the [batch](../api/classes/hyperformula.md#batch) method
 
-You can use the `batch` method to batch operations. This method accepts
+You can use the [batch](../api/classes/hyperformula.md#batch) method to batch operations. This method accepts
 just one parameter: a callback function that stacks the selected
 operations into one. It performs the cumulative operation at the end.
 
@@ -41,7 +41,7 @@ const changes = hfInstance.batch(() => {
 });
 ```
 
-### Using the `suspendEvaluation` and `resumeEvaluation` methods
+### Using the [suspendEvaluation](../api/classes/hyperformula.md#suspendevaluation) and [resumeEvaluation](../api/classes/hyperformula.md#resumeevaluation) methods
 
 The same result can be achieved by suspending and resuming the
 evaluation.
@@ -69,15 +69,15 @@ hfInstance.setSheetContent(1, [['50'], ['60']]);
 const changes = hfInstance.resumeEvaluation();
 ```
 
-You can resume the evaluation by calling the `resumeEvaluation` method
-which triggers the recalculation. Just like in the case of the `batch`
+You can resume the evaluation by calling the [resumeEvaluation](../api/classes/hyperformula.md#resumeevaluation) method
+which triggers the recalculation. Just like in the case of the [batch](../api/classes/hyperformula.md#batch)
 method, it returns a list of cells which values changed after the
 operation, together with their absolute addresses, and new values.
 
-### Adjusting need with the `isEvaluationSuspended` method
+### Checking the evaluation suspension state
 
 When you need to check if the evaluation is suspended you can
-call the `isEvaluationSuspended` method.
+call the [isEvaluationSuspended](../api/classes/hyperformula.md#isevaluationsuspended) method.
 
 ```javascript
 const hfInstance = HyperFormula.buildEmpty();
@@ -95,9 +95,9 @@ hfInstance.resumeEvaluation();
 
 ## When to batch
 
-You can use `batch` anytime you want to stack several operations into
+You can batch operations anytime you want to stack several actions into
 one. However, if you want to see the most amazing benefits of this
-feature, use `batch` when there are a lot of heavy operations.
+feature, use batch operations when there are a lot of heavy methods.
 This will result in better performance. The best candidates to
 batch in this situation are the following methods:
 
