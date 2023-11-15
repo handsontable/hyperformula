@@ -3385,7 +3385,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Runs multiple operations and recomputes formulas at the end.
+   * Runs the provided callback as a single [batch operation](../../guide/batch-operations.md) and returns the changed cells.
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -3428,7 +3428,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Suspends the dependency graph recalculation.
+   * Suspends the dependency graph recalculation to start a [batch operation](../../guide/batch-operations.md).
    * It allows optimizing the performance.
    * With this method, multiple CRUD operations can be done without triggering recalculation after every operation.
    * Suspending evaluation should result in an overall faster calculation compared to recalculating after each operation separately.
@@ -3466,7 +3466,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Resumes the dependency graph recalculation that was suspended with [[suspendEvaluation]].
+   * Resumes the dependency graph recalculation that was [suspended](../../guide/batch-operations.md) with [[suspendEvaluation]].
    * It also triggers the recalculation and returns changes that are a result of all batched operations.
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -3504,7 +3504,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Checks if the dependency graph recalculation process is suspended or not.
+   * Checks if the dependency graph recalculation process is [suspended](../../guide/batch-operations.md) or not.
    *
    * @example
    * ```js
