@@ -1,11 +1,17 @@
 # Batch operations
 
 HyperFormula offers a built-in feature for doing batch operations.
-This allows you to put multiple CRUD and move operations into a
-single operation.
+It allows you to combine multiple data modification actions into a single operation.
 
 In some cases, batch operations can result in better performance,
 especially when your app requires doing a large number of operations.
+
+::: tip
+It's not possible to include read operations in a batch.
+Methods such as [`getCellContents`](../api/classes/hyperformula.md#getcellcontents), [`getSheetSerialized`](../api/classes/hyperformula.md#getsheetserialized) or [`getFillRangeData`](../api/classes/hyperformula.md#getfillrangedata) will result in error when called inside a batch callback or when the evaluation is suspended.
+
+Note: [`paste`](../api/classes/hyperformula.md#paste) method also cannot be called when batching as it reads the contents of the copied cells.
+:::
 
 ## How to batch
 
@@ -20,8 +26,8 @@ operation together with their absolute addresses and new values.
 
 ```javascript
 const hfInstance = HyperFormula.buildFromSheets({
- MySheet1: [ ['1'] ],
- MySheet2: [ ['10'] ],
+  MySheet1: [ ['1'] ],
+  MySheet2: [ ['10'] ],
 });
 
 // multiple operations in a single callback will trigger evaluation only once
@@ -30,9 +36,8 @@ const hfInstance = HyperFormula.buildFromSheets({
 const changes = hfInstance.batch(() => {
   hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
   hfInstance.setCellContents({ col: 4, row: 0, sheet: 0 }, [['=A1']]);
-
+  
   // and numerous others
-  ...
 });
 ```
 
@@ -49,8 +54,8 @@ operation together with their absolute addresses and new values.
 
 ```javascript
 const hfInstance = HyperFormula.buildFromSheets({
- MySheet1: [ ['1'] ],
- MySheet2: [ ['10'] ],
+  MySheet1: [ ['1'] ],
+  MySheet2: [ ['10'] ],
 });
 
 // suspend the evaluation
@@ -118,9 +123,9 @@ can be sent as a single one.
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.6.x/batch-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="handsontable/hyperformula-demos: batch-operations"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.6.x/batch-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: batch-operations"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>
