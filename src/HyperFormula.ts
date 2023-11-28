@@ -3426,7 +3426,7 @@ export class HyperFormula implements TypedEmitter {
    * Returns [an array of cells whose values changed as a result of all batched operations](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
-   **
+   *
    * @param {() => void} batchOperations - a function with operations to be performed
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
