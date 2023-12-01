@@ -8,7 +8,7 @@ import {SimpleCellAddress} from './Cell'
 import {Config} from './Config'
 import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {InterpreterState} from './interpreter/InterpreterState'
-import {FunctionArgumentType} from './interpreter/plugin/FunctionPlugin'
+import {FunctionArgumentType} from './interpreter'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
 export class ArraySize {
@@ -16,11 +16,7 @@ export class ArraySize {
     public width: number,
     public height: number,
     public isRef: boolean = false,
-  ) {
-    if (width <= 0 || height <= 0) {
-      throw Error('Incorrect array size')
-    }
-  }
+  ) {}
 
   public static fromArray<T>(array: T[][]): ArraySize {
     return new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
@@ -35,7 +31,7 @@ export class ArraySize {
   }
 
   isScalar(): boolean {
-    return (this.width <= 1 && this.height <= 1) || this.isRef
+    return (this.width === 1 && this.height === 1) || this.isRef
   }
 }
 
@@ -131,37 +127,53 @@ export class ArraySizePredictor {
   }
 
   private checkArraySizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
-    const metadata = this.functionRegistry.getMetadata(ast.procedureName)
     const pluginArraySizeFunction = this.functionRegistry.getArraySizeFunction(ast.procedureName)
+
     if (pluginArraySizeFunction !== undefined) {
       return pluginArraySizeFunction(ast, state)
     }
-    const subChecks = ast.args.map((arg) => this.checkArraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
-    if (metadata === undefined || metadata.expandRanges || !state.arraysFlag || metadata.vectorizationForbidden || metadata.parameters === undefined) {
+
+    const metadata = this.functionRegistry.getMetadata(ast.procedureName)
+
+    if (
+      metadata === undefined
+      || metadata.expandRanges
+      || !state.arraysFlag
+      || metadata.vectorizationForbidden
+      || metadata.parameters === undefined
+    ) {
       return new ArraySize(1, 1)
     }
+
+    const subChecks = ast.args.map((arg) => this.checkArraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
     const argumentDefinitions = [...metadata.parameters]
-    if (metadata.repeatLastArgs === undefined && argumentDefinitions.length < subChecks.length) {
-      return ArraySize.error()
-    }
-    if (metadata.repeatLastArgs !== undefined && argumentDefinitions.length < subChecks.length &&
-      (subChecks.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0) {
+
+    if (
+      metadata.repeatLastArgs !== undefined
+      && argumentDefinitions.length < subChecks.length
+      && (subChecks.length - argumentDefinitions.length) % metadata.repeatLastArgs !== 0
+    ) {
       return ArraySize.error()
     }
 
     while (argumentDefinitions.length < subChecks.length) {
-      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs!))
+      if (metadata.repeatLastArgs === undefined) {
+        return ArraySize.error()
+      }
+
+      argumentDefinitions.push(...argumentDefinitions.slice(argumentDefinitions.length - metadata.repeatLastArgs))
     }
 
     let maxWidth = 1
     let maxHeight = 1
+
     for (let i = 0; i < subChecks.length; i++) {
       if (argumentDefinitions[i].argumentType !== FunctionArgumentType.RANGE && argumentDefinitions[i].argumentType !== FunctionArgumentType.ANY) {
         maxHeight = Math.max(maxHeight, subChecks[i].height)
         maxWidth = Math.max(maxWidth, subChecks[i].width)
       }
     }
+
     return new ArraySize(maxWidth, maxHeight)
   }
 }
-
