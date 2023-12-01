@@ -563,6 +563,11 @@ export class Operations {
       } else {
         try {
           const size = this.arraySizePredictor.checkArraySize(ast, address)
+
+          if (size.width <= 0 || size.height <= 0) {
+            throw Error('Incorrect array size')
+          }
+
           this.setFormulaToCell(address, size, parserResult)
         } catch (error) {
 
