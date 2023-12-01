@@ -704,4 +704,45 @@ describe('Function MATCH', () => {
 
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA))
   })
+
+  describe('tmp', () => {
+    it('works with empty sheet - cell range', () => {
+      const hf = HyperFormula.buildFromSheets({
+        table1: [],
+        table2: [['=MATCH(0, table1!A1:A10)']],
+      })
+
+      expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('works with empty sheet - column range', () => {
+      const hf = HyperFormula.buildFromSheets({
+        table1: [[]],
+        table2: [['=MATCH(0, table1!A:A)']],
+      })
+
+      expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('works with empty sheet - row range', () => {
+      const hf = HyperFormula.buildFromSheets({
+        table1: [],
+        table2: [['=MATCH(0, table1!1:1)']],
+      })
+
+      expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('works in calculateFormula with empty sheet', () => {
+      const hf = HyperFormula.buildFromArray([])
+
+      expect(hf.calculateFormula('=MATCH(0, A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('works in calculateFormula with empty sheet 2', () => {
+      const hf = HyperFormula.buildFromArray([])
+
+      expect(hf.calculateFormula('=MATCH(0, Sheet1!A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
+    })
+  })
 })
