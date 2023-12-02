@@ -14,6 +14,16 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
+  it('validates number of arguments when array arithmetics is on', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(1)'],
+      ['=MATCH(1, B1:B3, 0, 42)'],
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+  })
+
   it('validates that 1st argument is number, string or boolean', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(C2:C3, B1:B1)'],
