@@ -16,11 +16,7 @@ export class ArraySize {
     public width: number,
     public height: number,
     public isRef: boolean = false,
-  ) {
-    if (width <= 0 || height <= 0) {
-      throw Error('Incorrect array size')
-    }
-  }
+  ) {}
 
   public static error() {
     return new ArraySize(1, 1, true)
