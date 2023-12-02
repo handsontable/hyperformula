@@ -135,4 +135,13 @@ describe('Function COUNTIF', () => {
 
     expect(engine.getCellValue(adr('A4'))).toEqual(2)
   })
+
+  it('works with a column range reference to an empty sheet', () => {
+    const hf = HyperFormula.buildFromSheets({
+      table1: [],
+      table2: [['=COUNTIF(table1!A:C, ">1")']],
+    })
+
+    expect(hf.getCellValue(adr('A1', 1))).toEqual(0)
+  })
 })
