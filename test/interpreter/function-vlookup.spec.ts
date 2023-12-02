@@ -840,4 +840,13 @@ describe('BinarySearchStrategy', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqual('1')
   })
+
+  it('works with a column range reference to an empty sheet', () => {
+    const hf = HyperFormula.buildFromSheets({
+      table1: [],
+      table2: [['=VLOOKUP("42", table1!A:C, 1)']],
+    })
+
+    expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
+  })
 })
