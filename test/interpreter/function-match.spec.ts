@@ -705,8 +705,8 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA))
   })
 
-  describe('tmp', () => {
-    it('works with empty sheet - cell range', () => {
+  describe('works with a range reference to an empty sheet', () => {
+    it('- cell range', () => {
       const hf = HyperFormula.buildFromSheets({
         table1: [],
         table2: [['=MATCH(0, table1!A1:A10)']],
@@ -715,7 +715,7 @@ describe('Function MATCH', () => {
       expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
     })
 
-    it('works with empty sheet - column range', () => {
+    it('- column range', () => {
       const hf = HyperFormula.buildFromSheets({
         table1: [[]],
         table2: [['=MATCH(0, table1!A:A)']],
@@ -724,7 +724,7 @@ describe('Function MATCH', () => {
       expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
     })
 
-    it('works with empty sheet - row range', () => {
+    it('- row range', () => {
       const hf = HyperFormula.buildFromSheets({
         table1: [],
         table2: [['=MATCH(0, table1!1:1)']],
@@ -733,16 +733,16 @@ describe('Function MATCH', () => {
       expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
     })
 
-    it('works in calculateFormula with empty sheet', () => {
-      const hf = HyperFormula.buildFromArray([])
-
-      expect(hf.calculateFormula('=MATCH(0, A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
-    })
-
-    it('works in calculateFormula with empty sheet 2', () => {
+    it('- column range (called from calculateFormula)', () => {
       const hf = HyperFormula.buildFromArray([])
 
       expect(hf.calculateFormula('=MATCH(0, Sheet1!A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('- column range (called from calculateFormula without explicit sheet reference)', () => {
+      const hf = HyperFormula.buildFromArray([])
+
+      expect(hf.calculateFormula('=MATCH(0, A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
     })
   })
 })
