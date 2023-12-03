@@ -69,7 +69,7 @@ describe('Function SUBSTITUTE', () => {
     expect(engine.getCellValue(adr('A8'))).toEqual('foo.foo.foo.bar.')
   })
 
-  it('should accept regex special characters in the search string', () => {
+  it('should accept regexp special characters in the search string', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBSTITUTE("foo[bar", "[", "BAZ")'],
       ['=SUBSTITUTE("foo]bar", "]", "BAZ")'],
@@ -91,7 +91,7 @@ describe('Function SUBSTITUTE', () => {
     expect(engine.getCellValue(adr('A8'))).toEqual('fooBAZbar')
   })
 
-  it('should accept work with search strings that look like regexps', () => {
+  it('should work with search strings that look like regular expressions', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBSTITUTE("foo.*bar", ".*", "BAZ")'],
       ['=SUBSTITUTE("foo[a-z]+bar", "[a-z]+", "BAZ")'],
