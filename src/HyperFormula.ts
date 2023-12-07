@@ -2877,6 +2877,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
    *
+   * The returned array may also include named expression dependents. They are represented as cell references with sheet id `-1`.
+   *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
    * @throws [[ExpectedValueOfTypeError]] if address is not [[SimpleCellAddress]] or [[SimpleCellRange]]
@@ -2912,6 +2914,8 @@ export class HyperFormula implements TypedEmitter {
    * Returns all the in-neighbors in the [dependency graph](../../guide/dependency-graph.md) for a given cell address or range. In particular:
    * - If the argument is a single cell, `getCellPrecedents()` returns all cells and ranges contained in that cell's formula.
    * - If the argument is a range of cells, `getCellPrecedents()` returns some of the cell addresses and smaller ranges contained in that range (but not all of them). The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
+   *
+   * The returned array may also include named expression precedents. They are represented as cell references with sheet id `-1`.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
