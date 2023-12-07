@@ -107,7 +107,9 @@ export class HyperFormula implements TypedEmitter {
   public static releaseDate = process.env.HT_RELEASE_DATE as string
 
   /**
-   * Contains all available languages to use in registerLanguage.
+   * When using UMD build, this property contains all available languages to use in registerLanguage.
+   *
+   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
    *
    * @category Static Properties
    */
