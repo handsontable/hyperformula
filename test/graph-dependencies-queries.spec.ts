@@ -43,6 +43,28 @@ describe('address queries', () => {
       expect(engine.getCellDependents(adr('D1', dataSheetId))).toEqual([])
     })
 
+    it('should return only immediate reversed dependencies', () => {
+      const hfInstance = HyperFormula.buildFromArray([[ '1', '=A1', '=A1+B1', '=B1+C1' ]])
+
+      const dependents = hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0 })
+
+      expect(dependents).toEqual([
+        { sheet: 0, col: 1, row: 0 },
+        { sheet: 0, col: 2, row: 0 },
+      ])
+    })
+
+    it('should return named expressions dependents as cell references in sheet -1', () => {
+      const hfInstance = HyperFormula.buildFromArray([[ '1' ]])
+      hfInstance.addNamedExpression('foo', '=Sheet1!$A$1')
+
+      const dependents = hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0 })
+
+      expect(dependents).toEqual([
+        { sheet: -1, col: 0, row: 0 },
+      ])
+    })
+
     it('should throw error if address is a malformed SimpleCellAddress', () => {
       const engine = HyperFormula.buildFromArray([
         [1, 2, 3],
@@ -74,6 +96,28 @@ describe('address queries', () => {
 
       expect(engine.getCellPrecedents(simpleCellRange(adr('A1'), adr('B1')))).toEqual([adr('A1'), adr('B1')])
       expect(engine.getCellPrecedents(simpleCellRange(adr('A3'), adr('B3')))).toEqual([])
+    })
+
+    it('should return only immediate dependencies', () => {
+      const hfInstance = HyperFormula.buildFromArray([[ '1', '2', '=A1', '=B1+C1' ]])
+
+      const precedents = hfInstance.getCellPrecedents({ sheet: 0, col: 3, row: 0 })
+
+      expect(precedents).toEqual([
+        { sheet: 0, col: 1, row: 0 },
+        { sheet: 0, col: 2, row: 0 },
+      ])
+    })
+
+    it('should return named expressions dependencies as cell references in sheet -1', () => {
+      const hfInstance = HyperFormula.buildFromArray([[ '=foo' ]])
+      hfInstance.addNamedExpression('foo', '=42')
+
+      const dependents = hfInstance.getCellPrecedents({ sheet: 0, col: 0, row: 0 })
+
+      expect(dependents).toEqual([
+        { sheet: -1, col: 0, row: 0 },
+      ])
     })
 
     it('should throw error if address is a malformed SimpleCellAddress', () => {
