@@ -39,13 +39,24 @@ export interface BenchmarkResult {
   statistics: Stats,
 }
 
-export function benchmark(name: string, sheet: Sheet, expectedValues: ExpectedValue[], config: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
+// TODO: remove this function. It is a spacial case of benchmarkCruds
+export function benchmark(
+  name: string,
+  sheet: Sheet,
+  expectedValues: ExpectedValue[],
+  config: Partial<Config> = defaultConfig
+): Maybe<BenchmarkResult> {
   const runEngine = (engineConfig?: Partial<ConfigParams>) => HyperFormula.buildFromArray(sheet, engineConfig)
   return benchmarkBuild(name, runEngine, expectedValues, config)
 }
 
-export function benchmarkCruds(name: string, sheet: Sheet, cruds: (engine: HyperFormula) => void,
-                               expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
+export function benchmarkCruds(
+  name: string,
+  sheet: Sheet,
+  cruds: (engine: HyperFormula) => void,
+  expectedValues: ExpectedValue[],
+  userConfig: Partial<Config> = defaultConfig
+): Maybe<BenchmarkResult> {
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
