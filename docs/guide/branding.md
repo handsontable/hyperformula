@@ -28,5 +28,5 @@ brand materials available on this website are owned by Handsoncode.
 
 * [TMview](https://www.tmdn.org/tmview/#/tmview/detail/EM500000018141121)
 (European Trade Mark and Design Network)
-* [EUIPO](https://www.euipo.europa.eu/eSearch/#details/trademarks/018141121)
+* [EUIPO](https://euipo.europa.eu/eSearch/#details/trademarks/018141121)
 (European Union Intellectual Property Office)
