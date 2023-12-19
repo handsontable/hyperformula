@@ -71,7 +71,7 @@ const changes = hfInstance.resumeEvaluation();
 ```
 
 You can resume the evaluation by calling the [`resumeEvaluation`](../api/classes/hyperformula.md#resumeevaluation) method
-which triggers the recalculation. Just like in the case of the [batch](../api/classes/hyperformula.md#batch)
+which triggers the recalculation. Just like in the case of the [`batch`](../api/classes/hyperformula.md#batch)
 method, it returns a list of cells which values changed after the
 operation, together with their absolute addresses, and new values.
 
