@@ -18,7 +18,7 @@ Note: [paste](../api/classes/hyperformula.md#paste) method also cannot be called
 
 ### Using the [batch](../api/classes/hyperformula.md#batch) method
 
-You can use the [batch](../api/classes/hyperformula.md#batch) method to batch operations. This method accepts
+You can use the [`batch`](../api/classes/hyperformula.md#batch) method to batch operations. This method accepts
 just one parameter: a callback function that stacks the selected
 operations into one. It performs the cumulative operation at the end.
 
