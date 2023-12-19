@@ -27,7 +27,7 @@ follows:
 | Type                    | Custom name | Example expression        |
 |:------------------------|:------------|:--------------------------|
 | Named cell              | myCell      | =Sheet1!$A$1              |
-| Named range of cells    | myRange     | =Sheet1!$A$1:Sheet1!$D$10 |
+| Named range of cells    | myRange     | =Sheet1!$A$1:$D$10        |
 | Named constant (number) | myNumber    | =10                       |
 | Named constant (string) | myText      | ="One Small Step for Man" |
 | Named formula           | myFormula   | =SUM(Sheet1!$A$1:$D$10)   |
@@ -59,19 +59,19 @@ hfInstance.addNamedExpression('MyRevenue', '=Sheet2!$A$1+100', 1);
 
 For examples of valid and invalid expression names, see the following table:
 
-| Name         | Validity |
-| :----------- | :------- |
-| my Revenue   | Invalid  |
-| myRevenue    | Valid    |
-| quarter1     | Invalid  |
-| quarter_1    | Valid    |
-| 1stQuarter   | Invalid  |
+| Name        | Validity |
+|:------------|:---------|
+| my Revenue  | Invalid  |
+| myRevenue   | Valid    |
+| quarter1    | Invalid  |
+| quarter_1   | Valid    |
+| 1stQuarter  | Invalid  |
 | _1stQuarter | Valid    |
-| .NET         | Invalid  |
-| ASP.NET      | Valid    |
-| A1           | Invalid  |
-| $A$1         | Invalid  |
-| RC           | Invalid  |
+| .NET        | Invalid  |
+| ASP.NET     | Valid    |
+| A1          | Invalid  |
+| $A$1        | Invalid  |
+| RC          | Invalid  |
 
 ## Available methods
 

@@ -159,6 +159,10 @@ describe('i18n', () => {
     ).toThrow(new LanguageNotRegisteredError())
   })
 
+  it('`languages` static property should contain only default enGB language when using ES module', () => {
+    expect(Object.keys(HyperFormula.languages)).toEqual(['enGB'])
+  })
+
   describe('language "enUS"', () => {
     it('should be available', () => {
       HyperFormula.registerLanguage('enUS', enUS)
