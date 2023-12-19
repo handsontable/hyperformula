@@ -39,6 +39,76 @@ describe('Function SUBSTITUTE', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual('fofofofufo')
   })
 
+  it('should return the original text if there are not enough occurences of the search string', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBSTITUTE("foobar", "o", "BAZ", 3)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('foobar')
+  })
+
+  it('should accept "." character in the search string', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBSTITUTE("foo.bar", ".", "BAZ")'],
+      ['=SUBSTITUTE("foo.bar", "foo.", "BAZ")'],
+      ['=SUBSTITUTE("foo.bar", ".bar", "BAZ")'],
+      ['=SUBSTITUTE("foo.foo.foo.bar.", ".", "BAZ", 1)'],
+      ['=SUBSTITUTE("foo.foo.foo.bar.", ".", "BAZ", 2)'],
+      ['=SUBSTITUTE("foo.foo.foo.bar.", ".", "BAZ", 3)'],
+      ['=SUBSTITUTE("foo.foo.foo.bar.", ".", "BAZ", 4)'],
+      ['=SUBSTITUTE("foo.foo.foo.bar.", ".", "BAZ", 5)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A2'))).toEqual('BAZbar')
+    expect(engine.getCellValue(adr('A3'))).toEqual('fooBAZ')
+    expect(engine.getCellValue(adr('A4'))).toEqual('fooBAZfoo.foo.bar.')
+    expect(engine.getCellValue(adr('A5'))).toEqual('foo.fooBAZfoo.bar.')
+    expect(engine.getCellValue(adr('A6'))).toEqual('foo.foo.fooBAZbar.')
+    expect(engine.getCellValue(adr('A7'))).toEqual('foo.foo.foo.barBAZ')
+    expect(engine.getCellValue(adr('A8'))).toEqual('foo.foo.foo.bar.')
+  })
+
+  it('should accept regexp special characters in the search string', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBSTITUTE("foo[bar", "[", "BAZ")'],
+      ['=SUBSTITUTE("foo]bar", "]", "BAZ")'],
+      ['=SUBSTITUTE("foo-bar", "-", "BAZ")'],
+      ['=SUBSTITUTE("foo*bar", "*", "BAZ")'],
+      ['=SUBSTITUTE("foo+bar", "+", "BAZ")'],
+      ['=SUBSTITUTE("foo?bar", "?", "BAZ")'],
+      ['=SUBSTITUTE("foo^bar", "^", "BAZ")'],
+      ['=SUBSTITUTE("foo$bar", "$", "BAZ")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A2'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A3'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A4'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A5'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A6'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A7'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A8'))).toEqual('fooBAZbar')
+  })
+
+  it('should work with search strings that look like regular expressions', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUBSTITUTE("foo.*bar", ".*", "BAZ")'],
+      ['=SUBSTITUTE("foo[a-z]+bar", "[a-z]+", "BAZ")'],
+      ['=SUBSTITUTE("foo[^-]bar", "[^-]", "BAZ")'],
+      ['=SUBSTITUTE("foo[^*]bar", "[^*]", "BAZ")'],
+      ['=SUBSTITUTE("foo/.*/bar", "/.*/", "BAZ")'],
+      ['=SUBSTITUTE("foo\\sbar", "\\s", "BAZ")'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A2'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A3'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A4'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A5'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A6'))).toEqual('fooBAZbar')
+  })
+
   it('should coerce', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBSTITUTE("foobar", "o", TRUE(), 1)'],

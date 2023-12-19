@@ -120,6 +120,15 @@ describe('SUM', () => {
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
+  it('works with a column range reference to an empty sheet', () => {
+    const hf = HyperFormula.buildFromSheets({
+      table1: [],
+      table2: [['=SUM(table1!A:C)']],
+    })
+
+    expect(hf.getCellValue(adr('A1', 1))).toEqual(0)
+  })
+
   describe('works with reversed cell ranges', () => {
     it('simple case', () => {
       const engine = HyperFormula.buildFromArray([
