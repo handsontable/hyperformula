@@ -57,7 +57,7 @@ different cells in the workbook.
 
 ### Referring to named expressions
 
-This is a special case in HyperFormula. Upon creation you define the
+This is a special case in HyperFormula. Upon creation, you define the
 scope of the expression:
 
 ```javascript
@@ -166,18 +166,17 @@ In HyperFormula, a range is a reference to a group of at least two adjacent cell
 
 ### Range definition
 
-Range `<Cell address 1>:<Cell address 2>` is a reference to the smallest possible group of adjacent cells that includes:
+Range `<Cell address 1>:<Cell address 2>` is a reference to the smallest rectangular group of adjacent cells that includes:
 
 - The cell at `<Cell address 1>`
 - The cell at `<Cell address 2>`
-- If referencing across different sheets (so-called 3D reference): all cells on all sheets between `<Cell address 1>` and `<Cell address 2>`
 
 ### Range types
 
 HyperFormula features the following types of ranges:
 
 | Range type   | Description                         | Example                                       |
-| ------------ | ----------------------------------- | --------------------------------------------- |
+|--------------|-------------------------------------|-----------------------------------------------|
 | Cell range   | Has the shape of a finite rectangle | =A1:B2<br>or =A2:B1<br>or =B1:A2<br>or =B2:A1 |
 | Column range | Contains entire columns             | =A:B<br>or =B:A                               |
 | Row range    | Contains entire rows                | =1:2<br>or =2:1                               |
@@ -185,9 +184,9 @@ HyperFormula features the following types of ranges:
 ### Referencing ranges
 
 You can reference ranges:
-- Through relative references (=A1:B2)
-- Through absolute references (=A$1:$B$2)
-- Across different sheets (=Sheet1!A1:Sheet5!B2)<br>If you don't specify a sheet name for the second cell address, the sheet name of the first cell address is used: `=Sheet5!A1:B2` is equivalent to `=Sheet5!A1:Sheet5!B2`.
+- Through a relative reference, e.g. `=A1:B2`
+- Through an absolute reference, e.g. `=A$1:$B$2`
+- Through a reference with an explicit sheet address, e.g. `=Sheet5!A1:B2`
 
 ### Range restraints
 
@@ -228,7 +227,7 @@ used in a cell.
 Consider the following example:
 
 | Formula in C1 | Action          | Result in B1 |
-| :------------ | :-------------- | :----------- |
+|:--------------|:----------------|:-------------|
 | =A1+B1+20     | Delete column A | #REF!        |
 
 The #REF! error may also occur in other specific situations:

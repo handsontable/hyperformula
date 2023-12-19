@@ -27,7 +27,7 @@ follows:
 | Type                    | Custom name | Example expression        |
 |:------------------------|:------------|:--------------------------|
 | Named cell              | myCell      | =Sheet1!$A$1              |
-| Named range of cells    | myRange     | =Sheet1!$A$1:Sheet1!$D$10 |
+| Named range of cells    | myRange     | =Sheet1!$A$1:$D$10        |
 | Named constant (number) | myNumber    | =10                       |
 | Named constant (string) | myText      | ="One Small Step for Man" |
 | Named formula           | myFormula   | =SUM(Sheet1!$A$1:$D$10)   |
