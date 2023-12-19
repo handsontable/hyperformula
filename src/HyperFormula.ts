@@ -1048,6 +1048,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Undo the previous operation.
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
@@ -1077,6 +1079,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Re-do recently undone operation.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -1202,6 +1206,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Sets the content for a block of cells of a given coordinates.
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {SimpleCellAddress} topLeftCornerAddress - top left corner of block of cells
@@ -1237,6 +1243,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders rows of a sheet according to a source-target mapping.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -1327,6 +1335,8 @@ export class HyperFormula implements TypedEmitter {
    * Parameter `newRowOrder` should have a form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`.
    * This method might be used to [sort the rows of a sheet](../../guide/sorting-data.md).
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note: This method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
@@ -1402,6 +1412,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders columns of a sheet according to a source-target mapping.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -1487,6 +1499,8 @@ export class HyperFormula implements TypedEmitter {
    * Reorders columns of a sheet according to a permutation of 0-based indexes.
    * Parameter `newColumnOrder` should have a form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`.
    * This method might be used to [sort the columns of a sheet](../../guide/sorting-data.md).
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note: This method may trigger dependency graph recalculation.
    *
@@ -1596,6 +1610,8 @@ export class HyperFormula implements TypedEmitter {
    * Adds multiple rows into a specified position in a given sheet.
    * Does nothing if rows are outside effective sheet size.
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID in which rows will be added
@@ -1667,6 +1683,8 @@ export class HyperFormula implements TypedEmitter {
    * Removes multiple rows from a specified position in a given sheet.
    * Does nothing if rows are outside the effective sheet size.
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID from which rows will be removed
@@ -1735,6 +1753,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Adds multiple columns into a specified position in a given sheet.
    * Does nothing if the columns are outside the effective sheet size.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -1809,6 +1829,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Removes multiple columns from a specified position in a given sheet.
    * Does nothing if columns are outside the effective sheet size.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -1892,6 +1914,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Moves the content of a cell block from source to the target location.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -1984,6 +2008,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Moves a particular number of rows to a specified position in a given sheet.
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - a sheet number in which the operation will be performed
@@ -2063,6 +2089,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Moves a particular number of columns to a specified position in a given sheet.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -2186,6 +2214,8 @@ export class HyperFormula implements TypedEmitter {
    * When called after [[copy]] it pastes copied values and formulas into a cell block.
    * When called after [[cut]] it performs [[moveCells]] operation into the cell block.
    * Does nothing if the clipboard is empty.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -2581,6 +2611,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Removes a sheet
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID.
@@ -2653,6 +2685,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Clears the sheet content. Double-checks if the sheet exists.
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - sheet ID.
@@ -2723,6 +2757,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Replaces the sheet content with new values.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * @param {number} sheetId - sheet ID.
    * @param {RawCellContent[][]} values - array of new values
@@ -3393,6 +3429,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Runs multiple operations and recomputes formulas at the end.
    *
+   * Returns [an array of cells whose values changed as a result of all batched operations](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {() => void} batchOperations - a function with operations to be performed
@@ -3473,7 +3511,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Resumes the dependency graph recalculation that was suspended with [[suspendEvaluation]].
-   * It also triggers the recalculation and returns changes that are a result of all batched operations.
+   * It also triggers the recalculation and returns [an array of cells whose values changed as a result of all batched operations](/guide/basic-operations.md#changes-array).
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * @fires [[evaluationResumed]] after the recomputation of necessary values
@@ -3572,6 +3610,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Adds a specified named expression.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -3791,6 +3831,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Changes a given named expression to a specified formula.
    *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
    * Note that this method may trigger dependency graph recalculation.
    *
    * @param {string} expressionName - an expression name, case-insensitive.
@@ -3872,6 +3914,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Removes a named expression.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
@@ -4379,6 +4423,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Runs a recomputation starting from recently changed vertices.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
    *
    * Note that this method may trigger dependency graph recalculation.
    *
