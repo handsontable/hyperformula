@@ -8,7 +8,8 @@ especially when your app requires doing a large number of operations.
 
 ::: tip
 It's not possible to include read operations in a batch.
-Methods such as [getCellValue](../api/classes/hyperformula.md#getcellvalue), [getSheetSerialized](../api/classes/hyperformula.md#getsheetserialized) or [getFillRangeData](../api/classes/hyperformula.md#getfillrangedata) will result in error when called inside a [batch callback](#using-the-batch-method) or when the evaluation is [suspended](#using-the-suspendevaluation-and-resumeevaluation-methods).
+Methods such as [`getCellValue`](../api/classes/hyperformula.md#getcellvalue), [`getSheetSerialized`](../api/classes/hyperformula.md#getsheetserialized), or [`getFillRangeData`](../api/classes/hyperformula.md#getfillrangedata) will result in an error when called inside a [batch callback](#using-the-batch-method) or when the evaluation is [suspended](#using-the-suspendevaluation-and-resumeevaluation-methods).
+
 
 Note: [paste](../api/classes/hyperformula.md#paste) method also cannot be called when batching as it reads the contents of the copied cells.
 :::
