@@ -1,6 +1,6 @@
-# Integration with Vue 3
+# Integration with Vue
 
-The installation process for applications written in Vue 3 is the same
+The installation process for applications written in Vue is the same
 as in the case of pure JavaScript. You can check the
 [client-side installation](client-side-installation.md) section for
 more details.
