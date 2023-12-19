@@ -78,7 +78,7 @@ operation, together with their absolute addresses, and new values.
 ### Checking the evaluation suspension state
 
 When you need to check if the evaluation is suspended you can
-call the [isEvaluationSuspended](../api/classes/hyperformula.md#isevaluationsuspended) method.
+call the [`isEvaluationSuspended`](../api/classes/hyperformula.md#isevaluationsuspended) method.
 
 ```javascript
 const hfInstance = HyperFormula.buildEmpty();
