@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.6.1] - 2023-12-27
+
 ### Fixed
 
 - Fixed an issue where operation on ranges with incompatible sizes resulted in a runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
