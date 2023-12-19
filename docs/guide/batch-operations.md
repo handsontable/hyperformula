@@ -42,7 +42,7 @@ const changes = hfInstance.batch(() => {
 });
 ```
 
-### Using the [suspendEvaluation](../api/classes/hyperformula.md#suspendevaluation) and [resumeEvaluation](../api/classes/hyperformula.md#resumeevaluation) methods
+### Using the [`suspendEvaluation`](../api/classes/hyperformula.md#suspendevaluation) and [`resumeEvaluation`](../api/classes/hyperformula.md#resumeevaluation) methods
 
 The same result can be achieved by suspending and resuming the
 evaluation.
