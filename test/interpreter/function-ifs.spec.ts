@@ -15,6 +15,18 @@ describe('Function IFS', () => {
     expect(engine.getCellValue(adr('B3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
+  it('Should not work for wrong number of arguments when array arithmetic is on', () => {
+    const engine = HyperFormula.buildFromArray([
+      [10, '=IFS()'],
+      [20, '=IFS(A1>90)'],
+      [30, '=IFS(A1>90, "A", A1>80)'],
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('B3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+  })
+
   it('Nominal operation', () => {
     const engine = HyperFormula.buildFromArray([
       [11, '=IFS(A1>30, "A", A1>20, "B", A1>10, "C")'],

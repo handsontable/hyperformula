@@ -17,7 +17,7 @@ describe('Interpreter - function RANDBETWEEN', () => {
       arr[val] += 1
     }
     for (const val of arr) {
-      expect(val).toBeGreaterThan(0)
+      expect(val).toBeGreaterThan(0) // 10*9^100/10^100 ~= 0.0003 chance of failure if truly random
     }
   })
 

@@ -194,16 +194,58 @@ describe('Adding row - reevaluation', () => {
     expect(c1setCellValueSpy).toHaveBeenCalled()
   })
 
-  it('returns changed values', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['1'],
-      ['2', '=COUNTBLANK(A1:A2)'],
-    ])
+  describe('returns array of changes', () => {
+    it('not including a value cell that was shifted due to adding a row before it', () => {
+      const engine = HyperFormula.buildFromArray([['1'],])
 
-    const changes = engine.addRows(0, [1, 1])
+      const changes = engine.addRows(0, [0, 1])
+      expect(changes.length).toBe(0)
+    })
 
-    expect(changes.length).toBe(1)
-    expect(changes).toContainEqual(new ExportedCellChange(adr('B3'), 1))
+    it('not including a formula cell that was shifted due to adding a row before it, but its value is the same', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2],
+        ['=SUM(A1:B1)'],
+      ])
+
+      const changes = engine.addRows(0, [1, 1])
+      expect(changes.length).toBe(0)
+    })
+
+    it('not including a formula cell in which the cell references changed (due to the row shift), but its value is the same', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=SUM(A2:B2)'],
+        [1, 2],
+      ])
+
+      const changes = engine.addRows(0, [1, 1])
+      expect(changes.length).toBe(0)
+    })
+
+    it('including a formula cell that was re-evaluated to different result', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1'],
+        ['2', '=COUNTBLANK(A1:A2)'],
+      ])
+
+      const changes = engine.addRows(0, [1, 1])
+
+      expect(changes.length).toBe(1)
+      expect(changes).toContainEqual(new ExportedCellChange(adr('B3'), 1))
+    })
+
+    it('not including a formula cell that was re-evaluated to same result', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['1'],
+        ['2', '=ROWS(A1:A2)-COUNTBLANK(A1:A2)'],
+      ])
+
+      expect(engine.getCellValue(adr('B2'))).toBe(2)
+
+      const changes = engine.addRows(0, [1, 1])
+
+      expect(changes.length).toBe(0)
+    })
   })
 })
 

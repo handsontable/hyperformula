@@ -49,6 +49,10 @@ export class ArrayValue implements CellArray {
   constructor(array: InternalScalarValue[][]) {
     this.size = new ArraySize(array.length > 0 ? array[0].length : 0, array.length)
     this.array = array
+
+    if (this.size.width <= 0 || this.size.height <= 0) {
+      throw Error('Incorrect array size')
+    }
   }
 
   static fromInterpreterValue(value: InterpreterValue) {

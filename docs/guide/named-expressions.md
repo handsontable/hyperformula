@@ -27,7 +27,7 @@ follows:
 | Type                    | Custom name | Example expression        |
 |:------------------------|:------------|:--------------------------|
 | Named cell              | myCell      | =Sheet1!$A$1              |
-| Named range of cells    | myRange     | =Sheet1!$A$1:Sheet1!$D$10 |
+| Named range of cells    | myRange     | =Sheet1!$A$1:$D$10        |
 | Named constant (number) | myNumber    | =10                       |
 | Named constant (string) | myText      | ="One Small Step for Man" |
 | Named formula           | myFormula   | =SUM(Sheet1!$A$1:$D$10)   |
@@ -59,19 +59,19 @@ hfInstance.addNamedExpression('MyRevenue', '=Sheet2!$A$1+100', 1);
 
 For examples of valid and invalid expression names, see the following table:
 
-| Name         | Validity |
-| :----------- | :------- |
-| my Revenue   | Invalid  |
-| myRevenue    | Valid    |
-| quarter1     | Invalid  |
-| quarter_1    | Valid    |
-| 1stQuarter   | Invalid  |
+| Name        | Validity |
+|:------------|:---------|
+| my Revenue  | Invalid  |
+| myRevenue   | Valid    |
+| quarter1    | Invalid  |
+| quarter_1   | Valid    |
+| 1stQuarter  | Invalid  |
 | _1stQuarter | Valid    |
-| .NET         | Invalid  |
-| ASP.NET      | Valid    |
-| A1           | Invalid  |
-| $A$1         | Invalid  |
-| RC           | Invalid  |
+| .NET        | Invalid  |
+| ASP.NET     | Valid    |
+| A1          | Invalid  |
+| $A$1        | Invalid  |
+| RC          | Invalid  |
 
 ## Available methods
 
@@ -85,10 +85,8 @@ You can add a named expression by using the `addNamedExpression` method. It
 accepts name for the expression, the expression as a raw cell content, and
 optionally the scope. If you do not define the scope it will be set to global,
 meaning the expression name will be valid for the whole workbook. If you want to
-add many of them, it is advised to do so in a [batch](batch-operations.md). This
-method returns a list of cells whose values were affected by this operation,
-their absolute addresses, and new values. See the "changes" section in
-[basic operations](basic-operations) for more info.
+add many of them, it is advised to do so in a [batch](batch-operations.md).
+This method returns [an array of changed cells](basic-operations.md#changes-array).
 
 ```javascript
 // add 'prettyName' expression to the local scope of 'Sheet1' (sheetId = 0)
@@ -106,10 +104,8 @@ Select the name of an expression to change and pass it as the first parameter,
 then define the new expression as raw cell content and optionally add the scope.
 If you do not define the scope it will be set to global, meaning the expression
 will be valid for the whole workbook. If you want to change many of them, it is
-advised to do so in a [batch](batch-operations.md). This method returns a list
-of cells whose values were affected by this operation, their absolute addresses,
-and new values. See the "changes" section in
-[basic operations](basic-operations) for more info.
+advised to do so in a [batch](batch-operations.md).
+This method returns [an array of changed cells](basic-operations.md#changes-array).
 
 ```javascript
 // change the named expression
@@ -124,9 +120,8 @@ const changes = hfInstance.changeNamedExpression(
 You can remove a named expression by using the `removeNamedExpression` method.
 Select the name of an expression to remove and pass it as the first parameter
 and optionally define the scope. If you do not define the scope it will be
-understood as global, meaning, the whole workbook. This method returns a list of
-[cells whose values were affected by this operation](basic-operations.md#what-are-the-changes),
-their absolute addresses, and new values.
+understood as global, meaning, the whole workbook.
+This method returns [an array of changed cells](basic-operations.md#changes-array).
 
 ```javascript
 // remove 'prettyName' expression from 'Sheet1' (sheetId=0)
@@ -150,7 +145,7 @@ Operations on named expressions throw errors when something goes wrong. These
 errors can be [handled](basic-operations.md#handling-an-error) to provide a good
 user experience in the application. It is also possible to check the
 availability of operations using `isItPossibleTo*` methods, which are also
-described in [that section](basic-operations#isitpossibleto-methods).
+described in [that section](basic-operations.md#isitpossibleto-methods).
 
 ## Demo
 
