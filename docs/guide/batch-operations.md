@@ -16,7 +16,7 @@ Note: [paste](../api/classes/hyperformula.md#paste) method also cannot be called
 
 ## How to batch
 
-### Using the [batch](../api/classes/hyperformula.md#batch) method
+### Using the [`batch`](../api/classes/hyperformula.md#batch) method
 
 You can use the [`batch`](../api/classes/hyperformula.md#batch) method to batch operations. This method accepts
 just one parameter: a callback function that stacks the selected
