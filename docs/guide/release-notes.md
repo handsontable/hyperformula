@@ -12,12 +12,11 @@ HyperFormula adheres to
 
 ### Fixed
 
-- Fixed an issue where operation on ranges with incompatible sizes resulted in a runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
-- Fixed an issue where `simpleCellAddressFromString` method was crashing when called with a non-ASCII character in an unquoted sheet name. [#1312](https://github.com/handsontable/hyperformula/issues/1312)
-- Fixed a bug where adding a row to the very large spreadsheet resulted in `Maximum call stack size exceeded` error. [#1332](https://github.com/handsontable/hyperformula/issues/1332)
-- Fixed a typo in the JSDoc comment of the `HyperFormula` class. [#1323](https://github.com/handsontable/hyperformula/issues/1323)
-- Fixed the `Incorrect array size` error when using column range reference to an empty sheet as a function argument. [#1147](https://github.com/handsontable/hyperformula/issues/1147)
-- Fixed a bug where function SUBSTITUTE did not work correctly with regexp special characters. [#1289](https://github.com/handsontable/hyperformula/issues/1289)
+- Fixed an issue where operating on ranges of incompatible sizes resulted in a runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
+- Fixed an issue where the [`simpleCellAddressFromString()`](../api/classes/hyperformula.md#simplecelladdressfromstring) method was crashing when called with a non-ASCII character in an unquoted sheet name. [#1312](https://github.com/handsontable/hyperformula/issues/1312)
+- Fixed an issue where adding a row to a very large spreadsheet resulted in the `Maximum call stack size exceeded` error. [#1332](https://github.com/handsontable/hyperformula/issues/1332)
+- Fixed an issue where using a column-range reference to an empty sheet as a function argument resulted in the `Incorrect array size` error. [#1147](https://github.com/handsontable/hyperformula/issues/1147)
+- Fixed an issue where the SUBSTITUTE function wasn't working correctly with regex special characters. [#1289](https://github.com/handsontable/hyperformula/issues/1289)
 
 ## 2.6.0
 
