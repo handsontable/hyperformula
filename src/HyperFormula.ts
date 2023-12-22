@@ -107,9 +107,9 @@ export class HyperFormula implements TypedEmitter {
   public static releaseDate = process.env.HT_RELEASE_DATE as string
 
   /**
-   * When using UMD build, this property contains all available languages to use in [registerLanguage](#registerlanguage) method.
+   * When using the UMD build, this property contains all available languages to use with the [registerLanguage](#registerlanguage) method.
    *
-   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
+   * For more information, see the [Localizing functions](/guide/localizing-functions.md) guide.
    *
    * @category Static Properties
    */
@@ -2788,9 +2788,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Computes simple (absolute) address of a cell address based on its string representation.
-   * - If sheet name is present in the string representation but is not present in the engine, returns `undefined`.
-   * - If sheet name is not present in the string representation, returns `contextSheetId` as sheet number.
+   * Computes the simple (absolute) address of a cell address, based on its string representation.
+   * - If a sheet name is present in the string representation but is not present in the engine, returns `undefined`.
+   * - If a sheet name is not present in the string representation, returns `contextSheetId` as sheet number.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} contextSheetId - context used in case of missing sheet in the first argument
@@ -2915,7 +2915,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
    *
-   * The returned array includes also named expression dependents. They are represented as cell references with sheet id `-1`.
+   * The returned array includes also named expression dependents. They are represented as cell references with sheet ID `-1`.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
@@ -2953,7 +2953,7 @@ export class HyperFormula implements TypedEmitter {
    * - If the argument is a single cell, `getCellPrecedents()` returns all cells and ranges contained in that cell's formula.
    * - If the argument is a range of cells, `getCellPrecedents()` returns some of the cell addresses and smaller ranges contained in that range (but not all of them). The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
    *
-   * The returned array includes also named expression precedents. They are represented as cell references with sheet id `-1`.
+   * The returned array includes also named expression precedents. They are represented as cell references with sheet ID `-1`.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
