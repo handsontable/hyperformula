@@ -1,7 +1,7 @@
 # Named expressions
 
 An expression can be assigned a human-friendly name. Thanks to this you can
-refer to that name anywhere across the workbook. Names are especially useful
+reference that name anywhere across the workbook. Names are especially useful
 when you use some references repeatedly. In this case, names simplify the
 formulas and reduce the risk of making a mistake. Such a worksheet is also
 easier to maintain.
@@ -16,7 +16,7 @@ moment.
 
 Dynamic ranges are supported through functions such as INDEX and OFFSET.
 
-Named ranges can overlap each other, e.g. it is possible to define the names as
+Named ranges can overlap each other, e.g., it is possible to define the names as
 follows:
 
 - rangeOne: Sheet1!$A$1:$D$10

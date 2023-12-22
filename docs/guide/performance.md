@@ -48,7 +48,7 @@ between cells in the sheet, we recalculate only the cells affected
 by the update.
 
 Sometimes, a simple change can cause recalculation of a large part
-of the sheet, e.g. when the modified cell is at the very beginning
+of the sheet, e.g., when the modified cell is at the very beginning
 of the dependency chain or when there are many
 [volatile functions](volatile-functions.md) in the worksheet.
 In such a case you may want to postpone the recalculation.

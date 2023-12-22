@@ -1,6 +1,6 @@
 # Cell references
 
-A formula can refer to one or more cells and automatically update its
+A formula can reference one or more cells and automatically update its
 contents whenever any of the referenced cells change. The values from
 other cells can be obtained using A1 notation which is a flexible
 way of pointing at different sources of data for the formulas.
@@ -185,9 +185,9 @@ HyperFormula features the following types of ranges:
 ### Referencing ranges
 
 You can reference ranges:
-- Through a relative reference, e.g. `=A1:B2`
-- Through an absolute reference, e.g. `=A$1:$B$2`
-- Through a reference with an explicit sheet address, e.g. `=Sheet5!A1:B2`
+- Through a relative reference, e.g., `=A1:B2`
+- Through an absolute reference, e.g., `=A$1:$B$2`
+- Through a reference with an explicit sheet address, e.g., `=Sheet5!A1:B2`
 
 ### Range restraints
 
@@ -209,7 +209,7 @@ In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat sing
 
 Since HyperFormula does not embed any UI, it allows for the input of a circular reference into a cell. Compared to popular spreadsheets,
 HyperFormula does not force any specific interaction with the user
-(i.e. displaying a warning ) when circular reference happens.
+(i.e., displaying a warning ) when circular reference happens.
 
 When circular reference happens, HyperFormula returns #CYCLE as
 the value of the cell where the circular reference occurred. After

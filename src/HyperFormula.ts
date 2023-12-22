@@ -158,7 +158,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `graph` method on the dependency graph.
-   * Allows for executing `graph` directly, without a need to refer to `dependencyGraph`.
+   * Allows for executing `graph` directly, without a need to reference `dependencyGraph`.
    *
    * @internal
    */
@@ -168,7 +168,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `rangeMapping` method on the dependency graph.
-   * Allows for executing `rangeMapping` directly, without a need to refer to `dependencyGraph`.
+   * Allows for executing `rangeMapping` directly, without a need to reference `dependencyGraph`.
    *
    * @internal
    */
@@ -178,7 +178,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `arrayMapping` method on the dependency graph.
-   * Allows for executing `arrayMapping` directly, without a need to refer to `dependencyGraph`.
+   * Allows for executing `arrayMapping` directly, without a need to reference `dependencyGraph`.
    *
    * @internal
    */
@@ -188,7 +188,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `sheetMapping` method on the dependency graph.
-   * Allows for executing `sheetMapping` directly, without a need to refer to `dependencyGraph`.
+   * Allows for executing `sheetMapping` directly, without a need to reference `dependencyGraph`.
    *
    * @internal
    */
@@ -198,7 +198,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `addressMapping` method on the dependency graph.
-   * Allows for executing `addressMapping` directly, without a need to refer to `dependencyGraph`.
+   * Allows for executing `addressMapping` directly, without a need to reference `dependencyGraph`.
    *
    * @internal
    */
@@ -482,7 +482,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note: This method does not affect the existing HyperFormula instances.
    *
-   * @param {string} functionId - function id, e.g. 'SUMIF'
+   * @param {string} functionId - function id, e.g., 'SUMIF'
    * @param {FunctionPluginDefinition} plugin - plugin class
    * @param {FunctionTranslationsPackage} translations - translations for the function name
    *
@@ -511,7 +511,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note: This method does not affect the existing HyperFormula instances.
    *
-   * @param {string} functionId - function id, e.g. 'SUMIF'
+   * @param {string} functionId - function id, e.g., 'SUMIF'
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
@@ -575,7 +575,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns class of a plugin used by function with given id
    *
-   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   * @param {string} functionId - id of a function, e.g., 'SUMIF'
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
@@ -978,8 +978,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
-   * @throws [[ExpectedValueOfTypeError]] when some parameters of config are of wrong type (e.g. currencySymbol)
-   * @throws [[ConfigValueEmpty]] when some parameters of config are of invalid value (e.g. currencySymbol)
+   * @throws [[ExpectedValueOfTypeError]] when some parameters of config are of wrong type (e.g., currencySymbol)
+   * @throws [[ConfigValueEmpty]] when some parameters of config are of invalid value (e.g., currencySymbol)
    *
    * @example
    * ```js
@@ -4033,12 +4033,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Parses and then unparses a formula.
-   * Returns a normalized formula (e.g. restores the original capitalization of sheet names, function names, cell addresses, and named expressions).
+   * Returns a normalized formula (e.g., restores the original capitalization of sheet names, function names, cell addresses, and named expressions).
    *
    * @param {string} formulaString - a formula in a proper format - it must start with "="
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e. does not start with "="
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e., does not start with "="
    *
    * @example
    * ```js
@@ -4072,7 +4072,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - The ID of a sheet in context of which the formula gets evaluated.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
-   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e. doesn't start with `=`).
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e., doesn't start with `=`).
    * @throws [[NoSheetWithIdError]] when the provided `sheetID` doesn't exist.
    *
    * @example
@@ -4158,7 +4158,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns class of a plugin used by function with given id
    *
-   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   * @param {string} functionId - id of a function, e.g., 'SUMIF'
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *

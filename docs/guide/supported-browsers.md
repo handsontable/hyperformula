@@ -19,7 +19,7 @@ users: performance and accuracy of calculations.
 
 ## Full ICU support
 
-Browsers that do not support full-icu (e.g. UC Browser mobile) will
+Browsers that do not support full-icu (e.g., UC Browser mobile) will
 not handle the comparison of accented strings properly. In
 these browsers, string comparison might give different results than
 in browsers that fully support the feature.

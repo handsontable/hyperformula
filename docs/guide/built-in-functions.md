@@ -157,7 +157,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | ISNUMBER    | Returns TRUE if the value refers to a number.                                                                  | ISNUMBER(Value)  |
 | ISODD       | Returns TRUE if the value is odd, or FALSE if the number is even.                                              | ISODD(Value)     |
 | ISREF       | Returns TRUE if provided value is #REF! error.                                                                 | ISREF(Value)     |
-| ISTEXT      | Returns TRUE if the cell contents refer to text.                                                               | ISTEXT(Value)    |
+| ISTEXT      | Returns TRUE if the cell contents reference text.                                                               | ISTEXT(Value)    |
 | SHEET       | Returns sheet number of a given value or a formula sheet number if no argument is provided.                    | SHEET([Value])   |
 | SHEETS      | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value])  |
 | NA          | Returns #N/A! error value.                                                                                     | NA(Value)        |
