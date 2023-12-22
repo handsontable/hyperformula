@@ -31,7 +31,7 @@ operations such as calculating the number of days between two dates.
 
 ## Forcing the string value type
 
-Like most spreadsheet software, HyperFormula detects the type of the input value automatically.
+Like most spreadsheet software, HyperFormula automatically detects the type of an input value.
 
 But sometimes the value should be treated as a string even though it's parsable as a formula, number, date, time, datetime, boolean, currency or percentage.
 Typical examples are numeric values with no number semantics, such as ZIP codes, bank sort codes, social security numbers, etc.

@@ -408,7 +408,7 @@ export interface ConfigParams {
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    *
    * @example
-   * e.g., for `timeFormats = ['hh:mm:ss.sss']`, valid time strings include:
+   * E.g., for `timeFormats = ['hh:mm:ss.sss']`, valid time strings include:
    * - `1:33:33`
    * - `1:33:33.3`
    * - `1:33:33.33`

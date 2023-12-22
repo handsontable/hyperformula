@@ -57,9 +57,9 @@ different cells in the workbook.
 
 ### Referencing named expressions
 
-You can reference [named expressions](./named-expressions.md) by their assigned names. For example, if you name the expression `=SUM(100+10)` as `MySum`, you can then use `MySum` instead of the expression itself.
+You can reference [named expressions](./named-expressions.md) by their assigned names. For example, if you name the expression `=SUM(100+10)` as `MySum`, you can then reference that expression by `MySum`.
 
-Named expressions work within scopes. You define the scope when creating a named expression:
+A named expression works within a scope. You define the scope when creating a named expression:
 
 ```javascript
 // define for a local scope

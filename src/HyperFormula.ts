@@ -158,7 +158,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `graph` method on the dependency graph.
-   * Allows for executing `graph` directly, without a need to reference `dependencyGraph`.
+   * Allows for executing `graph` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -168,7 +168,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `rangeMapping` method on the dependency graph.
-   * Allows for executing `rangeMapping` directly, without a need to reference `dependencyGraph`.
+   * Allows for executing `rangeMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -178,7 +178,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `arrayMapping` method on the dependency graph.
-   * Allows for executing `arrayMapping` directly, without a need to reference `dependencyGraph`.
+   * Allows for executing `arrayMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -188,7 +188,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `sheetMapping` method on the dependency graph.
-   * Allows for executing `sheetMapping` directly, without a need to reference `dependencyGraph`.
+   * Allows for executing `sheetMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -198,7 +198,7 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Calls the `addressMapping` method on the dependency graph.
-   * Allows for executing `addressMapping` directly, without a need to reference `dependencyGraph`.
+   * Allows for executing `addressMapping` directly, without a need to refer to `dependencyGraph`.
    *
    * @internal
    */
@@ -2790,7 +2790,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Computes the simple (absolute) address of a cell address, based on its string representation.
    * - If a sheet name is present in the string representation but is not present in the engine, returns `undefined`.
-   * - If a sheet name is not present in the string representation, returns `contextSheetId` as sheet number.
+   * - If no sheet name is present in the string representation, returns `contextSheetId` as sheet number.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} contextSheetId - context used in case of missing sheet in the first argument

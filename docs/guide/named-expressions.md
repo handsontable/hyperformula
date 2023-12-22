@@ -1,7 +1,7 @@
 # Named expressions
 
 An expression can be assigned a human-friendly name. Thanks to this you can
-reference that name anywhere across the workbook. Names are especially useful
+refer to that name anywhere across the workbook. Names are especially useful
 when you use some references repeatedly. In this case, names simplify the
 formulas and reduce the risk of making a mistake. Such a worksheet is also
 easier to maintain.
