@@ -1,9 +1,8 @@
 # Integration with Vue
 
-The installation process for applications written in Vue is the same
-as in the case of pure JavaScript. You can check the
-[client-side installation](client-side-installation.md) section for
-more details.
+Installing HyperFormula in a Vue application works the same as with vanilla JavaScript.
+
+For more details, see the [client-side installation](client-side-installation.md) section.
 
 ## Demo
 
