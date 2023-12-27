@@ -132,13 +132,6 @@ module.exports = {
           alias: '/api/events',
           collapsable: true,
         },
-        {
-          title: 'Error Types',
-          collapsable: true,
-          children: fs.readdirSync(path.join(__dirname, '../api/classes'))
-            .filter((n) => n.match(/.*error\.md$/))
-            .map(f => `/api/classes/${f}`)
-        },
       ],
       '/': [
         {
