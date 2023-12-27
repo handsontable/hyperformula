@@ -1,8 +1,7 @@
 # Types of values
 
-In HyperFormula, values can reference Numbers, Text, Logical, Date, Time, DateTime, Error, or Duration data.
-The type of the value depends on the data that the value is referencing.
-Functions may work differently based on the types of values.
+In HyperFormula, values can be of type Number, Text, Logical, Date, Time, DateTime, Error, Duration, Currency, or Percentage depending on the data.
+Functions may work differently based on the types of arguments.
 
 | Type of value              | Description                                                                                                                                                                                                      |
 |:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
