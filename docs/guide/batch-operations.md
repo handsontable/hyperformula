@@ -6,14 +6,6 @@ It allows you to combine multiple data modification actions into a single operat
 In some cases, batch operations can result in better performance,
 especially when your app requires doing a large number of operations.
 
-::: tip
-It's not possible to include read operations in a batch.
-Methods such as [`getCellValue`](../api/classes/hyperformula.md#getcellvalue), [`getSheetSerialized`](../api/classes/hyperformula.md#getsheetserialized), or [`getFillRangeData`](../api/classes/hyperformula.md#getfillrangedata) will result in an error when called inside a [batch callback](#using-the-batch-method) or when the evaluation is [suspended](#using-the-suspendevaluation-and-resumeevaluation-methods).
-
-
-Note: [paste](../api/classes/hyperformula.md#paste) method also cannot be called when batching as it reads the contents of the copied cells.
-:::
-
 ## How to batch
 
 ### Using the [`batch`](../api/classes/hyperformula.md#batch) method
@@ -120,6 +112,14 @@ in faster calculation across the whole HyperFormula instance.
 Batching can also be useful when you decide to use HyperFormula
 on the [server-side](server-side-installation). Several operations
 can be sent as a single one.
+
+## What you can't batch
+
+You can't batch read operations.
+
+Methods such as [`getCellValue`](../api/classes/hyperformula.md#getcellvalue), [`getSheetSerialized`](../api/classes/hyperformula.md#getsheetserialized), or [`getFillRangeData`](../api/classes/hyperformula.md#getfillrangedata) will result in an error when called inside a [batch callback](#using-the-batch-method) or when the evaluation is [suspended](#using-the-suspendevaluation-and-resumeevaluation-methods).
+
+The [paste](../api/classes/hyperformula.md#paste) method also can't be called when batching as it reads the contents of the copied cells.
 
 ## Demo
 

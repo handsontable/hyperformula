@@ -107,9 +107,9 @@ export class HyperFormula implements TypedEmitter {
   public static releaseDate = process.env.HT_RELEASE_DATE as string
 
   /**
-   * When using UMD build, this property contains all available languages to use in [registerLanguage](#registerlanguage) method.
+   * When using the UMD build, this property contains all available languages to use with the [registerLanguage](#registerlanguage) method.
    *
-   * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
+   * For more information, see the [Localizing functions](/guide/localizing-functions.md) guide.
    *
    * @category Static Properties
    */
@@ -482,7 +482,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note: This method does not affect the existing HyperFormula instances.
    *
-   * @param {string} functionId - function id, e.g. 'SUMIF'
+   * @param {string} functionId - function id, e.g., 'SUMIF'
    * @param {FunctionPluginDefinition} plugin - plugin class
    * @param {FunctionTranslationsPackage} translations - translations for the function name
    *
@@ -511,7 +511,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * Note: This method does not affect the existing HyperFormula instances.
    *
-   * @param {string} functionId - function id, e.g. 'SUMIF'
+   * @param {string} functionId - function id, e.g., 'SUMIF'
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
@@ -575,7 +575,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns class of a plugin used by function with given id
    *
-   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   * @param {string} functionId - id of a function, e.g., 'SUMIF'
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
@@ -978,8 +978,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Partial<ConfigParams>} newParams configuration options to be updated or added
    *
-   * @throws [[ExpectedValueOfTypeError]] when some parameters of config are of wrong type (e.g. currencySymbol)
-   * @throws [[ConfigValueEmpty]] when some parameters of config are of invalid value (e.g. currencySymbol)
+   * @throws [[ExpectedValueOfTypeError]] when some parameters of config are of wrong type (e.g., currencySymbol)
+   * @throws [[ConfigValueEmpty]] when some parameters of config are of invalid value (e.g., currencySymbol)
    *
    * @example
    * ```js
@@ -2788,9 +2788,9 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Computes simple (absolute) address of a cell address based on its string representation.
-   * - If sheet name is present in the string representation but is not present in the engine, returns `undefined`.
-   * - If sheet name is not present in the string representation, returns `contextSheetId` as sheet number.
+   * Computes the simple (absolute) address of a cell address, based on its string representation.
+   * - If a sheet name is present in the string representation but is not present in the engine, returns `undefined`.
+   * - If no sheet name is present in the string representation, returns `contextSheetId` as sheet number.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} contextSheetId - context used in case of missing sheet in the first argument
@@ -2915,7 +2915,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
    *
-   * The returned array includes also named expression dependents. They are represented as cell references with sheet id `-1`.
+   * The returned array includes also named expression dependents. They are represented as cell references with sheet ID `-1`.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
@@ -2953,7 +2953,7 @@ export class HyperFormula implements TypedEmitter {
    * - If the argument is a single cell, `getCellPrecedents()` returns all cells and ranges contained in that cell's formula.
    * - If the argument is a range of cells, `getCellPrecedents()` returns some of the cell addresses and smaller ranges contained in that range (but not all of them). The exact result depends on the optimizations applied by the HyperFormula to the dependency graph, some of which are described in the section ["Optimizations for large ranges"](../../guide/dependency-graph.md#optimizations-for-large-ranges).
    *
-   * The returned array includes also named expression precedents. They are represented as cell references with sheet id `-1`.
+   * The returned array includes also named expression precedents. They are represented as cell references with sheet ID `-1`.
    *
    * @param {SimpleCellAddress | SimpleCellRange} address - object representation of an absolute address or range of addresses
    *
@@ -4033,12 +4033,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Parses and then unparses a formula.
-   * Returns a normalized formula (e.g. restores the original capitalization of sheet names, function names, cell addresses, and named expressions).
+   * Returns a normalized formula (e.g., restores the original capitalization of sheet names, function names, cell addresses, and named expressions).
    *
    * @param {string} formulaString - a formula in a proper format - it must start with "="
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e. does not start with "="
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula, i.e., does not start with "="
    *
    * @example
    * ```js
@@ -4072,7 +4072,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {number} sheetId - The ID of a sheet in context of which the formula gets evaluated.
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
-   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e. doesn't start with `=`).
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e., doesn't start with `=`).
    * @throws [[NoSheetWithIdError]] when the provided `sheetID` doesn't exist.
    *
    * @example
@@ -4158,7 +4158,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns class of a plugin used by function with given id
    *
-   * @param {string} functionId - id of a function, e.g. 'SUMIF'
+   * @param {string} functionId - id of a function, e.g., 'SUMIF'
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *

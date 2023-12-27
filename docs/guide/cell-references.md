@@ -1,11 +1,11 @@
 # Cell references
 
-A formula can refer to one or more cells and automatically update its
+A formula can reference one or more cells and automatically update its
 contents whenever any of the referenced cells change. The values from
 other cells can be obtained using A1 notation which is a flexible
 way of pointing at different sources of data for the formulas.
 
-The table below summarizes the most popular methods of referring to
+The table below summarizes the most popular methods of referencing
 different cells in the workbook.
 
 <table>
@@ -55,25 +55,26 @@ different cells in the workbook.
   </tbody>
 </table>
 
-### Referring to named expressions
+### Referencing named expressions
 
-This is a special case in HyperFormula. Upon creation, you define the
-scope of the expression:
+You can reference [named expressions](./named-expressions.md) by their assigned names. For example, if you name the expression `=SUM(100+10)` as `MySum`, you can then reference that expression by `MySum`.
+
+A named expression works within a scope. You define the scope when creating a named expression:
 
 ```javascript
-// define for a global scope
-// sheet id not passed
-hfInstance.addNamedExpression('MyGlobal', '=SUM(100+10)');
-
 // define for a local scope
-// sheet id passed
+// sheet ID passed (1)
 hfInstance.addNamedExpression('MyLocal', '=Sheet2!$A$1+100', 1);
+
+// define for the global scope
+// sheet ID not passed
+hfInstance.addNamedExpression('MyGlobal', '=SUM(100+10)');
 ```
 
-And now you can use 'MyGlobal' and 'MyLocal' names.
+Now, you can reference `MyLocal` in the `1` sheet, and `MyGlobal` in any sheet.
 
 HyperFormula is more limited than
-typical spreadsheet software when it comes to referring to named ranges.
+typical spreadsheet software when it comes to referencing named ranges.
 For more information about how
 HyperFormula handles named ranges,
 see [this section](named-expressions.md).
@@ -184,9 +185,9 @@ HyperFormula features the following types of ranges:
 ### Referencing ranges
 
 You can reference ranges:
-- Through a relative reference, e.g. `=A1:B2`
-- Through an absolute reference, e.g. `=A$1:$B$2`
-- Through a reference with an explicit sheet address, e.g. `=Sheet5!A1:B2`
+- Through a relative reference, e.g., `=A1:B2`
+- Through an absolute reference, e.g., `=A$1:$B$2`
+- Through a reference with an explicit sheet address, e.g., `=Sheet5!A1:B2`
 
 ### Range restraints
 
@@ -208,7 +209,7 @@ In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat sing
 
 Since HyperFormula does not embed any UI, it allows for the input of a circular reference into a cell. Compared to popular spreadsheets,
 HyperFormula does not force any specific interaction with the user
-(i.e. displaying a warning ) when circular reference happens.
+(i.e., displaying a warning ) when circular reference happens.
 
 When circular reference happens, HyperFormula returns #CYCLE as
 the value of the cell where the circular reference occurred. After

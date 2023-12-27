@@ -204,7 +204,7 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
 export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
 /**
- * Checks if given object is a simple cell address.
+ * Checks if the object is a simple cell address.
  */
 export function isSimpleCellAddress(obj: unknown): obj is SimpleCellAddress {
   return obj

@@ -380,11 +380,11 @@ const hf = HyperFormula.buildFromArray([
   ['=COUNTBLANK(A1:A3)'],
 ]);
 
-// Insert an empty row between the row 0 and the row 1
+// insert an empty row between the row 0 and the row 1
 const changes = hf.addRows(0, [1, 1]);
 
 console.log(hf.getSheetSerialized(0));
-// Sheet after adding the row:
+// sheet after adding the row:
 // [
 //   [0],
 //   [],
@@ -394,7 +394,7 @@ console.log(hf.getSheetSerialized(0));
 // ]
 
 console.log(changes);
-// Changes include only the COUNTBLANK cell:
+// changes include only the COUNTBLANK cell:
 // [{
 //   address: { sheet: 0, row: 4, col: 0 },
 //   newValue: 1,

@@ -1,9 +1,8 @@
 # Integration with Angular
 
-The installation process for applications written in Angular is the
-same as in the case of VanillaJS. You can check the
-[client-side installation](client-side-installation.md) section for
-more details.
+Installing HyperFormula in an Angular application works the same as with vanilla JavaScript.
+
+For more details, see the [client-side installation](client-side-installation.md) section.
 
 ## Demo
 

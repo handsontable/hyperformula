@@ -660,7 +660,7 @@ export class Operations {
   /**
    * Returns true if row number is outside of given sheet.
    * @param {number} row - row number
-   * @param {number} sheet - sheet id number
+   * @param {number} sheet - sheet ID number
    */
   public rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
     const height = this.dependencyGraph.addressMapping.getHeight(sheet)
@@ -803,7 +803,7 @@ export class Operations {
   /**
    * Returns true if row number is outside of given sheet.
    * @param {number} column - row number
-   * @param {number} sheet - sheet id number
+   * @param {number} sheet - sheet ID number
    */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
     const width = this.dependencyGraph.addressMapping.getWidth(sheet)

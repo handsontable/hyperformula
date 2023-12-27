@@ -54,7 +54,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Array manipulation
 
 | Function ID     | Description                                                      | Syntax                                               |
-|:----------------|:-----------------------------------------------------------------|:-----------------------------------------------------|
+| :-------------- | :--------------------------------------------------------------- | :--------------------------------------------------- |
 | ARRAYFORMULA    | Enables the array arithmetic mode for a single formula.          | ARRAYFORMULA(Formula)                                |
 | FILTER          | Filters an array, based on multiple conditions (boolean arrays). | FILTER(SourceArray, BoolArray1[, BoolArray2[, ...]]) |
 | ARRAY_CONSTRAIN | Truncates an array to given dimensions.                          | ARRAY_CONSTRAIN(Array, Height, Width)                |
@@ -62,7 +62,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Date and time
 
 | Function ID      | Description                                                                                                                                                                                                                             | Syntax                                              |
-|:-----------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------------------------------------------------|
+| :--------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------- |
 | DATE             | Returns the specified date as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).                                                                                                                   | DATE(Year, Month, Day)                              |
 | DATEDIF          | Calculates distance between two dates, in provided unit parameter.                                                                                                                                                                      | DATEDIF(Date1, Date2, Units)                        |
 | DATEVALUE        | Parses a date string and returns it as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).<br><br>Accepts formats set by the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option. | DATEVALUE(Datestring)                               |
@@ -93,7 +93,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Engineering
 
 | Function ID | Description                                                                         | Syntax                           |
-|:------------|:------------------------------------------------------------------------------------|:---------------------------------|
+| :---------- | :---------------------------------------------------------------------------------- | :------------------------------- |
 | BIN2DEC     | The result is the decimal number for the binary number entered.                     | BIN2DEC(Number)                  |
 | BIN2HEX     | The result is the hexadecimal number for the binary number entered.                 | BIN2HEX(Number, Places)          |
 | BIN2OCT     | The result is the octal number for the binary number entered.                       | BIN2OCT(Number, Places)          |
@@ -144,7 +144,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Information
 
 | Function ID | Description                                                                                                    | Syntax           |
-|:------------|:---------------------------------------------------------------------------------------------------------------|:-----------------|
+| :---------- | :------------------------------------------------------------------------------------------------------------- | :--------------- |
 | ISBINARY    | Returns TRUE if provided value is a valid binary number.                                                       | ISBINARY(Value)  |
 | ISBLANK     | Returns TRUE if the reference to a cell is blank.                                                              | ISBLANK(Value)   |
 | ISERR       | Returns TRUE if the value is error value except #N/A!.                                                         | ISERR(Value)     |
@@ -157,7 +157,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | ISNUMBER    | Returns TRUE if the value refers to a number.                                                                  | ISNUMBER(Value)  |
 | ISODD       | Returns TRUE if the value is odd, or FALSE if the number is even.                                              | ISODD(Value)     |
 | ISREF       | Returns TRUE if provided value is #REF! error.                                                                 | ISREF(Value)     |
-| ISTEXT      | Returns TRUE if the cell contents refer to text.                                                               | ISTEXT(Value)    |
+| ISTEXT      | Returns TRUE if the cell contents reference text.                                                              | ISTEXT(Value)    |
 | SHEET       | Returns sheet number of a given value or a formula sheet number if no argument is provided.                    | SHEET([Value])   |
 | SHEETS      | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS([Value])  |
 | NA          | Returns #N/A! error value.                                                                                     | NA(Value)        |
@@ -165,7 +165,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Financial
 
 | Function ID | Description                                                                                                                | Syntax                                     |
-|:------------|:---------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------|
+| :---------- | :------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |
 | CUMIPMT     | Returns the cumulative interest paid on a loan between a start period and an end period.                                   | CUMIPMT(Rate, Nper, Pv, Start, End, type)  |
 | CUMPRINC    | Returns the cumulative principal paid on a loan between a start period and an end period.                                  | CUMPRINC(Rate, Nper, Pv, Start, End, Type) |
 | DB          | Returns the depreciation of an asset for a period using the fixed-declining balance method.                                | DB(Cost, Salvage, Life, Period[, Month])   |
@@ -197,7 +197,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Logical
 
 | Function ID | Description                                                                                                                      | Syntax                                                                         |
-|:------------|:---------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------|
+| :---------- | :------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
 | AND         | Returns TRUE if all arguments are TRUE.                                                                                          | AND(Logicalvalue1, Logicalvalue2 ...Logicalvalue30)                            |
 | FALSE       | Returns the logical value FALSE.                                                                                                 | FALSE()                                                                        |
 | IF          | Specifies a logical test to be performed.                                                                                        | IF(Test, Then value, Otherwisevalue)                                           |
@@ -213,7 +213,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Lookup and reference
 
 | Function ID | Description                                                                                                                              | Syntax                                                                 |
-|:------------|:-----------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------|
+| :---------- | :--------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------- |
 | ADDRESS     | Returns a cell reference as a string.                                                                                                    | ADDRESS(Row, Column[, AbsoluteRelativeMode[, UseA1Notation[, Sheet]]]) |
 | CHOOSE      | Uses an index to return a value from a list of up to 30 values.                                                                          | CHOOSE(Index, Value1, ..., Value30)                                    |
 | COLUMN      | Returns column number of a given reference or formula reference if argument not provided.                                                | COLUMNS([Reference])                                                   |
@@ -231,7 +231,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Math and trigonometry
 
 | Function ID     | Description                                                                                                   | Syntax                                                                                      |
-|:----------------|:--------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------|
+| :-------------- | :------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------ |
 | ABS             | Returns the absolute value of a number.                                                                       | ABS(Number)                                                                                 |
 | ACOS            | Returns the inverse trigonometric cosine of a number.                                                         | ACOS(Number)                                                                                |
 | ACOSH           | Returns the inverse hyperbolic cosine of a number.                                                            | ACOSH(Number)                                                                               |
@@ -311,7 +311,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Matrix functions
 
 | Function ID | Description                                                                                                 | Syntax                                 |
-|:------------|:------------------------------------------------------------------------------------------------------------|:---------------------------------------|
+| :---------- | :---------------------------------------------------------------------------------------------------------- | :------------------------------------- |
 | MMULT       | Calculates the array product of two arrays.                                                                 | MMULT(Array, Array)                    |
 | MEDIANPOOL  | Calculates a smaller range which is a median of a Window_size, in a given Range, for every Stride element.  | MEDIANPOOL(Range, Window_size, Stride) |
 | MAXPOOL     | Calculates a smaller range which is a maximum of a Window_size, in a given Range, for every Stride element. | MAXPOOL(Range, Window_size, Stride)    |
@@ -320,7 +320,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Operator
 
 | Function ID      | Description                                  | Syntax                      |
-|:-----------------|:---------------------------------------------|:----------------------------|
+| :--------------- | :------------------------------------------- | :-------------------------- |
 | HF.ADD           | Adds two values.                             | HF.ADD(Number, Number)      |
 | HF.CONCAT        | Concatenates two strings.                    | HF.CONCAT(String, String)   |
 | HF.DIVIDE        | Divides two values.                          | HF.DIVIDE(Number, Number)   |
@@ -340,7 +340,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Statistical
 
 | Function ID     | Description                                                                                               | Syntax                                                                                      |
-|:----------------|:----------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------|
+| :-------------- | :-------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
 | AVEDEV          | Returns the average deviation of the arguments.                                                           | AVEDEV(Number1, Number2, ...Number30)                                                       |
 | AVERAGE         | Returns the average of the arguments.                                                                     | AVERAGE(Number1, Number2, ...Number30)                                                      |
 | AVERAGEA        | Returns the average of the arguments.                                                                     | AVERAGEA(Value1, Value2, ... Value30)                                                       |
@@ -479,7 +479,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Text
 
 | Function ID | Description                                                                                                                                                                                                                                                                                                                     | Syntax                                             |
-|:------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------------------------------------------|
+| :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------- |
 | CHAR        | Converts a number into a character according to the current code table.                                                                                                                                                                                                                                                         | CHAR(Number)                                       |
 | CLEAN       | Returns text that has been "cleaned" of line breaks and other non-printable characters.                                                                                                                                                                                                                                         | CLEAN("Text")                                      |
 | CODE        | Returns a numeric code for the first character in a text string.                                                                                                                                                                                                                                                                | CODE("Text")                                       |

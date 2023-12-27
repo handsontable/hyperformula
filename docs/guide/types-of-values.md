@@ -1,9 +1,8 @@
 # Types of values
 
-Values in HyperFormula can refer to Numbers, Text, Logical, Date, Time,
-DateTime, Error, or Duration data. The type of the value depends on the data to
-which it's referring. Functions may work differently based on the types of
-values.
+In HyperFormula, values can reference Numbers, Text, Logical, Date, Time, DateTime, Error, or Duration data.
+The type of the value depends on the data that the value is referencing.
+Functions may work differently based on the types of values.
 
 | Type of value              | Description                                                                                                                                                                                                      |
 |:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -32,10 +31,12 @@ operations such as calculating the number of days between two dates.
 
 ## Forcing the string value type
 
-Similarly to other popular spreadsheet software, HyperFormula automatically detects the type of an input value.
-On some occasions, the value should be treated as a string even though it's parsable as a formula, number, date, time, datetime, boolean, currency or percentage.
-Typical examples are numeric values with no number semantics, such as zip codes, bank sort codes, social security numbers, etc.
-To prevent the automatic type conversion, you can prepend the string value with an apostrophe character (`'`). 
+Like most spreadsheet software, HyperFormula automatically detects the type of an input value.
+
+But sometimes the value should be treated as a string even though it's parsable as a formula, number, date, time, datetime, boolean, currency or percentage.
+Typical examples are numeric values with no number semantics, such as ZIP codes, bank sort codes, social security numbers, etc.
+
+To prevent the automatic type conversion, prepend the string value with an apostrophe (`'`).
 
 ```js
 const hf = HyperFormula.buildFromArray([
