@@ -13,10 +13,10 @@ export const toEqualError: ExpectExtendMap = {
   toEqualError(received: any, expected: any): CustomMatcherResult {
     let result = false
 
-    if (typeof received === 'object' && typeof expected === 'object') {
+    if (typeof received === 'object' && typeof expected === 'object' && received.message != null && expected.message != null && received.message.includes(expected.message)) {
       result = this.equals(
-        {...received, root: undefined, address: undefined},
-        {...expected, root: undefined, address: undefined}
+        {...received, message: undefined, root: undefined, address: undefined},
+        {...expected, message: undefined, root: undefined, address: undefined}
       )
     } else {
       result = this.equals(received, expected)

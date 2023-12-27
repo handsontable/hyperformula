@@ -14,6 +14,16 @@ describe('Function MATCH', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
+  it('validates number of arguments when array arithmetics is on', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MATCH(1)'],
+      ['=MATCH(1, B1:B3, 0, 42)'],
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
+  })
+
   it('validates that 1st argument is number, string or boolean', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MATCH(C2:C3, B1:B1)'],
@@ -703,5 +713,46 @@ describe('Function MATCH', () => {
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NA))
+  })
+
+  describe('works with a range reference to an empty sheet', () => {
+    it('- cell range', () => {
+      const hf = HyperFormula.buildFromSheets({
+        table1: [],
+        table2: [['=MATCH(0, table1!A1:A10)']],
+      })
+
+      expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('- column range', () => {
+      const hf = HyperFormula.buildFromSheets({
+        table1: [[]],
+        table2: [['=MATCH(0, table1!A:A)']],
+      })
+
+      expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('- row range', () => {
+      const hf = HyperFormula.buildFromSheets({
+        table1: [],
+        table2: [['=MATCH(0, table1!1:1)']],
+      })
+
+      expect(hf.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('- column range (called from calculateFormula)', () => {
+      const hf = HyperFormula.buildFromArray([])
+
+      expect(hf.calculateFormula('=MATCH(0, Sheet1!A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
+    })
+
+    it('- column range (called from calculateFormula without explicit sheet reference)', () => {
+      const hf = HyperFormula.buildFromArray([])
+
+      expect(hf.calculateFormula('=MATCH(0, A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
+    })
   })
 })

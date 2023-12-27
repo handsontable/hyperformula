@@ -27,7 +27,7 @@ an object that declares the functions provided by this plugin.
 
 The name of that object becomes the ID by which
 [translations](#function-name-translations), [aliases](#function-aliases), and
-other elements refer to your function. Make the ID unique among all HyperFormula
+other elements reference your function. Make the ID unique among all HyperFormula
 functions ([built-in](built-in-functions.md#list-of-available-functions) and
 custom).
 

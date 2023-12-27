@@ -286,22 +286,23 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   public substitute(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('SUBSTITUTE'), (text: string, oldText: string, newText: string, occurrence: number | undefined) => {
-      const oldTextRegexp = new RegExp(oldText, 'g')
+    return this.runFunction(ast.args, state, this.metadata('SUBSTITUTE'), (text: string, searchString: string, replacementString: string, occurrenceNum: number | undefined) => {
+      const escapedSearchString = this.escapeRegExpSpecialCharacters(searchString)
+      const searchRegExp = new RegExp(escapedSearchString, 'g')
 
-      if (occurrence === undefined) {
-        return text.replace(oldTextRegexp, newText)
+      if (occurrenceNum === undefined) {
+        return text.replace(searchRegExp, replacementString)
       }
 
-      if (occurrence < 1) {
+      if (occurrenceNum < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
 
       let match: RegExpExecArray | null
       let i = 0
-      while ((match = oldTextRegexp.exec(text)) !== null) {
-        if (occurrence === ++i) {
-          return text.substring(0, match.index) + newText + text.substring(oldTextRegexp.lastIndex)
+      while ((match = searchRegExp.exec(text)) !== null) {
+        if (occurrenceNum === ++i) {
+          return text.substring(0, match.index) + replacementString + text.substring(searchRegExp.lastIndex)
         }
       }
 
@@ -335,5 +336,9 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     return this.runFunction(ast.args, state, this.metadata('UPPER'), (arg: string) => {
       return arg.toUpperCase()
     })
+  }
+
+  private escapeRegExpSpecialCharacters(text: string): string {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }
 }

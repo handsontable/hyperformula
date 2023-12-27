@@ -21,7 +21,7 @@ To import the language packs, use the module-system-specific dedicated bundles a
 * **CommonJS**: `hyperformula/commonjs/i18n/languages/`
 * **UMD**: `hyperformula/dist/languages/`
 
-For the UMD build, the languages are accessible through `HyperFormula.languages`, e.g. `HyperFormula.languages.frFR`.
+For the UMD build, the languages are accessible through `HyperFormula.languages`, e.g., `HyperFormula.languages.frFR`.
 :::
 
 Then set it inside it the [configuration options](configuration-options.md):

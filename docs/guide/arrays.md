@@ -5,10 +5,10 @@ Use array formulas to perform an operation (or call a function) on multiple cell
 ## About arrays
 
 In HyperFormula, an array can be:
-* A range of cell addresses (e.g. `A1:A10`)
-* A result of an arithmetic operation (e.g. `5*A1:B5`)
-* A result of a function (e.g. `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5, 2, 2))`)
-* An **inline array**: an ad-hoc array that doesn't refer to any range of cells (e.g. `{1, 3, 5}`)
+* A range of cell addresses (e.g., `A1:A10`)
+* A result of an arithmetic operation (e.g., `5*A1:B5`)
+* A result of a function (e.g., `=ARRAYFORMULA(ARRAY_CONSTRAIN(A2:E5, 2, 2))`)
+* An **inline array**: an ad-hoc array that doesn't reference any range of cells (e.g., `{1, 3, 5}`)
 
 An array is inherently a two-dimensional object.
 
@@ -150,7 +150,7 @@ If your specified output array size is larger or equal to the input array size, 
 ### With the array arithmetic mode enabled
 
 When the [array arithmetic mode](#array-arithmetic-mode) is enabled, and you pass an array to a [scalar](#about-arrays) function, the following rules apply:
-* Array dimensions need to be consistent (e.g. every row needs to be of the same length).
+* Array dimensions need to be consistent (e.g., every row needs to be of the same length).
 * If an input array value is missing (due to a difference in dimensions), the corresponding output array value is `#N/A`.
 * If a cell evaluates to an array, the array values are spilled into neighboring cells (unless the neighboring cells are already filled).<br>This behavior doesn't apply to ranges, which return the `#VALUE!` error in this case.
 * If one of input array dimensions is `1` (`1`x`n` or `n`x`1`), the array is repeated, to match the output array dimensions.

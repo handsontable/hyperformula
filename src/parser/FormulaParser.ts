@@ -195,7 +195,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for column range, e.g. A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
+   * Rule for column range, e.g., A:B, Sheet1!A:B, Sheet1!A:Sheet1!B
    */
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
     const range = this.CONSUME(ColumnRange) as ExtendedToken
@@ -221,7 +221,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for row range, e.g. 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
+   * Rule for row range, e.g., 1:2, Sheet1!1:2, Sheet1!1:Sheet1!2
    */
   private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
     const range = this.CONSUME(RowRange) as ExtendedToken
@@ -247,7 +247,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for cell reference expression (e.g. A1, $A1, A$1, $A$1, $Sheet42!A$17)
+   * Rule for cell reference expression (e.g., A1, $A1, A$1, $A$1, $Sheet42!A$17)
    */
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference) as ExtendedToken
@@ -322,7 +322,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for cell ranges (e.g. A1:B$3, A1:OFFSET())
+   * Rule for cell ranges (e.g., A1:B$3, A1:OFFSET())
    */
   private cellRangeExpression: AstRule = this.RULE('cellRangeExpression', () => {
     const start = this.CONSUME(CellReference)
@@ -621,7 +621,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for multiplication category operators (e.g. 1 * A1, 1 / A1)
+   * Rule for multiplication category operators (e.g., 1 * A1, 1 / A1)
    */
   private multiplicationExpression: AstRule = this.RULE('multiplicationExpression', () => {
     let lhs: Ast = this.SUBRULE(this.powerExpression)
@@ -645,7 +645,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for addition category operators (e.g. 1 + A1, 1 - A1)
+   * Rule for addition category operators (e.g., 1 + A1, 1 - A1)
    */
   private additionExpression: AstRule = this.RULE('additionExpression', () => {
     let lhs: Ast = this.SUBRULE(this.multiplicationExpression)
@@ -669,7 +669,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for concatenation operator expression (e.g. "=" & A1)
+   * Rule for concatenation operator expression (e.g., "=" & A1)
    */
   private concatenateExpression: AstRule = this.RULE('concatenateExpression', () => {
     let lhs: Ast = this.SUBRULE(this.additionExpression)
@@ -684,7 +684,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   })
 
   /**
-   * Rule for boolean expression (e.g. 1 <= A1)
+   * Rule for boolean expression (e.g., 1 <= A1)
    */
   private booleanExpression: AstRule = this.RULE('booleanExpression', () => {
     let lhs: Ast = this.SUBRULE(this.concatenateExpression)

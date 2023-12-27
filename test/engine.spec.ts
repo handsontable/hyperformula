@@ -1,10 +1,9 @@
-import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType, SimpleCellAddress, SimpleCellRange} from '../src'
+import {DetailedCellError, ErrorType, HyperFormula, CellType, CellValueDetailedType, CellValueType, SimpleCellAddress, SimpleCellRange, ExpectedValueOfTypeError} from '../src'
 import {AbsoluteCellRange, simpleCellRange} from '../src/AbsoluteCellRange'
 import {Config} from '../src/Config'
 import {ErrorMessage} from '../src/error-message'
 import {plPL} from '../src/i18n/languages'
 import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
-import {ExpectedValueOfTypeError} from '../src/errors'
 import {simpleCellAddress} from '../src/Cell'
 
 describe('#buildFromArray', () => {
@@ -1068,6 +1067,29 @@ describe('#simpleCellAddressFromString', () => {
   it('should convert a string to a simpleCellAddress', () => {
     const engine = HyperFormula.buildEmpty()
     expect(engine.simpleCellAddressFromString('C5', 2)).toEqual(simpleCellAddress(2, 2, 4))
+  })
+
+  it('should work for address with sheet name', () => {
+    const engine = HyperFormula.buildFromSheets({
+        Sheet1: [],
+    })
+    expect(engine.simpleCellAddressFromString('Sheet1!C5', 2)).toEqual(simpleCellAddress(0, 2, 4))
+  })
+
+  it('should work when sheet name contains unicode characters (sheet name in single quotes)', () => {
+    // noinspection NonAsciiCharacters
+    const engine = HyperFormula.buildFromSheets({
+      あは: [],
+    })
+    expect(engine.simpleCellAddressFromString("'あは'!C5", 2)).toEqual(simpleCellAddress(0, 2, 4))
+  })
+
+  it('should return undefined when sheet name contains unicode characters (unquoted sheet name)', () => {
+    // noinspection NonAsciiCharacters
+    const engine = HyperFormula.buildFromSheets({
+      あは: [],
+    })
+    expect(engine.simpleCellAddressFromString('あは!C5', 2)).toBe(undefined)
   })
 })
 

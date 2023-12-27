@@ -7,6 +7,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.6.1] - 2023-12-27
+
+### Fixed
+
+- Fixed an issue where operating on ranges of incompatible sizes resulted in a runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
+- Fixed an issue where the `simpleCellAddressFromString()` method was crashing when called with a non-ASCII character in an unquoted sheet name. [#1312](https://github.com/handsontable/hyperformula/issues/1312)
+- Fixed an issue where adding a row to a very large spreadsheet resulted in the `Maximum call stack size exceeded` error. [#1332](https://github.com/handsontable/hyperformula/issues/1332)
+- Fixed an issue where using a column-range reference to an empty sheet as a function argument resulted in the `Incorrect array size` error. [#1147](https://github.com/handsontable/hyperformula/issues/1147)
+- Fixed an issue where the SUBSTITUTE function wasn't working correctly with regex special characters. [#1289](https://github.com/handsontable/hyperformula/issues/1289)
+- Fixed a typo in the JSDoc comment of the `HyperFormula` class. [#1323](https://github.com/handsontable/hyperformula/issues/1323)
+
 ## [2.6.0] - 2023-09-19
 
 ### Added
@@ -277,7 +288,7 @@ For more information on this release, see:
 - **Breaking change**: Changed config options [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before                | after                |
-| --------------------- | -------------------- |
+|-----------------------|----------------------|
 | matrixColumnSeparator | arrayColumnSeparator |
 | matrixRowSeparator    | arrayRowSeparator    |
 
@@ -286,14 +297,14 @@ For more information on this release, see:
 - **Breaking change**: Changed API methods [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before             | after             |
-| ------------------ | ----------------- |
+|--------------------|-------------------|
 | matrixMapping      | arrrayMapping     |
 | isCellPartOfMatrix | isCellPartOfArray |
 
 - **Breaking change**: Changed Exceptions [#747](https://github.com/handsontable/hyperformula/issues/747):
 
 | before                       | after                       |
-| ---------------------------- | --------------------------- |
+|------------------------------|-----------------------------|
 | SourceLocationHasMatrixError | SourceLocationHasArrayError |
 | TargetLocationHasMatrixError | TargetLocationHasArrayError |
 

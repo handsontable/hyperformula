@@ -154,8 +154,12 @@ export class CellError {
   ) {
   }
 
-  public static parsingError() {
-    return new CellError(ErrorType.ERROR, ErrorMessage.ParseError)
+  /**
+   * Returns a CellError with a given message.
+   * @param {string} detailedMessage - message to be displayed
+   */
+  public static parsingError(detailedMessage?: string): CellError {
+    return new CellError(ErrorType.ERROR, `${ErrorMessage.ParseError}${detailedMessage ? ' ' + detailedMessage : ''}`)
   }
 
   public attachRootVertex(vertex: FormulaVertex): CellError {
@@ -199,12 +203,15 @@ export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: numb
 
 export const addressKey = (address: SimpleCellAddress) => `${address.sheet},${address.row},${address.col}`
 
-export function isSimpleCellAddress(obj: any): obj is SimpleCellAddress {
-  if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
-    return 'col' in obj && typeof obj.col === 'number' && 'row' in obj && typeof obj.row === 'number' && 'sheet' in obj && typeof obj.sheet === 'number'
-  } else {
-    return false
-  }
+/**
+ * Checks if the object is a simple cell address.
+ */
+export function isSimpleCellAddress(obj: unknown): obj is SimpleCellAddress {
+  return obj
+    && (typeof obj === 'object' || typeof obj === 'function')
+    && typeof (obj as SimpleCellAddress)?.sheet === 'number'
+    && typeof (obj as SimpleCellAddress)?.col === 'number'
+    && typeof (obj as SimpleCellAddress)?.row === 'number'
 }
 
 export const absoluteSheetReference = (address: AddressWithSheet, baseAddress: SimpleCellAddress): number => {
