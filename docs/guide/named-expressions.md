@@ -16,7 +16,7 @@ moment.
 
 Dynamic ranges are supported through functions such as INDEX and OFFSET.
 
-Named ranges can overlap each other, e.g. it is possible to define the names as
+Named ranges can overlap each other, e.g., it is possible to define the names as
 follows:
 
 - rangeOne: Sheet1!$A$1:$D$10

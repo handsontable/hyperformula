@@ -659,7 +659,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
    * If range is dependent on smaller range, list will contain value of smaller range for this function
    * and values of cells that are not present in smaller range
    *
-   * @param functionName - function name (e.g. SUM)
+   * @param functionName - function name (e.g., SUM)
    * @param range - cell range
    * @param rangeVertex
    * @param mapFunction

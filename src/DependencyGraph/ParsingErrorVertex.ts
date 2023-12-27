@@ -7,7 +7,7 @@ import {CellError} from '../Cell'
 import {ParsingError} from '../parser/Ast'
 
 /**
- * Represents a cell with a parsing error.
+ * Represents a cell that contains a parsing error.
  */
 export class ParsingErrorVertex {
   /**
@@ -20,7 +20,7 @@ export class ParsingErrorVertex {
   }
 
   /**
-   * Returns the value of this cell.
+   * Returns the value of the cell.
    */
   public getCellValue(): CellError {
     const firstNonemptyMessage = this.errors.map(error => error.message).find((msg) => msg)
@@ -28,7 +28,7 @@ export class ParsingErrorVertex {
   }
 
   /**
-   * Returns the formula of this cell.
+   * Returns the formula of the cell.
    */
   public getFormula(): string {
     return this.rawInput

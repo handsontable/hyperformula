@@ -6,6 +6,19 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.6.1
+
+**Release date: Dec 27, 2023**
+
+### Fixed
+
+- Fixed an issue where operating on ranges of incompatible sizes resulted in a runtime exception. [#1267](https://github.com/handsontable/hyperformula/issues/1267)
+- Fixed an issue where the [`simpleCellAddressFromString()`](../api/classes/hyperformula.md#simplecelladdressfromstring) method was crashing when called with a non-ASCII character in an unquoted sheet name. [#1312](https://github.com/handsontable/hyperformula/issues/1312)
+- Fixed an issue where adding a row to a very large spreadsheet resulted in the `Maximum call stack size exceeded` error. [#1332](https://github.com/handsontable/hyperformula/issues/1332)
+- Fixed an issue where using a column-range reference to an empty sheet as a function argument resulted in the `Incorrect array size` error. [#1147](https://github.com/handsontable/hyperformula/issues/1147)
+- Fixed an issue where the SUBSTITUTE function wasn't working correctly with regex special characters. [#1289](https://github.com/handsontable/hyperformula/issues/1289)
+- Fixed a typo in the JSDoc comment of the `HyperFormula` class. [#1323](https://github.com/handsontable/hyperformula/issues/1323)
+
 ## 2.6.0
 
 **Release date: Sep 19, 2023**
