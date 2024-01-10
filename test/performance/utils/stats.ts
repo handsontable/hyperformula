@@ -5,7 +5,7 @@ export type Stats = Map<EnrichedStatType, number>
 
 export enum ExtStatType {
   INIT_DATASTRUCTURES = 'INIT_DATASTRUCTURES',
-  PREPROCESSING = 'PREPROCESING',
+  PREPROCESSING = 'PREPROCESSING',
   CRUDS_TOTAL = 'CRUDS_TOTAL',
 }
 
