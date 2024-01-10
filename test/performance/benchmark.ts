@@ -39,7 +39,6 @@ export interface BenchmarkResult {
   statistics: Stats,
 }
 
-// TODO: remove this function. It is a spacial case of benchmarkCruds
 export function benchmark(
   name: string,
   sheet: Sheet,
