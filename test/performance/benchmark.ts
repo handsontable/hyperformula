@@ -81,9 +81,8 @@ export function benchmarkCruds(
   } while (currentRun < config.numberOfRuns)
 
   const averages = reduceStats(statistics, average)
-  statsTreePrintCruds(averages)
-
   const totalTime = averages.get(EnrichedStatType.CRUDS_TOTAL) || 0
+  statsTreePrintCruds(averages)
 
   return {
     name: name,
@@ -134,8 +133,8 @@ function benchmarkBuild(
   } while (currentRun < config.numberOfRuns)
 
   const averages = reduceStats(statistics, average)
-  statsTreePrint(averages)
   const totalTime = averages.get(EnrichedStatType.BUILD_ENGINE_TOTAL) || 0
+  statsTreePrint(averages)
 
   return {
     name: name,
