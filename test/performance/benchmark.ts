@@ -4,7 +4,6 @@ import {
   average,
   EnrichedStatType,
   enrichStatistics,
-  ExtStatType,
   measureCruds,
   reduceStats,
   Stats,
@@ -54,33 +53,43 @@ export function benchmarkCruds(
   sheet: Sheet,
   cruds: (engine: HyperFormula) => void,
   expectedValues: ExpectedValue[],
-  userConfig: Partial<Config> = defaultConfig
+  userConfig: Partial<Config> = defaultConfig,
 ): Maybe<BenchmarkResult> {
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
   const engineConfig = Object.assign({}, config.engineConfig, defaultEngineConfig)
 
-  const engine = HyperFormula.buildFromArray(sheet, engineConfig)
+  const statistics: Stats[] = []
 
-  const statistics = measureCruds(engine, name, cruds)
+  let currentRun = 0
+  let engine: HyperFormula | undefined
 
-  if (!validate(engine, expectedValues)) {
-    console.error('Sheet validation error')
-    if (process.exit) {
-      process.exit(1)
+  do {
+    engine = HyperFormula.buildFromArray(sheet, engineConfig)
+    statistics.push(enrichStatistics(measureCruds(engine, name, cruds)))
+
+    currentRun++
+
+    if (!validate(engine, expectedValues)) {
+      console.error('Sheet validation error')
+      if (process.exit) {
+        process.exit(1)
+      }
+      return
     }
-    return
-  }
+  } while (currentRun < config.numberOfRuns)
 
-  const totalTime = statistics.get(ExtStatType.CRUDS_TOTAL) || 0
-  statsTreePrintCruds(statistics)
+  const averages = reduceStats(statistics, average)
+  statsTreePrintCruds(averages)
+
+  const totalTime = averages.get(EnrichedStatType.CRUDS_TOTAL) || 0
 
   return {
     name: name,
     engine: engine,
     totalTime: totalTime,
-    statistics: statistics,
+    statistics: averages,
   }
 }
 
@@ -93,14 +102,18 @@ export function batch(stats: BenchmarkResult[], ...benchmarks: (() => Maybe<Benc
   }
 }
 
-function benchmarkBuild(name: string, runEngine: (engineConfig?: Partial<ConfigParams>) => HyperFormula,
-                        expectedValues: ExpectedValue[], userConfig: Partial<Config> = defaultConfig): Maybe<BenchmarkResult> {
+function benchmarkBuild(
+  name: string,
+  runEngine: (engineConfig?: Partial<ConfigParams>) => HyperFormula,
+  expectedValues: ExpectedValue[],
+  userConfig: Partial<Config> = defaultConfig,
+): Maybe<BenchmarkResult> {
   console.info(`=== Benchmark - ${name} === `)
 
   const config = Object.assign({}, defaultConfig, userConfig)
   const engineConfig = Object.assign({}, config.engineConfig, defaultEngineConfig)
 
-  const statistics: Map<EnrichedStatType, number>[] = []
+  const statistics: Stats[] = []
 
   let currentRun = 0
   let engine: HyperFormula

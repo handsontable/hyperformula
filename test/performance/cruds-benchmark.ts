@@ -20,7 +20,7 @@ export function runCrudsBenchmark(): BenchmarkResult[] {
       engine.removeColumns(0, [0, 1])
     }, [
       {address: 'E7000', value: -1.17344394901827e+23},
-    ], { numberOfRuns: 10 }),
+    ], { numberOfRuns: 100 }),
 
     () => benchmarkCruds('Sheet B: change value, add/remove row/column', sheetB, (engine: HyperFormula) => {
       engine.setCellContents(adr('A1'), '123')
@@ -31,14 +31,14 @@ export function runCrudsBenchmark(): BenchmarkResult[] {
     }, [
       {address: 'E50', value: 1347},
       {address: 'E2002', value: 2001122},
-    ], { numberOfRuns: 10 }),
+    ], { numberOfRuns: 100 }),
 
     () => benchmarkCruds('Column ranges - add column', columnRanges, (engine: HyperFormula) => {
       engine.addColumns(0, [1, 1])
       engine.setCellContents(adr('A1'), 5)
     }, [
       {address: 'AY50', value: 3.47832712968835e+63},
-    ], { numberOfRuns: 10 }),
+    ], { numberOfRuns: 100 }),
 
     () => benchmarkCruds('Column ranges - without batch', columnRanges, (engine: HyperFormula) => {
       engine.setCellContents(adr('A1'), 1)
@@ -48,7 +48,7 @@ export function runCrudsBenchmark(): BenchmarkResult[] {
       engine.setCellContents(adr('A1'), 5)
     }, [
       {address: 'AX50', value: 3.47832712968835e+63},
-    ], { numberOfRuns: 10 }),
+    ], { numberOfRuns: 100 }),
 
     () => benchmarkCruds('Column ranges - batch', columnRanges, (engine: HyperFormula) => {
       engine.batch(() => {
@@ -60,7 +60,7 @@ export function runCrudsBenchmark(): BenchmarkResult[] {
       })
     }, [
       {address: 'AX50', value: 3.47832712968835e+63},
-    ], { numberOfRuns: 10 })
+    ], { numberOfRuns: 100 })
   )
 
   return result
