@@ -1,17 +1,16 @@
 # Batch operations
 
 HyperFormula offers a built-in feature for doing batch operations.
-This allows you to put multiple CRUD and move operations into a
-single operation.
+It allows you to combine multiple data modification actions into a single operation.
 
 In some cases, batch operations can result in better performance,
 especially when your app requires doing a large number of operations.
 
 ## How to batch
 
-### Using the `batch` method
+### Using the [`batch`](../api/classes/hyperformula.md#batch) method
 
-You can use the `batch` method to batch operations. This method accepts
+You can use the [`batch`](../api/classes/hyperformula.md#batch) method to batch operations. This method accepts
 just one parameter: a callback function that stacks the selected
 operations into one. It performs the cumulative operation at the end.
 
@@ -20,8 +19,8 @@ operation together with their absolute addresses and new values.
 
 ```javascript
 const hfInstance = HyperFormula.buildFromSheets({
- MySheet1: [ ['1'] ],
- MySheet2: [ ['10'] ],
+  MySheet1: [ ['1'] ],
+  MySheet2: [ ['10'] ],
 });
 
 // multiple operations in a single callback will trigger evaluation only once
@@ -30,13 +29,12 @@ const hfInstance = HyperFormula.buildFromSheets({
 const changes = hfInstance.batch(() => {
   hfInstance.setCellContents({ col: 3, row: 0, sheet: 0 }, [['=B1']]);
   hfInstance.setCellContents({ col: 4, row: 0, sheet: 0 }, [['=A1']]);
-
+  
   // and numerous others
-  ...
 });
 ```
 
-### Using the `suspendEvaluation` and `resumeEvaluation` methods
+### Using the [`suspendEvaluation`](../api/classes/hyperformula.md#suspendevaluation) and [`resumeEvaluation`](../api/classes/hyperformula.md#resumeevaluation) methods
 
 The same result can be achieved by suspending and resuming the
 evaluation.
@@ -49,8 +47,8 @@ operation together with their absolute addresses and new values.
 
 ```javascript
 const hfInstance = HyperFormula.buildFromSheets({
- MySheet1: [ ['1'] ],
- MySheet2: [ ['10'] ],
+  MySheet1: [ ['1'] ],
+  MySheet2: [ ['10'] ],
 });
 
 // suspend the evaluation
@@ -64,15 +62,15 @@ hfInstance.setSheetContent(1, [['50'], ['60']]);
 const changes = hfInstance.resumeEvaluation();
 ```
 
-You can resume the evaluation by calling the `resumeEvaluation` method
-which triggers the recalculation. Just like in the case of the `batch`
+You can resume the evaluation by calling the [`resumeEvaluation`](../api/classes/hyperformula.md#resumeevaluation) method
+which triggers the recalculation. Just like in the case of the [`batch`](../api/classes/hyperformula.md#batch)
 method, it returns a list of cells which values changed after the
 operation, together with their absolute addresses, and new values.
 
-### Adjusting need with the `isEvaluationSuspended` method
+### Checking the evaluation suspension state
 
 When you need to check if the evaluation is suspended you can
-call the `isEvaluationSuspended` method.
+call the [`isEvaluationSuspended`](../api/classes/hyperformula.md#isevaluationsuspended) method.
 
 ```javascript
 const hfInstance = HyperFormula.buildEmpty();
@@ -90,9 +88,9 @@ hfInstance.resumeEvaluation();
 
 ## When to batch
 
-You can use `batch` anytime you want to stack several operations into
+You can batch operations anytime you want to stack several actions into
 one. However, if you want to see the most amazing benefits of this
-feature, use `batch` when there are a lot of heavy operations.
+feature, use batch operations when there are a lot of heavy methods.
 This will result in better performance. The best candidates to
 batch in this situation are the following methods:
 
@@ -115,12 +113,20 @@ Batching can also be useful when you decide to use HyperFormula
 on the [server-side](server-side-installation). Several operations
 can be sent as a single one.
 
+## What you can't batch
+
+You can't batch read operations.
+
+Methods such as [`getCellValue`](../api/classes/hyperformula.md#getcellvalue), [`getSheetSerialized`](../api/classes/hyperformula.md#getsheetserialized), or [`getFillRangeData`](../api/classes/hyperformula.md#getfillrangedata) will result in an error when called inside a [batch callback](#using-the-batch-method) or when the evaluation is [suspended](#using-the-suspendevaluation-and-resumeevaluation-methods).
+
+The [paste](../api/classes/hyperformula.md#paste) method also can't be called when batching as it reads the contents of the copied cells.
+
 ## Demo
 
 <iframe
-     src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.6.x/batch-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="handsontable/hyperformula-demos: batch-operations"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+  src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.6.x/batch-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: batch-operations"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+</iframe>

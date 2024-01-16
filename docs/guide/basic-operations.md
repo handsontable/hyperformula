@@ -49,8 +49,8 @@ const sheetsCount = hfInstance.countSheets();
 
 A sheet can be removed by using the `removeSheet` method. To do that
 you need to pass a mandatory parameter: the ID of a sheet to be
-removed. This method returns a list of cells whose values were affected
-by this operation together with their absolute addresses and new values.
+removed.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by removing the sheet 0
@@ -78,9 +78,8 @@ hfInstance.renameSheet(sheetID, 'AnotherNewName');
 ### Clearing a sheet
 
 A sheet's content can be cleared with the `clearSheet` method. You need
-to provide the ID of a sheet whose content you want to clear. This
-method returns a list of cells whose values were affected by this
-operation together with their absolute addresses and new values.
+to provide the ID of a sheet whose content you want to clear.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // clear the content of sheet 0
@@ -91,9 +90,8 @@ const changes = hfInstance.clearSheet(0);
 
 Instead of removing and adding the content of a sheet you can replace
 it right away. To do so use `setSheetContent`, in which you can pass
-the sheet ID and its new values. This method returns a list of cells
-whose values were affected by this operation together with their
-absolute addresses and new values.
+the sheet ID and its new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // set new values for sheet 0
@@ -107,8 +105,7 @@ const changes = hfInstance.setSheetContent(0, [['50'], ['60']]);
 You can add one or more rows by using the `addRows` method. The first
 parameter you need to pass is a sheet ID, and the second parameter
 represents the position and the size of a block of rows to be added.
-This method returns a list of cells whose values were affected by this
-operation together with their absolute addresses and new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by adding
@@ -121,9 +118,8 @@ const changes = hfInstance.addRows(0, [0, 2]);
 You can remove one or more rows by using the `removeRows` method. The
 first parameter you need to pass is a sheet ID, and the second
 parameter represents the position and the size of a block of rows to
-be removed. This method returns a list of cells whose values were
-affected by this operation together with their absolute addresses
-and new values.
+be removed.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by removing
@@ -141,8 +137,7 @@ to pass the following parameters:
 * Number of rows to be moved
 * Target row
 
-This method returns a list of cells whose values were affected by
-this operation, together with their absolute addresses and new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by moving
@@ -156,8 +151,7 @@ You can change the order of rows by using the `setRowOrder` method. You need to 
 * Sheet ID
 * New row order
 
-This method returns a list of cells whose values were affected by
-this operation, together with their absolute addresses and new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // row 0 and row 2 swap places
@@ -171,9 +165,8 @@ const changes = hfInstance.setRowOrder(0, [2, 1, 0]);
 You can add one or more columns by using the `addColumns` method.
 The first parameter you need to pass is a sheet ID, and the second
 parameter represents the position and the size of a block of columns
-to be added. This method returns a list of cells whose values were
-affected by this operation together with their absolute addresses
-and new values.
+to be added.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by adding
@@ -186,9 +179,8 @@ const changes = hfInstance.addColumns(0, [0, 2]);
 You can remove one or more columns by using the `removeColumns` method.
 The first parameter you need to pass is a sheet ID, and the second
 parameter represents the position and the size of a block of columns
-to be removed. This method returns a list of cells which values were
-affected by this operation together with their absolute addresses
-and new values.
+to be removed.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by removing
@@ -206,8 +198,7 @@ You need to pass the following parameters:
 * Number of columns to be moved
 * Target column
 
-This method returns a list of cells whose values were affected by
-this operation together with their absolute addresses and new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by moving
@@ -221,8 +212,7 @@ You can change the order of columns by using the `setColumnOrder` method. You ne
 * Sheet ID
 * New column order
 
-This method returns a list of cells whose values were affected by
-this operation, together with their absolute addresses and new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // column 0 and column 2 swap places
@@ -250,8 +240,7 @@ to pass the following parameters:
 * Source range ([SimpleCellRange](../api/interfaces/simplecellrange))
 * Top left corner of the destination range ([SimpleCellAddress](../api/interfaces/simplecelladdress))
 
-This method returns a list of cells whose values were affected by
-this operation together with their absolute addresses and new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // choose the source cells
@@ -270,8 +259,7 @@ You can set the content of a block of cells by using the
 `setCellContents` method. You need to pass the top left corner address
 of a block as a simple cell address, along with the content to be set.
 It can be content for either a single cell or a set of cells in an array.
-This method returns a list of cells whose values were affected by this
-operation together with their absolute addresses and new values.
+This method returns [an array of changed cells](#changes-array).
 
 ```javascript
 // track the changes triggered by setting
@@ -365,23 +353,53 @@ if (!isRemovable) {
 }
 ```
 
-## What are the "changes"?
+## Changes array
 
-Several methods return the "changes". This is a list of cells
-whose values were affected by an operation, together with their
-absolute addresses and new values.
+All data modification methods return an array of `ExportedChange`.
+This is a collection of cells whose **values** were affected by an operation,
+together with their absolute addresses and new values.
 
 ```javascript
- [{
-   address: { sheet: 0, col: 0, row: 0 },
-   newValue: { error: [CellError], value: '#REF!' },
- }]
+[{
+  address: { sheet: 0, col: 0, row: 0 },
+  newValue: { error: [CellError], value: '#REF!' },
+}]
 ```
 
 This gives you information about where the change happened, what the
 new value of a cell is, and even what type it is - in this case, an
-error. The change shows only those parts where calculations were made;
-it will return an empty array if there were none.
+error.
+
+The array of changes includes only cells that have different **values** after performing the operation. See the example:
+
+```js
+const hf = HyperFormula.buildFromArray([
+  [0],
+  [1],
+  ['=SUM(A1:A2)'],
+  ['=COUNTBLANK(A1:A3)'],
+]);
+
+// insert an empty row between the row 0 and the row 1
+const changes = hf.addRows(0, [1, 1]);
+
+console.log(hf.getSheetSerialized(0));
+// sheet after adding the row:
+// [
+//   [0],
+//   [],
+//   [1],
+//   ['=SUM(A1:A3)'],
+//   ['=COUNTBLANK(A1:A4)'],
+// ]
+
+console.log(changes);
+// changes include only the COUNTBLANK cell:
+// [{
+//   address: { sheet: 0, row: 4, col: 0 },
+//   newValue: 1,
+// }]
+```
 
 ## Demo
 

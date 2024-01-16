@@ -23,7 +23,7 @@ const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
  * Computes R0C0 representation of cell address based on it's string representation and base address.
  *
  * @param sheetMapping - mapping function needed to change name of a sheet to index
- * @param stringAddress - string representation of cell address, e.g. 'C64'
+ * @param stringAddress - string representation of cell address, e.g., 'C64'
  * @param baseAddress - base address for R0C0 conversion
  * @returns object representation of address
  */
@@ -101,9 +101,9 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
  * - If sheet name is not present in the string representation, returns {@param contextSheetId} as sheet number.
  *
  * @param sheetMapping - mapping function needed to change name of a sheet to index
- * @param stringAddress - string representation of cell address, e.g. 'C64'
+ * @param stringAddress - string representation of cell address, e.g., 'C64'
  * @param contextSheetId - sheet in context of which we should parse the address
- * @returns absolute representation of address, e.g. { sheet: 0, col: 1, row: 1 }
+ * @returns absolute representation of address, e.g., { sheet: 0, col: 1, row: 1 }
  */
 export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellAddress> => {
   const regExpExecArray = addressRegex.exec(stringAddress)!
@@ -183,7 +183,7 @@ export const simpleCellRangeToString = (sheetIndexMapping: SheetIndexMappingFn, 
 /**
  * Convert column label to index
  *
- * @param columnStringRepresentation - column label (e.g. 'AAB')
+ * @param columnStringRepresentation - column label (e.g., 'AAB')
  * @returns column index
  */
 function columnLabelToIndex(columnStringRepresentation: string): number {
@@ -200,7 +200,7 @@ function columnLabelToIndex(columnStringRepresentation: string): number {
  * Converts column index to label
  *
  * @param column - address to convert
- * @returns string representation, e.g. 'AAB'
+ * @returns string representation, e.g., 'AAB'
  */
 export function columnIndexToLabel(column: number) {
   let result = ''

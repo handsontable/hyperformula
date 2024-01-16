@@ -89,7 +89,7 @@ export interface FunctionMetadata {
    * Engine.
    *
    * If set to `true`, the function gets recalculated with each sheet shape change
-   * (e.g. when adding/removing rows or columns).
+   * (e.g., when adding/removing rows or columns).
    */
   isDependentOnSheetStructureChange?: boolean,
 
@@ -179,7 +179,7 @@ export interface FunctionArgument {
 
   /**
    * If set to `true`, arguments need to be passed with full type information.
-   * (e.g. for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`)
+   * (e.g., for numbers: `Date` or `DateTime` or `Time` or `Currency` or `Percentage`)
    */
   passSubtype?: boolean,
 

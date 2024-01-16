@@ -817,7 +817,7 @@ describe('Named expressions - evaluation', () => {
 })
 
 describe('Named expressions - cross scope', () => {
-  it('should be possible to refer to other sheet', () => {
+  it('should be possible to reference another sheet', () => {
     const engine = HyperFormula.buildFromSheets({
       'Sheet1': [['foo']],
       'Sheet2': [['bar']]

@@ -1,11 +1,14 @@
-# Integration with Vue 3
+# Integration with Vue
 
-The installation process for applications written in Vue 3 is the same
-as in the case of pure JavaScript. You can check the
-[client-side installation](client-side-installation.md) section for
-more details.
+Installing HyperFormula in a Vue application works the same as with vanilla JavaScript.
+
+For more details, see the [client-side installation](client-side-installation.md) section.
 
 ## Demo
+
+::: tip
+This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking for an example using Vue 2, check out the [code on GitHub](https://github.com/handsontable/hyperformula-demos/tree/2.5.x/vue-demo).
+:::
 
 <iframe
      src="https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.6.x/vue-3-demo?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview"
