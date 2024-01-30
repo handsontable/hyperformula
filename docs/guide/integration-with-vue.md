@@ -6,6 +6,10 @@ For more details, see the [client-side installation](client-side-installation.md
 
 ## Demo
 
+::: tip
+This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking for an example using Vue 2, check out the [code on GitHub](https://github.com/handsontable/hyperformula-demos/tree/2.5.x/vue-demo).
+:::
+
 <iframe
   src="https://codesandbox.io/p/devbox/github/handsontable/hyperformula-demos/tree/2.6.x/vue-3-demo"
   style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
