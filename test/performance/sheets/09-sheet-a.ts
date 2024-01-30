@@ -1,13 +1,14 @@
+import {RawCellContent, Sheet} from '../../../src'
 import {ExpectedValue} from '../benchmark'
 
-export function sheet(rows: number = 10000) {
-  const sheet = []
+export function sheet(rows: number = 10000): Sheet {
+  const sheet: Sheet = []
   sheet.push(['1', '2', '3', '4', '5'])
 
   let prev = 1
 
   while (prev < rows) {
-    const rowToPush = [
+    const rowToPush: RawCellContent[] = [
       `${prev + 1}`,
       '3',
       `=A${prev}*A${prev}`,
@@ -21,7 +22,7 @@ export function sheet(rows: number = 10000) {
   return sheet
 }
 
-export function expectedValues(_sheet: string[][]): ExpectedValue[] {
+export function expectedValues(_sheet: Sheet): ExpectedValue[] {
   return [
     {address: 'A10000', value: 10000},
     {address: 'B10000', value: 3},

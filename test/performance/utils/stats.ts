@@ -5,7 +5,7 @@ export type Stats = Map<EnrichedStatType, number>
 
 export enum ExtStatType {
   INIT_DATASTRUCTURES = 'INIT_DATASTRUCTURES',
-  PREPROCESSING = 'PREPROCESING',
+  PREPROCESSING = 'PREPROCESSING',
   CRUDS_TOTAL = 'CRUDS_TOTAL',
 }
 
@@ -84,23 +84,4 @@ export function average(values: number[]): number {
     return sum + value
   }, 0)
   return sum / values.length
-}
-
-export function median(values: number[]): number {
-  return values.sort((a, b) => a - b)[Math.trunc(values.length / 2)]
-}
-
-export function stdDev(values: number[]): number {
-  const avg = average(values)
-  const sqrDiffs = squareDiffs(values, avg)
-  const avgSquareDiffs = average(sqrDiffs)
-
-  return Math.sqrt(avgSquareDiffs)
-}
-
-function squareDiffs(values: number[], avg: number): number[] {
-  return values.map((value) => {
-    const diff = value - avg
-    return diff * diff
-  })
 }
