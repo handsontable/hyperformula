@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2023 Handsoncode. All rights reserved.
+ * Copyright (c) 2024 Handsoncode. All rights reserved.
  */
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
