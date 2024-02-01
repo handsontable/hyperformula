@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Removed `unorm` dependency. [#1370](https://github.com/handsontable/hyperformula/issues/1370)
+
 ## [2.6.1] - 2023-12-27
 
 ### Fixed
