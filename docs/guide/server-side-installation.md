@@ -34,7 +34,7 @@ the `./node_modules` directory.
 Then you can just `require` it:
 
 ```javascript
-const HyperFormula = require('hyperformula');
+const { HyperFormula } = require('hyperformula');
 
 // your code
 ```
