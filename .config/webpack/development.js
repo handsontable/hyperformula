@@ -29,12 +29,6 @@ module.exports.create = function create() {
         commonjs: 'tiny-emitter',
         amd: 'tiny-emitter',
       },
-      unorm: {
-        root: 'unorm',
-        commonjs2: 'unorm',
-        commonjs: 'unorm',
-        amd: 'unorm',
-      },
     };
     c.plugins.push(new WebpackBar({ name: ` ${PACKAGE_FILENAME}.js` }));
   });
