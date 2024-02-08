@@ -11,8 +11,6 @@ features.
 | [core-js](https://github.com/zloirock/core-js)              | The MIT License | Denis Pushkarev                    |
 | [jStat](https://github.com/jstat/jstat)                     | The MIT License | jStat                              |
 | [tiny-emitter](https://github.com/scottcorgan/tiny-emitter) | The MIT License | Scott Corgan                       |
-| [unorm](https://github.com/walling/unorm)                   | The MIT License | Matsuza, Bjarke Walling            |
-
 
 The _bessel_ and _jStat_ projects are distributed with the code repository at the path `src/interpreter/plugin/3rdparty` and bundled with the code package.
 
