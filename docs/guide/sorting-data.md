@@ -202,5 +202,5 @@ To see the code, select "Open Sandbox" in the frame's bottom right corner.
      style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
      title="handsontable/hyperformula-demos: sorting"
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-autoplay allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
    ></iframe>

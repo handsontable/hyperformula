@@ -47,7 +47,6 @@ Or you may load just a minimal build and add the dependencies on your own:
 ```html
 <script src="https://cdn.jsdelivr.net/npm/chevrotain@6/lib/chevrotain.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tiny-emitter@2/dist/tinyemitter.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/unorm@1/lib/unorm.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.min.js"></script>
 ```
 

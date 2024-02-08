@@ -1,9 +1,8 @@
 /**
  * @license
- * Copyright (c) 2023 Handsoncode. All rights reserved.
+ * Copyright (c) 2024 Handsoncode. All rights reserved.
  */
 
-import unorm from 'unorm'
 import {CellError, CellValueTypeOrd, ErrorType, getCellValueType} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
@@ -835,6 +834,5 @@ export function coerceRangeToScalar(arg: SimpleRangeValue, state: InterpreterSta
 type NormalizationForm = 'nfc' | 'nfd' | 'nfkc' | 'nfkd'
 
 export function normalizeString(str: string, form: NormalizationForm): string {
-  return typeof str.normalize === 'function'
-    ? str.normalize(form.toUpperCase()) : unorm[form](str)
+  return str.normalize(form.toUpperCase())
 }
