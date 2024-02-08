@@ -22,6 +22,31 @@ module.exports = {
     `],
     // Google Console
     ['meta', { name: 'google-site-verification', content: 'MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q' }],
+    // Sentry monitoring
+    [
+      'script', {}, `
+        window.sentryOnLoad = function () {
+          Sentry.init({
+            integrations: [
+              // If you use a bundle with performance monitoring enabled, add the BrowserTracing integration
+              new Sentry.BrowserTracing(),
+              // If you use a bundle with session replay enabled, add the SessionReplay integration
+              new Sentry.Replay({
+                maskAllText: false,
+                blockAllMedia: false,
+              }),   
+            ],
+          });
+        };
+    `],
+    [
+      'script',
+        {
+          id: 'Sentry.io',
+          src: 'https://js.sentry-cdn.com/50617701901516ce348cb7b252564a60.min.js',
+          crossorigin: 'anonymous',
+        },
+    ],
     // Favicon
     ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' }],
     ['link', { rel: 'icon', sizes: '32x32', type: 'image/png', href: '/favicon/favicon-32x32.png' }],
