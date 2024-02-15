@@ -95,6 +95,10 @@
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@0.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
     "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}"
   },
+  "dependencies": {
+    "chevrotain": "^6.5.0",
+    "tiny-emitter": "^2.1.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.4",
@@ -154,8 +158,283 @@
     "webpack-cli": "^3.3.11",
     "webpackbar": "^4.0.0"
   },
-  "dependencies": {
-    "chevrotain": "^6.5.0",
-    "tiny-emitter": "^2.1.0"
+  "exports": {
+    ".": {
+      "import": "./es/index.mjs",
+      "require": "./commonjs/index.js",
+      "types": "./typings/index.d.ts"
+    },
+    "./i18n/csCZ": {
+      "import": "./es/i18n/languages/csCZ.mjs",
+      "require": "./commonjs/i18n/languages/csCZ",
+      "types": "./typings/i18n/languages/csCZ"
+    },
+    "./es/i18n/languages/csCZ": {
+      "import": "./es/i18n/languages/csCZ.mjs",
+      "require": "./commonjs/i18n/languages/csCZ",
+      "types": "./typings/i18n/languages/csCZ"
+    },
+    "./commonjs/i18n/languages/csCZ": {
+      "import": "./es/i18n/languages/csCZ.mjs",
+      "require": "./commonjs/i18n/languages/csCZ",
+      "types": "./typings/i18n/languages/csCZ"
+    },
+    "./hyperformula/dist/languages/csCZ": "./hyperformula/dist/languages/csCZ",
+    "./i18n/daDK": {
+      "import": "./es/i18n/languages/daDK.mjs",
+      "require": "./commonjs/i18n/languages/daDK",
+      "types": "./typings/i18n/languages/daDK"
+    },
+    "./es/i18n/languages/daDK": {
+      "import": "./es/i18n/languages/daDK.mjs",
+      "require": "./commonjs/i18n/languages/daDK",
+      "types": "./typings/i18n/languages/daDK"
+    },
+    "./commonjs/i18n/languages/daDK": {
+      "import": "./es/i18n/languages/daDK.mjs",
+      "require": "./commonjs/i18n/languages/daDK",
+      "types": "./typings/i18n/languages/daDK"
+    },
+    "./hyperformula/dist/languages/daDK": "./hyperformula/dist/languages/daDK",
+    "./i18n/deDE": {
+      "import": "./es/i18n/languages/deDE.mjs",
+      "require": "./commonjs/i18n/languages/deDE",
+      "types": "./typings/i18n/languages/deDE"
+    },
+    "./es/i18n/languages/deDE": {
+      "import": "./es/i18n/languages/deDE.mjs",
+      "require": "./commonjs/i18n/languages/deDE",
+      "types": "./typings/i18n/languages/deDE"
+    },
+    "./commonjs/i18n/languages/deDE": {
+      "import": "./es/i18n/languages/deDE.mjs",
+      "require": "./commonjs/i18n/languages/deDE",
+      "types": "./typings/i18n/languages/deDE"
+    },
+    "./hyperformula/dist/languages/deDE": "./hyperformula/dist/languages/deDE",
+    "./i18n/enGB": {
+      "import": "./es/i18n/languages/enGB.mjs",
+      "require": "./commonjs/i18n/languages/enGB",
+      "types": "./typings/i18n/languages/enGB"
+    },
+    "./es/i18n/languages/enGB": {
+      "import": "./es/i18n/languages/enGB.mjs",
+      "require": "./commonjs/i18n/languages/enGB",
+      "types": "./typings/i18n/languages/enGB"
+    },
+    "./commonjs/i18n/languages/enGB": {
+      "import": "./es/i18n/languages/enGB.mjs",
+      "require": "./commonjs/i18n/languages/enGB",
+      "types": "./typings/i18n/languages/enGB"
+    },
+    "./hyperformula/dist/languages/enGB": "./hyperformula/dist/languages/enGB",
+    "./i18n/enUS": {
+      "import": "./es/i18n/languages/enUS.mjs",
+      "require": "./commonjs/i18n/languages/enUS",
+      "types": "./typings/i18n/languages/enUS"
+    },
+    "./es/i18n/languages/enUS": {
+      "import": "./es/i18n/languages/enUS.mjs",
+      "require": "./commonjs/i18n/languages/enUS",
+      "types": "./typings/i18n/languages/enUS"
+    },
+    "./commonjs/i18n/languages/enUS": {
+      "import": "./es/i18n/languages/enUS.mjs",
+      "require": "./commonjs/i18n/languages/enUS",
+      "types": "./typings/i18n/languages/enUS"
+    },
+    "./hyperformula/dist/languages/enUS": "./hyperformula/dist/languages/enUS",
+    "./i18n/esES": {
+      "import": "./es/i18n/languages/esES.mjs",
+      "require": "./commonjs/i18n/languages/esES",
+      "types": "./typings/i18n/languages/esES"
+    },
+    "./es/i18n/languages/esES": {
+      "import": "./es/i18n/languages/esES.mjs",
+      "require": "./commonjs/i18n/languages/esES",
+      "types": "./typings/i18n/languages/esES"
+    },
+    "./commonjs/i18n/languages/esES": {
+      "import": "./es/i18n/languages/esES.mjs",
+      "require": "./commonjs/i18n/languages/esES",
+      "types": "./typings/i18n/languages/esES"
+    },
+    "./hyperformula/dist/languages/esES": "./hyperformula/dist/languages/esES",
+    "./i18n/fiFI": {
+      "import": "./es/i18n/languages/fiFI.mjs",
+      "require": "./commonjs/i18n/languages/fiFI",
+      "types": "./typings/i18n/languages/fiFI"
+    },
+    "./es/i18n/languages/fiFI": {
+      "import": "./es/i18n/languages/fiFI.mjs",
+      "require": "./commonjs/i18n/languages/fiFI",
+      "types": "./typings/i18n/languages/fiFI"
+    },
+    "./commonjs/i18n/languages/fiFI": {
+      "import": "./es/i18n/languages/fiFI.mjs",
+      "require": "./commonjs/i18n/languages/fiFI",
+      "types": "./typings/i18n/languages/fiFI"
+    },
+    "./hyperformula/dist/languages/fiFI": "./hyperformula/dist/languages/fiFI",
+    "./i18n/frFR": {
+      "import": "./es/i18n/languages/frFR.mjs",
+      "require": "./commonjs/i18n/languages/frFR",
+      "types": "./typings/i18n/languages/frFR"
+    },
+    "./es/i18n/languages/frFR": {
+      "import": "./es/i18n/languages/frFR.mjs",
+      "require": "./commonjs/i18n/languages/frFR",
+      "types": "./typings/i18n/languages/frFR"
+    },
+    "./commonjs/i18n/languages/frFR": {
+      "import": "./es/i18n/languages/frFR.mjs",
+      "require": "./commonjs/i18n/languages/frFR",
+      "types": "./typings/i18n/languages/frFR"
+    },
+    "./hyperformula/dist/languages/frFR": "./hyperformula/dist/languages/frFR",
+    "./i18n/huHU": {
+      "import": "./es/i18n/languages/huHU.mjs",
+      "require": "./commonjs/i18n/languages/huHU",
+      "types": "./typings/i18n/languages/huHU"
+    },
+    "./es/i18n/languages/huHU": {
+      "import": "./es/i18n/languages/huHU.mjs",
+      "require": "./commonjs/i18n/languages/huHU",
+      "types": "./typings/i18n/languages/huHU"
+    },
+    "./commonjs/i18n/languages/huHU": {
+      "import": "./es/i18n/languages/huHU.mjs",
+      "require": "./commonjs/i18n/languages/huHU",
+      "types": "./typings/i18n/languages/huHU"
+    },
+    "./hyperformula/dist/languages/huHU": "./hyperformula/dist/languages/huHU",
+    "./i18n/itIT": {
+      "import": "./es/i18n/languages/itIT.mjs",
+      "require": "./commonjs/i18n/languages/itIT",
+      "types": "./typings/i18n/languages/itIT"
+    },
+    "./es/i18n/languages/itIT": {
+      "import": "./es/i18n/languages/itIT.mjs",
+      "require": "./commonjs/i18n/languages/itIT",
+      "types": "./typings/i18n/languages/itIT"
+    },
+    "./commonjs/i18n/languages/itIT": {
+      "import": "./es/i18n/languages/itIT.mjs",
+      "require": "./commonjs/i18n/languages/itIT",
+      "types": "./typings/i18n/languages/itIT"
+    },
+    "./hyperformula/dist/languages/itIT": "./hyperformula/dist/languages/itIT",
+    "./i18n/nbNO": {
+      "import": "./es/i18n/languages/nbNO.mjs",
+      "require": "./commonjs/i18n/languages/nbNO",
+      "types": "./typings/i18n/languages/nbNO"
+    },
+    "./es/i18n/languages/nbNO": {
+      "import": "./es/i18n/languages/nbNO.mjs",
+      "require": "./commonjs/i18n/languages/nbNO",
+      "types": "./typings/i18n/languages/nbNO"
+    },
+    "./commonjs/i18n/languages/nbNO": {
+      "import": "./es/i18n/languages/nbNO.mjs",
+      "require": "./commonjs/i18n/languages/nbNO",
+      "types": "./typings/i18n/languages/nbNO"
+    },
+    "./hyperformula/dist/languages/nbNO": "./hyperformula/dist/languages/nbNO",
+    "./i18n/nlNL": {
+      "import": "./es/i18n/languages/nlNL.mjs",
+      "require": "./commonjs/i18n/languages/nlNL",
+      "types": "./typings/i18n/languages/nlNL"
+    },
+    "./es/i18n/languages/nlNL": {
+      "import": "./es/i18n/languages/nlNL.mjs",
+      "require": "./commonjs/i18n/languages/nlNL",
+      "types": "./typings/i18n/languages/nlNL"
+    },
+    "./commonjs/i18n/languages/nlNL": {
+      "import": "./es/i18n/languages/nlNL.mjs",
+      "require": "./commonjs/i18n/languages/nlNL",
+      "types": "./typings/i18n/languages/nlNL"
+    },
+    "./hyperformula/dist/languages/nlNL": "./hyperformula/dist/languages/nlNL",
+    "./i18n/plPL": {
+      "import": "./es/i18n/languages/plPL.mjs",
+      "require": "./commonjs/i18n/languages/plPL",
+      "types": "./typings/i18n/languages/plPL"
+    },
+    "./es/i18n/languages/plPL": {
+      "import": "./es/i18n/languages/plPL.mjs",
+      "require": "./commonjs/i18n/languages/plPL",
+      "types": "./typings/i18n/languages/plPL"
+    },
+    "./commonjs/i18n/languages/plPL": {
+      "import": "./es/i18n/languages/plPL.mjs",
+      "require": "./commonjs/i18n/languages/plPL",
+      "types": "./typings/i18n/languages/plPL"
+    },
+    "./hyperformula/dist/languages/plPL": "./hyperformula/dist/languages/plPL",
+    "./i18n/ptPT": {
+      "import": "./es/i18n/languages/ptPT.mjs",
+      "require": "./commonjs/i18n/languages/ptPT",
+      "types": "./typings/i18n/languages/ptPT"
+    },
+    "./es/i18n/languages/ptPT": {
+      "import": "./es/i18n/languages/ptPT.mjs",
+      "require": "./commonjs/i18n/languages/ptPT",
+      "types": "./typings/i18n/languages/ptPT"
+    },
+    "./commonjs/i18n/languages/ptPT": {
+      "import": "./es/i18n/languages/ptPT.mjs",
+      "require": "./commonjs/i18n/languages/ptPT",
+      "types": "./typings/i18n/languages/ptPT"
+    },
+    "./hyperformula/dist/languages/ptPT": "./hyperformula/dist/languages/ptPT",
+    "./i18n/ruRU": {
+      "import": "./es/i18n/languages/ruRU.mjs",
+      "require": "./commonjs/i18n/languages/ruRU",
+      "types": "./typings/i18n/languages/ruRU"
+    },
+    "./es/i18n/languages/ruRU": {
+      "import": "./es/i18n/languages/ruRU.mjs",
+      "require": "./commonjs/i18n/languages/ruRU",
+      "types": "./typings/i18n/languages/ruRU"
+    },
+    "./commonjs/i18n/languages/ruRU": {
+      "import": "./es/i18n/languages/ruRU.mjs",
+      "require": "./commonjs/i18n/languages/ruRU",
+      "types": "./typings/i18n/languages/ruRU"
+    },
+    "./hyperformula/dist/languages/ruRU": "./hyperformula/dist/languages/ruRU",
+    "./i18n/svSE": {
+      "import": "./es/i18n/languages/svSE.mjs",
+      "require": "./commonjs/i18n/languages/svSE",
+      "types": "./typings/i18n/languages/svSE"
+    },
+    "./es/i18n/languages/svSE": {
+      "import": "./es/i18n/languages/svSE.mjs",
+      "require": "./commonjs/i18n/languages/svSE",
+      "types": "./typings/i18n/languages/svSE"
+    },
+    "./commonjs/i18n/languages/svSE": {
+      "import": "./es/i18n/languages/svSE.mjs",
+      "require": "./commonjs/i18n/languages/svSE",
+      "types": "./typings/i18n/languages/svSE"
+    },
+    "./hyperformula/dist/languages/svSE": "./hyperformula/dist/languages/svSE",
+    "./i18n/trTR": {
+      "import": "./es/i18n/languages/trTR.mjs",
+      "require": "./commonjs/i18n/languages/trTR",
+      "types": "./typings/i18n/languages/trTR"
+    },
+    "./es/i18n/languages/trTR": {
+      "import": "./es/i18n/languages/trTR.mjs",
+      "require": "./commonjs/i18n/languages/trTR",
+      "types": "./typings/i18n/languages/trTR"
+    },
+    "./commonjs/i18n/languages/trTR": {
+      "import": "./es/i18n/languages/trTR.mjs",
+      "require": "./commonjs/i18n/languages/trTR",
+      "types": "./typings/i18n/languages/trTR"
+    },
+    "./hyperformula/dist/languages/trTR": "./hyperformula/dist/languages/trTR"
   }
 }
