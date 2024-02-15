@@ -6,6 +6,14 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.6.2
+
+**Release date: Feb 15, 2024**
+
+### Changed
+
+- Removed `unorm` dependency. [#1370](https://github.com/handsontable/hyperformula/issues/1370)
+
 ## 2.6.1
 
 **Release date: Dec 27, 2023**
