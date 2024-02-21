@@ -1,3 +1,5 @@
+// Based on https://github.com/handsontable/handsontable/blob/bd7628544ff83d6e74a9cc949e2c3c38fef74d76/handsontable/.config/plugin/babel/add-import-extension.js
+
 const { existsSync, lstatSync } = require('fs');
 const { dirname, resolve } = require('path');
 const { types } = require('@babel/core');
