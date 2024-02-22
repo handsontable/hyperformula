@@ -47,6 +47,7 @@
     "last 2 op_mob versions"
   ],
   "license": "GPL-3.0-only",
+  "type": "commonjs",
   "module": "es/index.mjs",
   "main": "commonjs/index.js",
   "jsnext:main": "es/index.mjs",
