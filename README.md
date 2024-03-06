@@ -64,25 +64,26 @@ Once installed, you can use it like this:
 ```js
 import { HyperFormula } from 'hyperformula';
 
-// define the options
-const options = {
-  licenseKey: 'gpl-v3',
-};
+// Create a HyperFormula instance
+const hf = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' });
 
-// define the data
-const data = [['10', '20', '30', '=SUM(A1:C1)']];
+// Add an empty sheet
+const sheetName = hf.addSheet('Mortgage Calculator');
+const sheetId = hf.getSheetId(sheetName);
 
-// build an instance with defined options and data
-const hfInstance = HyperFormula.buildFromArray(data, options);
+// Enter the mortgage parameters
+hf.addNamedExpression('AnnualInterestRate', '8%');
+hf.addNamedExpression('NumberOfMonths', 10);
+hf.addNamedExpression('LoanAmount', 10000);
 
-// call getCellValue to get the calculation results
-const mySum = hfInstance.getCellValue({ col: 3, row: 0, sheet: 0 });
+// Use the PMT function to calculate the monthly payment
+hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PMT(AnnualInterestRate/12, NumberOfMonths, -LoanAmount)']]);
 
-// print the result in the browser's console
-console.log(mySum);
+// Display the result
+console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })}`);
 ```
 
-[Run this code in CodeSandbox](https://codesandbox.io/s/github/handsontable/hyperformula-demos/tree/develop/basic-usage)
+[Run this code in CodeSandbox](https://codesandbox.io/p/devbox/hyperformula-mortgage-calculator-sfjk43)
 
 ## What can it be used for?
 
