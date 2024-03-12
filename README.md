@@ -83,7 +83,7 @@ hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PM
 console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })}`);
 ```
 
-[Run this code in CodeSandbox](https://codesandbox.io/p/devbox/hyperformula-mortgage-calculator-sfjk43)
+[Run this code in CodeSandbox](https://codesandbox.io/p/sandbox/github/handsontable/hyperformula-demos/tree/feature/issue-1380/mortgage-calculator)
 
 ## What can it be used for?
 
