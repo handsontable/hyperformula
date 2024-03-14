@@ -4105,6 +4105,36 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Return a list of named expressions used by a formula.
+   *
+   * @param {string} formulaString - A formula in a proper format, starting with `=`.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e., doesn't start with `=`).
+   *
+   * @example
+   * ```js
+   * // TODO
+   * ```
+   *
+   * @category Helpers
+   */
+  public getNamedExpressionsFromFormula(formulaString: string): string[] {
+    validateArgToType(formulaString, 'string', 'formulaString')
+    const { ast } = this.extractTemporaryFormula(formulaString)
+
+    if (ast === undefined) {
+      throw new NotAFormulaError()
+    }
+
+    if (ast.type === AstNodeType.ERROR && !ast.error) {
+      throw new NotAFormulaError()
+    }
+
+    return []
+  }
+
+  /**
    * Validates the formula.
    * If the provided string starts with "=" and is a parsable formula, the method returns `true`.
    * The validation is purely grammatical: the method doesn't verify if the formula can be calculated or not.
