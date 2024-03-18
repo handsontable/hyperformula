@@ -10,7 +10,7 @@ import {ErrorType} from '../src'
 import {Vertex} from '../src/DependencyGraph'
 import {ErrorMessage} from '../src/error-message'
 import {NoRelativeAddressesAllowedError} from '../src'
-import {adr, detailedError} from './testUtils'
+import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
 import {Config} from '../src/Config'
 import {DependencyGraph} from '../src/DependencyGraph'
 import {Statistics} from '../src/statistics'
@@ -1269,4 +1269,44 @@ describe('serialization', () => {
       {name: 'alsoPrettyName', expression: '=3', scope: 1, options: undefined}
     ])
   })
+})
+
+describe('getNamedExpressionsFromFormula method', () => {
+  it('should return an empty array when called with a formula that has no named expressions', () => {
+    // const engine = HyperFormula.buildEmpty({}, [
+    //   { name: 'foo', expression: '=42' },
+    // ])
+    //
+    // expect(engine.getNamedExpressionsFromFormula('="test"')).toEqual([])
+  })
+
+  it('should return the existing named expressions', () => {
+    // const engine = HyperFormula.buildEmpty({}, [
+    //   { name: 'foo', expression: '=42' },
+    //   { name: 'bar', expression: '=42' },
+    // ])
+    //
+    // expectArrayWithSameContent(engine.getNamedExpressionsFromFormula('=foo+bar*2'), ['foo', 'bar'])
+  })
+
+  it('should return the non-existing named expressions', () => {
+    // const engine = HyperFormula.buildEmpty({}, [
+    //   { name: 'foo', expression: '=42' },
+    // ])
+    //
+    // expectArrayWithSameContent(engine.getNamedExpressionsFromFormula('=bar+baz*2'), ['bar', 'baz'])
+  })
+
+  it('should return each named expression only once', () => {
+    // const engine = HyperFormula.buildEmpty({}, [
+    //   { name: 'foo', expression: '=42' },
+    // ])
+    //
+    // expect(engine.getNamedExpressionsFromFormula('=foo+foo*2')).toEqual(['foo'])
+  })
+
+  it('should throw the ExpectedValueOfTypeError exception for input of wrong type', () => {})
+  it('should throw an exception for non-parsable formula', () => {})
+  it('should throw an exception for empty formula', () => {})
+  it('should not evaluate the formula', () => {})
 })
