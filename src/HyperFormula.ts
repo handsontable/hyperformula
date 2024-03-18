@@ -4121,7 +4121,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public getNamedExpressionsFromFormula(formulaString: string): string[] {
     validateArgToType(formulaString, 'string', 'formulaString')
-    const { ast } = this.extractTemporaryFormula(formulaString)
+    const { ast } = this.extractTemporaryFormula(formulaString) // TODO: what does it do?
 
     if (ast === undefined) {
       throw new NotAFormulaError()

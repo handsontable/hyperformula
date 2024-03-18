@@ -1,9 +1,10 @@
 import {
+  ExpectedValueOfTypeError,
   ExportedCellChange,
   ExportedNamedExpressionChange,
   HyperFormula,
   NamedExpressionDoesNotExistError,
-  NoSheetWithIdError
+  NoSheetWithIdError, NotAFormulaError
 } from '../src'
 import {AbsoluteCellRange} from '../src/AbsoluteCellRange'
 import {ErrorType} from '../src'
@@ -1305,8 +1306,29 @@ describe('getNamedExpressionsFromFormula method', () => {
     // expect(engine.getNamedExpressionsFromFormula('=foo+foo*2')).toEqual(['foo'])
   })
 
-  it('should throw the ExpectedValueOfTypeError exception for input of wrong type', () => {})
-  it('should throw an exception for non-parsable formula', () => {})
-  it('should throw an exception for empty formula', () => {})
+  it('should throw the ExpectedValueOfTypeError exception for input of wrong type', () => {
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expect(() => engine.getNamedExpressionsFromFormula(42 as any)).toThrow(new ExpectedValueOfTypeError('string', 'formulaString'))
+  })
+
+  it('should throw the NotAFormulaError exception for non-parsable formula', () => {
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expect(() => engine.getNamedExpressionsFromFormula('TEST')).toThrow(new NotAFormulaError())
+  })
+
+  it('should throw an exception for empty formula', () => {
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expect(() => engine.getNamedExpressionsFromFormula('')).toThrow(new NotAFormulaError())
+  })
+
   it('should not evaluate the formula', () => {})
 })
