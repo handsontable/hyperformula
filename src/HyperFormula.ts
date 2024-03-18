@@ -4114,7 +4114,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
-   * // TODO
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // returns a list of named expressions used by a formula
+   * // for this example, returns ['foo', 'bar']
+   * const namedExpressions = hfInstance.getNamedExpressionsFromFormula('=foo+bar*2');
    * ```
    *
    * @category Helpers
