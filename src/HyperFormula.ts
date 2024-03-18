@@ -53,7 +53,7 @@ import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './Named
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   Ast,
-  AstNodeType,
+  AstNodeType, NamedExpressionDependency,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,
@@ -4121,7 +4121,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public getNamedExpressionsFromFormula(formulaString: string): string[] {
     validateArgToType(formulaString, 'string', 'formulaString')
-    const { ast } = this.extractTemporaryFormula(formulaString) // TODO: what does it do?
+    const { ast, dependencies } = this.extractTemporaryFormula(formulaString)
 
     if (ast === undefined) {
       throw new NotAFormulaError()
@@ -4131,7 +4131,13 @@ export class HyperFormula implements TypedEmitter {
       throw new NotAFormulaError()
     }
 
-    return []
+    const namedExpressionDependencies = dependencies
+      .filter(dep => dep instanceof NamedExpressionDependency)
+      .map(namedExpr => (namedExpr as NamedExpressionDependency).name)
+
+    const uniqueNamedExpressionDependencies = [ ...new Set(namedExpressionDependencies) ]
+
+    return uniqueNamedExpressionDependencies
   }
 
   /**

@@ -1274,36 +1274,36 @@ describe('serialization', () => {
 
 describe('getNamedExpressionsFromFormula method', () => {
   it('should return an empty array when called with a formula that has no named expressions', () => {
-    // const engine = HyperFormula.buildEmpty({}, [
-    //   { name: 'foo', expression: '=42' },
-    // ])
-    //
-    // expect(engine.getNamedExpressionsFromFormula('="test"')).toEqual([])
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expect(engine.getNamedExpressionsFromFormula('="test"')).toEqual([])
   })
 
   it('should return the existing named expressions', () => {
-    // const engine = HyperFormula.buildEmpty({}, [
-    //   { name: 'foo', expression: '=42' },
-    //   { name: 'bar', expression: '=42' },
-    // ])
-    //
-    // expectArrayWithSameContent(engine.getNamedExpressionsFromFormula('=foo+bar*2'), ['foo', 'bar'])
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+      { name: 'bar', expression: '=42' },
+    ])
+
+    expectArrayWithSameContent(engine.getNamedExpressionsFromFormula('=foo+bar*2'), ['foo', 'bar'])
   })
 
   it('should return the non-existing named expressions', () => {
-    // const engine = HyperFormula.buildEmpty({}, [
-    //   { name: 'foo', expression: '=42' },
-    // ])
-    //
-    // expectArrayWithSameContent(engine.getNamedExpressionsFromFormula('=bar+baz*2'), ['bar', 'baz'])
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expectArrayWithSameContent(engine.getNamedExpressionsFromFormula('=bar+baz*2'), ['bar', 'baz'])
   })
 
   it('should return each named expression only once', () => {
-    // const engine = HyperFormula.buildEmpty({}, [
-    //   { name: 'foo', expression: '=42' },
-    // ])
-    //
-    // expect(engine.getNamedExpressionsFromFormula('=foo+foo*2')).toEqual(['foo'])
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expect(engine.getNamedExpressionsFromFormula('=foo+foo*2')).toEqual(['foo'])
   })
 
   it('should throw the ExpectedValueOfTypeError exception for input of wrong type', () => {
@@ -1329,6 +1329,4 @@ describe('getNamedExpressionsFromFormula method', () => {
 
     expect(() => engine.getNamedExpressionsFromFormula('')).toThrow(new NotAFormulaError())
   })
-
-  it('should not evaluate the formula', () => {})
 })
