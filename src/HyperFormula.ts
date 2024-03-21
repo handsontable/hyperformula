@@ -4131,10 +4131,6 @@ export class HyperFormula implements TypedEmitter {
       throw new NotAFormulaError()
     }
 
-    if (ast.type === AstNodeType.ERROR && !ast.error) {
-      throw new NotAFormulaError()
-    }
-
     const namedExpressionDependencies = dependencies
       .filter(dep => dep instanceof NamedExpressionDependency)
       .map(namedExpr => (namedExpr as NamedExpressionDependency).name)
@@ -4165,15 +4161,7 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(formulaString, 'string', 'formulaString')
     const { ast } = this.extractTemporaryFormula(formulaString)
 
-    if (ast === undefined) {
-      return false
-    }
-
-    if (ast.type === AstNodeType.ERROR && !ast.error) {
-      return false // codecov note: could not identify a formulaString that would cause this condition
-    }
-
-    return true
+    return ast !== undefined
   }
 
   /**
