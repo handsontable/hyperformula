@@ -1314,12 +1314,12 @@ describe('getNamedExpressionsFromFormula method', () => {
     expect(() => engine.getNamedExpressionsFromFormula(42 as any)).toThrow(new ExpectedValueOfTypeError('string', 'formulaString'))
   })
 
-  it('should throw the NotAFormulaError exception for non-parsable formula', () => {
+  it('should throw the NotAFormulaError exception for a string that doesn\'t start with "="', () => {
     const engine = HyperFormula.buildEmpty({}, [
       { name: 'foo', expression: '=42' },
     ])
 
-    expect(() => engine.getNamedExpressionsFromFormula('TEST')).toThrow(new NotAFormulaError())
+    expect(() => engine.getNamedExpressionsFromFormula('foo')).toThrow(new NotAFormulaError())
   })
 
   it('should throw an exception for empty formula', () => {
@@ -1328,5 +1328,25 @@ describe('getNamedExpressionsFromFormula method', () => {
     ])
 
     expect(() => engine.getNamedExpressionsFromFormula('')).toThrow(new NotAFormulaError())
+  })
+
+  it('should return an empty array when called with a formula with an error literal', () => {
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expect(engine.getNamedExpressionsFromFormula('=#VALUE!')).toEqual([])
+  })
+
+  it('should throw the NotAFormulaError exception for an unparsable formula', () => {
+    const engine = HyperFormula.buildEmpty({}, [
+      { name: 'foo', expression: '=42' },
+    ])
+
+    expect(() => engine.getNamedExpressionsFromFormula('=#FOO!')).toThrow(new NotAFormulaError())
+    expect(() => engine.getNamedExpressionsFromFormula('=100%%*foo')).toThrow(new NotAFormulaError())
+    expect(() => engine.getNamedExpressionsFromFormula('=@foo')).toThrow(new NotAFormulaError())
+    expect(() => engine.getNamedExpressionsFromFormula("=foo'bar")).toThrow(new NotAFormulaError())
+    expect(() => engine.getNamedExpressionsFromFormula('=\u00A0foo')).toThrow(new NotAFormulaError())
   })
 })
