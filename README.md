@@ -86,8 +86,8 @@ const sheetId = hf.getSheetId(sheetName);
 
 // Enter the mortgage parameters
 hf.addNamedExpression('AnnualInterestRate', '8%');
-hf.addNamedExpression('NumberOfMonths', 10);
-hf.addNamedExpression('LoanAmount', 10000);
+hf.addNamedExpression('NumberOfMonths', 360);
+hf.addNamedExpression('LoanAmount', 800000);
 
 // Use the PMT function to calculate the monthly payment
 hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PMT(AnnualInterestRate/12, NumberOfMonths, -LoanAmount)']]);
