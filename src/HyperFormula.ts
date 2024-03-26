@@ -2880,6 +2880,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns string representation of an absolute range in A1 notation or `undefined` if the sheet index is not present in the engine.
    *
+   * Note: This method is useful only for cell ranges; does not work with column ranges and row ranges.
+   *
    * @param {SimpleCellRange} cellRange - object representation of an absolute range
    * @param {number} sheetId - context used in case of missing sheet in the first argument
    *
