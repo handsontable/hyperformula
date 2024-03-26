@@ -24,7 +24,7 @@ If your project requires a more permissive license than GPLv3, please contact us
 
 Contact our Sales Team:
 
-* Through the [contact form](https://handsontable.com/contact?category=request_for_quotation) on the Handsontable website
+* Through the [contact form](https://handsontable.com/get-a-quote) on the Handsontable website
 * By email at [sales@handsontable.com](mailto:sales@handsontable.com)
 
 ## Entering a license key
