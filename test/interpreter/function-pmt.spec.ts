@@ -25,4 +25,24 @@ describe('Function PMT', () => {
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(-102.126124417629)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-27.777777777777)
   })
+
+  it('should be possible to implement a mortgage calculator', () => {
+    // Create a HyperFormula instance
+    const hf = HyperFormula.buildEmpty({ licenseKey: 'gpl-v3' })
+
+    // Add an empty sheet
+    const sheetName = hf.addSheet('Mortgage Calculator')
+    const sheetId = hf.getSheetId(sheetName)!
+
+    // Enter the mortgage parameters
+    hf.addNamedExpression('AnnualInterestRate', '8%')
+    hf.addNamedExpression('NumberOfMonths', 10)
+    hf.addNamedExpression('LoanAmount', 10000)
+
+    // Use the PMT function to calculate the monthly payment
+    hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PMT(AnnualInterestRate/12, NumberOfMonths, -LoanAmount)']])
+
+    // Display the result
+    expect(hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })).toBeCloseTo(1037.03)
+  })
 })
