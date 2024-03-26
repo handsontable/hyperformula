@@ -22,10 +22,10 @@
 
 ---
 
-HyperFormula is a headless spreadsheet built in TypeScript, serving as both a parser and evaluator of spreadsheet formulas. It can be seamlessly integrated into your browser or utilized as a service with Node.js as your back-end technology.
+HyperFormula is a headless spreadsheet built in TypeScript, serving as both a parser and evaluator of spreadsheet formulas. It can be integrated into your browser or utilized as a service with Node.js as your back-end technology.
 
 ## What HyperFormula can be used for?
-HyperFormula doesn't assume any existing user interface, making it a great general-purpose library that can be used in various business applications. Here are some examples:
+HyperFormula doesn't assume any existing user interface, making it a general-purpose library that can be used in various business applications. Here are some examples:
 
 - Custom spreadsheet-like app
 - Business logic builder
@@ -35,19 +35,19 @@ HyperFormula doesn't assume any existing user interface, making it a great gener
 
 ## Features
 
-- Function syntax compatible with [Microsoft Excel](https://hyperformula.handsontable.com/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/guide/compatibility-with-google-sheets.html)
+- [Function syntax compatible with Microsoft Excel](https://hyperformula.handsontable.com/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/guide/compatibility-with-google-sheets.html)
 - High-speed parsing and evaluation of spreadsheet formulas
-- A library of [~400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
-- Support for [custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
+- [A library of ~400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
+- [Support for custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
 - [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)
-- Support for [undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
-- Support for [CRUD operations](https://hyperformula.handsontable.com/guide/basic-operations.html)
-- Support for [clipboard](https://hyperformula.handsontable.com/guide/clipboard-operations.html)
-- Support for [named expressions](https://hyperformula.handsontable.com/guide/named-expressions.html)
-- Support for [data sorting](https://hyperformula.handsontable.com/guide/sorting-data.html)
-- Support for [formula localization](https://hyperformula.handsontable.com/guide/i18n-features.html) with 17 built-in languages
+- [Support for undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
+- [Support for CRUD operations](https://hyperformula.handsontable.com/guide/basic-operations.html)
+- [Support for clipboard](https://hyperformula.handsontable.com/guide/clipboard-operations.html)
+- [Support for named expressions](https://hyperformula.handsontable.com/guide/named-expressions.html)
+- [Support for data sorting](https://hyperformula.handsontable.com/guide/sorting-data.html)
+- [Support for formula localization with 17 built-in languages](https://hyperformula.handsontable.com/guide/i18n-features.html)
 - GPLv3 license
-- Maintained by the company that stands behind the [Handsontable](https://handsontable.com/) data grid
+- Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
 
 ## Documentation
 
@@ -59,6 +59,7 @@ HyperFormula doesn't assume any existing user interface, making it a great gener
 - [API Reference](https://hyperformula.handsontable.com/api/)
 
 ## Integrations
+
 - [Integration with React](https://hyperformula.handsontable.com/guide/integration-with-react.html#demo)
 - [Integration with Angular](https://hyperformula.handsontable.com/guide/integration-with-angular.html#demo)
 - [Integration with Vue](https://hyperformula.handsontable.com/guide/integration-with-vue.html#demo)
@@ -100,11 +101,10 @@ console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCel
 
 ## Contributing
 
-Please read the [Contributing Guide](https://hyperformula.handsontable.com/guide/contributing.html) before making a pull request.
+Contributions are welcome, but before you make them, please read the [Contributing Guide](https://hyperformula.handsontable.com/guide/contributing.html) and accept the [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2).
 
 ## License
 
 HyperFormula is available under two different licenses: GPLv3 and commercial. The commercial license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
 
-## Copyrights
-© 2024 Handsoncode
+Copyright (c) Handsoncode
