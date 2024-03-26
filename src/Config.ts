@@ -82,6 +82,14 @@ export interface ConfigParams {
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
+   * A generic context object that can be used to pass data to custom functions.
+   *
+   * @default {}
+   *
+   * @category Engine
+   */
+  context: unknown,
+  /**
    * Sets symbols that denote currency numbers.
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
@@ -494,6 +502,7 @@ export class Config implements ConfigParams, ParserConfig {
     currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
+    context: {},
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
     decimalSeparator: '.',
@@ -596,6 +605,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
+  /** @inheritDoc */
+  public readonly context: Record<string, unknown>
   /**
    * Built automatically based on translation package.
    *
@@ -623,6 +634,7 @@ export class Config implements ConfigParams, ParserConfig {
       caseSensitive,
       caseFirst,
       chooseAddressMappingPolicy,
+      context,
       currencySymbol,
       dateFormats,
       decimalSeparator,
@@ -709,6 +721,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
     this.currencySymbol = this.setupCurrencySymbol(currencySymbol)
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+    this.context = configValueFromParam(context, 'object', 'context')
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
