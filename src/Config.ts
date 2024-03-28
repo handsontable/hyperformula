@@ -721,7 +721,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
     this.currencySymbol = this.setupCurrencySymbol(currencySymbol)
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
-    this.context = configValueFromParam(context, 'object', 'context')
+    this.context = context
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)

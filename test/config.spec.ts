@@ -97,11 +97,9 @@ describe('Config', () => {
     expect(() => new Config({caseFirst: 'abcd'})).toThrowError('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
   })
 
-  it('validation: context', () => {
-    expect(() => new Config({context: 'ABCD'})).toThrowError('Expected value of type: object for config parameter: context')
+  it('should return the specified context', () => {
     const context ={a: 1, b: 2}
-    const validConfig = {context}
-    const config = new Config(validConfig)
+    const config = new Config({context})
     expect(config.context).toBe(context)
   })
 
