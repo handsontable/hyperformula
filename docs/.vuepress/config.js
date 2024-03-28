@@ -71,6 +71,8 @@ module.exports = {
         $page.version = HyperFormula.version
         // inject current HF buildDate as {{ $page.buildDate }} variable
         $page.buildDate = HyperFormula.buildDate
+        // inject current HF buildDate URI encoded as {{ $page.buildDateURIEncoded }} variable
+        $page.buildDateURIEncoded = encodeURIComponent(HyperFormula.buildDate)
         // inject current HF releaseDate as {{ $page.releaseDate }} variable
         $page.releaseDate = HyperFormula.releaseDate
         // inject current HF function count as {{ $page.functionsCount }} variable

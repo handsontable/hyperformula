@@ -128,7 +128,7 @@ export interface ConfigParams {
   /**
    * Sets a separator character that separates procedure arguments in formulas.
    *
-   * Must be different from [[decimalSeparator]] and [[thousandSeparator]].
+   * Must be different from [decimalSeparator](/api/interfaces/configparams.md#decimalseparator) and [thousandSeparator](/api/interfaces/configparams.md#thousandseparator).
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
@@ -144,7 +144,7 @@ export interface ConfigParams {
    * - `.` (period)
    * - `,` (comma)
    *
-   * Must be different from [[thousandSeparator]] and [[functionArgSeparator]].
+   * Must be different from [thousandSeparator](/api/interfaces/configparams.md#thousandseparator) and [functionArgSeparator](/api/interfaces/configparams.md#functionargseparator).
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
@@ -205,7 +205,7 @@ export interface ConfigParams {
    *
    * For compatibility with Lotus 1-2-3 and Microsoft Excel, set this option to `true`.
    *
-   * For more information, see [[nullDate]].
+   * For more information, see [nullDate](/api/interfaces/configparams.md#nulldate).
    *
    * @default false
    *
@@ -376,7 +376,7 @@ export interface ConfigParams {
   /**
    * When set to `false`, no rounding happens, and numbers are equal if and only if they are of truly identical value.
    *
-   * For more information, see [[precisionEpsilon]].
+   * For more information, see [precisionEpsilon](/api/interfaces/configparams.md#precisionepsilon).
    *
    * @default true
    *
@@ -391,7 +391,7 @@ export interface ConfigParams {
    * - `,` (comma)
    * - ` ` (empty space)
    *
-   * Must be different from [[decimalSeparator]] and [[functionArgSeparator]].
+   * Must be different from [decimalSeparator](/api/interfaces/configparams.md#decimalseparator) and [functionArgSeparator](/api/interfaces/configparams.md#functionargseparator).
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
    *
