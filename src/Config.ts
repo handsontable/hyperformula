@@ -82,7 +82,7 @@ export interface ConfigParams {
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
-   * A generic context object that can be used to pass data to custom functions.
+   * A generic parameter that can be used to pass data to custom functions.
    *
    * @default undefined
    *
