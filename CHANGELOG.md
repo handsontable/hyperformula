@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added a configuration option `context` that can be used to pass data to custom functions.
+
 ## [2.6.2] - 2024-02-15
 
 ### Changed

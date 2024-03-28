@@ -97,6 +97,12 @@ describe('Config', () => {
     expect(() => new Config({caseFirst: 'abcd'})).toThrowError('Expected one of \'upper\' \'lower\' \'false\' for config parameter: caseFirst')
   })
 
+  it('should return the specified context', () => {
+    const context ={a: 1, b: 2}
+    const config = new Config({context})
+    expect(config.context).toBe(context)
+  })
+
   it('should throw error when Function Translation cannot be found', () => {
     const config = new Config()
     const functionName = '0123456ABCDEFGH'
