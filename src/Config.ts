@@ -84,7 +84,7 @@ export interface ConfigParams {
   /**
    * A generic context object that can be used to pass data to custom functions.
    *
-   * @default {}
+   * @default undefined
    *
    * @category Engine
    */
@@ -502,7 +502,7 @@ export class Config implements ConfigParams, ParserConfig {
     currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
-    context: {},
+    context: undefined,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
     decimalSeparator: '.',
@@ -606,7 +606,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly undoLimit: number
   /** @inheritDoc */
-  public readonly context: Record<string, unknown>
+  public readonly context: unknown
   /**
    * Built automatically based on translation package.
    *
