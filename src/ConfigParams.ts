@@ -18,11 +18,8 @@ export interface ConfigParams {
   accentSensitive: boolean,
   /**
    * Sets a minimum number of elements that a range must have to use binary search.
-   *
    * @deprecated Every search of sorted data always uses binary search.
-   *
    * @default 20
-   *
    * @category Engine
    */
   binarySearchThreshold: number,
@@ -30,9 +27,7 @@ export interface ConfigParams {
    * When set to `true`, makes string comparison case-sensitive.
    *
    * Applies to comparison operators only.
-   *
    * @default false
-   *
    * @category String
    */
   caseSensitive: boolean,
@@ -42,9 +37,7 @@ export interface ConfigParams {
    * When set to `lower`, lower case sorts first.
    *
    * When set to `false`, uses the locale's default.
-   *
    * @default 'lower'
-   *
    * @category String
    */
   caseFirst: 'upper' | 'lower' | 'false',
@@ -55,9 +48,7 @@ export interface ConfigParams {
    * - `DenseSparseChooseBasedOnThreshold`: sets the address mapping policy separately for each sheet, based on fill ratio.
    * - `AlwaysDense`: uses `DenseStrategy` for all sheets.
    * - `AlwaysSparse`: uses `SparseStrategy` for all sheets.
-   *
    * @default AlwaysDense
-   *
    * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
@@ -65,9 +56,7 @@ export interface ConfigParams {
    * Sets symbols that denote currency numbers.
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
-   *
    * @default ['$']
-   *
    * @category Number
    */
   currencySymbol: string[],
@@ -91,9 +80,7 @@ export interface ConfigParams {
    * Regardless of the separator specified in the format string, all of the above are accepted by the date-parsing function.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
-   *
    * @default ['DD/MM/YYYY', 'DD/MM/YY']
-   *
    * @category Date and Time
    */
   dateFormats: string[],
@@ -103,9 +90,7 @@ export interface ConfigParams {
    * Must be different from [decimalSeparator](/api/interfaces/configparams.md#decimalseparator) and [thousandSeparator](/api/interfaces/configparams.md#thousandseparator).
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
-   *
    * @default ','
-   *
    * @category Formula Syntax
    */
   functionArgSeparator: string,
@@ -119,34 +104,26 @@ export interface ConfigParams {
    * Must be different from [thousandSeparator](/api/interfaces/configparams.md#thousandseparator) and [functionArgSeparator](/api/interfaces/configparams.md#functionargseparator).
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
-   *
    * @default '.'
-   *
    * @category Number
    */
   decimalSeparator: '.' | ',',
   /**
    * When set to `true`, formulas evaluating to `null` evaluate to `0` instead.
-   *
    * @default false
-   *
    * @category Engine
    */
   evaluateNullToZero: boolean,
   /**
    * Lists additional function plugins to be used by the formula interpreter.
-   *
    * @default []
-   *
    * @category Formula Syntax
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functionPlugins: any[],
   /**
    * When set to `true`, string comparison ignores punctuation.
-   *
    * @default false
-   *
    * @category String
    */
   ignorePunctuation: boolean,
@@ -154,9 +131,7 @@ export interface ConfigParams {
    * Sets a translation package for function and error names.
    *
    * For more information, see the [Localizing functions guide](/guide/localizing-functions.md).
-   *
    * @default 'enGB'
-   *
    * @category Formula Syntax
    */
   language: string,
@@ -166,9 +141,7 @@ export interface ConfigParams {
    * When set to `'standard'`, allows only SPACE (U+0020), CHARACTER TABULATION (U+0009), LINE FEED (U+000A), and CARRIAGE RETURN (U+000D) (compliant with OpenFormula Standard 1.3)
    *
    * When set to `'any'`, allows all whitespace characters that would be captured by the `\s` character class of the JavaScript regular expressions.
-   *
    * @default 'standard'
-   *
    * @category Formula Syntax
    */
   ignoreWhiteSpace: 'standard' | 'any',
@@ -178,9 +151,7 @@ export interface ConfigParams {
    * For compatibility with Lotus 1-2-3 and Microsoft Excel, set this option to `true`.
    *
    * For more information, see [nullDate](/api/interfaces/configparams.md#nulldate).
-   *
    * @default false
-   *
    * @category Date and Time
    */
   leapYear1900: boolean,
@@ -192,9 +163,7 @@ export interface ConfigParams {
    * To use HyperFormula with your commercial license, set this option to your valid license key string.
    *
    * For more information, go [here](/guide/license-key.md).
-   *
    * @default undefined
-   *
    * @category License
    */
   licenseKey: string,
@@ -204,9 +173,7 @@ export interface ConfigParams {
    * Accepts **IETF BCP 47** language tags.
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
-   *
    * @default 'en'
-   *
    * @category String
    */
   localeLang: string,
@@ -214,38 +181,31 @@ export interface ConfigParams {
    * When set to `true`, function criteria require whole cells to match the pattern.
    *
    * When set to `false`, function criteria require just a sub-word to match the pattern.
-   *
    * @default true
    * @category String
    */
   matchWholeCell: boolean,
   /**
    * Sets a column separator symbol for array notation.
-   *
    * @default ','
    * @category Formula Syntax
    */
   arrayColumnSeparator: ',' | ';',
   /**
    * Sets a row separator symbol for array notation.
-   *
    * @default ';'
    * @category Formula Syntax
    */
   arrayRowSeparator: ';' | '|',
   /**
    * Sets the maximum number of rows.
-   *
    * @default 40.000
-   *
    * @category Engine
    */
   maxRows: number,
   /**
    * Sets the maximum number of columns.
-   *
    * @default 18.278 (Columns A, B, ..., ZZZ)
-   *
    * @category Engine
    */
   maxColumns: number,
@@ -255,9 +215,7 @@ export interface ConfigParams {
    * This option sets a specific date from which that number of days is counted.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
-   *
    * @default {year: 1899, month: 12, day: 30}
-   *
    * @category Date and Time
    */
   nullDate: SimpleDate,
@@ -269,9 +227,7 @@ export interface ConfigParams {
    * If `xx` is less or equal to `nullYear`, two-digit year values become `20xx`.
    *
    * If `xx` is more than `nullYear`, two-digit year values become `19xx`.
-   *
    * @default 30
-   *
    * @category Date and Time
    */
   nullYear: number,
@@ -281,9 +237,7 @@ export interface ConfigParams {
    * The function should return a [DateTime](../globals.md#datetime) object or undefined.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
-   *
    * @default defaultParseToDateTime
-   *
    * @category Date and Time
    */
   parseDateTime: (dateTimeString: string, dateFormat?: string, timeFormat?: string) => Maybe<DateTime>,
@@ -298,9 +252,7 @@ export interface ConfigParams {
    * Additionally, this option controls the snap-to-zero behavior for additions and subtractions:
    * - For `c=a+b`, if `abs(c)` <= `precisionEpsilon * abs(a)`, then `c` is set to `0`
    * - For `c=a-b`, if `abs(c)` <= `precisionEpsilon * abs(a)`, then `c` is set to `0`
-   *
    * @default 1e-13
-   *
    * @category Number
    */
   precisionEpsilon: number,
@@ -315,9 +267,7 @@ export interface ConfigParams {
    * (for example, with `precisionRounding` set to `4`, 100005 becomes 100010).
    *
    * We recommend setting `precisionRounding` to a value between `10` and `14`.
-   *
    * @default 14
-   *
    * @category Number
    */
   precisionRounding: number,
@@ -327,9 +277,7 @@ export interface ConfigParams {
    * The function should return a string or undefined.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
-   *
    * @default defaultStringifyDateTime
-   *
    * @category Date and Time
    */
   stringifyDateTime: (dateTime: SimpleDateTime, dateTimeFormat: string) => Maybe<string>,
@@ -339,9 +287,7 @@ export interface ConfigParams {
    * The function should return a string or undefined.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
-   *
    * @default defaultStringifyDuration
-   *
    * @category Date and Time
    */
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
@@ -349,9 +295,7 @@ export interface ConfigParams {
    * When set to `false`, no rounding happens, and numbers are equal if and only if they are of truly identical value.
    *
    * For more information, see [precisionEpsilon](/api/interfaces/configparams.md#precisionepsilon).
-   *
    * @default true
-   *
    * @category Number
    */
   smartRounding: boolean,
@@ -366,9 +310,7 @@ export interface ConfigParams {
    * Must be different from [decimalSeparator](/api/interfaces/configparams.md#decimalseparator) and [functionArgSeparator](/api/interfaces/configparams.md#functionargseparator).
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).
-   *
    * @default ''
-   *
    * @category Number
    */
   thousandSeparator: '' | ',' | ' ' | '.',
@@ -386,7 +328,6 @@ export interface ConfigParams {
    * Regardless of the time format specified, the hours-minutes-seconds value may be followed by the AM/PM designator.
    *
    * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
-   *
    * @example
    * E.g., for `timeFormats = ['hh:mm:ss.sss']`, valid time strings include:
    * - `1:33:33`
@@ -400,9 +341,7 @@ export interface ConfigParams {
    * - `1:33:33 pm`
    * - `1:33:33AM`
    * - `1:33:33PM`
-   *
    * @default ['hh:mm', 'hh:mm:ss.sss']
-   *
    * @category Date and Time
    */
   timeFormats: string[],
@@ -412,9 +351,7 @@ export interface ConfigParams {
    * When set to `false`, array arithmetic is enabled only inside array functions (`ARRAYFORMULA`, `FILTER`, and `ARRAY_CONSTRAIN`).
    *
    * For more information, see the [Arrays guide](/guide/arrays.md).
-   *
    * @default false
-   *
    * @category Engine
    */
   useArrayArithmetic: boolean,
@@ -424,9 +361,7 @@ export interface ConfigParams {
    * Using column index improves efficiency of the `VLOOKUP` and `MATCH` functions, but increases memory usage.
    *
    * When searching with wildcards or regular expressions, column search strategy falls back to binary search (even with `useColumnIndex` set to `true`).
-   *
    * @default false
-   *
    * @category Engine
    */
   useColumnIndex: boolean,
@@ -434,30 +369,24 @@ export interface ConfigParams {
    * When set to `true`, enables gathering engine statistics and timings.
    *
    * Useful for testing and benchmarking.
-   *
    * @default false
-   *
    * @category Engine
    */
   useStats: boolean,
   /**
    * Sets the number of elements kept in the undo history.
-   *
    * @default 20
-   *
    * @category Undo and Redo
    */
   undoLimit: number,
   /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
-   *
    * @default false
    * @category String
    */
   useRegularExpressions: boolean,
   /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) can use the `*` and `?` wildcards.
-   *
    * @default true
    * @category String
    */
