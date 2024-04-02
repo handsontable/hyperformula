@@ -140,21 +140,21 @@ module.exports = {
     sidebar: {
       '/api/': [
         {
-          title: 'Introduction',
+          title: 'API Reference Overview',
           path: '/api/',
         },
         {
-          title: 'HyperFormula Class',
+          title: 'HyperFormula',
           path: '/api/classes/hyperformula',
           collapsable: true,
         },
         {
-          title: 'Configuration Options',
+          title: 'ConfigParams ',
           path: '/api/interfaces/configparams',
           collapsable: true,
         },
         {
-          title: 'Event Types',
+          title: 'Listeners',
           path: '/api/interfaces/listeners',
           alias: '/api/events',
           collapsable: true,

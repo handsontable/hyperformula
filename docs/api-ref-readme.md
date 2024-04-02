@@ -22,7 +22,7 @@ const sheetData = [
 const hfInstance = HyperFormula.buildFromArray(sheetData, options);
 ```
 
-#### Configuration Options
+#### ConfigParams
 This section contains information about options that allow you to configure the instance of HyperFormula.
 
 An example set of options:
@@ -34,7 +34,7 @@ const options = {
 };
 ```
 
-#### Event Types
+#### Listeners
 In this section, you can find information about all events you can subscribe to.
 
 For example, subscribing to `sheetAdded` event:
