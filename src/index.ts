@@ -8,7 +8,7 @@ import {ArraySize} from './ArraySize'
 import {CellError, CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
-import {Config, ConfigParams} from './Config'
+import {Config} from './Config'
 import {ColumnRowIndex} from './CrudOperations'
 import {
   AlwaysDense,
@@ -55,6 +55,7 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
+import {ConfigParams} from './ConfigParams'
 
 /**
  * Aggregate class for default export

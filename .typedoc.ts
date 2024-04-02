@@ -1,7 +1,7 @@
 module.exports = {
   "inputFiles": [
     "./src/HyperFormula.ts",
-    "./src/Config.ts",
+    "./src/ConfigParams.ts",
     "./src/Emitter.ts",
   ],
   "exclude": [
@@ -47,7 +47,7 @@ module.exports = {
   ],
   "toc": [
     "HyperFormula",
-    "Config",
+    "ConfigParams",
     "Emitter"
   ]
 }
