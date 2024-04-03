@@ -6,7 +6,7 @@
 import {ArraySizePredictor} from './ArraySize'
 import {CellContentParser} from './CellContentParser'
 import {ClipboardOperations} from './ClipboardOperations'
-import {Config, ConfigParams} from './Config'
+import {Config} from './Config'
 import {CrudOperations} from './CrudOperations'
 import {DateTimeHelper} from './DateTimeHelper'
 import {DependencyGraph} from './DependencyGraph'
@@ -28,6 +28,7 @@ import {Serialization, SerializedNamedExpression} from './Serialization'
 import {findBoundaries, Sheet, Sheets, validateAsSheet} from './Sheet'
 import {EmptyStatistics, Statistics, StatType} from './statistics'
 import {UndoRedo} from './UndoRedo'
+import {ConfigParams} from './ConfigParams'
 
 export type EngineState = {
   config: Config,

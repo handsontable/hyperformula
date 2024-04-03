@@ -19,7 +19,7 @@ import {
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
-import {Config, ConfigParams, getDefaultConfig} from './Config'
+import {Config, getDefaultConfig} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {
@@ -65,6 +65,7 @@ import {
 import {Serialization, SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 import {Statistics, StatType} from './statistics'
+import {ConfigParams} from './ConfigParams'
 
 /**
  * This is a class for creating HyperFormula instance, all the following public methods
@@ -2879,6 +2880,8 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns string representation of an absolute range in A1 notation or `undefined` if the sheet index is not present in the engine.
+   *
+   * Note: This method is useful only for cell ranges; does not work with column ranges and row ranges.
    *
    * @param {SimpleCellRange} cellRange - object representation of an absolute range
    * @param {number} sheetId - context used in case of missing sheet in the first argument
