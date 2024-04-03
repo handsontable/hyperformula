@@ -53,7 +53,7 @@ import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './Named
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   Ast,
-  AstNodeType,
+  AstNodeType, NamedExpressionDependency,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,
@@ -4108,6 +4108,42 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Return a list of named expressions used by a formula.
+   *
+   * @param {string} formulaString - A formula in a proper format, starting with `=`.
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
+   * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e., doesn't start with `=`).
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // returns a list of named expressions used by a formula
+   * // for this example, returns ['foo', 'bar']
+   * const namedExpressions = hfInstance.getNamedExpressionsFromFormula('=foo+bar*2');
+   * ```
+   *
+   * @category Helpers
+   */
+  public getNamedExpressionsFromFormula(formulaString: string): string[] {
+    validateArgToType(formulaString, 'string', 'formulaString')
+    const { ast, dependencies } = this.extractTemporaryFormula(formulaString)
+
+    if (ast === undefined) {
+      throw new NotAFormulaError()
+    }
+
+    const namedExpressionDependencies = dependencies
+      .filter((dep): dep is NamedExpressionDependency => dep instanceof NamedExpressionDependency)
+      .map(namedExpr => namedExpr.name)
+
+    const uniqueNamedExpressionDependencies = [ ...new Set(namedExpressionDependencies) ]
+
+    return uniqueNamedExpressionDependencies
+  }
+
+  /**
    * Validates the formula.
    * If the provided string starts with "=" and is a parsable formula, the method returns `true`.
    * The validation is purely grammatical: the method doesn't verify if the formula can be calculated or not.
@@ -4128,15 +4164,7 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(formulaString, 'string', 'formulaString')
     const { ast } = this.extractTemporaryFormula(formulaString)
 
-    if (ast === undefined) {
-      return false
-    }
-
-    if (ast.type === AstNodeType.ERROR && !ast.error) {
-      return false // codecov note: could not identify a formulaString that would cause this condition
-    }
-
-    return true
+    return ast !== undefined
   }
 
   /**
