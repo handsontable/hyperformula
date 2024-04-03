@@ -19,7 +19,7 @@ import {
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
-import {Config, ConfigParams, getDefaultConfig} from './Config'
+import {Config, getDefaultConfig} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
 import {
@@ -65,6 +65,7 @@ import {
 import {Serialization, SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
 import {Statistics, StatType} from './statistics'
+import {ConfigParams} from './ConfigParams'
 
 /**
  * This is a class for creating HyperFormula instance, all the following public methods
