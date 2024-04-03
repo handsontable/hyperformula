@@ -53,6 +53,12 @@ export interface ConfigParams {
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
+   * A generic parameter that can be used to pass data to custom functions.
+   * @default undefined
+   * @category Engine
+   */
+  context: unknown,
+  /**
    * Sets symbols that denote currency numbers.
    *
    * For more information, see the [Internationalization features guide](/guide/i18n-features.md).

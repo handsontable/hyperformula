@@ -34,6 +34,7 @@ export class Config implements ConfigParams, ParserConfig {
     currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
+    context: undefined,
     chooseAddressMappingPolicy: new AlwaysDense(),
     dateFormats: ['DD/MM/YYYY', 'DD/MM/YY'],
     decimalSeparator: '.',
@@ -136,6 +137,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly currencySymbol: string[]
   /** @inheritDoc */
   public readonly undoLimit: number
+  /** @inheritDoc */
+  public readonly context: unknown
 
   /**
    * Built automatically based on translation package.
@@ -168,6 +171,7 @@ export class Config implements ConfigParams, ParserConfig {
       caseSensitive,
       caseFirst,
       chooseAddressMappingPolicy,
+      context,
       currencySymbol,
       dateFormats,
       decimalSeparator,
@@ -254,6 +258,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
     this.currencySymbol = this.setupCurrencySymbol(currencySymbol)
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+    this.context = context
 
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
