@@ -4132,8 +4132,8 @@ export class HyperFormula implements TypedEmitter {
     }
 
     const namedExpressionDependencies = dependencies
-      .filter(dep => dep instanceof NamedExpressionDependency)
-      .map(namedExpr => (namedExpr as NamedExpressionDependency).name)
+      .filter((dep): dep is NamedExpressionDependency => dep instanceof NamedExpressionDependency)
+      .map(namedExpr => namedExpr.name)
 
     const uniqueNamedExpressionDependencies = [ ...new Set(namedExpressionDependencies) ]
 
