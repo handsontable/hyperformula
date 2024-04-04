@@ -6,6 +6,15 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.7.0
+
+**Release date: Apr 10, 2024**
+
+### Added
+
+- Added a new method `getNamedExpressionsFromFormula`. [#1365](https://github.com/handsontable/hyperformula/issues/1365)
+- Added a configuration option `context` that can be used to pass data to custom functions.  [#1396](https://github.com/handsontable/hyperformula/issues/1396)
+
 ## 2.6.2
 
 **Release date: Feb 15, 2024**

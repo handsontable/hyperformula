@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.7.0] - 2024-04-10
+
 ### Added
 
 - Added a new method `getNamedExpressionsFromFormula`. [#1365](https://github.com/handsontable/hyperformula/issues/1365)
