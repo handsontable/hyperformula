@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added a new method `getNamedExpressionsFromFormula`. [#1365](https://github.com/handsontable/hyperformula/issues/1365)
+- Added a configuration option `context` that can be used to pass data to custom functions.  [#1396](https://github.com/handsontable/hyperformula/issues/1396)
+
 ## [2.6.2] - 2024-02-15
 
 ### Changed

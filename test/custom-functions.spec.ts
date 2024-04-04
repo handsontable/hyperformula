@@ -191,7 +191,7 @@ class GreetingsPlugin extends FunctionPlugin {
       EXAMPLE_ARRAY_FUNCTION: 'EXAMPLE_ARRAY_FUNCTION',
     }
   }
-  
+
   greet(ast: ProcedureAst, state: InterpreterState) {
     return this.runFunction(
       ast.args,
@@ -216,6 +216,18 @@ class GreetingsPlugin extends FunctionPlugin {
         return SimpleRangeValue.onlyValues([[val, val], [val, val]])
       },
     )
+  }
+}
+
+class ContextPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    'GETCONTEXT': {
+      method: 'getContext',
+    }
+  }
+
+  public getContext(ast: ProcedureAst, state: InterpreterState): unknown {
+    return this.config.context
   }
 }
 
@@ -550,5 +562,19 @@ describe('Custom function implemented with runFunction)', () => {
 
       engine.getCellValue(adr('A2'))
     }).toThrow(new Error('Function returning array cannot be vectorized.'))
+  })
+})
+
+describe('Context accessible within custom function', () => {
+  it('works', () => {
+    HyperFormula.registerFunctionPlugin(ContextPlugin)
+    HyperFormula.getLanguage('enGB').extendFunctions({GETCONTEXT: 'GETCONTEXT'})
+
+    const context = 'abc'
+    const engine = HyperFormula.buildFromArray([
+      ['=GETCONTEXT()'],
+    ], {context})
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(context)
   })
 })
