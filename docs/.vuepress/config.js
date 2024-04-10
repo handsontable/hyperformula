@@ -71,6 +71,8 @@ module.exports = {
         $page.version = HyperFormula.version
         // inject current HF buildDate as {{ $page.buildDate }} variable
         $page.buildDate = HyperFormula.buildDate
+        // inject current HF buildDate URI encoded as {{ $page.buildDateURIEncoded }} variable
+        $page.buildDateURIEncoded = encodeURIComponent(HyperFormula.buildDate)
         // inject current HF releaseDate as {{ $page.releaseDate }} variable
         $page.releaseDate = HyperFormula.releaseDate
         // inject current HF function count as {{ $page.functionsCount }} variable
@@ -138,21 +140,21 @@ module.exports = {
     sidebar: {
       '/api/': [
         {
-          title: 'Introduction',
+          title: 'API Reference Overview',
           path: '/api/',
         },
         {
-          title: 'HyperFormula Class',
+          title: 'HyperFormula',
           path: '/api/classes/hyperformula',
           collapsable: true,
         },
         {
-          title: 'Configuration Options',
+          title: 'ConfigParams ',
           path: '/api/interfaces/configparams',
           collapsable: true,
         },
         {
-          title: 'Event Types',
+          title: 'Listeners',
           path: '/api/interfaces/listeners',
           alias: '/api/events',
           collapsable: true,
