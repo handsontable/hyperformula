@@ -129,6 +129,19 @@ describe('SUM', () => {
     expect(hf.getCellValue(adr('A1', 1))).toEqual(0)
   })
 
+  it('accepts 100k parameters', () => {
+    const numOfParams = 100000
+    const argsList = Array(numOfParams).fill('1').map((_, i) => `A${i+2}`).join(', ')
+    const formula = `=SUM(${argsList})`
+
+    const engine = HyperFormula.buildFromArray([
+      [formula],
+      ...Array(numOfParams).fill([1])
+    ], { maxRows: numOfParams+2 })
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(numOfParams)
+  })
+
   describe('works with reversed cell ranges', () => {
     it('simple case', () => {
       const engine = HyperFormula.buildFromArray([
