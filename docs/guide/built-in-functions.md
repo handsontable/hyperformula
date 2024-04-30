@@ -231,7 +231,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Math and trigonometry
 
 | Function ID     | Description                                                                                                   | Syntax                                                                                      |
-| :-------------- | :------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------ |
+| :-------------- | :------------------------------------------------------------------------------------------------------------ |:--------------------------------------------------------------------------------------------|
 | ABS             | Returns the absolute value of a number.                                                                       | ABS(Number)                                                                                 |
 | ACOS            | Returns the inverse trigonometric cosine of a number.                                                         | ACOS(Number)                                                                                |
 | ACOSH           | Returns the inverse hyperbolic cosine of a number.                                                            | ACOSH(Number)                                                                               |
@@ -278,7 +278,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | ODD             | Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer. | ODD(Number)                                                                                 |
 | PI              | Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places.                     | PI()                                                                                        |
 | POWER           | Returns a number raised to another number.                                                                    | POWER(Base, Exponent)                                                                       |
-| PRODUCT         | Returns product of numbers.                                                                                   | PRODUCT(Number1, Number2, ..., Number30)                                                    |
+| PRODUCT         | Returns product of numbers.                                                                                   | PRODUCT(Number1, Number2, ...)                                                              |
 | QUOTIENT        | Returns integer part of a division.                                                                           | QUOTIENT(Dividend, Divisor)                                                                 |
 | RADIANS         | Converts degrees to radians.                                                                                  | RADIANS(Number)                                                                             |
 | RAND            | Returns a random number between 0 and 1.                                                                      | RAND()                                                                                      |
@@ -296,11 +296,11 @@ Total number of functions: **{{ $page.functionsCount }}**
 | SQRT            | Returns the positive square root of a number.                                                                 | SQRT(Number)                                                                                |
 | SQRTPI          | Returns sqrt of number times pi.                                                                              | SQRTPI(Number)                                                                              |
 | SUBTOTAL        | Computes aggregation using function specified by number.                                                      | SUBTOTAL(Function, Number1, Number2, ... Number30)                                          |
-| SUM             | Sums up the values of the specified cells.                                                                    | SUM(Number1, Number2, ..., Number30)                                                        |
+| SUM             | Sums up the values of the specified cells.                                                                    | SUM(Number1, Number2, ...)                                                                  |
 | SUMIF           | Sums up the values of cells that belong to the specified range and meet the specified condition.              | SUMIF(Range, Criteria, Sumrange)                                                            |
 | SUMIFS          | Sums up the values of cells that belong to the specified range and meet the specified sets of conditions.     | SUMIFS(Sum_Range , Criterion_range1 , Criterion1 [ , Criterion_range2 , Criterion2 [,...]]) |
 | SUMPRODUCT      | Multiplies corresponding elements in the given arrays, and returns the sum of those products.                 | SUMPRODUCT(Array1, Array2...Array30)                                                        |
-| SUMSQ           | Returns the sum of the squares of the arguments                                                               | SUMSQ(Number1, Number2, ..., Number30)                                                      |
+| SUMSQ           | Returns the sum of the squares of the arguments                                                               | SUMSQ(Number1, Number2, ...)                                                                |
 | SUMX2MY2        | Returns the sum of the square differences.                                                                    | SUMX2MY2(Range1, Range2)                                                                    |
 | SUMX2PY2        | Returns the sum of the square sums.                                                                           | SUMX2PY2(Range1, Range2)                                                                    |
 | SUMXMY2         | Returns the sum of the square of differences.                                                                 | SUMXMY2(Range1, Range2)                                                                     |
@@ -340,10 +340,10 @@ Total number of functions: **{{ $page.functionsCount }}**
 ### Statistical
 
 | Function ID     | Description                                                                                               | Syntax                                                                                      |
-| :-------------- | :-------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
+| :-------------- | :-------------------------------------------------------------------------------------------------------- |:--------------------------------------------------------------------------------------------|
 | AVEDEV          | Returns the average deviation of the arguments.                                                           | AVEDEV(Number1, Number2, ...Number30)                                                       |
-| AVERAGE         | Returns the average of the arguments.                                                                     | AVERAGE(Number1, Number2, ...Number30)                                                      |
-| AVERAGEA        | Returns the average of the arguments.                                                                     | AVERAGEA(Value1, Value2, ... Value30)                                                       |
+| AVERAGE         | Returns the average of the arguments.                                                                     | AVERAGE(Number1, Number2, ...)                                                              |
+| AVERAGEA        | Returns the average of the arguments.                                                                     | AVERAGEA(Value1, Value2, ...)                                                               |
 | AVERAGEIF       | Returns the arithmetic mean of all cells in a range that satisfy a given condition.                       | AVERAGEIF(Range, Criterion [, Average_Range ])                                              |
 | BESSELI         | Returns value of Bessel function.                                                                         | BESSELI(x, n)                                                                               |
 | BESSELJ         | Returns value of Bessel function.                                                                         | BESSELJ(x, n)                                                                               |
@@ -414,11 +414,11 @@ Total number of functions: **{{ $page.functionsCount }}**
 | LOGNORM.INV     | Returns value of inverse lognormal distribution.                                                          | LOGNORM.INV(P, Mean, Stddev)                                                                |
 | LOGNORMINV      | Returns value of inverse lognormal distribution.                                                          | LOGNORMINV(P, Mean, Stddev)                                                                 |
 | LOGINV          | Returns value of inverse lognormal distribution.                                                          | LOGINV(P, Mean, Stddev)                                                                     |
-| MAX             | Returns the maximum value in a list of arguments.                                                         | MAX(Number1, Number2, ...Number30)                                                          |
+| MAX             | Returns the maximum value in a list of arguments.                                                         | MAX(Number1, Number2, ...)                                                                  |
 | MAXA            | Returns the maximum value in a list of arguments.                                                         | MAXA(Value1, Value2, ... Value30)                                                           |
 | MAXIFS          | Returns the maximum value of the cells in a range that meet a set of criteria.                            | MAXIFS(Max_Range , Criterion_range1 , Criterion1 [ , Criterion_range2 , Criterion2 [,...]]) |
 | MEDIAN          | Returns the median of a set of numbers.                                                                   | MEDIAN(Number1, Number2, ...Number30)                                                       |
-| MIN             | Returns the minimum value in a list of arguments.                                                         | MIN(Number1, Number2, ...Number30)                                                          |
+| MIN             | Returns the minimum value in a list of arguments.                                                         | MIN(Number1, Number2, ...)                                                                  |
 | MINA            | Returns the minimum value in a list of arguments.                                                         | MINA(Value1, Value2, ... Value30)                                                           |
 | MINIFS          | Returns the minimum value of the cells in a range that meet a set of criteria.                            | MINIFS(Min_Range , Criterion_range1 , Criterion1 [ , Criterion_range2 , Criterion2 [,...]]) |
 | NEGBINOM.DIST   | Returns density of negative binomial distribution.                                                        | NEGBINOM.DIST(Number1, Number2, Number3, Mode)                                              |
