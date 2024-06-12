@@ -106,6 +106,19 @@ describe('Move columns', () => {
     expect(engine.getCellValue(adr('D1'))).toEqual(4)
   })
 
+  it('should work when maxColumns limit is set tightly', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1', '2', '3', '4']
+    ], { maxColumns: 4 })
+
+    engine.moveColumns(0, 0, 1, 2)
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('C1'))).toEqual(3)
+    expect(engine.getCellValue(adr('D1'))).toEqual(4)
+  })
+
   it('should move column when moving to left', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '4']
