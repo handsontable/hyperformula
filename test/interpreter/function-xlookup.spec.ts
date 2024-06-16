@@ -34,4 +34,17 @@ describe('Function XLOOKUP', () => {
 
     expect(engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A6'), 2, 1))).toEqual([['Dianne Pugh', 'Finance']])
   })
+
+  it('should find use if_not_found argument if not found (official example 3)', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['1234', 'Dianne Pugh', 'Finance'],
+      ['4390', 'Ned Lanning', 'Marketing'],
+      ['8604', 'Margo Hendrix', 'Sales'],
+      ['8389', 'Dianne Pugh', 'Finance'],
+      ['4937', 'Earlene McCarty', 'Accounting'],
+      ['=XLOOKUP(A1, A2:A5, B2:C5, "ID not found")'],
+    ], { useColumnIndex: false })
+
+    expect(engine.getCellValue(adr('A6'))).toEqual('ID not found')
+  })
 })

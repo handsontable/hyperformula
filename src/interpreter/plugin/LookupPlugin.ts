@@ -132,7 +132,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (returnRange === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
-      if (ifNotFound !== ErrorType.NA && !(ifNotFound instanceof String)) {
+      if (ifNotFound !== ErrorType.NA && typeof ifNotFound !== 'string') {
         return new CellError(ErrorType.VALUE, ErrorMessage.NoConditionMet)
       }
       if (![0, -1, 1, 2].includes(matchMode)) {
@@ -260,7 +260,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupAbsRange.start, 1, lookupAbsRange.height()), this.dependencyGraph)
       const rowIndex = this.searchInRange(key, searchedRange, false, this.columnSearch)
       if (rowIndex === -1) {
-        return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
+        return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
       }
       const topLeft = { sheet: absReturnRange.sheet, col: absReturnRange.start.col, row: absReturnRange.start.row + rowIndex }
       const width = absReturnRange.end.col - absReturnRange.start.col + 1
