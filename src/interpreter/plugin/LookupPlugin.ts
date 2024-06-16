@@ -158,7 +158,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     const lookupRangeValue = ast?.args?.[1] as CellRange
     const returnRangeValue = ast?.args?.[2] as CellRange
     const searchWidth = lookupRangeValue.end.col - lookupRangeValue.start.col + 1 
-    const searchHeight = lookupRangeValue.end.row - lookupRangeValue.start.row + 1 
+
+    if (returnRangeValue?.start == null || returnRangeValue?.end == null) {
+      return ArraySize.scalar();
+    }
 
     if (searchWidth === 1) {
       // column search
@@ -265,8 +268,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       const topLeft = { sheet: absReturnRange.sheet, col: absReturnRange.start.col, row: absReturnRange.start.row + rowIndex }
       const width = absReturnRange.end.col - absReturnRange.start.col + 1
 
-      const ret = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(topLeft, width, 1), this.dependencyGraph)
-      return ret
+      return SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(topLeft, width, 1), this.dependencyGraph)
     } else if (lookupAbsRange.start.row === lookupAbsRange.end.row && lookupAbsRange.start.col <= lookupAbsRange.end.col) {
       // single row
       const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupAbsRange.start, lookupAbsRange.width(), 1), this.dependencyGraph)
