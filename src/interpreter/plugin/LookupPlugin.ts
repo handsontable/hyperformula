@@ -160,17 +160,17 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     const searchWidth = lookupRangeValue.end.col - lookupRangeValue.start.col + 1 
 
     if (returnRangeValue?.start == null || returnRangeValue?.end == null) {
-      return ArraySize.scalar();
+      return ArraySize.scalar()
     }
 
     if (searchWidth === 1) {
       // column search
       const outputWidth = returnRangeValue.end.col - returnRangeValue.start.col + 1 
-      return new ArraySize(outputWidth, 1);
+      return new ArraySize(outputWidth, 1)
     } else {
       // row search
       const outputHeight = returnRangeValue.end.row - returnRangeValue.start.row + 1 
-      return new ArraySize(1, outputHeight);
+      return new ArraySize(1, outputHeight)
     }
   }
 
