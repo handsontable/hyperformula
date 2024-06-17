@@ -42,6 +42,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     'XLOOKUP': {
       method: 'xlookup',
       arraySizeMethod: 'xlookupArraySize',
+      vectorizationForbidden: true,
       parameters: [
         // lookup_value
         { argumentType: FunctionArgumentType.NOERROR },
