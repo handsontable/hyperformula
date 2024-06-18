@@ -363,11 +363,8 @@ This demo contains the implementation of both the
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
 
 <iframe
-  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.7.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
-  title="handsontable/hyperformula-demos: custom-functions"
-  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
+  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/custom-functions?embed=1&file=src/app/employees/employees.helper.ts&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
+  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;">
 </iframe>
 
 ## Function options
