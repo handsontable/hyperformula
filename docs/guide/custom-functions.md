@@ -363,8 +363,8 @@ This demo contains the implementation of both the
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
 
 <iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/custom-functions?embed=1&file=src/app/employees/employees.helper.ts&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;">
+  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/custom-functions?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
+  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
 </iframe>
 
 ## Function options

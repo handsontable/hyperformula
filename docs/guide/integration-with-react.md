@@ -7,6 +7,6 @@ For more details, see the [client-side installation](client-side-installation.md
 ## Demo
 
 <iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/react-demo?embed=1&file=src/app/employees/employees.helper.ts&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;">
+  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/react-demo?embed=1&file=src/lib/employee/employee.hf.ts&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
+  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
 </iframe>

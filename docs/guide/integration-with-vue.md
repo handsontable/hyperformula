@@ -11,6 +11,6 @@ This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking 
 :::
 
 <iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/vue-3-demo?embed=1&file=src/app/employees/employees.helper.ts&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;">
+  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/vue-3-demo?embed=1&file=src/lib/employees-data-provider.ts&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
+  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
 </iframe>
