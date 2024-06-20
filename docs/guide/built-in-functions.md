@@ -227,6 +227,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | ROW         | Returns row number of a given reference or formula reference if argument not provided.                                                   | ROW([Reference])                                                       |
 | ROWS        | Returns the number of rows in the given reference.                                                                                       | ROWS(Array)                                                            |
 | VLOOKUP     | Searches vertically with reference to adjacent cells to the right.                                                                       | VLOOKUP(Search_Criterion, Array, Index, Sort_Order)                    |
+| XLOOKUP     | The XLOOKUP function searches a range or an array, and then returns the item corresponding to the first match it finds. If no match exists, then XLOOKUP can return the closest (approximate) match. Current limitations: only default match_mode and search_mode are supported, a range of value is returned, not a range, so having XLOOKUP(...):XLOOKUP(...) will not work.                                                                      | XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])                    |
 
 ### Math and trigonometry
 
