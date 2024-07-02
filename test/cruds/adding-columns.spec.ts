@@ -1,4 +1,4 @@
-import {ExportedCellChange, HyperFormula} from '../../src'
+import {AlwaysSparse, ExportedCellChange, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {Config} from '../../src/Config'
 import {ArrayVertex, FormulaCellVertex} from '../../src/DependencyGraph'
@@ -422,5 +422,65 @@ describe('Adding column - arrays', () => {
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
+  })
+})
+
+describe('Adding a column at the beginning of the sheet', () => {
+  it('works with buildEmpty', () => {
+    const engine = HyperFormula.buildEmpty()
+    engine.addSheet()
+    engine.setCellContents({col: 0, row: 0, sheet: 0}, 1)
+    engine.setCellContents({col: 0, row: 1, sheet: 0}, 2)
+    engine.setCellContents({col: 0, row: 5, sheet: 0}, 5)
+    engine.addColumns(0, [0, 1])
+
+    expect(engine.getSheetSerialized(0)).toEqual([[null, 1], [null, 2], [], [], [], [null, 5]])
+  })
+
+  it('works with buildFromArray', () => {
+    const engine = HyperFormula.buildFromArray([[1], [2], [], [], [], [5]])
+    engine.addColumns(0, [0, 1])
+
+    expect(engine.getSheetSerialized(0)).toEqual([[null, 1], [null, 2], [], [], [], [null, 5]])
+  })
+
+  it('works with buildEmpty and AlwaysDense', () => {
+    const engine = HyperFormula.buildEmpty({chooseAddressMappingPolicy: new AlwaysDense()})
+    engine.addSheet()
+    engine.setCellContents({col: 0, row: 0, sheet: 0}, 1)
+    engine.setCellContents({col: 0, row: 1, sheet: 0}, 2)
+    engine.setCellContents({col: 0, row: 5, sheet: 0}, 5)
+    engine.addColumns(0, [0, 1])
+
+    expect(engine.getSheetSerialized(0)).toEqual([[null, 1], [null, 2], [], [], [], [null, 5]])
+  })
+
+  it('works with buildFromArray and AlwaysDense', () => {
+    const engine = HyperFormula.buildFromArray([[1], [2], [], [], [], [5]], {
+      chooseAddressMappingPolicy: new AlwaysDense(),
+    })
+    engine.addColumns(0, [0, 1])
+
+    expect(engine.getSheetSerialized(0)).toEqual([[null, 1], [null, 2], [], [], [], [null, 5]])
+  })
+
+  it('works with buildEmpty and AlwaysSparse', () => {
+    const engine = HyperFormula.buildEmpty({chooseAddressMappingPolicy: new AlwaysSparse()})
+    engine.addSheet()
+    engine.setCellContents({col: 0, row: 0, sheet: 0}, 1)
+    engine.setCellContents({col: 0, row: 1, sheet: 0}, 2)
+    engine.setCellContents({col: 0, row: 5, sheet: 0}, 5)
+    engine.addColumns(0, [0, 1])
+
+    expect(engine.getSheetSerialized(0)).toEqual([[null, 1], [null, 2], [], [], [], [null, 5]])
+  })
+
+  it('works with buildFromArray and AlwaysSparse', () => {
+    const engine = HyperFormula.buildFromArray([[1], [2], [], [], [], [5]], {
+      chooseAddressMappingPolicy: new AlwaysSparse(),
+    })
+    engine.addColumns(0, [0, 1])
+
+    expect(engine.getSheetSerialized(0)).toEqual([[null, 1], [null, 2], [], [], [], [null, 5]])
   })
 })
