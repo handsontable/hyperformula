@@ -962,3 +962,59 @@ describe('Removing columns - changes', () => {
     expect(alwaysDenseChanges).toEqual(alwaysSparseChanges)
   })
 })
+
+describe('Removing column where there are empty rows in the address mapping (DenseStrategy) - issue #1406', () => {
+  it('should not throw errors (stackblitz reproduction)', () => {
+    const hf = HyperFormula.buildEmpty({
+      licenseKey: 'gpl-v3',
+      chooseAddressMappingPolicy: new AlwaysDense()
+    })
+
+    const sheetName = hf.addSheet('main')
+    const sheetId = hf.getSheetId(sheetName)!
+
+    hf.setCellContents(
+      { row: 0, col: 0, sheet: sheetId },
+      [
+        ['test', null, undefined, 4],
+        [null, 3, '=ISBLANK(B1)'],
+      ]
+    )
+
+    hf.addRows(0, [2, 1])
+    hf.addRows(0, [3, 1])
+    hf.setCellContents(
+      { row: 3, col: 0, sheet: sheetId },
+      'will-it-break?'
+    )
+    hf.removeColumns(0, [0, 1]) //one column removed
+
+    expect(hf.getSheetSerialized(0)).toEqual([
+      [null, null, 4],
+      [3, '=ISBLANK(A1)'],
+    ])
+  })
+
+  it('should not throw errors (user reported case)', () => {
+    const data= [
+      [],
+      [null, 1],
+      [null, 2],
+      [null, '=sum(B2:B3)']
+    ]
+
+    const options = { licenseKey: 'gpl-v3', chooseAddressMappingPolicy: new AlwaysDense() }
+    const hf=HyperFormula.buildEmpty(options)
+
+    hf.addSheet('sheet1')
+    hf.setSheetContent(0, data)
+    hf.removeColumns(0, [0, 1])
+
+    expect(hf.getSheetSerialized(0)).toEqual([
+      [],
+      [1],
+      [2],
+      ['=SUM(A2:A3)']
+    ])
+  })
+})
