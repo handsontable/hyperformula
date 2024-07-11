@@ -1,9 +1,13 @@
-import {ExportedCellChange, HyperFormula} from '../../src'
+import {
+  AlwaysDense,
+  ExportedCellChange,
+  HyperFormula,
+  SheetSizeLimitExceededError,
+  ErrorType,
+} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {Config} from '../../src/Config'
 import {ArrayVertex, FormulaCellVertex} from '../../src/DependencyGraph'
-import {AlwaysDense} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {SheetSizeLimitExceededError} from '../../src/errors'
 import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {
   adr,
@@ -12,7 +16,6 @@ import {
   extractMatrixRange,
   extractRange
 } from '../testUtils'
-import { ErrorType } from '../../src/Cell'
 import { ErrorMessage } from '../../src/error-message'
 import { detailedError } from '../testUtils'
 
@@ -422,5 +425,49 @@ describe('Adding column - arrays', () => {
 
     const matrixVertex = engine.addressMapping.fetchCell(adr('D1')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
+  })
+})
+
+describe('Adding column where there are empty rows in the address mapping (DenseStrategy) - issue #1406', () => {
+  it('should not throw errors (simple case)', () => {
+    const hf = HyperFormula.buildFromArray([], { chooseAddressMappingPolicy: new AlwaysDense() })
+
+    hf.setCellContents({ row: 1, col: 0, sheet: 0 }, 'test')
+    hf.addColumns(0, [0, 1]) //one column added index [row, amount] - added
+
+    expect(hf.getSheetSerialized(0)).toEqual([ [], [null, 'test'] ])
+  })
+
+  it('should not throw errors (stackblitz reproduction)', () => {
+    const hf = HyperFormula.buildEmpty({
+      licenseKey: 'gpl-v3',
+      chooseAddressMappingPolicy: new AlwaysDense()
+    })
+
+    const sheetName = hf.addSheet('main')
+    const sheetId = hf.getSheetId(sheetName)!
+
+    hf.setCellContents(
+      { row: 0, col: 0, sheet: sheetId },
+      [
+        ['test', null, undefined, 4],
+        [null, 3, '=ISBLANK(B1)'],
+      ]
+    )
+
+    hf.addRows(0, [2, 1])
+    hf.addRows(0, [3, 1])
+    hf.setCellContents(
+      { row: 3, col: 0, sheet: sheetId },
+      'will-it-break?'
+    )
+    hf.addColumns(0, [0, 1])
+
+    expect(hf.getSheetSerialized(0)).toEqual([
+      [null, 'test', null, null, 4],
+      [null, null, 3, '=ISBLANK(C1)'],
+      [],
+      [null, 'will-it-break?'],
+    ])
   })
 })
