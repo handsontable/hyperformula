@@ -11,9 +11,9 @@ jobs:
   performance-test:
     strategy:
       matrix:
-        node-version: [ '16' ]
+        node-version: [ '22' ]
         os: [ 'ubuntu-latest' ]
-    name: performance-test
+    name: Test performance
     runs-on: ${{ matrix.os }}
     steps:
       - name: Setup Node.js ${{ matrix.node-version }}
