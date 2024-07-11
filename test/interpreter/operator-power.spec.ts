@@ -83,4 +83,18 @@ describe('Operator POWER', () => {
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
     expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
+
+  it('negative base', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['', 2, -2],
+      [3, '=B1^A2', '=C1^A2'],
+      [3.5, '=B1^A3', '=C1^A3'],
+    ])
+
+    expect(engine.getCellValue(adr('B2'))).toBe(8)
+    expect(engine.getCellValue(adr('B3'))).toBeCloseTo(11.3137)
+    expect(engine.getCellValue(adr('C2'))).toBe(-8)
+    expect(engine.getCellValue(adr('C3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+
+  })
 })
