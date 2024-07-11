@@ -18,7 +18,10 @@ export class DenseStrategy implements AddressMappingStrategy {
   /**
    * Array in which actual data is stored.
    *
-   * It is created when building the mapping and the size of it is fixed.
+   * - array size: this.height * this.width
+   * - array is sparse:
+   *   - empty cells might be missing (undefined)
+   *   - empty rows might be missing (undefined)
    */
   private readonly mapping: CellVertex[][]
 
@@ -86,7 +89,9 @@ export class DenseStrategy implements AddressMappingStrategy {
 
   public addColumns(column: number, numberOfColumns: number): void {
     for (let i = 0; i < this.height; i++) {
-      this.mapping[i].splice(column, 0, ...new Array(numberOfColumns))
+      if (this.mapping[i] !== undefined) {
+        this.mapping[i].splice(column, 0, ...new Array(numberOfColumns))
+      }
     }
     this.width += numberOfColumns
   }
@@ -100,7 +105,9 @@ export class DenseStrategy implements AddressMappingStrategy {
 
   public removeColumns(removedColumns: ColumnsSpan): void {
     for (let i = 0; i < this.height; i++) {
-      this.mapping[i].splice(removedColumns.columnStart, removedColumns.numberOfColumns)
+      if (this.mapping[i] !== undefined) {
+        this.mapping[i].splice(removedColumns.columnStart, removedColumns.numberOfColumns)
+      }
     }
     const rightmostColumnRemoved = Math.min(this.width - 1, removedColumns.columnEnd)
     const numberOfColumnsRemoved = Math.max(0, rightmostColumnRemoved - removedColumns.columnStart + 1)
