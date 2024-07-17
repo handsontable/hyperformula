@@ -40,35 +40,35 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 
 ## Features
 
-- [Function syntax compatible with Microsoft Excel](https://hyperformula.handsontable.com/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/guide/compatibility-with-google-sheets.html)
+- [Function syntax compatible with Microsoft Excel](guide/compatibility-with-microsoft-excel.md) and [Google Sheets](guide/compatibility-with-google-sheets.md)
 - High-speed parsing and evaluation of spreadsheet formulas
-- [A library of ~400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
-- [Support for custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
-- [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)
-- [Support for undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
-- [Support for CRUD operations](https://hyperformula.handsontable.com/guide/basic-operations.html)
-- [Support for clipboard](https://hyperformula.handsontable.com/guide/clipboard-operations.html)
-- [Support for named expressions](https://hyperformula.handsontable.com/guide/named-expressions.html)
-- [Support for data sorting](https://hyperformula.handsontable.com/guide/sorting-data.html)
-- [Support for formula localization with 17 built-in languages](https://hyperformula.handsontable.com/guide/i18n-features.html)
+- [A library of ~400 built-in functions](guide/built-in-functions.md)
+- [Support for custom functions](guide/custom-functions.md)
+- [Support for Node.js](guide/server-side-installation.md#install-with-npm-or-yarn)
+- [Support for undo/redo](guide/undo-redo.md)
+- [Support for CRUD operations](guide/basic-operations.md)
+- [Support for clipboard](guide/clipboard-operations.md)
+- [Support for named expressions](guide/named-expressions.md)
+- [Support for data sorting](guide/sorting-data.md)
+- [Support for formula localization with 17 built-in languages](guide/i18n-features.md)
 - GPLv3 license
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
 
 ## Documentation
 
-- [Client-side installation](https://hyperformula.handsontable.com/guide/client-side-installation.html)
-- [Server-side installation](https://hyperformula.handsontable.com/guide/server-side-installation.html)
-- [Basic usage](https://hyperformula.handsontable.com/guide/basic-usage.html)
-- [Configuration options](https://hyperformula.handsontable.com/guide/configuration-options.html)
-- [List of built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
-- [API Reference](https://hyperformula.handsontable.com/api/)
+- [Client-side installation](guide/client-side-installation.md)
+- [Server-side installation](guide/server-side-installation.md)
+- [Basic usage](guide/basic-usage.md)
+- [Configuration options](guide/configuration-options.md)
+- [List of built-in functions](guide/built-in-functions.md)
+- [API Reference](api/)
 
 ## Integrations
 
-- [Integration with React](https://hyperformula.handsontable.com/guide/integration-with-react.html#demo)
-- [Integration with Angular](https://hyperformula.handsontable.com/guide/integration-with-angular.html#demo)
-- [Integration with Vue](https://hyperformula.handsontable.com/guide/integration-with-vue.html#demo)
-- [Integration with Svelte](https://hyperformula.handsontable.com/guide/integration-with-svelte.html#demo)
+- [Integration with React](guide/integration-with-react.md#demo)
+- [Integration with Angular](guide/integration-with-angular.md#demo)
+- [Integration with Vue](guide/integration-with-vue.md#demo)
+- [Integration with Svelte](guide/integration-with-svelte.md#demo)
 
 ## Installation and usage
 
@@ -106,7 +106,7 @@ console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCel
 
 ## Contributing
 
-Contributions are welcome, but before you make them, please read the [Contributing Guide](https://hyperformula.handsontable.com/guide/contributing.html) and accept the [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2).
+Contributions are welcome, but before you make them, please read the [Contributing Guide](guide/contributing.md) and accept the [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2).
 
 ## License
 
