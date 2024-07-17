@@ -1,11 +1,11 @@
 Copyright (c) HANDSONCODE sp. z o. o.
 
-  HYPERFORMULA is a software distributed by HANDSONCODE sp. z o. o., a
+HYPERFORMULA is a software distributed by HANDSONCODE sp. z o. o., a
 Polish corporation based in Gdynia, Poland, at Aleja Zwyciestwa 96-98,
 registered by the District Court in Gdansk under number 538651,
 EU VAT: PL5862294002, share capital: PLN 62,800.00.
 
-  This software is dual-licensed, giving you the option to use it under
+This software is dual-licensed, giving you the option to use it under
 either a proprietary license or the GNU General Public License version 3
 (GPLv3). The specific license under which you use the software is
 determined by the license key you apply. Each licensing option comes with
@@ -13,22 +13,22 @@ its own terms and conditions as specified below.
 
   1. PROPRIETARY LICENSE:
 
-  Your use of this software is subject to the terms included in an
-applicable proprietary license agreement between you and HANDSONCODE. The
-proprietary license can be purchased from HANDSONCODE or an authorized
-reseller.
+    Your use of this software is subject to the terms included in an
+    applicable proprietary license agreement between you and HANDSONCODE.
+    The proprietary license can be purchased from HANDSONCODE or an
+    authorized reseller.
 
   2. GNU GENERAL PUBLIC LICENSE v3:
 
-  This software is also available under the terms of the GNU General
-Public License v3. You are permitted to run, modify, and distribute this
-software under the terms of the GPLv3, as published by the Free Software
-Foundation. The full text of the GPLv3 can be found at
-https://www.gnu.org/licenses/.
+    This software is also available under the terms of the GNU General
+    Public License v3. You are permitted to run, modify, and distribute
+    this software under the terms of the GPLv3, as published by the Free
+    Software Foundation. The full text of the GPLv3 can be found at
+    https://www.gnu.org/licenses/.
 
-  UNLESS EXPRESSLY AGREED OTHERWISE, HANDSONCODE PROVIDES THIS SOFTWARE
-ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, AND IN
-NO EVENT AND UNDER NO LEGAL THEORY, SHALL HANDSONCODE BE LIABLE TO YOU
-FOR DAMAGES, INCLUDING ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
+UNLESS EXPRESSLY AGREED OTHERWISE, HANDSONCODE PROVIDES THIS SOFTWARE ON
+AN "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, AND IN NO
+EVENT AND UNDER NO LEGAL THEORY, SHALL HANDSONCODE BE LIABLE TO YOU FOR
+DAMAGES, INCLUDING ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES OF ANY CHARACTER ARISING FROM USE OR INABILITY TO
 USE THIS SOFTWARE.
