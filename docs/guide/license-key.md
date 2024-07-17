@@ -13,33 +13,33 @@ const options = {
 }
 ```
 
-## Commercial license
+## Proprietary license
 
-To use HyperFormula under a [commercial license](licensing.md#commercial-license), follow these steps:
+To use HyperFormula under a [proprietary license](licensing.md#proprietary-license), follow these steps:
 
-1. Contact our [Sales Team](licensing.md#commercial-license) to purchase a commercial license.
-2. Our Sales Team sends you your commercial license key.
-3. In your [configuration options](configuration-options.md), assign the mandatory `licenseKey` property to your commercial license key:
+1. Contact our [Sales Team](licensing.md#proprietary-license) to purchase a proprietary license.
+2. Our Sales Team sends you your proprietary license key.
+3. In your [configuration options](configuration-options.md), assign the mandatory `licenseKey` property to your proprietary license key:
 
 ```js
 const options = {
-  // replace xxxx-xxxx-xxxx-xxxx-xxxx with your commercial license key:
+  // replace xxxx-xxxx-xxxx-xxxx-xxxx with your proprietary license key:
   licenseKey: 'xxxx-xxxx-xxxx-xxxx-xxxx',
   //... other options
 }
 ```
 
-### Commercial license key validation
+### Proprietary license key validation
 
 ::: tip
-HyperFormula doesn't use an internet connection to validate your commercial license key.
+HyperFormula doesn't use an internet connection to validate your proprietary license key.
 :::
 
 To determine whether a user is still entitled to use a particular
 version of the software, HyperFormula compares the time between
 two dates:
 * The HyperFormula build date
-* The date in your commercial license key
+* The date in your proprietary license key
 
 This process doesn't require any connection to the server.
 
