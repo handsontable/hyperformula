@@ -110,6 +110,6 @@ Contributions are welcome, but before you make them, please read the [Contributi
 
 ## License
 
-HyperFormula is available under two different licenses: GPLv3 and commercial. The commercial license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
+HyperFormula is available under two different licenses: GPLv3 and proprietary. The proprietary license can be purchased by [contacting our team](https://handsontable.com/get-a-quote) at Handsontable.
 
 Copyright (c) Handsoncode
