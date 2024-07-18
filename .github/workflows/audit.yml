@@ -16,7 +16,7 @@ jobs:
   audit:
     strategy:
       matrix:
-        node-version: [ '22' ]
+        node-version: [ '20' ]
         os: [ 'ubuntu-latest' ]
     name: audit
     runs-on: ${{ matrix.os }}
