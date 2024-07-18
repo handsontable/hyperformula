@@ -16,7 +16,7 @@ jobs:
   unit-tests:
     strategy:
       matrix:
-        node-version: [ '22' ]
+        node-version: [ '20' ]
         os: [ 'ubuntu-latest' ]
     name: unit-tests
     runs-on: ${{ matrix.os }}
@@ -42,7 +42,7 @@ jobs:
   browser-tests:
     strategy:
       matrix:
-        node-version: [ '22' ]
+        node-version: [ '20' ]
         os: [ 'ubuntu-latest' ]
     name: browser-tests
     runs-on: ${{ matrix.os }}
