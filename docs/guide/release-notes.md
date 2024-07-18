@@ -6,6 +6,14 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.7.1
+
+**Release date: July 18, 2024**
+
+### Fixed
+
+- Fixed an issue where adding or removing columns with `DenseStrategy` for address mapping resulted in the `Cannot read properties of undefined (reading 'splice')` error. [#1406](https://github.com/handsontable/hyperformula/issues/1406)
+
 ## 2.7.0
 
 **Release date: Apr 10, 2024**

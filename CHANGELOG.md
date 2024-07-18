@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.7.1] - 2024-07-18
+
+### Fixed
+
+- Fixed an issue where adding or removing columns with `DenseStrategy` for address mapping resulted in the `Cannot read properties of undefined (reading 'splice')` error. [#1406](https://github.com/handsontable/hyperformula/issues/1406)
+
 ## [2.7.0] - 2024-04-10
 
 ### Added
