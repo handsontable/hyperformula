@@ -55,7 +55,7 @@
   "typings": "./typings/index.d.ts",
   "scripts": {
     "docs:dev": "npm run typedoc:build-api && vuepress dev docs --silent --no-clear-screen --no-cache",
-    "docs:build": "npm run bundle-all && npm run typedoc:build-api && set NODE_OPTIONS=--openssl-legacy-provider && vuepress build docs",
+    "docs:build": "npm run bundle-all && set NODE_OPTIONS=--openssl-legacy-provider && npm run typedoc:build-api && set NODE_OPTIONS=--openssl-legacy-provider && vuepress build docs",
     "bundle-all": "cross-env HF_COMPILE=1 npm-run-all clean compile bundle:** verify-bundles",
     "bundle:es": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=es env-cmd -f ht.config.js babel lib --out-dir es",
     "bundle:cjs": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js babel lib --out-dir commonjs",
