@@ -9,7 +9,7 @@ jobs:
   publish-docs:
     strategy:
       matrix:
-        node-version: [ '20' ]
+        node-version: [ '16' ]
         os: [ 'ubuntu-latest' ]
     name: publish-docs
     runs-on: ${{ matrix.os }}
