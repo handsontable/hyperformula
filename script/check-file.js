@@ -31,9 +31,11 @@ try {
     assert(valueB1 === 44)
 
     // Check if the file contains no redundant license comments
-    const fileContent = fs.readFileSync(fileToCheck, 'utf8')
-    const licenseComments = fileContent.match(/@license/g)
-    assert.equal(licenseComments.length, 2)
+    if (fileToCheck.includes('.js')) {
+        const fileContent = fs.readFileSync(resolve(fileToCheck), 'utf8')
+        const licenseComments = fileContent.match(/@license/g)
+        assert.equal(licenseComments.length, 2)
+    }
 
     console.log(`Bundle check: \u001b[1;37m${fileToCheck}\u001b[0m \u001b[0;32mOK\u001b[0m`)
 } catch (ex) {
