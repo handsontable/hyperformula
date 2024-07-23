@@ -31,7 +31,7 @@ try {
     assert(valueB1 === 44)
 
     // Check if the file contains no redundant license comments
-    const fileContent = fs.readFileSync(resolve(fileToCheck), 'utf8')
+    const fileContent = fs.readFileSync(fileToCheck, 'utf8')
     const licenseComments = fileContent.match(/@license/g)
     assert.equal(licenseComments.length, 2)
 
