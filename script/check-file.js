@@ -1,5 +1,6 @@
 const { resolve } = require('path')
 const assert = require('assert')
+const fs = require('fs')
 const htConfig = require('../ht.config')
 
 const [ /* node bin */ , /* path to this script */ , fileToCheck] = process.argv;
@@ -28,6 +29,13 @@ try {
     // Check if the engine works.
     assert(valueA1 === 42)
     assert(valueB1 === 44)
+
+    // Check if the file contains no redundant license comments
+    if (fileToCheck.includes('.js')) {
+        const fileContent = fs.readFileSync(resolve(fileToCheck), 'utf8')
+        const licenseComments = fileContent.match(/@license/g)
+        assert.equal(licenseComments.length, 2)
+    }
 
     console.log(`Bundle check: \u001b[1;37m${fileToCheck}\u001b[0m \u001b[0;32mOK\u001b[0m`)
 } catch (ex) {
