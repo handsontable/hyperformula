@@ -11,6 +11,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fix ES module build to make importing language files possible in Node environment. [#1344](https://github.com/handsontable/hyperformula/issues/1344)
 
+## [2.7.1] - 2024-07-18
+
+### Fixed
+
+- Fixed an issue where adding or removing columns with `DenseStrategy` for address mapping resulted in the `Cannot read properties of undefined (reading 'splice')` error. [#1406](https://github.com/handsontable/hyperformula/issues/1406)
+
+## [2.7.0] - 2024-04-10
+
+### Added
+
+- Added method `getNamedExpressionsFromFormula` to extract named expressions from formulas. [#1365](https://github.com/handsontable/hyperformula/issues/1365)
+- Added `context` config option for passing data to custom functions. [#1396](https://github.com/handsontable/hyperformula/issues/1396)
+
 ## [2.6.2] - 2024-02-15
 
 ### Changed

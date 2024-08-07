@@ -17,7 +17,9 @@ module.exports.create = function create() {
 
     c.optimization = {
       minimize: true,
-      minimizer: [new TerserPlugin()]
+      minimizer: [new TerserPlugin({
+        extractComments: false
+      })]
     };
 
     c.plugins.forEach((plugin) => {

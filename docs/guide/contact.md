@@ -10,7 +10,7 @@ We typically reply within a few hours during our working hours:
 
 Write to us at [sales@handsontable.com](mailto:sales@handsontable.com)
 or submit your inquiry through the
-[contact form](https://handsontable.com/contact?category=request_for_quotation).
+[contact form](https://handsontable.com/get-a-quote).
 
 ## Billing address
 

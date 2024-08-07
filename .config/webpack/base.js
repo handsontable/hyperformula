@@ -2,10 +2,11 @@ const path = require('path');
 const fs = require('fs');
 const { BannerPlugin } = require('webpack');
 
-let licenseBody = fs.readFileSync(path.resolve(__dirname, '../../LICENSE.txt'), 'utf8');
+const licenseComment = fs.readFileSync(path.resolve(__dirname, '../source-license-header.js'), 'utf8').trim();
+let licensePreamble = fs.readFileSync(path.resolve(__dirname, '../../LICENSE.txt'), 'utf8');
 
-licenseBody += '\nVersion: ' + process.env.HT_VERSION;
-licenseBody += '\nRelease date: ' + process.env.HT_RELEASE_DATE + ' (built at ' + process.env.HT_BUILD_DATE + ')';
+licensePreamble += '\n\nVersion: ' + process.env.HT_VERSION;
+licensePreamble += '\nRelease date: ' + process.env.HT_RELEASE_DATE + ' (built at ' + process.env.HT_BUILD_DATE + ')';
 
 module.exports.create = function create(processedFile) {
   const config = {
@@ -42,10 +43,18 @@ module.exports.create = function create(processedFile) {
             }
           ]
         },
+        {
+          test: /\.js$/,
+          loader: 'string-replace-loader',
+          options: {
+            search: licenseComment,
+            replace: '',
+          }
+        }
       ]
     },
     plugins: [
-      new BannerPlugin(licenseBody),
+      new BannerPlugin(licensePreamble),
     ],
   };
 

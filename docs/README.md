@@ -52,7 +52,7 @@ docs                            # All documentation files
 │   └── highlight.js            # Code highlight configuration
 ├── api                         # The API reference files, generated automatically from JsDoc. Do not edit!
 ├── guide                       # The docs source files: Markdown content
-├── api-template.md             # The API reference welcome page
+├── api-ref-readme.md           # The API reference welcome page
 ├── index.md                    # The main docs portal welcome page
 └── README.md                   # The file you're looking at right now!
 ```
