@@ -29,12 +29,12 @@ const FILES_CHECKLIST = [
   'commonjs/index.js',
   'commonjs/HyperFormula.js',
   'dist/hyperformula.js',
-  'es/index.js',
-  'es/HyperFormula.js',
+  'es/index.mjs',
+  'es/HyperFormula.mjs',
   'typings/index.d.ts',
   'typings/HyperFormula.d.ts',
   'dist/languages/plPL.js',
-  'es/i18n/languages/plPL.js',
+  'es/i18n/languages/plPL.mjs',
   'commonjs/i18n/languages/plPL.js',
 ]
 
