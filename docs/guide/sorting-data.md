@@ -13,7 +13,7 @@ You can implement any sorting algorithm that returns an array of row or column i
 To sort rows, use the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) and [`setRowOrder`](../api/classes/hyperformula.md#setroworder) methods.
 
 ### Step 1: Choose a new row order
-Choose your required permutation of row indexes. 
+Choose your required permutation of row indexes.
 
 For example, if you want to swap the first row with the third row, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
 
@@ -196,6 +196,9 @@ if (!isColumnOrderOk) {
 The demo below shows how to sort rows in ascending and descending order, based on the results (calculated values) of the cells in the second column.
 
 <iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/sorting?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
+  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.7.x/sorting?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
+  style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: sorting"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>

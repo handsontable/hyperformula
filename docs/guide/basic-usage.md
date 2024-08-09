@@ -19,7 +19,7 @@ import { HyperFormula } from 'hyperformula';
 
 If you embed HyperFormula in the `<script>` tag using CDN, then it will
 be accessible as global variable `HyperFormula` and ready to use.
-  
+
 Now you can use the [available options](configuration-options.md) to
 configure the instance of HyperFormula according to your needs, like
 this:
@@ -38,7 +38,7 @@ set will contain numbers and just one formula `=SUM(A1,B1)`. Use the
 // define the data
 const data = [['10', '20', '3.14159265359', '=SUM(A1:C1)']];
 
-// build an instance with defined options and data 
+// build an instance with defined options and data
 const hfInstance = HyperFormula.buildFromArray(data, options);
 ```
 
@@ -65,6 +65,9 @@ works. It's time to move on to a more
 ## Demo
 
 <iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/basic-usage?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
+  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.7.x/basic-usage?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
+  style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: basic-usage"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>

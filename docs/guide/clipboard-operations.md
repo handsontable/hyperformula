@@ -17,7 +17,7 @@ const hfInstance = HyperFormula.buildFromArray([
 
 // copy [ [ 2 ] ]
 const clipboardContent = hfInstance.copy({
-  start: { sheet: 0, col: 1, row: 0 }, 
+  start: { sheet: 0, col: 1, row: 0 },
   end: { sheet: 0, col: 1, row: 0 },
 });
 ```
@@ -113,6 +113,9 @@ Depending on what was cut, the data is stored as:
 ## Demo
 
 <iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/clipboard-operations?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
+  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/2.7.x/clipboard-operations?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
+  style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
+  title="handsontable/hyperformula-demos: clipboard-operations"
+  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>
