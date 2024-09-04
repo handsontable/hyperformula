@@ -1,4 +1,4 @@
-name: Security
+name: Build docs
 
 on:
   pull_request:
@@ -13,12 +13,12 @@ on:
       - 'release/**'
 
 jobs:
-  audit:
+  publish-docs:
     strategy:
       matrix:
         node-version: [ '20' ]
         os: [ 'ubuntu-latest' ]
-    name: audit
+    name: build-docs
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
@@ -28,6 +28,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Run audit
+      - name: Install dependencies
         run: |
-          npm audit --omit='dev'
+          npm ci
+
+      - name: Build docs
+        run: |
+          npm run docs:build
