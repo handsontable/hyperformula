@@ -20,7 +20,7 @@ const tab = (tabName, token, id) => {
 
   return [
     openTSDivToken,
-    // token,
+    token,
     closeDivToken
   ];
 };
