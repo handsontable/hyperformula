@@ -1,16 +1,15 @@
 # Demo
 
-<iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/vanillajs-demo?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
-</iframe>
+::: example #example1 --html 1 --css 2 --js 3 --ts 4
 
-In this demo, you can see how HyperFormula handles basic operations by using API methods, such as:
+@[code](@/examples/demo/example1.html)
 
-* `buildEmpty` static method to initialize the instance
-* `addSheet` method to add a new sheet
-* `setCellContents` method to add content
-* `getSheetId` method to retrieve the sheet's ID
-* `getCellValue` method to get the value of a cell
-* `calculateFormula` method to calculate a formula
-* `getCellFormula` method to retrieve a formula from a cell
+@[code](@/examples/demo/example1.css)
+
+@[code](@/examples/demo/example1.js)
+
+@[code](@/examples/demo/example1.ts)
+
+:::
+
+paragraph
