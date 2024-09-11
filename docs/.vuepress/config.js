@@ -5,7 +5,6 @@ const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
 const HyperFormula = require('../../dist/hyperformula.full');
 const firstHeaderInjection = require('./plugins/markdown-it-header-injection');
-const headerAnchor = require('./plugins/markdown-it-header-anchor');
 const conditionalContainer = require('./plugins/markdown-it-conditional-container');
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
 const fs = require('fs');
@@ -118,7 +117,6 @@ module.exports = {
       md.use(includeCodeSnippet)
       md.use(conditionalContainer)
       md.use(firstHeaderInjection)
-      md.use(headerAnchor)
     }
   },
   // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,

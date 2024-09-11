@@ -94,154 +94,90 @@ module.exports = function(docsVersion, base) {
       const token = tokens[index];
       const m = token.info.trim().match(EXAMPLE_REGEX);
 
-      if (token.nesting === 1 && m) {
-        // open preview
-        let [, , id, klass, preset, args] = m;
-
-        id = id ? id.substring(1) : 'example1';
-        klass = klass ? klass.substring(1) : '';
-        preset = preset ? preset.substring(1) : 'hot';
-        args = args || '';
-
-        const htmlPos = args.match(/--html (\d*)/)?.[1];
-        const htmlIndex = htmlPos ? index + Number.parseInt(htmlPos, 10) : 0;
-        const htmlToken = htmlPos ? tokens[htmlIndex] : undefined;
-        const htmlContent = htmlToken
-          ? htmlToken.content
-          : `<div id="${id}" class="hot ${klass}"></div>`;
-        const htmlContentRoot = `<div data-preset-type="${preset}" data-example-id="${id}" >${htmlContent}</div>`;
-
-        const cssPos = args.match(/--css (\d*)/)?.[1];
-        const cssIndex = cssPos ? index + Number.parseInt(cssPos, 10) : 0;
-        const cssToken = cssPos ? tokens[cssIndex] : undefined;
-        const cssContent = cssToken ? cssToken.content : '';
-
-        const jsPos = args.match(/--js (\d*)/)?.[1] || 1;
-        const jsIndex = jsPos ? index + Number.parseInt(jsPos, 10) : 0;
-        const jsToken = jsPos ? tokens[jsIndex] : undefined;
-
-        const tsPos = args.match(/--ts (\d*)/)?.[1];
-        const tsIndex = tsPos ? index + Number.parseInt(tsPos, 10) : 0;
-        const tsToken = tsPos ? tokens[tsIndex] : undefined;
-
-        // Parse code
-        // const jsTokenWithBasePath = jsToken?.content?.replaceAll('{{$basePath}}', base);
-        // const tsTokenWithBasePath = tsToken?.content?.replaceAll('{{$basePath}}', base);
-        // const codeToCompile = parseCode(jsTokenWithBasePath);
-        // const tsCodeToCompile = parseCode(tsTokenWithBasePath);
-        // const codeToCompileSandbox = parseCodeSandbox(jsTokenWithBasePath);
-        // const tsCodeToCompileSandbox = parseCodeSandbox(tsTokenWithBasePath);
-        // const codeToPreview = parsePreview(jsTokenWithBasePath);
-        // const tsCodeToPreview = parsePreview(tsTokenWithBasePath);
-
-        // Replace token content
-        // if (jsToken) jsToken.content = codeToPreview;
-
-        // if (tsToken) tsToken.content = tsCodeToPreview;
-
-        [htmlIndex, jsIndex, tsIndex, cssIndex].filter(x => !!x).sort().reverse().forEach((x) => {
-          tokens.splice(x, 1);
-        });
-
-        const newTokens = [
-          new Token('container_div_open', 'div', 1),
-          new Token('container_div_close', 'div', -1),
-          new Token('container_div_open', 'div', 1),
-          new Token('container_div_close', 'div', -1),
-        ];
-
-        tokens.splice(index + 1, 0, ...newTokens);
-
-        // const codeForPreset = addCodeForPreset(codeToCompile, preset, id);
-        // const tsCodeForPreset = addCodeForPreset(tsCodeToCompile, preset, id);
-        // const code = buildCode(
-        //   id + (preset.includes('angular') ? '.ts' : '.jsx'),
-        //   codeForPreset,
-        //   env.relativePath
-        // );
-        // const encodedCode = encodeURI(
-        //   `useHandsontable('${docsVersion}', function(){${code}}, '${preset}')`
-        // );
-        const activeTab = `${args.match(/--tab (code|html|css|preview)/)?.[1] ?? 'preview'}-tab-${id}`;
-        const noEdit = !!args.match(/--no-edit/)?.[0];
-        // const isRTL = /layoutDirection(.*)'rtl'/.test(codeToCompile) || /dir="rtl"/.test(htmlContent);
-        const isActive = `$parent.$parent.isScriptLoaderActivated('${id}')`;
-        const selectedLang = '$parent.$parent.selectedLang';
-        const isJavaScript = preset.includes('hot');
-        const isReact = preset.includes('react');
-        const isReactOrJavaScript = isJavaScript || isReact;
-
+      if (token.nesting !== 1 || !m) {
         return '';
-        return `
-          <div class="example-container">
-            <template v-if="${isActive}">
-<!--              <style v-pre>${cssContent}</style>-->
-<!--              <div v-pre>${htmlContentRoot}</div>-->
-<!--              <ScriptLoader code="${encodedCode}"></ScriptLoader>-->
-            </template>
-          </div>
-          <div class="tabs-button-wrapper">
-            <div class="tabs-button-list" ${isRTL ? 'div="rtl"' : ''}>
-<!--              <button class="show-code" @click="$parent.$parent.showCodeButton($event)">-->
-<!--                <i class="ico i-code"></i>Source code-->
-<!--              </button>-->
-              <div class="example-controls">
-                <div class="examples-buttons" v-if="${selectedLang} === 'JavaScript' || !${isReactOrJavaScript}">
-                  ${!true
-    ? stackblitz(
-      id,
-      htmlContent,
-      codeToCompileSandbox,
-      cssContent,
-      docsVersion,
-      preset,
-      'JavaScript'
-    )
-    : ''}
-                </div>
-                <div class="examples-buttons" v-if="${selectedLang} === 'TypeScript' && ${isReactOrJavaScript}">
-                  ${!true
-    ? stackblitz(
-      id,
-      htmlContent,
-      tsCodeToCompileSandbox,
-      cssContent,
-      docsVersion,
-      preset,
-      'TypeScript'
-    )
-    : ''}
-                </div>
-<!--                <button
-                  aria-label="Reset the demo" 
-                  @click="$parent.$parent.resetDemo('${id}')" 
-                  :disabled="$parent.$parent.isButtonInactive"
-                >
-                  <i class="ico i-refresh"></i>
-                </button>-->
-<!--                <button
-                  aria-label="View the source on GitHub" 
-                  @click="$parent.$parent.openExample('${env.relativePath}', '${preset}', '${id}')" 
-                >
-                  <i class="ico i-github"></i>
-                </button>-->
-<!--                <select class="selected-lang" value="ts" hidden>
-                  <option value="ts">ts</option>
-                  <option value="js">js</option>
-                </select>-->
-              </div>
-            </div>
-            <div class="example-container-code">
-<!--              <tabs
-                :options="{ useUrlFragment: false, defaultTabHash: '${activeTab}' }"
-                cache-lifetime="0"
-              >-->
-          `;
-      } else {
-        // close preview
-        return '';
-        return '</tabs></div></div>';
       }
+
+      let [, , id, klass, preset, args] = m;
+
+      id = id ? id.substring(1) : 'example1';
+      klass = klass ? klass.substring(1) : '';
+      preset = preset ? preset.substring(1) : 'hot';
+      args = args || '';
+
+      const htmlPos = args.match(/--html (\d*)/)?.[1];
+      const htmlIndex = htmlPos ? index + Number.parseInt(htmlPos, 10) : 0;
+      const htmlToken = htmlPos ? tokens[htmlIndex] : undefined;
+      const htmlContent = htmlToken
+        ? htmlToken.content
+        : `<div id="${id}" class="hot ${klass}"></div>`;
+      const htmlContentRoot = `<div data-preset-type="${preset}" data-example-id="${id}" >${htmlContent}</div>`;
+
+      const cssPos = args.match(/--css (\d*)/)?.[1];
+      const cssIndex = cssPos ? index + Number.parseInt(cssPos, 10) : 0;
+      const cssToken = cssPos ? tokens[cssIndex] : undefined;
+      const cssContent = cssToken ? cssToken.content : '';
+
+      const jsPos = args.match(/--js (\d*)/)?.[1] || 1;
+      const jsIndex = jsPos ? index + Number.parseInt(jsPos, 10) : 0;
+      const jsToken = jsPos ? tokens[jsIndex] : undefined;
+
+      const tsPos = args.match(/--ts (\d*)/)?.[1];
+      const tsIndex = tsPos ? index + Number.parseInt(tsPos, 10) : 0;
+      const tsToken = tsPos ? tokens[tsIndex] : undefined;
+
+      // Parse code
+      const jsTokenWithBasePath = jsToken?.content?.replaceAll('{{$basePath}}', base);
+      const tsTokenWithBasePath = tsToken?.content?.replaceAll('{{$basePath}}', base);
+      const codeToCompile = parseCode(jsTokenWithBasePath);
+      const tsCodeToCompile = parseCode(tsTokenWithBasePath);
+      const codeToCompileSandbox = parseCodeSandbox(jsTokenWithBasePath);
+      const tsCodeToCompileSandbox = parseCodeSandbox(tsTokenWithBasePath);
+      const codeToPreview = parsePreview(jsTokenWithBasePath);
+      const tsCodeToPreview = parsePreview(tsTokenWithBasePath);
+
+      // Replace token content
+      if (jsToken) jsToken.content = codeToPreview;
+
+      if (tsToken) tsToken.content = tsCodeToPreview;
+
+      [htmlIndex, jsIndex, tsIndex, cssIndex].filter(x => !!x).sort().reverse().forEach((x) => {
+        tokens.splice(x, 1);
+      });
+
+      const newTokens = [
+        new Token('container_div_open', 'div', 1),
+        new Token('container_div_close', 'div', -1),
+        new Token('container_div_open', 'div', 1),
+        new Token('container_div_close', 'div', -1),
+      ];
+
+      tokens.splice(index + 1, 0, ...newTokens);
+
+      const codeForPreset = addCodeForPreset(codeToCompile, preset, id);
+      const tsCodeForPreset = addCodeForPreset(tsCodeToCompile, preset, id);
+      const code = buildCode(
+        id + (preset.includes('angular') ? '.ts' : '.jsx'),
+        codeForPreset,
+        env.relativePath
+      );
+      const encodedCode = encodeURI(
+        `useHandsontable('${docsVersion}', function(){${code}}, '${preset}')`
+      );
+      const activeTab = `${args.match(/--tab (code|html|css|preview)/)?.[1] ?? 'preview'}-tab-${id}`;
+      const noEdit = !!args.match(/--no-edit/)?.[0];
+      const selectedLang = '$parent.$parent.selectedLang';
+      const isJavaScript = preset.includes('hot');
+      const isReact = preset.includes('react');
+      const isReactOrJavaScript = isJavaScript || isReact;
+
+      return `
+        <div class="example-container">
+          <style v-pre>${cssContent}</style>
+          <div v-pre>${htmlContentRoot}</div>
+<!--          <ScriptLoader code="${encodedCode}"></ScriptLoader>-->
+        </div>
+      `;
     },
   };
 };
