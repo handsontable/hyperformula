@@ -165,7 +165,7 @@ module.exports = function(docsVersion, base) {
         `useHandsontable('${docsVersion}', function(){${code}}, '${preset}')`
       );
       const activeTab = `${args.match(/--tab (code|html|css|preview)/)?.[1] ?? 'preview'}-tab-${id}`;
-      const noEdit = !!args.match(/--no-edit/)?.[0];
+      const noEdit = true; //!!args.match(/--no-edit/)?.[0];
       const selectedLang = '$parent.$parent.selectedLang';
       const isJavaScript = preset.includes('hot');
       const isReact = preset.includes('react');
@@ -176,6 +176,54 @@ module.exports = function(docsVersion, base) {
           <style v-pre>${cssContent}</style>
           <div v-pre>${htmlContentRoot}</div>
 <!--          <ScriptLoader code="${encodedCode}"></ScriptLoader>-->
+        </div>
+        <div class="tabs-button-wrapper">
+          <div class="tabs-button-list">
+            <button class="show-code" @click="$parent.$parent.showCodeButton($event)">
+              <i class="ico i-code"></i>Source code
+            </button>
+            <div class="example-controls">
+              <div class="examples-buttons" v-if="${selectedLang} === 'JavaScript' || !${isReactOrJavaScript}">
+                ${!noEdit ? stackblitz(
+                  id,
+                  htmlContent,
+                  codeToCompileSandbox,
+                  cssContent,
+                  docsVersion,
+                  preset,
+                  'JavaScript'
+                ) : ''}
+              </div>
+              <div class="examples-buttons" v-if="${selectedLang} === 'TypeScript' && ${isReactOrJavaScript}">
+                ${!noEdit ? stackblitz(
+                  id,
+                  htmlContent,
+                  tsCodeToCompileSandbox,
+                  cssContent,
+                  docsVersion,
+                  preset,
+                  'TypeScript'
+                ) : ''}    
+              </div>
+              <button
+                aria-label="Reset the demo" 
+                @click="$parent.$parent.resetDemo('${id}')" 
+                :disabled="$parent.$parent.isButtonInactive"
+              >
+                <i class="ico i-refresh"></i>
+              </button>
+              <button
+                aria-label="View the source on GitHub" 
+                @click="$parent.$parent.openExample('${env.relativePath}', '${preset}', '${id}')" 
+              >
+                <i class="ico i-github"></i>
+              </button>
+              <select class="selected-lang" value="ts" hidden>
+                <option value="ts">ts</option>
+                <option value="js">js</option>
+              </select>
+            </div>
+          </div>
         </div>
       `;
     },
