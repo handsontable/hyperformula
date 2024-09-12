@@ -1,5 +1,68 @@
-h3.demo-preview {
-  margin-bottom: 0.3rem !important;
-  padding-top: 0 !important;
-  margin-top: 0.5rem !important;
+.example button.run {
+  background-color: #1c49e4;
+  border-color: #1c49e4;
+  margin-bottom: 20px;
+}
+
+.example button.run:hover {
+  background-color: #2350ea;
+}
+
+.example button.button.reset {
+  border-color: #1c49e4;
+  color: #1c49e4;
+  margin-bottom: 20px;
+}
+
+table tbody tr:last-child {
+  font-weight: 600;
+}
+
+table tbody tr:last-child td:first-child {
+  text-align: right;
+}
+
+table tbody tr td:first-child {
+  text-align: center;
+  padding: 0;
+}
+
+table {
+  table-layout: fixed;
+  font-size: 14px;
+}
+
+table thead tr th:first-child {
+  padding-left: 40px;
+}
+
+table tbody tr td:first-child span {
+  width: 100%;
+  display: inline-block;
+  text-align: left;
+  padding-left: 15px;
+  margin-left: 0;
+}
+
+table tbody tr td:first-child span::before {
+  counter-increment: row-counter;
+  content: counter(row-counter);
+  display: inline-block;
+  width: 20px;
+  position: relative;
+  left: -10px;
+}
+
+table tbody tr td.updated-cell span {
+  animation-name: cell-appear;
+  animation-duration: 0.6s;
+}
+
+@keyframes cell-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
