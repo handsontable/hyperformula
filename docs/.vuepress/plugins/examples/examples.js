@@ -96,15 +96,13 @@ module.exports = function(docsVersion, base) {
         codeForPreset,
         env.relativePath
       );
-      const encodedCode = encodeURI(
-        `useHandsontable('${docsVersion}', function(){${code}}, '${preset}')`
-      );
+      const encodedCode = encodeURI(code);
 
       return `
         <div class="example-container">
           <style v-pre>${cssContent}</style>
           <div v-pre>${htmlContentRoot}</div>
-<!--          <ScriptLoader code="${encodedCode}"></ScriptLoader>-->
+          <ScriptLoader code="${encodedCode}"></ScriptLoader>
         </div>
         <div class="example-controls">
           <div class="examples-buttons">
