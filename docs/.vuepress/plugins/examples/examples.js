@@ -9,35 +9,6 @@ const { buildCode } = require('./code-builder');
 const { addCodeForPreset } = require('./add-code-for-preset');
 const { stackblitz } = require('./stackblitz');
 
-const tab = (tabName, token, id) => {
-  if (!token) return [];
-
-  const openTSDivToken = new Token('html_block', '', 1);
-  const closeDivToken = new Token('html_block', '', -1);
-
-  openTSDivToken.content = `<tab id="${tabName.toLowerCase()}-tab-${id}" name="${tabName}">`;
-  closeDivToken.content = '</tab>';
-
-  return [
-    openTSDivToken,
-    token,
-    closeDivToken
-  ];
-};
-
-const parsePreview = (content) => {
-  if (!content) return '';
-
-  return content
-    // Remove the all "/* start:skip-in-compilation */" and "/* end:skip-in-compilation */" comments
-    .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\n/gm, '')
-    // Remove the code between "/* start:skip-in-preview */" and "/* end:skip-in-preview */" expressions
-    .replace(/\/\*(\s+)?start:skip-in-preview(\s+)?\*\/\n.*?\/\*(\s+)?end:skip-in-preview(\s+)?\*\/\n/msg, '')
-    // Remove /* end-file */
-    .replace(/\/\* end-file \*\//gm, '')
-    .trim();
-};
-
 const parseCode = (content) => {
   if (!content) return '';
 
@@ -59,32 +30,6 @@ const parseCodeSandbox = (content) => {
     .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\n/gm, '')
     // Remove the all "/* start:skip-in-compilation */" and "/* end:skip-in-compilation */" comments
     .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\n/gm, '');
-};
-
-const getCodeToken = (jsToken, tsToken) => {
-  const code = new Token('inline', '', 1);
-  const openJSDivToken = new Token('container_div_open', 'div', 1);
-  const openTSDivToken = new Token('container_div_open', 'div', 1);
-  const closeDivToken = new Token('container_div_close', 'div', -1);
-
-  openJSDivToken.attrSet('class', 'tab-content-js');
-  openJSDivToken.attrSet('v-if', '$parent.$parent.selectedLang === \'JavaScript\'');
-  openTSDivToken.attrSet('class', 'tab-content-ts');
-  openTSDivToken.attrSet('v-if', '$parent.$parent.selectedLang === \'TypeScript\'');
-
-  code.children = [
-    openJSDivToken,
-    jsToken,
-    closeDivToken
-  ];
-
-  if (tsToken) {
-    code.children.push(openTSDivToken);
-    code.children.push(tsToken);
-    code.children.push(closeDivToken);
-  }
-
-  return code;
 };
 
 module.exports = function(docsVersion, base) {
@@ -130,16 +75,7 @@ module.exports = function(docsVersion, base) {
       const jsTokenWithBasePath = jsToken?.content?.replaceAll('{{$basePath}}', base);
       const tsTokenWithBasePath = tsToken?.content?.replaceAll('{{$basePath}}', base);
       const codeToCompile = parseCode(jsTokenWithBasePath);
-      const tsCodeToCompile = parseCode(tsTokenWithBasePath);
-      const codeToCompileSandbox = parseCodeSandbox(jsTokenWithBasePath);
       const tsCodeToCompileSandbox = parseCodeSandbox(tsTokenWithBasePath);
-      const codeToPreview = parsePreview(jsTokenWithBasePath);
-      const tsCodeToPreview = parsePreview(tsTokenWithBasePath);
-
-      // Replace token content
-      if (jsToken) jsToken.content = codeToPreview;
-
-      if (tsToken) tsToken.content = tsCodeToPreview;
 
       [htmlIndex, jsIndex, tsIndex, cssIndex].filter(x => !!x).sort().reverse().forEach((x) => {
         tokens.splice(x, 1);
@@ -155,7 +91,6 @@ module.exports = function(docsVersion, base) {
       tokens.splice(index + 1, 0, ...newTokens);
 
       const codeForPreset = addCodeForPreset(codeToCompile, preset, id);
-      const tsCodeForPreset = addCodeForPreset(tsCodeToCompile, preset, id);
       const code = buildCode(
         id + (preset.includes('angular') ? '.ts' : '.jsx'),
         codeForPreset,
@@ -164,12 +99,6 @@ module.exports = function(docsVersion, base) {
       const encodedCode = encodeURI(
         `useHandsontable('${docsVersion}', function(){${code}}, '${preset}')`
       );
-      const activeTab = `${args.match(/--tab (code|html|css|preview)/)?.[1] ?? 'preview'}-tab-${id}`;
-      const noEdit = true; //!!args.match(/--no-edit/)?.[0];
-      const selectedLang = '$parent.$parent.selectedLang';
-      const isJavaScript = preset.includes('hot');
-      const isReact = preset.includes('react');
-      const isReactOrJavaScript = isJavaScript || isReact;
 
       return `
         <div class="example-container">
@@ -177,52 +106,17 @@ module.exports = function(docsVersion, base) {
           <div v-pre>${htmlContentRoot}</div>
 <!--          <ScriptLoader code="${encodedCode}"></ScriptLoader>-->
         </div>
-        <div class="tabs-button-wrapper">
-          <div class="tabs-button-list">
-            <button class="show-code" @click="$parent.$parent.showCodeButton($event)">
-              <i class="ico i-code"></i>Source code
-            </button>
-            <div class="example-controls">
-              <div class="examples-buttons" v-if="${selectedLang} === 'JavaScript' || !${isReactOrJavaScript}">
-                ${!noEdit ? stackblitz(
-                  id,
-                  htmlContent,
-                  codeToCompileSandbox,
-                  cssContent,
-                  docsVersion,
-                  preset,
-                  'JavaScript'
-                ) : ''}
-              </div>
-              <div class="examples-buttons" v-if="${selectedLang} === 'TypeScript' && ${isReactOrJavaScript}">
-                ${!noEdit ? stackblitz(
-                  id,
-                  htmlContent,
-                  tsCodeToCompileSandbox,
-                  cssContent,
-                  docsVersion,
-                  preset,
-                  'TypeScript'
-                ) : ''}    
-              </div>
-              <button
-                aria-label="Reset the demo" 
-                @click="$parent.$parent.resetDemo('${id}')" 
-                :disabled="$parent.$parent.isButtonInactive"
-              >
-                <i class="ico i-refresh"></i>
-              </button>
-              <button
-                aria-label="View the source on GitHub" 
-                @click="$parent.$parent.openExample('${env.relativePath}', '${preset}', '${id}')" 
-              >
-                <i class="ico i-github"></i>
-              </button>
-              <select class="selected-lang" value="ts" hidden>
-                <option value="ts">ts</option>
-                <option value="js">js</option>
-              </select>
-            </div>
+        <div class="example-controls">
+          <div class="examples-buttons">
+            ${stackblitz(
+              id,
+              htmlContent,
+              tsCodeToCompileSandbox,
+              cssContent,
+              docsVersion,
+              preset,
+              'TypeScript'
+            )}
           </div>
         </div>
       `;
