@@ -16,6 +16,7 @@ module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
+    [ 'script', { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.full.min.js' } ],
     // Google Tag Manager, an extra element within the `ssr.html` file.
     ['script', {}, `
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -45,11 +46,11 @@ module.exports = {
     `],
     [
       'script',
-        {
-          id: 'Sentry.io',
-          src: 'https://js.sentry-cdn.com/50617701901516ce348cb7b252564a60.min.js',
-          crossorigin: 'anonymous',
-        },
+      {
+        id: 'Sentry.io',
+        src: 'https://js.sentry-cdn.com/50617701901516ce348cb7b252564a60.min.js',
+        crossorigin: 'anonymous',
+      },
     ],
     // Favicon
     ['link', { rel: 'apple-touch-icon', sizes: '180x180', href: '/favicon/apple-touch-icon.png' }],
