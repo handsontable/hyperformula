@@ -122,7 +122,5 @@ module.exports = function(docsVersion, base) {
   };
 };
 
-// - use HF in demo
-// - remove non-needed glue-code
-// - runtime requires js, stackblitz should be in ts, so we need the converter script from HOT as well
 // - all demos need to be reworked to the 3-file format
+// - remove non-needed glue-code
