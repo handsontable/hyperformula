@@ -105,22 +105,20 @@ module.exports = function(docsVersion, base) {
           <ScriptLoader code="${encodedCode}"></ScriptLoader>
         </div>
         <div class="example-controls">
-          <div class="examples-buttons">
-            ${stackblitz(
-              id,
-              htmlContent,
-              tsCodeToCompileSandbox,
-              cssContent,
-              docsVersion,
-              preset,
-              'TypeScript'
-            )}
-          </div>
+          ${stackblitz(
+            id,
+            htmlContent,
+            tsCodeToCompileSandbox,
+            cssContent,
+            docsVersion,
+            preset,
+            'TypeScript'
+          )}
         </div>
       `;
     },
   };
 };
 
-// - all demos need to be reworked to the 3-file format
 // - remove non-needed glue-code
+// - all demos need to be reworked to the 3-file format
