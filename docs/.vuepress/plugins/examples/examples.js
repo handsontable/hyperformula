@@ -1,13 +1,13 @@
+const Token = require('markdown-it/lib/token');
+const { buildCode } = require('./code-builder');
+const { stackblitz } = require('./stackblitz');
+
 /**
  * Matches into: `example #ID .class :preset --css 2 --html 0 --js 1 --ts 3 --no-edit`.
  *
  * @type {RegExp}
  */
 const EXAMPLE_REGEX = /^(example)\s*(#\S*|)\s*(\.\S*|)\s*(:\S*|)\s*([\S|\s]*)$/;
-const Token = require('markdown-it/lib/token');
-const { buildCode } = require('./code-builder');
-const { addCodeForPreset } = require('./add-code-for-preset');
-const { stackblitz } = require('./stackblitz');
 
 const parseCode = (content) => {
   if (!content) return '';
@@ -16,7 +16,6 @@ const parseCode = (content) => {
     // Remove the all "/* start:skip-in-preview */" and "/* end:skip-in-preview */" comments
     .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\n/gm, '')
     // Remove the code between "/* start:skip-in-compilation */" and "/* end:skip-in-compilation */" expressions
-    // eslint-disable-next-line max-len
     .replace(/\/\*(\s+)?start:skip-in-compilation(\s+)?\*\/\n.*?\/\*(\s+)?end:skip-in-compilation(\s+)?\*\/\n/msg, '')
     // Remove /* end-file */
     .replace(/\/\* end-file \*\//gm, '');
@@ -32,7 +31,7 @@ const parseCodeSandbox = (content) => {
     .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\n/gm, '');
 };
 
-module.exports = function(docsVersion, base) {
+module.exports = function() {
   return {
     type: 'example',
     render(tokens, index, _opts, env) {
@@ -72,10 +71,8 @@ module.exports = function(docsVersion, base) {
       const tsToken = tsPos ? tokens[tsIndex] : undefined;
 
       // Parse code
-      const jsTokenWithBasePath = jsToken?.content?.replaceAll('{{$basePath}}', base);
-      const tsTokenWithBasePath = tsToken?.content?.replaceAll('{{$basePath}}', base);
-      const codeToCompile = parseCode(jsTokenWithBasePath);
-      const tsCodeToCompileSandbox = parseCodeSandbox(tsTokenWithBasePath);
+      const codeToCompile = parseCode(jsToken?.content);
+      const tsCodeToCompileSandbox = parseCodeSandbox(tsToken?.content);
 
       [htmlIndex, jsIndex, tsIndex, cssIndex].filter(x => !!x).sort().reverse().forEach((x) => {
         tokens.splice(x, 1);
@@ -90,13 +87,12 @@ module.exports = function(docsVersion, base) {
 
       tokens.splice(index + 1, 0, ...newTokens);
 
-      const codeForPreset = addCodeForPreset(codeToCompile, preset, id);
-      const code = buildCode(
-        id + (preset.includes('angular') ? '.ts' : '.jsx'),
-        codeForPreset,
+      const builtCode = buildCode(
+        id + '.js',
+        codeToCompile,
         env.relativePath
       );
-      const encodedCode = encodeURI(code);
+      const encodedCode = encodeURI(builtCode);
 
       return `
         <div class="example-container">
@@ -110,15 +106,10 @@ module.exports = function(docsVersion, base) {
             htmlContent,
             tsCodeToCompileSandbox,
             cssContent,
-            docsVersion,
-            preset,
-            'TypeScript'
+            'ts'
           )}
         </div>
       `;
     },
   };
 };
-
-// - remove non-needed glue-code
-// - all demos need to be reworked to the 3-file format

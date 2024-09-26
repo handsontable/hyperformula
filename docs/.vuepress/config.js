@@ -7,8 +7,6 @@ const HyperFormula = require('../../dist/hyperformula.full');
 const firstHeaderInjection = require('./plugins/markdown-it-header-injection');
 const conditionalContainer = require('./plugins/markdown-it-conditional-container');
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
-const fs = require('fs');
-const path = require('path');
 
 const searchPattern = new RegExp('^/api', 'i');
 
@@ -16,6 +14,7 @@ module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
+    // Import HF (required for the examples)
     [ 'script', { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.full.min.js' } ],
     // Google Tag Manager, an extra element within the `ssr.html` file.
     ['script', {}, `
@@ -62,15 +61,7 @@ module.exports = {
   base: '/',
   plugins: [
     searchBoxPlugin,
-    ['container', examples('1.0.0', 'docs')],
-    // [
-    //   'vuepress-plugin-clean-urls',
-    //   {
-    //     normalSuffix: '',
-    //     indexSuffix: '/',
-    //     notFoundPath: '/404.html',
-    //   },
-    // ],
+    ['container', examples()],
     {
       extendPageData ($page) {
         // inject current HF version as {{ $page.version }} variable
