@@ -56,7 +56,7 @@ function bindEvents() {
   });
 
   resetButton.addEventListener("click", () => {
-    resetTable(tableData);
+    resetTable();
   });
 }
 
