@@ -4,8 +4,6 @@ const footnotePlugin = require('markdown-it-footnote');
 const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
 const HyperFormula = require('../../dist/hyperformula.full');
-const firstHeaderInjection = require('./plugins/markdown-it-header-injection');
-const conditionalContainer = require('./plugins/markdown-it-conditional-container');
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
 
 const searchPattern = new RegExp('^/api', 'i');
@@ -107,8 +105,6 @@ module.exports = {
       })
       md.use(footnotePlugin)
       md.use(includeCodeSnippet)
-      md.use(conditionalContainer)
-      md.use(firstHeaderInjection)
     }
   },
   // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
