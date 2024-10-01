@@ -5,7 +5,7 @@ const buildJavascriptBody = ({ id, html, js, css, hyperformulaVersion, lang }) =
         content: `{
   "name": "hyperformula-demo",
   "version": "1.0.0",
-  "description": "",
+  "main": "index.html",
   "dependencies": {
     "hyperformula": "${hyperformulaVersion}"
   }
@@ -39,6 +39,7 @@ ${js}`
 const stackblitz = (id, html, js, css, lang) => {
   const hyperformulaVersion = 'latest';
   const body = buildJavascriptBody({ id, html, js, css, hyperformulaVersion, lang });
+  const template = lang === 'ts' ? 'typescript' : 'node';
 
   const projects = body?.files
     ? Object.entries(body?.files).map(([key, value]) => (
@@ -55,9 +56,9 @@ const stackblitz = (id, html, js, css, lang) => {
     ${projects.join('\n')}
     <input type="hidden" name="project[title]" value="hyperformula-demo"/>
     <input type="hidden" name="project[dependencies]" 
-      value='{"hyperformula":"latest"}'
+      value='{"hyperformula":"${hyperformulaVersion}"}'
     />
-    <input type="hidden" name="project[template]" value="node"/>
+    <input type="hidden" name="project[template]" value="${template}"/>
     
     <div class="js-stackblitz-link">
       <button type="submit">

@@ -7,9 +7,6 @@ console.log(
   'color: blue; font-weight: bold'
 );
 
-/**
- * Initial table data.
- */
 const tableData = [
   ['Greg Black', 4.66, '=B1*1.3', '=AVERAGE(B1:C1)', '=SUM(B1:C1)'],
   ['Anne Carpenter', 5.25, '=$B$2*30%', '=AVERAGE(B2:C2)', '=SUM(B2:C2)'],
@@ -46,18 +43,16 @@ hf.setCellContents(
 hf.addNamedExpression('Year_1', '=SUM(main!$B$1:main!$B$5)');
 hf.addNamedExpression('Year_2', '=SUM(main!$C$1:main!$C$5)');
 
-/**
- * Bind the events to the buttons.
- */
+// Bind the events to the buttons.
 function bindEvents() {
   const runButton = document.querySelector('#run');
   const resetButton = document.querySelector('#reset');
 
   runButton.addEventListener('click', () => {
-    runCalculations(hf, sheetId);
+    runCalculations();
   });
   resetButton.addEventListener('click', () => {
-    resetTable(tableData);
+    resetTable();
   });
 }
 
@@ -121,16 +116,12 @@ function renderTable(calculated = false) {
   tbodyDOM.innerHTML = newTbodyHTML;
 }
 
-/**
- * Replace formulas with their results.
- */
+// Replace formulas with their results.
 function runCalculations() {
   renderTable(true);
 }
 
-/**
- * Replace the values in the table with initial data.
- */
+// Replace the values in the table with initial data.
 function resetTable() {
   renderTable();
 }
