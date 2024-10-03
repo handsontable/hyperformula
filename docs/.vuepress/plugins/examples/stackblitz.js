@@ -7,7 +7,8 @@ const buildJavascriptBody = ({ id, html, js, css, hyperformulaVersion, lang }) =
   "version": "1.0.0",
   "main": "index.html",
   "dependencies": {
-    "hyperformula": "${hyperformulaVersion}"
+    "hyperformula": "${hyperformulaVersion}",
+    "moment": "latest"
   }
 }`
       },
@@ -56,7 +57,7 @@ const stackblitz = (id, html, js, css, lang) => {
     ${projects.join('\n')}
     <input type="hidden" name="project[title]" value="hyperformula-demo"/>
     <input type="hidden" name="project[dependencies]" 
-      value='{"hyperformula":"${hyperformulaVersion}"}'
+      value='{"hyperformula":"${hyperformulaVersion}", "moment": "latest"}'
     />
     <input type="hidden" name="project[template]" value="${template}"/>
     

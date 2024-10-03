@@ -14,6 +14,8 @@ module.exports = {
   head: [
     // Import HF (required for the examples)
     [ 'script', { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.full.min.js' } ],
+    // Import moment (required for the examples)
+    [ 'script', { src: 'https://cdn.jsdelivr.net/npm/moment/moment.min.js' } ],
     // Google Tag Manager, an extra element within the `ssr.html` file.
     ['script', {}, `
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
