@@ -135,8 +135,8 @@ function resetTable() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const runButton = document.querySelector('#run');
-  const resetButton = document.querySelector('#reset');
+  const runButton = document.querySelector('.example #run');
+  const resetButton = document.querySelector('.example #reset');
 
   runButton.addEventListener('click', () => {
     runCalculations(hf, sheetId);
