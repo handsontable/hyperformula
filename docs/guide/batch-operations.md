@@ -122,8 +122,14 @@ Methods such as [`getCellValue`](../api/classes/hyperformula.md#getcellvalue), [
 The [paste](../api/classes/hyperformula.md#paste) method also can't be called when batching as it reads the contents of the copied cells.
 
 ## Demo
+::: example #example1 --html 1 --css 2 --js 3 --ts 4
 
-<iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/batch-operations?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
-</iframe>
+@[code](@/docs/examples/batch-operations/example1.html)
+
+@[code](@/docs/examples/batch-operations/example1.css)
+
+@[code](@/docs/examples/batch-operations/example1.js)
+
+@[code](@/docs/examples/batch-operations/example1.ts)
+
+:::
