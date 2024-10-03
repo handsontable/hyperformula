@@ -116,9 +116,9 @@ let IS_CALCULATED = false;
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const runButton = document.querySelector("#run");
-  const resetButton = document.querySelector("#reset");
-  const calculatedCheckbox = document.querySelector("#isCalculated");
+  const runButton = document.querySelector(".example #run");
+  const resetButton = document.querySelector(".example #reset");
+  const calculatedCheckbox = document.querySelector(".example #isCalculated");
 
   runButton.addEventListener("click", () => {
     runBatchOperations();

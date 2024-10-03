@@ -204,7 +204,7 @@ function renderTable(sheetName) {
  */
 function updateSheetDropdown() {
   const sheetNames = hf.getSheetNames();
-  const sheetDropdownDOM = document.querySelector("#sheet-select");
+  const sheetDropdownDOM = document.querySelector(".example #sheet-select");
   let dropdownContent = "";
 
   sheetDropdownDOM.innerHTML = "";
@@ -225,10 +225,10 @@ function updateSheetDropdown() {
  * @param {string} action Action chosen from the dropdown.
  */
 function updateForm(action) {
-  const inputsDOM = document.querySelector("#inputs");
-  const submitButtonDOM = document.querySelector("#inputs button");
-  const allInputsDOM = document.querySelectorAll("#inputs input");
-  const disclaimerDOM = document.querySelector("#disclaimer");
+  const inputsDOM = document.querySelector(".example #inputs");
+  const submitButtonDOM = document.querySelector(".example #inputs button");
+  const allInputsDOM = document.querySelectorAll(".example #inputs input");
+  const disclaimerDOM = document.querySelector(".example #disclaimer");
 
   // Hide all inputs
   allInputsDOM.forEach(input => {
@@ -238,7 +238,7 @@ function updateForm(action) {
   });
 
   inputConfig[action].inputs.forEach((inputCfg, index) => {
-    const inputDOM = document.querySelector(`#input-${index + 1}`);
+    const inputDOM = document.querySelector(`.example #input-${index + 1}`);
 
     // Show only those needed
     inputDOM.style.display = "block";
@@ -265,8 +265,8 @@ function updateForm(action) {
  * @param {string} message Error message.
  */
 function renderError(message) {
-  const inputsDOM = document.querySelector("#inputs");
-  const errorDOM = document.querySelector("#error-message");
+  const inputsDOM = document.querySelector(".example #inputs");
+  const errorDOM = document.querySelector(".example #error-message");
 
   if (inputsDOM.className.indexOf("error") === -1) {
     inputsDOM.className += " error";
@@ -280,8 +280,8 @@ function renderError(message) {
  * Clear the error overlay.
  */
 function clearError() {
-  const inputsDOM = document.querySelector("#inputs");
-  const errorDOM = document.querySelector("#error-message");
+  const inputsDOM = document.querySelector(".example #inputs");
+  const errorDOM = document.querySelector(".example #error-message");
 
   inputsDOM.className = inputsDOM.className.replace(" error", "");
 
@@ -293,9 +293,9 @@ function clearError() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const sheetDropdown = document.querySelector("#sheet-select");
-  const actionDropdown = document.querySelector("#action-select");
-  const submitButton = document.querySelector("#inputs button");
+  const sheetDropdown = document.querySelector(".example #sheet-select");
+  const actionDropdown = document.querySelector(".example #action-select");
+  const submitButton = document.querySelector(".example #inputs button");
 
   sheetDropdown.addEventListener("change", event => {
     state.currentSheet = event.target.value;
@@ -312,7 +312,7 @@ function bindEvents() {
   });
 
   submitButton.addEventListener("click", event => {
-    const action = document.querySelector("#action-select").value;
+    const action = document.querySelector(".example #action-select").value;
 
     doAction(action);
   });
@@ -326,8 +326,8 @@ function bindEvents() {
 function doAction(action) {
   let cellAddress = null;
   let inputValues = [
-    document.querySelector("#input-1").value || void 0,
-    document.querySelector("#input-2").value || void 0
+    document.querySelector(".example #input-1").value || void 0,
+    document.querySelector(".example #input-2").value || void 0
   ];
 
   clearError();
@@ -397,7 +397,7 @@ function doAction(action) {
       renderTable();
       break;
     case "get-value":
-      const resultDOM = document.querySelector("#input-2");
+      const resultDOM = document.querySelector(".example #input-2");
       cellAddress = handleError(() => {
         return hf.simpleCellAddressFromString(
           inputValues[0],

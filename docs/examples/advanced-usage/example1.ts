@@ -65,7 +65,7 @@ hf.setSheetContent(hf.getSheetId(sheetInfo.formulas.sheetName), formulasData);
  */
 function renderTable(sheetName) {
   const sheetId = hf.getSheetId(sheetName);
-  const tbodyDOM = document.querySelector(`#${sheetName}-container tbody`);
+  const tbodyDOM = document.querySelector(`.example #${sheetName}-container tbody`);
   const { height, width } = hf.getSheetDimensions(sheetId);
   let newTbodyHTML = "";
 
@@ -94,7 +94,7 @@ function renderTable(sheetName) {
  * Render the result block.
  */
 function renderResult() {
-  const resultOutputDOM = document.querySelector("#result .output");
+  const resultOutputDOM = document.querySelector(".example #result .output");
   const cellAddress = hf.simpleCellAddressFromString(
     `${sheetInfo.formulas.sheetName}!A1`, hf.getSheetId(sheetInfo.formulas.sheetName)
   );
@@ -108,7 +108,7 @@ function renderResult() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const runButton = document.querySelector("#run");
+  const runButton = document.querySelector(".example #run");
 
   runButton.addEventListener("click", () => {
     renderResult();

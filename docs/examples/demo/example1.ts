@@ -32,8 +32,8 @@ hf.addNamedExpression("Year_2", "=SUM(main!$C$1:main!$C$5)");
 
 // Bind the events to the buttons.
 function bindEvents() {
-  const runButton = document.querySelector("#run");
-  const resetButton = document.querySelector("#reset");
+  const runButton = document.querySelector(".example #run");
+  const resetButton = document.querySelector(".example #reset");
 
   runButton.addEventListener("click", () => {
     runCalculations();
