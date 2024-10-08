@@ -1,11 +1,11 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
-import enUS from 'hyperformula/es/i18n/languages/enUS';
 import moment from 'moment';
 
 /* end:skip-in-compilation */
 /* start:skip-in-sandbox */
-//const enUS = HyperFormula.languages.enUS;
+const enUS = HyperFormula.languages.enUS;
+
 /* end:skip-in-sandbox */
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
@@ -194,8 +194,8 @@ function resetTable() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const runButton = document.querySelector('#run');
-  const resetButton = document.querySelector('#reset');
+  const runButton = document.querySelector('.example #run');
+  const resetButton = document.querySelector('.example #reset');
 
   runButton.addEventListener('click', () => {
     runCalculations(hf, sheetId);
