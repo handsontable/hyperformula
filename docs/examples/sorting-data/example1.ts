@@ -136,8 +136,8 @@ const doSortDESC = () => {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const ascSort = document.querySelector("#asc");
-  const descSort = document.querySelector("#desc");
+  const ascSort = document.querySelector(".example #asc");
+  const descSort = document.querySelector(".example #desc");
 
   ascSort.addEventListener("click", () => {
     doSortASC();
