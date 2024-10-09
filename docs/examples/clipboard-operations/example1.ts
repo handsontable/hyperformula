@@ -2,24 +2,27 @@
 import HyperFormula from 'hyperformula';
 /* end:skip-in-compilation */
 
-console.log(`%c Using HyperFormula ${HyperFormula.version}`, 'color: blue; font-weight: bold');
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
 
 /**
  * Initial table data.
  */
 const tableData = [
-  ["Greg", "Black", '=CONCATENATE(A1, " ",B1)'],
-  ["Anne", "Carpenter", '=CONCATENATE(A2, " ", B2)'],
-  ["Chris", "Aklips", '=CONCATENATE(A3, " ",B3)']
+  ['Greg', 'Black', '=CONCATENATE(A1, " ",B1)'],
+  ['Anne', 'Carpenter', '=CONCATENATE(A2, " ", B2)'],
+  ['Chris', 'Aklips', '=CONCATENATE(A3, " ",B3)'],
 ];
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
-  licenseKey: "gpl-v3"
+  licenseKey: 'gpl-v3',
 });
 
 // Add a new sheet and get its id.
-const sheetName = hf.addSheet("main");
+const sheetName = hf.addSheet('main');
 const sheetId = hf.getSheetId(sheetName);
 
 /**
@@ -30,7 +33,7 @@ function reinitializeData() {
     {
       row: 0,
       col: 0,
-      sheet: sheetId
+      sheet: sheetId,
     },
     tableData
   );
@@ -40,23 +43,23 @@ function reinitializeData() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const copyButton = document.querySelector(".example #copy");
-  const pasteButton = document.querySelector(".example #paste");
-  const resetButton = document.querySelector(".example #reset");
+  const copyButton = document.querySelector('.example #copy');
+  const pasteButton = document.querySelector('.example #paste');
+  const resetButton = document.querySelector('.example #reset');
 
-  copyButton.addEventListener("click", () => {
+  copyButton.addEventListener('click', () => {
     copy();
-    updateCopyInfo("Second row copied");
+    updateCopyInfo('Second row copied');
   });
 
-  pasteButton.addEventListener("click", () => {
+  pasteButton.addEventListener('click', () => {
     paste();
-    updateCopyInfo("Pasted into the first row");
+    updateCopyInfo('Pasted into the first row');
   });
 
-  resetButton.addEventListener("click", () => {
+  resetButton.addEventListener('click', () => {
     reinitializeData();
-    updateCopyInfo("");
+    updateCopyInfo('');
     renderTable();
   });
 }
@@ -65,7 +68,10 @@ function bindEvents() {
  * Copy the second row.
  */
 function copy() {
-  return hf.copy({start: { sheet: 0, col: 0, row: 1 }, end: { sheet: 0, col: 2, row: 1 }});
+  return hf.copy({
+    start: { sheet: 0, col: 0, row: 1 },
+    end: { sheet: 0, col: 2, row: 1 },
+  });
 }
 
 /**
@@ -82,15 +88,15 @@ const ANIMATION_ENABLED = true;
  * Fill the HTML table with data.
  */
 function renderTable() {
-  const tbodyDOM = document.querySelector(".example tbody");
-  const updatedCellClass = ANIMATION_ENABLED ? "updated-cell" : "";
+  const tbodyDOM = document.querySelector('.example tbody');
+  const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';
   const { height, width } = hf.getSheetDimensions(sheetId);
-  let newTbodyHTML = "";
+  let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
-      let cellValue = "";
+      let cellValue = '';
 
       if (!hf.isCellEmpty(cellAddress)) {
         cellValue = hf.getCellValue(cellAddress);
@@ -101,7 +107,7 @@ function renderTable() {
       </span></td>`;
     }
 
-    newTbodyHTML += "</tr>";
+    newTbodyHTML += '</tr>';
   }
 
   tbodyDOM.innerHTML = newTbodyHTML;
@@ -113,7 +119,7 @@ function renderTable() {
  * @param {string} message Message to display.
  */
 function updateCopyInfo(message) {
-  const copyInfoDOM = document.querySelector(".example #copyInfo");
+  const copyInfoDOM = document.querySelector('.example #copyInfo');
 
   copyInfoDOM.innerText = message;
 }

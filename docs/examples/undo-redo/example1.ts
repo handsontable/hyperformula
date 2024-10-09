@@ -2,20 +2,26 @@
 import HyperFormula from 'hyperformula';
 /* end:skip-in-compilation */
 
-console.log(`%c Using HyperFormula ${HyperFormula.version}`, 'color: blue; font-weight: bold');
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
 
 /**
  * Initial table data.
  */
-const tableData = [["Greg", "2"], ["Chris", "4"]];
+const tableData = [
+  ['Greg', '2'],
+  ['Chris', '4'],
+];
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
-  licenseKey: "gpl-v3"
+  licenseKey: 'gpl-v3',
 });
 
 // Add a new sheet and get its id.
-const sheetName = hf.addSheet("main");
+const sheetName = hf.addSheet('main');
 const sheetId = hf.getSheetId(sheetName);
 
 // Fill the HyperFormula sheet with data.
@@ -23,7 +29,7 @@ hf.setCellContents(
   {
     row: 0,
     col: 0,
-    sheet: sheetId
+    sheet: sheetId,
   },
   tableData
 );
@@ -35,22 +41,22 @@ hf.clearUndoStack();
  * Fill the HTML table with data.
  */
 function renderTable() {
-  const tbodyDOM = document.querySelector(".example tbody");
-  const updatedCellClass = ANIMATION_ENABLED ? "updated-cell" : "";
+  const tbodyDOM = document.querySelector('.example tbody');
+  const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';
   const { height, width } = hf.getSheetDimensions(sheetId);
-  let newTbodyHTML = "";
+  let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
-      let cellValue = hf.getCellValue(cellAddress);
+      const cellValue = hf.getCellValue(cellAddress);
 
       newTbodyHTML += `<td class="${updatedCellClass}"><span>
       ${cellValue}
       </span></td>`;
     }
 
-    newTbodyHTML += "</tr>";
+    newTbodyHTML += '</tr>';
   }
 
   tbodyDOM.innerHTML = newTbodyHTML;
@@ -60,9 +66,9 @@ function renderTable() {
  * Clear the existing information.
  */
 function clearInfo() {
-  const infoBoxDOM = document.querySelector(".example #info-box");
+  const infoBoxDOM = document.querySelector('.example #info-box');
 
-  infoBoxDOM.innerHTML = "&nbsp;";
+  infoBoxDOM.innerHTML = '&nbsp;';
 }
 
 /**
@@ -71,7 +77,7 @@ function clearInfo() {
  * @param {string} message Message to display.
  */
 function displayInfo(message) {
-  const infoBoxDOM = document.querySelector(".example #info-box");
+  const infoBoxDOM = document.querySelector('.example #info-box');
 
   infoBoxDOM.innerText = message;
 }
@@ -80,14 +86,14 @@ function displayInfo(message) {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const removeRowButton = document.querySelector(".example #remove-row");
-  const undoButton = document.querySelector(".example #undo");
+  const removeRowButton = document.querySelector('.example #remove-row');
+  const undoButton = document.querySelector('.example #undo');
 
-  removeRowButton.addEventListener("click", () => {
+  removeRowButton.addEventListener('click', () => {
     removeSecondRow();
   });
 
-  undoButton.addEventListener("click", () => {
+  undoButton.addEventListener('click', () => {
     undo();
   });
 }

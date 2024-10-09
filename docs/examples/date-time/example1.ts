@@ -1,9 +1,12 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
-import moment from "moment";
+import moment from 'moment';
 /* end:skip-in-compilation */
 
-console.log(`%c Using HyperFormula ${HyperFormula.version}`, 'color: blue; font-weight: bold');
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
 
 /**
  * Function defining the way HF should handle the provided date string.
@@ -19,7 +22,7 @@ const customParseDate = (dateString, dateFormat) => {
     return {
       year: momentDate.year(),
       month: momentDate.month() + 1,
-      day: momentDate.date()
+      day: momentDate.date(),
     };
   }
 };
@@ -30,26 +33,26 @@ const customParseDate = (dateString, dateFormat) => {
  * @param {{month: *, year: *, day: *}} dateObject Object with date-related information.
  * @returns {string} Formatted date string.
  */
-const getFormattedDate = dateObject => {
+const getFormattedDate = (dateObject) => {
   dateObject.month -= 1;
 
-  return moment(dateObject).format("MMM D YY");
+  return moment(dateObject).format('MMM D YY');
 };
 
 /**
  * Initial table data.
  */
-const tableData = [["Jan 31 00", "Jun 2 01", "=B1-A1"]];
+const tableData = [['Jan 31 00', 'Jun 2 01', '=B1-A1']];
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
   parseDateTime: customParseDate,
-  dateFormats: ["MMM D YY"],
-  licenseKey: "gpl-v3"
+  dateFormats: ['MMM D YY'],
+  licenseKey: 'gpl-v3',
 });
 
 // Add a new sheet and get its id.
-const sheetName = hf.addSheet("main");
+const sheetName = hf.addSheet('main');
 const sheetId = hf.getSheetId(sheetName);
 
 // Fill the HyperFormula sheet with data.
@@ -57,7 +60,7 @@ hf.setCellContents(
   {
     row: 0,
     col: 0,
-    sheet: sheetId
+    sheet: sheetId,
   },
   tableData
 );
@@ -68,20 +71,20 @@ hf.setCellContents(
  * @param {boolean} calculated `true` if it should render calculated values, `false` otherwise.
  */
 function renderTable(calculated = false) {
-  const tbodyDOM = document.querySelector(".example tbody");
-  const updatedCellClass = ANIMATION_ENABLED ? "updated-cell" : "";
+  const tbodyDOM = document.querySelector('.example tbody');
+  const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';
   const { height, width } = hf.getSheetDimensions(sheetId);
-  let newTbodyHTML = "";
+  let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
       const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
       const showFormula = calculated || !cellHasFormula;
-      let cellValue = displayValue(cellAddress, showFormula);
+      const cellValue = displayValue(cellAddress, showFormula);
 
       newTbodyHTML += `<td class="${
-        cellHasFormula ? updatedCellClass : ""
+        cellHasFormula ? updatedCellClass : ''
       }"><span>
       ${cellValue}
       </span></td>`;
@@ -99,8 +102,8 @@ function renderTable(calculated = false) {
  */
 function displayValue(cellAddress, showFormula) {
   // Declare which columns should display the raw source data, instead of the data from HyperFormula.
-  let sourceColumns = [0, 1];
-  let cellValue = "";
+  const sourceColumns = [0, 1];
+  let cellValue = '';
 
   if (sourceColumns.includes(cellAddress.col)) {
     cellValue = getFormattedDate(hf.numberToDate(hf.getCellValue(cellAddress)));
@@ -133,14 +136,14 @@ function resetTable() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const runButton = document.querySelector(".example #run");
-  const resetButton = document.querySelector(".example #reset");
+  const runButton = document.querySelector('.example #run');
+  const resetButton = document.querySelector('.example #reset');
 
-  runButton.addEventListener("click", () => {
+  runButton.addEventListener('click', () => {
     runCalculations();
   });
 
-  resetButton.addEventListener("click", () => {
+  resetButton.addEventListener('click', () => {
     resetTable();
   });
 }

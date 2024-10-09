@@ -80,7 +80,7 @@ function renderTable(calculated = false) {
       const cellAddress = { sheet: sheetId, col, row };
       const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
       const showFormula = calculated || !cellHasFormula;
-      let cellValue = displayValue(cellAddress, showFormula);
+      const cellValue = displayValue(cellAddress, showFormula);
 
       newTbodyHTML += `<td class="${
         cellHasFormula ? updatedCellClass : ''
@@ -101,7 +101,7 @@ function renderTable(calculated = false) {
  */
 function displayValue(cellAddress, showFormula) {
   // Declare which columns should display the raw source data, instead of the data from HyperFormula.
-  let sourceColumns = [0, 1];
+  const sourceColumns = [0, 1];
   let cellValue = '';
 
   if (sourceColumns.includes(cellAddress.col)) {

@@ -48,7 +48,7 @@ function renderTable() {
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
-      let cellValue = hf.getCellValue(cellAddress);
+      const cellValue = hf.getCellValue(cellAddress);
 
       newTbodyHTML += `<td class="${updatedCellClass}"><span>
       ${cellValue}

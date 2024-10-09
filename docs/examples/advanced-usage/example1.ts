@@ -2,44 +2,48 @@
 import HyperFormula from 'hyperformula';
 /* end:skip-in-compilation */
 
-console.log(`%c Using HyperFormula ${HyperFormula.version}`, 'color: blue; font-weight: bold');
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
 
 // first column represents players' IDs
 // second column represents players' scores
 const playersAData = [
-  ["1", "2"],
-  ["2", "3"],
-  ["3", "5"],
-  ["4", "7"],
-  ["5", "13"],
-  ["6", "17"]
+  ['1', '2'],
+  ['2', '3'],
+  ['3', '5'],
+  ['4', '7'],
+  ['5', '13'],
+  ['6', '17'],
 ];
+
 const playersBData = [
-  ["7", "19"],
-  ["8", "31"],
-  ["9", "61"],
-  ["10", "89"],
-  ["11", "107"],
-  ["12", "127"]
+  ['7', '19'],
+  ['8', '31'],
+  ['9', '61'],
+  ['10', '89'],
+  ['11', '107'],
+  ['12', '127'],
 ];
 
 // in a cell A1 a formula checks which team is a winning one
 // in cells A2 and A3 formulas calculate the average score of players
 const formulasData = [
   ['=IF(Formulas!A2>Formulas!A3,"TeamA","TeamB")'],
-  ["=AVERAGE(TeamA!B1:B6)"],
-  ["=AVERAGE(TeamB!B1:B6)"]
+  ['=AVERAGE(TeamA!B1:B6)'],
+  ['=AVERAGE(TeamB!B1:B6)'],
 ];
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
-  licenseKey: "gpl-v3"
+  licenseKey: 'gpl-v3',
 });
 
 const sheetInfo = {
-  teamA: { sheetName: "TeamA" },
-  teamB: { sheetName: "TeamB" },
-  formulas: { sheetName: "Formulas" },
+  teamA: { sheetName: 'TeamA' },
+  teamB: { sheetName: 'TeamB' },
+  formulas: { sheetName: 'Formulas' },
 };
 
 // add 'TeamA' sheet
@@ -57,7 +61,6 @@ hf.addSheet(sheetInfo.formulas.sheetName);
 // add formulas to that sheet
 hf.setSheetContent(hf.getSheetId(sheetInfo.formulas.sheetName), formulasData);
 
-
 /**
  * Fill the HTML table with data.
  *
@@ -65,15 +68,18 @@ hf.setSheetContent(hf.getSheetId(sheetInfo.formulas.sheetName), formulasData);
  */
 function renderTable(sheetName) {
   const sheetId = hf.getSheetId(sheetName);
-  const tbodyDOM = document.querySelector(`.example #${sheetName}-container tbody`);
+  const tbodyDOM = document.querySelector(
+    `.example #${sheetName}-container tbody`
+  );
+
   const { height, width } = hf.getSheetDimensions(sheetId);
-  let newTbodyHTML = "";
+  let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
       const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
-      let cellValue = "";
+      let cellValue = '';
 
       if (!hf.isCellEmpty(cellAddress) && !cellHasFormula) {
         cellValue = hf.getCellValue(cellAddress);
@@ -84,7 +90,7 @@ function renderTable(sheetName) {
       newTbodyHTML += `<td><span>${cellValue}</span></td>`;
     }
 
-    newTbodyHTML += "</tr>";
+    newTbodyHTML += '</tr>';
   }
 
   tbodyDOM.innerHTML = newTbodyHTML;
@@ -94,9 +100,10 @@ function renderTable(sheetName) {
  * Render the result block.
  */
 function renderResult() {
-  const resultOutputDOM = document.querySelector(".example #result .output");
+  const resultOutputDOM = document.querySelector('.example #result .output');
   const cellAddress = hf.simpleCellAddressFromString(
-    `${sheetInfo.formulas.sheetName}!A1`, hf.getSheetId(sheetInfo.formulas.sheetName)
+    `${sheetInfo.formulas.sheetName}!A1`,
+    hf.getSheetId(sheetInfo.formulas.sheetName)
   );
 
   resultOutputDOM.innerHTML = `<span>
@@ -108,9 +115,9 @@ function renderResult() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const runButton = document.querySelector(".example #run");
+  const runButton = document.querySelector('.example #run');
 
-  runButton.addEventListener("click", () => {
+  runButton.addEventListener('click', () => {
     renderResult();
   });
 }

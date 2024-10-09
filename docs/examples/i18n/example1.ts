@@ -1,25 +1,58 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
-import enUS from "hyperformula/es/i18n/languages/enUS";
-import moment from "moment";
+import enUS from 'hyperformula/es/i18n/languages/enUS';
+import moment from 'moment';
 /* end:skip-in-compilation */
 
 /* start:skip-in-sandbox */
 const enUS = HyperFormula.languages.enUS;
 /* end:skip-in-sandbox */
 
-console.log(`%c Using HyperFormula ${HyperFormula.version}`, 'color: blue; font-weight: bold');
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
 
 /**
  * Initial table data.
  */
 const tableData = [
-  ["Greg Black", "11:45 AM", "05/23/1989", "=YEAR(NOW())-YEAR(C1)", "$80,000.00"],
-  ["Anne Carpenter", "12:30 PM", "01/01/1980", "=YEAR(NOW())-YEAR(C2)", "$95,000.00"],
-  ["Natalie Dem", "1:30 PM", "12/13/1973", "=YEAR(NOW())-YEAR(C3)","$78,500.00"],
-  ["John Sieg", "2:00 PM", "10/31/1995", "=YEAR(NOW())-YEAR(C4)", "$114,000.00"],
-  ["Chris Aklips", "11:30 AM", "08/18/1987", "=YEAR(NOW())-YEAR(C5)", "$71,900.00"],
-  ["AVERAGE", null, null, "=AVERAGE(D1:D5)", "=AVERAGE(E1:E5)"]
+  [
+    'Greg Black',
+    '11:45 AM',
+    '05/23/1989',
+    '=YEAR(NOW())-YEAR(C1)',
+    '$80,000.00',
+  ],
+  [
+    'Anne Carpenter',
+    '12:30 PM',
+    '01/01/1980',
+    '=YEAR(NOW())-YEAR(C2)',
+    '$95,000.00',
+  ],
+  [
+    'Natalie Dem',
+    '1:30 PM',
+    '12/13/1973',
+    '=YEAR(NOW())-YEAR(C3)',
+    '$78,500.00',
+  ],
+  [
+    'John Sieg',
+    '2:00 PM',
+    '10/31/1995',
+    '=YEAR(NOW())-YEAR(C4)',
+    '$114,000.00',
+  ],
+  [
+    'Chris Aklips',
+    '11:30 AM',
+    '08/18/1987',
+    '=YEAR(NOW())-YEAR(C5)',
+    '$71,900.00',
+  ],
+  ['AVERAGE', null, null, '=AVERAGE(D1:D5)', '=AVERAGE(E1:E5)'],
 ];
 
 const config = {
@@ -31,7 +64,7 @@ const config = {
   functionArgSeparator: ';',
   currencySymbol: ['$', 'USD'],
   localeLang: 'en-US',
-  licenseKey: "gpl-v3",
+  licenseKey: 'gpl-v3',
 };
 
 HyperFormula.registerLanguage('enUS', enUS);
@@ -40,7 +73,7 @@ HyperFormula.registerLanguage('enUS', enUS);
 const hf = HyperFormula.buildEmpty(config);
 
 // Add a new sheet and get its id.
-const sheetName = hf.addSheet("main");
+const sheetName = hf.addSheet('main');
 const sheetId = hf.getSheetId(sheetName);
 
 // Fill the HyperFormula sheet with data.
@@ -48,7 +81,7 @@ hf.setCellContents(
   {
     row: 0,
     col: 0,
-    sheet: sheetId
+    sheet: sheetId,
   },
   tableData
 );
@@ -62,7 +95,7 @@ const columnTypes = ['string', 'time', 'date', 'number', 'currency'];
  */
 function formatCellValue(cellAddress) {
   if (hf.isCellEmpty(cellAddress)) {
-    return "";
+    return '';
   }
 
   if (columnTypes[cellAddress.col] === 'time') {
@@ -74,10 +107,10 @@ function formatCellValue(cellAddress) {
   }
 
   if (columnTypes[cellAddress.col] === 'currency') {
-    return formatCurrency((hf.getCellValue(cellAddress)));
+    return formatCurrency(hf.getCellValue(cellAddress));
   }
 
-  return hf.getCellValue(cellAddress)
+  return hf.getCellValue(cellAddress);
 }
 
 /**
@@ -89,7 +122,7 @@ function formatDate(dateObject) {
   dateObject.month -= 1;
 
   return moment(dateObject).format('MM/DD/YYYY');
-};
+}
 
 /**
  * Time formatting function.
@@ -98,7 +131,7 @@ function formatDate(dateObject) {
  */
 function formatTime(dateTimeObject) {
   return moment(dateTimeObject).format('h:mm A');
-};
+}
 
 /**
  * Currency formatting function.
@@ -110,7 +143,7 @@ function formatCurrency(value) {
     style: 'currency',
     currency: 'USD',
   });
-};
+}
 
 /**
  * Fill the HTML table with data.
@@ -118,26 +151,28 @@ function formatCurrency(value) {
  * @param {boolean} calculated `true` if it should render calculated values, `false` otherwise.
  */
 function renderTable(calculated = false) {
-  const tbodyDOM = document.querySelector(".example tbody");
-  const updatedCellClass = ANIMATION_ENABLED ? "updated-cell" : "";
+  const tbodyDOM = document.querySelector('.example tbody');
+  const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';
   const { height, width } = hf.getSheetDimensions(sheetId);
-  let newTbodyHTML = "";
+  let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
       const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
       const showFormula = cellHasFormula && !calculated;
-      const displayValue = showFormula ? hf.getCellFormula(cellAddress) : formatCellValue(cellAddress);
+      const displayValue = showFormula
+        ? hf.getCellFormula(cellAddress)
+        : formatCellValue(cellAddress);
 
       newTbodyHTML += `<td class="${
-        cellHasFormula ? updatedCellClass : ""
+        cellHasFormula ? updatedCellClass : ''
       }"><span>
       ${displayValue}
       </span></td>`;
     }
 
-    newTbodyHTML += "</tr>";
+    newTbodyHTML += '</tr>';
   }
 
   tbodyDOM.innerHTML = newTbodyHTML;
@@ -161,14 +196,14 @@ function resetTable() {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const runButton = document.querySelector(".example #run");
-  const resetButton = document.querySelector(".example #reset");
+  const runButton = document.querySelector('.example #run');
+  const resetButton = document.querySelector('.example #reset');
 
-  runButton.addEventListener("click", () => {
+  runButton.addEventListener('click', () => {
     runCalculations();
   });
 
-  resetButton.addEventListener("click", () => {
+  resetButton.addEventListener('click', () => {
     resetTable();
   });
 }

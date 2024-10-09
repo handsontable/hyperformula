@@ -50,7 +50,7 @@ function sort(ascending, callback) {
   const rowCount = hf.getSheetDimensions(sheetId).height;
   const colValues = [];
   let newOrder = null;
-  let newOrderMapping = [];
+  const newOrderMapping = [];
 
   for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
     colValues.push({

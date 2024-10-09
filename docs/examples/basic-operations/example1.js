@@ -318,7 +318,7 @@ function bindEvents() {
  */
 function doAction(action) {
   let cellAddress = null;
-  let inputValues = [
+  const inputValues = [
     document.querySelector('.example #input-1').value || void 0,
     document.querySelector('.example #input-2').value || void 0,
   ];

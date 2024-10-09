@@ -2,29 +2,32 @@
 import HyperFormula from 'hyperformula';
 /* end:skip-in-compilation */
 
-console.log(`%c Using HyperFormula ${HyperFormula.version}`, 'color: blue; font-weight: bold');
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
 
 /**
  * Initial table data.
  */
 const tableData = [
-  ["Greg Black", "100"],
-  ["Anne Carpenter", "=SUM(100,100)"],
-  ["Natalie Dem", "500"],
-  ["John Sieg", "50"],
-  ["Chris Aklips", "20"],
-  ["Bart Hoopoe", "700"],
-  ["Chris Site", "80"],
-  ["Agnes Whitey", "90"]
+  ['Greg Black', '100'],
+  ['Anne Carpenter', '=SUM(100,100)'],
+  ['Natalie Dem', '500'],
+  ['John Sieg', '50'],
+  ['Chris Aklips', '20'],
+  ['Bart Hoopoe', '700'],
+  ['Chris Site', '80'],
+  ['Agnes Whitey', '90'],
 ];
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
-  licenseKey: "gpl-v3"
+  licenseKey: 'gpl-v3',
 });
 
 // Add a new sheet and get its id.
-const sheetName = hf.addSheet("main");
+const sheetName = hf.addSheet('main');
 const sheetId = hf.getSheetId(sheetName);
 
 // Fill the HyperFormula sheet with data.
@@ -32,7 +35,7 @@ hf.setCellContents(
   {
     row: 0,
     col: 0,
-    sheet: sheetId
+    sheet: sheetId,
   },
   tableData
 );
@@ -47,7 +50,7 @@ function sort(ascending, callback) {
   const rowCount = hf.getSheetDimensions(sheetId).height;
   const colValues = [];
   let newOrder = null;
-  let newOrderMapping = [];
+  const newOrderMapping = [];
 
   for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
     colValues.push({
@@ -55,13 +58,14 @@ function sort(ascending, callback) {
       value: hf.getCellValue({
         sheet: sheetId,
         col: 1,
-        row: rowIndex
-      })
+        row: rowIndex,
+      }),
     });
   }
 
   colValues.sort((objA, objB) => {
     const delta = objA.value - objB.value;
+
     return ascending ? delta : -delta;
   });
 
@@ -82,17 +86,17 @@ function sort(ascending, callback) {
  * @param {boolean} calculated `true` if it should render calculated values, `false` otherwise.
  */
 function renderTable(calculated = false) {
-  const tbodyDOM = document.querySelector(".example tbody");
-  const updatedCellClass = ANIMATION_ENABLED ? "updated-cell" : "";
+  const tbodyDOM = document.querySelector('.example tbody');
+  const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';
   const { height, width } = hf.getSheetDimensions(sheetId);
-  let newTbodyHTML = "";
+  let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
       const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
       const showFormula = calculated || !cellHasFormula;
-      let cellValue = "";
+      let cellValue = '';
 
       if (!hf.isCellEmpty(cellAddress) && showFormula) {
         cellValue = hf.getCellValue(cellAddress);
@@ -101,13 +105,13 @@ function renderTable(calculated = false) {
       }
 
       newTbodyHTML += `<td class="${
-        cellHasFormula ? updatedCellClass : ""
+        cellHasFormula ? updatedCellClass : ''
       }"><span>
       ${cellValue}
       </span></td>`;
     }
 
-    newTbodyHTML += "</tr>";
+    newTbodyHTML += '</tr>';
   }
 
   tbodyDOM.innerHTML = newTbodyHTML;
@@ -129,14 +133,14 @@ const doSortDESC = () => {
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const ascSort = document.querySelector(".example #asc");
-  const descSort = document.querySelector(".example #desc");
+  const ascSort = document.querySelector('.example #asc');
+  const descSort = document.querySelector('.example #desc');
 
-  ascSort.addEventListener("click", () => {
+  ascSort.addEventListener('click', () => {
     doSortASC();
   });
 
-  descSort.addEventListener("click", () => {
+  descSort.addEventListener('click', () => {
     doSortDESC();
   });
 }

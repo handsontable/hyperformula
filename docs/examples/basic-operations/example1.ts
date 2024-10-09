@@ -2,7 +2,10 @@
 import HyperFormula from 'hyperformula';
 /* end:skip-in-compilation */
 
-console.log(`%c Using HyperFormula ${HyperFormula.version}`, 'color: blue; font-weight: bold');
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
 
 const ANIMATION_ENABLED = true;
 
@@ -33,7 +36,7 @@ function getSampleData(rows, columns) {
  * @type {object}
  */
 const state = {
-  currentSheet: null
+  currentSheet: null,
 };
 
 /**
@@ -42,116 +45,117 @@ const state = {
  * @type {object}
  */
 const inputConfig = {
-  "add-sheet": {
+  'add-sheet': {
     inputs: [
       {
-        type: "text",
-        placeholder: "Sheet name"
-      }
+        type: 'text',
+        placeholder: 'Sheet name',
+      },
     ],
-    buttonText: "Add Sheet",
+    buttonText: 'Add Sheet',
     disclaimer:
-      "For the sake of this demo, the new sheets will be filled with random data."
+      'For the sake of this demo, the new sheets will be filled with random data.',
   },
-  "remove-sheet": {
+  'remove-sheet': {
     inputs: [
       {
-        type: "text",
-        placeholder: "Sheet name"
-      }
+        type: 'text',
+        placeholder: 'Sheet name',
+      },
     ],
-    buttonText: "Remove Sheet"
+    buttonText: 'Remove Sheet',
   },
-  "add-rows": {
+  'add-rows': {
     inputs: [
       {
-        type: "number",
-        placeholder: "Index"
+        type: 'number',
+        placeholder: 'Index',
       },
       {
-        type: "number",
-        placeholder: "Amount"
-      }
+        type: 'number',
+        placeholder: 'Amount',
+      },
     ],
-    buttonText: "Add Rows"
+    buttonText: 'Add Rows',
   },
-  "add-columns": {
+  'add-columns': {
     inputs: [
       {
-        type: "number",
-        placeholder: "Index"
+        type: 'number',
+        placeholder: 'Index',
       },
       {
-        type: "number",
-        placeholder: "Amount"
-      }
+        type: 'number',
+        placeholder: 'Amount',
+      },
     ],
-    buttonText: "Add Columns"
+    buttonText: 'Add Columns',
   },
-  "remove-rows": {
+  'remove-rows': {
     inputs: [
       {
-        type: "number",
-        placeholder: "Index"
+        type: 'number',
+        placeholder: 'Index',
       },
       {
-        type: "number",
-        placeholder: "Amount"
-      }
+        type: 'number',
+        placeholder: 'Amount',
+      },
     ],
-    buttonText: "Remove Rows"
+    buttonText: 'Remove Rows',
   },
-  "remove-columns": {
+  'remove-columns': {
     inputs: [
       {
-        type: "number",
-        placeholder: "Index"
+        type: 'number',
+        placeholder: 'Index',
       },
       {
-        type: "number",
-        placeholder: "Amount"
-      }
+        type: 'number',
+        placeholder: 'Amount',
+      },
     ],
-    buttonText: "Remove Columns"
+    buttonText: 'Remove Columns',
   },
-  "get-value": {
+  'get-value': {
     inputs: [
       {
-        type: "text",
-        placeholder: "Cell Address"
+        type: 'text',
+        placeholder: 'Cell Address',
       },
       {
-        type: "text",
-        disabled: "disabled",
-        placeholder: ""
-      }
+        type: 'text',
+        disabled: 'disabled',
+        placeholder: '',
+      },
     ],
-    disclaimer: "Cell addresses format examples: A1, B4, C6.",
-    buttonText: "Get Value"
+    disclaimer: 'Cell addresses format examples: A1, B4, C6.',
+    buttonText: 'Get Value',
   },
-  "set-value": {
+  'set-value': {
     inputs: [
       {
-        type: "text",
-        placeholder: "Cell Address"
+        type: 'text',
+        placeholder: 'Cell Address',
       },
       {
-        type: "text",
-        placeholder: "Value"
-      }
+        type: 'text',
+        placeholder: 'Value',
+      },
     ],
-    disclaimer: "Cell addresses format examples: A1, B4, C6.",
-    buttonText: "Set Value"
-  }
+    disclaimer: 'Cell addresses format examples: A1, B4, C6.',
+    buttonText: 'Set Value',
+  },
 };
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
-  licenseKey: "gpl-v3"
+  licenseKey: 'gpl-v3',
 });
 
 // Add a new sheet and get its id.
-state.currentSheet = "InitialSheet";
+state.currentSheet = 'InitialSheet';
+
 const sheetName = hf.addSheet(state.currentSheet);
 const sheetId = hf.getSheetId(sheetName);
 
@@ -163,10 +167,10 @@ hf.setSheetContent(sheetId, getSampleData(5, 5));
  */
 function renderTable() {
   const sheetId = hf.getSheetId(state.currentSheet);
-  const tbodyDOM = document.querySelector(".example tbody");
-  const updatedCellClass = ANIMATION_ENABLED ? "updated-cell" : "";
+  const tbodyDOM = document.querySelector('.example tbody');
+  const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';
   const { height, width } = hf.getSheetDimensions(sheetId);
-  let newTbodyHTML = "";
+  let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
     for (let col = 0; col < width; col++) {
@@ -174,10 +178,10 @@ function renderTable() {
       const isEmpty = hf.isCellEmpty(cellAddress);
       const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
       const showFormula = cellHasFormula;
-      let cellValue = "";
+      let cellValue = '';
 
       if (isEmpty) {
-        cellValue = "";
+        cellValue = '';
       } else if (!showFormula) {
         cellValue = hf.getCellValue(cellAddress);
       } else {
@@ -185,13 +189,13 @@ function renderTable() {
       }
 
       newTbodyHTML += `<td class="${
-        cellHasFormula ? updatedCellClass : ""
+        cellHasFormula ? updatedCellClass : ''
       }"><span>
       ${cellValue}
       </span></td>`;
     }
 
-    newTbodyHTML += "</tr>";
+    newTbodyHTML += '</tr>';
   }
 
   tbodyDOM.innerHTML = newTbodyHTML;
@@ -202,15 +206,16 @@ function renderTable() {
  */
 function updateSheetDropdown() {
   const sheetNames = hf.getSheetNames();
-  const sheetDropdownDOM = document.querySelector(".example #sheet-select");
-  let dropdownContent = "";
+  const sheetDropdownDOM = document.querySelector('.example #sheet-select');
+  let dropdownContent = '';
 
-  sheetDropdownDOM.innerHTML = "";
+  sheetDropdownDOM.innerHTML = '';
 
-  sheetNames.forEach(sheetName => {
+  sheetNames.forEach((sheetName) => {
     const isCurrent = sheetName === state.currentSheet;
+
     dropdownContent += `<option value="${sheetName}" ${
-      isCurrent ? "selected" : ""
+      isCurrent ? 'selected' : ''
     }>${sheetName}</option>`;
   });
 
@@ -223,15 +228,15 @@ function updateSheetDropdown() {
  * @param {string} action Action chosen from the dropdown.
  */
 function updateForm(action) {
-  const inputsDOM = document.querySelector(".example #inputs");
-  const submitButtonDOM = document.querySelector(".example #inputs button");
-  const allInputsDOM = document.querySelectorAll(".example #inputs input");
-  const disclaimerDOM = document.querySelector(".example #disclaimer");
+  const inputsDOM = document.querySelector('.example #inputs');
+  const submitButtonDOM = document.querySelector('.example #inputs button');
+  const allInputsDOM = document.querySelectorAll('.example #inputs input');
+  const disclaimerDOM = document.querySelector('.example #disclaimer');
 
   // Hide all inputs
-  allInputsDOM.forEach(input => {
-    input.style.display = "none";
-    input.value = "";
+  allInputsDOM.forEach((input) => {
+    input.style.display = 'none';
+    input.value = '';
     input.disabled = false;
   });
 
@@ -239,7 +244,7 @@ function updateForm(action) {
     const inputDOM = document.querySelector(`.example #input-${index + 1}`);
 
     // Show only those needed
-    inputDOM.style.display = "block";
+    inputDOM.style.display = 'block';
 
     for (const [attribute, value] of Object.entries(inputCfg)) {
       inputDOM.setAttribute(attribute, value);
@@ -251,10 +256,10 @@ function updateForm(action) {
   if (inputConfig[action].disclaimer) {
     disclaimerDOM.innerHTML = inputConfig[action].disclaimer;
   } else {
-    disclaimerDOM.innerHTML = "&nbsp;";
+    disclaimerDOM.innerHTML = '&nbsp;';
   }
 
-  inputsDOM.style.display = "block";
+  inputsDOM.style.display = 'block';
 }
 
 /**
@@ -263,39 +268,39 @@ function updateForm(action) {
  * @param {string} message Error message.
  */
 function renderError(message) {
-  const inputsDOM = document.querySelector(".example #inputs");
-  const errorDOM = document.querySelector(".example #error-message");
+  const inputsDOM = document.querySelector('.example #inputs');
+  const errorDOM = document.querySelector('.example #error-message');
 
-  if (inputsDOM.className.indexOf("error") === -1) {
-    inputsDOM.className += " error";
+  if (inputsDOM.className.indexOf('error') === -1) {
+    inputsDOM.className += ' error';
   }
 
   errorDOM.innerText = message;
-  errorDOM.style.display = "block";
+  errorDOM.style.display = 'block';
 }
 
 /**
  * Clear the error overlay.
  */
 function clearError() {
-  const inputsDOM = document.querySelector(".example #inputs");
-  const errorDOM = document.querySelector(".example #error-message");
+  const inputsDOM = document.querySelector('.example #inputs');
+  const errorDOM = document.querySelector('.example #error-message');
 
-  inputsDOM.className = inputsDOM.className.replace(" error", "");
+  inputsDOM.className = inputsDOM.className.replace(' error', '');
 
-  errorDOM.innerText = "";
-  errorDOM.style.display = "none";
+  errorDOM.innerText = '';
+  errorDOM.style.display = 'none';
 }
 
 /**
  * Bind the events to the buttons.
  */
 function bindEvents() {
-  const sheetDropdown = document.querySelector(".example #sheet-select");
-  const actionDropdown = document.querySelector(".example #action-select");
-  const submitButton = document.querySelector(".example #inputs button");
+  const sheetDropdown = document.querySelector('.example #sheet-select');
+  const actionDropdown = document.querySelector('.example #action-select');
+  const submitButton = document.querySelector('.example #inputs button');
 
-  sheetDropdown.addEventListener("change", event => {
+  sheetDropdown.addEventListener('change', (event) => {
     state.currentSheet = event.target.value;
 
     clearError();
@@ -303,14 +308,14 @@ function bindEvents() {
     renderTable();
   });
 
-  actionDropdown.addEventListener("change", event => {
+  actionDropdown.addEventListener('change', (event) => {
     clearError();
 
     updateForm(event.target.value);
   });
 
-  submitButton.addEventListener("click", event => {
-    const action = document.querySelector(".example #action-select").value;
+  submitButton.addEventListener('click', (event) => {
+    const action = document.querySelector('.example #action-select').value;
 
     doAction(action);
   });
@@ -323,25 +328,29 @@ function bindEvents() {
  */
 function doAction(action) {
   let cellAddress = null;
-  let inputValues = [
-    document.querySelector(".example #input-1").value || void 0,
-    document.querySelector(".example #input-2").value || void 0
+  const inputValues = [
+    document.querySelector('.example #input-1').value || void 0,
+    document.querySelector('.example #input-2').value || void 0,
   ];
 
   clearError();
 
   switch (action) {
-    case "add-sheet":
+    case 'add-sheet':
       state.currentSheet = hf.addSheet(inputValues[0]);
 
       handleError(() => {
-        hf.setSheetContent(hf.getSheetId(state.currentSheet), getSampleData(5, 5));
+        hf.setSheetContent(
+          hf.getSheetId(state.currentSheet),
+          getSampleData(5, 5)
+        );
       });
 
       updateSheetDropdown();
       renderTable();
+
       break;
-    case "remove-sheet":
+    case 'remove-sheet':
       handleError(() => {
         hf.removeSheet(hf.getSheetId(inputValues[0]));
       });
@@ -353,55 +362,61 @@ function doAction(action) {
       }
 
       updateSheetDropdown();
+
       break;
-    case "add-rows":
+    case 'add-rows':
       handleError(() => {
         hf.addRows(hf.getSheetId(state.currentSheet), [
           parseInt(inputValues[0], 10),
-          parseInt(inputValues[1], 10)
+          parseInt(inputValues[1], 10),
         ]);
       });
 
       renderTable();
+
       break;
-    case "add-columns":
+    case 'add-columns':
       handleError(() => {
         hf.addColumns(hf.getSheetId(state.currentSheet), [
           parseInt(inputValues[0], 10),
-          parseInt(inputValues[1], 10)
+          parseInt(inputValues[1], 10),
         ]);
       });
 
       renderTable();
+
       break;
-    case "remove-rows":
+    case 'remove-rows':
       handleError(() => {
         hf.removeRows(hf.getSheetId(state.currentSheet), [
           parseInt(inputValues[0], 10),
-          parseInt(inputValues[1], 10)
+          parseInt(inputValues[1], 10),
         ]);
       });
 
       renderTable();
+
       break;
-    case "remove-columns":
+    case 'remove-columns':
       handleError(() => {
         hf.removeColumns(hf.getSheetId(state.currentSheet), [
           parseInt(inputValues[0], 10),
-          parseInt(inputValues[1], 10)
+          parseInt(inputValues[1], 10),
         ]);
       });
 
       renderTable();
+
       break;
-    case "get-value":
-      const resultDOM = document.querySelector(".example #input-2");
+    case 'get-value':
+      const resultDOM = document.querySelector('.example #input-2');
+
       cellAddress = handleError(() => {
         return hf.simpleCellAddressFromString(
           inputValues[0],
           hf.getSheetId(state.currentSheet)
         );
-      }, "Invalid cell address format.");
+      }, 'Invalid cell address format.');
 
       if (cellAddress !== null) {
         resultDOM.value = handleError(() => {
@@ -410,13 +425,13 @@ function doAction(action) {
       }
 
       break;
-    case "set-value":
+    case 'set-value':
       cellAddress = handleError(() => {
         return hf.simpleCellAddressFromString(
           inputValues[0],
           hf.getSheetId(state.currentSheet)
         );
-      }, "Invalid cell address format.");
+      }, 'Invalid cell address format.');
 
       if (cellAddress !== null) {
         handleError(() => {
@@ -425,6 +440,7 @@ function doAction(action) {
       }
 
       renderTable();
+
       break;
     default:
   }
@@ -445,7 +461,7 @@ function handleError(tryFunc, message = null) {
     if (e instanceof Error) {
       renderError(message || e.message);
     } else {
-      renderError("Something went wrong");
+      renderError('Something went wrong');
     }
   }
 
