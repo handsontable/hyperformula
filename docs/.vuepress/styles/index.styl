@@ -88,3 +88,52 @@ table {
         text-align: left;
     }
 }
+
+.example-controls {
+    display: flex
+    flex-wrap: wrap
+    gap: 8px
+    background: $editorColor
+    border-radius: $radius
+    padding: 10px
+    margin 0
+
+    .hidden {
+        display: none
+    }
+
+    button {
+        border: 1px solid $borderColor
+        border-radius: $radius
+        padding: 7px 16px 7px 13px !important
+        display: flex
+        align-items: center
+        gap: 8px
+        background: white
+        font-size: 14px
+
+        i, svg {
+            opacity: .7
+        }
+
+        svg {
+            path {
+                fill: black
+            }
+        }
+
+        &:disabled {
+            i {
+                opacity: 0.3 !important
+            }
+        }
+
+        @media (hover: hover) {
+            &:hover {
+                i, svg {
+                    opacity 1
+                }
+            }
+        }
+    }
+}

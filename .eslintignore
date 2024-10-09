@@ -1,6 +1,9 @@
 # Common files
 node_modules
 
+# example files
+docs/examples/
+
 # 3rd party
 src/interpreter/plugin/3rdparty
 

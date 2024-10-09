@@ -1,0 +1,171 @@
+.example {
+  color: #606c76;
+  font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: .01em;
+  line-height: 1.6;
+}
+
+.example button {
+  border: 0.1em solid #1c49e4;
+  border-radius: .3em;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: .85em;
+  font-weight: 700;
+  height: 3em;
+  letter-spacing: .1em;
+  line-height: 3em;
+  padding: 0 3em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 20px;
+  background-color: #1c49e4;
+}
+
+.example button:hover {
+  background-color: #2350ea;
+}
+
+.example button.outline {
+  background-color: transparent;
+  color: #1c49e4;
+}
+
+.example table {
+  table-layout: fixed;
+}
+
+.example table tbody tr td,
+.example table tbody tr th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.example table tbody tr td:first-child span {
+  width: 100%;
+  display: inline-block;
+  text-align: left;
+  padding-left: 15px;
+  margin-left: 0;
+}
+
+.example table tbody tr {
+  counter-increment: row-counter;
+}
+
+.example table tbody tr td:first-child span::before {
+  content: counter(row-counter);
+  display: inline-block;
+  width: 20px;
+  position: relative;
+  left: -10px;
+  font-weight: bold;
+}
+
+.example table tbody tr td.updated-cell span {
+  animation-name: cell-appear;
+  animation-duration: 0.6s;
+}
+
+.example table thead tr th:first-child {
+  padding-left: 40px;
+}
+
+.example table thead tr th {
+  counter-increment: col-counter;
+}
+
+.example table thead tr th::before {
+  content: counter(col-counter, upper-alpha);
+  display: inline-block;
+  width: 20px;
+}
+
+.example .crud-entry {
+  margin-bottom: 10px;
+}
+
+.example #inputs input:focus,
+.example #inputs select:focus,
+.example #toolbar select:focus {
+  border-color: #1c49e4;
+}
+
+.example input.inline,
+.example select.inline {
+  border-bottom-right-radius: 0;
+  border-right: 0;
+  border-top-right-radius: 0;
+  margin: 0;
+  width: 10em;
+  float: left;
+}
+
+.example input.inline.middle {
+  border-radius: 0;
+  margin: 0;
+  width: 10em;
+  float: left;
+}
+
+.example input::placeholder {
+  opacity: 0.55;
+}
+
+.example button.inline {
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  margin: 0;
+}
+
+.example #error-message {
+  display: none;
+}
+
+.example #disclaimer {
+  font-size: 1rem;
+  opacity: 0.6;
+  margin: 0;
+}
+
+.example input:disabled {
+  background-color: #f7f7f7;
+}
+
+.example #sheet-select {
+  width: 12rem;
+}
+
+.example #action-select {
+  width: 14rem;
+}
+
+.example #preview-header {
+  margin: 30px 0 0 0;
+}
+
+.example #inputs {
+  display: none;
+}
+
+.example #inputs.error input {
+  border: 1px solid red;
+}
+
+.example #error-message {
+  color: red;
+}
+
+@keyframes cell-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

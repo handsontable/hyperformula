@@ -1,0 +1,48 @@
+<div class="example">
+  <div id="toolbar" class="container">
+    <div class="row">
+      <div class="column">
+        <select id="sheet-select">
+          <option value="" disabled selected>SheetName</option>
+        </select>
+        <select id="action-select">
+          <option value="" disabled selected>Select action</option>
+          <option value="add-sheet">Add sheet</option>
+          <option value="remove-sheet">Remove sheet</option>
+          <option value="add-rows">Add row(s)</option>
+          <option value="add-columns">Add column(s)</option>
+          <option value="remove-rows">Remove row(s)</option>
+          <option value="remove-columns">Remove column(s)</option>
+          <option value="get-value">Get value</option>
+          <option value="set-value">Set value</option>
+        </select><br />
+      </div>
+    </div>
+
+    <div id="inputs" class="row">
+      <div class="column">
+        <input id="input-1" class="inline" />
+        <input id="input-2" class="inline middle" />
+        <button class="button run inline">
+          Run
+        </button>
+        <p id="error-message"></p>
+        <p id="disclaimer"></p>
+      </div>
+    </div>
+  </div>
+  <div id="preview">
+    <table>
+      <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
