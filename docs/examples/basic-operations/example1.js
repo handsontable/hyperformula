@@ -164,10 +164,8 @@ hf.setSheetContent(sheetId, getSampleData(5, 5));
 
 /**
  * Fill the HTML table with data.
- *
- * @param {string} sheetName Sheet name.
  */
-function renderTable(sheetName) {
+function renderTable() {
   const sheetId = hf.getSheetId(state.currentSheet);
   const tbodyDOM = document.querySelector('.example tbody');
   const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';

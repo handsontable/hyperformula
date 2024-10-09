@@ -105,11 +105,11 @@ function bindEvents() {
   const resetButton = document.querySelector(".example #reset");
 
   runButton.addEventListener("click", () => {
-    runCalculations(hf, sheetId);
+    runCalculations();
   });
 
   resetButton.addEventListener("click", () => {
-    resetTable(tableData);
+    resetTable();
   });
 }
 

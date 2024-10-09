@@ -111,7 +111,7 @@ function removeSecondRow() {
   }
 
   hf.removeRows(sheetId, [1, 1]);
-  renderTable(true);
+  renderTable();
 }
 
 /**

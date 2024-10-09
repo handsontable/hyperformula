@@ -113,13 +113,6 @@ function renderTable(calculated = false) {
   tbodyDOM.innerHTML = newTbodyHTML;
 }
 
-/**
- * Replace the values in the table with initial data.
- */
-function resetTable() {
-  renderTable();
-}
-
 const doSortASC = () => {
   sort(true, () => {
     renderTable(true);

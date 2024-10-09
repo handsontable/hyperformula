@@ -119,6 +119,6 @@ function bindEvents() {
 bindEvents();
 
 // Render the preview tables.
-for (const [tableName, tableInfo] of Object.entries(sheetInfo)) {
+for (const [_, tableInfo] of Object.entries(sheetInfo)) {
   renderTable(tableInfo.sheetName);
 }
