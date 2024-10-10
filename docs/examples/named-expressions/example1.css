@@ -1,7 +1,7 @@
 /* general */
 .example {
   color: #606c76;
-  font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  font-family: sans-serif;
   font-size: 14px;
   font-weight: 300;
   letter-spacing: .01em;
@@ -17,6 +17,7 @@
   cursor: pointer;
   display: inline-block;
   font-size: .85em;
+  font-family: inherit;
   font-weight: 700;
   height: 3em;
   letter-spacing: .1em;
@@ -44,6 +45,21 @@
 .example label {
   display: inline-block;
   margin-left: 5px;
+}
+
+/* message */
+
+.message-box {
+  border: 1px solid #1c49e433;
+  background-color: #1c49e405;
+  border-radius: 0.2rem;
+  padding: 10px;
+}
+
+.message-box span {
+  animation-name: cell-appear;
+  animation-duration: 0.2s;
+  margin: 0;
 }
 
 /* table */
@@ -116,11 +132,17 @@
 
 /* table: summary row */
 
-table tbody tr.summary {
+.example table tbody tr.summary {
   font-weight: 600;
 }
 
-/* keyframes animation */
+/* updated-cell animation */
+
+.example table tr td.updated-cell span {
+  animation-name: cell-appear;
+  animation-duration: 0.6s;
+}
+
 @keyframes cell-appear {
   from {
     opacity: 0;

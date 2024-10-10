@@ -97,10 +97,10 @@ function renderTable(sheetName) {
 }
 
 /**
- * Render the result block.
+ * Render the result block
  */
 function renderResult() {
-  const resultOutputDOM = document.querySelector('.example #result .output');
+  const resultOutputDOM = document.querySelector('.example #output');
   const cellAddress = hf.simpleCellAddressFromString(
     `${sheetInfo.formulas.sheetName}!A1`,
     hf.getSheetId(sheetInfo.formulas.sheetName)

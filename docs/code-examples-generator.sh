@@ -90,7 +90,7 @@ go_through_all_examples_concurrently() {
 
   wait
   echo "Waiting for the result of all jobs..."
-  sleep 20
+  sleep 30
   echo "All jobs finished"
 }
 

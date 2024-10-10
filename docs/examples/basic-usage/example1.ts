@@ -74,8 +74,8 @@ function renderTable() {
  */
 function bindEvents() {
   const calculateButton = document.querySelector('.example #calculate');
-  const formulaPreview = document.querySelector('.example #address-preview');
-  const calculationResult = document.querySelector('.example #result');
+  const formulaPreview = document.querySelector('.example #address-output');
+  const calculationResult = document.querySelector('.example #result-output');
   const cellAddress = { sheet: sheetId, row: 0, col: 2 };
 
   formulaPreview.innerText = hf.simpleCellAddressToString(cellAddress, sheetId);
