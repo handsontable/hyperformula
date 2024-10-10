@@ -54,6 +54,7 @@
   overflow-x: auto;
   text-align: left;
   width: 100%;
+  counter-reset: row-counter col-counter;
 }
 
 .example table tr td,
@@ -67,16 +68,22 @@
 /* table: header row */
 
 .example table thead tr th span::before {
-  content: counter(col-counter, upper-alpha);
   display: inline-block;
   width: 20px;
 }
 
-.example table thead tr th span {
+.example table.spreadsheet thead tr th span::before {
+  content: counter(col-counter, upper-alpha);
+}
+
+.example table.spreadsheet thead tr th {
   counter-increment: col-counter;
 }
 
 /* table: first column */
+.example table.spreadsheet tbody {
+  counter-set: row-counter -1;
+}
 
 .example table tbody tr td:first-child {
   text-align: center;
@@ -109,7 +116,7 @@
 
 /* table: summary row */
 
-table tbody tr:last-child {
+table tbody tr.summary {
   font-weight: 600;
 }
 
