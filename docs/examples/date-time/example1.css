@@ -1,3 +1,4 @@
+/* general */
 .example {
   color: #606c76;
   font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
@@ -6,6 +7,8 @@
   letter-spacing: .01em;
   line-height: 1.6;
 }
+
+/* buttons */
 
 .example button {
   border: 0.1em solid #1c49e4;
@@ -36,32 +39,48 @@
   color: #1c49e4;
 }
 
+/* labels */
+
 .example label {
   display: inline-block;
   margin-left: 5px;
 }
 
-.example table tbody tr {
-  counter-increment: row-counter;
+/* table */
+
+.example table {
+  table-layout: fixed;
+  border-spacing: 0;
+  overflow-x: auto;
+  text-align: left;
+  width: 100%;
+}
+
+.example table tr td,
+.example table tr th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 0.1rem solid #e1e1e1;
+  padding: .6em 1em;
+}
+
+/* table: header row */
+
+.example table thead tr th span::before {
+  content: counter(col-counter, upper-alpha);
+  display: inline-block;
+  width: 20px;
 }
 
 .example table thead tr th span {
   counter-increment: col-counter;
 }
 
+/* table: first column */
+
 .example table tbody tr td:first-child {
   text-align: center;
   padding: 0;
-}
-
-.example table {
-  table-layout: fixed;
-}
-
-.example table tbody tr td,
-.example table tbody tr th {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .example table thead tr th:first-child {
@@ -84,11 +103,17 @@
   left: -10px;
 }
 
-.example table tbody tr td.updated-cell span {
-  animation-name: cell-appear;
-  animation-duration: 0.6s;
+.example table tbody tr {
+  counter-increment: row-counter;
 }
 
+/* table: summary row */
+
+table tbody tr:last-child {
+  font-weight: 600;
+}
+
+/* keyframes animation */
 @keyframes cell-appear {
   from {
     opacity: 0;
@@ -97,3 +122,8 @@
     opacity: 1;
   }
 }
+
+/* TODO:
+ - dopiescic cssy,
+ - review adrian,
+ - krzysiek (instrukcje jak deployowac) */

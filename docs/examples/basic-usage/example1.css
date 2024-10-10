@@ -1,3 +1,4 @@
+/* general */
 .example {
   color: #606c76;
   font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
@@ -6,6 +7,8 @@
   letter-spacing: .01em;
   line-height: 1.6;
 }
+
+/* buttons */
 
 .example button {
   border: 0.1em solid #1c49e4;
@@ -36,19 +39,48 @@
   color: #1c49e4;
 }
 
-.example table tbody tr td:first-child {
-  text-align: center;
-  padding: 0;
+/* labels */
+
+.example label {
+  display: inline-block;
+  margin-left: 5px;
 }
+
+/* table */
 
 .example table {
   table-layout: fixed;
+  border-spacing: 0;
+  overflow-x: auto;
+  text-align: left;
+  width: 100%;
 }
 
-.example table tbody tr td,
-.example table tbody tr th {
+.example table tr td,
+.example table tr th {
   overflow: hidden;
   text-overflow: ellipsis;
+  border-bottom: 0.1rem solid #e1e1e1;
+  padding: .6em 1em;
+}
+
+/* table: header row */
+
+.example table thead tr th span::before {
+  content: counter(col-counter, upper-alpha);
+  display: inline-block;
+  width: 20px;
+}
+
+.example table thead tr th span {
+  counter-increment: col-counter;
+}
+
+/* table: first column */
+
+.example table tbody tr td:first-child {
+  text-align: center;
+  padding: 0;
 }
 
 .example table thead tr th:first-child {
@@ -63,10 +95,6 @@
   margin-left: 0;
 }
 
-.example table tbody tr {
-  counter-increment: row-counter;
-}
-
 .example table tbody tr td:first-child span::before {
   content: counter(row-counter);
   display: inline-block;
@@ -75,25 +103,27 @@
   left: -10px;
 }
 
-.example table thead tr th span {
-  counter-increment: col-counter;
+.example table tbody tr {
+  counter-increment: row-counter;
 }
 
-.example table thead tr th span::before {
-  content: counter(col-counter, upper-alpha);
-  display: inline-block;
-  width: 20px;
+/* table: summary row */
+
+table tbody tr:last-child {
+  font-weight: 600;
 }
 
-.example #address-preview {
-  font-weight: bold;
+/* keyframes animation */
+@keyframes cell-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.example div.result {
-  display: inline-block;
-  margin: 0 0 0 15px;
-}
-
-.example p.data-label {
-  margin: 0;
-}
+/* TODO:
+ - dopiescic cssy,
+ - review adrian,
+ - krzysiek (instrukcje jak deployowac) */
