@@ -94,7 +94,7 @@ function renderTable(calculated = false) {
     newTbodyHTML += '</tr>';
   }
 
-  totalRowsHTML = `<tr>
+  totalRowsHTML = `<tr class="summary">
 <td>TOTAL</td>
 <td class="${updatedCellClass}">
   <span>${
