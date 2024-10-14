@@ -276,7 +276,7 @@ function renderError(message) {
   }
 
   errorDOM.innerText = message;
-  errorDOM.style.display = 'block';
+  errorDOM.parentElement.style.display = 'block';
 }
 
 /**
@@ -289,7 +289,7 @@ function clearError() {
   inputsDOM.className = inputsDOM.className.replace(' error', '');
 
   errorDOM.innerText = '';
-  errorDOM.style.display = 'none';
+  errorDOM.parentElement.style.display = 'none';
 }
 
 /**

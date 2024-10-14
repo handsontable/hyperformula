@@ -26,21 +26,30 @@
         <button class="button run inline">
           Run
         </button>
-        <p id="error-message"></p>
-        <p id="disclaimer"></p>
+        <div class="message-box">
+          <p id="error-message" class="color: red;"></p>
+          <p id="disclaimer" class="opacity: 0.6;"></p>
+        </div>
       </div>
     </div>
   </div>
   <div id="preview">
-    <table>
+    <table class="spreadsheet">
+      <colgroup>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+      </colgroup>
       <thead>
-      <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
+        <tr>
+          <th><span></span></th>
+          <th><span></span></th>
+          <th><span></span></th>
+          <th><span></span></th>
+          <th><span></span></th>
+        </tr>
       </thead>
       <tbody></tbody>
     </table>

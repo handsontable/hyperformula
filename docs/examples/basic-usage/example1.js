@@ -60,8 +60,6 @@ function renderTable() {
       ${cellValue}
       </span></td>`;
     }
-
-    newTbodyHTML += '</tr>';
   }
 
   tbodyDOM.innerHTML = `<tr>${newTbodyHTML}</tr>`;
