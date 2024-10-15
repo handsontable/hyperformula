@@ -155,6 +155,8 @@ function renderTable(calculated = false) {
   let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
+    newTbodyHTML += `<tr class="${row === height - 1 ? 'summary' : ''}">`;
+
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
       const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
@@ -165,9 +167,7 @@ function renderTable(calculated = false) {
 
       newTbodyHTML += `<td class="${
         cellHasFormula ? updatedCellClass : ''
-      }"><span>
-      ${displayValue}
-      </span></td>`;
+      }"><span>${displayValue}</span></td>`;
     }
 
     newTbodyHTML += '</tr>';

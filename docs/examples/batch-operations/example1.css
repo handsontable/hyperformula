@@ -85,7 +85,7 @@
   padding: 10px;
 }
 
-.message-box span {
+.example .message-box span {
   animation-name: cell-appear;
   animation-duration: 0.2s;
   margin: 0;
