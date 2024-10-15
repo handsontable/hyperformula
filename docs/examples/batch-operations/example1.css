@@ -78,7 +78,7 @@
 
 /* message */
 
-.message-box {
+.example .message-box {
   border: 1px solid #1c49e433;
   background-color: #1c49e405;
   border-radius: 0.2em;
@@ -181,51 +181,4 @@
   to {
     opacity: 1;
   }
-}
-
-/* basic-operations form */
-
-.example #inputs {
-  display: none;
-}
-
-.example #inputs input,
-.example #toolbar select,
-.example #inputs button {
-  height: 38px;
-}
-
-.example #inputs input.inline,
-.example #inputs select.inline {
-  border-bottom-right-radius: 0;
-  border-right: 0;
-  border-top-right-radius: 0;
-  margin: 0;
-  width: 10em;
-  float: left;
-}
-
-.example #inputs button.inline {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-  margin: 0;
-}
-
-.example #inputs input.inline.middle {
-  border-radius: 0;
-  margin: 0;
-  width: 10em;
-  float: left;
-}
-
-.example #inputs input::placeholder {
-  opacity: 0.55;
-}
-
-.example #inputs input:disabled {
-  background-color: #f7f7f7;
-}
-
-.example #inputs.error input {
-  border: 1px solid red;
 }

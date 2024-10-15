@@ -255,6 +255,7 @@ function updateForm(action) {
 
   if (inputConfig[action].disclaimer) {
     disclaimerDOM.innerHTML = inputConfig[action].disclaimer;
+    disclaimerDOM.parentElement.style.display = 'block';
   } else {
     disclaimerDOM.innerHTML = '&nbsp;';
   }
@@ -476,3 +477,5 @@ renderTable();
 
 // Refresh the sheet dropdown list
 updateSheetDropdown();
+
+document.querySelector('.example .message-box').style.display = 'block';
