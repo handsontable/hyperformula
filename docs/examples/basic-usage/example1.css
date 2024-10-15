@@ -81,7 +81,7 @@
 .message-box {
   border: 1px solid #1c49e433;
   background-color: #1c49e405;
-  border-radius: 0.2rem;
+  border-radius: 0.2em;
   padding: 10px;
 }
 
@@ -110,8 +110,9 @@
 .example table tr th {
   overflow: hidden;
   text-overflow: ellipsis;
-  border-bottom: 0.1rem solid #e1e1e1;
-  padding: .6em 1em;
+  border-bottom: 0.1em solid #e1e1e1;
+  padding: 0 1em;
+  height: 3.5em;
 }
 
 /* table: header row */
