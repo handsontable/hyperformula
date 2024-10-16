@@ -63,11 +63,8 @@
   border: 0.1em solid #d1d1d1;
   border-radius: .4em;
   height: 3.8em;
-  padding: .6em 1em .7em;
-}
-
-.example select {
-  padding-right: 3em;
+  width: 12em;
+  padding: 0 .5em;
 }
 
 .example input:focus,
