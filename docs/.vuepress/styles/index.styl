@@ -105,12 +105,19 @@ table {
     button {
         border: 1px solid $borderColor
         border-radius: $radius
-        padding: 7px 16px 7px 13px !important
+        padding: 12px 20px 11px 17px !important
         display: flex
         align-items: center
         gap: 8px
+        transition: background 0.3s ease, box-shadow 0.3s ease
+        cursor: pointer
         background: white
         font-size: 14px
+
+        &:hover {
+            background: #f3f3f3
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+        }
 
         i, svg {
             opacity: .7
