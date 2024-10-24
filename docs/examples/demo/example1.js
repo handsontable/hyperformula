@@ -1,12 +1,12 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
 
-/* end:skip-in-compilation */
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
   'color: blue; font-weight: bold'
 );
 
+/* end:skip-in-compilation */
 const tableData = [
   ['Greg Black', 4.66, '=B1*1.3', '=AVERAGE(B1:C1)', '=SUM(B1:C1)'],
   ['Anne Carpenter', 5.25, '=$B$2*30%', '=AVERAGE(B2:C2)', '=SUM(B2:C2)'],

@@ -2,16 +2,16 @@
 import HyperFormula from 'hyperformula';
 import enUS from 'hyperformula/es/i18n/languages/enUS';
 import moment from 'moment';
-/* end:skip-in-compilation */
-
-/* start:skip-in-sandbox */
-const enUS = HyperFormula.languages.enUS;
-/* end:skip-in-sandbox */
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
   'color: blue; font-weight: bold'
 );
+/* end:skip-in-compilation */
+
+/* start:skip-in-sandbox */
+const enUS = HyperFormula.languages.enUS;
+/* end:skip-in-sandbox */
 
 /**
  * Initial table data.
@@ -157,7 +157,7 @@ function renderTable(calculated = false) {
   let newTbodyHTML = '';
 
   for (let row = 0; row < height; row++) {
-    newTbodyHTML += `<tr class="${row === height-1 ? 'summary' : ''}">`;
+    newTbodyHTML += `<tr class="${row === height - 1 ? 'summary' : ''}">`;
 
     for (let col = 0; col < width; col++) {
       const cellAddress = { sheet: sheetId, col, row };
@@ -167,7 +167,9 @@ function renderTable(calculated = false) {
         ? hf.getCellFormula(cellAddress)
         : formatCellValue(cellAddress);
 
-      newTbodyHTML += `<td class="${cellHasFormula ? updatedCellClass : ''}"><span>${displayValue}</span></td>`;
+      newTbodyHTML += `<td class="${
+        cellHasFormula ? updatedCellClass : ''
+      }"><span>${displayValue}</span></td>`;
     }
 
     newTbodyHTML += '</tr>';

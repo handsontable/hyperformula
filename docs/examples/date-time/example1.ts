@@ -1,12 +1,12 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
 import moment from 'moment';
-/* end:skip-in-compilation */
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
   'color: blue; font-weight: bold'
 );
+/* end:skip-in-compilation */
 
 /**
  * Function defining the way HF should handle the provided date string.

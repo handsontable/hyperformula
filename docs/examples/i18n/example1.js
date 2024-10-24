@@ -2,16 +2,15 @@
 import HyperFormula from 'hyperformula';
 import moment from 'moment';
 
-/* end:skip-in-compilation */
-/* start:skip-in-sandbox */
-const enUS = HyperFormula.languages.enUS;
-
-/* end:skip-in-sandbox */
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
   'color: blue; font-weight: bold'
 );
 
+/* end:skip-in-compilation */
+/* start:skip-in-sandbox */
+const enUS = HyperFormula.languages.enUS;
+/* end:skip-in-sandbox */
 /**
  * Initial table data.
  */

@@ -1,12 +1,12 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
 
-/* end:skip-in-compilation */
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
   'color: blue; font-weight: bold'
 );
 
+/* end:skip-in-compilation */
 const tableData = [['10', '20', '=SUM(A1,B1)']];
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({

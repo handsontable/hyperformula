@@ -1,16 +1,15 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
 
-/* end:skip-in-compilation */
-/* start:skip-in-sandbox */
-const frFR = HyperFormula.languages.frFR;
-
-/* end:skip-in-sandbox */
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
   'color: blue; font-weight: bold'
 );
 
+/* end:skip-in-compilation */
+/* start:skip-in-sandbox */
+const frFR = HyperFormula.languages.frFR;
+/* end:skip-in-sandbox */
 /**
  * Initial table data.
  */

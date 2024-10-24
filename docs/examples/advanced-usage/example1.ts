@@ -1,11 +1,11 @@
 /* start:skip-in-compilation */
 import HyperFormula from 'hyperformula';
-/* end:skip-in-compilation */
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
   'color: blue; font-weight: bold'
 );
+/* end:skip-in-compilation */
 
 // first column represents players' IDs
 // second column represents players' scores
