@@ -4,20 +4,18 @@ To upgrade your HyperFormula version from 2.x.x to 3.0.0, follow this guide.
 
 ## Importing language files
 
+TODO: description of a change
+
 ### Projects in Angular framework
 
 #### Required steps
 
-1. Upgrade to Typescript 5
+1. Make sure you use Typescript 5 or newer
 2. In your `tsconfig.json`, set:
 
 ```
 "moduleResolution": "bundler",
 ```
-
-#### Explanation
-
-TODO
 
 ### Projects in Typescript
 
@@ -82,9 +80,14 @@ I found out that webpack 4 does not support exports, and there seems to be no ea
 
 #### Explanation
 
+TODO
+
 parcel does not support "exports" by default, since v2.9 it can be configured to support it
 
 - https://github.com/parcel-bundler/parcel/issues/4155
 - https://parceljs.org/blog/v2-9-0/#new-resolver
 
 // TODO
+- read https://github.com/microsoft/TypeScript/issues/18442
+- read https://github.com/microsoft/TypeScript/issues/49462
+- read https://www.sensedeep.com/blog/posts/2021/how-to-create-single-source-npm-module.html
