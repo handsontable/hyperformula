@@ -58,7 +58,7 @@
 
 /* inputs */
 
-.example input, .example select, .example textarea, .example fieldset {
+.example input:not([type='checkbox']), .example select, .example textarea, .example fieldset {
   margin-bottom: 1.5em;
   border: 0.1em solid #d1d1d1;
   border-radius: .4em;
