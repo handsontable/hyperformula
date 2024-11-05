@@ -19,7 +19,7 @@ const { frFR } = require('hyperformula/i18n/languages'); // CommonJS
 ```
 If you use the UMD module system, you don't need to change anything.
 
-### Additional steps for projects using Angular 17 or older
+### Additional steps for projects using Angular
 
 1. Make sure you use Typescript 5 or newer
 2. In your `tsconfig.json`, set:
