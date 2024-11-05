@@ -14,11 +14,11 @@ const parseCode = (content) => {
 
   return content
     // Remove the all "/* start:skip-in-preview */" and "/* end:skip-in-preview */" comments
-    .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\n/gm, '')
+    .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\r?\n/gm, '')
     // Remove the all "/* start:skip-in-sandbox */" and "/* end:skip-in-sandbox */" comments
-    .replace(/\/\*(\s+)?(start|end):skip-in-sandbox(\s+)?\*\/\n/gm, '')
+    .replace(/\/\*(\s+)?(start|end):skip-in-sandbox(\s+)?\*\/\r?\n/gm, '')
     // Remove the code between "/* start:skip-in-compilation */" and "/* end:skip-in-compilation */" expressions
-    .replace(/\/\*(\s+)?start:skip-in-compilation(\s+)?\*\/\n.*?\/\*(\s+)?end:skip-in-compilation(\s+)?\*\/\n/msg, '')
+    .replace(/\/\*(\s+)?start:skip-in-compilation(\s+)?\*\/\r?\n.*?\/\*(\s+)?end:skip-in-compilation(\s+)?\*\/\r?\n/msg, '')
     // Remove /* end-file */
     .replace(/\/\* end-file \*\//gm, '');
 };
@@ -28,11 +28,11 @@ const parseCodeSandbox = (content) => {
 
   return content
     // Remove the code between "/* start:skip-in-sandbox */" and "/* end:skip-in-sandbox */" expressions
-    .replace(/\/\*(\s+)?start:skip-in-sandbox(\s+)?\*\/\n.*?\/\*(\s+)?end:skip-in-sandbox(\s+)?\*\/\n/msg, '')
+    .replace(/\/\*(\s+)?start:skip-in-sandbox(\s+)?\*\/\r?\n.*?\/\*(\s+)?end:skip-in-sandbox(\s+)?\*\/\r?\n/msg, '')
     // Remove the all "/* start:skip-in-preview */" and "/* end:skip-in-preview */" comments
-    .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\n/gm, '')
+    .replace(/\/\*(\s+)?(start|end):skip-in-preview(\s+)?\*\/\r?\n/gm, '')
     // Remove the all "/* start:skip-in-compilation */" and "/* end:skip-in-compilation */" comments
-    .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\n/gm, '');
+    .replace(/\/\*(\s+)?(start|end):skip-in-compilation(\s+)?\*\/\r?\n/gm, '');
 };
 
 module.exports = function() {
