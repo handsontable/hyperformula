@@ -37,8 +37,4 @@ export class ValueCellVertex {
   public getCellValue(): ValueCellVertexValue {
     return this.parsedValue
   }
-
-  public setCellValue(_cellValue: ValueCellVertexValue): never {
-    throw Error('SetCellValue is deprecated for ValueCellVertex')
-  }
 }
