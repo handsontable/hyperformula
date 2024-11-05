@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking change**: Removed the `binarySearchThreshold` configuration option. [#1439](https://github.com/handsontable/hyperformula/issues/1439)
+
 ## [2.7.1] - 2024-07-18
 
 ### Fixed
