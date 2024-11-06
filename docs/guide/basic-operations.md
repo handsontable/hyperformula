@@ -403,10 +403,16 @@ console.log(changes);
 
 ## Demo
 
-This demo presents several basic operations integrated with a
-sample UI.
+This demo presents several basic operations integrated with a sample UI.
 
-<iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/basic-operations?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
-</iframe>
+::: example #example1 --html 1 --css 2 --js 3 --ts 4
+
+@[code](@/docs/examples/basic-operations/example1.html)
+
+@[code](@/docs/examples/basic-operations/example1.css)
+
+@[code](@/docs/examples/basic-operations/example1.js)
+
+@[code](@/docs/examples/basic-operations/example1.ts)
+
+:::
