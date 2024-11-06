@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - **Breaking change**: Removed the `binarySearchThreshold` configuration option. [#1439](https://github.com/handsontable/hyperformula/issues/1439)
+- **Breaking change**: Changed the default value of the `precisionRounding` configuration option to `10`. [#1300](https://github.com/handsontable/hyperformula/issues/1300)
 
 ## [2.7.1] - 2024-07-18
 
