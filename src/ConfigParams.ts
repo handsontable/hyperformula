@@ -17,13 +17,6 @@ export interface ConfigParams {
    */
   accentSensitive: boolean,
   /**
-   * Sets a minimum number of elements that a range must have to use binary search.
-   * @deprecated Every search of sorted data always uses binary search.
-   * @default 20
-   * @category Engine
-   */
-  binarySearchThreshold: number,
-  /**
    * When set to `true`, makes string comparison case-sensitive.
    *
    * Applies to comparison operators only.

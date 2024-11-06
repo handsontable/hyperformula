@@ -402,37 +402,6 @@ describe('Config', () => {
     afterEach(() => {
       resetSpy(console.warn)
     })
-
-    it('should log usage of deprecated options when they are passed while engine initialization', () => {
-      new Config({
-        binarySearchThreshold: 20,
-      })
-
-      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
-      expect(console.warn).toHaveBeenCalledTimes(1)
-    })
-
-    it('should log usage of deprecated options when they are passed while merging the Config object', () => {
-      const config = new Config()
-
-      config.mergeConfig({
-        binarySearchThreshold: 20
-      })
-
-      expect(console.warn).toHaveBeenCalledTimes(1)
-      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
-    })
-
-    it('should not log usage of deprecated options when they are not passed while merging the Config object', () => {
-      const config = new Config({
-        binarySearchThreshold: 20,
-      })
-      resetSpy(console.warn)
-
-      config.mergeConfig({})
-
-      expect(console.warn).not.toHaveBeenCalled()
-    })
   })
 })
 

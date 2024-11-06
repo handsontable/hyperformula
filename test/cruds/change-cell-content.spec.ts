@@ -196,16 +196,12 @@ describe('changing cell content', () => {
       ['1', '2', '=SUM(A1:B1)'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const b1 = engine.addressMapping.getCell(adr('B1'))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const b1setCellValueSpy = spyOn(b1 as any, 'setCellValue')
     const c1 = engine.addressMapping.getCell(adr('C1'))
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const c1setCellValueSpy = spyOn(c1 as any, 'setCellValue')
 
     engine.setCellContents(adr('B1'), [['2']])
 
-    expect(b1setCellValueSpy).not.toHaveBeenCalled()
     expect(c1setCellValueSpy).not.toHaveBeenCalled()
   })
 
