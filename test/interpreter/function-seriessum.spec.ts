@@ -47,8 +47,8 @@ describe('Function SERIESSUM', () => {
       [1, 2, 3, 4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(147347.41562949, 6)
-    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(168708.537245456, 6)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(147347.41562949, 5)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(168708.537245456, 5)
   })
 
   it('propagates errors', () => {

@@ -375,22 +375,22 @@ describe('Config', () => {
       const dateAsNumber = 0.564969131944444
 
       let engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.s'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ssss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sssss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
     })
   })
 

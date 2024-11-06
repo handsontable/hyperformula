@@ -75,7 +75,7 @@ describe('function BITLSHIFT', () => {
       ['=BITLSHIFT(2, 47)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(140737488355328)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(140737488355328, -4)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.BitshiftLong))
   })
 

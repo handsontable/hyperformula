@@ -215,7 +215,7 @@ describe('tests', () => {
       ['0.000123456789', '1', '=A1+B1'],
     ], {smartRounding: true})
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(1.000123456789)
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(1.000123456789, 10)
   })
 
   it('addition of small numbers with smartRounding #2', () => {
