@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Date and time handling | HyperFormula (v2.7.1)</title>
     <meta name="generator" content="VuePress 1.9.10">
+    <script src="https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hyperformula@2.7.1/dist/languages/enUS.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hyperformula@2.7.1/dist/languages/frFR.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
     <script>
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
       new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -35,8 +39,8 @@
     <link rel="mask-icon" color="#ffffff" href="/favicon/safari-pinned-tab.svg">
     <meta name="description" content="HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.">
     <meta name="google-site-verification" content="MZpSOa8SNvFLRRGwUQpYVZ78kIHQoPVdVbafHhJ_d4Q">
-    <link rel="preload" href="/assets/css/0.styles.1c8a208f.css" as="style"><link rel="preload" href="/assets/js/app.8bf3d018.js" as="script"><link rel="preload" href="/assets/js/2.3597a886.js" as="script"><link rel="preload" href="/assets/js/1.bee78e53.js" as="script"><link rel="preload" href="/assets/js/52.92dd526a.js" as="script"><link rel="prefetch" href="/assets/js/11.019d5f3e.js"><link rel="prefetch" href="/assets/js/12.7dd46617.js"><link rel="prefetch" href="/assets/js/13.8a7546fa.js"><link rel="prefetch" href="/assets/js/14.328e168f.js"><link rel="prefetch" href="/assets/js/15.708b24f2.js"><link rel="prefetch" href="/assets/js/16.3a906b23.js"><link rel="prefetch" href="/assets/js/17.02a9d3fc.js"><link rel="prefetch" href="/assets/js/18.2a86adbf.js"><link rel="prefetch" href="/assets/js/19.b6f79fca.js"><link rel="prefetch" href="/assets/js/20.5ea7c08d.js"><link rel="prefetch" href="/assets/js/21.5d58ad33.js"><link rel="prefetch" href="/assets/js/22.454880a0.js"><link rel="prefetch" href="/assets/js/23.30a6760d.js"><link rel="prefetch" href="/assets/js/24.c21aeeeb.js"><link rel="prefetch" href="/assets/js/25.c76bba42.js"><link rel="prefetch" href="/assets/js/26.5c577268.js"><link rel="prefetch" href="/assets/js/27.525e9e91.js"><link rel="prefetch" href="/assets/js/28.c1b2a791.js"><link rel="prefetch" href="/assets/js/29.08459f0f.js"><link rel="prefetch" href="/assets/js/3.04ec4b26.js"><link rel="prefetch" href="/assets/js/30.b3c69847.js"><link rel="prefetch" href="/assets/js/31.e31ed84d.js"><link rel="prefetch" href="/assets/js/32.e1ae4c88.js"><link rel="prefetch" href="/assets/js/33.d6db5fa4.js"><link rel="prefetch" href="/assets/js/34.361c554b.js"><link rel="prefetch" href="/assets/js/35.ea25f7fe.js"><link rel="prefetch" href="/assets/js/36.dd40a385.js"><link rel="prefetch" href="/assets/js/37.c9ecff3c.js"><link rel="prefetch" href="/assets/js/38.8f378788.js"><link rel="prefetch" href="/assets/js/39.a7bc1413.js"><link rel="prefetch" href="/assets/js/4.21c8f297.js"><link rel="prefetch" href="/assets/js/40.a2565cea.js"><link rel="prefetch" href="/assets/js/41.1bed8049.js"><link rel="prefetch" href="/assets/js/42.bda807df.js"><link rel="prefetch" href="/assets/js/43.59967862.js"><link rel="prefetch" href="/assets/js/44.3d038708.js"><link rel="prefetch" href="/assets/js/45.1e5e74f5.js"><link rel="prefetch" href="/assets/js/46.de453dde.js"><link rel="prefetch" href="/assets/js/47.886a66c3.js"><link rel="prefetch" href="/assets/js/48.b7e89138.js"><link rel="prefetch" href="/assets/js/49.3d41626d.js"><link rel="prefetch" href="/assets/js/5.0228b95d.js"><link rel="prefetch" href="/assets/js/50.93b4da13.js"><link rel="prefetch" href="/assets/js/51.4bbd3d06.js"><link rel="prefetch" href="/assets/js/53.c9b5af0d.js"><link rel="prefetch" href="/assets/js/54.78cc2f42.js"><link rel="prefetch" href="/assets/js/55.a030a5fa.js"><link rel="prefetch" href="/assets/js/56.cbe19882.js"><link rel="prefetch" href="/assets/js/57.6a6656d6.js"><link rel="prefetch" href="/assets/js/58.2b4e70da.js"><link rel="prefetch" href="/assets/js/59.55d1cf4b.js"><link rel="prefetch" href="/assets/js/6.9278eb5a.js"><link rel="prefetch" href="/assets/js/60.669f8207.js"><link rel="prefetch" href="/assets/js/61.310460a1.js"><link rel="prefetch" href="/assets/js/62.ab533bc5.js"><link rel="prefetch" href="/assets/js/63.02048b72.js"><link rel="prefetch" href="/assets/js/64.20210a10.js"><link rel="prefetch" href="/assets/js/65.8e2fcc87.js"><link rel="prefetch" href="/assets/js/66.479d1e6b.js"><link rel="prefetch" href="/assets/js/67.e16b0d4e.js"><link rel="prefetch" href="/assets/js/68.4c77e6eb.js"><link rel="prefetch" href="/assets/js/69.c960a2c8.js"><link rel="prefetch" href="/assets/js/7.fa0ec3d7.js"><link rel="prefetch" href="/assets/js/70.66a391d8.js"><link rel="prefetch" href="/assets/js/71.af814097.js"><link rel="prefetch" href="/assets/js/72.3b1bbe7d.js"><link rel="prefetch" href="/assets/js/73.01ee86a2.js"><link rel="prefetch" href="/assets/js/74.cbd0f9a2.js"><link rel="prefetch" href="/assets/js/75.2849b1b9.js"><link rel="prefetch" href="/assets/js/76.4c43eb77.js"><link rel="prefetch" href="/assets/js/77.0a7d4a53.js"><link rel="prefetch" href="/assets/js/78.92388409.js"><link rel="prefetch" href="/assets/js/79.2749fbc6.js"><link rel="prefetch" href="/assets/js/8.6f971748.js"><link rel="prefetch" href="/assets/js/80.9db43bbe.js"><link rel="prefetch" href="/assets/js/81.19bc2abb.js"><link rel="prefetch" href="/assets/js/82.bfd7010e.js"><link rel="prefetch" href="/assets/js/83.e94f4dfe.js"><link rel="prefetch" href="/assets/js/84.db8197c1.js"><link rel="prefetch" href="/assets/js/vendors~docsearch.fd489898.js">
-    <link rel="stylesheet" href="/assets/css/0.styles.1c8a208f.css">
+    <link rel="preload" href="/assets/css/0.styles.4697ef37.css" as="style"><link rel="preload" href="/assets/js/app.069dfc70.js" as="script"><link rel="preload" href="/assets/js/2.351f39b2.js" as="script"><link rel="preload" href="/assets/js/1.5b588322.js" as="script"><link rel="preload" href="/assets/js/53.49e389dd.js" as="script"><link rel="preload" href="/assets/js/25.628ab8b7.js" as="script"><link rel="prefetch" href="/assets/js/11.019d5f3e.js"><link rel="prefetch" href="/assets/js/12.fd895246.js"><link rel="prefetch" href="/assets/js/13.500599f9.js"><link rel="prefetch" href="/assets/js/14.eee11ab6.js"><link rel="prefetch" href="/assets/js/15.862b1485.js"><link rel="prefetch" href="/assets/js/16.c6045874.js"><link rel="prefetch" href="/assets/js/17.f0987bd7.js"><link rel="prefetch" href="/assets/js/18.e327e1af.js"><link rel="prefetch" href="/assets/js/19.ce19b5b3.js"><link rel="prefetch" href="/assets/js/20.e88d9e93.js"><link rel="prefetch" href="/assets/js/21.5d58ad33.js"><link rel="prefetch" href="/assets/js/22.18e65e2c.js"><link rel="prefetch" href="/assets/js/23.7becfb43.js"><link rel="prefetch" href="/assets/js/24.ee551fdd.js"><link rel="prefetch" href="/assets/js/26.33555da8.js"><link rel="prefetch" href="/assets/js/27.de80e3de.js"><link rel="prefetch" href="/assets/js/28.f3abda06.js"><link rel="prefetch" href="/assets/js/29.075370e1.js"><link rel="prefetch" href="/assets/js/3.ed99d57d.js"><link rel="prefetch" href="/assets/js/30.af33c46d.js"><link rel="prefetch" href="/assets/js/31.3330a9a3.js"><link rel="prefetch" href="/assets/js/32.34008073.js"><link rel="prefetch" href="/assets/js/33.9a0a7a6b.js"><link rel="prefetch" href="/assets/js/34.db7d122b.js"><link rel="prefetch" href="/assets/js/35.0e1c1717.js"><link rel="prefetch" href="/assets/js/36.d29aca7d.js"><link rel="prefetch" href="/assets/js/37.df8cb8ca.js"><link rel="prefetch" href="/assets/js/38.ac7e1c09.js"><link rel="prefetch" href="/assets/js/39.b0ae52ec.js"><link rel="prefetch" href="/assets/js/4.d3630ce9.js"><link rel="prefetch" href="/assets/js/40.9dfe8118.js"><link rel="prefetch" href="/assets/js/41.6e5165b5.js"><link rel="prefetch" href="/assets/js/42.680c435f.js"><link rel="prefetch" href="/assets/js/43.65698538.js"><link rel="prefetch" href="/assets/js/44.059ab648.js"><link rel="prefetch" href="/assets/js/45.9f58e0da.js"><link rel="prefetch" href="/assets/js/46.c666a6cf.js"><link rel="prefetch" href="/assets/js/47.cc6a25c4.js"><link rel="prefetch" href="/assets/js/48.fc1d2d64.js"><link rel="prefetch" href="/assets/js/49.0ea1a358.js"><link rel="prefetch" href="/assets/js/5.a8958dd7.js"><link rel="prefetch" href="/assets/js/50.6059034f.js"><link rel="prefetch" href="/assets/js/51.7c50d3d8.js"><link rel="prefetch" href="/assets/js/52.ba02d89e.js"><link rel="prefetch" href="/assets/js/54.adffe78b.js"><link rel="prefetch" href="/assets/js/55.5687157f.js"><link rel="prefetch" href="/assets/js/56.4a0ca4b6.js"><link rel="prefetch" href="/assets/js/57.f51c7286.js"><link rel="prefetch" href="/assets/js/58.3cd59511.js"><link rel="prefetch" href="/assets/js/59.0c1fc556.js"><link rel="prefetch" href="/assets/js/6.9ec9a725.js"><link rel="prefetch" href="/assets/js/60.9a66a7a3.js"><link rel="prefetch" href="/assets/js/61.674288b0.js"><link rel="prefetch" href="/assets/js/62.1f888d6e.js"><link rel="prefetch" href="/assets/js/63.0c602e11.js"><link rel="prefetch" href="/assets/js/64.7afe8604.js"><link rel="prefetch" href="/assets/js/65.eeb5fb63.js"><link rel="prefetch" href="/assets/js/66.5b929165.js"><link rel="prefetch" href="/assets/js/67.9706e192.js"><link rel="prefetch" href="/assets/js/68.34064fbd.js"><link rel="prefetch" href="/assets/js/69.1209b460.js"><link rel="prefetch" href="/assets/js/7.2e673d2c.js"><link rel="prefetch" href="/assets/js/70.8960674b.js"><link rel="prefetch" href="/assets/js/71.ffe652db.js"><link rel="prefetch" href="/assets/js/72.350f1ba5.js"><link rel="prefetch" href="/assets/js/73.c5715921.js"><link rel="prefetch" href="/assets/js/74.7fc17af8.js"><link rel="prefetch" href="/assets/js/75.b6404f7e.js"><link rel="prefetch" href="/assets/js/76.faa45821.js"><link rel="prefetch" href="/assets/js/77.2514b48e.js"><link rel="prefetch" href="/assets/js/78.cc63a2dd.js"><link rel="prefetch" href="/assets/js/79.6d51a957.js"><link rel="prefetch" href="/assets/js/8.b41cc13f.js"><link rel="prefetch" href="/assets/js/80.956f1e4c.js"><link rel="prefetch" href="/assets/js/81.77876438.js"><link rel="prefetch" href="/assets/js/82.cc050297.js"><link rel="prefetch" href="/assets/js/83.0d9024fd.js"><link rel="prefetch" href="/assets/js/84.e0d65e80.js"><link rel="prefetch" href="/assets/js/85.8ee90586.js"><link rel="prefetch" href="/assets/js/vendors~docsearch.fd489898.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.4697ef37.css">
 </head>
 <body>
 <!-- Google Tag Manager element -->
@@ -100,7 +104,572 @@ work on strings, dates, etc.</p> <h2 id="moment-js-integration"><a href="#moment
 <span class="token punctuation">}</span><span class="token punctuation">;</span>
 </code></pre></div><p>After that, you should be able to add a dataset with dates in
 your custom format:</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token keyword">const</span> data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token string">&quot;31st Jan 00&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;2nd Jun 01&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;=B1-A1&quot;</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-</code></pre></div><p>And now, HyperFormula recognizes these values as valid dates and can operate on them.</p> <h2 id="demo"><a href="#demo" class="header-anchor">#</a> Demo</h2> <iframe src="https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/date-time?embed=1&amp;file=src/hyperformulaConfig.js&amp;hideNavigation=1&amp;view=preview&amp;v=04%2F09%2F2024%2012%3A44%3A07" style="width:100%;height:590px;border:0;border-radius:4px;overflow:hidden;"></iframe></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/handsontable/hyperformula/edit/master/docs/guide/date-and-time-handling.md" target="_blank" rel="noopener noreferrer">Help us improve this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+</code></pre></div><p>And now, HyperFormula recognizes these values as valid dates and can operate on them.</p> <h2 id="demo"><a href="#demo" class="header-anchor">#</a> Demo</h2> <div class="example-container"><style>/* general */
+.example {
+  color: #606c76;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: .01em;
+  line-height: 1.6;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.example *,
+.example *::before,
+.example *::after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* buttons */
+
+.example button {
+  border: 0.1em solid #1c49e4;
+  border-radius: .3em;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: .85em;
+  font-family: inherit;
+  font-weight: 700;
+  height: 3em;
+  letter-spacing: .1em;
+  line-height: 3em;
+  padding: 0 3em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 20px;
+  background-color: #1c49e4;
+}
+
+.example button:hover {
+  background-color: #2350ea;
+}
+
+.example button.outline {
+  background-color: transparent;
+  color: #1c49e4;
+}
+
+/* labels */
+
+.example label {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+/* inputs */
+
+.example input:not([type='checkbox']), .example select, .example textarea, .example fieldset {
+  margin-bottom: 1.5em;
+  border: 0.1em solid #d1d1d1;
+  border-radius: .4em;
+  height: 3.8em;
+  width: 12em;
+  padding: 0 .5em;
+}
+
+.example input:focus,
+.example select:focus {
+  outline: none;
+  border-color: #1c49e4;
+}
+
+/* message */
+
+.example .message-box {
+  border: 1px solid #1c49e433;
+  background-color: #1c49e405;
+  border-radius: 0.2em;
+  padding: 10px;
+}
+
+.example .message-box span {
+  animation-name: cell-appear;
+  animation-duration: 0.2s;
+  margin: 0;
+}
+
+/* table */
+
+.example table {
+  table-layout: fixed;
+  border-spacing: 0;
+  overflow-x: auto;
+  text-align: left;
+  width: 100%;
+  counter-reset: row-counter col-counter;
+}
+
+.example table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+.example table tr td,
+.example table tr th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 0.1em solid #e1e1e1;
+  padding: 0 1em;
+  height: 3.5em;
+}
+
+/* table: header row */
+
+.example table thead tr th span::before {
+  display: inline-block;
+  width: 20px;
+}
+
+.example table.spreadsheet thead tr th span::before {
+  content: counter(col-counter, upper-alpha);
+}
+
+.example table.spreadsheet thead tr th {
+  counter-increment: col-counter;
+}
+
+/* table: first column */
+
+.example table tbody tr td:first-child {
+  text-align: center;
+  padding: 0;
+}
+
+.example table thead tr th:first-child {
+  padding-left: 40px;
+}
+
+.example table tbody tr td:first-child span {
+  width: 100%;
+  display: inline-block;
+  text-align: left;
+  padding-left: 15px;
+  margin-left: 0;
+}
+
+.example table tbody tr td:first-child span::before {
+  content: counter(row-counter);
+  display: inline-block;
+  width: 20px;
+  position: relative;
+  left: -10px;
+}
+
+.example table tbody tr {
+  counter-increment: row-counter;
+}
+
+/* table: summary row */
+
+.example table tbody tr.summary {
+  font-weight: 600;
+}
+
+/* updated-cell animation */
+
+.example table tr td.updated-cell span {
+  animation-name: cell-appear;
+  animation-duration: 0.6s;
+}
+
+@keyframes cell-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+</style> <div><div data-preset-type="hot" data-example-id="example1"><div class="example"><button id="run" class="button run">
+    Run calculations
+  </button> <button id="reset" class="button button-outline reset">
+    Reset
+  </button> <table><colgroup><col> <col> <col></colgroup> <thead><tr><th>Release 1.0.0</th> <th>Release 4.3.1</th> <th>Number of days between</th></tr></thead> <tbody></tbody></table></div></div></div> <div></div></div> <div class="example-controls"><form action="https://stackblitz.com/run" method="post" target="_blank" class="form-stackblitz-external"><textarea class="hidden" name="project[files][package.json]" readOnly="">{
+  &quot;name&quot;: &quot;hyperformula-demo&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;main&quot;: &quot;index.html&quot;,
+  &quot;dependencies&quot;: {
+    &quot;hyperformula&quot;: &quot;latest&quot;,
+    &quot;moment&quot;: &quot;latest&quot;
+  }
+}</textarea> <textarea class="hidden" name="project[files][index.html]" readOnly="">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+    &lt;title&gt;HyperFormula demo&lt;/title&gt;
+  &lt;/head&gt;
+
+  &lt;body&gt;
+    &lt;div class=&quot;example&quot;&gt;
+  &lt;button id=&quot;run&quot; class=&quot;button run&quot;&gt;
+    Run calculations
+  &lt;/button&gt;
+  &lt;button id=&quot;reset&quot; class=&quot;button button-outline reset&quot;&gt;
+    Reset
+  &lt;/button&gt;
+  &lt;table&gt;
+    &lt;colgroup&gt;
+      &lt;col style=&quot;width:20%&quot; /&gt;
+      &lt;col style=&quot;width:20%&quot; /&gt;
+      &lt;col style=&quot;width:30%&quot; /&gt;
+    &lt;/colgroup&gt;
+    &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Release 1.0.0&lt;/th&gt;
+      &lt;th&gt;Release 4.3.1&lt;/th&gt;
+      &lt;th&gt;Number of days between&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;&lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</textarea> <textarea class="hidden" name="project[files][styles.css]" readOnly="">/* general */
+.example {
+  color: #606c76;
+  font-family: sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: .01em;
+  line-height: 1.6;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.example *,
+.example *::before,
+.example *::after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/* buttons */
+
+.example button {
+  border: 0.1em solid #1c49e4;
+  border-radius: .3em;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-size: .85em;
+  font-family: inherit;
+  font-weight: 700;
+  height: 3em;
+  letter-spacing: .1em;
+  line-height: 3em;
+  padding: 0 3em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 20px;
+  background-color: #1c49e4;
+}
+
+.example button:hover {
+  background-color: #2350ea;
+}
+
+.example button.outline {
+  background-color: transparent;
+  color: #1c49e4;
+}
+
+/* labels */
+
+.example label {
+  display: inline-block;
+  margin-left: 5px;
+}
+
+/* inputs */
+
+.example input:not([type='checkbox']), .example select, .example textarea, .example fieldset {
+  margin-bottom: 1.5em;
+  border: 0.1em solid #d1d1d1;
+  border-radius: .4em;
+  height: 3.8em;
+  width: 12em;
+  padding: 0 .5em;
+}
+
+.example input:focus,
+.example select:focus {
+  outline: none;
+  border-color: #1c49e4;
+}
+
+/* message */
+
+.example .message-box {
+  border: 1px solid #1c49e433;
+  background-color: #1c49e405;
+  border-radius: 0.2em;
+  padding: 10px;
+}
+
+.example .message-box span {
+  animation-name: cell-appear;
+  animation-duration: 0.2s;
+  margin: 0;
+}
+
+/* table */
+
+.example table {
+  table-layout: fixed;
+  border-spacing: 0;
+  overflow-x: auto;
+  text-align: left;
+  width: 100%;
+  counter-reset: row-counter col-counter;
+}
+
+.example table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+.example table tr td,
+.example table tr th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 0.1em solid #e1e1e1;
+  padding: 0 1em;
+  height: 3.5em;
+}
+
+/* table: header row */
+
+.example table thead tr th span::before {
+  display: inline-block;
+  width: 20px;
+}
+
+.example table.spreadsheet thead tr th span::before {
+  content: counter(col-counter, upper-alpha);
+}
+
+.example table.spreadsheet thead tr th {
+  counter-increment: col-counter;
+}
+
+/* table: first column */
+
+.example table tbody tr td:first-child {
+  text-align: center;
+  padding: 0;
+}
+
+.example table thead tr th:first-child {
+  padding-left: 40px;
+}
+
+.example table tbody tr td:first-child span {
+  width: 100%;
+  display: inline-block;
+  text-align: left;
+  padding-left: 15px;
+  margin-left: 0;
+}
+
+.example table tbody tr td:first-child span::before {
+  content: counter(row-counter);
+  display: inline-block;
+  width: 20px;
+  position: relative;
+  left: -10px;
+}
+
+.example table tbody tr {
+  counter-increment: row-counter;
+}
+
+/* table: summary row */
+
+.example table tbody tr.summary {
+  font-weight: 600;
+}
+
+/* updated-cell animation */
+
+.example table tr td.updated-cell span {
+  animation-name: cell-appear;
+  animation-duration: 0.6s;
+}
+
+@keyframes cell-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+</textarea> <textarea class="hidden" name="project[files][index.ts]" readOnly="">import './styles.css'
+import HyperFormula from 'hyperformula';
+import moment from 'moment';
+
+console.log(
+  `%c Using HyperFormula ${HyperFormula.version}`,
+  'color: blue; font-weight: bold'
+);
+
+/**
+ * Function defining the way HF should handle the provided date string.
+ *
+ * @param {string} dateString The date string.
+ * @param {string} dateFormat The date format.
+ * @returns {{month: *, year: *, day: *}} Object with date-related information.
+ */
+const customParseDate = (dateString, dateFormat) =&gt; {
+  const momentDate = moment(dateString, dateFormat, true);
+
+  if (momentDate.isValid()) {
+    return {
+      year: momentDate.year(),
+      month: momentDate.month() + 1,
+      day: momentDate.date(),
+    };
+  }
+};
+
+/**
+ * Date formatting function.
+ *
+ * @param {{month: *, year: *, day: *}} dateObject Object with date-related information.
+ * @returns {string} Formatted date string.
+ */
+const getFormattedDate = (dateObject) =&gt; {
+  dateObject.month -= 1;
+
+  return moment(dateObject).format('MMM D YY');
+};
+
+/**
+ * Initial table data.
+ */
+const tableData = [['Jan 31 00', 'Jun 2 01', '=B1-A1']];
+
+// Create an empty HyperFormula instance.
+const hf = HyperFormula.buildEmpty({
+  parseDateTime: customParseDate,
+  dateFormats: ['MMM D YY'],
+  licenseKey: 'gpl-v3',
+});
+
+// Add a new sheet and get its id.
+const sheetName = hf.addSheet('main');
+const sheetId = hf.getSheetId(sheetName);
+
+// Fill the HyperFormula sheet with data.
+hf.setCellContents(
+  {
+    row: 0,
+    col: 0,
+    sheet: sheetId,
+  },
+  tableData
+);
+
+/**
+ * Fill the HTML table with data.
+ *
+ * @param {boolean} calculated `true` if it should render calculated values, `false` otherwise.
+ */
+function renderTable(calculated = false) {
+  const tbodyDOM = document.querySelector('.example tbody');
+  const updatedCellClass = ANIMATION_ENABLED ? 'updated-cell' : '';
+  const { height, width } = hf.getSheetDimensions(sheetId);
+  let newTbodyHTML = '';
+
+  for (let row = 0; row &lt; height; row++) {
+    for (let col = 0; col &lt; width; col++) {
+      const cellAddress = { sheet: sheetId, col, row };
+      const cellHasFormula = hf.doesCellHaveFormula(cellAddress);
+      const showFormula = calculated || !cellHasFormula;
+      const cellValue = displayValue(cellAddress, showFormula);
+
+      newTbodyHTML += `&lt;td class=&quot;${
+        cellHasFormula ? updatedCellClass : ''
+      }&quot;&gt;&lt;span&gt;
+      ${cellValue}
+      &lt;/span&gt;&lt;/td&gt;`;
+    }
+  }
+
+  tbodyDOM.innerHTML = newTbodyHTML;
+}
+
+/**
+ * Force the table to display either the formula, the value or a raw source data value.
+ *
+ * @param {SimpleCellAddress} cellAddress Cell address.
+ * @param {boolean} showFormula `true` if the formula should be visible.
+ */
+function displayValue(cellAddress, showFormula) {
+  // Declare which columns should display the raw source data, instead of the data from HyperFormula.
+  const sourceColumns = [0, 1];
+  let cellValue = '';
+
+  if (sourceColumns.includes(cellAddress.col)) {
+    cellValue = getFormattedDate(hf.numberToDate(hf.getCellValue(cellAddress)));
+  } else {
+    if (!hf.isCellEmpty(cellAddress) &amp;&amp; showFormula) {
+      cellValue = hf.getCellValue(cellAddress);
+    } else {
+      cellValue = hf.getCellFormula(cellAddress);
+    }
+  }
+
+  return cellValue;
+}
+
+/**
+ * Replace formulas with their results.
+ */
+function runCalculations() {
+  renderTable(true);
+}
+
+/**
+ * Replace the values in the table with initial data.
+ */
+function resetTable() {
+  renderTable();
+}
+
+/**
+ * Bind the events to the buttons.
+ */
+function bindEvents() {
+  const runButton = document.querySelector('.example #run');
+  const resetButton = document.querySelector('.example #reset');
+
+  runButton.addEventListener('click', () =&gt; {
+    runCalculations();
+  });
+
+  resetButton.addEventListener('click', () =&gt; {
+    resetTable();
+  });
+}
+
+const ANIMATION_ENABLED = true;
+
+// Bind the button events.
+bindEvents();
+
+// Render the table.
+renderTable();
+</textarea> <input type="hidden" name="project[title]" value="hyperformula-demo"> <input type="hidden" name="project[dependencies]" value="{&quot;hyperformula&quot;:&quot;latest&quot;, &quot;moment&quot;: &quot;latest&quot;}"> <input type="hidden" name="project[template]" value="typescript"> <div class="js-stackblitz-link"><button type="submit"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="10.43" height="15" preserveAspectRatio="xMidYMid" viewBox="0 0 256 368" class="icon outbound"><path fill="currentColor" d="M109.586 217.013H0L200.34 0l-53.926 150.233H256L55.645 367.246l53.927-150.233z"></path></svg>
+        Open in Stackblitz
+      </button></div></form></div> <div></div><div></div></div> <footer class="page-edit"><div class="edit-link"><a href="https://github.com/handsontable/hyperformula/edit/master/docs/guide/date-and-time-handling.md" target="_blank" rel="noopener noreferrer">Help us improve this page</a> <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></div> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
       ←
       <a href="/guide/localizing-functions.html" class="prev">
         Localizing functions
@@ -109,6 +678,6 @@ your custom format:</p> <div class="language-javascript extra-class"><pre class=
       </a>
       →
     </span></p></div> </main></div><div class="global-ui"></div></div>
-<script src="/assets/js/app.8bf3d018.js" defer></script><script src="/assets/js/2.3597a886.js" defer></script><script src="/assets/js/1.bee78e53.js" defer></script><script src="/assets/js/52.92dd526a.js" defer></script>
+<script src="/assets/js/app.069dfc70.js" defer></script><script src="/assets/js/2.351f39b2.js" defer></script><script src="/assets/js/1.5b588322.js" defer></script><script src="/assets/js/53.49e389dd.js" defer></script><script src="/assets/js/25.628ab8b7.js" defer></script>
 </body>
 </html>
