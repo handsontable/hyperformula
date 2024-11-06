@@ -310,6 +310,7 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   private static warnDeprecatedOptions(options: Partial<ConfigParams>) {
+    // an example of deprecation warning
     // Config.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
   }
 
