@@ -266,7 +266,6 @@ export interface ConfigParams {
    * (for example, with `precisionRounding` set to `4`, 100005 becomes 100010).
    *
    * Setting precisionRounding too high will expose the floating-point calculation errors. For example, with `precisionRounding` set to `15`, `0.1 + 0.2` results in `0.3000000000000001`.
-   * We don't recommend setting `precisionRounding` to a value higher than `11`.
    * @default 10
    * @category Number
    */
