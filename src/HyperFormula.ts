@@ -53,7 +53,7 @@ import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './Named
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   Ast,
-  AstNodeType, NamedExpressionDependency,
+  NamedExpressionDependency,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,

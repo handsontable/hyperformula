@@ -1052,6 +1052,66 @@ describe('#simpleCellRangeToString', () => {
       engine.simpleCellRangeToString({} as SimpleCellRange, 0)
     }).toThrow(new ExpectedValueOfTypeError('SimpleCellRange', 'cellRange'))
   })
+
+  it('should work without second argument', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellRange = { start: { sheet: 0, row: 0, col: 0 }, end: { sheet: 0, row: 1, col: 1 }}
+    const stringRange = hf.simpleCellRangeToString(cellRange)
+
+    expect(stringRange).toEqual('A1:B2')
+  })
+
+  it('should work with second argument `undefined`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellRange = { start: { sheet: 0, row: 0, col: 0 }, end: { sheet: 0, row: 1, col: 1 }}
+    const stringRange = hf.simpleCellRangeToString(cellRange, undefined)
+
+    expect(stringRange).toEqual('A1:B2')
+  })
+
+  it('should work with second argument `{}`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellRange = { start: { sheet: 0, row: 0, col: 0 }, end: { sheet: 0, row: 1, col: 1 }}
+    const stringRange = hf.simpleCellRangeToString(cellRange, {})
+
+    expect(stringRange).toEqual('A1:B2')
+  })
+
+  it('should work with second argument `{ includeSheetName: false }`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellRange = { start: { sheet: 0, row: 0, col: 0 }, end: { sheet: 0, row: 1, col: 1 }}
+    const stringRange = hf.simpleCellRangeToString(cellRange, { includeSheetName: false })
+
+    expect(stringRange).toEqual('A1:B2')
+  })
+
+  it('should work with second argument `{ includeSheetName: true }`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellRange = { start: { sheet: 0, row: 0, col: 0 }, end: { sheet: 0, row: 1, col: 1 }}
+    const stringRange = hf.simpleCellRangeToString(cellRange, { includeSheetName: true })
+
+    expect(stringRange).toEqual('Sheet0!A1:B2')
+  })
 })
 
 describe('#simpleCellAddressToString', () => {
@@ -1060,6 +1120,66 @@ describe('#simpleCellAddressToString', () => {
     expect(() => {
       engine.simpleCellAddressToString({} as SimpleCellAddress, 0)
     }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress'))
+  })
+
+  it('should work without second argument', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellAddress = { sheet: 0, row: 0, col: 0 }
+    const stringAddress = hf.simpleCellAddressToString(cellAddress)
+
+    expect(stringAddress).toEqual('A1')
+  })
+
+  it('should work with second argument `undefined`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellAddress = { sheet: 0, row: 0, col: 0 }
+    const stringAddress = hf.simpleCellAddressToString(cellAddress, undefined)
+
+    expect(stringAddress).toEqual('A1')
+  })
+
+  it('should work with second argument `{}`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellAddress = { sheet: 0, row: 0, col: 0 }
+    const stringAddress = hf.simpleCellAddressToString(cellAddress, {})
+
+    expect(stringAddress).toEqual('A1')
+  })
+
+  it('should work with second argument `{ includeSheetName: false }`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellAddress = { sheet: 0, row: 0, col: 0 }
+    const stringAddress = hf.simpleCellAddressToString(cellAddress, { includeSheetName: false })
+
+    expect(stringAddress).toEqual('A1')
+  })
+
+  it('should work with second argument `{ includeSheetName: true }`', () => {
+    const hf = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    const cellAddress = { sheet: 0, row: 0, col: 0 }
+    const stringAddress = hf.simpleCellAddressToString(cellAddress, { includeSheetName: true })
+
+    expect(stringAddress).toEqual('Sheet0!A1')
   })
 })
 
