@@ -62,13 +62,7 @@ module: {
 ### Additional steps for projects using Parcel
 
 1. Make sure you use Parcel 2.9 or newer. Older versions of Parcel do not support `exports` property.
-2. Install the `@babel/core` package:
-
-```
-npm install --save-dev @babel/core
-```
-
-3. In your `package.json`, add the [following configuration](https://parceljs.org/blog/v2-9-0/#new-resolver):
+2. In your `package.json`, add the [following configuration](https://parceljs.org/blog/v2-9-0/#new-resolver):
 
 ```
 "@parcel/resolver-default": {
@@ -76,7 +70,7 @@ npm install --save-dev @babel/core
 }
 ```
 
-If you don't want to upgrade Parcel or install `@babel/core`, you can keep using the legacy import paths for language files. E.g.:
+If you don't want to upgrade Parcel, you can keep using the legacy import paths for language files, but they will be removed in one of the upcoming releases. E.g.:
 
 ```javascript
 import { frFR } from "hyperformula/es/i18n/languages";
