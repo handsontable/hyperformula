@@ -100,6 +100,12 @@ describe('simpleCellAddressToString', () => {
     expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1', 42), 42)).toBeUndefined()
     expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1', 42), 1)).toBeUndefined()
   })
+
+  it('should work without second argument', () => {})
+  it('should work with second argument `undefined`', () => {})
+  it('should work with second argument `{}`', () => {})
+  it('should work with second argument `{ includeSheetName: true }`', () => {})
+  it('should work with second argument `{ includeSheetName: false }`', () => {})
 })
 
 describe('simpleCellRangeToString', () => {
