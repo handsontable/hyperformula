@@ -31,7 +31,9 @@ module.exports = {
     },
     // Environment for transpiling files to be compatible with ES Modules.
     es: {
-      plugins: [],
+      plugins: [
+        ['./.config/babel/add-import-extension.js', { extension: 'mjs' }],
+      ],
     },
   },
 };
