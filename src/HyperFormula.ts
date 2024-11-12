@@ -2791,7 +2791,7 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Computes the simple (absolute) address of a cell address, based on its string representation.
    * - If a sheet name is present in the string representation but is not present in the engine, returns `undefined`.
-   * - If no sheet name is present in the string representation, returns `contextSheetId` as sheet number.
+   * - If no sheet name is present in the string representation, uses `contextSheetId` as a sheet id in the returned address.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
    * @param {number} contextSheetId - sheet id used to construct the simple address in case of missing sheet name in `cellAddress` argument
@@ -2852,7 +2852,7 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns string representation of an absolute address in A1 notation or `undefined` if the sheet id is not present in the engine.
+   * Computes string representation of an absolute address in A1 notation. If `cellAddress.sheet` is not present in the engine, returns `undefined`.
    *
    * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
    * @param {object | number } optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
@@ -2896,7 +2896,12 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns string representation of an absolute range in A1 notation or `undefined` if the sheet index is not present in the engine.
+   * Computes string representation of an absolute range in A1 notation.
+   * Returns `undefined` if:
+   * - `cellRange` is not a valid range,
+   * - `cellRange.start.sheet` and `cellRange.start.end` are different,
+   * - `cellRange.start.sheet` is not present in the engine,
+   * - `cellRange.start.end` is not present in the engine.
    *
    * Note: This method is useful only for cell ranges; does not work with column ranges and row ranges.
    *
