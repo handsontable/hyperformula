@@ -7,9 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking change**: Removed the `binarySearchThreshold` configuration option. [#1439](https://github.com/handsontable/hyperformula/issues/1439)
+
 ### Fixed
 
-- Fix ES module build to make importing language files possible in Node environment. [#1344](https://github.com/handsontable/hyperformula/issues/1344)
+- **Breaking change**: Fix ES module build to make importing language files possible in Node environment. [#1344](https://github.com/handsontable/hyperformula/issues/1344)
 
 ## [2.7.1] - 2024-07-18
 

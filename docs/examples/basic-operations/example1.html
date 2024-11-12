@@ -1,0 +1,57 @@
+<div class="example">
+  <div id="toolbar" class="container">
+    <div>
+      <div>
+        <select id="sheet-select">
+          <option value="" disabled selected>SheetName</option>
+        </select>
+        <select id="action-select">
+          <option value="" disabled selected>Select action</option>
+          <option value="add-sheet">Add sheet</option>
+          <option value="remove-sheet">Remove sheet</option>
+          <option value="add-rows">Add row(s)</option>
+          <option value="add-columns">Add column(s)</option>
+          <option value="remove-rows">Remove row(s)</option>
+          <option value="remove-columns">Remove column(s)</option>
+          <option value="get-value">Get value</option>
+          <option value="set-value">Set value</option>
+        </select><br />
+      </div>
+    </div>
+
+    <div id="inputs">
+      <div>
+        <input id="input-1" class="inline" />
+        <input id="input-2" class="inline middle" />
+        <button class="button run inline">
+          Run
+        </button>
+        <div class="message-box">
+          <p id="error-message" class="color: red;"></p>
+          <p id="disclaimer" class="opacity: 0.6;"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="preview">
+    <table class="spreadsheet">
+      <colgroup>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+        <col style="width:20%"/>
+      </colgroup>
+      <thead>
+        <tr>
+          <th><span></span></th>
+          <th><span></span></th>
+          <th><span></span></th>
+          <th><span></span></th>
+          <th><span></span></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>

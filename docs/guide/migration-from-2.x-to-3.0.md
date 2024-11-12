@@ -79,3 +79,7 @@ import { frFR } from "hyperformula/es/i18n/languages";
 ### Other projects
 
 We tested the changes with the most popular bundlers and frameworks. If you use a different configuration, and you encounter any issues, please contact us via GitHub. We will try to make it work for you, although for older versions of bundlers and frameworks, it might be impossible.
+
+## Removal of the `binarySearchThreshold` configuration option (deprecated since version 1.1.0)
+
+The `binarySearchThreshold` has no effect since version 1.1.0. If your codebase still uses this option, please remove it.

@@ -195,7 +195,14 @@ if (!isColumnOrderOk) {
 
 The demo below shows how to sort rows in ascending and descending order, based on the results (calculated values) of the cells in the second column.
 
-<iframe
-  :src="`https://stackblitz.com/github/handsontable/hyperformula-demos/tree/2.7.x/sorting?embed=1&file=src/hyperformulaConfig.js&hideNavigation=1&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:590px; border:0; border-radius: 4px; overflow:hidden;">
-</iframe>
+::: example #example1 --html 1 --css 2 --js 3 --ts 4
+
+@[code](@/docs/examples/sorting-data/example1.html)
+
+@[code](@/docs/examples/sorting-data/example1.css)
+
+@[code](@/docs/examples/sorting-data/example1.js)
+
+@[code](@/docs/examples/sorting-data/example1.ts)
+
+:::
