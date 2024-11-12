@@ -2794,7 +2794,7 @@ export class HyperFormula implements TypedEmitter {
    * - If no sheet name is present in the string representation, returns `contextSheetId` as sheet number.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
-   * @param {number} contextSheetId - context used in case of missing sheet in the first argument
+   * @param {number} contextSheetId - sheet id used to construct the simple address in case of missing sheet name in `cellAddress` argument
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
@@ -2829,7 +2829,7 @@ export class HyperFormula implements TypedEmitter {
    * If sheet name is present in string representation but not present in the engine, returns `undefined`.
    *
    * @param {string} cellRange - string representation of cell range in A1 notation
-   * @param {number} contextSheetId - context used in case of missing sheet in the first argument
+   * @param {number} contextSheetId - sheet id used to construct the simple address in case of missing sheet name in `cellRange` argument
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -2874,10 +2874,10 @@ export class HyperFormula implements TypedEmitter {
    * // should return 'Sheet0!B2'
    * const A1Notation = hfInstance.simpleCellAddressToString(addr, { includeSheetName: true });
    *
-   * // should return 'B2'
+   * // should return 'B2' as context sheet id is the same as addr.sheet
    * const A1Notation = hfInstance.simpleCellAddressToString(addr, 0);
    *
-   * // should return 'Sheet0!B2'
+   * // should return 'Sheet0!B2' as context sheet id is different from addr.sheet
    * const A1Notation = hfInstance.simpleCellAddressToString(addr, 42);
    * ```
    *
@@ -2920,10 +2920,10 @@ export class HyperFormula implements TypedEmitter {
    * // should return 'Sheet0!B2:C2'
    * const A1Notation = hfInstance.simpleCellRangeToString(range, { includeSheetName: true });
    *
-   * // should return 'B2:C2'
+   * // should return 'B2:C2' as context sheet id is the same as range.start.sheet and range.end.sheet
    * const A1Notation = hfInstance.simpleCellRangeToString(range, 0);
    *
-   * // should return 'Sheet0!B2:C2'
+   * // should return 'Sheet0!B2:C2' as context sheet id is different from range.start.sheet and range.end.sheet
    * const A1Notation = hfInstance.simpleCellRangeToString(range, 42);
    * ```
    *

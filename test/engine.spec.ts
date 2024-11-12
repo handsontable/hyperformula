@@ -1218,4 +1218,35 @@ describe('#simpleCellRangeFromString', () => {
     const engine = HyperFormula.buildEmpty()
     expect(engine.simpleCellRangeFromString('A1:C1', 0)).toEqual(simpleCellRange(adr('A1'), adr('C1')))
   })
+
+  it('should set sheetId to contestSheetId if there is no sheet name in the first argument', () => {
+    const engine = HyperFormula.buildEmpty()
+
+    expect(engine.simpleCellRangeFromString('A1:C1', 42)).toEqual(simpleCellRange(adr('A1', 42), adr('C1', 42)))
+  })
+
+  it('should set sheetId correctly if the sheet name is provided for the start of the range', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet0: []
+    })
+
+    expect(engine.simpleCellRangeFromString('Sheet0!A1:C1', 42)).toEqual(simpleCellRange(adr('A1', 0), adr('C1', 0)))
+  })
+
+  it('should set sheetId correctly if the same sheet name is provided for both ends of the range', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet0: []
+    })
+
+    expect(engine.simpleCellRangeFromString('Sheet0!A1:Sheet0!C1', 42)).toEqual(simpleCellRange(adr('A1', 0), adr('C1', 0)))
+  })
+
+  it('should return undefined if different sheet names are provided for the start and the end of the range', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet0: [],
+      Sheet1: []
+    })
+
+    expect(engine.simpleCellRangeFromString('Sheet0!A1:Sheet1!C1', 42)).toEqual(undefined)
+  })
 })

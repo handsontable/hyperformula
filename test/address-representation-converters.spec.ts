@@ -8,7 +8,6 @@ import {
   simpleCellRangeToString
 } from '../src/parser'
 import {adr} from './testUtils'
-import {HyperFormula} from '../src'
 
 describe('simpleCellAddressFromString', () => {
   const sheetMappingFunction = (name: string): Maybe<number> => {
