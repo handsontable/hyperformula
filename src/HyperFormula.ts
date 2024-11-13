@@ -2855,7 +2855,7 @@ export class HyperFormula implements TypedEmitter {
    * Computes string representation of an absolute address in A1 notation. If `cellAddress.sheet` is not present in the engine, returns `undefined`.
    *
    * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
-   * @param {object | number } optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
+   * @param {object | number} optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
    *
    * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
    *
