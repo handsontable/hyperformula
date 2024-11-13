@@ -2906,7 +2906,7 @@ export class HyperFormula implements TypedEmitter {
    * Note: This method is useful only for cell ranges; does not work with column ranges and row ranges.
    *
    * @param {SimpleCellRange} cellRange - object representation of an absolute range
-   * @param {object | number } optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
+   * @param {object | number} optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
    *
    * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
    *
