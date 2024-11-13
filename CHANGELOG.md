@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - **Breaking change**: Change ES module build to use `mjs` files and `exports` property in `package.json` to make importing language files possible in Node environment. [#1344](https://github.com/handsontable/hyperformula/issues/1344)
 - **Breaking change**: Removed the `binarySearchThreshold` configuration option. [#1439](https://github.com/handsontable/hyperformula/issues/1439)
+- Make methods `simpleCellAddressToString` and `simpleCellRangeToString` more logical and easier to use. [#1151](https://github.com/handsontable/hyperformula/issues/1151)
 
 ## [2.7.1] - 2024-07-18
 
