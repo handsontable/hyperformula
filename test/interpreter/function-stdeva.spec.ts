@@ -17,7 +17,7 @@ describe('Function STDEVA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEVA(2, 3)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.707106781186548)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.707106781186548, 11)
   })
 
   it('should coerce explicit argument to numbers', () => {

@@ -55,7 +55,7 @@ export class Config implements ConfigParams, ParserConfig {
     nullDate: {year: 1899, month: 12, day: 30},
     parseDateTime: defaultParseToDateTime,
     precisionEpsilon: 1e-13,
-    precisionRounding: 14,
+    precisionRounding: 10,
     smartRounding: true,
     stringifyDateTime: defaultStringifyDateTime,
     stringifyDuration: defaultStringifyDuration,

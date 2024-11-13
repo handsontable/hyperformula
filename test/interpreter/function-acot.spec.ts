@@ -31,7 +31,7 @@ describe('Function ACOT', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(-0.785398163397448)
-    expect(engine.getCellValue(adr('B2'))).toEqual(1.5707963267949)
+    expect(engine.getCellValue(adr('B2'))).toBeCloseTo(1.5707963267949, 10)
   })
 
   it('errors propagation', () => {

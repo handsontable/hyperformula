@@ -6,7 +6,7 @@ describe('Function CSCH', () => {
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['=CSCH(1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(0.850918128239322)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.850918128239322, 11)
   })
 
   it('when value not numeric', () => {

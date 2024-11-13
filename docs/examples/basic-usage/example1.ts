@@ -11,7 +11,7 @@ const tableData = [['10', '20', '=SUM(A1,B1)']];
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
-  precisionRounding: 10,
+  precisionRounding: 9,
   licenseKey: 'gpl-v3',
 });
 

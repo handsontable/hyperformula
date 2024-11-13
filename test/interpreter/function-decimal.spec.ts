@@ -52,7 +52,7 @@ describe('Function DECIMAL', () => {
       [`=DECIMAL(\"${tooLongNumber}\", 2)`],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(5.78960446186581e+76)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(5.78960446186581e+76, -66)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
   })
 

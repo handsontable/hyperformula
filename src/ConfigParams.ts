@@ -265,8 +265,8 @@ export interface ConfigParams {
    * Setting `precisionRounding` too low can cause large numbers' imprecision
    * (for example, with `precisionRounding` set to `4`, 100005 becomes 100010).
    *
-   * We recommend setting `precisionRounding` to a value between `10` and `14`.
-   * @default 14
+   * Setting precisionRounding too high will expose the floating-point calculation errors. For example, with `precisionRounding` set to `15`, `0.1 + 0.2` results in `0.3000000000000001`.
+   * @default 10
    * @category Number
    */
   precisionRounding: number,

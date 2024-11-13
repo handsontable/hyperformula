@@ -47,7 +47,7 @@ describe('function HEX2DEC', () => {
     expect(engine.getCellValue(adr('A6'))).toEqual(11574629)
     expect(engine.getCellValue(adr('A7'))).toEqual(253233380)
     expect(engine.getCellValue(adr('A8'))).toEqual(185061383)
-    expect(engine.getCellValue(adr('A9'))).toEqual(549755813887)
+    expect(engine.getCellValue(adr('A9'))).toBeCloseTo(549755813887, -1)
     expect(engine.getCellValue(adr('A10'))).toEqual(-54444247247)
     expect(engine.getCellValue(adr('A11'))).toEqual(-1)
   })
@@ -84,6 +84,6 @@ describe('function HEX2DEC', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotHex))
-    expect(engine.getCellValue(adr('A2'))).toEqual(513113223378)
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(513113223378, -1)
   })
 })
