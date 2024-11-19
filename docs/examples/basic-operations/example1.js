@@ -3,7 +3,7 @@ import HyperFormula from 'hyperformula';
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
-  'color: blue; font-weight: bold'
+  'color: blue; font-weight: bold',
 );
 
 /* end:skip-in-compilation */
@@ -188,9 +188,7 @@ function renderTable() {
         cellValue = hf.getCellFormula(cellAddress);
       }
 
-      newTbodyHTML += `<td class="${
-        cellHasFormula ? updatedCellClass : ''
-      }"><span>
+      newTbodyHTML += `<td class="${cellHasFormula ? updatedCellClass : ''}"><span>
       ${cellValue}
       </span></td>`;
     }
@@ -213,9 +211,7 @@ function updateSheetDropdown() {
   sheetNames.forEach((sheetName) => {
     const isCurrent = sheetName === state.currentSheet;
 
-    dropdownContent += `<option value="${sheetName}" ${
-      isCurrent ? 'selected' : ''
-    }>${sheetName}</option>`;
+    dropdownContent += `<option value="${sheetName}" ${isCurrent ? 'selected' : ''}>${sheetName}</option>`;
   });
   sheetDropdownDOM.innerHTML = dropdownContent;
 }
@@ -332,7 +328,7 @@ function doAction(action) {
       handleError(() => {
         hf.setSheetContent(
           hf.getSheetId(state.currentSheet),
-          getSampleData(5, 5)
+          getSampleData(5, 5),
         );
       });
       updateSheetDropdown();
@@ -398,7 +394,7 @@ function doAction(action) {
       cellAddress = handleError(() => {
         return hf.simpleCellAddressFromString(
           inputValues[0],
-          hf.getSheetId(state.currentSheet)
+          hf.getSheetId(state.currentSheet),
         );
       }, 'Invalid cell address format.');
 
@@ -413,7 +409,7 @@ function doAction(action) {
       cellAddress = handleError(() => {
         return hf.simpleCellAddressFromString(
           inputValues[0],
-          hf.getSheetId(state.currentSheet)
+          hf.getSheetId(state.currentSheet),
         );
       }, 'Invalid cell address format.');
 

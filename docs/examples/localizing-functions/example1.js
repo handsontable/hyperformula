@@ -3,7 +3,7 @@ import HyperFormula from 'hyperformula';
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
-  'color: blue; font-weight: bold'
+  'color: blue; font-weight: bold',
 );
 
 /* end:skip-in-compilation */
@@ -47,7 +47,7 @@ hf.setCellContents(
     col: 0,
     sheet: sheetId,
   },
-  tableData
+  tableData,
 );
 // Add named expressions for the "TOTAL" row.
 hf.addNamedExpression('Year_1', '=SOMME(main!$B$1:main!$B$5)');
@@ -83,9 +83,7 @@ function renderTable(calculated = false) {
         cellValue = hf.getCellFormula(cellAddress);
       }
 
-      newTbodyHTML += `<td class="${
-        cellHasFormula ? updatedCellClass : ''
-      }"><span>
+      newTbodyHTML += `<td class="${cellHasFormula ? updatedCellClass : ''}"><span>
       ${cellValue}
       </span></td>`;
     }
@@ -96,14 +94,10 @@ function renderTable(calculated = false) {
   totalRowsHTML = `<tr class="summary">
 <td>TOTAL</td>
 <td class="${updatedCellClass}">
-  <span>${
-    calculated ? hf.calculateFormula(totals[0], sheetId).toFixed(2) : totals[0]
-  }</span>
+  <span>${calculated ? hf.calculateFormula(totals[0], sheetId).toFixed(2) : totals[0]}</span>
 </td>
 <td class="${updatedCellClass}">
-  <span>${
-    calculated ? hf.calculateFormula(totals[1], sheetId).toFixed(2) : totals[1]
-  }</span>
+  <span>${calculated ? hf.calculateFormula(totals[1], sheetId).toFixed(2) : totals[1]}</span>
 </td>
 <td colspan="2"></td>
 </tr>`;

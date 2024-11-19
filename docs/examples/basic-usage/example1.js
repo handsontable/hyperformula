@@ -3,7 +3,7 @@ import HyperFormula from 'hyperformula';
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
-  'color: blue; font-weight: bold'
+  'color: blue; font-weight: bold',
 );
 
 /* end:skip-in-compilation */
@@ -25,7 +25,7 @@ hf.setCellContents(
     col: 0,
     sheet: sheetId,
   },
-  tableData
+  tableData,
 );
 
 /**
