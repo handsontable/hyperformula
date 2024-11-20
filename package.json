@@ -138,7 +138,7 @@
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",
     "full-icu": "^1.5.0",
-    "jasmine": "^4.0.0",
+    "jasmine": "^5.4.0",
     "jest": "^26.0.0",
     "jsdom": "^16.2.2",
     "karma": "^6.4.2",
