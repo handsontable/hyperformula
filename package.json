@@ -84,7 +84,6 @@
     "test:browser": "cross-env-shell BABEL_ENV=dist env-cmd -f ht.config.js karma start",
     "test:browser.debug": "cross-env-shell BABEL_ENV=dist NODE_ENV=debug env-cmd -f ht.config.js karma start",
     "test:performance": "npm run benchmark:basic && npm run benchmark:cruds",
-    "typedoc:build": "cross-env NODE_OPTIONS=--openssl-legacy-provider typedoc --options .typedoc.ts",
     "typedoc:build-api": "cross-env NODE_OPTIONS=--openssl-legacy-provider typedoc --options .typedoc.md.ts",
     "benchmark:basic": "npm run tsnode test/performance/run-basic-benchmark.ts",
     "benchmark:cruds": "npm run tsnode test/performance/run-cruds-benchmark.ts",
@@ -94,8 +93,6 @@
     "lint:fix": "eslint . --ext .js,.ts --fix",
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
     "compile": "tsc",
-    "compile:tests": "tsc --project tsconfig.test.json",
-    "jasmine:start": "cross-env NODE_ICU_DATA=node_modules/full-icu jasmine --config=jasmine.json",
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@2.7.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
     "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}"
   },
