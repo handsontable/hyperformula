@@ -1,6 +1,6 @@
 # Compatibility with Microsoft Excel
 
-Achieve nearly full compatibility wih Microsoft Excel, using the right HyperFormula configuration.
+Achieve nearly full compatibility with Microsoft Excel, using the right HyperFormula configuration.
 
 **Contents:**
 [[toc]]
