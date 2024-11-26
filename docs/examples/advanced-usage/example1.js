@@ -3,7 +3,7 @@ import HyperFormula from 'hyperformula';
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
-  'color: blue; font-weight: bold'
+  'color: blue; font-weight: bold',
 );
 
 /* end:skip-in-compilation */
@@ -67,7 +67,7 @@ hf.setSheetContent(hf.getSheetId(sheetInfo.formulas.sheetName), formulasData);
 function renderTable(sheetName) {
   const sheetId = hf.getSheetId(sheetName);
   const tbodyDOM = document.querySelector(
-    `.example #${sheetName}-container tbody`
+    `.example #${sheetName}-container tbody`,
   );
 
   const { height, width } = hf.getSheetDimensions(sheetId);
@@ -101,7 +101,7 @@ function renderResult() {
   const resultOutputDOM = document.querySelector('.example #output');
   const cellAddress = hf.simpleCellAddressFromString(
     `${sheetInfo.formulas.sheetName}!A1`,
-    hf.getSheetId(sheetInfo.formulas.sheetName)
+    hf.getSheetId(sheetInfo.formulas.sheetName),
   );
 
   resultOutputDOM.innerHTML = `<span>

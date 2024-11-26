@@ -393,16 +393,6 @@ describe('Config', () => {
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
     })
   })
-
-  describe('deprecated option warning messages', () => {
-    beforeEach(() => {
-      spyOn(console, 'warn')
-    })
-
-    afterEach(() => {
-      resetSpy(console.warn)
-    })
-  })
 })
 
 describe('getConfig', () => {

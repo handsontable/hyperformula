@@ -5,10 +5,9 @@
 const tar = require('tar')
 const util = require('util')
 const fs = require('fs')
-const rimraf = require('rimraf')
+const { rimraf } = require('rimraf')
 
 const stat = util.promisify(fs.stat);
-const rimrafPromisified = util.promisify(rimraf);
 
 /**
  * Default directory name where the package is unziped.
@@ -90,5 +89,5 @@ async function checkDirectoryTreeStructure() {
 }
 
 async function removePackage(files) {
-  return rimrafPromisified(files)
+  return rimraf(files)
 }
