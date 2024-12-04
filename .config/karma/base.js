@@ -58,6 +58,9 @@ module.exports.create = function(config) {
     // how many browser should be started simultaneous
     concurrency: Infinity,
 
+    // Extending timeout fixes https://github.com/handsontable/hyperformula/issues/1430
+    browserDisconnectTimeout : 60000,
+
     // Webpack's configuration for Karma
     webpack: (function() {
       // Take the second config from an array - full HF build.
