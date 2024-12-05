@@ -232,6 +232,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'UKENR',
     WORKDAY: 'ARBEIDSDAG',
     'WORKDAY.INTL': 'ARBEIDSDAG.INTL',
+    XLOOKUP: 'XOPPSLAG',
     XNPV: 'XNNV',
     XOR: 'EKSKLUSIVELLER',
     YEAR: 'ÅR',
