@@ -15,9 +15,6 @@ import { InterpreterState } from '../InterpreterState'
 import { InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
 import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
-import { ArraySize } from '../../ArraySize'
-
-
 
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
@@ -41,7 +38,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'XLOOKUP': {
       method: 'xlookup',
-      arraySizeMethod: 'xlookupArraySize',
       vectorizationForbidden: true,
       parameters: [
         // lookup_value
@@ -130,49 +126,37 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (lookupRange === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
+
       if (returnRange === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
+      
       if (ifNotFound !== ErrorType.NA && typeof ifNotFound !== 'string') {
         return new CellError(ErrorType.VALUE, ErrorMessage.NoConditionMet)
       }
+      
       if (![0, -1, 1, 2].includes(matchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NoConditionMet)
       }
+      
       if (![1, -1, 1, 2].includes(searchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.NoConditionMet)
       }
 
-      // TODO - Implement all options - until then, return NotSupported
       if (matchMode !== 0) {
+        // not supported yet
+        // TODO: Implement match mode
         return new CellError(ErrorType.NAME, ErrorMessage.FunctionName('XLOOKUP'))
       }
+
       if (searchMode !== 1) {
+        // not supported yet
+        // TODO: Implement search mode
         return new CellError(ErrorType.NAME, ErrorMessage.FunctionName('XLOOKUP'))
       }
 
       return this.doXlookup(zeroIfEmpty(key), lookupRangeValue, returnRangeValue, ifNotFound, matchMode, searchMode)
     })
-  }
-
-  public xlookupArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
-    const lookupRangeValue = ast?.args?.[1] as CellRange
-    const returnRangeValue = ast?.args?.[2] as CellRange
-    const searchWidth = lookupRangeValue.end.col - lookupRangeValue.start.col + 1 
-
-    if (returnRangeValue?.start == null || returnRangeValue?.end == null) {
-      return ArraySize.scalar()
-    }
-
-    if (searchWidth === 1) {
-      // column search
-      const outputWidth = returnRangeValue.end.col - returnRangeValue.start.col + 1 
-      return new ArraySize(outputWidth, 1)
-    } else {
-      // row search
-      const outputHeight = returnRangeValue.end.row - returnRangeValue.start.row + 1 
-      return new ArraySize(1, outputHeight)
-    }
   }
 
   public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {

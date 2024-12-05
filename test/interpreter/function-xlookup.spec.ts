@@ -1,7 +1,7 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src'
-import {ErrorMessage} from '../../src/error-message'
-import {adr, detailedError} from '../testUtils'
+import { HyperFormula, ErrorType } from '../../src'
+import { ErrorMessage } from '../../src/error-message'
+import { adr, detailedError } from '../testUtils'
+import { AbsoluteCellRange } from '../../src/AbsoluteCellRange'
 
 describe('Function XLOOKUP', () => {
   describe('validates arguments', () => {
@@ -13,9 +13,9 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     })
 
-    it('returns error when less more than 3 arguments', () => {
+    it('returns error when less more than 5 arguments', () => {
       const engine = HyperFormula.buildFromArray([
-        ['=XLOOKUP(1, A2:B3, C4:D5, "foo")'],
+        ['=XLOOKUP(1, A2:B3, C4:D5, "foo", 0, 1, 42)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
