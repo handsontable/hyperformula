@@ -147,19 +147,16 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public xlookupArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
-    if (ast?.args?.length !== 5) {
-      return ArraySize.error()
-    }
-
     const lookupRangeValue = ast?.args?.[1] as CellRange
     const returnRangeValue = ast?.args?.[2] as CellRange
 
-    if ([
-      lookupRangeValue.start,
-      returnRangeValue.start,
-      lookupRangeValue.end,
-      returnRangeValue.end
-    ].some((val) => val === undefined)) {
+    if (lookupRangeValue == null
+      || lookupRangeValue.start == null
+      || lookupRangeValue.end == null
+      || returnRangeValue == null
+      || returnRangeValue.start == null
+      || returnRangeValue.end == null
+    ) {
       return ArraySize.error()
     }
 
