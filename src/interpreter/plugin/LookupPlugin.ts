@@ -49,7 +49,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         // return_array
         { argumentType: FunctionArgumentType.RANGE },
         // [if_not_found]
-        { argumentType: FunctionArgumentType.STRING, optionalArg: true, defaultValue: ErrorType.NA },
+        { argumentType: FunctionArgumentType.SCALAR, optionalArg: true, defaultValue: ErrorType.NA },
         // [match_mode]
         { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0 },
         // [search_mode]
@@ -121,40 +121,25 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param state
    */
   public xlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number) => {
-      const lookupRange = lookupRangeValue.range
-      const returnRange = returnRangeValue.range
-
-      if (lookupRange === undefined) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-      }
-
-      if (returnRange === undefined) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-      }
-      
-      if (ifNotFound !== ErrorType.NA && typeof ifNotFound !== 'string') {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NoConditionMet)
-      }
-      
+    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number) => {      
       if (![0, -1, 1, 2].includes(matchMode)) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NoConditionMet)
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
       
       if (![1, -1, 1, 2].includes(searchMode)) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NoConditionMet)
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
       if (matchMode !== 0) {
         // not supported yet
         // TODO: Implement match mode
-        return new CellError(ErrorType.NAME, ErrorMessage.FunctionName('XLOOKUP'))
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
       if (searchMode !== 1) {
         // not supported yet
         // TODO: Implement search mode
-        return new CellError(ErrorType.NAME, ErrorMessage.FunctionName('XLOOKUP'))
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
       return this.doXlookup(zeroIfEmpty(key), lookupRangeValue, returnRangeValue, ifNotFound, matchMode, searchMode)
@@ -162,8 +147,22 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   public xlookupArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast?.args?.length !== 5) {
+      return ArraySize.error()
+    }
+
     const lookupRangeValue = ast?.args?.[1] as CellRange
     const returnRangeValue = ast?.args?.[2] as CellRange
+
+    if ([
+      lookupRangeValue.start,
+      returnRangeValue.start,
+      lookupRangeValue.end,
+      returnRangeValue.end
+    ].some((val) => val === undefined)) {
+      return ArraySize.error()
+    }
+
     const searchWidth = lookupRangeValue.end.col - lookupRangeValue.start.col + 1 
 
     if (returnRangeValue?.start == null || returnRangeValue?.end == null) {

@@ -13,18 +13,82 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     })
 
-    it('returns error when less more than 5 arguments', () => {
+    it('returns error when more than 5 arguments', () => {
       const engine = HyperFormula.buildFromArray([
-        ['=XLOOKUP(1, A2:B3, C4:D5, "foo", 0, 1, 42)'],
+        ['=XLOOKUP(1, A2:A3, B2:B3, "foo", 0, 1, 42)'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     })
 
-    // arg types validation
+    it('returns error when lookupArray is not a range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(1, B1, C1:C1)'],
+        ['=XLOOKUP(1, 42, C1:C1)'],
+        ['=XLOOKUP(1, "string", C1:C1)'],
+        ['=XLOOKUP(1, TRUE(), C1:C1)'],
+      ])
 
-    it('returns error when lookupArray and returnArray are not of the same shape', () => {
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    })
 
+    it('returns error when returnArray is not a range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(1, C1:C1, B1)'],
+        ['=XLOOKUP(1, C1:C1, 42)'],
+        ['=XLOOKUP(1, C1:C1, "string")'],
+        ['=XLOOKUP(1, C1:C1, TRUE())'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    })
+
+    // it('returns error when lookupArray and returnArray are not of the same shape', () => {
+    //   const engine = HyperFormula.buildFromArray([
+    //     ['=XLOOKUP(1, B1:B2, C1:C3)'],
+    //   ])
+
+    //   expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
+    // })
+
+    it('returns error when matchMode is of wrong type', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, -2)'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 3)'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 0.5)'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, "string")'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, B1:B2)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+      expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))   
+    })
+
+    it('returns error when searchMode is of wrong type', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 0, -3)'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 0, 3)'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 0, 0)'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 0, 0.5)'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 0, "string")'],
+        ['=XLOOKUP(1, B1:B2, C1:C2, 0, 0, D1:D2)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
+      expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+      expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     })
 
     it('propagates errors properly', () => {
@@ -63,7 +127,7 @@ describe('Function XLOOKUP', () => {
         ['Indonesia', 'ID'],
         ['France', 'FR'],
         ['=XLOOKUP("Indonesia", A1:A5, B1:B5)'],
-      ], { useColumnIndex: false })
+      ])
 
       expect(engine.getCellValue(adr('A6'))).toEqual('ID')
     })
@@ -76,7 +140,7 @@ describe('Function XLOOKUP', () => {
         ['8389', 'Dianne Pugh', 'Finance'],
         ['4937', 'Earlene McCarty', 'Accounting'],
         ['=XLOOKUP(A1, A2:A5, B2:C5)'],
-      ], { useColumnIndex: false })
+      ])
 
       expect(engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A6'), 2, 1))).toEqual([['Dianne Pugh', 'Finance']])
     })
@@ -88,7 +152,7 @@ describe('Function XLOOKUP', () => {
         ['Finance', 'Marketing', 'Sales', 'Finance', 'Accounting'],
         ['=XLOOKUP(A1, B1:E1, B2:E3)'],
         []
-      ], { useColumnIndex: false })
+      ])
 
       expect(engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A4'), 1, 2))).toEqual([['Dianne Pugh'], ['Finance']])
     })
@@ -100,8 +164,8 @@ describe('Function XLOOKUP', () => {
         ['8604', 'Margo Hendrix', 'Sales'],
         ['8389', 'Dianne Pugh', 'Finance'],
         ['4937', 'Earlene McCarty', 'Accounting'],
-        ['=XLOOKUP(A1, A2:A5, B2:C5, "ID not found")'],
-      ], { useColumnIndex: false })
+        ['=XLOOKUP(A1, A2:A5, B2:B5, "ID not found")'],
+      ])
 
       expect(engine.getCellValue(adr('A6'))).toEqual('ID not found')
     })
@@ -120,7 +184,7 @@ describe('Function XLOOKUP', () => {
         ['Tax', '4246', '6211', '5346', '5298', '21100'],
         ['Net profit', '19342', '28295', '24352', '24134', '96124'],
         ['Profit %', '29.3', '27.8', '23.4', '27.6', '26.9'],
-      ], { useColumnIndex: false })
+      ])
 
       expect(engine.getCellValue(adr('B2'))).toEqual(25000)
     })
