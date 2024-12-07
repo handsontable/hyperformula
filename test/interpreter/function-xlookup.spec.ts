@@ -121,10 +121,55 @@ describe('Function XLOOKUP', () => {
   })
 
   describe('looks up values', () => {
-    // sorted column, NA if not found
-    // sorted row, NA if not found
-    // unsorted column, NA if not found
-    // unsorted row, NA if not found
+    it('finds value in a sorted row', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(2, B1:D1, B1:D1)', 1, 2, 3],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+
+    it('finds value in an unsorted row', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(2, B1:D1, B1:D1)', 4, 2, 3],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+
+    it('finds value in a sorted column', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(2, B1:B3, B1:B3)', 1],
+        ['', 2],
+        ['', 3],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+
+    it('finds value in an unsorted column', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(2, B1:B3, B1:B3)', 4],
+        ['', 2],
+        ['', 3],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+
+    it('when key is not found, returns ifNotFound value or NA error', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(2, B1:B3, B1:B3)'],
+        ['=XLOOKUP(2, B1:D1, B1:D1)'],
+        ['=XLOOKUP(2, B1:B3, B1:B3, "not found")'],
+        ['=XLOOKUP(2, B1:D1, B1:D1, "not found")'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+      expect(engine.getCellValue(adr('A3'))).toEqual("not found")
+      expect(engine.getCellValue(adr('A4'))).toEqual("not found")
+    })
 
     it('works when returnArray is shifted (verical search)', () => {
       const engine = HyperFormula.buildFromArray([
@@ -155,8 +200,7 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual('b')
     })
 
-    // TODO
-    xit('works when lookupArray is a single cell', () => {
+    it('works when lookupArray is a single cell', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, B1:B1, C1:C1)', 1, 'a', 'horizontal'], // lookupArray: single cell, returnArray: single cell
         ['=XLOOKUP(1, B1, C1:C1)', '', 'vertical'], // lookupArray: single cell, returnArray: single cell
@@ -174,8 +218,6 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A6'))).toEqual(['a', 'horizontal'])
     })
   })
-
-  // different modes
 
   describe('acts similar to Microsoft Excel', () => {
   /**
@@ -234,6 +276,19 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A6'))).toEqual('ID not found')
     })
 
+    xit('example 4', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['10', 'a'],
+        ['20', 'b'],
+        ['30', 'c'],
+        ['40', 'd'],
+        ['50', 'e'],
+        ['=XLOOKUP(25, A1:A5, B1:B5, 0, 1, 1)'],
+      ])
+
+      expect(engine.getCellValue(adr('A6'))).toEqual('c')
+    })
+
     it('nested xlookup function to perform both a vertical and horizontal match (official example 5)', () => {
       const engine = HyperFormula.buildFromArray([
         ['Quarter', 'Gross profit', 'Net profit', 'Profit %'],
@@ -254,3 +309,7 @@ describe('Function XLOOKUP', () => {
     })
   })
 })
+
+// TODO:
+// - single cell
+// - modes
