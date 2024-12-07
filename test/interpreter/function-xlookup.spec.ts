@@ -49,13 +49,29 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     })
 
-    // it('returns error when lookupArray and returnArray are not of the same shape', () => {
-    //   const engine = HyperFormula.buildFromArray([
-    //     ['=XLOOKUP(1, B1:B2, C1:C3)'],
-    //   ])
+    it('returns error when shapes of lookupArray and returnArray are incompatible', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(1, B1:B10, C1:C9)'], // returnArray too short
+        ['=XLOOKUP(1, B1:B10, C1:C11)'], // returnArray too long
+        ['=XLOOKUP(1, B1:B10, C1:D5)'], // returnArray too short
+        ['=XLOOKUP(1, B1:E1, B2:D2)'], // returnArray too short
+        ['=XLOOKUP(1, B1:E1, B2:F2)'], // returnArray too long
+        ['=XLOOKUP(1, B1:E1, B2:C3)'], // returnArray too short
+        ['=XLOOKUP(1, B1:B3, C1:E1)'], // transposed
+        ['=XLOOKUP(1, C1:E1, B1:B3)'], // transposed
+        ['=XLOOKUP(1, B1:C2, D3:E4)'], // lookupArray: 2d range
+      ])
 
-    //   expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    // })
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+      expect(engine.getCellValue(adr('A9'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongDimension))
+    })
 
     it('returns error when matchMode is of wrong type', () => {
       const engine = HyperFormula.buildFromArray([
@@ -109,6 +125,54 @@ describe('Function XLOOKUP', () => {
     // sorted row, NA if not found
     // unsorted column, NA if not found
     // unsorted row, NA if not found
+
+    it('works when returnArray is shifted (verical search)', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(2, B1:B3, C11:C13)', 1],
+        ['', 2],
+        ['', 3],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        ['', '', 'a'],
+        ['', '', 'b'],
+        ['', '', 'c'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('b')
+    })
+
+    it('works when returnArray is shifted (horizontal search)', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(2, B1:D1, C2:E2)', '1', '2', '3'],
+        ['', '', 'a', 'b', 'c'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('b')
+    })
+
+    // TODO
+    xit('works when lookupArray is a single cell', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(1, B1:B1, C1:C1)', 1, 'a', 'horizontal'], // lookupArray: single cell, returnArray: single cell
+        ['=XLOOKUP(1, B1, C1:C1)', '', 'vertical'], // lookupArray: single cell, returnArray: single cell
+        ['=XLOOKUP(1, B1:B1, C1:C2)'], // lookupArray: single cell, returnArray: vertical range
+        ['=XLOOKUP(1, B1, C1:C2)'], // lookupArray: single cell, returnArray: vertical range
+        ['=XLOOKUP(1, B1:B1, C1:D1)'], // lookupArray: single cell, returnArray: horizontal range
+        ['=XLOOKUP(1, B1, C1:D1)'], // lookupArray: single cell, returnArray: horizontal range
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A2'))).toEqual(2)
+      expect(engine.getCellValue(adr('A3'))).toEqual([['a'], ['vertical']])
+      expect(engine.getCellValue(adr('A4'))).toEqual([['a'], ['vertical']])
+      expect(engine.getCellValue(adr('A5'))).toEqual(['a', 'horizontal'])
+      expect(engine.getCellValue(adr('A6'))).toEqual(['a', 'horizontal'])
+    })
   })
 
   // different modes

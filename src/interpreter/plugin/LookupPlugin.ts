@@ -160,6 +160,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       return ArraySize.error()
     }
 
+    if (!this.areRangesShapeValidForXlookup(lookupRangeValue, returnRangeValue)) {
+      return ArraySize.error()
+    }
+
     const searchWidth = lookupRangeValue.end.col - lookupRangeValue.start.col + 1 
 
     if (returnRangeValue?.start == null || returnRangeValue?.end == null) {
@@ -175,6 +179,21 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       const outputHeight = returnRangeValue.end.row - returnRangeValue.start.row + 1 
       return new ArraySize(1, outputHeight)
     }
+  }
+
+  private areRangesShapeValidForXlookup(lookupRange: CellRange, returnRange: CellRange): boolean {
+    const isVerticalSearch = lookupRange.start.col === lookupRange.end.col && lookupRange.start.row <= lookupRange.end.row
+    const isHorizontalSearch = lookupRange.start.row === lookupRange.end.row && lookupRange.start.col <= lookupRange.end.col
+
+    if (isVerticalSearch) {
+      return lookupRange.end.row - lookupRange.start.row === returnRange.end.row - returnRange.start.row
+    }
+
+    if (isHorizontalSearch) {
+      return lookupRange.end.col - lookupRange.start.col === returnRange.end.col - returnRange.start.col
+    }
+
+    return false
   }
 
   public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -254,40 +273,54 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
-  private doXlookup(key: RawNoErrorScalarValue, lookupAbsRangeValue: SimpleRangeValue, absReturnRangeValue: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number): InterpreterValue {
-    const lookupAbsRange = lookupAbsRangeValue.range
-    const absReturnRange = absReturnRangeValue.range
-    if (lookupAbsRange === undefined || absReturnRange === undefined) {
+  private doXlookup(key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number): InterpreterValue {
+    const lookupRange = lookupRangeValue.range
+    const returnRange = returnRangeValue.range
+
+    // handle single cell ranges
+
+    if (lookupRange === undefined || returnRange === undefined) {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
-    if (lookupAbsRange.start.col === lookupAbsRange.end.col && lookupAbsRange.start.row <= lookupAbsRange.end.row) {
-      // single column
-      const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupAbsRange.start, 1, lookupAbsRange.height()), this.dependencyGraph)
+    const isVerticalSearch = lookupRange.start.col === lookupRange.end.col && lookupRange.start.row <= lookupRange.end.row
+    const isHorizontalSearch = lookupRange.start.row === lookupRange.end.row && lookupRange.start.col <= lookupRange.end.col
+
+    if (isVerticalSearch) {
+      if(lookupRange.height() !== returnRange.height()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
+      }
+
+      const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupRange.start, 1, lookupRange.height()), this.dependencyGraph)
       const rowIndex = this.searchInRange(key, searchedRange, false, this.columnSearch)
       if (rowIndex === -1) {
         return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
       }
-      const topLeft = { sheet: absReturnRange.sheet, col: absReturnRange.start.col, row: absReturnRange.start.row + rowIndex }
-      const width = absReturnRange.end.col - absReturnRange.start.col + 1
+      const topLeft = { sheet: returnRange.sheet, col: returnRange.start.col, row: returnRange.start.row + rowIndex }
+      const width = returnRange.end.col - returnRange.start.col + 1
 
       return SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(topLeft, width, 1), this.dependencyGraph)
-    } else if (lookupAbsRange.start.row === lookupAbsRange.end.row && lookupAbsRange.start.col <= lookupAbsRange.end.col) {
-      // single row
-      const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupAbsRange.start, lookupAbsRange.width(), 1), this.dependencyGraph)
+    }
+    
+    if (isHorizontalSearch) {
+      if(lookupRange.width() !== returnRange.width()) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
+      }
+
+      const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupRange.start, lookupRange.width(), 1), this.dependencyGraph)
       const colIndex = this.searchInRange(key, searchedRange, false, this.rowSearch)
 
       if (colIndex === -1) {
         return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
       }
 
-      const topLeft = { sheet: absReturnRange.sheet, col: absReturnRange.start.col + colIndex, row: absReturnRange.start.row }
-      const height = absReturnRange.end.row - absReturnRange.start.row + 1
+      const topLeft = { sheet: returnRange.sheet, col: returnRange.start.col + colIndex, row: returnRange.start.row }
+      const height = returnRange.end.row - returnRange.start.row + 1
       return SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(topLeft, 1, height), this.dependencyGraph)
-    } else {
-      // multiple rows and tables - not supported
-      return new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
     }
+    
+
+    return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
   }
 
 
