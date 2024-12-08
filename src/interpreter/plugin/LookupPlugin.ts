@@ -3,45 +3,65 @@
  * Copyright (c) 2024 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange} from '../../AbsoluteCellRange'
-import {CellError, ErrorType, simpleCellAddress} from '../../Cell'
-import {ErrorMessage} from '../../error-message'
-import {RowSearchStrategy} from '../../Lookup/RowSearchStrategy'
-import {SearchOptions, SearchStrategy} from '../../Lookup/SearchStrategy'
-import {ProcedureAst} from '../../parser'
-import {StatType} from '../../statistics'
-import {zeroIfEmpty} from '../ArithmeticHelper'
-import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue, RawNoErrorScalarValue} from '../InterpreterValue'
-import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import { AbsoluteCellRange } from '../../AbsoluteCellRange'
+import { CellError, CellRange, ErrorType, simpleCellAddress } from '../../Cell'
+import { ErrorMessage } from '../../error-message'
+import { RowSearchStrategy } from '../../Lookup/RowSearchStrategy'
+import { SearchOptions, SearchStrategy } from '../../Lookup/SearchStrategy'
+import { ProcedureAst } from '../../parser'
+import { StatType } from '../../statistics'
+import { zeroIfEmpty } from '../ArithmeticHelper'
+import { InterpreterState } from '../InterpreterState'
+import { InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
+import { SimpleRangeValue } from '../../SimpleRangeValue'
+import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
+import { ArraySize } from '../../ArraySize'
 
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'VLOOKUP': {
       method: 'vlookup',
       parameters: [
-        {argumentType: FunctionArgumentType.NOERROR},
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: true},
+        { argumentType: FunctionArgumentType.NOERROR },
+        { argumentType: FunctionArgumentType.RANGE },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.BOOLEAN, defaultValue: true },
       ]
     },
     'HLOOKUP': {
       method: 'hlookup',
       parameters: [
-        {argumentType: FunctionArgumentType.NOERROR},
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: true},
+        { argumentType: FunctionArgumentType.NOERROR },
+        { argumentType: FunctionArgumentType.RANGE },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.BOOLEAN, defaultValue: true },
+      ]
+    },
+    'XLOOKUP': {
+      method: 'xlookup',
+      arraySizeMethod: 'xlookupArraySize',
+      vectorizationForbidden: true,
+      parameters: [
+        // lookup_value
+        { argumentType: FunctionArgumentType.NOERROR },
+        // lookup_array
+        { argumentType: FunctionArgumentType.RANGE },
+        // return_array
+        { argumentType: FunctionArgumentType.RANGE },
+        // [if_not_found]
+        { argumentType: FunctionArgumentType.SCALAR, optionalArg: true, defaultValue: ErrorType.NA },
+        // [match_mode]
+        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 0 },
+        // [search_mode]
+        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1 },
       ]
     },
     'MATCH': {
       method: 'match',
       parameters: [
-        {argumentType: FunctionArgumentType.NOERROR},
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.NOERROR },
+        { argumentType: FunctionArgumentType.RANGE },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
   }
@@ -92,6 +112,91 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       return this.doHlookup(zeroIfEmpty(key), rangeValue, index - 1, sorted)
     })
+  }
+
+  /**
+   * Corresponds to XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])
+   * 
+   * @param ast
+   * @param state
+   */
+  public xlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number) => {      
+      if (![0, -1, 1, 2].includes(matchMode)) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+      }
+      
+      if (![1, -1, 1, 2].includes(searchMode)) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+      }
+
+      if (matchMode !== 0) {
+        // not supported yet
+        // TODO: Implement match mode
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+      }
+
+      if (searchMode !== 1) {
+        // not supported yet
+        // TODO: Implement search mode
+        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
+      }
+
+      const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
+      const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
+
+      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, ifNotFound, matchMode, searchMode)
+    })
+  }
+
+  public xlookupArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    const lookupRangeValue = ast?.args?.[1] as CellRange
+    const returnRangeValue = ast?.args?.[2] as CellRange
+
+    if (lookupRangeValue == null
+      || lookupRangeValue.start == null
+      || lookupRangeValue.end == null
+      || returnRangeValue == null
+      || returnRangeValue.start == null
+      || returnRangeValue.end == null
+    ) {
+      return ArraySize.error()
+    }
+
+    if (!this.areRangesShapeValidForXlookup(lookupRangeValue, returnRangeValue)) {
+      return ArraySize.error()
+    }
+
+    const searchWidth = lookupRangeValue.end.col - lookupRangeValue.start.col + 1 
+
+    if (returnRangeValue?.start == null || returnRangeValue?.end == null) {
+      return ArraySize.scalar()
+    }
+
+    if (searchWidth === 1) {
+      // column search
+      const outputWidth = returnRangeValue.end.col - returnRangeValue.start.col + 1 
+      return new ArraySize(outputWidth, 1)
+    } else {
+      // row search
+      const outputHeight = returnRangeValue.end.row - returnRangeValue.start.row + 1 
+      return new ArraySize(1, outputHeight)
+    }
+  }
+
+  private areRangesShapeValidForXlookup(lookupRange: CellRange, returnRange: CellRange): boolean {
+    const isVerticalSearch = lookupRange.start.col === lookupRange.end.col && lookupRange.start.row <= lookupRange.end.row
+    const isHorizontalSearch = lookupRange.start.row === lookupRange.end.row && lookupRange.start.col <= lookupRange.end.col
+
+    if (isVerticalSearch) {
+      return lookupRange.end.row - lookupRange.start.row === returnRange.end.row - returnRange.start.row
+    }
+
+    if (isHorizontalSearch) {
+      return lookupRange.end.col - lookupRange.start.col === returnRange.end.col - returnRange.start.col
+    }
+
+    return false
   }
 
   public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -170,6 +275,26 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
     return value
   }
+
+  private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number): InterpreterValue {
+    const isVerticalSearch = lookupRange.width() === 1 && returnRange.height() === lookupRange.height()
+    const isHorizontalSearch = lookupRange.height() === 1 && returnRange.width() === lookupRange.width()
+
+    if (!isVerticalSearch && !isHorizontalSearch) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
+    }
+
+    const searchStrategy = isVerticalSearch ? this.columnSearch : this.rowSearch
+    const indexFound = this.searchInRange(key, lookupRange, false, searchStrategy)
+
+    if (indexFound === -1) {
+      return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
+    }
+
+    const returnValues: InternalScalarValue[][] = isVerticalSearch ? [returnRange.data[indexFound]] : returnRange.data.map((row) => [row[indexFound]])
+    return SimpleRangeValue.onlyValues(returnValues)
+  }
+
 
   private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number): InternalScalarValue {
     if (![-1, 0, 1].includes(type)) {
