@@ -142,7 +142,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
-      return this.doXlookup(zeroIfEmpty(key), lookupRangeValue, returnRangeValue, ifNotFound, matchMode, searchMode)
+      const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
+      const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
+
+      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, ifNotFound, matchMode, searchMode)
     })
   }
 
@@ -273,54 +276,23 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
-  private doXlookup(key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number): InterpreterValue {
-    const lookupRange = lookupRangeValue.range
-    const returnRange = returnRangeValue.range
+  private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number): InterpreterValue {
+    const isVerticalSearch = lookupRange.width() === 1 && returnRange.height() === lookupRange.height()
+    const isHorizontalSearch = lookupRange.height() === 1 && returnRange.width() === lookupRange.width()
 
-    // handle single cell ranges
-
-    if (lookupRange === undefined || returnRange === undefined) {
-      return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+    if (!isVerticalSearch && !isHorizontalSearch) {
+      return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
     }
 
-    const isVerticalSearch = lookupRange.start.col === lookupRange.end.col && lookupRange.start.row <= lookupRange.end.row
-    const isHorizontalSearch = lookupRange.start.row === lookupRange.end.row && lookupRange.start.col <= lookupRange.end.col
+    const searchStrategy = isVerticalSearch ? this.columnSearch : this.rowSearch
+    const indexFound = this.searchInRange(key, lookupRange, false, searchStrategy)
 
-    if (isVerticalSearch) {
-      if(lookupRange.height() !== returnRange.height()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
-      }
-
-      const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupRange.start, 1, lookupRange.height()), this.dependencyGraph)
-      const rowIndex = this.searchInRange(key, searchedRange, false, this.columnSearch)
-      if (rowIndex === -1) {
-        return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
-      }
-      const topLeft = { sheet: returnRange.sheet, col: returnRange.start.col, row: returnRange.start.row + rowIndex }
-      const width = returnRange.end.col - returnRange.start.col + 1
-
-      return SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(topLeft, width, 1), this.dependencyGraph)
+    if (indexFound === -1) {
+      return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
     }
-    
-    if (isHorizontalSearch) {
-      if(lookupRange.width() !== returnRange.width()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
-      }
 
-      const searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(lookupRange.start, lookupRange.width(), 1), this.dependencyGraph)
-      const colIndex = this.searchInRange(key, searchedRange, false, this.rowSearch)
-
-      if (colIndex === -1) {
-        return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
-      }
-
-      const topLeft = { sheet: returnRange.sheet, col: returnRange.start.col + colIndex, row: returnRange.start.row }
-      const height = returnRange.end.row - returnRange.start.row + 1
-      return SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(topLeft, 1, height), this.dependencyGraph)
-    }
-    
-
-    return new CellError(ErrorType.VALUE, ErrorMessage.WrongDimension)
+    const returnValues: InternalScalarValue[][] = isVerticalSearch ? [returnRange.data[indexFound]] : returnRange.data.map((row) => [row[indexFound]])
+    return SimpleRangeValue.onlyValues(returnValues)
   }
 
 

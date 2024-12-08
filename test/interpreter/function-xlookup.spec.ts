@@ -21,34 +21,6 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     })
 
-    it('returns error when lookupArray is not a range', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=XLOOKUP(1, B1, C1:C1)'],
-        ['=XLOOKUP(1, 42, C1:C1)'],
-        ['=XLOOKUP(1, "string", C1:C1)'],
-        ['=XLOOKUP(1, TRUE(), C1:C1)'],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    })
-
-    it('returns error when returnArray is not a range', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=XLOOKUP(1, C1:C1, B1)'],
-        ['=XLOOKUP(1, C1:C1, 42)'],
-        ['=XLOOKUP(1, C1:C1, "string")'],
-        ['=XLOOKUP(1, C1:C1, TRUE())'],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-      expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-      expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    })
-
     it('returns error when shapes of lookupArray and returnArray are incompatible', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, B1:B10, C1:C9)'], // returnArray too short
@@ -205,17 +177,28 @@ describe('Function XLOOKUP', () => {
         ['=XLOOKUP(1, B1:B1, C1:C1)', 1, 'a', 'horizontal'], // lookupArray: single cell, returnArray: single cell
         ['=XLOOKUP(1, B1, C1:C1)', '', 'vertical'], // lookupArray: single cell, returnArray: single cell
         ['=XLOOKUP(1, B1:B1, C1:C2)'], // lookupArray: single cell, returnArray: vertical range
+        [],
         ['=XLOOKUP(1, B1, C1:C2)'], // lookupArray: single cell, returnArray: vertical range
+        [],
         ['=XLOOKUP(1, B1:B1, C1:D1)'], // lookupArray: single cell, returnArray: horizontal range
         ['=XLOOKUP(1, B1, C1:D1)'], // lookupArray: single cell, returnArray: horizontal range
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
-      expect(engine.getCellValue(adr('A2'))).toEqual(2)
-      expect(engine.getCellValue(adr('A3'))).toEqual([['a'], ['vertical']])
-      expect(engine.getCellValue(adr('A4'))).toEqual([['a'], ['vertical']])
-      expect(engine.getCellValue(adr('A5'))).toEqual(['a', 'horizontal'])
-      expect(engine.getCellValue(adr('A6'))).toEqual(['a', 'horizontal'])
+      expect(engine.getCellValue(adr('A1'))).toEqual('a')
+      expect(engine.getCellValue(adr('A2'))).toEqual('a')
+      expect(engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A3'), 1, 2))).toEqual([['a'], ['vertical']])
+      expect(engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A5'), 1, 2))).toEqual([['a'], ['vertical']])
+      expect(engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A7'), 2, 1))).toEqual([['a', 'horizontal']])
+      expect(engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A8'), 2, 1))).toEqual([['a', 'horizontal']])
+    })
+
+    it('finds an empty cell', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP("", B1:D1, B2:D2)', 1, 2, ''],
+        ['', 'a', 'b', 'c']
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('c')
     })
   })
 
