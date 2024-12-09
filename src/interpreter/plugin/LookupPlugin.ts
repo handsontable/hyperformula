@@ -149,54 +149,37 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  public xlookupArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
-    const lookupRangeValue = ast?.args?.[1] as CellRange
-    const returnRangeValue = ast?.args?.[2] as CellRange
+  public xlookupArraySize(ast: ProcedureAst): ArraySize {
+    const lookupRange = ast?.args?.[1] as CellRange
+    const returnRange  = ast?.args?.[2] as CellRange
 
-    if (lookupRangeValue == null
-      || lookupRangeValue.start == null
-      || lookupRangeValue.end == null
-      || returnRangeValue == null
-      || returnRangeValue.start == null
-      || returnRangeValue.end == null
+    // co tu wpada jesli argumenty to single-cell range? 
+
+    if (lookupRange?.start == null
+      || lookupRange?.end == null
+      || returnRange?.start == null
+      || returnRange?.end == null
     ) {
       return ArraySize.error()
     }
 
-    if (!this.areRangesShapeValidForXlookup(lookupRangeValue, returnRangeValue)) {
+    const lookupRangeHeight = lookupRange.end.row - lookupRange.start.row + 1
+    const lookupRangeWidth = lookupRange.end.col - lookupRange.start.col + 1
+    const returnRangeHeight = returnRange.end.row - returnRange.start.row + 1
+    const returnRangeWidth = returnRange.end.col - returnRange.start.col + 1
+
+    const isVerticalSearch = lookupRangeWidth === 1 && returnRangeHeight === lookupRangeHeight
+    const isHorizontalSearch = lookupRangeHeight === 1 && returnRangeWidth === lookupRangeWidth
+
+    if (!isVerticalSearch && !isHorizontalSearch) {
       return ArraySize.error()
     }
 
-    const searchWidth = lookupRangeValue.end.col - lookupRangeValue.start.col + 1 
-
-    if (returnRangeValue?.start == null || returnRangeValue?.end == null) {
-      return ArraySize.scalar()
-    }
-
-    if (searchWidth === 1) {
-      // column search
-      const outputWidth = returnRangeValue.end.col - returnRangeValue.start.col + 1 
-      return new ArraySize(outputWidth, 1)
-    } else {
-      // row search
-      const outputHeight = returnRangeValue.end.row - returnRangeValue.start.row + 1 
-      return new ArraySize(1, outputHeight)
-    }
-  }
-
-  private areRangesShapeValidForXlookup(lookupRange: CellRange, returnRange: CellRange): boolean {
-    const isVerticalSearch = lookupRange.start.col === lookupRange.end.col && lookupRange.start.row <= lookupRange.end.row
-    const isHorizontalSearch = lookupRange.start.row === lookupRange.end.row && lookupRange.start.col <= lookupRange.end.col
-
     if (isVerticalSearch) {
-      return lookupRange.end.row - lookupRange.start.row === returnRange.end.row - returnRange.start.row
+      return new ArraySize(returnRangeWidth, 1)
     }
 
-    if (isHorizontalSearch) {
-      return lookupRange.end.col - lookupRange.start.col === returnRange.end.col - returnRange.start.col
-    }
-
-    return false
+    return new ArraySize(1, returnRangeHeight)
   }
 
   public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -294,7 +277,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     const returnValues: InternalScalarValue[][] = isVerticalSearch ? [returnRange.data[indexFound]] : returnRange.data.map((row) => [row[indexFound]])
     return SimpleRangeValue.onlyValues(returnValues)
   }
-
 
   private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number): InternalScalarValue {
     if (![-1, 0, 1].includes(type)) {
