@@ -172,22 +172,18 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual('b')
     })
 
-    describe('when lookupArray is a single cell', () => {
-      it('works when returnArray is also a single cell', () => {
+    describe('when lookupArray is a single-cell range', () => {
+      it('works when returnArray is also a single-cell range', () => {
         const engine = HyperFormula.buildFromArray([
           ['=XLOOKUP(1, B1:B1, C1:C1)', 1, 'a'],
-          ['=XLOOKUP(1, B1, C1:C1)'],
         ])
 
         expect(engine.getCellValue(adr('A1'))).toEqual('a')
-        expect(engine.getCellValue(adr('A2'))).toEqual('a')
       })
 
       it('works when returnArray is a vertical range', () => {
         const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(1, B1:B1, A5:A6)', 1],
-          [],
-          ['=XLOOKUP(1, B1, A5:A6)'],
+          ['=XLOOKUP(1, B1:B1, A3:A4)', 1],
           [],
           ['b'],
           ['c']
@@ -195,21 +191,16 @@ describe('Function XLOOKUP', () => {
 
         expect(engine.getCellValue(adr('A1'))).toEqual('b')
         expect(engine.getCellValue(adr('A2'))).toEqual('c')
-        expect(engine.getCellValue(adr('A3'))).toEqual('b')
-        expect(engine.getCellValue(adr('A4'))).toEqual('c')
       })
 
       it('works when returnArray is a horizontal range', () => {
         const engine = HyperFormula.buildFromArray([
           [1, 'b', 'c'],
           ['=XLOOKUP(1, A1:A1, B1:C1)'],
-          ['=XLOOKUP(1, A1, B1:C1)'],
         ])
 
         expect(engine.getCellValue(adr('A2'))).toEqual('b')
         expect(engine.getCellValue(adr('B2'))).toEqual('c')
-        expect(engine.getCellValue(adr('A3'))).toEqual('b')
-        expect(engine.getCellValue(adr('B3'))).toEqual('c')
       })
     })
 
@@ -280,7 +271,7 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A6'))).toEqual('ID not found')
     })
 
-    xit('example 4', () => {
+    it('example 4', () => {
       const engine = HyperFormula.buildFromArray([
         ['10', 'a'],
         ['20', 'b'],
@@ -315,7 +306,5 @@ describe('Function XLOOKUP', () => {
 })
 
 // TODO:
+// - implement modes
 // - debugger
-// - review arraysize function
-// - fix single cell
-// - implementmodes

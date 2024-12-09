@@ -26,7 +26,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         { argumentType: FunctionArgumentType.RANGE },
         { argumentType: FunctionArgumentType.NUMBER },
         { argumentType: FunctionArgumentType.BOOLEAN, defaultValue: true },
-      ]
+      ],
     },
     'HLOOKUP': {
       method: 'hlookup',
@@ -40,7 +40,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     'XLOOKUP': {
       method: 'xlookup',
       arraySizeMethod: 'xlookupArraySize',
-      vectorizationForbidden: true,
       parameters: [
         // lookup_value
         { argumentType: FunctionArgumentType.NOERROR },
@@ -152,8 +151,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   public xlookupArraySize(ast: ProcedureAst): ArraySize {
     const lookupRange = ast?.args?.[1] as CellRange
     const returnRange  = ast?.args?.[2] as CellRange
-
-    // co tu wpada jesli argumenty to single-cell range? 
 
     if (lookupRange?.start == null
       || lookupRange?.end == null
