@@ -49,7 +49,7 @@ function convertXlsxWorkbookToJavascriptArrays(workbook) {
       const rowData = [];
 
       row.eachCell((cell) => {
-        const cellData = cell.value.formula ? `=${cell.value.formula}` : cell.value;
+        const cellData = cell.formula ? `=${cell.formula}` : cell.value;
         rowData.push(cellData);
       });
 
