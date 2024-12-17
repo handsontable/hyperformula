@@ -86,7 +86,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doVlookup(zeroIfEmpty(key), rangeValue, index - 1, sorted)
+      return this.doVlookup(zeroIfEmpty(key), rangeValue, index - 1, { ordering: sorted ? 'asc' : 'none' })
     })
   }
 
@@ -109,7 +109,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doHlookup(zeroIfEmpty(key), rangeValue, index - 1, sorted)
+      return this.doHlookup(zeroIfEmpty(key), rangeValue, index - 1, { ordering: sorted ? 'asc' : 'none' })
     })
   }
 
@@ -135,16 +135,11 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
-      if (searchMode !== 1) {
-        // not supported yet
-        // TODO: Implement search mode
-        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
-      }
-
       const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
       const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
+      const searchOptions: SearchOptions = { ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none' }
 
-      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, ifNotFound, matchMode, searchMode)
+      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, ifNotFound, matchMode, searchOptions)
     })
   }
 
@@ -185,21 +180,21 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, sorted: boolean, searchStrategy: SearchStrategy): number {
+  protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, searchOptions: SearchOptions, searchStrategy: SearchStrategy): number {
     // for sorted option: use findInOrderedArray
 
-    if (!sorted && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
+    if (searchOptions.ordering === 'none' && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.arithmeticHelper.eqMatcherFunction(key),
         range
       )
     } else {
-      const searchOptions: SearchOptions = sorted ? { ordering: 'asc' } : { ordering: 'none', matchExactly: true }
-      return searchStrategy.find(key, range, searchOptions)
+      const newSearchOptions: SearchOptions = searchOptions.ordering === 'none' ? { ordering: 'none', matchExactly: true } : searchOptions
+      return searchStrategy.find(key, range, newSearchOptions)
     }
   }
 
-  private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
+  private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
     const range = rangeValue.range
     let searchedRange
@@ -208,7 +203,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     } else {
       searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
     }
-    const rowIndex = this.searchInRange(key, searchedRange, sorted, this.columnSearch)
+    const rowIndex = this.searchInRange(key, searchedRange, searchOptions, this.columnSearch)
 
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 
@@ -230,7 +225,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
-  private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, sorted: boolean): InternalScalarValue {
+  private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
     const range = rangeValue.range
     let searchedRange
     if (range === undefined) {
@@ -238,7 +233,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     } else {
       searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
     }
-    const colIndex = this.searchInRange(key, searchedRange, sorted, this.rowSearch)
+    const colIndex = this.searchInRange(key, searchedRange, searchOptions, this.rowSearch)
 
     if (colIndex === -1) {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
@@ -258,7 +253,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
-  private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number): InterpreterValue {
+  private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, ifNotFound: any, matchMode: number, searchOptions: SearchOptions): InterpreterValue {
     const isVerticalSearch = lookupRange.width() === 1 && returnRange.height() === lookupRange.height()
     const isHorizontalSearch = lookupRange.height() === 1 && returnRange.width() === lookupRange.width()
 
@@ -267,7 +262,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     const searchStrategy = isVerticalSearch ? this.columnSearch : this.rowSearch
-    const indexFound = this.searchInRange(key, lookupRange, false, searchStrategy)
+    const indexFound = this.searchInRange(key, lookupRange, searchOptions, searchStrategy)
 
     if (indexFound === -1) {
       return (ifNotFound == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : ifNotFound
