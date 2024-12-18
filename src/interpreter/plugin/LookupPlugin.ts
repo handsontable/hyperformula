@@ -125,7 +125,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
       
-      if (![1, -1, 1, 2].includes(searchMode)) {
+      if (![1, -1, 2, -2].includes(searchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
@@ -137,7 +137,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
       const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
-      const searchOptions: SearchOptions = { ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none' }
+      const searchOptions: SearchOptions = { ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none', matchExactly: true }
 
       return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, ifNotFound, matchMode, searchOptions)
     })

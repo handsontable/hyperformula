@@ -238,6 +238,19 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(2)
     })
 
+    it('1, returns "NotFound" if there is no match', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(5, A2:A6, B2:B6, "NotFound", 0, 1)'],
+        [2, 1],
+        [1, 2], 
+        [3, 3],
+        [1, 4],
+        [4, 5]
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+    })
+
     it('-1, finds the last match in unsorted horizontal range', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, A2:E2, A3:E3, "NotFound", 0, -1)'],
@@ -259,6 +272,19 @@ describe('Function XLOOKUP', () => {
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    })
+
+    it('-1, returns "NotFound" if there is no match', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(5, A2:A6, B2:B6, "NotFound", 0, -1)'],
+        [2, 1],
+        [1, 2], 
+        [3, 3],
+        [1, 4],
+        [4, 5]
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
     })
 
     it('2, finds the value in horizontal range sorted ascending', () => {
@@ -283,6 +309,19 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(2)
     })
 
+    it('2, returns "NotFound" if there is no match in a range sorted ascending', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(3, A2:A6, A2:A6, "NotFound", 0, 2)'],
+        [1],
+        [2],
+        [2],
+        [5],
+        [5],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+    })
+
     it('-2, finds the value in horizontal range sorted descending', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(2, A2:E2, A2:E2, "NotFound", 0, -2)'],
@@ -303,6 +342,19 @@ describe('Function XLOOKUP', () => {
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+
+    it('-2, returns "NotFound" if there is no match in a range sorted descending', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=XLOOKUP(3, A2:A6, A2:A6, "NotFound", 0, -2)'],
+        [5],
+        [2],
+        [2],
+        [1],
+        [1],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
     })
   })
 
@@ -398,6 +450,7 @@ describe('Function XLOOKUP', () => {
 })
 
 // TODO:
+// test notfound if sorted
 // - test with different row/column search strategies (columnindex etc)
 // - implement modes
 // - debugger
