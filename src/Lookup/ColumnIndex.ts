@@ -110,13 +110,16 @@ export class ColumnIndex implements ColumnSearchStrategy {
   /*
    * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
    */
-  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, matchExactly }: SearchOptions): number {
-    const handlingDuplicates = matchExactly === true ? 'findFirst' : 'findLast'
-    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, handlingDuplicates)
-    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, matchExactly })
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, matchExactly, returnOccurence }: SearchOptions): number {
+    if (returnOccurence == null) {
+      returnOccurence = matchExactly === true ? 'first' : 'last'
+    }
+
+    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, returnOccurence)
+    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, matchExactly, returnOccurence })
   }
 
-  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, handlingDuplicates: 'findFirst' | 'findLast'): Maybe<number> {
+  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, returnOccurence: 'first' | 'last'): Maybe<number> {
     const range = rangeValue.range
     if (range === undefined) {
       return undefined
@@ -135,15 +138,15 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return undefined
     }
 
-    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, handlingDuplicates)
+    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, returnOccurence)
     return rowNumber !== undefined ? rowNumber - range.start.row : undefined
   }
 
-  private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, handlingDuplicates: 'findFirst' | 'findLast'): Maybe<number> {
+  private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, returnOccurence: 'first' | 'last'): Maybe<number> {
     const start = range.start.row
     const end = range.end.row
 
-    const positionInIndex = handlingDuplicates === 'findFirst'
+    const positionInIndex = returnOccurence === 'first'
       ? findInOrderedArray(start, valueIndex.index, 'upperBound')
       : findInOrderedArray(end, valueIndex.index, 'lowerBound')
 

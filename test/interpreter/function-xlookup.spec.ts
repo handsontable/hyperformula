@@ -450,7 +450,6 @@ describe('Function XLOOKUP', () => {
 })
 
 // TODO:
-// test notfound if sorted
 // - test with different row/column search strategies (columnindex etc)
-// - implement modes
-// - debugger
+// - implement matchMode
+// - setup debugger

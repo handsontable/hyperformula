@@ -17,6 +17,7 @@ import {ColumnIndex} from './ColumnIndex'
 export interface SearchOptions {
   ordering: 'asc' | 'desc' | 'none',
   matchExactly?: boolean,
+  returnOccurence?: 'first' | 'last',
 }
 
 export interface SearchStrategy {

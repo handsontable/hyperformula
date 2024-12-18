@@ -40,16 +40,16 @@ export abstract class AdvancedFind {
   /*
    * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
    */
-  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, matchExactly }: SearchOptions): number {
+  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, matchExactly, returnOccurence }: SearchOptions): number {
     const normalizedSearchKey = typeof searchKey === 'string' ? forceNormalizeString(searchKey) : searchKey
     const range = rangeValue.range
 
     if (range === undefined) {
-      return this.findNormalizedValue(normalizedSearchKey, rangeValue.valuesFromTopLeftCorner())
+      return this.findNormalizedValue(normalizedSearchKey, rangeValue.valuesFromTopLeftCorner(), returnOccurence)
     }
 
     if (ordering === 'none') {
-      return this.findNormalizedValue(normalizedSearchKey, this.dependencyGraph.computeListOfValuesInRange(range))
+      return this.findNormalizedValue(normalizedSearchKey, this.dependencyGraph.computeListOfValuesInRange(range), returnOccurence)
     }
 
     return findLastOccurrenceInOrderedRange(
@@ -60,10 +60,11 @@ export abstract class AdvancedFind {
     )
   }
 
-  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[]): number {
-    return searchArray
-    .map(getRawValue)
-    .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)
-    .indexOf(searchKey)
+  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], returnOccurence: 'first' | 'last' = 'first'): number {
+    const normalizedArray = searchArray
+      .map(getRawValue)
+      .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)
+
+    return returnOccurence === 'first' ? normalizedArray.indexOf(searchKey) : normalizedArray.lastIndexOf(searchKey)
   }
 }

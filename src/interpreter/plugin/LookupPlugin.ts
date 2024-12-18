@@ -137,7 +137,11 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
       const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
-      const searchOptions: SearchOptions = { ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none', matchExactly: true }
+      const searchOptions: SearchOptions = {
+        ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none',
+        returnOccurence: searchMode === -1 ? 'last' : 'first',
+        matchExactly: true,
+      }
 
       return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, ifNotFound, matchMode, searchOptions)
     })
@@ -181,16 +185,17 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, searchOptions: SearchOptions, searchStrategy: SearchStrategy): number {
-    // for sorted option: use findInOrderedArray
-
     if (searchOptions.ordering === 'none' && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.arithmeticHelper.eqMatcherFunction(key),
         range
       )
     } else {
-      const newSearchOptions: SearchOptions = searchOptions.ordering === 'none' ? { ordering: 'none', matchExactly: true } : searchOptions
-      return searchStrategy.find(key, range, newSearchOptions)
+      if (searchOptions.ordering === 'none') {
+        searchOptions.matchExactly = true;
+      }
+
+      return searchStrategy.find(key, range, searchOptions)
     }
   }
 
