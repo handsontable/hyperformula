@@ -129,12 +129,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
 
-      if (matchMode !== 0) {
-        // not supported yet
-        // TODO: Implement match mode
-        return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
-      }
-
       const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
       const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
       const searchOptions: SearchOptions = {
