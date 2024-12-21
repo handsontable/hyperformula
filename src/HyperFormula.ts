@@ -887,6 +887,8 @@ export class HyperFormula implements TypedEmitter {
    * Returns dimensions of a specified sheet.
    * The sheet dimensions is represented with numbers: width and height.
    *
+   * Note: Due to the memory optimizations, some of the empty bottom rows and rightmost columns are not counted to the dimensions.
+   *
    * @param {number} sheetId - sheet ID number
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -1341,7 +1343,7 @@ export class HyperFormula implements TypedEmitter {
    * Note: This method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
-   * @param {number[]} newRowOrder - permutation of rows
+   * @param {number[]} newRowOrder - permutation of rows; array length must match the number of rows returned by [getSheetDimensions()](#getsheetdimensions)
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -1506,7 +1508,7 @@ export class HyperFormula implements TypedEmitter {
    * Note: This method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
-   * @param {number[]} newColumnOrder - permutation of columns
+   * @param {number[]} newColumnOrder - permutation of columns; array length must match the number of columns returned by [getSheetDimensions()](#getsheetdimensions)
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
