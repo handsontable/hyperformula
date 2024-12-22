@@ -17,6 +17,10 @@ import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
 import { ArraySize } from '../../ArraySize'
 
+// enum MatchMode {
+//   matchExactly
+// }
+
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'VLOOKUP': {
@@ -79,14 +83,21 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
+      
       if (index < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
+
       if (index > range.width()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doVlookup(zeroIfEmpty(key), rangeValue, index - 1, { ordering: sorted ? 'asc' : 'none' })
+      const searchOptions: SearchOptions = {
+        ordering: sorted ? 'asc' : 'none',
+        ifNoMatch: sorted ? 'returnLowerBound' : 'returnNotFound'
+      }
+
+      return this.doVlookup(zeroIfEmpty(key), rangeValue, index - 1, searchOptions)
     })
   }
 
@@ -102,14 +113,21 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
+      
       if (index < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
+
       if (index > range.height()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexLarge)
       }
 
-      return this.doHlookup(zeroIfEmpty(key), rangeValue, index - 1, { ordering: sorted ? 'asc' : 'none' })
+      const searchOptions: SearchOptions = {
+        ordering: sorted ? 'asc' : 'none',
+        ifNoMatch: sorted ? 'returnLowerBound' : 'returnNotFound'
+      }
+
+      return this.doHlookup(zeroIfEmpty(key), rangeValue, index - 1, searchOptions)
     })
   }
 
@@ -120,7 +138,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
    * @param state
    */
   public xlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, ifNotFound: any, matchMode: number, searchMode: number) => {      
+    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, notFoundFlag: any, matchMode: number, searchMode: number) => {      
       if (![0, -1, 1, 2].includes(matchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
@@ -134,10 +152,14 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       const searchOptions: SearchOptions = {
         ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none',
         returnOccurence: searchMode === -1 ? 'last' : 'first',
-        matchExactly: true,
+        ifNoMatch: matchMode === -1
+          ? 'returnLowerBound'
+          : matchMode === 1
+            ? 'returnUpperBound'
+            : 'returnNotFound'
       }
 
-      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, ifNotFound, matchMode, searchOptions)
+      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, matchMode, searchOptions)
     })
   }
 
@@ -184,13 +206,9 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         this.arithmeticHelper.eqMatcherFunction(key),
         range
       )
-    } else {
-      if (searchOptions.ordering === 'none') {
-        searchOptions.matchExactly = true;
-      }
-
-      return searchStrategy.find(key, range, searchOptions)
     }
+    
+    return searchStrategy.find(key, range, searchOptions)
   }
 
   private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
@@ -282,8 +300,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
     const searchStrategy = rangeValue.width() === 1 ? this.columnSearch : this.rowSearch
     const searchOptions: SearchOptions = type === 0
-      ? { ordering: 'none', matchExactly: true }
-      : { ordering: type === -1 ? 'desc' : 'asc' }
+      ? { ordering: 'none', ifNoMatch: 'returnNotFound' }
+      : { ordering: type === -1 ? 'desc' : 'asc', ifNoMatch: 'returnLowerBound' }
     const index = searchStrategy.find(key, rangeValue, searchOptions)
 
     if (index === -1) {

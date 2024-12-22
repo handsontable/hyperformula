@@ -29,7 +29,7 @@ const NOT_FOUND = -1
 export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
   range: AbsoluteCellRange,
-  { searchCoordinate, orderingDirection, matchExactly }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', matchExactly?: boolean },
+  { searchCoordinate, orderingDirection, ifNoMatch }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' },
   dependencyGraph: DependencyGraph,
 ): number {
   const start = range.start[searchCoordinate]
@@ -50,11 +50,20 @@ export function findLastOccurrenceInOrderedRange(
     return NOT_FOUND
   }
 
-  if (matchExactly && foundValue !== searchKey) {
-    return NOT_FOUND
+  if (foundValue === searchKey) {
+    return foundIndex - start
   }
 
-  return foundIndex - start
+  if (ifNoMatch === 'returnLowerBound') {
+    return foundIndex - start
+  }
+
+  if (ifNoMatch === 'returnUpperBound') {
+    const upperBoundIndex = foundIndex+1
+    return upperBoundIndex <= end ? upperBoundIndex - start : NOT_FOUND
+  }
+
+  return NOT_FOUND
 }
 
 /*

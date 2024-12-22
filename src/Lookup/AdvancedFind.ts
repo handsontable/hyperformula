@@ -40,7 +40,7 @@ export abstract class AdvancedFind {
   /*
    * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
    */
-  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, matchExactly, returnOccurence }: SearchOptions): number {
+  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, returnOccurence }: SearchOptions): number {
     const normalizedSearchKey = typeof searchKey === 'string' ? forceNormalizeString(searchKey) : searchKey
     const range = rangeValue.range
 
@@ -55,7 +55,7 @@ export abstract class AdvancedFind {
     return findLastOccurrenceInOrderedRange(
       normalizedSearchKey,
       range,
-      { searchCoordinate, orderingDirection: ordering, matchExactly },
+      { searchCoordinate, orderingDirection: ordering, ifNoMatch },
       this.dependencyGraph
     )
   }

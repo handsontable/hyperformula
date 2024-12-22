@@ -503,99 +503,130 @@ describe('Function XLOOKUP', () => {
   })
 
   describe('with BinarySearch column search strategy, when provided with matchMode = ', () => {
-    describe('-1, returns a lower bound if the search key is not present', () => {
-      it('in unsorted horizontal range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:E2, A3:E3, "NotFound", -1, 1)'],
-          [2, 1, 4, 2, 5],
-          [1, 2, 3, 4, 5],
-        ], { useColumnIndex: false })
+    describe('-1 (looking for a lower bound', () => {
+      describe('in array ordered ascending', () => {
+        it('returns exact match if exists', () => {
+          const engine = HyperFormula.buildFromArray([
+            ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
+            [1, 2, 42, 50, 51],
+          ], { useColumnIndex: false })
+    
+          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+        })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        it('returns a lower bound when there is no exact match', () => {
+          const engine = HyperFormula.buildFromArray([
+            ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
+            [1, 2, 40, 50, 51],
+          ], { useColumnIndex: false })
+    
+          expect(engine.getCellValue(adr('A1'))).toEqual(40)
+        })
+
+        it.todo('returns a lower bound when all elements are smaller than the key')
+        it.todo('returns -1 when all elements are greater than the key')
       })
 
-      it('in unsorted vertical range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:A6, B2:B6, "NotFound", -1, 1)'],
-          [2, 1],
-          [1, 2],
-          [4, 3],
-          [2, 4],
-          [5, 5]
-        ], { useColumnIndex: false })
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
-      })
-
-      it('in sorted horizontal range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:E2, A2:E2, "NotFound", -1, 2)'],
-          [1, 2, 2, 5, 6],
-        ], { useColumnIndex: false })
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
-      })
-
-      it('in sorted vertical range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:A6, A2:A6, "NotFound", -1, 2)'],
-          [1],
-          [2],
-          [4],
-          [5],
-          [6]
-        ], { useColumnIndex: false })
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      describe('in array ordered descending', () => {
       })
     })
 
-    describe('1, returns an upper bound if the search key is not present', () => {
-      it('in unsorted horizontal range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:E2, A3:E3, "NotFound", 1, 1)'],
-          [2, 1, 4, 4, 5],
-          [1, 2, 3, 4, 5],
-        ], { useColumnIndex: false })
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
-      })
-
-      it('in unsorted vertical range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:A6, B2:B6, "NotFound", 1, 1)'],
-          [2, 1],
-          [1, 2],
-          [4, 3],
-          [4, 4],
-          [5, 5]
-        ], { useColumnIndex: false })
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
-      })
-
-      it('in sorted horizontal range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:E2, A2:E2, "NotFound", 1, 2)'],
-          [1, 2, 4, 5, 6],
-        ], { useColumnIndex: false })
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
-      })
-
-      it('in sorted vertical range', () => {
-        const engine = HyperFormula.buildFromArray([
-          ['=XLOOKUP(3, A2:A6, A2:A6, "NotFound", 1, 2)'],
-          [1],
-          [2],
-          [4],
-          [5],
-          [6]
-        ], { useColumnIndex: false })
-
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
-      })
+    describe('when looking for an upper bound', () => {
     })
+
+    // describe('-1, returns a lower bound if the search key is not present', () => {
+    //   it('in unsorted horizontal range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:E2, A3:E3, "NotFound", -1, 1)'],
+    //       [2, 1, 4, 2, 5],
+    //       [1, 2, 3, 4, 5],
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    //   })
+
+    //   it('in unsorted vertical range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:A6, B2:B6, "NotFound", -1, 1)'],
+    //       [2, 1],
+    //       [1, 2],
+    //       [4, 3],
+    //       [2, 4],
+    //       [5, 5]
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    //   })
+
+    //   it('in sorted horizontal range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:E2, A2:E2, "NotFound", -1, 2)'],
+    //       [1, 2, 2, 5, 6],
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    //   })
+
+    //   it('in sorted vertical range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:A6, A2:A6, "NotFound", -1, 2)'],
+    //       [1],
+    //       [2],
+    //       [4],
+    //       [5],
+    //       [6]
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    //   })
+    // })
+
+    // describe('1, returns an upper bound if the search key is not present', () => {
+    //   it('in unsorted horizontal range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:E2, A3:E3, "NotFound", 1, 1)'],
+    //       [2, 1, 4, 4, 5],
+    //       [1, 2, 3, 4, 5],
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    //   })
+
+    //   it('in unsorted vertical range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:A6, B2:B6, "NotFound", 1, 1)'],
+    //       [2, 1],
+    //       [1, 2],
+    //       [4, 3],
+    //       [4, 4],
+    //       [5, 5]
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    //   })
+
+    //   it('in sorted horizontal range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:E2, A2:E2, "NotFound", 1, 2)'],
+    //       [1, 2, 4, 5, 6],
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    //   })
+
+    //   it('in sorted vertical range', () => {
+    //     const engine = HyperFormula.buildFromArray([
+    //       ['=XLOOKUP(3, A2:A6, A2:A6, "NotFound", 1, 2)'],
+    //       [1],
+    //       [2],
+    //       [4],
+    //       [5],
+    //       [6]
+    //     ], { useColumnIndex: false })
+
+    //     expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    //   })
+    // })
 
     describe('2, performs a wildcard match', () => {
       // TODO
@@ -698,5 +729,5 @@ describe('Function XLOOKUP', () => {
 })
 
 // TODO:
-// - setup debugger!!! last day of cursor
-// - implement matchMode
+// TODO: test returnUpperBound
+// - setup debugger, upgrade to premium

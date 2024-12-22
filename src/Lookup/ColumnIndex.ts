@@ -110,13 +110,13 @@ export class ColumnIndex implements ColumnSearchStrategy {
   /*
    * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
    */
-  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, matchExactly, returnOccurence }: SearchOptions): number {
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurence }: SearchOptions): number {
     if (returnOccurence == null) {
-      returnOccurence = matchExactly === true ? 'first' : 'last'
+      returnOccurence = ifNoMatch === 'returnNotFound' ? 'first' : 'last'
     }
 
     const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, returnOccurence)
-    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, matchExactly, returnOccurence })
+    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, ifNoMatch, returnOccurence })
   }
 
   private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, returnOccurence: 'first' | 'last'): Maybe<number> {
