@@ -46,7 +46,19 @@ export function findLastOccurrenceInOrderedRange(
   const foundIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
   const foundValue = getValueFromIndexFn(foundIndex)
 
-  if (foundIndex === NOT_FOUND || typeof foundValue !== typeof searchKey) {
+  if (foundIndex === NOT_FOUND) {
+    if (ifNoMatch === 'returnLowerBound' && orderingDirection === 'desc') {
+      return 0
+    }
+
+    if (ifNoMatch === 'returnUpperBound' && orderingDirection === 'asc') {
+      return 0
+    }
+
+    return NOT_FOUND
+  }
+
+  if (typeof foundValue !== typeof searchKey) {
     return NOT_FOUND
   }
 
@@ -55,12 +67,21 @@ export function findLastOccurrenceInOrderedRange(
   }
 
   if (ifNoMatch === 'returnLowerBound') {
-    return foundIndex - start
+    if (orderingDirection === 'asc') {
+      return foundIndex - start
+    }
+
+    const nextIndex = foundIndex+1
+    return nextIndex <= end ? nextIndex - start : NOT_FOUND
   }
 
   if (ifNoMatch === 'returnUpperBound') {
-    const upperBoundIndex = foundIndex+1
-    return upperBoundIndex <= end ? upperBoundIndex - start : NOT_FOUND
+    if (orderingDirection === 'desc') {
+      return foundIndex - start
+    }
+
+    const nextIndex = foundIndex+1
+    return nextIndex <= end ? nextIndex - start : NOT_FOUND
   }
 
   return NOT_FOUND
