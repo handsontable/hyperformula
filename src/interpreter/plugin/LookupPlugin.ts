@@ -301,7 +301,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     const searchStrategy = rangeValue.width() === 1 ? this.columnSearch : this.rowSearch
     const searchOptions: SearchOptions = type === 0
       ? { ordering: 'none', ifNoMatch: 'returnNotFound' }
-      : { ordering: type === -1 ? 'desc' : 'asc', ifNoMatch: 'returnLowerBound' }
+      : { ordering: type === -1 ? 'desc' : 'asc', ifNoMatch: type === -1 ? 'returnUpperBound' : 'returnLowerBound' }
     const index = searchStrategy.find(key, rangeValue, searchOptions)
 
     if (index === -1) {

@@ -108,6 +108,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
   public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurence }: SearchOptions): number {
+    if (ifNoMatch == null) {
+      ifNoMatch = 'returnNotFound'
+    }
+    
     if (returnOccurence == null) {
       returnOccurence = ifNoMatch === 'returnNotFound' ? 'first' : 'last'
     }
