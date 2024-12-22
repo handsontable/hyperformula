@@ -107,9 +107,6 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  /*
-   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
-   */
   public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurence }: SearchOptions): number {
     if (returnOccurence == null) {
       returnOccurence = ifNoMatch === 'returnNotFound' ? 'first' : 'last'
