@@ -16,13 +16,9 @@ const NOT_FOUND = -1
  * Options:
  * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search,
  * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range,
- * - matchExactly - when set to false, searches for the lower/upper bound.
+ * - ifNoMatch - must be set to 'returnLowerBound', 'returnUpperBound' or 'returnNotFound'
  *
- * Semantics:
- * - If orderingDirection === 'asc', searches for the lower bound for the searchKey value (unless marchExactly === true).
- * - If orderingDirection === 'desc', searches for the upper bound for the searchKey value (unless marchExactly === true).
- * - If the search range contains duplicates, returns the last matching value.
- * - If no value in the range satisfies the above, returns -1.
+ * If the search range contains duplicates, returns the last matching value. If no value found in the range satisfies the above, returns -1.
  *
  * Note: this function does not normalize input strings.
  */
