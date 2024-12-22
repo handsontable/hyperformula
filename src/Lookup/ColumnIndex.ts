@@ -113,7 +113,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
     
     if (returnOccurence == null) {
-      returnOccurence = ifNoMatch === 'returnNotFound' ? 'first' : 'last'
+      returnOccurence = ordering === 'none' ? 'first' : 'last'
     }
 
     const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, returnOccurence)
