@@ -23,7 +23,7 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
-import {ColumnSearchStrategy, SearchOptions} from './SearchStrategy'
+import {AdvancedFindOptions, ColumnSearchStrategy, SearchOptions} from './SearchStrategy'
 import {Maybe} from '../Maybe'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
@@ -162,8 +162,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
 
-  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number {
-    return this.binarySearchStrategy.advancedFind(keyMatcher, range)
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue, options: AdvancedFindOptions = { returnOccurence: 'first' }): number {
+    return this.binarySearchStrategy.advancedFind(keyMatcher, range, options)
   }
 
   public addColumns(columnsSpan: ColumnsSpan) {

@@ -11,7 +11,7 @@ import {
   RawNoErrorScalarValue
 } from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import {SearchOptions} from './SearchStrategy'
+import {AdvancedFindOptions, SearchOptions} from './SearchStrategy'
 import {forceNormalizeString} from '../interpreter/ArithmeticHelper'
 import {compare, findLastOccurrenceInOrderedRange} from '../interpreter/binarySearch'
 
@@ -23,15 +23,17 @@ export abstract class AdvancedFind {
   ) {
   }
 
-  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue): number {
-    let values: InternalScalarValue[]
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue, { returnOccurence }: AdvancedFindOptions = { returnOccurence: 'first' }): number {
     const range = rangeValue.range
-    if (range === undefined) {
-      values = rangeValue.valuesFromTopLeftCorner()
-    } else {
-      values = this.dependencyGraph.computeListOfValuesInRange(range)
-    }
-    for (let i = 0; i < values.length; i++) {
+    const values: InternalScalarValue[] = (range === undefined)
+      ? rangeValue.valuesFromTopLeftCorner()
+      : this.dependencyGraph.computeListOfValuesInRange(range)
+    
+    const initialIterationIndex = returnOccurence === 'first' ? 0 : values.length-1
+    const iterationCondition = returnOccurence === 'first' ? (i: number) => i < values.length : (i: number) => i >= 0
+    const incrementIndex = returnOccurence === 'first' ? (i: number) => i+1 : (i: number) => i-1
+
+    for (let i = initialIterationIndex; iterationCondition(i); i = incrementIndex(i)) {
       if (keyMatcher(getRawValue(values[i]))) {
         return i
       }

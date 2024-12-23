@@ -20,13 +20,17 @@ export interface SearchOptions {
   returnOccurence?: 'first' | 'last',
 }
 
+export interface AdvancedFindOptions {
+  returnOccurence?: 'first' | 'last'
+}
+
 export interface SearchStrategy {
   /*
    * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
    */
   find(searchKey: RawNoErrorScalarValue, range: SimpleRangeValue, options: SearchOptions): number,
 
-  advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number,
+  advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue, options: AdvancedFindOptions): number,
 }
 
 export interface ColumnSearchStrategy extends SearchStrategy {

@@ -149,6 +149,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
       const lookupRange = lookupRangeValue instanceof SimpleRangeValue ? lookupRangeValue : SimpleRangeValue.fromScalar(lookupRangeValue)
       const returnRange = returnRangeValue instanceof SimpleRangeValue ? returnRangeValue : SimpleRangeValue.fromScalar(returnRangeValue)
+      const isWildcardMatchMode = matchMode === 2
       const searchOptions: SearchOptions = {
         ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none',
         returnOccurence: searchMode === -1 ? 'last' : 'first',
@@ -159,7 +160,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
             : 'returnNotFound'
       }
 
-      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, searchOptions)
+      return this.doXlookup(zeroIfEmpty(key), lookupRange, returnRange, notFoundFlag, isWildcardMatchMode, searchOptions)
     })
   }
 
@@ -200,11 +201,13 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
-  protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, searchOptions: SearchOptions, searchStrategy: SearchStrategy): number {
-    if (searchOptions.ordering === 'none' && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
+  protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, isWildcardMatchMode: boolean, searchOptions: SearchOptions, searchStrategy: SearchStrategy): number {
+    // if (searchOptions.ordering === 'none' && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
+    if (isWildcardMatchMode && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.arithmeticHelper.eqMatcherFunction(key),
-        range
+        range,
+        { returnOccurence: searchOptions.returnOccurence }
       )
     }
     
@@ -220,7 +223,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     } else {
       searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, 1, range.height()), this.dependencyGraph)
     }
-    const rowIndex = this.searchInRange(key, searchedRange, searchOptions, this.columnSearch)
+    const rowIndex = this.searchInRange(key, searchedRange, searchOptions.ordering === 'none', searchOptions, this.columnSearch)
 
     this.dependencyGraph.stats.end(StatType.VLOOKUP)
 
@@ -250,7 +253,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     } else {
       searchedRange = SimpleRangeValue.onlyRange(AbsoluteCellRange.spanFrom(range.start, range.width(), 1), this.dependencyGraph)
     }
-    const colIndex = this.searchInRange(key, searchedRange, searchOptions, this.rowSearch)
+    const colIndex = this.searchInRange(key, searchedRange, searchOptions.ordering === 'none', searchOptions, this.rowSearch)
 
     if (colIndex === -1) {
       return new CellError(ErrorType.NA, ErrorMessage.ValueNotFound)
@@ -270,7 +273,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
-  private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, notFoundFlag: any, searchOptions: SearchOptions): InterpreterValue {
+  private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, notFoundFlag: any, isWildcardMatchMode: boolean, searchOptions: SearchOptions): InterpreterValue {
     const isVerticalSearch = lookupRange.width() === 1 && returnRange.height() === lookupRange.height()
     const isHorizontalSearch = lookupRange.height() === 1 && returnRange.width() === lookupRange.width()
 
@@ -279,7 +282,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     const searchStrategy = isVerticalSearch ? this.columnSearch : this.rowSearch
-    const indexFound = this.searchInRange(key, lookupRange, searchOptions, searchStrategy)
+    const indexFound = this.searchInRange(key, lookupRange, isWildcardMatchMode, searchOptions, searchStrategy)
 
     if (indexFound === -1) {
       return (notFoundFlag == ErrorType.NA) ? new CellError(ErrorType.NA, ErrorMessage.ValueNotFound) : notFoundFlag
