@@ -17,10 +17,6 @@ import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
 import { ArraySize } from '../../ArraySize'
 
-// enum MatchMode {
-//   matchExactly
-// }
-
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'VLOOKUP': {
@@ -202,7 +198,6 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   }
 
   protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, isWildcardMatchMode: boolean, searchOptions: SearchOptions, searchStrategy: SearchStrategy): number {
-    // if (searchOptions.ordering === 'none' && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
     if (isWildcardMatchMode && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
         this.arithmeticHelper.eqMatcherFunction(key),
