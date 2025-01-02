@@ -55,7 +55,6 @@ export function findLastOccurrenceInOrderedRange(
       return orderingDirection === 'asc' ? NOT_FOUND : 0
     }
 
-    // czy to sie zdarza?
     if (typeof foundValue !== typeof searchKey) {
       return NOT_FOUND
     }
@@ -75,7 +74,6 @@ export function findLastOccurrenceInOrderedRange(
       return orderingDirection === 'asc' ? 0 : NOT_FOUND
     }
 
-    // czy to sie zdarza?
     if (typeof foundValue !== typeof searchKey) {
       return NOT_FOUND
     }
