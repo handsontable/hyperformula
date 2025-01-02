@@ -17,11 +17,11 @@ import {ColumnIndex} from './ColumnIndex'
 export interface SearchOptions {
   ordering: 'asc' | 'desc' | 'none',
   ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound',
-  returnOccurence?: 'first' | 'last',
+  returnOccurrence?: 'first' | 'last',
 }
 
 export interface AdvancedFindOptions {
-  returnOccurence?: 'first' | 'last',
+  returnOccurrence?: 'first' | 'last',
 }
 
 export interface SearchStrategy {

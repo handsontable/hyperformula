@@ -107,20 +107,20 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurence }: SearchOptions): number {
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurrence }: SearchOptions): number {
     if (ifNoMatch == null) {
       ifNoMatch = 'returnNotFound'
     }
     
-    if (returnOccurence == null) {
-      returnOccurence = ordering === 'none' ? 'first' : 'last'
+    if (returnOccurrence == null) {
+      returnOccurrence = ordering === 'none' ? 'first' : 'last'
     }
 
-    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, returnOccurence)
-    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, ifNoMatch, returnOccurence })
+    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, returnOccurrence)
+    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, ifNoMatch, returnOccurrence })
   }
 
-  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, returnOccurence: 'first' | 'last'): Maybe<number> {
+  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, returnOccurrence: 'first' | 'last'): Maybe<number> {
     const range = rangeValue.range
     if (range === undefined) {
       return undefined
@@ -139,15 +139,15 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return undefined
     }
 
-    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, returnOccurence)
+    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, returnOccurrence)
     return rowNumber !== undefined ? rowNumber - range.start.row : undefined
   }
 
-  private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, returnOccurence: 'first' | 'last'): Maybe<number> {
+  private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, returnOccurrence: 'first' | 'last'): Maybe<number> {
     const start = range.start.row
     const end = range.end.row
 
-    const positionInIndex = returnOccurence === 'first'
+    const positionInIndex = returnOccurrence === 'first'
       ? findInOrderedArray(start, valueIndex.index, 'upperBound')
       : findInOrderedArray(end, valueIndex.index, 'lowerBound')
 
@@ -162,7 +162,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
 
-  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue, options: AdvancedFindOptions = { returnOccurence: 'first' }): number {
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue, options: AdvancedFindOptions = { returnOccurrence: 'first' }): number {
     return this.binarySearchStrategy.advancedFind(keyMatcher, range, options)
   }
 

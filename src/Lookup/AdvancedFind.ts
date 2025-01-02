@@ -23,15 +23,15 @@ export abstract class AdvancedFind {
   ) {
   }
 
-  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue, { returnOccurence }: AdvancedFindOptions = { returnOccurence: 'first' }): number {
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue, { returnOccurrence }: AdvancedFindOptions = { returnOccurrence: 'first' }): number {
     const range = rangeValue.range
     const values: InternalScalarValue[] = (range === undefined)
       ? rangeValue.valuesFromTopLeftCorner()
       : this.dependencyGraph.computeListOfValuesInRange(range)
     
-    const initialIterationIndex = returnOccurence === 'first' ? 0 : values.length-1
-    const iterationCondition = returnOccurence === 'first' ? (i: number) => i < values.length : (i: number) => i >= 0
-    const incrementIndex = returnOccurence === 'first' ? (i: number) => i+1 : (i: number) => i-1
+    const initialIterationIndex = returnOccurrence === 'first' ? 0 : values.length-1
+    const iterationCondition = returnOccurrence === 'first' ? (i: number) => i < values.length : (i: number) => i >= 0
+    const incrementIndex = returnOccurrence === 'first' ? (i: number) => i+1 : (i: number) => i-1
 
     for (let i = initialIterationIndex; iterationCondition(i); i = incrementIndex(i)) {
       if (keyMatcher(getRawValue(values[i]))) {
@@ -41,16 +41,16 @@ export abstract class AdvancedFind {
     return NOT_FOUND
   }
 
-  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, returnOccurence }: SearchOptions): number {
+  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, returnOccurrence }: SearchOptions): number {
     const normalizedSearchKey = typeof searchKey === 'string' ? forceNormalizeString(searchKey) : searchKey
     const range = rangeValue.range
 
     if (range === undefined) {
-      return this.findNormalizedValue(normalizedSearchKey, rangeValue.valuesFromTopLeftCorner(), ifNoMatch, returnOccurence)
+      return this.findNormalizedValue(normalizedSearchKey, rangeValue.valuesFromTopLeftCorner(), ifNoMatch, returnOccurrence)
     }
 
     if (ordering === 'none') {
-      return this.findNormalizedValue(normalizedSearchKey, this.dependencyGraph.computeListOfValuesInRange(range), ifNoMatch, returnOccurence)
+      return this.findNormalizedValue(normalizedSearchKey, this.dependencyGraph.computeListOfValuesInRange(range), ifNoMatch, returnOccurrence)
     }
 
     return findLastOccurrenceInOrderedRange(
@@ -61,13 +61,13 @@ export abstract class AdvancedFind {
     )
   }
 
-  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' = 'returnNotFound', returnOccurence: 'first' | 'last' = 'first'): number {
+  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' = 'returnNotFound', returnOccurrence: 'first' | 'last' = 'first'): number {
     const normalizedArray = searchArray
       .map(getRawValue)
       .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)
 
     if (ifNoMatch === 'returnNotFound') {
-      return returnOccurence === 'first' ? normalizedArray.indexOf(searchKey) : normalizedArray.lastIndexOf(searchKey)
+      return returnOccurrence === 'first' ? normalizedArray.indexOf(searchKey) : normalizedArray.lastIndexOf(searchKey)
     }
 
     const compareFn = ifNoMatch === 'returnLowerBound'
@@ -77,9 +77,9 @@ export abstract class AdvancedFind {
     let bestValue: RawNoErrorScalarValue = ifNoMatch === 'returnLowerBound' ? -Infinity : Infinity
     let bestIndex = NOT_FOUND
 
-    const initialIterationIndex = returnOccurence === 'first' ? 0 : normalizedArray.length-1
-    const iterationCondition = returnOccurence === 'first' ? (i: number) => i < normalizedArray.length : (i: number) => i >= 0
-    const incrementIndex = returnOccurence === 'first' ? (i: number) => i+1 : (i: number) => i-1
+    const initialIterationIndex = returnOccurrence === 'first' ? 0 : normalizedArray.length-1
+    const iterationCondition = returnOccurrence === 'first' ? (i: number) => i < normalizedArray.length : (i: number) => i >= 0
+    const incrementIndex = returnOccurrence === 'first' ? (i: number) => i+1 : (i: number) => i-1
 
     for (let i = initialIterationIndex; iterationCondition(i); i = incrementIndex(i)) {
       const value = normalizedArray[i] as RawNoErrorScalarValue

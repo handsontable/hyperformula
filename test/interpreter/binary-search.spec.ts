@@ -58,7 +58,7 @@ describe('findLastOccurrenceInOrderedArray', () => {
     expect(findLastOccurrenceInOrderedArray('xyz', values)).toBe(5)
   })
 
-  it('returns the last occurence', () => {
+  it('returns the last occurrence', () => {
     const values = [1, 2, 2, 2, 2, 2, 3, 3, 3]
     expect(findLastOccurrenceInOrderedArray(2, values)).toBe(5)
   })

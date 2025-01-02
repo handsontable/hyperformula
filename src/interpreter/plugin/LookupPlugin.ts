@@ -148,7 +148,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       const isWildcardMatchMode = matchMode === 2
       const searchOptions: SearchOptions = {
         ordering: searchMode === 2 ? 'asc' : searchMode === -2 ? 'desc' : 'none',
-        returnOccurence: searchMode === -1 ? 'last' : 'first',
+        returnOccurrence: searchMode === -1 ? 'last' : 'first',
         ifNoMatch: matchMode === -1
           ? 'returnLowerBound'
           : matchMode === 1
@@ -202,7 +202,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       return searchStrategy.advancedFind(
         this.arithmeticHelper.eqMatcherFunction(key),
         range,
-        { returnOccurence: searchOptions.returnOccurence }
+        { returnOccurrence: searchOptions.returnOccurrence }
       )
     }
     
