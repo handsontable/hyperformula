@@ -175,7 +175,7 @@ describe('Function XLOOKUP', () => {
     it('should not perform the wildcard match unless matchMode=2', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP("a?b*", A2:E2, A2:E2)'],
-        ["a", "axxb", "a1b111", "a2b222", "x"],
+        ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
       ])
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
@@ -547,7 +547,7 @@ describe('Function XLOOKUP', () => {
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: false })
     
-          expect(engine.getCellValue(adr('A1'))).toEqual("NotFound")
+          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
 
@@ -585,7 +585,7 @@ describe('Function XLOOKUP', () => {
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: false })
     
-          expect(engine.getCellValue(adr('A1'))).toEqual("NotFound")
+          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
 
@@ -763,37 +763,37 @@ describe('Function XLOOKUP', () => {
         it('when searchMode = 1, returns the first matching item', () => {
           const engine = HyperFormula.buildFromArray([
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, 1)'],
-            ["a", "axxb", "a1b111", "a2b222", "x"],
+            ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
   
-          expect(engine.getCellValue(adr('A1'))).toEqual("a1b111")
+          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
         it('when searchMode = 2, returns the first matching item', () => {
           const engine = HyperFormula.buildFromArray([
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, 2)'],
-            ["a", "axxb", "a1b111", "a2b222", "x"],
+            ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
   
-          expect(engine.getCellValue(adr('A1'))).toEqual("a1b111")
+          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
         it('when searchMode = -2, returns the first matching item', () => {
           const engine = HyperFormula.buildFromArray([
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, -2)'],
-            ["a", "axxb", "a1b111", "a2b222", "x"],
+            ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
   
-          expect(engine.getCellValue(adr('A1'))).toEqual("a1b111")
+          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
         it('when searchMode = -1, returns the last matching item', () => {
           const engine = HyperFormula.buildFromArray([
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, -1)'],
-            ["a", "axxb", "a1b111", "a2b222", "x"],
+            ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
   
-          expect(engine.getCellValue(adr('A1'))).toEqual("a2b222")
+          expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
         })
 
         it('when there are no matching items, returns NotFound (all searchModes)', () => {
@@ -802,18 +802,87 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP("t?b*", A5:E5, A5:E5, "NotFound", 2, -1)'],
             ['=XLOOKUP("t?b*", A5:E5, A5:E5, "NotFound", 2, 2)'],
             ['=XLOOKUP("t?b*", A5:E5, A5:E5, "NotFound", 2, -2)'],
-            ["a", "axxb", "a1b111", "a2b222", "x"],
+            ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
   
-          expect(engine.getCellValue(adr('A1'))).toEqual("NotFound")
-          expect(engine.getCellValue(adr('A2'))).toEqual("NotFound")
-          expect(engine.getCellValue(adr('A3'))).toEqual("NotFound")
-          expect(engine.getCellValue(adr('A4'))).toEqual("NotFound")
+          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A4'))).toEqual('NotFound')
         })
       })
 
       describe('for a vertical range', () => {
-        // TODO
+        it('when searchMode = 1, returns the first matching item', () => {
+          const engine = HyperFormula.buildFromArray([
+            ['=XLOOKUP("a?b*", A2:A6, A2:A6, "NotFound", 2, 1)'],
+            ['a'],
+            ['axxb'],
+            ['a1b111'],
+            ['a2b222'],
+            ['x'],
+          ], { useColumnIndex: false })
+  
+          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+        })
+
+        it('when searchMode = 2, returns the first matching item', () => {
+          const engine = HyperFormula.buildFromArray([
+            ['=XLOOKUP("a?b*", A2:A6, A2:A6, "NotFound", 2, 2)'],
+            ['a'],
+            ['axxb'],
+            ['a1b111'],
+            ['a2b222'],
+            ['x'],
+          ], { useColumnIndex: false })
+  
+          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+        })
+
+        it('when searchMode = -2, returns the first matching item', () => {
+          const engine = HyperFormula.buildFromArray([
+            ['=XLOOKUP("a?b*", A2:A6, A2:A6, "NotFound", 2, -2)'],
+            ['a'],
+            ['axxb'],
+            ['a1b111'],
+            ['a2b222'],
+            ['x'],
+          ], { useColumnIndex: false })
+  
+          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+        })
+
+        it('when searchMode = -1, returns the last matching item', () => {
+          const engine = HyperFormula.buildFromArray([
+            ['=XLOOKUP("a?b*", A2:A6, A2:A6, "NotFound", 2, -1)'],
+            ['a'],
+            ['axxb'],
+            ['a1b111'],
+            ['a2b222'],
+            ['x'],
+          ], { useColumnIndex: false })
+  
+          expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
+        })
+
+        it('when there are no matching items, returns NotFound (all searchModes)', () => {
+          const engine = HyperFormula.buildFromArray([
+            ['=XLOOKUP("t?b*", A5:A9, A5:A9, "NotFound", 2, 1)'],
+            ['=XLOOKUP("t?b*", A5:A9, A5:A9, "NotFound", 2, -1)'],
+            ['=XLOOKUP("t?b*", A5:A9, A5:A9, "NotFound", 2, 2)'],
+            ['=XLOOKUP("t?b*", A5:A9, A5:A9, "NotFound", 2, -2)'],
+            ['a'],
+            ['axxb'],
+            ['a1b111'],
+            ['a2b222'],
+            ['x'],
+          ], { useColumnIndex: false })
+  
+          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A4'))).toEqual('NotFound')
+        })
       })
     })
   })
@@ -854,7 +923,7 @@ describe('Function XLOOKUP', () => {
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: true })
     
-          expect(engine.getCellValue(adr('A1'))).toEqual("NotFound")
+          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
 
@@ -892,7 +961,7 @@ describe('Function XLOOKUP', () => {
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: true })
     
-          expect(engine.getCellValue(adr('A1'))).toEqual("NotFound")
+          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
 
@@ -1160,5 +1229,3 @@ describe('Function XLOOKUP', () => {
     })
   })
 })
-
-// TODO: setup debugger, upgrade to premium
