@@ -21,7 +21,7 @@ export interface SearchOptions {
 }
 
 export interface AdvancedFindOptions {
-  returnOccurence?: 'first' | 'last'
+  returnOccurence?: 'first' | 'last',
 }
 
 export interface SearchStrategy {
