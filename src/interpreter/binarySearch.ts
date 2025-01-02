@@ -46,44 +46,51 @@ export function findLastOccurrenceInOrderedRange(
   const foundIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
   const foundValue = getValueFromIndexFn(foundIndex)
 
-  if (foundIndex === NOT_FOUND) {
-    if (ifNoMatch === 'returnLowerBound' && orderingDirection === 'desc') {
-      return 0
-    }
-
-    if (ifNoMatch === 'returnUpperBound' && orderingDirection === 'asc') {
-      return 0
-    }
-
-    return NOT_FOUND
-  }
-
-  if (typeof foundValue !== typeof searchKey) {
-    return NOT_FOUND
-  }
-
   if (foundValue === searchKey) {
     return foundIndex - start
   }
 
   if (ifNoMatch === 'returnLowerBound') {
+    if (foundIndex === NOT_FOUND) {
+      return orderingDirection === 'asc' ? NOT_FOUND : 0
+    }
+
+    // czy to sie zdarza?
+    if (typeof foundValue !== typeof searchKey) {
+      return NOT_FOUND
+    }
+
+    // here: foundValue !== searchKey
     if (orderingDirection === 'asc') {
       return foundIndex - start
     }
 
+    // orderingDirection === 'desc'
     const nextIndex = foundIndex+1
     return nextIndex <= end ? nextIndex - start : NOT_FOUND
   }
 
   if (ifNoMatch === 'returnUpperBound') {
+    if (foundIndex === NOT_FOUND) {
+      return orderingDirection === 'asc' ? 0 : NOT_FOUND
+    }
+
+    // czy to sie zdarza?
+    if (typeof foundValue !== typeof searchKey) {
+      return NOT_FOUND
+    }
+
+    // here: foundValue !== searchKey
     if (orderingDirection === 'desc') {
       return foundIndex - start
     }
 
+    // orderingDirection === 'asc'
     const nextIndex = foundIndex+1
     return nextIndex <= end ? nextIndex - start : NOT_FOUND
   }
 
+  // ifNoMatch === 'returnNotFound'
   return NOT_FOUND
 }
 
