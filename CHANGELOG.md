@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added a new function: XLOOKUP. [#1458](https://github.com/handsontable/hyperformula/issues/1458)
+
 ### Changed
 
 - **Breaking change**: Changed ES module build to use `mjs` files and `exports` property in `package.json` to make importing language files possible in Node environment. [#1344](https://github.com/handsontable/hyperformula/issues/1344)

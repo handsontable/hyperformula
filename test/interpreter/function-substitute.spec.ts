@@ -39,7 +39,7 @@ describe('Function SUBSTITUTE', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual('fofofofufo')
   })
 
-  it('should return the original text if there are not enough occurences of the search string', () => {
+  it('should return the original text if there are not enough occurrences of the search string', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUBSTITUTE("foobar", "o", "BAZ", 3)'],
     ])
