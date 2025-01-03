@@ -28,10 +28,6 @@ export function findLastOccurrenceInOrderedRange(
   { searchCoordinate, orderingDirection, ifNoMatch }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' },
   dependencyGraph: DependencyGraph,
 ): number {
-  if (ifNoMatch == null) {
-    ifNoMatch = 'returnNotFound'
-  }
-
   const start = range.start[searchCoordinate]
   const end = searchCoordinate === 'col' ? range.effectiveEndColumn(dependencyGraph) : range.effectiveEndRow(dependencyGraph)
 
