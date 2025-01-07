@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-01-14
+
 ### Added
 
 - Added a new function: XLOOKUP. [#1458](https://github.com/handsontable/hyperformula/issues/1458)
