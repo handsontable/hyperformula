@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2024 Handsoncode. All rights reserved.
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
@@ -16,20 +16,16 @@ const NOT_FOUND = -1
  * Options:
  * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search,
  * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range,
- * - matchExactly - when set to false, searches for the lower/upper bound.
+ * - ifNoMatch - must be set to 'returnLowerBound', 'returnUpperBound' or 'returnNotFound'
  *
- * Semantics:
- * - If orderingDirection === 'asc', searches for the lower bound for the searchKey value (unless marchExactly === true).
- * - If orderingDirection === 'desc', searches for the upper bound for the searchKey value (unless marchExactly === true).
- * - If the search range contains duplicates, returns the last matching value.
- * - If no value in the range satisfies the above, returns -1.
+ * If the search range contains duplicates, returns the last matching value. If no value found in the range satisfies the above, returns -1.
  *
  * Note: this function does not normalize input strings.
  */
 export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
   range: AbsoluteCellRange,
-  { searchCoordinate, orderingDirection, matchExactly }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', matchExactly?: boolean },
+  { searchCoordinate, orderingDirection, ifNoMatch }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' },
   dependencyGraph: DependencyGraph,
 ): number {
   const start = range.start[searchCoordinate]
@@ -46,15 +42,50 @@ export function findLastOccurrenceInOrderedRange(
   const foundIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
   const foundValue = getValueFromIndexFn(foundIndex)
 
-  if (foundIndex === NOT_FOUND || typeof foundValue !== typeof searchKey) {
-    return NOT_FOUND
+  if (foundValue === searchKey) {
+    return foundIndex - start
   }
 
-  if (matchExactly && foundValue !== searchKey) {
-    return NOT_FOUND
+  if (ifNoMatch === 'returnLowerBound') {
+    if (foundIndex === NOT_FOUND) {
+      return orderingDirection === 'asc' ? NOT_FOUND : 0
+    }
+
+    if (typeof foundValue !== typeof searchKey) {
+      return NOT_FOUND
+    }
+
+    // here: foundValue !== searchKey
+    if (orderingDirection === 'asc') {
+      return foundIndex - start
+    }
+
+    // orderingDirection === 'desc'
+    const nextIndex = foundIndex+1
+    return nextIndex <= end ? nextIndex - start : NOT_FOUND
   }
 
-  return foundIndex - start
+  if (ifNoMatch === 'returnUpperBound') {
+    if (foundIndex === NOT_FOUND) {
+      return orderingDirection === 'asc' ? 0 : NOT_FOUND
+    }
+
+    if (typeof foundValue !== typeof searchKey) {
+      return NOT_FOUND
+    }
+
+    // here: foundValue !== searchKey
+    if (orderingDirection === 'desc') {
+      return foundIndex - start
+    }
+
+    // orderingDirection === 'asc'
+    const nextIndex = foundIndex+1
+    return nextIndex <= end ? nextIndex - start : NOT_FOUND
+  }
+
+  // ifNoMatch === 'returnNotFound'
+  return NOT_FOUND
 }
 
 /*

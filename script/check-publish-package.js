@@ -5,10 +5,9 @@
 const tar = require('tar')
 const util = require('util')
 const fs = require('fs')
-const rimraf = require('rimraf')
+const { rimraf } = require('rimraf')
 
 const stat = util.promisify(fs.stat);
-const rimrafPromisified = util.promisify(rimraf);
 
 /**
  * Default directory name where the package is unziped.
@@ -29,12 +28,12 @@ const FILES_CHECKLIST = [
   'commonjs/index.js',
   'commonjs/HyperFormula.js',
   'dist/hyperformula.js',
-  'es/index.js',
-  'es/HyperFormula.js',
+  'es/index.mjs',
+  'es/HyperFormula.mjs',
   'typings/index.d.ts',
   'typings/HyperFormula.d.ts',
   'dist/languages/plPL.js',
-  'es/i18n/languages/plPL.js',
+  'es/i18n/languages/plPL.mjs',
   'commonjs/i18n/languages/plPL.js',
 ]
 
@@ -90,5 +89,5 @@ async function checkDirectoryTreeStructure() {
 }
 
 async function removePackage(files) {
-  return rimrafPromisified(files)
+  return rimraf(files)
 }

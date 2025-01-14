@@ -37,7 +37,7 @@ describe('Function SEC', () => {
       [1.57079632679486, '=SEC(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(27249001701268.1)
+    expect(engine.getCellValue(adr('B1'))).toBeCloseTo(27249001701268.1, -3)
   })
 
   it('errors propagation', () => {

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2024 Handsoncode. All rights reserved.
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
 import {
@@ -30,7 +30,6 @@ export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     accentSensitive: false,
-    binarySearchThreshold: 20,
     currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
@@ -56,7 +55,7 @@ export class Config implements ConfigParams, ParserConfig {
     nullDate: {year: 1899, month: 12, day: 30},
     parseDateTime: defaultParseToDateTime,
     precisionEpsilon: 1e-13,
-    precisionRounding: 14,
+    precisionRounding: 10,
     smartRounding: true,
     stringifyDateTime: defaultStringifyDateTime,
     stringifyDuration: defaultStringifyDuration,
@@ -130,8 +129,6 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly useStats: boolean
   /** @inheritDoc */
-  public readonly binarySearchThreshold: number
-  /** @inheritDoc */
   public readonly nullDate: SimpleDate
   /** @inheritDoc */
   public readonly currencySymbol: string[]
@@ -167,7 +164,6 @@ export class Config implements ConfigParams, ParserConfig {
   constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
     const {
       accentSensitive,
-      binarySearchThreshold,
       caseSensitive,
       caseFirst,
       chooseAddressMappingPolicy,
@@ -240,7 +236,6 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
     this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
-    this.binarySearchThreshold = binarySearchThreshold ?? Config.defaultConfig.binarySearchThreshold
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
@@ -315,7 +310,8 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   private static warnDeprecatedOptions(options: Partial<ConfigParams>) {
-    Config.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
+    // an example of deprecation warning
+    // Config.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

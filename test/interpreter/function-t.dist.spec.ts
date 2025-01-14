@@ -62,7 +62,7 @@ describe('Function T.DIST', () => {
       ['=T.DIST(1, 0.9, FALSE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.159154942198517)
+    expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.159154942198517, 11)
     //product #2 returns different error
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })

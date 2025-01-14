@@ -9,7 +9,7 @@ module.exports = {
         ['@babel/preset-env', {
           modules: false,
           useBuiltIns: 'usage',
-          corejs: '3.23',
+          corejs: '3.39.0',
         }]
       ],
       plugins: [
@@ -18,7 +18,7 @@ module.exports = {
           helpers: false,
           regenerator: false,
           useESModules: false,
-          version: '^7.18.9',
+          version: '^7.25.9',
         }],
         ['@babel/plugin-transform-modules-commonjs', { loose: true }]
       ]
@@ -31,7 +31,9 @@ module.exports = {
     },
     // Environment for transpiling files to be compatible with ES Modules.
     es: {
-      plugins: [],
+      plugins: [
+        ['./.config/babel/add-import-extension.js', { extension: 'mjs' }],
+      ],
     },
   },
 };

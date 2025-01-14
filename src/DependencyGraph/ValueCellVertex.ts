@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2024 Handsoncode. All rights reserved.
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
 import {CellError} from '../Cell'
@@ -36,9 +36,5 @@ export class ValueCellVertex {
    */
   public getCellValue(): ValueCellVertexValue {
     return this.parsedValue
-  }
-
-  public setCellValue(_cellValue: ValueCellVertexValue): never {
-    throw Error('SetCellValue is deprecated for ValueCellVertex')
   }
 }

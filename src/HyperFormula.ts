@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2024 Handsoncode. All rights reserved.
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
 import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange} from './AbsoluteCellRange'
@@ -53,7 +53,7 @@ import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './Named
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
   Ast,
-  AstNodeType, NamedExpressionDependency,
+  NamedExpressionDependency,
   ParserWithCaching,
   RelativeDependency,
   simpleCellAddressFromString,
@@ -887,6 +887,8 @@ export class HyperFormula implements TypedEmitter {
    * Returns dimensions of a specified sheet.
    * The sheet dimensions is represented with numbers: width and height.
    *
+   * Note: Due to the memory optimizations, some of the empty bottom rows and rightmost columns are not counted to the dimensions.
+   *
    * @param {number} sheetId - sheet ID number
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -1341,7 +1343,7 @@ export class HyperFormula implements TypedEmitter {
    * Note: This method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
-   * @param {number[]} newRowOrder - permutation of rows
+   * @param {number[]} newRowOrder - permutation of rows; array length must match the number of rows returned by [getSheetDimensions()](#getsheetdimensions)
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -1506,7 +1508,7 @@ export class HyperFormula implements TypedEmitter {
    * Note: This method may trigger dependency graph recalculation.
    *
    * @param {number} sheetId - ID of a sheet to operate on
-   * @param {number[]} newColumnOrder - permutation of columns
+   * @param {number[]} newColumnOrder - permutation of columns; array length must match the number of columns returned by [getSheetDimensions()](#getsheetdimensions)
    *
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
@@ -2791,10 +2793,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Computes the simple (absolute) address of a cell address, based on its string representation.
    * - If a sheet name is present in the string representation but is not present in the engine, returns `undefined`.
-   * - If no sheet name is present in the string representation, returns `contextSheetId` as sheet number.
+   * - If no sheet name is present in the string representation, uses `contextSheetId` as a sheet id in the returned address.
    *
    * @param {string} cellAddress - string representation of cell address in A1 notation
-   * @param {number} contextSheetId - context used in case of missing sheet in the first argument
+   * @param {number} contextSheetId - sheet id used to construct the simple address in case of missing sheet name in `cellAddress` argument
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    *
@@ -2803,17 +2805,17 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildEmpty();
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
    *
-   * // returns { sheet: 0, col: 0, row: 0 }
-   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 0);
+   * // returns { sheet: 42, col: 0, row: 0 }
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('A1', 42);
    *
    * // returns { sheet: 0, col: 0, row: 5 }
-   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet1!A6');
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet0!A6', 42);
    *
    * // returns { sheet: 0, col: 0, row: 5 }
-   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet1!$A$6');
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet0!$A$6', 42);
    *
    * // returns 'undefined', as there's no 'Sheet 2' in the HyperFormula instance
-   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet2!A6');
+   * const simpleCellAddress = hfInstance.simpleCellAddressFromString('Sheet2!A6', 42);
    * ```
    *
    * @category Helpers
@@ -2829,7 +2831,7 @@ export class HyperFormula implements TypedEmitter {
    * If sheet name is present in string representation but not present in the engine, returns `undefined`.
    *
    * @param {string} cellRange - string representation of cell range in A1 notation
-   * @param {number} sheetId - context used in case of missing sheet in the first argument
+   * @param {number} contextSheetId - sheet id used to construct the simple address in case of missing sheet name in `cellRange` argument
    *
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -2845,17 +2847,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public simpleCellRangeFromString(cellRange: string, sheetId: number): SimpleCellRange | undefined {
+  public simpleCellRangeFromString(cellRange: string, contextSheetId: number): SimpleCellRange | undefined {
     validateArgToType(cellRange, 'string', 'cellRange')
-    validateArgToType(sheetId, 'number', 'sheetId')
-    return simpleCellRangeFromString(this.sheetMapping.get, cellRange, sheetId)
+    validateArgToType(contextSheetId, 'number', 'sheetId')
+    return simpleCellRangeFromString(this.sheetMapping.get, cellRange, contextSheetId)
   }
 
   /**
-   * Returns string representation of an absolute address in A1 notation or `undefined` if the sheet index is not present in the engine.
+   * Computes string representation of an absolute address in A1 notation. If `cellAddress.sheet` is not present in the engine, returns `undefined`.
    *
    * @param {SimpleCellAddress} cellAddress - object representation of an absolute address
-   * @param {number} sheetId - context used in case of missing sheet in the first argument
+   * @param {object | number} optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
    *
    * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
    *
@@ -2863,28 +2865,50 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
+   * const addr = { sheet: 0, col: 1, row: 1 };
    *
    * // should return 'B2'
-   * const A1Notation = hfInstance.simpleCellAddressToString({ sheet: 0, col: 1, row: 1 }, 0);
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr);
+   *
+   * // should return 'B2'
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, { includeSheetName: false });
+   *
+   * // should return 'Sheet0!B2'
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, { includeSheetName: true });
+   *
+   * // should return 'B2' as context sheet id is the same as addr.sheet
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, 0);
+   *
+   * // should return 'Sheet0!B2' as context sheet id is different from addr.sheet
+   * const A1Notation = hfInstance.simpleCellAddressToString(addr, 42);
    * ```
    *
    * @category Helpers
    */
-  public simpleCellAddressToString(cellAddress: SimpleCellAddress, sheetId: number): string | undefined {
+  public simpleCellAddressToString(cellAddress: SimpleCellAddress, optionsOrContextSheetId: { includeSheetName?: boolean } | number = {}) {
     if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
-    validateArgToType(sheetId, 'number', 'sheetId')
-    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, sheetId)
+
+    const contextSheetId = typeof optionsOrContextSheetId === 'number'
+      ? optionsOrContextSheetId
+      : optionsOrContextSheetId.includeSheetName ? cellAddress.sheet+1 : cellAddress.sheet
+
+    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, contextSheetId)
   }
 
   /**
-   * Returns string representation of an absolute range in A1 notation or `undefined` if the sheet index is not present in the engine.
+   * Computes string representation of an absolute range in A1 notation.
+   * Returns `undefined` if:
+   * - `cellRange` is not a valid range,
+   * - `cellRange.start.sheet` and `cellRange.start.end` are different,
+   * - `cellRange.start.sheet` is not present in the engine,
+   * - `cellRange.start.end` is not present in the engine.
    *
    * Note: This method is useful only for cell ranges; does not work with column ranges and row ranges.
    *
    * @param {SimpleCellRange} cellRange - object representation of an absolute range
-   * @param {number} sheetId - context used in case of missing sheet in the first argument
+   * @param {object | number} optionsOrContextSheetId - options object or number used as context sheet id to construct the string address (see examples)
    *
    * @throws [[ExpectedValueOfTypeError]] if its arguments are of wrong type
    *
@@ -2892,23 +2916,36 @@ export class HyperFormula implements TypedEmitter {
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
    * hfInstance.addSheet('Sheet0'); //sheetId = 0
-   * hfInstance.addSheet('Sheet1'); //sheetId = 1
+   * const range = { start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } };
    *
    * // should return 'B2:C2'
-   * const A1Notation = hfInstance.simpleCellRangeToString({ start: { sheet: 0, col: 1, row: 1 }, end: { sheet: 0, col: 2, row: 1 } }, 0);
+   * const A1Notation = hfInstance.simpleCellRangeToString(range);
    *
-   *  // should return 'Sheet1!B2:C2'
-   * const another = hfInstance.simpleCellRangeToString({ start: { sheet: 1, col: 1, row: 1 }, end: { sheet: 1, col: 2, row: 1 } }, 0);
+   * // should return 'B2:C2'
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, { includeSheetName: false });
+   *
+   * // should return 'Sheet0!B2:C2'
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, { includeSheetName: true });
+   *
+   * // should return 'B2:C2' as context sheet id is the same as range.start.sheet and range.end.sheet
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, 0);
+   *
+   * // should return 'Sheet0!B2:C2' as context sheet id is different from range.start.sheet and range.end.sheet
+   * const A1Notation = hfInstance.simpleCellRangeToString(range, 42);
    * ```
    *
    * @category Helpers
    */
-  public simpleCellRangeToString(cellRange: SimpleCellRange, sheetId: number): string | undefined {
+  public simpleCellRangeToString(cellRange: SimpleCellRange, optionsOrContextSheetId: { includeSheetName?: boolean } | number = {}): string | undefined {
     if (!isSimpleCellRange(cellRange)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'cellRange')
     }
-    validateArgToType(sheetId, 'number', 'sheetId')
-    return simpleCellRangeToString(this.sheetMapping.fetchDisplayName, cellRange, sheetId)
+
+    const contextSheetId = typeof optionsOrContextSheetId === 'number'
+      ? optionsOrContextSheetId
+      : optionsOrContextSheetId.includeSheetName ? cellRange.start.sheet+cellRange.end.sheet+1 : cellRange.start.sheet
+
+    return simpleCellRangeToString(this.sheetMapping.fetchDisplayName, cellRange, contextSheetId)
   }
 
   /**

@@ -4,7 +4,7 @@ import moment from 'moment';
 
 console.log(
   `%c Using HyperFormula ${HyperFormula.version}`,
-  'color: blue; font-weight: bold'
+  'color: blue; font-weight: bold',
 );
 
 /* end:skip-in-compilation */
@@ -61,7 +61,7 @@ hf.setCellContents(
     col: 0,
     sheet: sheetId,
   },
-  tableData
+  tableData,
 );
 
 /**
@@ -82,9 +82,7 @@ function renderTable(calculated = false) {
       const showFormula = calculated || !cellHasFormula;
       const cellValue = displayValue(cellAddress, showFormula);
 
-      newTbodyHTML += `<td class="${
-        cellHasFormula ? updatedCellClass : ''
-      }"><span>
+      newTbodyHTML += `<td class="${cellHasFormula ? updatedCellClass : ''}"><span>
       ${cellValue}
       </span></td>`;
     }

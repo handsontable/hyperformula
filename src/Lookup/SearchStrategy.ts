@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2024 Handsoncode. All rights reserved.
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
 import {SimpleCellAddress} from '../Cell'
@@ -16,7 +16,12 @@ import {ColumnIndex} from './ColumnIndex'
 
 export interface SearchOptions {
   ordering: 'asc' | 'desc' | 'none',
-  matchExactly?: boolean,
+  ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound',
+  returnOccurrence?: 'first' | 'last',
+}
+
+export interface AdvancedFindOptions {
+  returnOccurrence?: 'first' | 'last',
 }
 
 export interface SearchStrategy {
@@ -25,7 +30,7 @@ export interface SearchStrategy {
    */
   find(searchKey: RawNoErrorScalarValue, range: SimpleRangeValue, options: SearchOptions): number,
 
-  advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number,
+  advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue, options: AdvancedFindOptions): number,
 }
 
 export interface ColumnSearchStrategy extends SearchStrategy {

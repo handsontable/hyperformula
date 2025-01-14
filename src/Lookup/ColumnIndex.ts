@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2024 Handsoncode. All rights reserved.
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
 import {CellError, movedSimpleCellAddress, SimpleCellAddress} from '../Cell'
@@ -23,7 +23,7 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
-import {ColumnSearchStrategy, SearchOptions} from './SearchStrategy'
+import {AdvancedFindOptions, ColumnSearchStrategy, SearchOptions} from './SearchStrategy'
 import {Maybe} from '../Maybe'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 
@@ -107,16 +107,16 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
-  /*
-   * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
-   */
-  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, matchExactly }: SearchOptions): number {
-    const handlingDuplicates = matchExactly === true ? 'findFirst' : 'findLast'
-    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, handlingDuplicates)
-    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, matchExactly })
+  public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurrence }: SearchOptions): number {
+    if (returnOccurrence == null) {
+      returnOccurrence = ordering === 'none' ? 'first' : 'last'
+    }
+
+    const resultUsingColumnIndex = this.findUsingColumnIndex(searchKey, rangeValue, returnOccurrence)
+    return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, ifNoMatch, returnOccurrence })
   }
 
-  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, handlingDuplicates: 'findFirst' | 'findLast'): Maybe<number> {
+  private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, returnOccurrence: 'first' | 'last'): Maybe<number> {
     const range = rangeValue.range
     if (range === undefined) {
       return undefined
@@ -135,15 +135,15 @@ export class ColumnIndex implements ColumnSearchStrategy {
       return undefined
     }
 
-    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, handlingDuplicates)
+    const rowNumber = ColumnIndex.findRowBelongingToRange(valueIndexForTheKey, range, returnOccurrence)
     return rowNumber !== undefined ? rowNumber - range.start.row : undefined
   }
 
-  private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, handlingDuplicates: 'findFirst' | 'findLast'): Maybe<number> {
+  private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, returnOccurrence: 'first' | 'last'): Maybe<number> {
     const start = range.start.row
     const end = range.end.row
 
-    const positionInIndex = handlingDuplicates === 'findFirst'
+    const positionInIndex = returnOccurrence === 'first'
       ? findInOrderedArray(start, valueIndex.index, 'upperBound')
       : findInOrderedArray(end, valueIndex.index, 'lowerBound')
 
@@ -158,8 +158,8 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
 
-  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue): number {
-    return this.binarySearchStrategy.advancedFind(keyMatcher, range)
+  public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue, options: AdvancedFindOptions = { returnOccurrence: 'first' }): number {
+    return this.binarySearchStrategy.advancedFind(keyMatcher, range, options)
   }
 
   public addColumns(columnsSpan: ColumnsSpan) {

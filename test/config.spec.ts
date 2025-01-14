@@ -375,63 +375,22 @@ describe('Config', () => {
       const dateAsNumber = 0.564969131944444
 
       let engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.s'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ssss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sssss'] })
-      expect(engine.getCellValue(adr('A1'))).toEqual(dateAsNumber)
-    })
-  })
-
-  describe('deprecated option warning messages', () => {
-    beforeEach(() => {
-      spyOn(console, 'warn')
-    })
-
-    afterEach(() => {
-      resetSpy(console.warn)
-    })
-
-    it('should log usage of deprecated options when they are passed while engine initialization', () => {
-      new Config({
-        binarySearchThreshold: 20,
-      })
-
-      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
-      expect(console.warn).toHaveBeenCalledTimes(1)
-    })
-
-    it('should log usage of deprecated options when they are passed while merging the Config object', () => {
-      const config = new Config()
-
-      config.mergeConfig({
-        binarySearchThreshold: 20
-      })
-
-      expect(console.warn).toHaveBeenCalledTimes(1)
-      expect(console.warn).toHaveBeenCalledWith('binarySearchThreshold option is deprecated since 1.1')
-    })
-
-    it('should not log usage of deprecated options when they are not passed while merging the Config object', () => {
-      const config = new Config({
-        binarySearchThreshold: 20,
-      })
-      resetSpy(console.warn)
-
-      config.mergeConfig({})
-
-      expect(console.warn).not.toHaveBeenCalled()
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
     })
   })
 })

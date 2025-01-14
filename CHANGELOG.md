@@ -7,6 +7,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-01-14
+
+### Added
+
+- Added a new function: XLOOKUP. [#1458](https://github.com/handsontable/hyperformula/issues/1458)
+
+### Changed
+
+- **Breaking change**: Changed ES module build to use `mjs` files and `exports` property in `package.json` to make importing language files possible in Node environment. [#1344](https://github.com/handsontable/hyperformula/issues/1344)
+- **Breaking change**: Changed the default value of the `precisionRounding` configuration option to `10`. [#1300](https://github.com/handsontable/hyperformula/issues/1300)
+- Make methods `simpleCellAddressToString` and `simpleCellRangeToString` more logical and easier to use. [#1151](https://github.com/handsontable/hyperformula/issues/1151)
+
+### Removed
+
+- **Breaking change**: Removed the `binarySearchThreshold` configuration option. [#1439](https://github.com/handsontable/hyperformula/issues/1439)
+
 ## [2.7.1] - 2024-07-18
 
 ### Fixed

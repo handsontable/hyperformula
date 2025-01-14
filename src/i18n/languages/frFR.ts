@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright (c) 2024 Handsoncode. All rights reserved.
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
 import {RawTranslationPackage} from '..'
@@ -232,6 +232,7 @@ const dictionary: RawTranslationPackage = {
     WEEKNUM: 'NO.SEMAINE',
     WORKDAY: 'SERIE.JOUR.OUVRE',
     'WORKDAY.INTL': 'SERIE.JOUR.OUVRE.INTL',
+    XLOOKUP: 'RECHERCHEX',
     XNPV: 'VAN.PAIEMENTS',
     XOR: 'OUX',
     YEAR: 'ANNEE',
