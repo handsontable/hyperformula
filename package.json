@@ -10,7 +10,7 @@
     "url": "https://github.com/handsontable/hyperformula/issues"
   },
   "author": "Handsoncode <hello@handsontable.com>",
-  "version": "2.7.1",
+  "version": "3.0.0",
   "keywords": [
     "formula",
     "spreadsheet",
@@ -94,7 +94,7 @@
     "lint:fix": "eslint . --ext .js,.ts --fix",
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
     "compile": "tsc",
-    "check:licenses": "license-checker --production --excludePackages=\"hyperformula@2.7.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
+    "check:licenses": "license-checker --production --excludePackages=\"hyperformula@3.0.0\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
     "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}"
   },
   "dependencies": {
