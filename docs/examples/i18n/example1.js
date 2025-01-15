@@ -65,7 +65,9 @@ const config = {
   licenseKey: 'gpl-v3',
 };
 
-HyperFormula.registerLanguage('enUS', enUS);
+if (!HyperFormula.getRegisteredLanguagesCodes().includes('enUS')) {
+  HyperFormula.registerLanguage('enUS', enUS);
+}
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty(config);

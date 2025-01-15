@@ -30,7 +30,9 @@ const tableData = [
 ];
 
 // register language
-HyperFormula.registerLanguage('frFR', frFR);
+if (!HyperFormula.getRegisteredLanguagesCodes().includes('frFR')) {
+  HyperFormula.registerLanguage('frFR', frFR);
+}
 
 // Create an empty HyperFormula instance.
 const hf = HyperFormula.buildEmpty({
