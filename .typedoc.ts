@@ -1,9 +1,4 @@
 module.exports = {
-  "inputFiles": [
-    "./src/HyperFormula.ts",
-    "./src/ConfigParams.ts",
-    "./src/Emitter.ts",
-  ],
   "exclude": [
     "./test/**",
     "./src/interpreter/**",
