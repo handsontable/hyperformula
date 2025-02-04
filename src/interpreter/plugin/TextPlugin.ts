@@ -192,7 +192,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
   public trim(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRIM'), (arg: string) => {
-      return arg.replace(/^ +| +$/g, '').replace(/ +/g, ' ')
+      return arg
+        .replace(/^ +/g, '')
+        .replace(/ +$/g, '')
+        .replace(/ +/g, ' ')
     })
   }
 
