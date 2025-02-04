@@ -1,11 +1,10 @@
-import {ErrorType, HyperFormula} from '../src'
+import {ErrorType, HyperFormula, MissingTranslationError} from '../src'
 import {Config} from '../src/Config'
 import {enGB, plPL} from '../src/i18n/languages'
 import {EmptyValue, NumberType} from '../src/interpreter/InterpreterValue'
-import {adr, resetSpy, unregisterAllLanguages} from './testUtils'
+import {adr, unregisterAllLanguages} from './testUtils'
 import {CellValueNoNumber} from '../src/Cell'
-import {MissingTranslationError} from '../src/errors'
-import {UIElement} from '../src/i18n/index'
+import {UIElement} from '../src/i18n'
 
 describe('Config', () => {
   beforeEach(() => {
