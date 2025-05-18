@@ -666,7 +666,7 @@ const namedExpressionVertex = (engine: HyperFormula, expressionName: string, she
     it('doesn\'t throw when added named expression is used in a formula twice', () => {
       const engine = HyperFormula.buildFromArray([
         ['55', '=age + age']
-      ]);
+      ])
 
       engine.addNamedExpression('age', '=Sheet1!$A$1', 0)
 
