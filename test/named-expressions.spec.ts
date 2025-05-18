@@ -662,6 +662,18 @@ const namedExpressionVertex = (engine: HyperFormula, expressionName: string, she
   return engine.dependencyGraph.fetchCell(namedExpression.address)
 }
 
+  describe('Named expressions - adding', () => {
+    it('doesn\'t throw when added named expression is used in a formula twice', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['55', '=age + age']
+      ]);
+
+      engine.addNamedExpression('age', '=Sheet1!$A$1', 0)
+
+      expect(engine.getCellValue(adr('B1'))).toEqual(110)
+    })
+  })
+
 describe('Named expressions - evaluation', () => {
   it('is recomputed', () => {
     const engine = HyperFormula.buildFromArray([
