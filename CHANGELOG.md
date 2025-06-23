@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed `Edge does not exist` error when a named expression is used twice in the same formula. [#1102](https://github.com/handsontable/hyperformula/issues/1102)
+- Fixed typos in the built-in functions guide. [#1517](https://github.com/handsontable/hyperformula/issues/1517)
 
 ## [3.0.0] - 2025-01-14
 
