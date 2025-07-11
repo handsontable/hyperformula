@@ -51,7 +51,8 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 - [Support for named expressions](guide/named-expressions.md)
 - [Support for data sorting](guide/sorting-data.md)
 - [Support for formula localization with 17 built-in languages](guide/i18n-features.md)
-- GPLv3 license
+- Easy integration with any front-end or back-end application
+- GPLv3 or a [commercial license](https://handsontable.com/get-a-quote)
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid
 
 ## Documentation
