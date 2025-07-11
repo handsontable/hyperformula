@@ -23,6 +23,7 @@ Quality assurance is at the heart of our development process:
 - **Nearly 5,000 unit tests** covering all aspects of the calculation engine
 - **97% test coverage** ensuring virtually every line of code is verified
 - Continuous integration across multiple environments
+- Regular performance comparisons between versions
 
 ::: tip
 Our high test coverage means you can be confident that HyperFormula will behave predictably in your application, even in complex scenarios.
@@ -44,6 +45,15 @@ HyperFormula's **entire source code is available on GitHub**, providing complete
 HyperFormula powers **Handsontable**, one of the most popular data grid solutions in JavaScript, trusted by thousands of developers worldwide.
 
 Additionally, HyperFormula is used by many other projects and organizations, providing continuous validation of its stability and performance across diverse applications.
+
+## Security
+
+HyperFormula maintains the highest security standards to protect your applications:
+
+- **Regular external security audits** conducted by independent security experts
+- **Dependency vulnerability scanning** using industry-leading tools including Fossa, Dependabot, and Snyk
+- **Security risk assessments** to identify and mitigate potential threats
+- **Proactive monitoring** of security advisories and immediate response to emerging threats
 
 ## Quality Assurance Process
 
