@@ -224,20 +224,12 @@ export class DependencyGraph {
     const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(expressionName, sheetId)
     return this.fetchCellOrCreateEmpty(namedExpression.address)
   }
-  public markAllNamedExpressionsAsDirty(): void {
-    const allExpressions = this.namedExpressions.getAllNamedExpressions();
-    for (const { expression } of allExpressions) {      
-      const vertex = this.shrinkPossibleArrayAndGetCell(expression.address);
-      if (vertex !== undefined) {
-        this.graph.markNodeAsDirty(vertex);
-      }
-    }
-  }
+
   public exchangeNode(addressFrom: SimpleCellAddress, addressTo: SimpleCellAddress) {
-    const vertexFrom = this.fetchCellOrCreateEmpty(addressFrom).vertex;
-    const vertexTo = this.fetchCellOrCreateEmpty(addressTo).vertex;
-    this.addressMapping.removeCell(addressFrom);
-    this.exchangeGraphNode(vertexFrom, vertexTo);
+    const vertexFrom = this.fetchCellOrCreateEmpty(addressFrom).vertex
+    const vertexTo = this.fetchCellOrCreateEmpty(addressTo).vertex
+    this.addressMapping.removeCell(addressFrom)
+    this.exchangeGraphNode(vertexFrom, vertexTo)
   }
 
   public fetchCellOrCreateEmpty(address: SimpleCellAddress): { vertex: CellVertex, id: Maybe<number> } {
