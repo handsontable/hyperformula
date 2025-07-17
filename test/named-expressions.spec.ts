@@ -675,109 +675,240 @@ const namedExpressionVertex = (engine: HyperFormula, expressionName: string, she
   })
 
 describe('Named expressions - evaluation', () => {
-  it('is recomputed', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['42'],
-    ])
-    engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
+  describe('when created with addNamedExpression', () => {
+    it('is recomputed', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['42'],
+      ])
+      engine.addNamedExpression('myName', '=Sheet1!$A$1+10')
+  
+      const changes = engine.setCellContents(adr('A1'), '20')
+  
+      expect(changes.length).toBe(2)
+      expect(changes).toContainEqual(new ExportedNamedExpressionChange('myName', 30))
+      expect(engine.getNamedExpressionValue('myName')).toEqual(30)
+    })
 
-    const changes = engine.setCellContents(adr('A1'), '20')
+    it('is recomputed on every change', () => {    
+      const hfInstance = HyperFormula.buildFromSheets(
+        { Sheet1: [[1]] },
+        {}
+      )
 
-    expect(changes.length).toBe(2)
-    expect(changes).toContainEqual(new ExportedNamedExpressionChange('myName', 30))
-    expect(engine.getNamedExpressionValue('myName')).toEqual(30)
-  })
+      hfInstance.addNamedExpression('test', '=Sheet1!$A$1')
+    
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(1)
+    
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 2)
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(2)
 
-  it('user original', () => {
-    const options = {
-      licenseKey: 'gpl-v3',
-      evaluateNullToZero: true,
-    }
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 3)
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(3)
 
-    const hfInstance = HyperFormula.buildFromSheets(
-      {
-        Sheet1: [[1, 2, '=SUM(test)']],
-      },
-      options,
-      [
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(4)
+    })
+
+    it('is recomputed on every change (array formula)', () => {
+      const options = {
+        licenseKey: 'gpl-v3',
+        evaluateNullToZero: true,
+      }
+  
+      const hfInstance = HyperFormula.buildFromSheets(
         {
-          name: 'test',
-          expression: '=Sheet1!$A$1:$B$1',
+          Sheet1: [[1, 2, '=SUM(test)']],
         },
-      ]
-    )
+        options
+      )
 
+      hfInstance.addNamedExpression('test', '=Sheet1!$A$1:$B$1')
+  
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
+      expect(hfInstance.getCellValue(adr('C1'))).toEqual(6)
+  
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 14)
+      expect(hfInstance.getCellValue(adr('C1'))).toEqual(16)
+    })
 
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
-    expect(hfInstance.getCellValue(adr('C1'))).toEqual(6)
+    it('should reevaluate volatile function in named expression', () => {
+      const engine = HyperFormula.buildFromArray([])
+  
+      engine.addNamedExpression('volatileExpression', '=RAND()')
+      const valueBeforeRecomputation = engine.getNamedExpressionValue('volatileExpression')
+  
+      const changes = engine.setCellContents(adr('A1'), 'foo')
+  
+      const valueAfterRecomputation = engine.getNamedExpressionValue('volatileExpression')
+      expect(valueAfterRecomputation).not.toEqual(valueBeforeRecomputation)
+      expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), 'foo'))
+      expect(changes).toContainEqual(new ExportedNamedExpressionChange('volatileExpression', valueAfterRecomputation!))
+    })
+  
+    it('adds edge to dependency', () => {
+      const engine = HyperFormula.buildFromArray([])
+      engine.addNamedExpression('FOO', '=42')
+  
+      engine.setCellContents(adr('A1'), '=FOO+10')
+  
+      const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
+      const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+      expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
+      expect(engine.getCellValue(adr('A1'))).toEqual(52)
+    })
 
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 14)
-    expect(hfInstance.getCellValue(adr('C1'))).toEqual(16)
+    it('named expression dependency works if named expression was defined later', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=FOO']
+      ])
+  
+      engine.addNamedExpression('FOO', '=42')
+  
+      const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
+      const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+      expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
+      expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    })
+  
+    it('removed named expression returns NAME error', () => {
+      const engine = HyperFormula.buildFromArray([])
+      engine.addNamedExpression('FOO', '=42')
+      engine.setCellContents(adr('A1'), '=FOO+10')
+  
+      engine.removeNamedExpression('FOO')
+  
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FOO')))
+    })
+  
+    it('removing node dependent on named expression', () => {
+      const engine = HyperFormula.buildFromArray([])
+      engine.addNamedExpression('FOO', '=42')
+      engine.setCellContents(adr('A1'), '=FOO+10')
+  
+      engine.setCellContents(adr('A1'), null)
+  
+      const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
+      expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
+    })
+  
+    it('named expressions are transformed during CRUDs', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=42']
+      ])
+      engine.addNamedExpression('FOO', '=Sheet1!$A$1 + 10')
+  
+      engine.removeSheet(0)
+  
+      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
+    })
+  
+    it('local named expression shadows global one', () => {
+      const engine = HyperFormula.buildFromArray([])
+      engine.addNamedExpression('FOO', '=42')
+      engine.addNamedExpression('FOO', '=13', 0)
+  
+      engine.setCellContents(adr('A1'), '=FOO+10')
+  
+      const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
+      const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.namedExpressionForScope('FOO')!.address)
+      const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+      expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
+      expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
+      expect(engine.getCellValue(adr('A1'))).toEqual(23)
+    })
+  
+    it('removing local named expression binds all the edges to global one', () => {
+      const engine = HyperFormula.buildFromArray([[]])
+      engine.addNamedExpression('foo', '10')
+      engine.addNamedExpression('foo', '20', 0)
+      engine.setCellContents(adr('A1'), [['=foo']])
+      const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+      const globalFooVertex = namedExpressionVertex(engine, 'foo')
+  
+      engine.removeNamedExpression('foo', 0)
+  
+      const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+      expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
+      expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
+      expect(engine.getCellValue(adr('A1'))).toEqual(10)
+    })
+  
+    it('removing local named expression binds all the edges to global one even if it doesnt exist', () => {
+      const engine = HyperFormula.buildFromArray([[]])
+      engine.addNamedExpression('foo', '20', 0)
+      engine.setCellContents(adr('A1'), [['=foo']])
+      const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+  
+      engine.removeNamedExpression('foo', 0)
+  
+      const globalFooVertex = namedExpressionVertex(engine, 'foo')
+      const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+      expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
+      expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
+    })
+  
+    it('adding local named expression binds all the edges from global one', () => {
+      const engine = HyperFormula.buildFromArray([[]])
+      engine.addNamedExpression('foo', '20')
+      engine.setCellContents(adr('A1'), [['=foo']])
+      const globalFooVertex = namedExpressionVertex(engine, 'foo')
+  
+      engine.addNamedExpression('foo', '30', 0)
+  
+      const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
+      const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
+      expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
+      expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
+      expect(engine.getCellValue(adr('A1'))).toEqual(30)
+    })
   })
 
-  it('user min', () => {    
-    const hfInstance = HyperFormula.buildFromSheets(
-      { Sheet1: [[1]] },
-      {},
-      [{ name: 'test', expression: '=Sheet1!$A$1' }]
-    )
+  describe('when created on initialization', () => {
+    it('is recomputed on every change', () => {    
+      const hfInstance = HyperFormula.buildFromSheets(
+        { Sheet1: [[1]] },
+        {},
+        [{ name: 'test', expression: '=Sheet1!$A$1' }]
+      )
+    
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(1)
+    
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 2)
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(2)
+
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 3)
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(3)
+
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
+      expect(hfInstance.getNamedExpressionValue('test')).toEqual(4)
+    })
+
+    it('is recomputed on every change (array formula)', () => {
+      const options = {
+        licenseKey: 'gpl-v3',
+        evaluateNullToZero: true,
+      }
   
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(1)
+      const hfInstance = HyperFormula.buildFromSheets(
+        {
+          Sheet1: [[1, 2, '=SUM(test)']],
+        },
+        options,
+        [
+          {
+            name: 'test',
+            expression: '=Sheet1!$A$1:$B$1',
+          },
+        ]
+      )
   
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 2)
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(2)
-
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 3)
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(3)
-
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(4)
-  })
-
-  it('user addNamedExpression', () => {    
-    const hfInstance = HyperFormula.buildFromSheets(
-      { Sheet1: [[1]] },
-      {}
-    )
-
-    hfInstance.addNamedExpression('test', '=Sheet1!$A$1')
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
+      expect(hfInstance.getCellValue(adr('C1'))).toEqual(6)
   
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(1)
-  
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 2)
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(2)
-
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 3)
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(3)
-
-    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
-    expect(hfInstance.getNamedExpressionValue('test')).toEqual(4)
-  })
-
-  it('should reevaluate volatile function in named expression', () => {
-    const engine = HyperFormula.buildFromArray([])
-
-    engine.addNamedExpression('volatileExpression', '=RAND()')
-    const valueBeforeRecomputation = engine.getNamedExpressionValue('volatileExpression')
-
-    const changes = engine.setCellContents(adr('A1'), 'foo')
-
-    const valueAfterRecomputation = engine.getNamedExpressionValue('volatileExpression')
-    expect(valueAfterRecomputation).not.toEqual(valueBeforeRecomputation)
-    expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), 'foo'))
-    expect(changes).toContainEqual(new ExportedNamedExpressionChange('volatileExpression', valueAfterRecomputation!))
-  })
-
-  it('adds edge to dependency', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('FOO', '=42')
-
-    engine.setCellContents(adr('A1'), '=FOO+10')
-
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
-    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(52)
+      hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 14)
+      expect(hfInstance.getCellValue(adr('C1'))).toEqual(16)
+    })
   })
 
   it('NAME error when there is no such named expression', () => {
@@ -786,112 +917,6 @@ describe('Named expressions - evaluation', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FOO')))
-  })
-
-  it('named expression dependency works if named expression was defined later', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=FOO']
-    ])
-
-    engine.addNamedExpression('FOO', '=42')
-
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
-    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(fooVertex, a1)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(42)
-  })
-
-  it('removed named expression returns NAME error', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('FOO', '=42')
-    engine.setCellContents(adr('A1'), '=FOO+10')
-
-    engine.removeNamedExpression('FOO')
-
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FOO')))
-  })
-
-  it('removing node dependent on named expression', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('FOO', '=42')
-    engine.setCellContents(adr('A1'), '=FOO+10')
-
-    engine.setCellContents(adr('A1'), null)
-
-    const fooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
-    expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
-  })
-
-  it('named expressions are transformed during CRUDs', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=42']
-    ])
-    engine.addNamedExpression('FOO', '=Sheet1!$A$1 + 10')
-
-    engine.removeSheet(0)
-
-    expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
-  })
-
-  it('local named expression shadows global one', () => {
-    const engine = HyperFormula.buildFromArray([])
-    engine.addNamedExpression('FOO', '=42')
-    engine.addNamedExpression('FOO', '=13', 0)
-
-    engine.setCellContents(adr('A1'), '=FOO+10')
-
-    const localFooVertex = engine.dependencyGraph.fetchNamedExpressionVertex('FOO', 0).vertex
-    const globalFooVertex = engine.dependencyGraph.fetchCell(engine.dependencyGraph.namedExpressions.namedExpressionForScope('FOO')!.address)
-    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
-    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
-    expect(engine.getCellValue(adr('A1'))).toEqual(23)
-  })
-
-  it('removing local named expression binds all the edges to global one', () => {
-    const engine = HyperFormula.buildFromArray([[]])
-    engine.addNamedExpression('foo', '10')
-    engine.addNamedExpression('foo', '20', 0)
-    engine.setCellContents(adr('A1'), [['=foo']])
-    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
-    const globalFooVertex = namedExpressionVertex(engine, 'foo')
-
-    engine.removeNamedExpression('foo', 0)
-
-    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
-    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(10)
-  })
-
-  it('removing local named expression binds all the edges to global one even if it doesnt exist', () => {
-    const engine = HyperFormula.buildFromArray([[]])
-    engine.addNamedExpression('foo', '20', 0)
-    engine.setCellContents(adr('A1'), [['=foo']])
-    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
-
-    engine.removeNamedExpression('foo', 0)
-
-    const globalFooVertex = namedExpressionVertex(engine, 'foo')
-    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(false)
-    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('foo')))
-  })
-
-  it('adding local named expression binds all the edges from global one', () => {
-    const engine = HyperFormula.buildFromArray([[]])
-    engine.addNamedExpression('foo', '20')
-    engine.setCellContents(adr('A1'), [['=foo']])
-    const globalFooVertex = namedExpressionVertex(engine, 'foo')
-
-    engine.addNamedExpression('foo', '30', 0)
-
-    const localFooVertex = namedExpressionVertex(engine, 'foo', 0)
-    const a1 = engine.dependencyGraph.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(localFooVertex, a1)).toBe(true)
-    expect(engine.graph.existsEdge(globalFooVertex, a1)).toBe(false)
-    expect(engine.getCellValue(adr('A1'))).toEqual(30)
   })
 })
 
