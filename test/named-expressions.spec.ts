@@ -688,6 +688,72 @@ describe('Named expressions - evaluation', () => {
     expect(engine.getNamedExpressionValue('myName')).toEqual(30)
   })
 
+  it('user original', () => {
+    const options = {
+      licenseKey: 'gpl-v3',
+      evaluateNullToZero: true,
+    }
+
+    const hfInstance = HyperFormula.buildFromSheets(
+      {
+        Sheet1: [[1, 2, '=SUM(test)']],
+      },
+      options,
+      [
+        {
+          name: 'test',
+          expression: '=Sheet1!$A$1:$B$1',
+        },
+      ]
+    )
+
+
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
+    expect(hfInstance.getCellValue(adr('C1'))).toEqual(6)
+
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 14)
+    expect(hfInstance.getCellValue(adr('C1'))).toEqual(16)
+  })
+
+  it('user min', () => {    
+    const hfInstance = HyperFormula.buildFromSheets(
+      { Sheet1: [[1]] },
+      {},
+      [{ name: 'test', expression: '=Sheet1!$A$1' }]
+    )
+  
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(1)
+  
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 2)
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(2)
+
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 3)
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(3)
+
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(4)
+  })
+
+  it('user addNamedExpression', () => {    
+    const hfInstance = HyperFormula.buildFromSheets(
+      { Sheet1: [[1]] },
+      {}
+    )
+
+    hfInstance.addNamedExpression('test', '=Sheet1!$A$1')
+  
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(1)
+  
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 2)
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(2)
+
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 3)
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(3)
+
+    hfInstance.setCellContents({ sheet: 0, col: 0, row: 0 }, 4)
+    expect(hfInstance.getNamedExpressionValue('test')).toEqual(4)
+  })
+
   it('should reevaluate volatile function in named expression', () => {
     const engine = HyperFormula.buildFromArray([])
 
