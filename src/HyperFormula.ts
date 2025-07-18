@@ -302,12 +302,19 @@ export class HyperFormula implements TypedEmitter {
    *  'Sheet2': [
    *    ['', '4', '=Sheet1!$B1'],
    *    ['', '8', '=SUM(9, 3, 3)'],
-   *    ['=Sheet1!$B1', '2', ''],
+   *    ['=Sheet1!$B1', '2', '=theUltimateQuestionOfLife'],
    *   ],
    * };
    *
+   * const namedExpressions = [
+   *  {
+   *    name: 'theUltimateQuestionOfLife',
+   *    expression: '=42',
+   *  },
+   * ];
+   *
    * // method with optional config parameter useColumnIndex
-   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { useColumnIndex: true });
+   * const hfInstance = HyperFormula.buildFromSheets(sheetData, { useColumnIndex: true }, namedExpressions);
    * ```
    *
    * @category Factories
@@ -326,8 +333,15 @@ export class HyperFormula implements TypedEmitter {
    *
    * @example
    * ```js
+   * const namedExpressions = [
+   *  {
+   *    name: 'theUltimateQuestionOfLife',
+   *    expression: '=42',
+   *  },
+   * ];
+   *
    * // build with no initial data and with optional config parameter maxColumns
-   * const hfInstance = HyperFormula.buildEmpty({ maxColumns: 1000 });
+   * const hfInstance = HyperFormula.buildEmpty({ maxColumns: 1000 }, namedExpressions);
    * ```
    *
    * @category Factories
