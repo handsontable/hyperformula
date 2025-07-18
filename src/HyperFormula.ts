@@ -256,11 +256,18 @@ export class HyperFormula implements TypedEmitter {
    * const sheetData = [
    *  ['0', '=SUM(1, 2, 3)', '52'],
    *  ['=SUM(A1:C1)', '', '=A1'],
-   *  ['2', '=SUM(A1:C1)', '91'],
+   *  ['2', '=SUM(A1:C1)', '=theUltimateQuestionOfLife'],
+   * ];
+   *
+   * const namedExpressions = [
+   *  {
+   *    name: 'theUltimateQuestionOfLife',
+   *    expression: '=42',
+   *  },
    * ];
    *
    * // method with optional config parameter maxColumns
-   * const hfInstance = HyperFormula.buildFromArray(sheetData, { maxColumns: 1000 });
+   * const hfInstance = HyperFormula.buildFromArray(sheetData, { maxColumns: 1000 }, namedExpressions);
    * ```
    *
    * @category Factories
