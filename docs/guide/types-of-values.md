@@ -6,7 +6,7 @@ Functions may work differently based on the types of arguments.
 | Type of value              | Description                                                                                                                                                                                                      |
 |:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Number                     | A numeric value such as 0, 2, -40, 0.1, and also scientific notation e.g. 5.6E+01; with a period as a default decimal separator.                                                                                 |
-| Text (string)              | A text value, like "ABC", "apollo".                                                                                                                                                                              |
+| Text (string)              | A text value, like "ABC", "apollo". Inside a formula, it should be enclosed in double quotes (`"`).                                                                                                                                                                             |
 | Logical (Distinct Boolean) | A logical value might be one of two values: TRUE or FALSE. Please note that even if there is type coercion this will be recognized as TRUE/FALSE when comparing to numbers. It will not be recognized as 1 or 0. |
 | Date                       | A Gregorian calendar date in DD/MM/YYYY (default format), like 22/06/2022. All dates from 30/12/1899 to 31/12/9999 are supported.                                                                                |
 | Time                       | A time in hh:mm:ss or hh:mm (default format), like 10:40:16.                                                                                                                                                     |
@@ -28,14 +28,22 @@ operations such as calculating the number of days between two dates.
 - A DateTime value is represented as the number of (possibly fractional) days
   since [`nullDate`](../api/interfaces/configparams.md#nulldate).
 
-## Forcing the string value type
+## Text values
+
+When working with text values directly inside formulas, you must enclose them in double quotes (`"`). This is different from entering text into cells, where quotes are not required. E.g.:
+
+```excel
+=IF(B1="Active", "Status OK", "Check Status")
+```
+
+### Forcing the text value type
 
 Like most spreadsheet software, HyperFormula automatically detects the type of an input value.
 
-But sometimes the value should be treated as a string even though it's parsable as a formula, number, date, time, datetime, boolean, currency or percentage.
+But sometimes the value should be treated as text even though it's parsable as a formula, number, date, time, datetime, boolean, currency or percentage.
 Typical examples are numeric values with no number semantics, such as ZIP codes, bank sort codes, social security numbers, etc.
 
-To prevent the automatic type conversion, prepend the string value with an apostrophe (`'`).
+To prevent the automatic type conversion, prepend the value value with an apostrophe (`'`).
 
 ```js
 const hf = HyperFormula.buildFromArray([
