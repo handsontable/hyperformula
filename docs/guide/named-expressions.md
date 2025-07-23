@@ -73,6 +73,20 @@ For examples of valid and invalid expression names, see the following table:
 | $A$1        | Invalid  |
 | RC          | Invalid  |
 
+## Using named expressions in formulas
+
+Named expressions can be used in any formula by referencing their names. Use them anywhere you would normally use a cell reference, range, or constant value.
+
+```javascript
+// Define named expressions
+hfInstance.addNamedExpression('TaxRate', '=0.08');
+hfInstance.addNamedExpression('SalesData', '=Sheet1!$A$1:$A$10');
+
+// Use them in formulas
+hfInstance.setCellContents({sheet: 0, col: 2, row: 0}, [['=SUM(SalesData)']]);
+hfInstance.setCellContents({sheet: 0, col: 2, row: 1}, [['=SUM(SalesData) * TaxRate']]);
+```
+
 ## Available methods
 
 These are the basic methods that can be used to add and manipulate named
