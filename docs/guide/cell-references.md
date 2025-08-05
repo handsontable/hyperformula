@@ -205,6 +205,25 @@ In contrast to Google Sheets or Microsoft Excel, HyperFormula doesn't treat sing
 - [Types of operators: Reference operators](/guide/types-of-operators.md#reference-operators)
 - [API reference: Ranges](/api/classes/hyperformula.md#ranges)
 
+## Sheet names in references
+
+When referencing cells or ranges from different sheets, you can specify the sheet name using the following syntax:
+
+```
+=SheetName!CellReference
+```
+
+If a sheet name contains any character other than `[A-Za-z\u00C0-\u02AF0-9_]`, it must be enclosed in single quotes. E.g.:
+```javascript
+=Data2023!A1
+=Sheet_1!B2
+=ÄöüSheet!C3
+='My Sheet'!A1
+='Sales-2023'!B2
+='Data (Q1)'!C3
+='Sheet #1'!D4
+```
+
 ## Circular references
 
 Since HyperFormula does not embed any UI, it allows for the input of a circular reference into a cell. Compared to popular spreadsheets,
