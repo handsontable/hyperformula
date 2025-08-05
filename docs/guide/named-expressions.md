@@ -81,12 +81,34 @@ of methods is available in the [API reference](../api).
 
 ### Adding a named expression
 
-You can add a named expression by using the `addNamedExpression` method. It
-accepts name for the expression, the expression as a raw cell content, and
-optionally the scope. If you do not define the scope it will be set to global,
-meaning the expression name will be valid for the whole workbook. If you want to
-add many of them, it is advised to do so in a [batch](batch-operations.md).
-This method returns [an array of changed cells](basic-operations.md#changes-array).
+You can add a named expression in two ways:
+
+**During engine initialization**: You can provide named expressions as a parameter when creating a HyperFormula instance using the factory methods `buildEmpty`, `buildFromArray`, or `buildFromSheets`. This is the most efficient way to add multiple named expressions at once.
+
+```javascript
+// Define named expressions during initialization
+const namedExpressions = [
+  {
+    name: 'prettyName',
+    expression: '=Sheet1!$A$1+100',
+    scope: 0 // optional: local scope for 'Sheet1'
+  },
+  {
+    name: 'globalConstant', 
+    expression: '=42'
+    // no scope specified = global scope
+  }
+];
+
+// Create engine with named expressions
+const hfInstance = HyperFormula.buildEmpty({}, namedExpressions);
+// or
+const hfInstance = HyperFormula.buildFromArray(sheetData, {}, namedExpressions);
+// or  
+const hfInstance = HyperFormula.buildFromSheets(sheetsData, {}, namedExpressions);
+```
+
+**After engine creation**: You can add a named expression by using the `addNamedExpression` method. It accepts name for the expression, the expression as a raw cell content, and optionally the scope. If you do not define the scope it will be set to global, meaning the expression name will be valid for the whole workbook. If you want to add many of them, it is advised to do so in a [batch](batch-operations.md). This method returns [an array of changed cells](basic-operations.md#changes-array).
 
 ```javascript
 // add 'prettyName' expression to the local scope of 'Sheet1' (sheetId = 0)
