@@ -20,7 +20,7 @@ HyperFormula is developed by a team of highly qualified experts:
 
 Quality assurance is at the heart of our development process:
 
-- **Nearly 5,000 unit tests** covering all aspects of the calculation engine
+- **Over 5,000 unit tests** covering all aspects of the calculation engine
 - **97% test coverage** ensuring virtually every line of code is verified
 - Continuous integration across multiple environments
 - Regular performance comparisons between versions
