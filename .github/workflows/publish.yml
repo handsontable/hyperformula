@@ -1,6 +1,6 @@
 name: Publish
 permissions:
-  contents: read
+  contents: write
   pages: write
 
 on:
