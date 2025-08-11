@@ -105,10 +105,6 @@ export class BuildEngineFactory {
     lazilyTransformingAstService.undoRedo = undoRedo
     const clipboardOperations = new ClipboardOperations(config, dependencyGraph, operations)
     const crudOperations = new CrudOperations(config, operations, undoRedo, clipboardOperations, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
-    inputNamedExpressions.forEach((entry: SerializedNamedExpression) => {
-      crudOperations.ensureItIsPossibleToAddNamedExpression(entry.name, entry.expression, entry.scope)
-      crudOperations.operations.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
-    })
 
     const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName, lazilyTransformingAstService)
     const serialization = new Serialization(dependencyGraph, unparser, exporter)
@@ -118,6 +114,11 @@ export class BuildEngineFactory {
     stats.measure(StatType.GRAPH_BUILD, () => {
       const graphBuilder = new GraphBuilder(dependencyGraph, columnSearch, parser, cellContentParser, stats, arraySizePredictor)
       graphBuilder.buildGraph(sheets, stats)
+    })
+
+    inputNamedExpressions.forEach((entry: SerializedNamedExpression) => {
+      crudOperations.ensureItIsPossibleToAddNamedExpression(entry.name, entry.expression, entry.scope)
+      crudOperations.operations.addNamedExpression(entry.name, entry.expression, entry.scope, entry.options)
     })
 
     const evaluator = new Evaluator(config, stats, interpreter, lazilyTransformingAstService, dependencyGraph, columnSearch)

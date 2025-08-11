@@ -1,4 +1,7 @@
 name: Publish
+permissions:
+  contents: write
+  pages: write
 
 on:
   push:

@@ -173,6 +173,7 @@ module.exports = {
           title: 'Overview',
           collapsable: false,
           children: [
+            ['/guide/quality', 'Quality'],
             ['/guide/supported-browsers', 'Supported browsers'],
             ['/guide/dependencies', 'Dependencies'],
             ['/guide/licensing', 'Licensing'],

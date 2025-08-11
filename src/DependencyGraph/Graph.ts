@@ -3,10 +3,10 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../Cell'
-import {SimpleCellRange} from '../AbsoluteCellRange'
-import {TopSort, TopSortResult} from './TopSort'
-import {ProcessableValue} from './ProcessableValue'
+import { SimpleCellAddress } from '../Cell'
+import { SimpleCellRange } from '../AbsoluteCellRange'
+import { TopSort, TopSortResult } from './TopSort'
+import { ProcessableValue } from './ProcessableValue'
 
 export type NodeId = number
 export type NodeAndId<Node> = { node: Node, id: NodeId }
@@ -63,7 +63,7 @@ export class Graph<Node> {
 
   constructor(
     private readonly dependencyQuery: DependencyQuery<Node>
-  ) {}
+  ) { }
 
   /**
    * Iterate over all nodes the in graph
@@ -231,9 +231,9 @@ export class Graph<Node> {
   /**
    * Removes edge between nodes if it exists.
    */
-  public removeEdgeIfExists(fromNode: Node, toNode: Node): void {
-    const fromId = this.getNodeId(fromNode)
-    const toId = this.getNodeId(toNode)
+  public removeEdgeIfExists(fromNode: Node | NodeId, toNode: Node | NodeId): void {
+    const fromId = this.getNodeIdIfNotNumber(fromNode)
+    const toId = this.getNodeIdIfNotNumber(toNode)
 
     if (fromId === undefined) {
       return
@@ -256,7 +256,7 @@ export class Graph<Node> {
    * Sorts the whole graph topologically. Nodes that are on cycles are kept separate.
    */
   public topSortWithScc(): TopSortResult<Node> {
-    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => {})
+    return this.getTopSortedWithSccSubgraphFrom(this.getNodes(), () => true, () => { })
   }
 
   /**
@@ -340,7 +340,7 @@ export class Graph<Node> {
       return
     }
 
-    this.dirtyAndVolatileNodeIds.rawValue.dirty = [ ...this.dirtyAndVolatileNodeIds.rawValue.dirty, ...this.changingWithStructureNodeIds ]
+    this.dirtyAndVolatileNodeIds.rawValue.dirty = [...this.dirtyAndVolatileNodeIds.rawValue.dirty, ...this.changingWithStructureNodeIds]
     this.dirtyAndVolatileNodeIds.markAsModified()
   }
 
@@ -361,7 +361,7 @@ export class Graph<Node> {
    * Returns an array of nodes marked as infinite ranges
    */
   public getInfiniteRanges(): NodeAndId<Node>[] {
-    return [ ...this.infiniteRangeIds].map(id => ({ node: this.nodesSparseArray[id], id }))
+    return [...this.infiniteRangeIds].map(id => ({ node: this.nodesSparseArray[id], id }))
   }
 
   /**
@@ -405,9 +405,9 @@ export class Graph<Node> {
    * @private
    */
   private processDirtyAndVolatileNodeIds({ dirty, volatile }: { dirty: NodeId[], volatile: NodeId[] }): Node[] {
-    return [ ...new Set([ ...dirty, ...volatile]) ]
-    .map(id => this.nodesSparseArray[id])
-    .filter(node => node !== undefined)
+    return [...new Set([...dirty, ...volatile])]
+      .map(id => this.nodesSparseArray[id])
+      .filter(node => node !== undefined)
   }
 
   /**

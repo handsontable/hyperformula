@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.1] - 2025-08-11
+
+### Fixed
+
+- Fixed `Edge does not exist` error when a named expression is used twice in the same formula. [#1102](https://github.com/handsontable/hyperformula/issues/1102)
+- Fixed typos in the built-in functions guide. [#1517](https://github.com/handsontable/hyperformula/issues/1517)
+- Fixed an issue where named expressions added on engine initialization were not updated on changes. [#1501](https://github.com/handsontable/hyperformula/issues/1501)
+
 ## [3.0.0] - 2025-01-14
 
 ### Added
