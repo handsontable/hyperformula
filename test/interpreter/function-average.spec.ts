@@ -35,10 +35,29 @@ describe('AVERAGE', () => {
       ['foo'],
       [null],
       ['=TRUE()'],
-      ['=AVERAGE(A1:A4)']
+      ['=X100'],
+      ['=AVERAGE(A1:A5)']
     ])
 
-    expect(engine.getCellValue(adr('A5'))).toEqual(42)
+    expect(engine.getCellValue(adr('A6'))).toEqual(42)
+  })
+
+  it('AVERAGE ignores all nonnumeric named expression arguments', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=AVERAGE(A, B, F)'],
+    ], {}, [
+      { name: 'A', expression: '42' },
+      { name: 'B', expression: '=42' },
+      { name: 'C', expression: 'foo' },
+      { name: 'D', expression: '="foo"' },
+      { name: 'E', expression: null },
+      { name: 'F', expression: '' },
+      { name: 'G', expression: '=""' },
+      { name: 'H', expression: '=TRUE()' },
+      { name: 'I', expression: '=Sheet1!$X$100' },
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
   })
 
   it('error when no meaningful arguments', () => {
