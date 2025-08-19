@@ -78,7 +78,6 @@
     "test": "npm-run-all lint test:unit test:browser test:compatibility",
     "test:unit": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:watch": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch",
-    "test:watch-tdd": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch xlookup",
     "test:coverage": "npm run test:unit -- --coverage",
     "test:logMemory": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --runInBand --logHeapUsage",
     "test:unit.ci": "cross-env NODE_ICU_DATA=node_modules/full-icu node --expose-gc ./node_modules/jest/bin/jest --forceExit",
