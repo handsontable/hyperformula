@@ -30,12 +30,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Disable 'Unchanged files with check annotations' section  # https://github.com/orgs/community/discussions/8379
-        run: |
-          echo "::remove-matcher owner=eslint-compact::"
-          echo "::remove-matcher owner=eslint-stylish::"
-          echo "::remove-matcher owner=tsc::"
-
       - name: Install dependencies
         run: |
           npm ci
