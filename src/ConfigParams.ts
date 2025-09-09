@@ -17,6 +17,12 @@ export interface ConfigParams {
    */
   accentSensitive: boolean,
   /**
+   * When set to `true`, allows circular references in formulas (up to a fixed iteration limit).
+   * @default false
+   * @category Engine
+   */
+  allowCircularReferences: boolean,
+  /**
    * When set to `true`, makes string comparison case-sensitive.
    *
    * Applies to comparison operators only.
