@@ -30,6 +30,7 @@ export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
     accentSensitive: false,
+    allowCircularReferences: false,
     currencySymbol: ['$'],
     caseSensitive: false,
     caseFirst: 'lower',
@@ -77,6 +78,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly chooseAddressMappingPolicy: ChooseAddressMapping
   /** @inheritDoc */
   public readonly accentSensitive: boolean
+  /** @inheritDoc */
+  public readonly allowCircularReferences: boolean
   /** @inheritDoc */
   public readonly caseFirst: 'upper' | 'lower' | 'false'
   /** @inheritDoc */
@@ -164,6 +167,7 @@ export class Config implements ConfigParams, ParserConfig {
   constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
     const {
       accentSensitive,
+      allowCircularReferences,
       caseSensitive,
       caseFirst,
       chooseAddressMappingPolicy,
@@ -209,6 +213,7 @@ export class Config implements ConfigParams, ParserConfig {
 
     this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
     this.accentSensitive = configValueFromParam(accentSensitive, 'boolean', 'accentSensitive')
+    this.allowCircularReferences = configValueFromParam(options.allowCircularReferences, 'boolean', 'allowCircularReferences')
     this.caseSensitive = configValueFromParam(caseSensitive, 'boolean', 'caseSensitive')
     this.caseFirst = configValueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
     this.ignorePunctuation = configValueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')

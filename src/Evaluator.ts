@@ -20,6 +20,7 @@ import {Ast, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
 
 export class Evaluator {
+  private readonly iterationCount = 100
 
   constructor(
     private readonly config: Config,
@@ -43,6 +44,7 @@ export class Evaluator {
 
   public partialRun(vertices: Vertex[]): ContentChanges {
     const changes = ContentChanges.empty()
+    const cycled: Vertex[] = []
 
     this.stats.measure(StatType.EVALUATION, () => {
       this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
@@ -68,15 +70,17 @@ export class Evaluator {
           if (vertex instanceof RangeVertex) {
             vertex.clearCache()
           } else if (vertex instanceof FormulaVertex) {
-            const address = vertex.getAddress(this.lazilyTransformingAstService)
-            this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
-            const error = new CellError(ErrorType.CYCLE, undefined, vertex)
-            vertex.setCellValue(error)
-            changes.addChange(error, address)
+            const firstCycleChanges = this.iterateCircularDependencies([vertex], 1)
+            changes.addAll(firstCycleChanges)
+            cycled.push(vertex)
           }
         },
       )
     })
+
+    const cycledChanges = this.iterateCircularDependencies(cycled, this.iterationCount - 1)
+    changes.addAll(cycledChanges)
+
     return changes
   }
 
@@ -105,11 +109,8 @@ export class Evaluator {
    * Recalculates formulas in the topological sort order
    */
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
-    cycled.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaVertex) {
-        vertex.setCellValue(new CellError(ErrorType.CYCLE, undefined, vertex))
-      }
-    })
+    this.iterateCircularDependencies(cycled)
+
     sorted.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
         const newCellValue = this.recomputeFormulaVertexValue(vertex)
@@ -117,6 +118,143 @@ export class Evaluator {
         this.columnSearch.add(getRawValue(newCellValue), address)
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
+      }
+    })
+  }
+
+  private blockCircularDependencies(cycled: Vertex[]): ContentChanges {
+    const changes = ContentChanges.empty()
+
+    cycled.forEach((vertex: Vertex) => {
+      if (vertex instanceof RangeVertex) {
+        vertex.clearCache()
+      } else if (vertex instanceof FormulaVertex) {
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
+        const error = new CellError(ErrorType.CYCLE, undefined, vertex)
+        vertex.setCellValue(error)
+        changes.addChange(error, address)
+      }
+    })
+
+    return changes
+  }
+
+  /**
+   * Iterates over all circular dependencies (cycled vertices) for 100 iterations
+   * Handles cascading dependencies by processing cycles in dependency order
+   */
+  private iterateCircularDependencies(cycled: Vertex[], cycles = this.iterationCount): ContentChanges {
+    if (!this.config.allowCircularReferences) {
+      return this.blockCircularDependencies(cycled)
+    }
+    
+    const changes = ContentChanges.empty()
+    cycled.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaVertex && !vertex.isComputed()) {
+        vertex.setCellValue(0)
+      }
+    })
+    
+    for (let i = 0; i < cycles; i++) {
+      this.clearCachesForCyclicRanges(cycled)
+      
+      cycled.forEach((vertex: Vertex) => {
+        if (!(vertex instanceof FormulaVertex)) {
+          return
+        }
+
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        const newCellValue = this.recomputeFormulaVertexValue(vertex)
+
+        if (i < cycles - 1) {
+          return
+        }
+          
+        this.columnSearch.add(getRawValue(newCellValue), address)
+        changes.addChange(newCellValue, address)
+      })
+    }
+    
+    const dependentChanges = this.updateNonCyclicDependents(cycled)
+    changes.addAll(dependentChanges)
+    
+    return changes
+  }
+
+  /**
+   * Updates all non-cyclic cells that depend on the given cycled vertices
+   * Uses topological sorting to ensure correct dependency order
+   */
+  private updateNonCyclicDependents(cycled: Vertex[]): ContentChanges {
+    const changes = ContentChanges.empty()
+    const cyclicSet = new Set(cycled)
+    
+    const dependents = new Set<Vertex>()
+    cycled.forEach(vertex => {
+      this.dependencyGraph.graph.adjacentNodes(vertex).forEach(dependent => {
+        if (!cyclicSet.has(dependent) && dependent instanceof FormulaVertex) {
+          dependents.add(dependent)
+        }
+      })
+    })
+    
+    if (dependents.size === 0) {
+      return changes
+    }
+    
+    const {sorted} = this.dependencyGraph.topSortWithScc()
+    const orderedDependents = sorted.filter(vertex => dependents.has(vertex))
+    
+    orderedDependents.forEach(vertex => {
+      if (vertex instanceof FormulaVertex) {
+        const newCellValue = this.recomputeFormulaVertexValue(vertex)
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        this.columnSearch.add(getRawValue(newCellValue), address)
+        changes.addChange(newCellValue, address)
+      }
+    })
+    
+    return changes
+  }
+
+  /**
+   * Clears function caches for ranges that contain any of the given cyclic vertices
+   * This ensures fresh computation during circular dependency iteration
+   */
+  private clearCachesForCyclicRanges(cycled: Vertex[]): void {
+    const cyclicAddresses = new Set<string>()
+    cycled.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaVertex) {
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        cyclicAddresses.add(`${address.sheet}:${address.col}:${address.row}`)
+      }
+    })
+    
+    const sheetsWithCycles = new Set<number>()
+    cycled.forEach((vertex: Vertex) => {
+      if (vertex instanceof FormulaVertex) {
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        sheetsWithCycles.add(address.sheet)
+      }
+    })
+    
+    sheetsWithCycles.forEach(sheet => {
+      for (const rangeVertex of this.dependencyGraph.rangeMapping.rangesInSheet(sheet)) {
+        const range = rangeVertex.range
+        let containsCyclicCell = false
+        
+        for (const address of range.addresses(this.dependencyGraph)) {
+          const addressKey = `${address.sheet}:${address.col}:${address.row}`
+          if (cyclicAddresses.has(addressKey)) {
+            containsCyclicCell = true
+            break
+          }
+        }
+        
+        if (containsCyclicCell) {
+          rangeVertex.clearCache()
+        }
       }
     })
   }
