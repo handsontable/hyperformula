@@ -150,14 +150,12 @@ export class Evaluator {
     }
     
     const changes = ContentChanges.empty()
-    // Step 1: Initialize all cyclic vertices with 0 if not computed
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex && !vertex.isComputed()) {
         vertex.setCellValue(0)
       }
     })
     
-    // Step 2: Process all cycles iteratively (100x each)
     for (let i = 0; i < cycles; i++) {
       this.clearCachesForCyclicRanges(cycled)
       
@@ -178,7 +176,6 @@ export class Evaluator {
       })
     }
     
-    // Step 3: Update non-cyclic dependents in topological order
     const dependentChanges = this.updateNonCyclicDependents(cycled)
     changes.addAll(dependentChanges)
     
@@ -194,7 +191,6 @@ export class Evaluator {
     const cyclicSet = new Set(cycled)
     
     
-    // Collect all non-cyclic dependents
     const dependents = new Set<Vertex>()
     cycled.forEach(vertex => {
       this.dependencyGraph.graph.adjacentNodes(vertex).forEach(dependent => {
@@ -208,11 +204,9 @@ export class Evaluator {
       return changes
     }
     
-    // Get topological order for all vertices, then filter to our dependents
     const {sorted} = this.dependencyGraph.topSortWithScc()
     const orderedDependents = sorted.filter(vertex => dependents.has(vertex))
     
-    // Update dependents in topological order
     orderedDependents.forEach(vertex => {
       if (vertex instanceof FormulaVertex) {
         const newCellValue = this.recomputeFormulaVertexValue(vertex)
@@ -230,7 +224,6 @@ export class Evaluator {
    * This ensures fresh computation during circular dependency iteration
    */
   private clearCachesForCyclicRanges(cycled: Vertex[]): void {
-    // Build set of cyclic addresses for fast lookup
     const cyclicAddresses = new Set<string>()
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
@@ -239,7 +232,6 @@ export class Evaluator {
       }
     })
     
-    // Get sheets that have cyclic vertices
     const sheetsWithCycles = new Set<number>()
     cycled.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
@@ -248,7 +240,6 @@ export class Evaluator {
       }
     })
     
-    // Clear caches for ranges that contain cyclic cells
     sheetsWithCycles.forEach(sheet => {
       for (const rangeVertex of this.dependencyGraph.rangeMapping.rangesInSheet(sheet)) {
         const range = rangeVertex.range

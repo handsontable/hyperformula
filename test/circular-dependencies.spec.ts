@@ -120,7 +120,6 @@ describe('Circular Dependencies', () => {
         allowCircularReferences: true
       })
 
-      // Create cycle by changing cell content
       engine.setCellContents(adr('A1'), [['=A1*2']])
       
       const value = engine.getCellValue(adr('A1'))
@@ -168,7 +167,6 @@ describe('Circular Dependencies', () => {
         allowCircularReferences: true
       })
 
-      // Add a new dependency
       engine.setCellContents(adr('C1'), [['=A1*2']])
       
       const valueA = engine.getCellValue(adr('A1'))
@@ -247,7 +245,7 @@ describe('Circular Dependencies', () => {
       const valueA = engine.getCellValue(adr('A1'))
       const valueB = engine.getCellValue(adr('B1'))
       
-      expect(valueA).toBe('') // Empty cell treated as 0 in numeric context
+      expect(valueA).toBe('')
       expect(valueB).toBe('')
     })
 
@@ -271,8 +269,8 @@ describe('Circular Dependencies', () => {
       const valueA = engine.getCellValue(adr('A1'))
       const valueB = engine.getCellValue(adr('B1'))
 
-      expect(valueA).toBe('0babababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababa') // 20 iterations
-      expect(valueB).toBe('0bababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab') // 19 iterations
+      expect(valueA).toBe('0babababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababa')
+      expect(valueB).toBe('0bababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab')
     })
 
     it('should handle very large cycles', () => {
