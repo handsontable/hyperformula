@@ -85,7 +85,7 @@
     "test:browser": "cross-env-shell BABEL_ENV=dist env-cmd -f ht.config.js karma start",
     "test:browser.debug": "cross-env-shell BABEL_ENV=dist NODE_ENV=debug env-cmd -f ht.config.js karma start",
     "test:performance": "npm run benchmark:basic && npm run benchmark:cruds",
-    "test:compatibility": "npm run tsnode test/compatibility/compare-evaluation-results.ts test/compatibility/sample_file.xlsx",
+    "test:compatibility": "npm run tsnode test/compatibility/compare-evaluation-results.ts test/compatibility/basic-arithmetic.xlsx",
     "typedoc:build-api": "cross-env NODE_OPTIONS=--openssl-legacy-provider typedoc --options .typedoc.md.ts",
     "benchmark:basic": "npm run tsnode test/performance/run-basic-benchmark.ts",
     "benchmark:cruds": "npm run tsnode test/performance/run-cruds-benchmark.ts",

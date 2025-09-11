@@ -1,9 +1,23 @@
 import { Cell, Row, Workbook, Worksheet } from 'exceljs'
-import { HyperFormula, RawCellContent, Sheets } from '../../src'
+import { ConfigParams, HyperFormula, RawCellContent, SerializedNamedExpression, Sheets } from '../../src'
 
-const HF_CONFIG = {
-  licenseKey: 'gpl-v3'
+const HF_CONFIG: Partial<ConfigParams> = {
+  licenseKey: 'gpl-v3',
+  dateFormats: ['MM/DD/YYYY', 'MM/DD/YY', 'YYYY/MM/DD'],
+  currencySymbol: ['$', 'USD'],
+  localeLang: 'en-US',
+  accentSensitive: true,
+  useArrayArithmetic: true,
+  ignoreWhiteSpace: 'any',
+  evaluateNullToZero: true,
+  leapYear1900: true,
+  nullDate: { year: 1899, month: 12, day: 31 },
 }
+
+const NAMED_EXPRESSIONS: SerializedNamedExpression[] = [
+  { name: 'TRUE', expression: '=TRUE()' },
+  { name: 'FALSE', expression: '=FALSE()' },
+]
 
 interface CellDiff {
   row: number,
@@ -17,10 +31,45 @@ interface SheetsDiff {
 }
 
 /**
+ * Utility class for comparing values with proper equality logic
+ */
+class ValueComparator {
+  /**
+   * Creates an instance of ValueComparator.
+   * @param {number} [epsilon=Number.EPSILON] - The tolerance used for floating point comparisons.
+   */
+  constructor(private epsilon: number = Number.EPSILON) {}
+
+  /**
+   * Determines if two values are equal
+   * @param {unknown} valA - First value to compare
+   * @param {unknown} valB - Second value to compare
+   * @returns {boolean} true if values are equal, false otherwise
+   */
+  areEqual(valA: unknown, valB: unknown): boolean {
+    if (valA == null && valB == null) return true
+
+    // Handle number comparison with potential floating point precision issues
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      if (isNaN(valA) && isNaN(valB)) return true
+      return Math.abs(valA - valB) < this.epsilon
+    }
+
+    // Handle object comparison (dates, etc.)
+    if (typeof valA === 'object' && typeof valB === 'object') {
+      return JSON.stringify(valA) === JSON.stringify(valB)
+    }
+
+    return valA === valB
+  }
+}
+
+/**
  * Main function to read Excel file and process it with HyperFormula
  */
 async function run(): Promise<void> {
   try {
+    const valueComparator = new ValueComparator(0.000000001)
     const filename = process.argv[2]
 
     if (!filename) {
@@ -32,7 +81,7 @@ async function run(): Promise<void> {
     const [hfFormulas, hfValues] = evaluateSheet(readFormulas)
 
     const diffFormulas = compareSheets(hfFormulas, readFormulas)
-    const diffValues = compareSheets(hfValues, readValues)
+    const diffValues = compareSheets(hfValues, readValues, valueComparator)
 
     console.log('Diff formulas:', diffFormulas)
     console.log('Diff values:', diffValues)
@@ -45,11 +94,11 @@ async function run(): Promise<void> {
 /**
  * Compares two sheets and returns the differences
  */
-function compareSheets(sheetCollectionA: Sheets, sheetCollectionB: Sheets): SheetsDiff {
+function compareSheets(sheetCollectionA: Sheets, sheetCollectionB: Sheets, comparator?: ValueComparator): SheetsDiff {
   const allSheetNames = new Set([...Object.keys(sheetCollectionA), ...Object.keys(sheetCollectionB)])
 
   const allSheetsDiff = Array.from(allSheetNames).reduce<SheetsDiff>((acc, sheetName: string) => {
-    const sheetDiff = compareSingleSheet(sheetCollectionA[sheetName] || [], sheetCollectionB[sheetName] || [])
+    const sheetDiff = compareSingleSheet(sheetCollectionA[sheetName] || [], sheetCollectionB[sheetName] || [], comparator)
 
     if (sheetDiff.length > 0) {
       acc[sheetName] = sheetDiff
@@ -64,9 +113,11 @@ function compareSheets(sheetCollectionA: Sheets, sheetCollectionB: Sheets): Shee
 /**
  * Compares two single sheet data arrays and returns the differences
  */
-function compareSingleSheet(sheetAData: RawCellContent[][], sheetBData: RawCellContent[][]): CellDiff[] {
+function compareSingleSheet(sheetAData: RawCellContent[][], sheetBData: RawCellContent[][], comparator?: ValueComparator): CellDiff[] {
+  const compare = comparator ? comparator.areEqual.bind(comparator) : (a: unknown, b: unknown) => a === b
+
   const maxRows = Math.max(sheetAData.length, sheetBData.length)
-  const sheetDiff = [] as CellDiff[];
+  const sheetDiff = [] as CellDiff[]
 
   for (let row = 0; row < maxRows; row++) {
     const maxCols = Math.max(sheetAData[row]?.length ?? 0, sheetBData[row]?.length ?? 0)
@@ -75,7 +126,7 @@ function compareSingleSheet(sheetAData: RawCellContent[][], sheetBData: RawCellC
       const cellA = sheetAData[row]?.[col] ?? null
       const cellB = sheetBData[row]?.[col] ?? null
 
-      if (cellA !== cellB) {
+      if (!compare(cellA, cellB)) {
         sheetDiff.push({
           row,
           col,
@@ -93,7 +144,7 @@ function compareSingleSheet(sheetAData: RawCellContent[][], sheetBData: RawCellC
  * Evaluates formulas using HyperFormula and returns computed values
  */
 function evaluateSheet(formulas: Sheets): [Sheets, Sheets] {
-  const hf = HyperFormula.buildFromSheets(formulas, HF_CONFIG)
+  const hf = HyperFormula.buildFromSheets(formulas, HF_CONFIG, NAMED_EXPRESSIONS)
   return [hf.getAllSheetsSerialized() as Sheets, hf.getAllSheetsValues() as Sheets]
 }
 
