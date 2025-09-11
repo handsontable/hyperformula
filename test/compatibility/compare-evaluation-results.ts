@@ -1,5 +1,5 @@
 import { Cell, Row, Workbook, Worksheet } from 'exceljs'
-import { ConfigParams, HyperFormula, RawCellContent, SerializedNamedExpression, Sheets } from '../../src'
+import { ConfigParams, DetailedCellError, HyperFormula, RawCellContent, SerializedNamedExpression, Sheets } from '../../src'
 
 const HF_CONFIG: Partial<ConfigParams> = {
   licenseKey: 'gpl-v3',
@@ -53,6 +53,15 @@ class ValueComparator {
     if (typeof valA === 'number' && typeof valB === 'number') {
       if (isNaN(valA) && isNaN(valB)) return true
       return Math.abs(valA - valB) < this.epsilon
+    }
+
+    // Handle error comparison
+    if (valA instanceof DetailedCellError) {
+      valA = { error: valA.value }
+    }
+
+    if (valB instanceof DetailedCellError) {
+      valB = { error: valB.type }
     }
 
     // Handle object comparison (dates, etc.)
@@ -182,7 +191,11 @@ function convertXlsxWorkbookToFormulasAndValuesArrays(workbook: Workbook): [Shee
 
       row.eachCell((cell: Cell) => {
         const cellData = cell.formula ? `=${cell.formula}` : cell.value as RawCellContent
-        const cellValue = (cell.value && typeof cell.value === 'object' && 'result' in cell.value && cell.value.result != null ? cell.value.result : cell.value) as RawCellContent
+        const cellValue = (cell.value && typeof cell.value === 'object' && 'result' in cell.value && cell.value.result != null
+          ? cell.value.result
+          : cell.value && typeof cell.value === 'object' && 'formula' in cell.value && cell.value.formula != null
+            ? 0
+            : cell.value) as RawCellContent
         rowData.push(cellData)
         rowReadValues.push(cellValue)
       })
