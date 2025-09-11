@@ -47,21 +47,28 @@ class ValueComparator {
    * @returns {boolean} true if values are equal, false otherwise
    */
   areEqual(valA: unknown, valB: unknown): boolean {
-    if (valA == null && valB == null) return true
+    // NORMALIZE NULL
+    if (valA == null) {
+      valA = null
+    }
+
+    if (valB == null) {
+      valB = null
+    }
+
+    // NORMALIZE ERRORS
+    if (valA instanceof DetailedCellError) {
+      valA = valA.value
+    }
+
+    if (valB instanceof DetailedCellError) {
+      valB = valB.value
+    }
 
     // Handle number comparison with potential floating point precision issues
     if (typeof valA === 'number' && typeof valB === 'number') {
       if (isNaN(valA) && isNaN(valB)) return true
       return Math.abs(valA - valB) < this.epsilon
-    }
-
-    // Handle error comparison
-    if (valA instanceof DetailedCellError) {
-      valA = { error: valA.value }
-    }
-
-    if (valB instanceof DetailedCellError) {
-      valB = { error: valB.type }
     }
 
     // Handle object comparison (dates, etc.)
@@ -191,11 +198,7 @@ function convertXlsxWorkbookToFormulasAndValuesArrays(workbook: Workbook): [Shee
 
       row.eachCell((cell: Cell) => {
         const cellData = cell.formula ? `=${cell.formula}` : cell.value as RawCellContent
-        const cellValue = (cell.value && typeof cell.value === 'object' && 'result' in cell.value && cell.value.result != null
-          ? cell.value.result
-          : cell.value && typeof cell.value === 'object' && 'formula' in cell.value && cell.value.formula != null
-            ? 0
-            : cell.value) as RawCellContent
+        const cellValue = (cell.value?.result?.error ?? cell.value?.result ?? (cell.value?.formula != null ? 0 : cell.value)) as RawCellContent
         rowData.push(cellData)
         rowReadValues.push(cellValue)
       })
