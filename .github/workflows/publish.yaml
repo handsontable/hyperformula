@@ -12,7 +12,10 @@ on:
         required: false
         default: "1.1.26"
         type: string
-
+  push:
+    branches:
+      - master
+      
 permissions:
   packages: write
   id-token: write
