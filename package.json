@@ -1,52 +1,19 @@
 {
-  "name": "hyperformula",
-  "description": "HyperFormula is a JavaScript engine for efficient processing of spreadsheet-like data and formulas",
-  "homepage": "https://hyperformula.handsontable.com/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/handsontable/hyperformula.git"
-  },
-  "bugs": {
-    "url": "https://github.com/handsontable/hyperformula/issues"
-  },
-  "author": "Handsoncode <hello@handsontable.com>",
-  "version": "3.0.1",
-  "keywords": [
-    "formula",
-    "spreadsheet",
-    "calculation",
-    "data",
-    "compute",
-    "tabular-data",
-    "operation",
-    "conversion",
-    "arithmetic",
-    "concatenation",
-    "comparison",
-    "logical",
-    "formulas",
-    "parser",
-    "excel",
-    "office",
-    "workbook",
-    "worksheet",
-    "sheet",
-    "open formula",
-    "openformula"
+  "name": "@stellar-fusion/hyperformula",
+  "version": "0.0.1",
+  "author": "Stellar Fusion Tech <tech@stellarfusion.io>",
+  "contributors": [
+    "Evan Hynes <evan.hynes@stellarfusion.io>"
   ],
-  "browserslist": [
-    "last 2 chrome versions",
-    "last 2 and_chr versions",
-    "last 2 firefox versions",
-    "last 2 and_ff versions",
-    "last 2 safari versions",
-    "last 2 ios_saf versions",
-    "last 2 edge versions",
-    "last 2 and_uc versions",
-    "last 2 and_qq versions",
-    "last 2 op_mob versions"
+  "publishConfig": {
+    "@stellar-fusion:registry": "https://npm.pkg.github.com/stellar-fusion"
+  },
+  "files": [
+    "commonjs",
+    "dist",
+    "es",
+    "typings"
   ],
-  "license": "GPL-3.0-only",
   "type": "commonjs",
   "module": "es/index.mjs",
   "main": "commonjs/index.js",
