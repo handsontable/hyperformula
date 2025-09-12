@@ -1,4 +1,4 @@
-import { Cell, Row, Workbook, Worksheet } from 'exceljs'
+import { Workbook, Worksheet } from 'exceljs'
 import { ConfigParams, DetailedCellError, HyperFormula, RawCellContent, SerializedNamedExpression, Sheets } from '../../src'
 
 const HF_CONFIG: Partial<ConfigParams> = {
@@ -58,6 +58,7 @@ class ValueComparator {
 
     // NORMALIZE ERRORS
     if (valA instanceof DetailedCellError) {
+      console.log('Error', valA.value, valA.message)
       valA = valA.value
     }
 
@@ -192,23 +193,36 @@ function convertXlsxWorkbookToFormulasAndValuesArrays(workbook: Workbook): [Shee
     const sheetData: RawCellContent[][] = []
     const sheetReadValues: RawCellContent[][] = []
 
-    worksheet.eachRow((row: Row) => {
+    // Get worksheet dimensions to handle empty rows/cells
+    const dimensions = worksheet.dimensions
+    if (!dimensions) {
+      // Empty worksheet
+      workbookData[worksheet.name] = sheetData
+      readValues[worksheet.name] = sheetReadValues
+      return
+    }
+
+    // Iterate through all rows and columns in the used range
+    for (let rowNum = dimensions.top; rowNum <= dimensions.bottom; rowNum++) {
       const rowData: RawCellContent[] = []
       const rowReadValues: RawCellContent[] = []
 
-      row.eachCell((cell: Cell) => {
+      for (let colNum = dimensions.left; colNum <= dimensions.right; colNum++) {
+        const cell = worksheet.getCell(rowNum, colNum)
+
         const cellData = cell.formula ? `=${cell.formula}` : cell.value as RawCellContent
         const cellValue = (cell.value?.result?.error ?? cell.value?.result ?? (cell.value?.formula != null ? 0 : cell.value)) as RawCellContent
+
         rowData.push(cellData)
         rowReadValues.push(cellValue)
-      })
+      }
 
       sheetData.push(rowData)
       sheetReadValues.push(rowReadValues)
-    })
+    }
 
     workbookData[worksheet.name] = sheetData
-    readValues.Sheet1 = sheetReadValues
+    readValues[worksheet.name] = sheetReadValues
   })
 
   return [workbookData, readValues]
