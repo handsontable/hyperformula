@@ -1,0 +1,54 @@
+name: Publish Forked Package
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag from which the package should be published'
+        default: ''
+        required: false
+        type: string
+      bun_js_version:
+        required: false
+        default: "1.1.26"
+        type: string
+
+permissions:
+  packages: write
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    name: Publish artifacts
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup Bun.js
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ inputs.bun_js_version }}
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Build
+        run: bun run build
+
+      - name: Setup .npmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+          registry-url: "https://npm.pkg.github.com/"
+          scope: "@stellar-fusion"
+          always-auth: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish
+        run: npm publish
