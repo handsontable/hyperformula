@@ -167,7 +167,7 @@ export class Evaluator {
         const address = vertex.getAddress(this.lazilyTransformingAstService)
         const newCellValue = this.recomputeFormulaVertexValue(vertex)
 
-        if (i < this.iterationCount - 1) {
+        if (i < cycles - 1) {
           return
         }
           
@@ -189,7 +189,6 @@ export class Evaluator {
   private updateNonCyclicDependents(cycled: Vertex[]): ContentChanges {
     const changes = ContentChanges.empty()
     const cyclicSet = new Set(cycled)
-    
     
     const dependents = new Set<Vertex>()
     cycled.forEach(vertex => {
