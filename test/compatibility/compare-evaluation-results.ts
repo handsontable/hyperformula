@@ -58,7 +58,6 @@ class ValueComparator {
 
     // NORMALIZE ERRORS
     if (valA instanceof DetailedCellError) {
-      console.log('Error', valA.value, valA.message)
       valA = valA.value
     }
 
@@ -100,8 +99,13 @@ async function run(): Promise<void> {
     const diffFormulas = compareSheets(hfFormulas, readFormulas)
     const diffValues = compareSheets(hfValues, readValues, valueComparator)
 
-    console.log('Diff formulas:', diffFormulas)
-    console.log('Diff values:', diffValues)
+    if (Object.keys(diffFormulas).length) {
+      console.log('Diff formulas:', diffFormulas)
+    }
+
+    if (Object.keys(diffValues).length) {
+      console.log('Diff values:', diffValues)
+    }
   } catch (error: unknown) {
     console.error('Error:', error)
     process.exit(1)
@@ -193,16 +197,13 @@ function convertXlsxWorkbookToFormulasAndValuesArrays(workbook: Workbook): [Shee
     const sheetData: RawCellContent[][] = []
     const sheetReadValues: RawCellContent[][] = []
 
-    // Get worksheet dimensions to handle empty rows/cells
     const dimensions = worksheet.dimensions
     if (!dimensions) {
-      // Empty worksheet
       workbookData[worksheet.name] = sheetData
       readValues[worksheet.name] = sheetReadValues
       return
     }
 
-    // Iterate through all rows and columns in the used range
     for (let rowNum = dimensions.top; rowNum <= dimensions.bottom; rowNum++) {
       const rowData: RawCellContent[] = []
       const rowReadValues: RawCellContent[] = []
