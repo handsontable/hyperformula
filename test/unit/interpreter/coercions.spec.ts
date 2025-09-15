@@ -1,17 +1,17 @@
-import {ErrorType, HyperFormula, SimpleRangeValue} from '../../src'
-import {CellError} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {DateTimeHelper} from '../../src/DateTimeHelper'
-import {ErrorMessage} from '../../src/error-message'
+import {ErrorType, HyperFormula, SimpleRangeValue} from '../../../src'
+import {CellError} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {DateTimeHelper} from '../../../src/DateTimeHelper'
+import {ErrorMessage} from '../../../src/error-message'
 import {
   ArithmeticHelper,
   coerceBooleanToNumber,
   coerceScalarToBoolean,
   coerceToRangeNumbersOrError,
   coerceScalarToString
-} from '../../src/interpreter/ArithmeticHelper'
-import {DateNumber, EmptyValue, TimeNumber} from '../../src/interpreter/InterpreterValue'
-import {NumberLiteralHelper} from '../../src/NumberLiteralHelper'
+} from '../../../src/interpreter/ArithmeticHelper'
+import {DateNumber, EmptyValue, TimeNumber} from '../../../src/interpreter/InterpreterValue'
+import {NumberLiteralHelper} from '../../../src/NumberLiteralHelper'
 import {adr, detailedError} from '../testUtils'
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {

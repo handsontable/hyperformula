@@ -1,9 +1,9 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src'
-import {SimpleDateTime} from '../../src/DateTimeHelper'
-import {ErrorMessage} from '../../src/error-message'
-import {defaultStringifyDateTime} from '../../src/format/format'
-import {Maybe} from '../../src/Maybe'
+import {HyperFormula} from '../../../src'
+import {ErrorType} from '../../../src'
+import {SimpleDateTime} from '../../../src/DateTimeHelper'
+import {ErrorMessage} from '../../../src/error-message'
+import {defaultStringifyDateTime} from '../../../src/format/format'
+import {Maybe} from '../../../src/Maybe'
 import {adr, detailedError} from '../testUtils'
 
 describe('TEXT()', () => {

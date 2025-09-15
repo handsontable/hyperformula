@@ -1,7 +1,7 @@
-import {HyperFormula} from '../../src'
-import {CellValueDetailedType, ErrorType} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {ErrorMessage} from '../../src/error-message'
+import {HyperFormula} from '../../../src'
+import {CellValueDetailedType, ErrorType} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {ErrorMessage} from '../../../src/error-message'
 import {adr, detailedError, timeNumberToString} from '../testUtils'
 
 describe('Function TIME', () => {
@@ -112,4 +112,3 @@ describe('Function TIME', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.FunctionName('FOOBAR')))
   })
 })
-

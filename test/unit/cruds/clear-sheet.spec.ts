@@ -1,4 +1,4 @@
-import {HyperFormula, NoSheetWithIdError} from '../../src'
+import {HyperFormula, NoSheetWithIdError} from '../../../src'
 import {adr} from '../testUtils'
 
 describe('Clear sheet - checking if its possible', () => {

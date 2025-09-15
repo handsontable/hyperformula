@@ -1,7 +1,7 @@
-import { HyperFormula, ErrorType } from '../../src'
-import { ErrorMessage } from '../../src/error-message'
+import { HyperFormula, ErrorType } from '../../../src'
+import { ErrorMessage } from '../../../src/error-message'
 import { adr, detailedError } from '../testUtils'
-import { AbsoluteCellRange } from '../../src/AbsoluteCellRange'
+import { AbsoluteCellRange } from '../../../src/AbsoluteCellRange'
 
 describe('Function XLOOKUP', () => {
   describe('validates arguments', () => {
@@ -58,7 +58,7 @@ describe('Function XLOOKUP', () => {
       expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
       expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.BadMode))
       expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
-      expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))   
+      expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     })
 
     it('returns error when searchMode is of wrong type', () => {
@@ -247,7 +247,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, A2:A6, B2:B6, "NotFound", 0, 1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -260,7 +260,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(5, A2:A6, B2:B6, "NotFound", 0, 1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -283,7 +283,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, A2:A6, B2:B6, "NotFound", 0, -1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -296,7 +296,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(5, A2:A6, B2:B6, "NotFound", 0, -1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -391,7 +391,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, A2:A6, B2:B6, "NotFound", 0, 1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -404,7 +404,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(5, A2:A6, B2:B6, "NotFound", 0, 1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -427,7 +427,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, A2:A6, B2:B6, "NotFound", 0, -1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -440,7 +440,7 @@ describe('Function XLOOKUP', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(5, A2:A6, B2:B6, "NotFound", 0, -1)'],
         [2, 1],
-        [1, 2], 
+        [1, 2],
         [3, 3],
         [1, 4],
         [4, 5]
@@ -528,7 +528,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -537,7 +537,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [1, 2, 40, 50, 51],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(40)
         })
 
@@ -546,7 +546,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(5)
         })
 
@@ -555,7 +555,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
@@ -566,7 +566,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -575,7 +575,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [55, 54, 40, 2, 1],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(40)
         })
 
@@ -584,7 +584,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(5)
         })
 
@@ -593,7 +593,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
@@ -629,7 +629,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -638,7 +638,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [1, 2, 44, 50, 51],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(44)
         })
 
@@ -647,7 +647,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
 
@@ -656,7 +656,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(43)
         })
       })
@@ -667,7 +667,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -676,7 +676,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [55, 54, 44, 2, 1],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(44)
         })
 
@@ -685,7 +685,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
 
@@ -694,7 +694,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: false })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(60)
         })
       })
@@ -730,7 +730,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, 1)'],
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
@@ -739,7 +739,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, 2)'],
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
@@ -748,7 +748,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, -2)'],
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
@@ -757,7 +757,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP("a?b*", A2:E2, A2:E2, "NotFound", 2, -1)'],
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
         })
 
@@ -769,7 +769,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP("t?b*", A5:E5, A5:E5, "NotFound", 2, -2)'],
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
           expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
           expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
@@ -787,7 +787,7 @@ describe('Function XLOOKUP', () => {
             ['a2b222'],
             ['x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
@@ -800,7 +800,7 @@ describe('Function XLOOKUP', () => {
             ['a2b222'],
             ['x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
@@ -813,7 +813,7 @@ describe('Function XLOOKUP', () => {
             ['a2b222'],
             ['x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
         })
 
@@ -826,7 +826,7 @@ describe('Function XLOOKUP', () => {
             ['a2b222'],
             ['x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
         })
 
@@ -842,7 +842,7 @@ describe('Function XLOOKUP', () => {
             ['a2b222'],
             ['x'],
           ], { useColumnIndex: false })
-  
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
           expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
           expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
@@ -860,7 +860,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -869,7 +869,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [1, 2, 40, 50, 51],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(40)
         })
 
@@ -878,7 +878,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(5)
         })
 
@@ -887,7 +887,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, 2)'],
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
@@ -898,7 +898,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -907,7 +907,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [55, 54, 40, 2, 1],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(40)
         })
 
@@ -916,7 +916,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(5)
         })
 
@@ -925,7 +925,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", -1, -2)'],
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
       })
@@ -961,7 +961,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -970,7 +970,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [1, 2, 44, 50, 51],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(44)
         })
 
@@ -979,7 +979,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
 
@@ -988,7 +988,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, 2)'],
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(43)
         })
       })
@@ -999,7 +999,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(42)
         })
 
@@ -1008,7 +1008,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [55, 54, 44, 2, 1],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(44)
         })
 
@@ -1017,7 +1017,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
         })
 
@@ -1026,7 +1026,7 @@ describe('Function XLOOKUP', () => {
             ['=XLOOKUP(42, A2:E2, A2:E2, "NotFound", 1, -2)'],
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: true })
-    
+
           expect(engine.getCellValue(adr('A1'))).toEqual(60)
         })
       })

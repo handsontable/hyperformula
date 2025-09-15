@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {HyperFormula} from '../../../src'
 import {adr} from '../testUtils'
 
 describe('dependencies with parenthesis', () => {

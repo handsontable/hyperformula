@@ -1,12 +1,12 @@
-import {ErrorType, HyperFormula, SimpleCellAddress, SimpleCellRange} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {EmptyCellVertex, FormulaCellVertex} from '../../src/DependencyGraph'
-import {SheetSizeLimitExceededError} from '../../src/errors'
-import {EmptyValue} from '../../src/interpreter/InterpreterValue'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {CellAddress} from '../../src/parser'
+import {ErrorType, HyperFormula, SimpleCellAddress, SimpleCellRange} from '../../../src'
+import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
+import {simpleCellAddress} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {EmptyCellVertex, FormulaCellVertex} from '../../../src/DependencyGraph'
+import {SheetSizeLimitExceededError} from '../../../src/errors'
+import {EmptyValue} from '../../../src/interpreter/InterpreterValue'
+import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
+import {CellAddress} from '../../../src/parser'
 import {
   adr,
   colEnd,
@@ -22,7 +22,7 @@ import {
   rowEnd,
   rowStart,
 } from '../testUtils'
-import {ExpectedValueOfTypeError} from '../../src/errors'
+import {ExpectedValueOfTypeError} from '../../../src/errors'
 
 describe('Moving rows - checking if its possible', () => {
   it('source top left corner should have valid coordinates', () => {

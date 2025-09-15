@@ -1,11 +1,11 @@
-import { ErrorType, simpleCellAddress } from '../../src/Cell'
-import { Config } from '../../src/Config'
-import { CellRangeAst } from '../../src/parser'
+import { ErrorType, simpleCellAddress } from '../../../src/Cell'
+import { Config } from '../../../src/Config'
+import { CellRangeAst } from '../../../src/parser'
 import { buildEmptyParserWithCaching } from '../parser/common'
 import { adr } from '../testUtils'
-import { ParenthesisAst, ProcedureAst, ErrorAst } from '../../src/parser/Ast'
-import { RowsSpan } from '../../src/Span'
-import { RemoveRowsTransformer } from '../../src/dependencyTransformers/RemoveRowsTransformer'
+import { ParenthesisAst, ProcedureAst, ErrorAst } from '../../../src/parser/Ast'
+import { RowsSpan } from '../../../src/Span'
+import { RemoveRowsTransformer } from '../../../src/dependencyTransformers/RemoveRowsTransformer'
 
 describe('RemoveRowsTransformer', () => {
 

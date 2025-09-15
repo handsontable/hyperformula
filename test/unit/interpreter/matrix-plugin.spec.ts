@@ -1,6 +1,6 @@
-import {ErrorType, HyperFormula} from '../../src'
-import {ErrorMessage} from '../../src/error-message'
-import {MatrixPlugin} from '../../src/interpreter/plugin/MatrixPlugin'
+import {ErrorType, HyperFormula} from '../../../src'
+import {ErrorMessage} from '../../../src/error-message'
+import {MatrixPlugin} from '../../../src/interpreter/plugin/MatrixPlugin'
 import {adr, detailedError, detailedErrorWithOrigin} from '../testUtils'
 
 describe('Matrix plugin', () => {

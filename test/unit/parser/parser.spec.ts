@@ -1,10 +1,10 @@
-import {ErrorType, HyperFormula} from '../../src'
-import {CellError} from '../../src'
-import {Config} from '../../src/Config'
-import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage} from '../../src/i18n'
-import {enGB, plPL} from '../../src/i18n/languages'
-import {NoSheetWithNameError} from '../../src/errors'
+import {ErrorType, HyperFormula} from '../../../src'
+import {CellError} from '../../../src'
+import {Config} from '../../../src/Config'
+import {SheetMapping} from '../../../src/DependencyGraph'
+import {buildTranslationPackage} from '../../../src/i18n'
+import {enGB, plPL} from '../../../src/i18n/languages'
+import {NoSheetWithNameError} from '../../../src/errors'
 import {
   AstNodeType,
   buildCellErrorAst,
@@ -20,8 +20,8 @@ import {
   PowerOpAst,
   ProcedureAst,
   StringAst,
-} from '../../src/parser'
-import {columnIndexToLabel} from '../../src/parser/addressRepresentationConverters'
+} from '../../../src/parser'
+import {columnIndexToLabel} from '../../../src/parser/addressRepresentationConverters'
 import {
   ArrayAst,
   buildCellReferenceAst,
@@ -32,9 +32,9 @@ import {
   ColumnRangeAst,
   ParenthesisAst,
   RangeSheetReferenceType, RowRangeAst,
-} from '../../src/parser/Ast'
-import {ColumnAddress} from '../../src/parser/ColumnAddress'
-import {RowAddress} from '../../src/parser/RowAddress'
+} from '../../../src/parser/Ast'
+import {ColumnAddress} from '../../../src/parser/ColumnAddress'
+import {RowAddress} from '../../../src/parser/RowAddress'
 import {adr, unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 
@@ -178,7 +178,7 @@ describe('ParserWithCaching', () => {
     const parser = buildEmptyParserWithCaching(new Config({ ignoreWhiteSpace: 'any' }))
 
     const { ast } = parser.parse('=\u00A042', adr('A1'))
-    
+
     expect(ast.type).toEqual(AstNodeType.NUMBER)
     expect(ast.leadingWhitespace).toEqual('\u00A0')
   })

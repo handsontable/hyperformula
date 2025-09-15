@@ -1,4 +1,4 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../../src/Config'
 import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 

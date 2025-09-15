@@ -1,6 +1,6 @@
-import {ErrorType, HyperFormula} from '../../src'
-import {DependencyGraph} from '../../src/DependencyGraph'
-import {ErrorMessage} from '../../src/error-message'
+import {ErrorType, HyperFormula} from '../../../src'
+import {DependencyGraph} from '../../../src/DependencyGraph'
+import {ErrorMessage} from '../../../src/error-message'
 import {adr, detailedError, resetSpy} from '../testUtils'
 
 describe('Function MATCH', () => {

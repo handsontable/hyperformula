@@ -1,5 +1,5 @@
-import {Config} from '../../src/Config'
-import {AstNodeType, ConcatenateOpAst, ProcedureAst} from '../../src/parser'
+import {Config} from '../../../src/Config'
+import {AstNodeType, ConcatenateOpAst, ProcedureAst} from '../../../src/parser'
 import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 

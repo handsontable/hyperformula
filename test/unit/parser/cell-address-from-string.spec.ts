@@ -1,7 +1,7 @@
-import {SheetMapping} from '../../src/DependencyGraph'
-import {buildTranslationPackage} from '../../src/i18n'
-import {enGB} from '../../src/i18n/languages'
-import {CellAddress, cellAddressFromString} from '../../src/parser'
+import {SheetMapping} from '../../../src/DependencyGraph'
+import {buildTranslationPackage} from '../../../src/i18n'
+import {enGB} from '../../../src/i18n/languages'
+import {CellAddress, cellAddressFromString} from '../../../src/parser'
 import {adr} from '../testUtils'
 
 describe('cellAddressFromString', () => {

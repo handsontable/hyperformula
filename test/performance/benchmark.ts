@@ -1,5 +1,5 @@
-import {CellValue, ConfigParams, HyperFormula, Sheet} from '../../../src'
-import {Maybe} from '../../../src/Maybe'
+import {CellValue, ConfigParams, HyperFormula, Sheet} from '../../src'
+import {Maybe} from '../../src/Maybe'
 import {
   average,
   EnrichedStatType,

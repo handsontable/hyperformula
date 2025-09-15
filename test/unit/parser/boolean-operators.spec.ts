@@ -1,4 +1,4 @@
-import {Config} from '../../src/Config'
+import {Config} from '../../../src/Config'
 import {
   AstNodeType,
   EqualsOpAst,
@@ -7,7 +7,7 @@ import {
   LessThanOpAst,
   LessThanOrEqualOpAst,
   NotEqualOpAst,
-} from '../../src/parser'
+} from '../../../src/parser'
 import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 

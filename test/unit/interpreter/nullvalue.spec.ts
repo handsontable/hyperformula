@@ -1,5 +1,5 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
+import {HyperFormula} from '../../../src'
+import {ErrorType} from '../../../src/Cell'
 import {adr, detailedError} from '../testUtils'
 
 describe('EmptyValue tests', () => {

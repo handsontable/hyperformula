@@ -1,6 +1,6 @@
-import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
-import {ErrorType} from '../../src/Cell'
-import {CellAddress} from '../../src/parser'
+import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../../src'
+import {ErrorType} from '../../../src/Cell'
+import {CellAddress} from '../../../src/parser'
 import {
   adr,
   colEnd,

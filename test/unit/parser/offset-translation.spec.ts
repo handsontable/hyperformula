@@ -1,7 +1,7 @@
-import {CellError, ErrorType} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {ErrorMessage} from '../../src/error-message'
-import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst} from '../../src/parser'
+import {CellError, ErrorType} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {ErrorMessage} from '../../../src/error-message'
+import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst} from '../../../src/parser'
 import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 

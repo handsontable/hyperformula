@@ -4,11 +4,11 @@ import {
   HyperFormula,
   SheetSizeLimitExceededError,
   ErrorType,
-} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {Config} from '../../src/Config'
-import {ArrayVertex, FormulaCellVertex} from '../../src/DependencyGraph'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+} from '../../../src'
+import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
+import {Config} from '../../../src/Config'
+import {ArrayVertex, FormulaCellVertex} from '../../../src/DependencyGraph'
+import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {
   adr,
   expectArrayWithSameContent,
@@ -16,7 +16,7 @@ import {
   extractMatrixRange,
   extractRange
 } from '../testUtils'
-import { ErrorMessage } from '../../src/error-message'
+import { ErrorMessage } from '../../../src/error-message'
 import { detailedError } from '../testUtils'
 
 describe('Adding column - checking if its possible', () => {

@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../../src'
+import {HyperFormula} from '../../src'
 import {batch, benchmarkCruds, BenchmarkResult} from './benchmark'
 import {sheet as sheetAGenerator} from './sheets/09-sheet-a'
 import {sheet as sheetBGenerator} from './sheets/10-sheet-b'

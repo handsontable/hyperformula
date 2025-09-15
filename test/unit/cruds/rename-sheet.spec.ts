@@ -1,4 +1,4 @@
-import {HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../../src'
+import {HyperFormula, NoSheetWithIdError, SheetNameAlreadyTakenError} from '../../../src'
 
 describe('Is it possible to rename sheet', () => {
   it('true if possible', () => {

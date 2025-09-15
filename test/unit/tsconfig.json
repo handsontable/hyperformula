@@ -6,17 +6,17 @@
   */
   "compilerOptions": {
     "module": "commonjs",
-    "outDir": "../test-jest",
+    "outDir": "../../test-jest",
     /* Make sure proper types are used */
     "types": [
       "jest",
       "node"
     ]
   },
-  "extends": "../tsconfig",
+  "extends": "../../tsconfig",
   "include": [
-    "../src",
-    "../test"
-  ],
+    "../../../src",
+    "../unit"
+, "../performance"  ],
   "exclude": []
 }

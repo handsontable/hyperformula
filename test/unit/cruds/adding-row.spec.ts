@@ -1,9 +1,9 @@
-import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {Config} from '../../src/Config'
-import {ArrayVertex, FormulaCellVertex} from '../../src/DependencyGraph'
-import {AlwaysDense} from '../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../../src'
+import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
+import {Config} from '../../../src/Config'
+import {ArrayVertex, FormulaCellVertex} from '../../../src/DependencyGraph'
+import {AlwaysDense} from '../../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
+import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {adr, expectArrayWithSameContent, expectEngineToBeTheSameAs, extractMatrixRange} from '../testUtils'
 
 describe('Adding row - checking if its possible', () => {

@@ -1,5 +1,5 @@
-import {HyperFormula} from '../../src'
-import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../src/Operations'
+import {HyperFormula} from '../../../src'
+import {normalizeAddedIndexes, normalizeRemovedIndexes} from '../../../src/Operations'
 import {adr, expectArrayWithSameContent} from '../testUtils'
 
 describe('batch cruds', () => {

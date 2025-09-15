@@ -1,5 +1,5 @@
-import {HyperFormula} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
+import {HyperFormula} from '../../../src'
+import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {adr} from '../testUtils'
 
 describe('Set matrix empty', () => {

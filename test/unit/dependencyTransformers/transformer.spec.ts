@@ -1,12 +1,12 @@
-import { ErrorType, simpleCellAddress, SimpleCellAddress } from '../../src/Cell'
-import { Config } from '../../src/Config'
-import { CellAddress, CellRangeAst } from '../../src/parser'
-import { ColumnAddress } from '../../src/parser/ColumnAddress'
-import { RowAddress } from '../../src/parser/RowAddress'
-import { Transformer } from '../../src/dependencyTransformers/Transformer'
+import { ErrorType, simpleCellAddress, SimpleCellAddress } from '../../../src/Cell'
+import { Config } from '../../../src/Config'
+import { CellAddress, CellRangeAst } from '../../../src/parser'
+import { ColumnAddress } from '../../../src/parser/ColumnAddress'
+import { RowAddress } from '../../../src/parser/RowAddress'
+import { Transformer } from '../../../src/dependencyTransformers/Transformer'
 import { buildEmptyParserWithCaching } from '../parser/common'
 import { adr } from '../testUtils'
-import { ParenthesisAst, ProcedureAst, ArrayAst } from '../../src/parser/Ast'
+import { ParenthesisAst, ProcedureAst, ArrayAst } from '../../../src/parser/Ast'
 
 describe('Transformer', () => {
 

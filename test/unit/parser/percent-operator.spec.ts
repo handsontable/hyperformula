@@ -1,6 +1,6 @@
-import {Config} from '../../src/Config'
-import {AstNodeType, MinusUnaryOpAst, PlusOpAst, PlusUnaryOpAst} from '../../src/parser'
-import {PercentOpAst, TimesOpAst} from '../../src/parser/Ast'
+import {Config} from '../../../src/Config'
+import {AstNodeType, MinusUnaryOpAst, PlusOpAst, PlusUnaryOpAst} from '../../../src/parser'
+import {PercentOpAst, TimesOpAst} from '../../../src/parser/Ast'
 import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 

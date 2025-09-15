@@ -1,4 +1,4 @@
-import {CellValueDetailedType, HyperFormula} from '../../src'
+import {CellValueDetailedType, HyperFormula} from '../../../src'
 import {adr} from '../testUtils'
 
 describe('When value is prepend with an apostrophe', () => {

@@ -1,9 +1,9 @@
-import {ErrorType, HyperFormula, NoSheetWithIdError} from '../../src'
-import {AbsoluteCellRange, SimpleCellRange} from '../../src/AbsoluteCellRange'
-import {EmptyCellVertex} from '../../src/DependencyGraph'
-import {EmptyValue} from '../../src/interpreter/InterpreterValue'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {CellAddress} from '../../src/parser'
+import {ErrorType, HyperFormula, NoSheetWithIdError} from '../../../src'
+import {AbsoluteCellRange, SimpleCellRange} from '../../../src/AbsoluteCellRange'
+import {EmptyCellVertex} from '../../../src/DependencyGraph'
+import {EmptyValue} from '../../../src/interpreter/InterpreterValue'
+import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
+import {CellAddress} from '../../../src/parser'
 import {
   adr,
   detailedError,
@@ -13,7 +13,7 @@ import {
   extractRange,
   extractReference, graphEdgesCount,
 } from '../testUtils'
-import {ExpectedValueOfTypeError} from '../../src/errors'
+import {ExpectedValueOfTypeError} from '../../../src/errors'
 
 describe('Address dependencies, moved formulas', () => {
   it('should update dependency to external cell when not overriding it', () => {

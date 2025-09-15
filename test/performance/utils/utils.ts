@@ -1,4 +1,4 @@
-import {SimpleCellAddress} from '../../../../src'
+import {SimpleCellAddress} from '../../../src'
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
   const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!

@@ -1,7 +1,7 @@
-import {HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {ErrorMessage} from '../../src/error-message'
+import {HyperFormula} from '../../../src'
+import {ErrorType} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {ErrorMessage} from '../../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Number literals', () => {

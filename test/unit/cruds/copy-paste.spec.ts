@@ -1,9 +1,9 @@
-import {ExportedCellChange, HyperFormula, NothingToPasteError, SimpleCellAddress} from '../../src'
-import {AbsoluteCellRange, SimpleCellRange} from '../../src/AbsoluteCellRange'
-import {ErrorType, simpleCellAddress} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {SheetSizeLimitExceededError} from '../../src/errors'
-import {CellAddress} from '../../src/parser'
+import {ExportedCellChange, HyperFormula, NothingToPasteError, SimpleCellAddress} from '../../../src'
+import {AbsoluteCellRange, SimpleCellRange} from '../../../src/AbsoluteCellRange'
+import {ErrorType, simpleCellAddress} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {SheetSizeLimitExceededError} from '../../../src/errors'
+import {CellAddress} from '../../../src/parser'
 import {
   adr,
   colEnd,
@@ -14,20 +14,20 @@ import {
   rowEnd,
   rowStart,
 } from '../testUtils'
-import { DependencyGraph } from '../../src/DependencyGraph'
-import { Statistics } from '../../src/statistics'
-import { FunctionRegistry } from '../../src/interpreter/FunctionRegistry'
-import { LazilyTransformingAstService } from '../../src/LazilyTransformingAstService'
-import { NamedExpressions } from '../../src/NamedExpressions'
-import { Operations } from '../../src/Operations'
-import { buildColumnSearchStrategy } from '../../src/Lookup/SearchStrategy'
-import { CellContentParser } from '../../src/CellContentParser'
-import { DateTimeHelper } from '../../src/DateTimeHelper'
-import { NumberLiteralHelper } from '../../src/NumberLiteralHelper'
-import { ParserWithCaching } from '../../src/parser'
-import { ArraySizePredictor } from '../../src/ArraySize'
-import { NoSheetWithIdError} from '../../src'
-import {ExpectedValueOfTypeError} from '../../src/errors'
+import { DependencyGraph } from '../../../src/DependencyGraph'
+import { Statistics } from '../../../src/statistics'
+import { FunctionRegistry } from '../../../src/interpreter/FunctionRegistry'
+import { LazilyTransformingAstService } from '../../../src/LazilyTransformingAstService'
+import { NamedExpressions } from '../../../src/NamedExpressions'
+import { Operations } from '../../../src/Operations'
+import { buildColumnSearchStrategy } from '../../../src/Lookup/SearchStrategy'
+import { CellContentParser } from '../../../src/CellContentParser'
+import { DateTimeHelper } from '../../../src/DateTimeHelper'
+import { NumberLiteralHelper } from '../../../src/NumberLiteralHelper'
+import { ParserWithCaching } from '../../../src/parser'
+import { ArraySizePredictor } from '../../../src/ArraySize'
+import { NoSheetWithIdError} from '../../../src'
+import {ExpectedValueOfTypeError} from '../../../src/errors'
 
 describe('Copy - paste integration', () => {
   it('copy should validate arguments', () => {

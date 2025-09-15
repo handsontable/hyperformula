@@ -1,4 +1,4 @@
-import {RawCellContent, Sheet} from '../../../../src'
+import {RawCellContent, Sheet} from '../../../src'
 import {ExpectedValue} from '../benchmark'
 
 export function sheet(rows: number = 10000): Sheet {

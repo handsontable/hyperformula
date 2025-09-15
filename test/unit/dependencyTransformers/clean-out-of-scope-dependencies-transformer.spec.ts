@@ -1,4 +1,4 @@
-import { CleanOutOfScopeDependenciesTransformer } from '../../src/dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
+import { CleanOutOfScopeDependenciesTransformer } from '../../../src/dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 
 describe('CleanOutOfScopeDependenciesTransformer', () => {
 

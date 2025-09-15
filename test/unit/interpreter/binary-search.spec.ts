@@ -1,6 +1,6 @@
-import {compare, findLastOccurrenceInOrderedArray} from '../../src/interpreter/binarySearch'
-import {EmptyValue} from '../../src/interpreter/InterpreterValue'
-import {CellError, ErrorType} from '../../src'
+import {compare, findLastOccurrenceInOrderedArray} from '../../../src/interpreter/binarySearch'
+import {EmptyValue} from '../../../src/interpreter/InterpreterValue'
+import {CellError, ErrorType} from '../../../src'
 
 describe('findLastOccurrenceInOrderedArray', () => {
   it('returns -1 when empty array', () => {

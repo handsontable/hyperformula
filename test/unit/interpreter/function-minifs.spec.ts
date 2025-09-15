@@ -1,8 +1,8 @@
-import {HyperFormula, ErrorType} from '../../src'
-import {ErrorMessage} from '../../src/error-message'
+import {HyperFormula, ErrorType} from '../../../src'
+import {ErrorMessage} from '../../../src/error-message'
 import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
-import {DateTimeHelper} from '../../src/DateTimeHelper'
-import {Config} from '../../src/Config'
+import {DateTimeHelper} from '../../../src/DateTimeHelper'
+import {Config} from '../../../src/Config'
 
 describe('Function MINIFS - argument validations and combinations', () => {
   it('requires odd number of arguments, but at least 3', () => {

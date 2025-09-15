@@ -1,7 +1,7 @@
-import {HyperFormula} from '../../src'
-import {CellValueDetailedType, ErrorType} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {ErrorMessage} from '../../src/error-message'
+import {HyperFormula} from '../../../src'
+import {CellValueDetailedType, ErrorType} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {ErrorMessage} from '../../../src/error-message'
 import {adr, dateNumberToString, detailedError} from '../testUtils'
 
 describe('Function DATE', () => {

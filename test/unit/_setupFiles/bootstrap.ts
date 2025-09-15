@@ -2,10 +2,10 @@
  * This script file presents you the opportunity of running some code immediately
  * after the test framework has been installed in the environment.
  */
-import {HyperFormula} from '../../src'
-import {Config} from '../../src/Config'
-import {enGB} from '../../src/i18n/languages'
-import * as plugins from '../../src/interpreter/plugin'
+import {HyperFormula} from '../../../src'
+import {Config} from '../../../src/Config'
+import {enGB} from '../../../src/i18n/languages'
+import * as plugins from '../../../src/interpreter/plugin'
 import {unregisterAllLanguages} from '../testUtils'
 import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from './matchers'
 

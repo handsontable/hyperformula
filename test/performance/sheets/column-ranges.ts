@@ -1,5 +1,5 @@
-import {RawCellContent, Sheet} from '../../../../src'
-import {columnIndexToLabel, simpleCellAddressToString} from '../../../../src/parser/addressRepresentationConverters'
+import {RawCellContent, Sheet} from '../../../src'
+import {columnIndexToLabel, simpleCellAddressToString} from '../../../src/parser/addressRepresentationConverters'
 
 export function sheet(cols: number = 50): Sheet {
   const sheet: Sheet = []

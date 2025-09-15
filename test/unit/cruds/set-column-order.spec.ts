@@ -1,4 +1,4 @@
-import {HyperFormula, AlwaysSparse} from '../../src'
+import {HyperFormula, AlwaysSparse} from '../../../src'
 import {adr} from '../testUtils'
 
 describe('swapping columns - checking if it is possible', () => {

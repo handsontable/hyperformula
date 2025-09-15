@@ -1,8 +1,8 @@
-import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {ArrayVertex} from '../../src/DependencyGraph'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
-import {CellAddress} from '../../src/parser'
+import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../../src'
+import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
+import {ArrayVertex} from '../../../src/DependencyGraph'
+import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
+import {CellAddress} from '../../../src/parser'
 import {
   adr,
   expectArrayWithSameContent,

@@ -1,4 +1,4 @@
-import {ErrorType, HyperFormula} from '../../src'
+import {ErrorType, HyperFormula} from '../../../src'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function NA', () => {

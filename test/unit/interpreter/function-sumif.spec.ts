@@ -1,8 +1,8 @@
-import {CellValueDetailedType, HyperFormula} from '../../src'
-import {ErrorType} from '../../src/Cell'
-import {ErrorMessage} from '../../src/error-message'
-import {plPL} from '../../src/i18n/languages'
-import {StatType} from '../../src/statistics'
+import {CellValueDetailedType, HyperFormula} from '../../../src'
+import {ErrorType} from '../../../src/Cell'
+import {ErrorMessage} from '../../../src/error-message'
+import {plPL} from '../../../src/i18n/languages'
+import {StatType} from '../../../src/statistics'
 import {adr, detailedError, expectArrayWithSameContent} from '../testUtils'
 
 describe('Function SUMIF - argument validations and combinations', () => {

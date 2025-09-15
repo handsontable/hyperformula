@@ -1,7 +1,7 @@
-import {HyperFormula} from '../../src'
-import {ProtectedFunctionError} from '../../src/errors'
-import {InterpreterValue} from '../../src/interpreter/InterpreterValue'
-import {FunctionPlugin, FunctionPluginTypecheck} from '../../src/interpreter/plugin/FunctionPlugin'
+import {HyperFormula} from '../../../src'
+import {ProtectedFunctionError} from '../../../src/errors'
+import {InterpreterValue} from '../../../src/interpreter/InterpreterValue'
+import {FunctionPlugin, FunctionPluginTypecheck} from '../../../src/interpreter/plugin/FunctionPlugin'
 import {adr} from '../testUtils'
 
 describe('Function VERSION', () => {

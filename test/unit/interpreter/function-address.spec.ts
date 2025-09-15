@@ -1,6 +1,6 @@
-import {HyperFormula, ErrorType} from '../../src'
+import {HyperFormula, ErrorType} from '../../../src'
 import {adr, detailedError} from '../testUtils'
-import {ErrorMessage} from '../../src/error-message'
+import {ErrorMessage} from '../../../src/error-message'
 
 describe('ADDRESS', () => {
   it('with row and col', () => {

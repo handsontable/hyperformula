@@ -3,7 +3,7 @@
  * before the test framework has been installed in the environment.
  */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const htConfig = require('./../../ht.config')
+const htConfig = require('./../../../ht.config')
 
 export default function() {
   // Extract all HF constants to the process environment namespance.

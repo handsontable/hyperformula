@@ -1,5 +1,5 @@
-import {ErrorType, HyperFormula} from '../../src'
-import {ErrorMessage} from '../../src/error-message'
+import {ErrorType, HyperFormula} from '../../../src'
+import {ErrorMessage} from '../../../src/error-message'
 import {adr, detailedError} from '../testUtils'
 
 describe('Function COMBIN', () => {

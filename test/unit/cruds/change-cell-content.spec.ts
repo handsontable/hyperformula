@@ -9,13 +9,13 @@ import {
   SheetSizeLimitExceededError,
   ArraySize,
   ExpectedValueOfTypeError,
-} from '../../src'
-import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
-import {simpleCellAddress} from '../../src/Cell'
-import {Config} from '../../src/Config'
-import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
-import {ErrorMessage} from '../../src/error-message'
-import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
+} from '../../../src'
+import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
+import {simpleCellAddress} from '../../../src/Cell'
+import {Config} from '../../../src/Config'
+import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../../src/DependencyGraph'
+import {ErrorMessage} from '../../../src/error-message'
+import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {
   adr,
   colEnd,

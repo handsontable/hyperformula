@@ -1,4 +1,4 @@
-import {HyperFormula} from '../../src'
+import {HyperFormula} from '../../../src'
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 

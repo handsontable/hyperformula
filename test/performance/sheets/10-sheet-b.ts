@@ -1,5 +1,5 @@
 import {ExpectedValue} from '../benchmark'
-import {RawCellContent, Sheet} from '../../../../src'
+import {RawCellContent, Sheet} from '../../../src'
 
 export function sheet(rows: number = 5000): Sheet {
   const sheet: Sheet = []
