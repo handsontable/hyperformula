@@ -22,8 +22,8 @@ const NAMED_EXPRESSIONS: SerializedNamedExpression[] = [
 interface CellDiff {
   row: number,
   col: number,
-  sheetA: RawCellContent,
-  sheetB: RawCellContent,
+  hf: RawCellContent,
+  source: RawCellContent,
 }
 
 interface SheetsDiff {
@@ -34,6 +34,8 @@ interface SheetsDiff {
  * Utility class for comparing values with proper equality logic
  */
 class ValueComparator {
+  private readonly nullLikeValues: unknown[] = [0, '', false, null, undefined]
+
   /**
    * Creates an instance of ValueComparator.
    * @param {number} [epsilon=Number.EPSILON] - The tolerance used for floating point comparisons.
@@ -42,28 +44,13 @@ class ValueComparator {
 
   /**
    * Determines if two values are equal
-   * @param {unknown} valA - First value to compare
-   * @param {unknown} valB - Second value to compare
+   * @param {unknown} rawValA - First value to compare
+   * @param {unknown} rawValB - Second value to compare
    * @returns {boolean} true if values are equal, false otherwise
    */
-  areEqual(valA: unknown, valB: unknown): boolean {
-    // NORMALIZE NULL
-    if (valA == null) {
-      valA = null
-    }
-
-    if (valB == null) {
-      valB = null
-    }
-
-    // NORMALIZE ERRORS
-    if (valA instanceof DetailedCellError) {
-      valA = valA.value
-    }
-
-    if (valB instanceof DetailedCellError) {
-      valB = valB.value
-    }
+  areEqual(rawValA: unknown, rawValB: unknown): boolean {
+    const valA = this.normalize(rawValA)
+    const valB = this.normalize(rawValB)
 
     // Handle number comparison with potential floating point precision issues
     if (typeof valA === 'number' && typeof valB === 'number') {
@@ -77,6 +64,23 @@ class ValueComparator {
     }
 
     return valA === valB
+  }
+
+  /**
+   * Normalizes values for comparison (converts null-like values to 0, extracts error values)
+   * @param {unknown} val - Value to normalize
+   * @returns {unknown} Normalized value
+   */
+  normalize(val: unknown): unknown {
+    if (val instanceof DetailedCellError) {
+      return val.value
+    }
+
+    if (this.nullLikeValues.includes(val)) {
+      return 0
+    }
+
+    return val
   }
 }
 
@@ -115,11 +119,11 @@ async function run(): Promise<void> {
 /**
  * Compares two sheets and returns the differences
  */
-function compareSheets(sheetCollectionA: Sheets, sheetCollectionB: Sheets, comparator?: ValueComparator): SheetsDiff {
-  const allSheetNames = new Set([...Object.keys(sheetCollectionA), ...Object.keys(sheetCollectionB)])
+function compareSheets(hfCollection: Sheets, sourceCollection: Sheets, comparator?: ValueComparator): SheetsDiff {
+  const allSheetNames = new Set([...Object.keys(hfCollection), ...Object.keys(sourceCollection)])
 
   const allSheetsDiff = Array.from(allSheetNames).reduce<SheetsDiff>((acc, sheetName: string) => {
-    const sheetDiff = compareSingleSheet(sheetCollectionA[sheetName] || [], sheetCollectionB[sheetName] || [], comparator)
+    const sheetDiff = compareSingleSheet(hfCollection[sheetName] || [], sourceCollection[sheetName] || [], comparator)
 
     if (sheetDiff.length > 0) {
       acc[sheetName] = sheetDiff
@@ -134,25 +138,25 @@ function compareSheets(sheetCollectionA: Sheets, sheetCollectionB: Sheets, compa
 /**
  * Compares two single sheet data arrays and returns the differences
  */
-function compareSingleSheet(sheetAData: RawCellContent[][], sheetBData: RawCellContent[][], comparator?: ValueComparator): CellDiff[] {
+function compareSingleSheet(hfData: RawCellContent[][], sourceData: RawCellContent[][], comparator?: ValueComparator): CellDiff[] {
   const compare = comparator ? comparator.areEqual.bind(comparator) : (a: unknown, b: unknown) => a === b
 
-  const maxRows = Math.max(sheetAData.length, sheetBData.length)
+  const maxRows = Math.max(hfData.length, sourceData.length)
   const sheetDiff = [] as CellDiff[]
 
   for (let row = 0; row < maxRows; row++) {
-    const maxCols = Math.max(sheetAData[row]?.length ?? 0, sheetBData[row]?.length ?? 0)
+    const maxCols = Math.max(hfData[row]?.length ?? 0, sourceData[row]?.length ?? 0)
 
     for (let col = 0; col < maxCols; col++) {
-      const cellA = sheetAData[row]?.[col] ?? null
-      const cellB = sheetBData[row]?.[col] ?? null
+      const hfCell = hfData[row]?.[col] ?? null
+      const sourceCell = sourceData[row]?.[col] ?? null
 
-      if (!compare(cellA, cellB)) {
+      if (!compare(hfCell, sourceCell)) {
         sheetDiff.push({
           row,
           col,
-          sheetA: cellA,
-          sheetB: cellB
+          hf: hfCell,
+          source: sourceCell
         })
       }
     }
