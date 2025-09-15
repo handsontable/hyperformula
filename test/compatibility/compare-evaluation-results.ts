@@ -1,4 +1,4 @@
-import { Workbook, Worksheet } from 'exceljs'
+import { CellValue, Workbook, Worksheet } from 'exceljs'
 import { ConfigParams, DetailedCellError, HyperFormula, RawCellContent, SerializedNamedExpression, Sheets } from '../../src'
 
 const HF_CONFIG: Partial<ConfigParams> = {
@@ -212,7 +212,7 @@ function convertXlsxWorkbookToFormulasAndValuesArrays(workbook: Workbook): [Shee
         const cell = worksheet.getCell(rowNum, colNum)
 
         const cellData = cell.formula ? `=${cell.formula}` : cell.value as RawCellContent
-        const cellValue = (cell.value?.result?.error ?? cell.value?.result ?? (cell.value?.formula != null ? 0 : cell.value)) as RawCellContent
+        const cellValue = readCellValue(cell.value)
 
         rowData.push(cellData)
         rowReadValues.push(cellValue)
@@ -227,6 +227,22 @@ function convertXlsxWorkbookToFormulasAndValuesArrays(workbook: Workbook): [Shee
   })
 
   return [workbookData, readValues]
+}
+
+/**
+ * Extracts the actual cell value from an Excel cell value object
+ * @param {CellValue} cellValueObject - The Excel cell value object to extract from
+ * @returns {RawCellContent} The extracted cell value
+ */
+function readCellValue(cellValueObject: CellValue): RawCellContent {
+  if (!cellValueObject) {
+    return null
+  }
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line
+  return cellValueObject.result?.error ?? cellValueObject.result ?? (cellValueObject.formula != null ? 0 : cellValueObject)
 }
 
 void run()
