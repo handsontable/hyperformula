@@ -213,7 +213,7 @@ export class Config implements ConfigParams, ParserConfig {
 
     this.useArrayArithmetic = configValueFromParam(useArrayArithmetic, 'boolean', 'useArrayArithmetic')
     this.accentSensitive = configValueFromParam(accentSensitive, 'boolean', 'accentSensitive')
-    this.allowCircularReferences = configValueFromParam(options.allowCircularReferences, 'boolean', 'allowCircularReferences')
+    this.allowCircularReferences = configValueFromParam(allowCircularReferences, 'boolean', 'allowCircularReferences')
     this.caseSensitive = configValueFromParam(caseSensitive, 'boolean', 'caseSensitive')
     this.caseFirst = configValueFromParam(caseFirst, ['upper', 'lower', 'false'], 'caseFirst')
     this.ignorePunctuation = configValueFromParam(ignorePunctuation, 'boolean', 'ignorePunctuation')
