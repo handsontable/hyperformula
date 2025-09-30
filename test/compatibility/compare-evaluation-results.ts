@@ -73,6 +73,7 @@ class ValueComparator {
    */
   normalize(val: unknown): unknown {
     if (val instanceof DetailedCellError) {
+      // console.error('HF Error:', val.value, val.message)
       return val.value
     }
 
@@ -98,18 +99,28 @@ async function run(): Promise<void> {
     }
 
     const [readFormulas, readValues] = await readFormulasAndValuesFromXlsxFile(filename)
+    // console.error('Read formulas:', readFormulas)
     const [hfFormulas, hfValues] = evaluateSheet(readFormulas)
 
     const diffFormulas = compareSheets(hfFormulas, readFormulas)
     const diffValues = compareSheets(hfValues, readValues, valueComparator)
 
-    if (Object.keys(diffFormulas).length) {
+    const hasFormulaDiffs = Object.keys(diffFormulas).length > 0
+    const hasValueDiffs = Object.keys(diffValues).length > 0
+
+    if (hasFormulaDiffs) {
       console.log('Diff formulas:', diffFormulas)
     }
 
-    if (Object.keys(diffValues).length) {
+    if (hasValueDiffs) {
       console.log('Diff values:', diffValues)
     }
+
+    if (hasFormulaDiffs || hasValueDiffs) {
+      process.exit(1)
+    }
+
+    process.exit(0)
   } catch (error: unknown) {
     console.error('Error:', error)
     process.exit(1)
@@ -174,11 +185,23 @@ function evaluateSheet(formulas: Sheets): [Sheets, Sheets] {
 }
 
 /**
+ * Clears formulas from _xlfn. prefix
+ */
+function clearFormulas(formulas: Sheets): Sheets {
+  return Object.entries(formulas).reduce<Sheets>((acc, [sheetName, sheet]) => {
+    acc[sheetName] = sheet.map((row) => row.map((cell) => typeof cell === 'string' ? cell.replace('_xlfn.', '') : cell))
+    return acc
+  }, {})
+}
+
+/**
  * Reads formulas and values from an Excel file
  */
 async function readFormulasAndValuesFromXlsxFile(filename: string): Promise<[Sheets, Sheets]> {
   const workbook = await readXlsxWorkbookFromFile(filename)
-  return convertXlsxWorkbookToFormulasAndValuesArrays(workbook)
+  const [formulas, values] = convertXlsxWorkbookToFormulasAndValuesArrays(workbook)
+  const cleanFormulas = clearFormulas(formulas)
+  return [cleanFormulas, values]
 }
 
 /**

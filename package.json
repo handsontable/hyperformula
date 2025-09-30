@@ -75,7 +75,7 @@
     "verify:cjs": "node script/check-file.js commonjs",
     "verify:publish-package": "npm pack | node script/check-publish-package.js",
     "verify:typings": "tsc --noEmit",
-    "test": "npm-run-all lint test:unit test:browser",
+    "test": "npm-run-all lint test:unit test:browser test:compatibility",
     "test:unit": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:watch": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch",
     "test:watch-tdd": "cross-env NODE_ICU_DATA=node_modules/full-icu jest --watch xlookup",

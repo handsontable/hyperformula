@@ -4,5 +4,10 @@ for file in test/compatibility/test_data/*.xlsx; do
     [[ "$filename" =~ ^~ ]] && continue
     echo -e "\033[34mProcessing: $filename\033[0m"
     ts-node --transpile-only -O {\"module\":\"commonjs\"} test/compatibility/compare-evaluation-results.ts "$file"
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
     echo -e "\033[34mDone: $filename\033[0m"
 done
+
+exit 0
