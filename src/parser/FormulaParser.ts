@@ -725,6 +725,7 @@ export class FormulaParser extends EmbeddedActionsParser {
 
   /**
    * Entry rule wrapper that sets formula address
+   *
    * @param {SimpleCellAddress} address - address of the cell in which formula is located
    */
   private formulaWithContext(address: SimpleCellAddress): Ast {
