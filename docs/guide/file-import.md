@@ -16,7 +16,7 @@ To import XLSX files, use a third-party [XLSX parser](https://www.npmjs.com/sear
 
 ### Example: Import XLSX files in Node
 
-This example uses [ExcelJS](https://www.npmjs.com/package/exceljs) to import XLSX files into HyperFormula. 
+This example uses [ExcelJS](https://www.npmjs.com/package/exceljs) to import XLSX files into HyperFormula.
 
 See full example on [GitHub](https://github.com/handsontable/hyperformula-demos/tree/3.0.x/read-excel-file).
 
@@ -43,18 +43,21 @@ function convertXlsxWorkbookToJavascriptArrays(workbook) {
   const workbookData = {};
 
   workbook.eachSheet((worksheet) => {
+    const sheetDimensions = worksheet.dimensions
     const sheetData = [];
 
-    worksheet.eachRow((row) => {
+    for (let rowNum = sheetDimensions.top; rowNum <= sheetDimensions.bottom; rowNum++) {
       const rowData = [];
 
-      row.eachCell((cell) => {
+      for (let colNum = sheetDimensions.left; colNum <= sheetDimensions.right; colNum++) {
+        const cell = worksheet.getCell(rowNum, colNum)
+
         const cellData = cell.formula ? `=${cell.formula}` : cell.value;
         rowData.push(cellData);
-      });
+      }
 
       sheetData.push(rowData);
-    });
+    }
 
     workbookData[worksheet.name] = sheetData;
   })

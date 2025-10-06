@@ -11,6 +11,7 @@ src/interpreter/plugin/3rdparty
 *.config.js
 karma.*
 doc
+test/unit/_setupFiles/*.js
 
 # Auto-generated directories
 commonjs
@@ -25,4 +26,3 @@ test-jasmine
 test-jest
 typedoc
 typings
-test/_setupFiles/*.js
