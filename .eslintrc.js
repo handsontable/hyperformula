@@ -90,9 +90,6 @@ module.exports = {
     'jsdoc/empty-tags': 'warn',
     'jsdoc/implements-on-classes': 'warn',
     'jsdoc/multiline-blocks': 'warn',
-    'jsdoc/tag-lines': ['warn', 'never', {
-      startLines: 1,
-    }],
     'jsdoc/no-multi-asterisks': 'warn',
     'jsdoc/require-param-description': 'warn',
     'jsdoc/require-param-name': 'warn',
