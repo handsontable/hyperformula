@@ -26,7 +26,12 @@ export interface SimpleCellRange {
   end: SimpleCellAddress,
 }
 
-export function isSimpleCellRange(obj: any): obj is SimpleCellRange {
+/**
+ * Type guard that checks if an object is a valid SimpleCellRange.
+ * @param {unknown} obj - The object to check
+ * @returns {boolean} True if and only if the object is a valid SimpleCellRange
+ */
+export function isSimpleCellRange(obj: unknown): obj is SimpleCellRange {
   if (obj && (typeof obj === 'object' || typeof obj === 'function')) {
     return 'start' in obj && isSimpleCellAddress(obj.start) && 'end' in obj && isSimpleCellAddress(obj.end)
   } else {
