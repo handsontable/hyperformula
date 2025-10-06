@@ -1,6 +1,10 @@
+import { HyperFormula } from '../../../src'
 import {CellError, ErrorType} from '../../../src/Cell'
 import {Config} from '../../../src/Config'
+import { SheetMapping } from '../../../src/DependencyGraph'
 import {ErrorMessage} from '../../../src/error-message'
+import { buildTranslationPackage } from '../../../src/i18n'
+import { enUS } from '../../../src/i18n/languages'
 import {AstNodeType, CellAddress, CellRangeAst, CellReferenceAst, ErrorAst} from '../../../src/parser'
 import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
@@ -174,5 +178,25 @@ describe('Parser - OFFSET to reference translation', () => {
     const ast = parser.parse('=oFfSeT(F16, 0, 0)', adr('B3', 1)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(4, 13))
+  })
+
+  it('parser returns address with a sheet reference', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enUS))
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
+
+    const ast = parser.parse('=OFFSET(Sheet1!A1, 0, 0)', adr('A1', 1)).ast as CellReferenceAst
+    expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
+    expect(ast.reference).toEqual(CellAddress.relative(0, 0, 0))
+  })
+
+  it('function OFFSET can reference a different sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['sheet1']],
+      Sheet2: [['sheet2', '=OFFSET(Sheet1!A1, 0, 0)']],
+    })
+
+    expect(engine.getCellValue(adr('B1', engine.getSheetId('Sheet2')))).toEqual('sheet1')
   })
 })
