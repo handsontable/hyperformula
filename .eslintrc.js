@@ -90,7 +90,9 @@ module.exports = {
     'jsdoc/empty-tags': 'warn',
     'jsdoc/implements-on-classes': 'warn',
     'jsdoc/multiline-blocks': 'warn',
-    'jsdoc/tag-lines': 'warn',
+    'jsdoc/tag-lines': ['warn', 'never', {
+      startLines: 1,
+    }],
     'jsdoc/no-multi-asterisks': 'warn',
     'jsdoc/require-param-description': 'warn',
     'jsdoc/require-param-name': 'warn',
@@ -104,8 +106,9 @@ module.exports = {
     'jsdoc/require-yields-check': 'warn',
     'jsdoc/valid-types': 'warn',
     'jsdoc/require-jsdoc': ['warn', {
+      checkConstructors: false,
       require: {
-        ArrowFunctionExpression: true,
+        ArrowFunctionExpression: false,
         ClassDeclaration: true,
         ClassExpression: true,
         FunctionDeclaration: true,
