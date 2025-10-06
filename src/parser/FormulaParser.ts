@@ -140,7 +140,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.OR([
       {ALT: () => this.SUBRULE(this.booleanExpression)},
       {ALT: EMPTY_ALT(buildEmptyArgAst())}
-    ])
+    ]) as Ast
   })
 
   /**
@@ -318,7 +318,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           }
         },
       },
-    ])
+    ]) as Ast
   })
 
   /**
@@ -371,7 +371,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           }
         },
       },
-    ])
+    ]) as Ast
   })
 
   /**
@@ -448,7 +448,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {
         ALT: () => this.SUBRULE(this.parenthesisExpression)
       }
-    ])
+    ]) as Ast
   })
 
   constructor(lexerConfig: LexerConfig, sheetMapping: SheetMappingFn) {
@@ -556,7 +556,7 @@ export class FormulaParser extends EmbeddedActionsParser {
           }
         },
       },
-    ]))
+    ])) as Ast
   })
 
   private rightUnaryOpAtomicExpression: AstRule = this.RULE('rightUnaryOpAtomicExpression', () => {
@@ -595,7 +595,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       {
         ALT: () => this.SUBRULE2(this.rightUnaryOpAtomicExpression),
       },
-    ])
+    ]) as Ast
   })
 
   /**
@@ -817,6 +817,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
       cellArg.reference.type,
+      cellArg.reference.sheet ?? undefined,
     )
 
     let absoluteCol = topLeftCorner.col
