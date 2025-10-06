@@ -18,7 +18,7 @@ jobs:
   unit-tests:
     strategy:
       matrix:
-        node-version: [ '20' ]
+        node-version: [ '22' ]
         os: [ 'ubuntu-latest' ]
     name: unit-tests
     runs-on: ${{ matrix.os }}
@@ -37,7 +37,7 @@ jobs:
       - name: Run tests
         run: |
           npm run test:unit.ci -- --coverage
-          
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@6004246f47ab62d32be025ce173b241cd84ac58e # https://github.com/codecov/codecov-action/releases/tag/v1.0.13
         env:
@@ -46,7 +46,7 @@ jobs:
   browser-tests:
     strategy:
       matrix:
-        node-version: [ '20' ]
+        node-version: [ '22' ]
         os: [ 'ubuntu-latest' ]
     name: browser-tests
     runs-on: ${{ matrix.os }}
