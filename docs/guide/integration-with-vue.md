@@ -17,3 +17,28 @@ This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking 
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
   sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>
+
+## Troubleshooting
+
+### Vue reactivity issues
+
+If you encounter an error like:
+
+```
+Uncaught TypeError: Cannot read properties of undefined (reading 'licenseKeyValidityState')
+```
+
+This error occurs when Vue's reactivity system tries to deeply observe the HyperFormula instance. To fix this, wrap your HyperFormula instance in Vue's [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw) function:
+
+```javascript
+import { markRaw } from 'vue';
+import { HyperFormula } from 'hyperformula';
+
+const hfInstance = markRaw(
+  HyperFormula.buildEmpty({
+    licenseKey: 'internal-use-in-handsontable',
+  })
+);
+```
+
+This function prevents Vue from converting the HyperFormula instance into a reactive proxy, which can cause errors and performance issues.
