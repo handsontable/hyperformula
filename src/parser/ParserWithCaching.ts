@@ -49,6 +49,12 @@ export class ParserWithCaching {
   private formulaParser: FormulaParser
   private formulaAddress?: SimpleCellAddress
 
+  /**
+   * Class constructor
+   * @param {ParserConfig} config - Parser configuration settings
+   * @param {FunctionRegistry} functionRegistry - Registry of available functions
+   * @param {SheetMappingFn} sheetMapping - Function to map sheet names to identifiers
+   */
   constructor(
     private readonly config: ParserConfig,
     private readonly functionRegistry: FunctionRegistry,

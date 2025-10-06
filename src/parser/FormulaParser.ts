@@ -817,6 +817,7 @@ export class FormulaParser extends EmbeddedActionsParser {
       cellArg.reference.col + colShift,
       cellArg.reference.row + rowShift,
       cellArg.reference.type,
+      cellArg.reference.sheet ?? undefined,
     )
 
     let absoluteCol = topLeftCorner.col
