@@ -582,6 +582,20 @@ describe('changing cell content', () => {
     expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 1 })).toEqual(CellValueDetailedType.NUMBER_CURRENCY)
     expect(engine.getCellValueDetailedType({ sheet: 0, col: 0, row: 2 })).toEqual(CellValueDetailedType.NUMBER_PERCENT)
   })
+
+  it('should work in scenario from issue https://github.com/handsontable/hyperformula/issues/1297', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, '=SUM(A1:B1)'],
+      ['=SUM(1:1)', 0, 0],
+      ['=SUM(1:2)', 0, 0],
+    ])
+
+    engine.setCellContents(adr('C1'), [['=SUM(A1:B1)']])
+    engine.setCellContents(adr('A3'), [['=SUM(A1:C2)']])
+    engine.setCellContents(adr('B1'), [[null]])
+
+    expect(engine.getCellValue(adr('A3'))).toEqual(4)
+  })
 })
 
 describe('change multiple cells contents', () => {
