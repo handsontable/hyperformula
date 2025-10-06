@@ -18,7 +18,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        node-version: [ '20' ]
+        node-version: [ '22' ]
         os: [ 'ubuntu-latest' ]
     name: lint
     runs-on: ${{ matrix.os }}
