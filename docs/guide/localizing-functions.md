@@ -69,6 +69,41 @@ errors: {
 }
 ```
 
+## Creating a custom language pack
+
+If your desired language is not in the list of supported languages, you can create a custom language pack:
+
+```javascript
+// Create a language pack object
+const spanish = {
+  errors: {
+    NAME: '#¿NOMBRE?',
+    // ...
+  },
+  functions: {
+    SUM: 'SUMA',
+    IF: 'SI',
+    // ...
+  },
+  langCode: 'es', // Your custom language code
+  ui: {
+    NEW_SHEET_PREFIX: 'Sheet',
+  },
+};
+
+// Register your language
+HyperFormula.registerLanguage('es', spanish);
+
+// Use it in your configuration
+const hf = HyperFormula.buildEmpty({
+  language: 'es'
+});
+```
+
+::: tip
+You can use an existing language pack as a template. Check the [language files in the repository](https://github.com/handsontable/hyperformula/tree/master/src/i18n/languages) to see complete examples with all available functions.
+:::
+
 ## Localizing custom functions
 
 You can localize your custom functions as well. For details, see the [Custom functions](custom-functions.md#function-name-translations) guide.
