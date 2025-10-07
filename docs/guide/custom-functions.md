@@ -385,8 +385,9 @@ You can set the following options for your function:
 | `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).<br/>Default: `false`                                                                                                                                                               |
 | `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).<br/>Default: `false`                                                                                                        |
 | `doesNotNeedArgumentsToBeComputed`  | Boolean | `true`: the function treats reference or range arguments as arguments that don't create dependency (other arguments are properly evaluated).<br/>Default: `false`                                                                             |
-| `arrayFunction`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.<br/>Default: `false`                                                                                                             |
+| `enableArrayArithmeticForArguments`                     | Boolean | `true`: the function enables the [array arithmetic mode](arrays.md) in its arguments and nested expressions.<br/>Default: `false`                                                                                                             |
 | `vectorizationForbidden`            | Boolean | `true`: the function will never get [vectorized](arrays.md#passing-arrays-to-scalar-functions-vectorization).<br/>Default: `false`                                                                                                            |
+| `arrayFunction`                     | Boolean | Deprecated; Use `enableArrayArithmeticForArguments` instead. |
 
 You can set the options in the static `implementedFunctions` property of your
 function plugin:
@@ -407,7 +408,7 @@ MyCustomPlugin.implementedFunctions = {
     isVolatile: false,
     isDependentOnSheetStructureChange: false,
     doesNotNeedArgumentsToBeComputed: false,
-    arrayFunction: false,
+    enableArrayArithmeticForArguments: false,
     vectorizationForbidden: false,
   },
 };

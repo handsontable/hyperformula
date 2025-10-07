@@ -107,7 +107,7 @@ export interface FunctionMetadata {
    *
    * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
    */
-  arrayFunction?: boolean,
+  enableArrayArithmeticForArguments?: boolean,
 
   /**
    * Internal.
@@ -117,6 +117,15 @@ export interface FunctionMetadata {
    * Some functions do not allow vectorization: array-output, and special functions.
    */
   vectorizationForbidden?: boolean,
+
+  /**
+   * Engine.
+   *
+   * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
+   *
+   * @deprecated; Use `enableArrayArithmeticForArguments` instead.
+   */
+  arrayFunction?: boolean,
 }
 
 export interface FunctionPluginDefinition {
@@ -577,4 +586,3 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     }
   }
 }
-

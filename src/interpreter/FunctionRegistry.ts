@@ -257,10 +257,16 @@ export class FunctionRegistry {
   public isFunctionDependentOnSheetStructureChange = (functionId: string): boolean => this.structuralChangeFunctions.has(functionId)
 
   private categorizeFunction(functionId: string, functionMetadata: FunctionMetadata): void {
+    // deprecation warning
+    if (functionMetadata.arrayFunction !== undefined) {
+      console.warn(`${functionId}: 'arrayFunction' parameter is deprecated; Use 'enableArrayArithmeticForArguments' instead.`)
+      functionMetadata.enableArrayArithmeticForArguments = functionMetadata.arrayFunction
+    }
+
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)
     }
-    if (functionMetadata.arrayFunction) {
+    if (functionMetadata.enableArrayArithmeticForArguments) {
       this.arrayFunctions.add(functionId)
     }
     if (functionMetadata.doesNotNeedArgumentsToBeComputed) {
