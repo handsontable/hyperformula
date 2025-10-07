@@ -105,7 +105,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       return ArraySize.error()
     }
     const metadata = this.metadata('MMULT')
-    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
     const [left, right] = subChecks
     return arraySizeForMultiplication(left, right)
   }
@@ -204,7 +204,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     const metadata = this.metadata('MAXPOOL')
-    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
 
     const array = subChecks[0]
     const windowArg = ast.args[1]
@@ -261,7 +261,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       return ArraySize.error()
     }
     const metadata = this.metadata('TRANSPOSE')
-    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
 
     const [size] = subChecks
 

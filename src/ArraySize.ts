@@ -131,12 +131,6 @@ export class ArraySizePredictor {
 
     const metadata = this.functionRegistry.getMetadata(ast.procedureName)
 
-    // deprecation warning
-    if (metadata && metadata.arrayFunction !== undefined) {
-      console.warn(`${ast.procedureName}: 'arrayFunction' parameter is deprecated; Use 'enableArrayArithmeticForArguments' instead.`)
-      metadata.enableArrayArithmeticForArguments = metadata.arrayFunction
-    }
-
     if (
       metadata === undefined
       || metadata.expandRanges

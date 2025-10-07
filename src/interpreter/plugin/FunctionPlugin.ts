@@ -123,7 +123,7 @@ export interface FunctionMetadata {
    *
    * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
    *
-   * @deprecated; Use `enableArrayArithmeticForArguments` instead.
+   * @deprecated since 3.1.0; Use `enableArrayArithmeticForArguments` instead.
    */
   arrayFunction?: boolean,
 }
