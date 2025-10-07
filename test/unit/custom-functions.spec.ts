@@ -16,7 +16,7 @@ import {FunctionPlugin, FunctionPluginTypecheck} from '../../src/interpreter/plu
 import {ConditionalAggregationPlugin, NumericAggregationPlugin} from '../../src/interpreter/plugin'
 import {VersionPlugin} from '../../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../../src/parser'
-import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
+import {adr, detailedError, expectArrayWithSameContent, resetSpy} from './testUtils'
 
 class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin> {
   public static implementedFunctions = {
@@ -644,7 +644,7 @@ describe('Custum function using "arrayFunction" parameter', () => {
   })
 
   it('displays a deprecation warning in console', () => {
-    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const consoleWarnSpy = spyOn(console, 'warn')
 
     try {
       HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
@@ -653,7 +653,7 @@ describe('Custum function using "arrayFunction" parameter', () => {
         "FUNCTION_USING_ARRAY_FUNCTION_PARAM: 'arrayFunction' parameter is deprecated since 3.1.0; Use 'enableArrayArithmeticForArguments' instead."
       )
     } finally {
-      consoleWarnSpy.mockRestore()
+      resetSpy(consoleWarnSpy)
     }
   })
 })
@@ -667,7 +667,7 @@ describe('Custum function using "arraySizeMethod" parameter', () => {
   })
 
   it('displays a deprecation warning in console', () => {
-    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const consoleWarnSpy = spyOn(console, 'warn')
 
     try {
       HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
@@ -676,7 +676,7 @@ describe('Custum function using "arraySizeMethod" parameter', () => {
         "FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: 'arraySizeMethod' parameter is deprecated since 3.1.0; Use 'sizeOfResultArrayMethod' instead."
       )
     } finally {
-      consoleWarnSpy.mockRestore()
+      resetSpy(consoleWarnSpy)
     }
   })
 })
