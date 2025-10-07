@@ -41,7 +41,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
   public static implementedFunctions: ImplementedFunctions = {
     'MMULT': {
       method: 'mmult',
-      arraySizeMethod: 'mmultArraySize',
+      sizeOfResultArrayMethod: 'mmultArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.RANGE},
@@ -50,7 +50,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'TRANSPOSE': {
       method: 'transpose',
-      arraySizeMethod: 'transposeArraySize',
+      sizeOfResultArrayMethod: 'transposeArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
       ],
@@ -58,7 +58,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'MAXPOOL': {
       method: 'maxpool',
-      arraySizeMethod: 'maxpoolArraySize',
+      sizeOfResultArrayMethod: 'maxpoolArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
@@ -68,7 +68,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'MEDIANPOOL': {
       method: 'medianpool',
-      arraySizeMethod: 'medianpoolArraySize',
+      sizeOfResultArrayMethod: 'medianpoolArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},

@@ -168,6 +168,11 @@ export class FunctionRegistry {
       console.warn(`${functionId}: 'arrayFunction' parameter is deprecated since 3.1.0; Use 'enableArrayArithmeticForArguments' instead.`)
       metadata.enableArrayArithmeticForArguments = metadata.arrayFunction
     }
+
+    if (metadata && metadata.arraySizeMethod !== undefined) {
+      console.warn(`${functionId}: 'arraySizeMethod' parameter is deprecated since 3.1.0; Use 'sizeOfResultArrayMethod' instead.`)
+      metadata.sizeOfResultArrayMethod = metadata.arraySizeMethod
+    }
   }
 
   /**
@@ -214,7 +219,7 @@ export class FunctionRegistry {
       const metadata = validateAndReturnMetadataFromName(functionId, plugin)
       const methodName = metadata.method
       this.functions.set(functionId, [methodName, foundPluginInstance])
-      const arraySizeMethodName = metadata.arraySizeMethod
+      const arraySizeMethodName = metadata.sizeOfResultArrayMethod
       if (arraySizeMethodName !== undefined) {
         this.arraySizeFunctions.set(functionId, [arraySizeMethodName, foundPluginInstance])
       }

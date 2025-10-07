@@ -75,8 +75,10 @@ export interface FunctionMetadata {
 
   /**
    * Engine.
+   *
+   * Name of the method that calculates the size of the result array. Not required for functions that never return an array.
    */
-  arraySizeMethod?: string,
+  sizeOfResultArrayMethod?: string,
 
   /**
    * Engine.
@@ -121,11 +123,16 @@ export interface FunctionMetadata {
   /**
    * Engine.
    *
-   * If set to `true`, the function enables the array arithmetic mode in its arguments and nested expressions.
-   *
    * @deprecated since 3.1.0; Use `enableArrayArithmeticForArguments` instead.
    */
   arrayFunction?: boolean,
+
+  /**
+   * Engine.
+   *
+   * @deprecated since 3.1.0; Use `sizeOfResultArrayMethod` instead.
+   */
+  arraySizeMethod?: string,
 }
 
 export interface FunctionPluginDefinition {

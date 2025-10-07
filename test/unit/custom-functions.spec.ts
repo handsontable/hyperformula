@@ -28,7 +28,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     },
     'ARRAYFOO': {
       method: 'arrayfoo',
-      arraySizeMethod: 'arraysizeFoo',
+      sizeOfResultArrayMethod: 'arraysizeFoo',
       parameters: [{ argumentType: FunctionArgumentType.NUMBER }],
     },
   }
@@ -585,8 +585,16 @@ describe('Context accessible within custom function', () => {
 class DeprecatedPlugin extends FunctionPlugin {
   public static implementedFunctions = {
     FUNCTION_USING_ARRAY_FUNCTION_PARAM: {
-      method: 'functionUsingArrayFunctionParam',
+      method: 'implementation',
       arrayFunction: true,
+      sizeOfResultArrayMethod: 'arraySizeMethod',
+      parameters: [
+        { argumentType: FunctionArgumentType.NUMBER }
+      ],
+    },
+    FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: {
+      method: 'implementation',
+      enableArrayArithmeticForArguments: true,
       arraySizeMethod: 'arraySizeMethod',
       parameters: [
         { argumentType: FunctionArgumentType.NUMBER }
@@ -597,16 +605,18 @@ class DeprecatedPlugin extends FunctionPlugin {
   public static translations = {
     enGB: {
       FUNCTION_USING_ARRAY_FUNCTION_PARAM: 'FUNCTION_USING_ARRAY_FUNCTION_PARAM',
+      FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: 'FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM',
     },
     enUS: {
       FUNCTION_USING_ARRAY_FUNCTION_PARAM: 'FUNCTION_USING_ARRAY_FUNCTION_PARAM',
-    }
+      FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: 'FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM',
+    },
   }
 
   /**
    * Test function using deprecated arrayFunction parameter.
    */
-  functionUsingArrayFunctionParam(ast: ProcedureAst, state: InterpreterState) {
+  implementation(ast: ProcedureAst, state: InterpreterState) {
     return this.runFunction(
       ast.args,
       state,
@@ -641,6 +651,29 @@ describe('Custum function using "arrayFunction" parameter', () => {
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         "FUNCTION_USING_ARRAY_FUNCTION_PARAM: 'arrayFunction' parameter is deprecated since 3.1.0; Use 'enableArrayArithmeticForArguments' instead."
+      )
+    } finally {
+      consoleWarnSpy.mockRestore()
+    }
+  })
+})
+
+describe('Custum function using "arraySizeMethod" parameter', () => {
+  it('returns the correct result', () => {
+    HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
+    const engine = HyperFormula.buildFromArray([['=FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM(1)']])
+
+    expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
+  })
+
+  it('displays a deprecation warning in console', () => {
+    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: 'arraySizeMethod' parameter is deprecated since 3.1.0; Use 'sizeOfResultArrayMethod' instead."
       )
     } finally {
       consoleWarnSpy.mockRestore()

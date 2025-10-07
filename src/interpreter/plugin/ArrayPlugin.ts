@@ -17,7 +17,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public static implementedFunctions: ImplementedFunctions = {
     'ARRAYFORMULA': {
       method: 'arrayformula',
-      arraySizeMethod: 'arrayformulaArraySize',
+      sizeOfResultArrayMethod: 'arrayformulaArraySize',
       enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.ANY}
@@ -25,7 +25,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
     'ARRAY_CONSTRAIN': {
       method: 'arrayconstrain',
-      arraySizeMethod: 'arrayconstrainArraySize',
+      sizeOfResultArrayMethod: 'arrayconstrainArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
@@ -35,7 +35,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
     'FILTER': {
       method: 'filter',
-      arraySizeMethod: 'filterArraySize',
+      sizeOfResultArrayMethod: 'filterArraySize',
       enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
