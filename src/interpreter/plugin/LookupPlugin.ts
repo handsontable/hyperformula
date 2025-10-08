@@ -39,7 +39,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
     'XLOOKUP': {
       method: 'xlookup',
-      arraySizeMethod: 'xlookupArraySize',
+      sizeOfResultArrayMethod: 'xlookupArraySize',
       parameters: [
         // lookup_value
         { argumentType: FunctionArgumentType.NOERROR },
@@ -79,7 +79,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
-      
+
       if (index < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
@@ -109,7 +109,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
       if (range === undefined) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
-      
+
       if (index < 1) {
         return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
       }
@@ -129,16 +129,16 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
 
   /**
    * Corresponds to XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])
-   * 
+   *
    * @param ast
    * @param state
    */
   public xlookup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, notFoundFlag: any, matchMode: number, searchMode: number) => {      
+    return this.runFunction(ast.args, state, this.metadata('XLOOKUP'), (key: RawNoErrorScalarValue, lookupRangeValue: SimpleRangeValue, returnRangeValue: SimpleRangeValue, notFoundFlag: any, matchMode: number, searchMode: number) => {
       if (![0, -1, 1, 2].includes(matchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
-      
+
       if (![1, -1, 2, -2].includes(searchMode)) {
         return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
       }
@@ -205,7 +205,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
         { returnOccurrence: searchOptions.returnOccurrence }
       )
     }
-    
+
     return searchStrategy.find(key, range, searchOptions)
   }
 

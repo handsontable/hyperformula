@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed the `arraySizeMethod` parameter in the `FunctionMetadata` interface to `sizeOfResultArrayMethod`. The `arraySizeMethod` is deprecated and will be removed in one of the next major releases. [#1401](https://github.com/handsontable/hyperformula/issues/1401)
+- Renamed the `arrayFunction` parameter in the `FunctionMetadata` interface to `enableArrayArithmeticForArguments`. The `arrayFunction` is deprecated and will be removed in one of the next major releases. [#1401](https://github.com/handsontable/hyperformula/issues/1401)
+
 ### Fixed
 
 - Fixed an issue where the `OFFSET` function was ignoring the sheet reference in the provided address. [#1477](https://github.com/handsontable/hyperformula/issues/1477)

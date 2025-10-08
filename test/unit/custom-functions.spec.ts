@@ -16,7 +16,7 @@ import {FunctionPlugin, FunctionPluginTypecheck} from '../../src/interpreter/plu
 import {ConditionalAggregationPlugin, NumericAggregationPlugin} from '../../src/interpreter/plugin'
 import {VersionPlugin} from '../../src/interpreter/plugin/VersionPlugin'
 import {ProcedureAst} from '../../src/parser'
-import {adr, detailedError, expectArrayWithSameContent} from './testUtils'
+import {adr, detailedError, expectArrayWithSameContent, resetSpy} from './testUtils'
 
 class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin> {
   public static implementedFunctions = {
@@ -28,7 +28,7 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     },
     'ARRAYFOO': {
       method: 'arrayfoo',
-      arraySizeMethod: 'arraysizeFoo',
+      sizeOfResultArrayMethod: 'arraysizeFoo',
       parameters: [{ argumentType: FunctionArgumentType.NUMBER }],
     },
   }
@@ -576,5 +576,107 @@ describe('Context accessible within custom function', () => {
     ], {context})
 
     expect(engine.getCellValue(adr('A1'))).toEqual(context)
+  })
+})
+
+/**
+ * Mock plugin for testing handling of the depracated parameters.
+ */
+class DeprecatedPlugin extends FunctionPlugin {
+  public static implementedFunctions = {
+    FUNCTION_USING_ARRAY_FUNCTION_PARAM: {
+      method: 'implementation',
+      arrayFunction: true,
+      sizeOfResultArrayMethod: 'arraySizeMethod',
+      parameters: [
+        { argumentType: FunctionArgumentType.NUMBER }
+      ],
+    },
+    FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: {
+      method: 'implementation',
+      enableArrayArithmeticForArguments: true,
+      arraySizeMethod: 'arraySizeMethod',
+      parameters: [
+        { argumentType: FunctionArgumentType.NUMBER }
+      ],
+    }
+  }
+
+  public static translations = {
+    enGB: {
+      FUNCTION_USING_ARRAY_FUNCTION_PARAM: 'FUNCTION_USING_ARRAY_FUNCTION_PARAM',
+      FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: 'FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM',
+    },
+    enUS: {
+      FUNCTION_USING_ARRAY_FUNCTION_PARAM: 'FUNCTION_USING_ARRAY_FUNCTION_PARAM',
+      FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: 'FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM',
+    },
+  }
+
+  /**
+   * Test function using deprecated arrayFunction parameter.
+   */
+  implementation(ast: ProcedureAst, state: InterpreterState) {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('FUNCTION_USING_ARRAY_FUNCTION_PARAM'),
+      (val: number) => {
+        return SimpleRangeValue.onlyValues([[val, val], [val, val]])
+      },
+    )
+  }
+
+  /**
+   * Returns array size for testing deprecated arrayFunction parameter.
+   */
+  arraySizeMethod(): ArraySize {
+    return new ArraySize(2, 2)
+  }
+}
+
+describe('Custum function using "arrayFunction" parameter', () => {
+  it('returns the correct result', () => {
+    HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
+    const engine = HyperFormula.buildFromArray([['=FUNCTION_USING_ARRAY_FUNCTION_PARAM(1)']])
+
+    expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
+  })
+
+  it('displays a deprecation warning in console', () => {
+    const consoleWarnSpy = spyOn(console, 'warn')
+
+    try {
+      HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "FUNCTION_USING_ARRAY_FUNCTION_PARAM: 'arrayFunction' parameter is deprecated since 3.1.0; Use 'enableArrayArithmeticForArguments' instead."
+      )
+    } finally {
+      resetSpy(consoleWarnSpy)
+    }
+  })
+})
+
+describe('Custum function using "arraySizeMethod" parameter', () => {
+  it('returns the correct result', () => {
+    HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
+    const engine = HyperFormula.buildFromArray([['=FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM(1)']])
+
+    expect(engine.getSheetValues(0)).toEqual([[1, 1], [1, 1]])
+  })
+
+  it('displays a deprecation warning in console', () => {
+    const consoleWarnSpy = spyOn(console, 'warn')
+
+    try {
+      HyperFormula.registerFunctionPlugin(DeprecatedPlugin, DeprecatedPlugin.translations)
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        "FUNCTION_USING_ARRAY_SIZE_METHOD_PARAM: 'arraySizeMethod' parameter is deprecated since 3.1.0; Use 'sizeOfResultArrayMethod' instead."
+      )
+    } finally {
+      resetSpy(consoleWarnSpy)
+    }
   })
 })

@@ -70,7 +70,7 @@ const hf = HyperFormula.buildFromArray([
 Sometimes a value should be treated as text even though it's parsable as a formula, number, date, time, datetime, boolean, currency or percentage.
 Typical examples are numeric values with no number semantics, such as ZIP codes, bank sort codes, social security numbers, etc.
 
-To prevent the automatic type conversion, prepend the value value with an apostrophe (`'`).
+To prevent the automatic type conversion, prepend the value with an apostrophe (`'`).
 
 ```js
 const hf = HyperFormula.buildFromArray([

@@ -135,7 +135,7 @@ to pass the following parameters:
 * Sheet ID
 * Starting row
 * Number of rows to be moved
-* Target row
+* [Target row](../api/classes/hyperformula.md#moverows)
 
 This method returns [an array of changed cells](#changes-array).
 
@@ -149,7 +149,7 @@ const changes = hfInstance.moveRows(0, 0, 1, 2);
 
 You can change the order of rows by using the [`setRowOrder`](../api/classes/hyperformula.md#setroworder) method. You need to pass the following parameters:
 * Sheet ID
-* New row order
+* [New row order](../api/classes/hyperformula.md#setroworder)
 
 This method returns [an array of changed cells](#changes-array).
 
@@ -196,7 +196,7 @@ You need to pass the following parameters:
 * Sheet ID
 * Starting column
 * Number of columns to be moved
-* Target column
+* [Target column](../api/classes/hyperformula.md#movecolumns)
 
 This method returns [an array of changed cells](#changes-array).
 
@@ -210,7 +210,7 @@ const changes = hfInstance.moveColumns(0, 0, 1, 2);
 
 You can change the order of columns by using the [`setColumnOrder`](../api/classes/hyperformula.md#setcolumnorder) method. You need to pass the following parameters:
 * Sheet ID
-* New column order
+* [New column order](../api/classes/hyperformula.md#setcolumnorder)
 
 This method returns [an array of changed cells](#changes-array).
 
