@@ -103,7 +103,7 @@ hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PM
 console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })}`);
 ```
 
-[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.0.x/mortgage-calculator)
+[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.1.x/mortgage-calculator)
 
 ## Contributing
 
