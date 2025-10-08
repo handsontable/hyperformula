@@ -56,7 +56,7 @@ Related options:
 
 Microsoft Excel has built-in constants (keywords) for the boolean values (`TRUE` and `FALSE`).
 
-To set up HyperFormula in the same way, define `TRUE` and `FALSE` as [named expressions](named-expressions.md), by using HyperFormula's [`TRUE`](built-in-functions.md#logical) and [`FALSE`](built-in-functions.md#logical) functions.
+To set up HyperFormula in the same way, define `TRUE` and `FALSE` as [named expressions](named-expressions.md), by using HyperFormula's [`TRUE()`](built-in-functions.md#logical) and [`FALSE()`](built-in-functions.md#logical) functions.
 
 ```js
 hfInstance.addNamedExpression('TRUE', '=TRUE()');
