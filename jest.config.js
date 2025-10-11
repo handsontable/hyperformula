@@ -50,4 +50,11 @@ module.exports = {
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
+
+  watchPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/commonjs/',
+    '/es/',
+  ]
 };

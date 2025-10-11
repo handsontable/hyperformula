@@ -68,6 +68,18 @@ describe('Parser - OFFSET to reference translation', () => {
     expect(ast.end).toEqual(CellAddress.relative(8, 13))
   })
 
+  it('OFFSET parsing into cell range in different sheet', () => {
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enUS))
+    sheetMapping.addSheet('Sheet1')
+    sheetMapping.addSheet('Sheet2')
+    const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
+
+    const ast = parser.parse('=OFFSET(Sheet2!F16, 0, 2, 1, 3)', adr('B3', 0)).ast as CellRangeAst
+    expect(ast.type).toBe(AstNodeType.CELL_RANGE)
+    expect(ast.start).toEqual(CellAddress.relative(6, 13, 1))
+    expect(ast.end).toEqual(CellAddress.relative(8, 13, 1))
+  })
+
   it('OFFSET first argument need to be reference', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
@@ -186,9 +198,9 @@ describe('Parser - OFFSET to reference translation', () => {
     sheetMapping.addSheet('Sheet2')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
-    const ast = parser.parse('=OFFSET(Sheet1!A1, 0, 0)', adr('A1', 1)).ast as CellReferenceAst
+    const ast = parser.parse('=OFFSET(Sheet2!A1, 0, 0)', adr('A1', 0)).ast as CellReferenceAst
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
-    expect(ast.reference).toEqual(CellAddress.relative(0, 0, 0))
+    expect(ast.reference).toEqual(CellAddress.relative(0, 0, 1))
   })
 
   it('function OFFSET can reference a different sheet', () => {
