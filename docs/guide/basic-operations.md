@@ -228,7 +228,7 @@ consists of a sheet ID, column ID, and row ID, like this:
 
 Alternatively, you can work with the **A1 notation** known from
 spreadsheets like Excel or Google Sheets. The API provides the helper
-function [`simpleCellAddressFromString`](../api/globals.md#simplecelladdressfromstring) which you can use to retrieve
+function [`simpleCellAddressFromString`](../api/classes/hyperformula.md#simplecelladdressfromstring) which you can use to retrieve
 the [`SimpleCellAddress`](../api/interfaces/simplecelladdress) .
 :::
 

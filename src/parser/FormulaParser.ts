@@ -843,8 +843,10 @@ export class FormulaParser extends EmbeddedActionsParser {
         topLeftCorner.col + width - 1,
         topLeftCorner.row + height - 1,
         topLeftCorner.type,
+        topLeftCorner.sheet,
       )
-      return buildCellRangeAst(topLeftCorner, bottomRightCorner, RangeSheetReferenceType.RELATIVE)
+      const rangeSheetReferenceType = cellArg.reference.sheet == null ? RangeSheetReferenceType.RELATIVE : RangeSheetReferenceType.BOTH_ABSOLUTE
+      return buildCellRangeAst(topLeftCorner, bottomRightCorner, rangeSheetReferenceType)
     }
   }
 

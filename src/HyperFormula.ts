@@ -649,6 +649,9 @@ export class HyperFormula implements TypedEmitter {
     return FunctionRegistry.getPlugins()
   }
 
+  /**
+   * @internal
+   */
   private static buildFromEngineState(engine: EngineState): HyperFormula {
     return new HyperFormula(
       engine.config,
@@ -4527,12 +4530,22 @@ export class HyperFormula implements TypedEmitter {
     objectDestroy(this)
   }
 
+  /**
+   * Throws an error if evaluation is suspended.
+   *
+   * @internal
+   */
   private ensureEvaluationIsNotSuspended() {
     if (this._evaluationSuspended) {
       throw new EvaluationSuspendedError()
     }
   }
 
+  /**
+   * Parses a formula string and extracts its AST and dependencies.
+   *
+   * @internal
+   */
   private extractTemporaryFormula(formulaString: string, sheetId: number = 1): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
     const parsedCellContent = this._cellContentParser.parse(formulaString)
     const address = {sheet: sheetId, col: 0, row: 0}

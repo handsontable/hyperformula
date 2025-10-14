@@ -6,6 +6,19 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.1.0
+
+**Release date: October 14, 2025**
+
+### Changed
+
+- Renamed the `arraySizeMethod` parameter in the `FunctionMetadata` interface to `sizeOfResultArrayMethod`. The `arraySizeMethod` is deprecated and will be removed in one of the next major releases. [#1401](https://github.com/handsontable/hyperformula/issues/1401)
+- Renamed the `arrayFunction` parameter in the `FunctionMetadata` interface to `enableArrayArithmeticForArguments`. The `arrayFunction` is deprecated and will be removed in one of the next major releases. [#1401](https://github.com/handsontable/hyperformula/issues/1401)
+
+### Fixed
+
+- Fixed an issue where the `OFFSET` function was ignoring the sheet reference in the provided address. [#1477](https://github.com/handsontable/hyperformula/issues/1477)
+
 ## 3.0.1
 
 **Release date: August 11, 2025**
