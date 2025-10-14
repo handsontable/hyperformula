@@ -17,15 +17,15 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   public static implementedFunctions: ImplementedFunctions = {
     'ARRAYFORMULA': {
       method: 'arrayformula',
-      arraySizeMethod: 'arrayformulaArraySize',
-      arrayFunction: true,
+      sizeOfResultArrayMethod: 'arrayformulaArraySize',
+      enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.ANY}
       ],
     },
     'ARRAY_CONSTRAIN': {
       method: 'arrayconstrain',
-      arraySizeMethod: 'arrayconstrainArraySize',
+      sizeOfResultArrayMethod: 'arrayconstrainArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
@@ -35,8 +35,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
     'FILTER': {
       method: 'filter',
-      arraySizeMethod: 'filterArraySize',
-      arrayFunction: true,
+      sizeOfResultArrayMethod: 'filterArraySize',
+      enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.RANGE},
@@ -55,7 +55,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     const metadata = this.metadata('ARRAYFORMULA')
-    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
 
     return subChecks[0]
   }
@@ -79,7 +79,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     const metadata = this.metadata('ARRAY_CONSTRAIN')
-    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
 
     let {height, width} = subChecks[0]
     if (ast.args[1].type === AstNodeType.NUMBER) {
@@ -141,7 +141,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
 
     const metadata = this.metadata('FILTER')
-    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
 
     const width = Math.max(...(subChecks).map(val => val.width))
     const height = Math.max(...(subChecks).map(val => val.height))

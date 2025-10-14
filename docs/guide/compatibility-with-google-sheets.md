@@ -15,6 +15,17 @@ Still, with the right configuration, you can achieve nearly full compatibility.
 
 ## Configure compatibility with Google Sheets
 
+### `TRUE` and `FALSE` constants
+
+Google Sheets has built-in constants (keywords) for the boolean values (`TRUE` and `FALSE`).
+
+To set up HyperFormula in the same way, define `TRUE` and `FALSE` as [named expressions](named-expressions.md), by using HyperFormula's [`TRUE()`](built-in-functions.md#logical) and [`FALSE()`](built-in-functions.md#logical) functions.
+
+```js
+hfInstance.addNamedExpression('TRUE', '=TRUE()');
+hfInstance.addNamedExpression('FALSE', '=FALSE()');
+```
+
 ### Array arithmetic mode
 
 In Google Sheets, the [array arithmetic mode](arrays.md#array-arithmetic-mode) is disabled by default.
@@ -97,4 +108,11 @@ const options = {
   leapYear1900: false, // set by default
   smartRounding: true, // set by default
 };
+
+// call the static method to build a new instance
+const hfInstance = HyperFormula.buildEmpty(options);
+
+// define TRUE and FALSE constants
+hfInstance.addNamedExpression('TRUE', '=TRUE()');
+hfInstance.addNamedExpression('FALSE', '=FALSE()');
 ```

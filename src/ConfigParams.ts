@@ -12,6 +12,8 @@ export interface ConfigParams {
    * When set to `true`, makes string comparison accent-sensitive.
    *
    * Applies only to comparison operators.
+   *
+   * For more information, see the [Types of operators guide](/guide/types-of-operators.md#comparing-strings).
    * @default false
    * @category String
    */
@@ -20,6 +22,8 @@ export interface ConfigParams {
    * When set to `true`, makes string comparison case-sensitive.
    *
    * Applies to comparison operators only.
+   *
+   * For more information, see the [Types of operators guide](/guide/types-of-operators.md#comparing-strings).
    * @default false
    * @category String
    */
@@ -30,6 +34,8 @@ export interface ConfigParams {
    * When set to `lower`, lower case sorts first.
    *
    * When set to `false`, uses the locale's default.
+   *
+   * For more information, see the [Types of operators guide](/guide/types-of-operators.md#comparing-strings).
    * @default 'lower'
    * @category String
    */
@@ -41,12 +47,16 @@ export interface ConfigParams {
    * - `DenseSparseChooseBasedOnThreshold`: sets the address mapping policy separately for each sheet, based on fill ratio.
    * - `AlwaysDense`: uses `DenseStrategy` for all sheets.
    * - `AlwaysSparse`: uses `SparseStrategy` for all sheets.
+   *
+   * For more information, see the [Performance guide](/guide/performance.md).
    * @default AlwaysDense
    * @category Engine
    */
   chooseAddressMappingPolicy: ChooseAddressMapping,
   /**
    * A generic parameter that can be used to pass data to custom functions.
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
    * @default undefined
    * @category Engine
    */
@@ -115,6 +125,8 @@ export interface ConfigParams {
   evaluateNullToZero: boolean,
   /**
    * Lists additional function plugins to be used by the formula interpreter.
+   *
+   * For more information, see the [Custom functions guide](/guide/custom-functions.md).
    * @default []
    * @category Formula Syntax
    */
@@ -122,6 +134,8 @@ export interface ConfigParams {
   functionPlugins: any[],
   /**
    * When set to `true`, string comparison ignores punctuation.
+   *
+   * For more information, see the [Types of operators guide](/guide/types-of-operators.md#comparing-strings).
    * @default false
    * @category String
    */
@@ -149,7 +163,7 @@ export interface ConfigParams {
    *
    * For compatibility with Lotus 1-2-3 and Microsoft Excel, set this option to `true`.
    *
-   * For more information, see [nullDate](/api/interfaces/configparams.md#nulldate).
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md) and [nullDate](/api/interfaces/configparams.md#nulldate).
    * @default false
    * @category Date and Time
    */
@@ -186,12 +200,16 @@ export interface ConfigParams {
   matchWholeCell: boolean,
   /**
    * Sets a column separator symbol for array notation.
+   *
+   * For more information, see the [Arrays guide](/guide/arrays.md).
    * @default ','
    * @category Formula Syntax
    */
   arrayColumnSeparator: ',' | ';',
   /**
    * Sets a row separator symbol for array notation.
+   *
+   * For more information, see the [Arrays guide](/guide/arrays.md).
    * @default ';'
    * @category Formula Syntax
    */
@@ -226,6 +244,8 @@ export interface ConfigParams {
    * If `xx` is less or equal to `nullYear`, two-digit year values become `20xx`.
    *
    * If `xx` is more than `nullYear`, two-digit year values become `19xx`.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md).
    * @default 30
    * @category Date and Time
    */
@@ -360,6 +380,8 @@ export interface ConfigParams {
    * Using column index improves efficiency of the `VLOOKUP` and `MATCH` functions, but increases memory usage.
    *
    * When searching with wildcards or regular expressions, column search strategy falls back to binary search (even with `useColumnIndex` set to `true`).
+   *
+   * For more information, see the [Performance guide](/guide/performance.md).
    * @default false
    * @category Engine
    */
@@ -374,6 +396,8 @@ export interface ConfigParams {
   useStats: boolean,
   /**
    * Sets the number of elements kept in the undo history.
+   *
+   * For more information, see the [Undo-Redo guide](/guide/undo-redo.md).
    * @default 20
    * @category Undo and Redo
    */

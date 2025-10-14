@@ -5,6 +5,8 @@ The formats for the default date and time parsing functions can be set using con
 - [`timeFormats`](../api/interfaces/configparams.md#timeformats),
 - [`nullYear`](../api/interfaces/configparams.md#nullyear).
 
+The API reference of [`dateFormats`](../api/interfaces/configparams.md#dateformats) and [`timeFormats`](../api/interfaces/configparams.md#timeformats) describes the supported date and time formats in detail.
+
 ## Example
 
 By default, HyperFormula uses the European date and time formats.
@@ -23,9 +25,7 @@ timeFormats: ['hh:mm', 'hh:mm:ss.sss'], // set by default
 
 ## Custom date and time handling
 
-HyperFormula offers the possibility to extend the number of supported
-date/time formats as well as the behavior of this functionality by exposing
-three options:
+If date and time formats supported by the [`dateFormats`](../api/interfaces/configparams.md#dateformats) and [`timeFormats`](../api/interfaces/configparams.md#timeformats) parameters are not enough, you can extend them by providing the following options:
 
 - [`parseDateTime`](../api/interfaces/configparams.md#parsedatetime), which allows to provide a function that accepts
 a string representing date/time and parses it into an actual date/time format

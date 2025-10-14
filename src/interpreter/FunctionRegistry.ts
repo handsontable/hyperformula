@@ -32,6 +32,7 @@ function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionP
   if (entry === undefined) {
     throw FunctionPluginValidationError.functionNotDeclaredInPlugin(functionId, plugin.name)
   }
+
   return entry
 }
 
@@ -159,8 +160,30 @@ export class FunctionRegistry {
     }
   }
 
+  /**
+   * Handles deprecated metadata properties.
+   */
+  private static handleDeprecatedMetadata(functionId: string, metadata: FunctionMetadata): void {
+    if (metadata && metadata.arrayFunction !== undefined) {
+      console.warn(`${functionId}: 'arrayFunction' parameter is deprecated since 3.1.0; Use 'enableArrayArithmeticForArguments' instead.`)
+      metadata.enableArrayArithmeticForArguments = metadata.arrayFunction
+    }
+
+    if (metadata && metadata.arraySizeMethod !== undefined) {
+      console.warn(`${functionId}: 'arraySizeMethod' parameter is deprecated since 3.1.0; Use 'sizeOfResultArrayMethod' instead.`)
+      metadata.sizeOfResultArrayMethod = metadata.arraySizeMethod
+    }
+  }
+
+  /**
+   * Loads a function into the registry.
+   */
   private static loadFunctionUnprotected(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, FunctionPluginDefinition>): void {
-    const methodName = validateAndReturnMetadataFromName(functionId, plugin).method
+    const metadata = validateAndReturnMetadataFromName(functionId, plugin)
+    const methodName = metadata.method
+
+    this.handleDeprecatedMetadata(functionId, metadata)
+
     if (Object.prototype.hasOwnProperty.call(plugin.prototype, methodName)) {
       registry.set(functionId, plugin)
     } else {
@@ -196,7 +219,7 @@ export class FunctionRegistry {
       const metadata = validateAndReturnMetadataFromName(functionId, plugin)
       const methodName = metadata.method
       this.functions.set(functionId, [methodName, foundPluginInstance])
-      const arraySizeMethodName = metadata.arraySizeMethod
+      const arraySizeMethodName = metadata.sizeOfResultArrayMethod
       if (arraySizeMethodName !== undefined) {
         this.arraySizeFunctions.set(functionId, [arraySizeMethodName, foundPluginInstance])
       }
@@ -260,7 +283,7 @@ export class FunctionRegistry {
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)
     }
-    if (functionMetadata.arrayFunction) {
+    if (functionMetadata.enableArrayArithmeticForArguments) {
       this.arrayFunctions.add(functionId)
     }
     if (functionMetadata.doesNotNeedArgumentsToBeComputed) {

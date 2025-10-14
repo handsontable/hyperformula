@@ -141,7 +141,7 @@ export class ArraySizePredictor {
       return new ArraySize(1, 1)
     }
 
-    const subChecks = ast.args.map((arg) => this.checkArraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.arrayFunction ?? false))))
+    const subChecks = ast.args.map((arg) => this.checkArraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
     const argumentDefinitions = [...metadata.parameters]
 
     if (

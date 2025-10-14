@@ -1,11 +1,11 @@
-import './test/_setupFiles/bootstrap';
+import './test/unit/_setupFiles/bootstrap';
 
 //@ts-ignore
 const specArg: string = __karma__.config.spec;
 
 // require all modules ending in ".spec.ts" from the
 // './test' directory and all subdirectories
-const testsContext = require.context('./test', true, /.spec.ts$/);
+const testsContext = require.context('./test/unit', true, /.spec.ts$/);
 let files = testsContext.keys();
 
 if (specArg) {
