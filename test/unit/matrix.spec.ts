@@ -229,15 +229,15 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
-    expect(matrix.set(0, 0, 11)).not.toThrow()
-    expect(matrix.set(1, 0, 12)).not.toThrow()
-    expect(matrix.set(2, 0, 13)).not.toThrow()
-    expect(matrix.set(0, 1, 14)).not.toThrow()
-    expect(matrix.set(1, 1, 15)).not.toThrow()
-    expect(matrix.set(2, 1, 16)).not.toThrow()
-    expect(matrix.set(0, 2, 17)).not.toThrow()
-    expect(matrix.set(1, 2, 18)).not.toThrow()
-    expect(matrix.set(2, 2, 19)).not.toThrow()
+    matrix.set(0, 0, 11)
+    matrix.set(1, 0, 12)
+    matrix.set(2, 0, 13)
+    matrix.set(0, 1, 14)
+    matrix.set(1, 1, 15)
+    matrix.set(2, 1, 16)
+    matrix.set(0, 2, 17)
+    matrix.set(1, 2, 18)
+    matrix.set(2, 2, 19)
     expect(matrix.raw()).toEqual([
       [11, 12, 13],
       [14, 15, 16],
