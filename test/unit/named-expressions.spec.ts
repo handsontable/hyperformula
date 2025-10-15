@@ -1627,6 +1627,34 @@ describe('Named expressions - named ranges', () => {
 
       expect(changes).toContainEqual(new ExportedNamedExpressionChange('fooo', [[1, 3], [2, 4]]))
     })
+
+    it('should update automatically when row is added to the referenced range', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2],
+        [3, 4],
+      ])
+
+      engine.addNamedExpression('range', '=Sheet1!$A$1:$B$2')
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$B$2')
+
+      engine.addRows(0, [1, 1])
+      expect(engine.getSheetValues(0)).toEqual([[1, 2], [], [3, 4]])
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$B$3')
+    })
+
+    it('should update automatically when column is added to the referenced range', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2],
+        [3, 4],
+      ])
+
+      engine.addNamedExpression('range', '=Sheet1!$A$1:$B$2')
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$B$2')
+
+      engine.addColumns(0, [1, 1])
+      expect(engine.getSheetValues(0)).toEqual([[1, null, 2], [3, null, 4]])
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$C$2')
+    })
   })
 
   describe('when created on initialization', () => {
@@ -1650,6 +1678,30 @@ describe('Named expressions - named ranges', () => {
 
       expect(engine.getCellValue(adr('B1'))).toEqual(4)
       expect(engine.getCellValue(adr('C1'))).toEqual(4)
+    })
+
+    it('should update automatically when row is added to the referenced range', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2],
+        [3, 4],
+      ], {}, [{ name: 'range', expression: '=Sheet1!$A$1:$B$2' }])
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$B$2')
+
+      engine.addRows(0, [1, 1])
+      expect(engine.getSheetValues(0)).toEqual([[1, 2], [], [3, 4]])
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$B$3')
+    })
+
+    it('should update automatically when column is added to the referenced range', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2],
+        [3, 4],
+      ], {}, [{ name: 'range', expression: '=Sheet1!$A$1:$B$2' }])
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$B$2')
+
+      engine.addColumns(0, [1, 1])
+      expect(engine.getSheetValues(0)).toEqual([[1, null, 2], [3, null, 4]])
+      expect(engine.getNamedExpressionFormula('range')).toEqual('=Sheet1!$A$1:$C$2')
     })
   })
 })
