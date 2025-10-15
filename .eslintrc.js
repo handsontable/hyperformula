@@ -25,7 +25,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'plugin:jasmine/recommended',
     'plugin:jest/recommended',
-    // 'plugin:jest/style',
+    'plugin:jest/style',
   ],
   rules: {
     // Automatic fixers
@@ -127,6 +127,8 @@ module.exports = {
     'jest/no-conditional-expect': 'warn',
     'jest/no-standalone-expect': 'warn',
     'jest/no-test-prefixes': 'off',
+    'jest/prefer-to-be': 'warn',
+    'jest/prefer-to-have-length': 'warn',
   },
   overrides: [
     {
