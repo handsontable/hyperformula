@@ -316,7 +316,7 @@ describe('Adding column, fixing ranges', () => {
     ]))
   })
 
-  it('it should insert new cell with edge to only one range at right', () => {
+  it('should insert new cell with edge to only one range at right', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', /* */ '3', '4'],
       ['=SUM(A1:A1)', '=SUM(A1:B1)', /* */ '=SUM(A1:C1)', '=SUM(A1:D1)'],

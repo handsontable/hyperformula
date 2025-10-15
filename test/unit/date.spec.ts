@@ -234,12 +234,6 @@ describe('By default function parseDateTimeFromConfigFormats', () => {
     expect(parsedDate).toEqual({})
   })
 
-  it('returns {} when trying to parse time but timeFormats=[]', () => {
-    const dateHelper = new DateTimeHelper(new Config({ timeFormats: [] }))
-    const parsedDate = dateHelper.parseDateTimeFromConfigFormats('01:01')
-    expect(parsedDate).toEqual({})
-  })
-
   it('returns {} when time format contains no day term', () => {
     const dateHelper = new DateTimeHelper(new Config({ dateFormats: ['MM/YY'] }))
     const parsedDate = dateHelper.parseDateTimeFromConfigFormats('12/12')

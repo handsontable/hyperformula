@@ -85,7 +85,7 @@ describe('Function SUMPRODUCT', () => {
     expect(engine.getCellValue(adr('A4'))).toEqual(5)
   })
 
-  it('it makes a coercion from other values', () => {
+  it('makes a coercion from other values', () => {
     const engine = HyperFormula.buildFromArray([
       ['=TRUE()', '42'],
       ['=SUMPRODUCT(A1,B1)'],
