@@ -57,7 +57,7 @@ describe('Function FORMULATEXT', () => {
     expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(1, 2)')
   })
 
-  it('should return REF when ', () => {
+  it('should return REF when', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUM(1, 2)']
     ])

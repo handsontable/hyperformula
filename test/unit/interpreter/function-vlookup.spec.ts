@@ -203,19 +203,6 @@ describe('ColumnIndex strategy', () => {
       expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
-    it('should find value in unsorted range using linearSearch', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['5', 'a'],
-        ['4', 'b'],
-        ['3', 'c'],
-        ['2', 'd'],
-        ['1', 'e'],
-        ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
-      ], { useColumnIndex: true })
-
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
-    })
-
     it('should find value in sorted range with different types', () => {
       const engine = HyperFormula.buildFromArray([
         ['1', 'a'],
@@ -551,19 +538,6 @@ describe('BinarySearchStrategy', () => {
       ], { useColumnIndex: false })
 
       expect(engine.getCellValue(adr('A6'))).toEqual('c')
-    })
-
-    it('should find value in unsorted range using linearSearch', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['5', 'a'],
-        ['4', 'b'],
-        ['3', 'c'],
-        ['2', 'd'],
-        ['1', 'e'],
-        ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
-      ], { useColumnIndex: false })
-
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
     })
 
     it('should find value in unsorted range using linearSearch', () => {

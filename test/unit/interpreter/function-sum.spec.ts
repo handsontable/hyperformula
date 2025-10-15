@@ -184,7 +184,7 @@ describe('SUM', () => {
         expect(engine.getCellValue(adr('A4'))).toEqual(9)
       })
 
-      it('when 1st row address is absolute and one of the ranges is a single value', () => {
+      it('when 1st row address is absolute and one of the ranges is a single value (2)', () => {
         const engine = HyperFormula.buildFromArray([
           ['=SUM(B$2:B1)', 1], // R1C[+1]:R[+0]C[+1]
           ['=SUM(B$2:B2)', 2], // R1C[+1]:R[+0]C[+1]
@@ -194,7 +194,7 @@ describe('SUM', () => {
         expect(engine.getCellValue(adr('A2'))).toEqual(2)
       })
 
-      it('when 2nd row address is absolute and one of the ranges is a single value', () => {
+      it('when 2nd row address is absolute and one of the ranges is a single value (2)', () => {
         const engine = HyperFormula.buildFromArray([
           ['=SUM(B1:B$1)', 1], // R[+0]C[+1]:R0C[+1]
           ['=SUM(B2:B$1)', 2], // R[+0]C[+1]:R0C[+1]

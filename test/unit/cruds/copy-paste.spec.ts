@@ -326,8 +326,8 @@ describe('Copy - paste integration', () => {
     const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
     const a2 = engine.addressMapping.fetchCell(adr('A2'))
     const a3 = engine.addressMapping.fetchCell(adr('A3'))
-    expect(engine.graph.existsEdge(a2, range))
-    expect(engine.graph.existsEdge(a3, range))
+    expect(engine.graph.existsEdge(a2, range)).toBe(true)
+    expect(engine.graph.existsEdge(a3, range)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 

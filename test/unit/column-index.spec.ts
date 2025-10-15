@@ -296,7 +296,7 @@ describe('ColumnIndex#removeColumns', () => {
     expect(index.getValueIndex(0, 0, 1).index).toEqual([])
   })
 
-  it('should remove multiple columns in the middle ', () => {
+  it('should remove multiple columns in the middle', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
     index.add(1, adr('A1'))
     index.add(2, adr('B1'))
@@ -311,7 +311,7 @@ describe('ColumnIndex#removeColumns', () => {
     expect(index.getValueIndex(0, 3, 4).index).toEqual([])
   })
 
-  it('should remove columns only in one sheet ', () => {
+  it('should remove columns only in one sheet', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
     index.add(1, adr('A1', 0))
     index.add(1, adr('A1', 1))
@@ -455,7 +455,7 @@ describe('ColumnIndex#removeRows', () => {
     expect(index.getValueIndex(0, 0, 1).index).toEqual([])
   })
 
-  it('should remove rows in the middle ', () => {
+  it('should remove rows in the middle', () => {
     const statistics = new Statistics()
     const transformingService = new LazilyTransformingAstService(statistics)
     const index = buildEmptyIndex(transformingService, new Config(), statistics)

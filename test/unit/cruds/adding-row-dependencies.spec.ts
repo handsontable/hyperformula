@@ -332,7 +332,7 @@ describe('Adding row, ranges', () => {
     ]))
   })
 
-  it('it should insert new cell with edge to all ranges below', () => {
+  it('should insert new cell with edge to all ranges below', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=SUM(A1:A1)'],
       ['2', '=SUM(A1:A2)'],
@@ -358,7 +358,7 @@ describe('Adding row, ranges', () => {
     expect(engine.graph.adjacentNodesCount(a2)).toBe(1)
   })
 
-  it('it should insert new cell with edge to only one range below, shifted by 1', () => {
+  it('should insert new cell with edge to only one range below, shifted by 1', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', null],
       ['2', '=SUM(A1:A1)'],

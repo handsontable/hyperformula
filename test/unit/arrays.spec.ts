@@ -380,7 +380,6 @@ describe('build from array', () => {
       [undefined, ArrayVertex, ArrayVertex],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
-    expect(engine.getSheetValues(0))
   })
 
   it('should REF last array', () => {
@@ -399,7 +398,6 @@ describe('build from array', () => {
       [noSpace(), 2, 2, 1, 2],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
-    expect(engine.getSheetValues(0))
   })
 
   it('array should work with different types of data', () => {
@@ -488,15 +486,6 @@ describe('column ranges', () => {
     ], {useArrayArithmetic: true})
 
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
-  })
-
-  it('arithmetic should work for row range', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=2*(2:2)', null],
-      [1, 2],
-    ], {useArrayArithmetic: true})
-
-    expect(engine.getSheetValues(0)).toEqual([[2, 4], [1, 2]])
   })
 
   it('arithmetic for shifted row range -- error', () => {

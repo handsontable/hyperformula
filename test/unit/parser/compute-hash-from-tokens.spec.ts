@@ -182,7 +182,7 @@ describe('computeHashFromTokens', () => {
     expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0#0R0, #0R0:#1R0 )')
   })
 
-  it('should skip whitespaces inside range ', () => {
+  it('should skip whitespaces inside range', () => {
     const formula = '=SUM( A1 : A2 )'
     const hash = computeFunc(formula, adr('A1'))
     expect(hash).toEqual('=SUM( #0R0:#1R0 )')

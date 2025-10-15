@@ -296,7 +296,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(42)
   })
 
-  it('set nothing again', () => {
+  it('set nothing again (2)', () => {
     const sheet = [
       [null],
     ]
@@ -486,7 +486,7 @@ describe('changing cell content', () => {
     expectArrayWithSameContent(changes.map((change) => change.newValue), [2, 10, 12, 18, 22])
   })
 
-  it('update empty cell to parsing error ', () => {
+  it('update empty cell to parsing error', () => {
     const engine = HyperFormula.buildFromArray([])
 
     engine.setCellContents(adr('A1'), '=SUM(')
@@ -494,7 +494,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
-  it('update dependency value cell to parsing error ', () => {
+  it('update dependency value cell to parsing error', () => {
     const sheet = [
       ['1', '=SUM(A1)'],
     ]
@@ -509,7 +509,7 @@ describe('changing cell content', () => {
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
-  it('update formula cell to parsing error ', () => {
+  it('update formula cell to parsing error', () => {
     const sheet = [
       ['1', '=SUM(A1)'],
     ]
@@ -907,7 +907,6 @@ describe('arrays', () => {
       [undefined, ArrayVertex, ArrayVertex],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
-    expect(engine.getSheetValues(0))
   })
 
   it('should REF last array', () => {
@@ -931,7 +930,6 @@ describe('arrays', () => {
       [noSpace(), 2, 2, 1, 2],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
-    expect(engine.getSheetValues(0))
   })
 
   it('should make existing array REF and change cell content to simple value', () => {
