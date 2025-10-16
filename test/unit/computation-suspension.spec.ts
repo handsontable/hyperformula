@@ -206,4 +206,16 @@ describe('Evaluation suspension', () => {
     expect(changes).toContainEqual(new ExportedCellChange(adr('B1'), 4))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C1'), 5))
   })
+
+  it('allows to set contents twice for the same cell (#1194)', () => {
+    const hf = HyperFormula.buildFromArray([], {
+      licenseKey: 'gpl-v3'
+    })
+
+    hf.suspendEvaluation()
+    hf.setCellContents(adr('A1'), '=42')
+    hf.setCellContents(adr('A1'), '=42')
+    hf.resumeEvaluation()
+    expect(hf.getCellValue(adr('A1'))).toBe(42)
+  })
 })

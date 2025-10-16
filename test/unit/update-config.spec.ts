@@ -112,4 +112,14 @@ describe('update config', () => {
     engine.updateConfig({ useColumnIndex: false, functionArgSeparator: ',', undoLimit: 20 })
     expect(rebuildEngineSpy).not.toHaveBeenCalled()
   })
+
+  it('doesn\'t throw after adding named expression (#1194)', () => {
+    const hf = HyperFormula.buildFromArray([["=42"]], {
+      licenseKey: "gpl-v3"
+    });
+
+
+    hf.addNamedExpression("ABC", "=Sheet1!$A$1")
+    expect(() => hf.updateConfig({ maxRows: 101 })).not.toThrow()
+  })
 })
