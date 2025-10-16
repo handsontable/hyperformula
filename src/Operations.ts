@@ -570,7 +570,6 @@ export class Operations {
 
           this.setFormulaToCell(address, size, parserResult)
         } catch (error) {
-
           if (!(error as Error).message) {
             throw error
           }
@@ -614,9 +613,9 @@ export class Operations {
     hasStructuralChangeFunction,
     dependencies
   }: ParsingResult) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.removeCellValueFromColumnSearch(address)
+
     const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
-    this.columnSearch.remove(getRawValue(oldValue), address)
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
   }
@@ -922,6 +921,21 @@ export class Operations {
       }
     }
     return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address).vertex
+  }
+
+  /**
+   * Removes a cell value from the columnSearch index.
+   * Ignores the non-computed formula vertices.
+   */
+  private removeCellValueFromColumnSearch(address: SimpleCellAddress): void {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (!vertex || vertex instanceof FormulaVertex && !vertex.isComputed()) {
+      return
+    }
+
+    const oldValue = vertex.getCellValue()
+    this.columnSearch.remove(getRawValue(oldValue), address)
   }
 }
 
