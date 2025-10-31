@@ -22,10 +22,10 @@ import {
   ParsingErrorVertex,
   SheetMapping,
   SparseStrategy,
-  ValueCellVertex
+  ValueCellVertex,
 } from './DependencyGraph'
 import { FormulaVertex } from './DependencyGraph/FormulaCellVertex'
-import { RawAndParsedValue } from './DependencyGraph/ValueCellVertex'
+import { RawAndParsedValue, ValueCellVertexValue } from './DependencyGraph/ValueCellVertex'
 import { AddColumnsTransformer } from './dependencyTransformers/AddColumnsTransformer'
 import { AddRowsTransformer } from './dependencyTransformers/AddRowsTransformer'
 import { CleanOutOfScopeDependenciesTransformer } from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
@@ -598,10 +598,11 @@ export class Operations {
   }
 
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.removeCellValueFromColumnSearch(address)
+
     const vertex = new ParsingErrorVertex(errors, rawInput)
     const arrayChanges = this.dependencyGraph.setParsingErrorToCell(address, vertex)
-    this.columnSearch.remove(getRawValue(oldValue), address)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
     this.changes.addChange(vertex.getCellValue(), address)
@@ -616,14 +617,16 @@ export class Operations {
     this.removeCellValueFromColumnSearch(address)
 
     const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
   }
 
   public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.changeCellValueInColumnSearch(address, value.parsedValue)
+
     const arrayChanges = this.dependencyGraph.setValueToCell(address, value)
-    this.columnSearch.change(getRawValue(oldValue), getRawValue(value.parsedValue), address)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges().filter(change => !equalSimpleCellAddress(change.address, address)))
     this.changes.addAll(arrayChanges)
     this.changes.addChange(value.parsedValue, address)
@@ -633,9 +636,11 @@ export class Operations {
     if (this.dependencyGraph.isArrayInternalCell(address)) {
       return
     }
-    const oldValue = this.dependencyGraph.getCellValue(address)
+
+    this.removeCellValueFromColumnSearch(address)
+
     const arrayChanges = this.dependencyGraph.setCellEmpty(address)
-    this.columnSearch.remove(getRawValue(oldValue), address)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
     this.changes.addChange(EmptyValue, address)
@@ -930,12 +935,23 @@ export class Operations {
   private removeCellValueFromColumnSearch(address: SimpleCellAddress): void {
     const vertex = this.dependencyGraph.getCell(address)
 
-    if (!vertex || vertex instanceof FormulaVertex && !vertex.isComputed()) {
+    if (!vertex || ('isComputed' in vertex && !vertex.isComputed())) {
       return
     }
 
     const oldValue = vertex.getCellValue()
     this.columnSearch.remove(getRawValue(oldValue), address)
+  }
+
+  private changeCellValueInColumnSearch(address: SimpleCellAddress, newValue: ValueCellVertexValue): void {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (!vertex || ('isComputed' in vertex && !vertex.isComputed())) {
+      return
+    }
+
+    const oldValue = vertex.getCellValue()
+    this.columnSearch.change(getRawValue(oldValue), getRawValue(newValue), address)
   }
 }
 

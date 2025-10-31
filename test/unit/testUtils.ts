@@ -213,7 +213,7 @@ export function columnIndexToSheet(columnIndex: ColumnIndex, width: number, heig
       for (const row of index) {
         result[row] = result[row] ?? []
         if (result[row][col] !== undefined) {
-          throw new Error('ColumnIndex ambiguity.')
+          throw new Error(`ColumnIndex ambiguity: ${JSON.stringify(result[row][col])} and ${JSON.stringify(value)}, ${JSON.stringify(row)}, ${JSON.stringify(col)}`)
         }
         result[row][col] = value
       }
