@@ -933,25 +933,38 @@ export class Operations {
    * Ignores the non-computed formula vertices.
    */
   private removeCellValueFromColumnSearch(address: SimpleCellAddress): void {
-    const vertex = this.dependencyGraph.getCell(address)
-
-    if (!vertex || ('isComputed' in vertex && !vertex.isComputed())) {
+    if (this.isNotComputed(address)) {
       return
     }
 
-    const oldValue = vertex.getCellValue()
+    const oldValue = this.dependencyGraph.getCellValue(address)
     this.columnSearch.remove(getRawValue(oldValue), address)
   }
 
+  /**
+   * Changes a cell value in the columnSearch index.
+   * Ignores the non-computed formula vertices.
+   */
   private changeCellValueInColumnSearch(address: SimpleCellAddress, newValue: ValueCellVertexValue): void {
-    const vertex = this.dependencyGraph.getCell(address)
-
-    if (!vertex || ('isComputed' in vertex && !vertex.isComputed())) {
+    if (this.isNotComputed(address)) {
       return
     }
 
-    const oldValue = vertex.getCellValue()
+    const oldValue = this.dependencyGraph.getCellValue(address)
     this.columnSearch.change(getRawValue(oldValue), getRawValue(newValue), address)
+  }
+
+  /**
+   * Checks if the FormulaCellVertex or ArrayVertex at the given address is not computed.
+   */
+  private isNotComputed(address: SimpleCellAddress): boolean {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (!vertex) {
+      return false
+    }
+
+    return 'isComputed' in vertex && !vertex.isComputed()
   }
 }
 
