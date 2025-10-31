@@ -133,6 +133,8 @@
     "env-cmd": "^10.1.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jasmine": "^4.2.2",
+    "eslint-plugin-jest": "^27.9.0",
     "eslint-plugin-jsdoc": "^50.5.0",
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",

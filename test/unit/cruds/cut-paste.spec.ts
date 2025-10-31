@@ -883,7 +883,7 @@ describe('aborting cut paste', () => {
     expect(engine.isClipboardEmpty()).toBe(true)
   })
 
-  it('should be aborted when addColumns is done before paste', () => {
+  it('should be aborted when removeColumns is done before paste', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2']
     ])

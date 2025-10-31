@@ -73,7 +73,7 @@ describe('Moving rows - checking if its possible', () => {
     expect(engine.isItPossibleToMoveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), adr('B2'))).toBe(false)
   })
 
-  it('no if we move beyond sheet size limits ', () => {
+  it('no if we move beyond sheet size limits', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],

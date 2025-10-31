@@ -255,7 +255,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
 })
 
 describe('Address dependencies, Case 3: formula in different sheet', () => {
-  it('case ARa: relative/absolute dependency below removed row should be shifted ', () => {
+  it('case ARa: relative/absolute dependency below removed row should be shifted', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!A3'],
@@ -648,7 +648,7 @@ describe('Removing rows - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('it should be REF if no space after removing row', () => {
+  it('should be REF if no space after removing row', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-B3:B4'],
       [],
@@ -672,7 +672,7 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should be REF, not CYCLE, after removing rows', () => {
+  it('should be REF, not CYCLE, after removing rows', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-A3:A4'],
       [],
@@ -696,7 +696,7 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should remove array when removing row with left corner', () => {
+  it('should remove array when removing row with left corner', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -711,7 +711,7 @@ describe('Removing rows - arrays', () => {
     ]))
   })
 
-  it('it should remove array when removing rows with whole matrix', () => {
+  it('should remove array when removing rows with whole matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],

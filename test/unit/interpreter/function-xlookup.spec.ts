@@ -232,7 +232,7 @@ describe('Function XLOOKUP', () => {
     })
   })
 
-  describe('with BinarySearch column search strategy, when provided with searchMode = ', () => {
+  describe('with BinarySearch column search strategy, when provided with searchMode =', () => {
     it('1, finds the first match in unsorted horizontal range', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, A2:E2, A3:E3, "NotFound", 0, 1)'],
@@ -376,7 +376,7 @@ describe('Function XLOOKUP', () => {
     })
   })
 
-  describe('with ColumnIndex column search strategy, when provided with searchMode = ', () => {
+  describe('with ColumnIndex column search strategy, when provided with searchMode =', () => {
     it('1, finds the first match in unsorted horizontal range', () => {
       const engine = HyperFormula.buildFromArray([
         ['=XLOOKUP(1, A2:E2, A3:E3, "NotFound", 0, 1)'],
@@ -520,7 +520,7 @@ describe('Function XLOOKUP', () => {
     })
   })
 
-  describe('with BinarySearch column search strategy, when provided with matchMode = ', () => {
+  describe('with BinarySearch column search strategy, when provided with matchMode =', () => {
     describe('-1 (looking for a lower bound)', () => {
       describe('in array ordered ascending', () => {
         it('returns exact match if exists', () => {
@@ -852,7 +852,7 @@ describe('Function XLOOKUP', () => {
     })
   })
 
-  describe('with ColumnIndex column search strategy, when provided with matchMode = ', () => {
+  describe('with ColumnIndex column search strategy, when provided with matchMode =', () => {
     describe('-1 (looking for a lower bound', () => {
       describe('in array ordered ascending', () => {
         it('returns exact match if exists', () => {
