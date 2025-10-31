@@ -21,7 +21,8 @@ Additionally, HyperFormula includes some functions that are not part of Excel's 
 
 For a complete list of supported functions, see the [built-in functions](built-in-functions.md) page.
 
-If you need any of the missing Excel functions, you can implement them as [custom functions](custom-functions.md), extending HyperFormula's capabilities to meet your specific requirements.
+If you need any of the missing Excel functions, you can [contact us](contact.md) or implement them as [custom functions](custom-functions.md), extending HyperFormula's capabilities to meet your specific requirements.
+
 
 ## Configure compatibility with Microsoft Excel
 
