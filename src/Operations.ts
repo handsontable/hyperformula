@@ -459,8 +459,6 @@ export class Operations {
 
   /**
    * Restores a single cell.
-   * @param {SimpleCellAddress} address
-   * @param {ClipboardCell} clipboardCell
    */
   public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell): void {
     switch (clipboardCell.type) {
@@ -597,6 +595,10 @@ export class Operations {
     }
   }
 
+  /**
+   * Sets cell content to an instance of parsing error.
+   * Creates a ParsingErrorVertex and updates the dependency graph and column search index.
+   */
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
     this.removeCellValueFromColumnSearch(address)
 
@@ -608,6 +610,10 @@ export class Operations {
     this.changes.addChange(vertex.getCellValue(), address)
   }
 
+  /**
+   * Sets cell content to a formula.
+   * Creates a FormulaCellVertex and updates the dependency graph and column search index.
+   */
   public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
     ast,
     hasVolatileFunction,
@@ -622,6 +628,10 @@ export class Operations {
     this.changes.addAll(arrayChanges)
   }
 
+  /**
+   * Sets cell content to a value.
+   * Creates a ValueCellVertex and updates the dependency graph and column search index.
+   */
   public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {
     this.changeCellValueInColumnSearch(address, value.parsedValue)
 
@@ -632,6 +642,10 @@ export class Operations {
     this.changes.addChange(value.parsedValue, address)
   }
 
+  /**
+   * Sets cell content to an empty value.
+   * Creates an EmptyCellVertex and updates the dependency graph and column search index.
+   */
   public setCellEmpty(address: SimpleCellAddress) {
     if (this.dependencyGraph.isArrayInternalCell(address)) {
       return
