@@ -1,6 +1,6 @@
-import {HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
+import {ErrorType, HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
 import {plPL} from '../../../src/i18n/languages'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Adding sheet - checking if its possible', () => {
   it('yes', () => {
@@ -104,5 +104,73 @@ describe('add sheet to engine', () => {
     expect(() => {
       engine.addSheet('bar')
     }).toThrow(new SheetNameAlreadyTakenError('bar'))
+  })
+
+  it('recalculates the cells referencing the new sheet (#1116)', () => {
+    const  engine = HyperFormula.buildEmpty()
+    const table1Name = 'table1'
+    const table2Name = 'table2'
+
+    engine.addSheet(table1Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(table2Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
+  })
+
+  it('#1116 - batch', () => {
+    const  engine = HyperFormula.buildEmpty()
+    const table1Name = 'table1'
+    const table2Name = 'table2'
+
+    engine.batch(() => {
+      engine.addSheet(table1Name)
+      engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
+
+      engine.addSheet(table2Name)
+      engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
+    })
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
+  })
+
+  it('#1116 - suspend', () => {
+    const  engine = HyperFormula.buildEmpty()
+    const table1Name = 'table1'
+    const table2Name = 'table2'
+
+    engine.suspendEvaluation()
+
+    engine.addSheet(table1Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
+
+    engine.addSheet(table2Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
+
+    engine.resumeEvaluation()
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
+  })
+
+  it('#1116 - rebuild', () => {
+    const  engine = HyperFormula.buildEmpty()
+    const table1Name = 'table1'
+    const table2Name = 'table2'
+
+    engine.addSheet(table1Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(table2Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
+
+    engine.rebuildAndRecalculate()
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
   })
 })
