@@ -17,66 +17,54 @@ import {Transformer} from './Transformer'
  */
 export class AddSheetTransformer extends Transformer {
   private parser?: ParserWithCaching
-  private readonly quotedSheetName: string
-  private readonly unquotedSheetName: string
+  private readonly quotedSheetNameLowercase: string
+  private readonly unquotedSheetNameLowercase: string
 
   constructor(
     public readonly sheet: number,
-    private readonly sheetName: string
+    sheetName: string
   ) {
     super()
-    // Prepare both quoted and unquoted forms for matching
-    this.unquotedSheetName = sheetName
-    this.quotedSheetName = `'${sheetName.replace(/'/g, "''")}'`
+    this.unquotedSheetNameLowercase = this.isQuotedSheetName(sheetName) ? sheetName.slice(1, -1).toLocaleLowerCase() : sheetName.toLocaleLowerCase()
+    this.quotedSheetNameLowercase = `'${this.unquotedSheetNameLowercase.replace(/'/g, "''")}'`
   }
 
-  public isIrreversible() {
+  public isIrreversible(): boolean {
     return true
   }
 
   public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
     this.parser = parser
     for (const node of graph.arrayFormulaNodes()) {
-      const [newAst, newAddress] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
+      const [newAst] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
       const cachedAst = parser.rememberNewAst(newAst)
       node.setFormula(cachedAst)
-      node.setAddress(newAddress)
     }
-  }
-
-  public transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress] {
-    const newAst = this.transformAst(ast, address)
-    const newAddress = this.fixNodeAddress(address)
-    return [newAst, newAddress]
   }
 
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
     return address
   }
 
-  protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, _formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
+  protected transformCellAddress<T extends CellAddress>(_dependencyAddress: T, _formulaAddress: SimpleCellAddress): ErrorType.REF | false | T {
     return false
   }
 
-  protected transformCellRange(start: CellAddress, _end: CellAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+  protected transformCellRange(_start: CellAddress, _end: CellAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
     return false
   }
 
-  protected transformColumnRange(start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+  protected transformColumnRange(_start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
     return false
   }
 
-  protected transformRowRange(start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+  protected transformRowRange(_start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
     return false
   }
 
   protected transformAst(ast: Ast, address: SimpleCellAddress): Ast {
-    // Handle ERROR_WITH_RAW_INPUT nodes that might reference the new sheet
-    if (ast.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
-      if (ast.error?.type === ErrorType.REF && this.containsSheetName(ast.rawInput)) {
-        return this.attemptReparse(ast.rawInput, address, ast.leadingWhitespace)
-      }
-      return ast
+    if (ast.type === AstNodeType.ERROR_WITH_RAW_INPUT && this.containsSheetName(ast.rawInput)) {
+      return this.attemptReparse(ast.rawInput, address, ast.leadingWhitespace)
     }
 
     // For all other nodes, use the standard traversal
@@ -89,20 +77,9 @@ export class AddSheetTransformer extends Transformer {
    */
   private containsSheetName(rawInput: string): boolean {
     const lowerInput = rawInput.toLowerCase()
-    const lowerUnquoted = this.unquotedSheetName.toLowerCase()
-    const lowerQuoted = this.quotedSheetName.toLowerCase()
 
-    // Check for unquoted sheet name followed by '!'
-    if (lowerInput.includes(`${lowerUnquoted}!`)) {
-      return true
-    }
-
-    // Check for quoted sheet name followed by '!'
-    if (lowerInput.includes(`${lowerQuoted}!`)) {
-      return true
-    }
-
-    return false
+    return lowerInput.includes(`${this.unquotedSheetNameLowercase}!`)
+        || lowerInput.includes(`${this.quotedSheetNameLowercase}!`)
   }
 
   /**
@@ -152,5 +129,9 @@ export class AddSheetTransformer extends Transformer {
         leadingWhitespace,
       }
     }
+  }
+
+  private isQuotedSheetName(sheetName: string): boolean {
+    return sheetName.startsWith("'") && sheetName.endsWith("'")
   }
 }

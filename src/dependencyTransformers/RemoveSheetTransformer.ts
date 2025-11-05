@@ -36,16 +36,16 @@ export class RemoveSheetTransformer extends Transformer {
     return this.transformAddress(dependencyAddress)
   }
 
-  protected transformCellRange(start: CellAddress, _end: CellAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
-    return this.transformAddress(start)
+  protected transformCellRange(start: CellAddress, end: CellAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+    return this.transformAddress(start) === ErrorType.REF || this.transformAddress(end) === ErrorType.REF ? ErrorType.REF : false
   }
 
-  protected transformColumnRange(start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
-    return this.transformAddress(start)
+  protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+    return this.transformAddress(start) === ErrorType.REF || this.transformAddress(end) === ErrorType.REF ? ErrorType.REF : false
   }
 
-  protected transformRowRange(start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
-    return this.transformAddress(start)
+  protected transformRowRange(start: RowAddress, end: RowAddress, _formulaAddress: SimpleCellAddress): ErrorType.REF | false {
+    return this.transformAddress(start) === ErrorType.REF || this.transformAddress(end) === ErrorType.REF ? ErrorType.REF : false
   }
 
   private transformAddress<T extends CellAddress | RowAddress | ColumnAddress>(address: T): ErrorType.REF | false {

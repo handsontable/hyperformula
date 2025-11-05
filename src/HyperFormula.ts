@@ -2635,6 +2635,7 @@ export class HyperFormula implements TypedEmitter {
       validateArgToType(sheetName, 'string', 'sheetName')
     }
     const addedSheetName = this._crudOperations.addSheet(sheetName)
+    this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.SheetAdded, addedSheetName)
     return addedSheetName
   }
