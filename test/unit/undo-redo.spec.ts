@@ -549,6 +549,8 @@ describe('Undo - adding sheet', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([]))
   })
+
+  // TODO: more tests
 })
 
 describe('Undo - clearing sheet', () => {
@@ -1003,10 +1005,13 @@ describe('UndoRedo - at the Operations layer', () => {
 
   it('clearUndoStack should clear out all undo entries', () => {
     expect(undoRedo.isUndoStackEmpty()).toBe(true)
-    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 1'))
-    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 2'))
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 1', 0))
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 2', 0))
+
     expect(undoRedo.isUndoStackEmpty()).toBe(false)
+
     undoRedo.clearUndoStack()
+
     expect(undoRedo.isUndoStackEmpty()).toBe(true)
   })
 

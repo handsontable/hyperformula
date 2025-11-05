@@ -222,9 +222,10 @@ export class RemoveColumnsUndoEntry extends BaseUndoEntry {
   }
 }
 
-export class AddSheetUndoEntry extends BaseUndoEntry {
+export class AddSheetUndoEntry extends BaseUndoEntry { // TODO
   constructor(
     public readonly sheetName: string,
+    public readonly version: number,
   ) {
     super()
   }

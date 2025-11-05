@@ -28,6 +28,7 @@ import { FormulaVertex } from './DependencyGraph/FormulaCellVertex'
 import { RawAndParsedValue } from './DependencyGraph/ValueCellVertex'
 import { AddColumnsTransformer } from './dependencyTransformers/AddColumnsTransformer'
 import { AddRowsTransformer } from './dependencyTransformers/AddRowsTransformer'
+import { AddSheetTransformer } from './dependencyTransformers/AddSheetTransformer'
 import { CleanOutOfScopeDependenciesTransformer } from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 import { MoveCellsTransformer } from './dependencyTransformers/MoveCellsTransformer'
 import { RemoveColumnsTransformer } from './dependencyTransformers/RemoveColumnsTransformer'
@@ -245,11 +246,43 @@ export class Operations {
     this.columnSearch.removeSheet(sheetId)
   }
 
-  public addSheet(name?: string) {
+  public addSheet(name?: string): { addedSheetName: string, version: number } {
     const sheetId = this.sheetMapping.addSheet(name)
     const sheet: Sheet = []
     this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries(sheet))
-    return this.sheetMapping.fetchDisplayName(sheetId)
+    const addedSheetName = this.sheetMapping.fetchDisplayName(sheetId)
+
+    // Rebuild formulas that reference the newly added sheet
+    let version = 0
+    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+      const transformation = new AddSheetTransformer(sheetId, addedSheetName)
+      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+
+      // TODO: move this logic to the transformer
+      // Rebuild non-array formulas that were transformed
+      for (const vertex of this.dependencyGraph.graph.getNodes()) {
+        if (vertex instanceof FormulaCellVertex) {
+          const originalAst = vertex.getFormula(this.lazilyTransformingAstService)
+          const address = vertex.getAddress(this.lazilyTransformingAstService)
+          const [transformedAst] = transformation.transformSingleAst(originalAst, address)
+
+          // Check if the AST actually changed
+          const originalHash = this.parser.computeHashFromAst(originalAst)
+          const transformedHash = this.parser.computeHashFromAst(transformedAst)
+
+          if (originalHash !== transformedHash) {
+            // The formula was transformed (ERROR_WITH_RAW_INPUT -> valid reference)
+            // We need to rebuild it with proper dependencies using setFormulaToCellFromCache
+            this.parser.rememberNewAst(transformedAst)
+            this.setFormulaToCellFromCache(transformedHash, address)
+          }
+        }
+      }
+
+      version = this.lazilyTransformingAstService.addTransformation(transformation)
+    })
+
+    return { addedSheetName, version }
   }
 
   public renameSheet(sheetId: number, newName: string) {
