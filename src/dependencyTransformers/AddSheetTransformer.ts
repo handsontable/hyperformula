@@ -64,10 +64,13 @@ export class AddSheetTransformer extends Transformer {
 
   protected transformAst(ast: Ast, address: SimpleCellAddress): Ast {
     if (ast.type === AstNodeType.ERROR_WITH_RAW_INPUT && this.containsSheetName(ast.rawInput)) {
-      return this.attemptReparse(ast.rawInput, address, ast.leadingWhitespace)
+      const maybeAst = this.attemptReparse(ast.rawInput, address, ast.leadingWhitespace)
+
+      if (maybeAst) {
+        return maybeAst
+      }
     }
 
-    // For all other nodes, use the standard traversal
     return super.transformAst(ast, address)
   }
 
@@ -87,47 +90,17 @@ export class AddSheetTransformer extends Transformer {
    * a valid reference (not an error), returns the new AST. Otherwise,
    * returns the original error node.
    */
-  private attemptReparse(rawInput: string, formulaAddress: SimpleCellAddress, leadingWhitespace?: string): Ast {
+  private attemptReparse(rawInput: string, formulaAddress: SimpleCellAddress, leadingWhitespace?: string): Ast | undefined {
     if (!this.parser) {
-      // Parser not available, return error node unchanged
-      return {
-        type: AstNodeType.ERROR_WITH_RAW_INPUT,
-        rawInput,
-        error: new CellError(ErrorType.REF),
-        leadingWhitespace,
-      }
+      return undefined
     }
 
     try {
-      // Re-parse the raw input as a complete formula (prepend '=' if needed)
-      const formulaToParse = rawInput.startsWith('=') ? rawInput : `=${rawInput}`
-      const parsingResult = this.parser.parse(formulaToParse, formulaAddress)
-      const newAst = parsingResult.ast
-
-      // Check if parsing produced an error node
-      if (newAst.type === AstNodeType.ERROR || newAst.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
-        // Still an error, keep the original error node
-        return {
-          type: AstNodeType.ERROR_WITH_RAW_INPUT,
-          rawInput,
-          error: new CellError(ErrorType.REF),
-          leadingWhitespace,
-        }
-      }
-
-      // Parsing succeeded! Return the new AST, preserving whitespace
-      return {
-        ...newAst,
-        leadingWhitespace: leadingWhitespace ?? newAst.leadingWhitespace,
-      }
+      const formulaText = rawInput.startsWith('=') ? rawInput : `=${rawInput}`
+      const { ast } = this.parser.parse(formulaText, formulaAddress)
+      return { ...ast, leadingWhitespace: leadingWhitespace ?? ast.leadingWhitespace }
     } catch (e) {
-      // Parsing failed, return error node unchanged
-      return {
-        type: AstNodeType.ERROR_WITH_RAW_INPUT,
-        rawInput,
-        error: new CellError(ErrorType.REF),
-        leadingWhitespace,
-      }
+      return undefined
     }
   }
 

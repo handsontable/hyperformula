@@ -21,10 +21,11 @@ export class RemoveSheetTransformer extends Transformer {
     return true
   }
 
-  public performEagerTransformations(graph: DependencyGraph, _parser: ParserWithCaching): void {
+  public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.arrayFormulaNodes()) {
       const [newAst] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
-      node.setFormula(newAst)
+      const cachedAst = parser.rememberNewAst(newAst)
+      node.setFormula(cachedAst)
     }
   }
 
