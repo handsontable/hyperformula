@@ -14,7 +14,8 @@ import {ColumnIndex} from '../../src/Lookup/ColumnIndex'
 import {NamedExpressions} from '../../src/NamedExpressions'
 import {ColumnsSpan, RowsSpan} from '../../src/Span'
 import {Statistics} from '../../src/statistics'
-import {adr, expectColumnIndexToMatchSheet} from './testUtils'
+import {adr, detailedError, expectColumnIndexToMatchSheet} from './testUtils'
+import { ErrorMessage } from '../../src/error-message'
 
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
@@ -599,6 +600,8 @@ describe('Arrays', () => {
     ], {useArrayArithmetic: true, useColumnIndex: true})
 
     engine.setCellContents(adr('D1'), [['foo']])
+
+    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
 
     expectColumnIndexToMatchSheet([
       [1, 2, null, 'foo']

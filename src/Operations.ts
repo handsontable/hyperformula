@@ -22,10 +22,10 @@ import {
   ParsingErrorVertex,
   SheetMapping,
   SparseStrategy,
-  ValueCellVertex
+  ValueCellVertex,
 } from './DependencyGraph'
 import { FormulaVertex } from './DependencyGraph/FormulaCellVertex'
-import { RawAndParsedValue } from './DependencyGraph/ValueCellVertex'
+import { RawAndParsedValue, ValueCellVertexValue } from './DependencyGraph/ValueCellVertex'
 import { AddColumnsTransformer } from './dependencyTransformers/AddColumnsTransformer'
 import { AddRowsTransformer } from './dependencyTransformers/AddRowsTransformer'
 import { CleanOutOfScopeDependenciesTransformer } from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
@@ -459,8 +459,6 @@ export class Operations {
 
   /**
    * Restores a single cell.
-   * @param {SimpleCellAddress} address
-   * @param {ClipboardCell} clipboardCell
    */
   public restoreCell(address: SimpleCellAddress, clipboardCell: ClipboardCell): void {
     switch (clipboardCell.type) {
@@ -570,7 +568,6 @@ export class Operations {
 
           this.setFormulaToCell(address, size, parserResult)
         } catch (error) {
-
           if (!(error as Error).message) {
             throw error
           }
@@ -598,45 +595,66 @@ export class Operations {
     }
   }
 
+  /**
+   * Sets cell content to an instance of parsing error.
+   * Creates a ParsingErrorVertex and updates the dependency graph and column search index.
+   */
   public setParsingErrorToCell(rawInput: string, errors: ParsingError[], address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.removeCellValueFromColumnSearch(address)
+
     const vertex = new ParsingErrorVertex(errors, rawInput)
     const arrayChanges = this.dependencyGraph.setParsingErrorToCell(address, vertex)
-    this.columnSearch.remove(getRawValue(oldValue), address)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
     this.changes.addChange(vertex.getCellValue(), address)
   }
 
+  /**
+   * Sets cell content to a formula.
+   * Creates a FormulaCellVertex and updates the dependency graph and column search index.
+   */
   public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
     ast,
     hasVolatileFunction,
     hasStructuralChangeFunction,
     dependencies
   }: ParsingResult) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.removeCellValueFromColumnSearch(address)
+
     const arrayChanges = this.dependencyGraph.setFormulaToCell(address, ast, absolutizeDependencies(dependencies, address), size, hasVolatileFunction, hasStructuralChangeFunction)
-    this.columnSearch.remove(getRawValue(oldValue), address)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
   }
 
+  /**
+   * Sets cell content to a value.
+   * Creates a ValueCellVertex and updates the dependency graph and column search index.
+   */
   public setValueToCell(value: RawAndParsedValue, address: SimpleCellAddress) {
-    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.changeCellValueInColumnSearch(address, value.parsedValue)
+
     const arrayChanges = this.dependencyGraph.setValueToCell(address, value)
-    this.columnSearch.change(getRawValue(oldValue), getRawValue(value.parsedValue), address)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges().filter(change => !equalSimpleCellAddress(change.address, address)))
     this.changes.addAll(arrayChanges)
     this.changes.addChange(value.parsedValue, address)
   }
 
+  /**
+   * Sets cell content to an empty value.
+   * Creates an EmptyCellVertex and updates the dependency graph and column search index.
+   */
   public setCellEmpty(address: SimpleCellAddress) {
     if (this.dependencyGraph.isArrayInternalCell(address)) {
       return
     }
-    const oldValue = this.dependencyGraph.getCellValue(address)
+
+    this.removeCellValueFromColumnSearch(address)
+
     const arrayChanges = this.dependencyGraph.setCellEmpty(address)
-    this.columnSearch.remove(getRawValue(oldValue), address)
+
     this.columnSearch.applyChanges(arrayChanges.getChanges())
     this.changes.addAll(arrayChanges)
     this.changes.addChange(EmptyValue, address)
@@ -922,6 +940,45 @@ export class Operations {
       }
     }
     return this.dependencyGraph.fetchCellOrCreateEmpty(expression.address).vertex
+  }
+
+  /**
+   * Removes a cell value from the columnSearch index.
+   * Ignores the non-computed formula vertices.
+   */
+  private removeCellValueFromColumnSearch(address: SimpleCellAddress): void {
+    if (this.isNotComputed(address)) {
+      return
+    }
+
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.columnSearch.remove(getRawValue(oldValue), address)
+  }
+
+  /**
+   * Changes a cell value in the columnSearch index.
+   * Ignores the non-computed formula vertices.
+   */
+  private changeCellValueInColumnSearch(address: SimpleCellAddress, newValue: ValueCellVertexValue): void {
+    if (this.isNotComputed(address)) {
+      return
+    }
+
+    const oldValue = this.dependencyGraph.getCellValue(address)
+    this.columnSearch.change(getRawValue(oldValue), getRawValue(newValue), address)
+  }
+
+  /**
+   * Checks if the FormulaCellVertex or ArrayVertex at the given address is not computed.
+   */
+  private isNotComputed(address: SimpleCellAddress): boolean {
+    const vertex = this.dependencyGraph.getCell(address)
+
+    if (!vertex) {
+      return false
+    }
+
+    return 'isComputed' in vertex && !vertex.isComputed()
   }
 }
 
