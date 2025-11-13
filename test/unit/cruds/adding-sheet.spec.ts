@@ -117,6 +117,9 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
 
     engine.addSheet(table2Name)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBeNull()
+
     engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
 
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
@@ -130,7 +133,6 @@ describe('add sheet to engine', () => {
     engine.batch(() => {
       engine.addSheet(table1Name)
       engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
-
       engine.addSheet(table2Name)
       engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
     })
@@ -144,13 +146,10 @@ describe('add sheet to engine', () => {
     const table2Name = 'table2'
 
     engine.suspendEvaluation()
-
     engine.addSheet(table1Name)
     engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
-
     engine.addSheet(table2Name)
     engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
-
     engine.resumeEvaluation()
 
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)

@@ -24,7 +24,7 @@ import {SimpleRangeValue} from '../SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
-import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
+import {Ast, AstNodeType, collectDependencies, NamedExpressionDependency} from '../parser'
 import {ColumnsSpan, RowsSpan, Span} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {
@@ -308,6 +308,10 @@ export class DependencyGraph {
     })
   }
 
+  public addSheet(sheetName: string): void {
+    // TODO
+  }
+
   public clearSheet(sheetId: number) {
     const arrays: Set<ArrayVertex> = new Set()
     for (const [address, vertex] of this.addressMapping.sheetEntries(sheetId)) {
@@ -518,6 +522,14 @@ export class DependencyGraph {
   public* arrayFormulaNodes(): IterableIterator<ArrayVertex> {
     for (const vertex of this.graph.getNodes()) {
       if (vertex instanceof ArrayVertex) {
+        yield vertex
+      }
+    }
+  }
+
+  public* formulaNodes(): IterableIterator<FormulaVertex> {
+    for (const vertex of this.graph.getNodes()) {
+      if (vertex instanceof FormulaVertex) {
         yield vertex
       }
     }

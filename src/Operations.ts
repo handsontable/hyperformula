@@ -28,7 +28,6 @@ import { FormulaVertex } from './DependencyGraph/FormulaCellVertex'
 import { RawAndParsedValue } from './DependencyGraph/ValueCellVertex'
 import { AddColumnsTransformer } from './dependencyTransformers/AddColumnsTransformer'
 import { AddRowsTransformer } from './dependencyTransformers/AddRowsTransformer'
-import { AddSheetTransformer } from './dependencyTransformers/AddSheetTransformer'
 import { CleanOutOfScopeDependenciesTransformer } from './dependencyTransformers/CleanOutOfScopeDependenciesTransformer'
 import { MoveCellsTransformer } from './dependencyTransformers/MoveCellsTransformer'
 import { RemoveColumnsTransformer } from './dependencyTransformers/RemoveColumnsTransformer'
@@ -52,7 +51,7 @@ import {
   NamedExpressions
 } from './NamedExpressions'
 import { NamedExpressionDependency, ParserWithCaching, ParsingErrorType, RelativeDependency } from './parser'
-import { ParsingError } from './parser/Ast'
+import { AstNodeType, ParsingError } from './parser/Ast'
 import { ParsingResult } from './parser/ParserWithCaching'
 import { findBoundaries, Sheet } from './Sheet'
 import { ColumnsSpan, RowsSpan } from './Span'
@@ -251,38 +250,27 @@ export class Operations {
     const sheet: Sheet = []
     this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries(sheet))
     const addedSheetName = this.sheetMapping.fetchDisplayName(sheetId)
+    const quotedSheetName = `'${addedSheetName.replace(/'/g, "''")}'`
 
-    // Rebuild formulas that reference the newly added sheet
-    let version = 0
+    // TODO: move this code to dependencyGraph.addSheet()
     this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new AddSheetTransformer(sheetId, addedSheetName)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-
-      // TODO: move this logic to the transformer
-      // Rebuild non-array formulas that were transformed
-      for (const vertex of this.dependencyGraph.graph.getNodes()) {
-        if (vertex instanceof FormulaCellVertex) {
-          const originalAst = vertex.getFormula(this.lazilyTransformingAstService)
-          const address = vertex.getAddress(this.lazilyTransformingAstService)
-          const [transformedAst] = transformation.transformSingleAst(originalAst, address)
-
-          // Check if the AST actually changed
-          const originalHash = this.parser.computeHashFromAst(originalAst)
-          const transformedHash = this.parser.computeHashFromAst(transformedAst)
-
-          if (originalHash !== transformedHash) {
-            // The formula was transformed (ERROR_WITH_RAW_INPUT -> valid reference)
-            // We need to rebuild it with proper dependencies using setFormulaToCellFromCache
-            this.parser.rememberNewAst(transformedAst)
-            this.setFormulaToCellFromCache(transformedHash, address)
-          }
+      for (const node of this.dependencyGraph.formulaNodes()) {
+        const ast = node.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+        if (ast.type === AstNodeType.ERROR_WITH_RAW_INPUT && this.containsSheetName(ast.rawInput, addedSheetName, quotedSheetName)) {
+          const address = node.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+          this.setCellContent(address, `=${ast.rawInput}`) // or maybe take just the inner part of this function body
         }
       }
-
-      version = this.lazilyTransformingAstService.addTransformation(transformation)
     })
 
-    return { addedSheetName, version }
+    return { addedSheetName, version: 0 } // TODO: calculate version
+  }
+
+  private containsSheetName(rawInput: string, unquotedSheetNameLowercase: string, quotedSheetNameLowercase: string): boolean {
+    const lowerInput = rawInput.toLowerCase()
+
+    return lowerInput.includes(`${unquotedSheetNameLowercase}!`)
+        || lowerInput.includes(`${quotedSheetNameLowercase}!`)
   }
 
   public renameSheet(sheetId: number, newName: string) {
