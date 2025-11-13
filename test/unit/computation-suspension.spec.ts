@@ -206,4 +206,22 @@ describe('Evaluation suspension', () => {
     expect(changes).toContainEqual(new ExportedCellChange(adr('B1'), 4))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C1'), 5))
   })
+
+  it('allows to update cell content of a not computed formula cell (#1194)', () => {
+    const hf = HyperFormula.buildFromArray([], {
+      licenseKey: 'gpl-v3'
+    })
+
+    hf.suspendEvaluation()
+    hf.setCellContents(adr('A1'), '=42')
+    hf.setCellContents(adr('A1'), 42)
+    hf.setCellContents(adr('A1'), '=42')
+    hf.setCellContents(adr('A1'), null)
+    hf.setCellContents(adr('A1'), '=42')
+    hf.setCellContents(adr('A1'), '==')
+    hf.setCellContents(adr('A1'), '=42')
+    hf.setCellContents(adr('A1'), '=42')
+    hf.resumeEvaluation()
+    expect(hf.getCellValue(adr('A1'))).toBe(42)
+  })
 })
