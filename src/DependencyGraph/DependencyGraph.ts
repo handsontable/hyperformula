@@ -24,7 +24,7 @@ import {SimpleRangeValue} from '../SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
-import {Ast, AstNodeType, collectDependencies, NamedExpressionDependency} from '../parser'
+import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {ColumnsSpan, RowsSpan, Span} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {

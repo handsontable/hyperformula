@@ -51,7 +51,7 @@ import {
   NamedExpressions
 } from './NamedExpressions'
 import { NamedExpressionDependency, ParserWithCaching, ParsingErrorType, RelativeDependency } from './parser'
-import { AstNodeType, ParsingError } from './parser/Ast'
+import { AstNodeType, ErrorWithRawInputAst, ParsingError } from './parser/Ast'
 import { ParsingResult } from './parser/ParserWithCaching'
 import { findBoundaries, Sheet } from './Sheet'
 import { ColumnsSpan, RowsSpan } from './Span'
@@ -261,42 +261,50 @@ export class Operations {
    */
   private reparseFormulasDependingOnSheet(sheetName: string): void {
     const quotedSheetName = `'${sheetName.replace(/'/g, "''")}'`
+
+    const containsSheetName = (formulaText: string): boolean => {
+      const lowerInput = formulaText.toLowerCase()
+      return lowerInput.includes(`${sheetName}!`)
+          || lowerInput.includes(`${quotedSheetName}!`)
+    }
+
     for (const node of this.dependencyGraph.formulaNodes()) {
-      const ast = node.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-      if (ast.type === AstNodeType.ERROR_WITH_RAW_INPUT && this.containsSheetName(ast.rawInput, sheetName, quotedSheetName)) {
-        const address = node.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-        const formulaText = `=${ast.rawInput}`
-        const parserResult = this.parser.parse(formulaText, address)
-        const { ast: newAst, errors } = parserResult
-        if (errors.length > 0) {
-          this.setParsingErrorToCell(formulaText, errors, address)
-        } else {
-          try {
-            const size = this.arraySizePredictor.checkArraySize(newAst, address)
-
-            if (size.width <= 0 || size.height <= 0) {
-              throw Error('Incorrect array size')
-            }
-
-            this.setFormulaToCell(address, size, parserResult)
-          } catch (error) {
-            if (!(error as Error).message) {
-              throw error
-            }
-
-            const parsingError: ParsingError = { type: ParsingErrorType.InvalidRangeSize, message: 'Invalid range size.' }
-            this.setParsingErrorToCell(formulaText, [parsingError], address)
-          }
-        }
+      const oldAst = node.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+      if (oldAst.type === AstNodeType.ERROR_WITH_RAW_INPUT && containsSheetName(oldAst.rawInput)) {
+        this.reparseFormulaNode(node, oldAst)
       }
     }
   }
 
-  private containsSheetName(rawInput: string, unquotedSheetNameLowercase: string, quotedSheetNameLowercase: string): boolean {
-    const lowerInput = rawInput.toLowerCase()
+  /**
+   * TODO
+   */
+  private reparseFormulaNode(node: FormulaCellVertex, ast: ErrorWithRawInputAst): void {
+    const address = node.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+    const formulaText = `=${ast.rawInput}`
+    const parserResult = this.parser.parse(formulaText, address)
+    const { ast: newAst, errors } = parserResult
 
-    return lowerInput.includes(`${unquotedSheetNameLowercase}!`)
-        || lowerInput.includes(`${quotedSheetNameLowercase}!`)
+    if (errors.length > 0) {
+      this.setParsingErrorToCell(formulaText, errors, address)
+    } else {
+      try {
+        const size = this.arraySizePredictor.checkArraySize(newAst, address)
+
+        if (size.width <= 0 || size.height <= 0) {
+          throw Error('Incorrect array size')
+        }
+
+        this.setFormulaToCell(address, size, parserResult)
+      } catch (error) {
+        if (!(error as Error).message) {
+          throw error
+        }
+
+        const parsingError: ParsingError = { type: ParsingErrorType.InvalidRangeSize, message: 'Invalid range size.' }
+        this.setParsingErrorToCell(formulaText, [parsingError], address)
+      }
+    }
   }
 
   public renameSheet(sheetId: number, newName: string) {
