@@ -245,25 +245,51 @@ export class Operations {
     this.columnSearch.removeSheet(sheetId)
   }
 
+  /**
+   * TODO
+   */
   public addSheet(name?: string): { addedSheetName: string, version: number } {
     const sheetId = this.sheetMapping.addSheet(name)
-    const sheet: Sheet = []
-    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries(sheet))
     const addedSheetName = this.sheetMapping.fetchDisplayName(sheetId)
-    const quotedSheetName = `'${addedSheetName.replace(/'/g, "''")}'`
+    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries([]))
+    this.reparseFormulasDependingOnSheet(addedSheetName)
+    return { addedSheetName, version: 0 } // TODO: calculate version
+  }
 
-    // TODO: move this code to dependencyGraph.addSheet()
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      for (const node of this.dependencyGraph.formulaNodes()) {
-        const ast = node.getFormula(this.dependencyGraph.lazilyTransformingAstService)
-        if (ast.type === AstNodeType.ERROR_WITH_RAW_INPUT && this.containsSheetName(ast.rawInput, addedSheetName, quotedSheetName)) {
-          const address = node.getAddress(this.dependencyGraph.lazilyTransformingAstService)
-          this.setCellContent(address, `=${ast.rawInput}`) // or maybe take just the inner part of this function body
+  /**
+   * TODO
+   */
+  private reparseFormulasDependingOnSheet(sheetName: string): void {
+    const quotedSheetName = `'${sheetName.replace(/'/g, "''")}'`
+    for (const node of this.dependencyGraph.formulaNodes()) {
+      const ast = node.getFormula(this.dependencyGraph.lazilyTransformingAstService)
+      if (ast.type === AstNodeType.ERROR_WITH_RAW_INPUT && this.containsSheetName(ast.rawInput, sheetName, quotedSheetName)) {
+        const address = node.getAddress(this.dependencyGraph.lazilyTransformingAstService)
+        const formulaText = `=${ast.rawInput}`
+        const parserResult = this.parser.parse(formulaText, address)
+        const { ast: newAst, errors } = parserResult
+        if (errors.length > 0) {
+          this.setParsingErrorToCell(formulaText, errors, address)
+        } else {
+          try {
+            const size = this.arraySizePredictor.checkArraySize(newAst, address)
+
+            if (size.width <= 0 || size.height <= 0) {
+              throw Error('Incorrect array size')
+            }
+
+            this.setFormulaToCell(address, size, parserResult)
+          } catch (error) {
+            if (!(error as Error).message) {
+              throw error
+            }
+
+            const parsingError: ParsingError = { type: ParsingErrorType.InvalidRangeSize, message: 'Invalid range size.' }
+            this.setParsingErrorToCell(formulaText, [parsingError], address)
+          }
         }
       }
-    })
-
-    return { addedSheetName, version: 0 } // TODO: calculate version
+    }
   }
 
   private containsSheetName(rawInput: string, unquotedSheetNameLowercase: string, quotedSheetNameLowercase: string): boolean {
