@@ -248,12 +248,12 @@ export class Operations {
   /**
    * TODO
    */
-  public addSheet(name?: string): { addedSheetName: string, version: number } {
+  public addSheet(name?: string): string {
     const sheetId = this.sheetMapping.addSheet(name)
     const addedSheetName = this.sheetMapping.fetchDisplayName(sheetId)
     this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries([]))
     this.reparseFormulasDependingOnSheet(addedSheetName)
-    return { addedSheetName, version: 0 } // TODO: calculate version
+    return addedSheetName
   }
 
   /**
