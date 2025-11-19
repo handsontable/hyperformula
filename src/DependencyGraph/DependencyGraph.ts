@@ -516,7 +516,7 @@ export class DependencyGraph {
   }
 
   /**
-   * TODO
+   * Iterator over all array formula nodes in the graph.
    */
   public* arrayFormulaNodes(): IterableIterator<ArrayVertex> {
     for (const vertex of this.graph.getNodes()) {
@@ -527,7 +527,7 @@ export class DependencyGraph {
   }
 
   /**
-   * TODO
+   * Iterator over all formula nodes in the graph.
    */
   public* formulaNodes(): IterableIterator<FormulaVertex> {
     for (const vertex of this.graph.getNodes()) {
