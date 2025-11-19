@@ -185,3 +185,6 @@ export {
   UnableToParseError,
   SerializedNamedExpression,
 }
+
+// Export lexo integration module
+export * as lexo from './lexo'

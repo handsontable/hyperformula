@@ -95,6 +95,7 @@
     "lint:fix": "eslint . --ext .js,.ts --fix",
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
     "compile": "tsc",
+    "build:lexo": "npm run clean && npm run compile && npm run bundle:typings && npm run bundle:es && npm run bundle:cjs",
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@3.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
     "tsnode": "ts-node --transpile-only -O {\\\"module\\\":\\\"commonjs\\\"}"
   },
