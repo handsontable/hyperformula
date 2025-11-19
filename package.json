@@ -93,6 +93,7 @@
     "benchmark:compare-benchmarks": "npm run tsnode test/performance/compare-benchmarks.ts",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "eslint . --ext .js,.ts --fix",
+    "audit": "npm audit --omit=dev",
     "clean": "rimraf coverage/ commonjs/ dist/ es/ languages/ lib/ typings/ test-jasmine/",
     "compile": "tsc",
     "check:licenses": "license-checker --production --excludePackages=\"hyperformula@3.0.1\" --onlyAllow=\"MIT; Apache-2.0; BSD-3-Clause; BSD-2-Clause; ISC; BSD; Unlicense\"",
