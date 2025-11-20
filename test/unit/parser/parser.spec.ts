@@ -373,7 +373,7 @@ describe('cell references and ranges', () => {
     const sheetName = 'Sheet3'
 
     expect(() => {
-      sheetMapping.fetch('Sheet3')
+      sheetMapping.getSheetIdOrThrowError('Sheet3')
     }).toThrow(new NoSheetWithNameError(sheetName))
   })
 

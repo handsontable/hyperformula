@@ -457,7 +457,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       () => state.formulaAddress.sheet + 1,
       (reference: SimpleCellAddress) => reference.sheet + 1,
       (value: string) => {
-        const sheetNumber = this.dependencyGraph.sheetMapping.get(value)
+        const sheetNumber = this.dependencyGraph.sheetMapping.getSheetId(value)
         if (sheetNumber !== undefined) {
           return sheetNumber + 1
         } else {

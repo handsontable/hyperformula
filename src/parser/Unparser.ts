@@ -4,6 +4,7 @@
  */
 
 import {ErrorType, SimpleCellAddress} from '../Cell'
+import { SheetMapping } from '../DependencyGraph/SheetMapping'
 import {NoSheetWithIdError} from '../index'
 import {NamedExpressions} from '../NamedExpressions'
 import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
@@ -24,7 +25,7 @@ export class Unparser {
   constructor(
     private readonly config: ParserConfig,
     private readonly lexerConfig: LexerConfig,
-    private readonly sheetMappingFn: SheetIndexMappingFn,
+    private readonly sheetMapping: SheetMapping,
     private readonly namedExpressions: NamedExpressions,
   ) {
   }
@@ -110,7 +111,7 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    const sheetName = sheetIndexToString(sheetId, this.sheetMappingFn)
+    const sheetName = sheetIndexToString(sheetId, this.sheetMapping.getSheetNameOrThrowError.bind(this.sheetMapping))
     if (sheetName === undefined) {
       throw new NoSheetWithIdError(sheetId)
     }

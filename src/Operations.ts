@@ -236,7 +236,7 @@ export class Operations {
   }
 
   public removeSheetByName(sheetName: string) {
-    const sheetId = this.sheetMapping.fetch(sheetName)
+    const sheetId = this.sheetMapping.getSheetIdOrThrowError(sheetName)
     return this.removeSheet(sheetId)
   }
 
@@ -249,7 +249,7 @@ export class Operations {
     const sheetId = this.sheetMapping.addSheet(name)
     const sheet: Sheet = []
     this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries(sheet))
-    return this.sheetMapping.fetchDisplayName(sheetId)
+    return this.sheetMapping.getSheetNameOrThrowError(sheetId)
   }
 
   public renameSheet(sheetId: number, newName: string) {

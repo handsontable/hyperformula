@@ -215,7 +215,7 @@ export class CrudOperations {
     this.ensureScopeIdIsValid(sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const originalName = this.sheetMapping.fetchDisplayName(sheetId)
+    const originalName = this.sheetMapping.getSheetNameOrThrowError(sheetId)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
     const {version, scopedNamedExpressions} = this.operations.removeSheet(sheetId)
     this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, scopedNamedExpressions, version))
@@ -552,7 +552,7 @@ export class CrudOperations {
       throw new NoSheetWithIdError(sheetId)
     }
 
-    const existingSheetId = this.sheetMapping.get(name)
+    const existingSheetId = this.sheetMapping.getSheetId(name)
     if (existingSheetId !== undefined && existingSheetId !== sheetId) {
       throw new SheetNameAlreadyTakenError(name)
     }

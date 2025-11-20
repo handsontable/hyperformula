@@ -2709,7 +2709,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public removeSheet(sheetId: number): ExportedChange[] {
     validateArgToType(sheetId, 'number', 'sheetId')
-    const displayName = this.sheetMapping.getDisplayName(sheetId) as string
+    const displayName = this.sheetMapping.getSheetName(sheetId) as string
     this._crudOperations.removeSheet(sheetId)
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.SheetRemoved, displayName, changes)
@@ -2888,7 +2888,7 @@ export class HyperFormula implements TypedEmitter {
   public simpleCellAddressFromString(cellAddress: string, contextSheetId: number): SimpleCellAddress | undefined {
     validateArgToType(cellAddress, 'string', 'cellAddress')
     validateArgToType(contextSheetId, 'number', 'sheetId')
-    return simpleCellAddressFromString(this.sheetMapping.get, cellAddress, contextSheetId)
+    return simpleCellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), cellAddress, contextSheetId)
   }
 
   /**
@@ -2917,7 +2917,7 @@ export class HyperFormula implements TypedEmitter {
   public simpleCellRangeFromString(cellRange: string, contextSheetId: number): SimpleCellRange | undefined {
     validateArgToType(cellRange, 'string', 'cellRange')
     validateArgToType(contextSheetId, 'number', 'sheetId')
-    return simpleCellRangeFromString(this.sheetMapping.get, cellRange, contextSheetId)
+    return simpleCellRangeFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), cellRange, contextSheetId)
   }
 
   /**
@@ -2963,7 +2963,7 @@ export class HyperFormula implements TypedEmitter {
       ? optionsOrContextSheetId
       : optionsOrContextSheetId.includeSheetName ? cellAddress.sheet+1 : cellAddress.sheet
 
-    return simpleCellAddressToString(this.sheetMapping.fetchDisplayName, cellAddress, contextSheetId)
+    return simpleCellAddressToString(this.sheetMapping.getSheetNameOrThrowError.bind(this.sheetMapping), cellAddress, contextSheetId)
   }
 
   /**
@@ -3016,7 +3016,7 @@ export class HyperFormula implements TypedEmitter {
       ? optionsOrContextSheetId
       : optionsOrContextSheetId.includeSheetName ? cellRange.start.sheet+cellRange.end.sheet+1 : cellRange.start.sheet
 
-    return simpleCellRangeToString(this.sheetMapping.fetchDisplayName, cellRange, contextSheetId)
+    return simpleCellRangeToString(this.sheetMapping.getSheetNameOrThrowError.bind(this.sheetMapping), cellRange, contextSheetId)
   }
 
   /**
@@ -3119,7 +3119,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public getSheetName(sheetId: number): string | undefined {
     validateArgToType(sheetId, 'number', 'sheetId')
-    return this.sheetMapping.getDisplayName(sheetId)
+    return this.sheetMapping.getSheetName(sheetId)
   }
 
   /**
@@ -3140,7 +3140,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetNames(): string[] {
-    return this.sheetMapping.sheetNames()
+    return this.sheetMapping.getAllSheetNames()
   }
 
   /**
@@ -3165,7 +3165,7 @@ export class HyperFormula implements TypedEmitter {
    */
   public getSheetId(sheetName: string): number | undefined {
     validateArgToType(sheetName, 'string', 'sheetName')
-    return this.sheetMapping.get(sheetName)
+    return this.sheetMapping.getSheetId(sheetName)
   }
 
   /**

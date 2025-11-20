@@ -87,7 +87,7 @@ export class EngineComparator {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode))
         }
         const sheetMapping = this.expected.sheetMapping
-        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
+        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.getSheetNameOrThrowError.bind(sheetMapping), address, 0)} (Sheet '${sheetMapping.getSheetNameOrThrowError(address.sheet)}') are not same`)
       }
     }
   }

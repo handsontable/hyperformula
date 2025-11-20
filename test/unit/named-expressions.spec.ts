@@ -1915,7 +1915,7 @@ describe('Named expressions - actions at the Operations layer', () => {
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
-    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping)
     const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
     operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
   })

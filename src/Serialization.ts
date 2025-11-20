@@ -114,8 +114,8 @@ export class Serialization {
 
   public genericAllSheetsGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
     const result: Record<string, T> = {}
-    for (const sheetName of this.dependencyGraph.sheetMapping.displayNames()) {
-      const sheetId = this.dependencyGraph.sheetMapping.fetch(sheetName)
+    for (const sheetName of this.dependencyGraph.sheetMapping.iterateAllSheetNames()) {
+      const sheetId = this.dependencyGraph.sheetMapping.getSheetIdOrThrowError(sheetName)
       result[sheetName] = sheetGetter(sheetId)
     }
     return result
@@ -140,8 +140,8 @@ export class Serialization {
   public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
     const idMap: number[] = []
     let id = 0
-    for (const sheetName of this.dependencyGraph.sheetMapping.displayNames()) {
-      const sheetId = this.dependencyGraph.sheetMapping.fetch(sheetName)
+    for (const sheetName of this.dependencyGraph.sheetMapping.iterateAllSheetNames()) {
+      const sheetId = this.dependencyGraph.sheetMapping.getSheetIdOrThrowError(sheetName)
       idMap[sheetId] = id
       id++
     }
@@ -156,7 +156,7 @@ export class Serialization {
   }
 
   public withNewConfig(newConfig: Config, namedExpressions: NamedExpressions): Serialization {
-    const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping.fetchDisplayName, namedExpressions)
+    const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping, namedExpressions)
     return new Serialization(this.dependencyGraph, newUnparser, this.exporter)
   }
 }

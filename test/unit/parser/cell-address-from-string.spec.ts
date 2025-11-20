@@ -6,31 +6,38 @@ import {adr} from '../testUtils'
 
 describe('cellAddressFromString', () => {
   it('is zero based', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A1', adr('A1'))).toEqual(CellAddress.relative(0, 0))
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'A1', adr('A1'))).toEqual(CellAddress.relative(0, 0))
   })
 
   it('works for bigger rows', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'A123', adr('A1'))).toEqual(CellAddress.relative(0, 122))
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'A123', adr('A1'))).toEqual(CellAddress.relative(0, 122))
   })
 
   it('one letter', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'Z1', adr('A1'))).toEqual(CellAddress.relative(25, 0))
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'Z1', adr('A1'))).toEqual(CellAddress.relative(25, 0))
   })
 
   it('last letter is Z', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'AA1', adr('A1'))).toEqual(CellAddress.relative(26, 0))
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'AA1', adr('A1'))).toEqual(CellAddress.relative(26, 0))
   })
 
   it('works for many letters', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'ABC1', adr('A1'))).toEqual(CellAddress.relative(730, 0))
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'ABC1', adr('A1'))).toEqual(CellAddress.relative(730, 0))
   })
 
   it('is not case sensitive', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'abc1', adr('A1'))).toEqual(CellAddress.relative(730, 0))
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'abc1', adr('A1'))).toEqual(CellAddress.relative(730, 0))
   })
 
   it('when sheet is missing, its took from base address', () => {
-    expect(cellAddressFromString(new SheetMapping(buildTranslationPackage(enGB)).get, 'B3', adr('A1', 42))).toEqual(CellAddress.relative(1, 2))
+    const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'B3', adr('A1', 42))).toEqual(CellAddress.relative(1, 2))
   })
 
   it('can into sheets', () => {
@@ -39,8 +46,8 @@ describe('cellAddressFromString', () => {
     const sheet2 = sheetMapping.addSheet('Sheet2')
     const sheet3 = sheetMapping.addSheet('~`!@#$%^&*()_-+_=/|?{}[]\"')
 
-    expect(cellAddressFromString(sheetMapping.get, 'Sheet1!B3', adr('A1', sheet1))).toEqual(CellAddress.relative(1, 2, sheet1))
-    expect(cellAddressFromString(sheetMapping.get, 'Sheet2!B3', adr('A1', sheet1))).toEqual(CellAddress.relative(1, 2, sheet2))
-    expect(cellAddressFromString(sheetMapping.get, "'~`!@#$%^&*()_-+_=/|?{}[]\"'!B3", adr('A1', sheet1))).toEqual(CellAddress.relative(1, 2, sheet3))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'Sheet1!B3', adr('A1', sheet1))).toEqual(CellAddress.relative(1, 2, sheet1))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), 'Sheet2!B3', adr('A1', sheet1))).toEqual(CellAddress.relative(1, 2, sheet2))
+    expect(cellAddressFromString(sheetMapping.getSheetId.bind(sheetMapping), "'~`!@#$%^&*()_-+_=/|?{}[]\"'!B3", adr('A1', sheet1))).toEqual(CellAddress.relative(1, 2, sheet3))
   })
 })
