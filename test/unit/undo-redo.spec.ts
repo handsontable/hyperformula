@@ -1005,8 +1005,8 @@ describe('UndoRedo - at the Operations layer', () => {
 
   it('clearUndoStack should clear out all undo entries', () => {
     expect(undoRedo.isUndoStackEmpty()).toBe(true)
-    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 1', 0))
-    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 2', 0))
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 1'))
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 2'))
 
     expect(undoRedo.isUndoStackEmpty()).toBe(false)
 

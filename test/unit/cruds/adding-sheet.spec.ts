@@ -125,7 +125,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
   })
 
-  it.only('recalculates formulas with range references and aggregate functions (#1116)', () => {
+  it('recalculates formulas with range references and aggregate functions (#1116)', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const sheet2Name = 'Sheet2'
