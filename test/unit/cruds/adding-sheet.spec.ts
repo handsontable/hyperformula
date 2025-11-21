@@ -6,8 +6,8 @@ describe('Adding sheet - checking if its possible', () => {
   it('yes', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(true)
-    expect(engine.isItPossibleToAddSheet('~`!@#$%^&*()_-+_=/|?{}[]\\"')).toEqual(true)
+    expect(engine.isItPossibleToAddSheet('Sheet1')).toBe(true)
+    expect(engine.isItPossibleToAddSheet('~`!@#$%^&*()_-+_=/|?{}[]\\"')).toBe(true)
   })
 
   it('no', () => {
@@ -16,8 +16,8 @@ describe('Adding sheet - checking if its possible', () => {
       Foo: [],
     })
 
-    expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(false)
-    expect(engine.isItPossibleToAddSheet('Foo')).toEqual(false)
+    expect(engine.isItPossibleToAddSheet('Sheet1')).toBe(false)
+    expect(engine.isItPossibleToAddSheet('Foo')).toBe(false)
   })
 })
 
@@ -27,7 +27,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
     expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['Sheet1'])
   })
 
@@ -38,7 +38,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(2)
+    expect(engine.sheetMapping.numberOfSheets()).toBe(2)
     expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['Sheet1', 'Sheet2'])
   })
 
@@ -47,7 +47,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.getCellValue(adr('A1', 0))).toBe(null)
+    expect(engine.getCellValue(adr('A1', 0))).toBeNull()
   })
 
   it('should add sheet with translated sheet name', function() {
@@ -56,7 +56,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
     expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['Arkusz1'])
   })
 
@@ -65,7 +65,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet('foo')
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
     expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['foo'])
   })
 
@@ -76,7 +76,8 @@ describe('add sheet to engine', () => {
     expect(() => {
       engine.addSheet('FOO')
     }).toThrowError(/already exists/)
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
     expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['foo'])
   })
 
@@ -85,7 +86,7 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet('foo')
 
-    expect(sheetName).toEqual('foo')
+    expect(sheetName).toBe('foo')
 
   })
 
@@ -94,7 +95,7 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet()
 
-    expect(sheetName).toEqual('Sheet1')
+    expect(sheetName).toBe('Sheet1')
   })
 
   it('should throw error when sheet name is already taken', () => {
