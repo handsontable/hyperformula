@@ -114,7 +114,7 @@ export class Serialization {
 
   public genericAllSheetsGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
     const result: Record<string, T> = {}
-    for (const sheetName of this.dependencyGraph.sheetMapping.iterateAllSheetNames()) {
+    for (const sheetName of this.dependencyGraph.sheetMapping.iterateSheetNames()) {
       const sheetId = this.dependencyGraph.sheetMapping.getSheetIdOrThrowError(sheetName)
       result[sheetName] = sheetGetter(sheetId)
     }
@@ -140,7 +140,7 @@ export class Serialization {
   public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
     const idMap: number[] = []
     let id = 0
-    for (const sheetName of this.dependencyGraph.sheetMapping.iterateAllSheetNames()) {
+    for (const sheetName of this.dependencyGraph.sheetMapping.iterateSheetNames()) {
       const sheetId = this.dependencyGraph.sheetMapping.getSheetIdOrThrowError(sheetName)
       idMap[sheetId] = id
       id++

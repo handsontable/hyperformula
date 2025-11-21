@@ -3140,7 +3140,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public getSheetNames(): string[] {
-    return this.sheetMapping.getAllSheetNames()
+    return this.sheetMapping.getSheetNames()
   }
 
   /**

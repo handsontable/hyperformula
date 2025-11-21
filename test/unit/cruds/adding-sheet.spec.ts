@@ -28,7 +28,7 @@ describe('add sheet to engine', () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(1)
-    expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['Sheet1'])
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['Sheet1'])
   })
 
   it('should add sheet to engine with one sheet', function() {
@@ -39,7 +39,7 @@ describe('add sheet to engine', () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(2)
-    expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['Sheet1', 'Sheet2'])
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['Sheet1', 'Sheet2'])
   })
 
   it('should be possible to fetch empty cell from newly added sheet', function() {
@@ -57,7 +57,7 @@ describe('add sheet to engine', () => {
     engine.addSheet()
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(1)
-    expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['Arkusz1'])
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['Arkusz1'])
   })
 
   it('should add sheet with given name', function() {
@@ -66,7 +66,7 @@ describe('add sheet to engine', () => {
     engine.addSheet('foo')
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(1)
-    expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['foo'])
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['foo'])
   })
 
   it('cannot add another sheet with same lowercased name', function() {
@@ -78,7 +78,7 @@ describe('add sheet to engine', () => {
     }).toThrowError(/already exists/)
 
     expect(engine.sheetMapping.numberOfSheets()).toBe(1)
-    expect(Array.from(engine.sheetMapping.iterateAllSheetNames())).toEqual(['foo'])
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['foo'])
   })
 
   it('should return given name', function() {

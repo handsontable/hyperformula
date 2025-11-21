@@ -20,7 +20,7 @@ export class EngineComparator {
               private actual: HyperFormula) {
   }
 
-  public compare() {
+  public compare() { // TODO
     const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets()
     const numberOfSheets = this.actual.sheetMapping.numberOfSheets()
 
