@@ -20,9 +20,9 @@ export class EngineComparator {
               private actual: HyperFormula) {
   }
 
-  public compare() { // TODO
-    const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets()
-    const numberOfSheets = this.actual.sheetMapping.numberOfSheets()
+  public compare(): void {
+    const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets({includeNotAdded: true})
+    const numberOfSheets = this.actual.sheetMapping.numberOfSheets({includeNotAdded: true})
 
     if (expectedNumberOfSheets !== numberOfSheets) {
       throw Error(`Expected number of sheets ${expectedNumberOfSheets}, actual: ${numberOfSheets}`)
@@ -36,7 +36,7 @@ export class EngineComparator {
     }
   }
 
-  private compareSheet(sheet: number) {
+  private compareSheet(sheet: number): void {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
@@ -87,7 +87,9 @@ export class EngineComparator {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode))
         }
         const sheetMapping = this.expected.sheetMapping
-        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.getSheetNameOrThrowError.bind(sheetMapping), address, 0)} (Sheet '${sheetMapping.getSheetNameOrThrowError(address.sheet)}') are not same`)
+        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${
+          simpleCellAddressToString(sheetMapping.getSheetName.bind(sheetMapping), address, 0) ?? 'ERROR'
+        } (Sheet '${sheetMapping.getSheetName(address.sheet) ?? 'Unknown sheet'}') are not same`)
       }
     }
   }
