@@ -107,7 +107,7 @@ describe('add sheet to engine', () => {
     }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 
-  it.only('recalculates the cells referencing the new sheet (#1116)', () => {
+  it('recalculates the cells referencing the new sheet (#1116)', () => {
     const  engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
     const table2Name = 'table2'

@@ -80,7 +80,7 @@ describe('computeHashFromTokens', () => {
   it('cell ref to not exsiting sheet', () => {
     const code = '=Sheet3!A1'
 
-    expect(computeFunc(code, adr('B2'))).toEqual('=Sheet3!A1')
+    expect(computeFunc(code, adr('B2'))).toBe('=#2#-1R-1')
   })
 
   it('cell range', () => {
