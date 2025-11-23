@@ -248,7 +248,7 @@ export class Operations {
   public addSheet(name?: string) {
     const sheetId = this.sheetMapping.addSheet(name)
     const sheet: Sheet = []
-    this.dependencyGraph.addressMapping.autoAddSheet(sheetId, findBoundaries(sheet))
+    this.dependencyGraph.addressMapping.addSheetAndSetStrategyBasedOnBounderies(sheetId, findBoundaries(sheet), { throwIfSheetNotExists: false })
     return this.sheetMapping.getSheetNameOrThrowError(sheetId)
   }
 
@@ -921,7 +921,7 @@ export class Operations {
   }
 
   private allocateNamedExpressionAddressSpace() {
-    this.dependencyGraph.addressMapping.addSheet(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, new SparseStrategy(0, 0))
+    this.dependencyGraph.addressMapping.addSheetWithStrategy(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, new SparseStrategy(0, 0))
   }
 
   private copyOrFetchGlobalNamedExpressionVertex(expressionName: string, sourceVertex: CellVertex, addedNamedExpressions: string[]): CellVertex {

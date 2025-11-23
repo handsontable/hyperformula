@@ -441,10 +441,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('entriesFromColumnsSpan returns the same result regardless of the strategy', () => {
     const denseMapping = new AddressMapping(new AlwaysDense())
-    denseMapping.addSheet(0, new DenseStrategy(5, 5))
+    denseMapping.addSheetWithStrategy(0, new DenseStrategy(5, 5))
 
     const sparseMapping = new AddressMapping(new AlwaysSparse())
-    sparseMapping.addSheet(0, new SparseStrategy(5, 5))
+    sparseMapping.addSheetWithStrategy(0, new SparseStrategy(5, 5))
 
     const mappingsAndResults: { mapping: AddressMapping, results: String[][] }[] = [
       {
@@ -487,14 +487,14 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 describe('SparseStrategy', () => {
   sharedExamples((maxCol: number, maxRow: number) => {
     const mapping = new AddressMapping(new AlwaysSparse())
-    mapping.addSheet(0, new SparseStrategy(maxCol, maxRow))
-    mapping.addSheet(1, new SparseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(0, new SparseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(1, new SparseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
-    mapping.addSheet(0, new SparseStrategy(4, 16))
+    mapping.addSheetWithStrategy(0, new SparseStrategy(4, 16))
 
     mapping.setCell(adr('D16'), new ValueCellVertex(42, 42))
 
@@ -505,7 +505,7 @@ describe('SparseStrategy', () => {
   it('get all vertices', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
-    mapping.addSheet(0, sparseStrategy)
+    mapping.addSheetWithStrategy(0, sparseStrategy)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -530,7 +530,7 @@ describe('SparseStrategy', () => {
   it('get all vertices - from column', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
-    mapping.addSheet(0, sparseStrategy)
+    mapping.addSheetWithStrategy(0, sparseStrategy)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -559,7 +559,7 @@ describe('SparseStrategy', () => {
   it('get all vertices - from row', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
-    mapping.addSheet(0, sparseStrategy)
+    mapping.addSheetWithStrategy(0, sparseStrategy)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -589,14 +589,14 @@ describe('SparseStrategy', () => {
 describe('DenseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
     const mapping = new AddressMapping(new AlwaysDense())
-    mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
-    mapping.addSheet(1, new DenseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(0, new DenseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(1, new DenseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(new AlwaysDense())
-    mapping.addSheet(0, new DenseStrategy(1, 2))
+    mapping.addSheetWithStrategy(0, new DenseStrategy(1, 2))
 
     expect(mapping.getSheetHeight(0)).toEqual(2)
     expect(mapping.getSheetWidth(0)).toEqual(1)
@@ -605,7 +605,7 @@ describe('DenseStrategy', () => {
   it('get all vertices', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
-    mapping.addSheet(0, denseStratgey)
+    mapping.addSheetWithStrategy(0, denseStratgey)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -630,7 +630,7 @@ describe('DenseStrategy', () => {
   it('get all vertices - from column', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
-    mapping.addSheet(0, denseStratgey)
+    mapping.addSheetWithStrategy(0, denseStratgey)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -659,7 +659,7 @@ describe('DenseStrategy', () => {
   it('get all vertices - from row', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
-    mapping.addSheet(0, denseStratgey)
+    mapping.addSheetWithStrategy(0, denseStratgey)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -693,7 +693,7 @@ describe('AddressMapping', () => {
       [null, null, null],
       [null, null, '1'],
     ]
-    addressMapping.autoAddSheet(0, findBoundaries(sheet))
+    addressMapping.addSheetAndSetStrategyBasedOnBounderies(0, findBoundaries(sheet))
 
     expect(addressMapping.getStrategyForSheet(0)).toBeInstanceOf(SparseStrategy)
   })
@@ -704,7 +704,7 @@ describe('AddressMapping', () => {
       ['1', '1'],
       ['1', '1'],
     ]
-    addressMapping.autoAddSheet(0, findBoundaries(sheet))
+    addressMapping.addSheetAndSetStrategyBasedOnBounderies(0, findBoundaries(sheet))
 
     expect(addressMapping.getStrategyForSheet(0)).toBeInstanceOf(DenseStrategy)
   })

@@ -96,8 +96,8 @@ export class SheetMapping {
    *
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
    */
-  public getSheetNameOrThrowError(sheetId: number): string {
-    return this._getSheetOrThrowError(sheetId, {}).displayName
+  public getSheetNameOrThrowError(sheetId: number, options: SheetMappingQueryOptions = {}): string {
+    return this._getSheetOrThrowError(sheetId, options).displayName
   }
 
   /**

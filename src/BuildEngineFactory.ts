@@ -87,7 +87,7 @@ export class BuildEngineFactory {
           throw new SheetSizeLimitExceededError()
         }
         const sheetId = sheetMapping.addSheet(sheetName)
-        addressMapping.autoAddSheet(sheetId, boundaries)
+        addressMapping.addSheetAndSetStrategyBasedOnBounderies(sheetId, boundaries, { throwIfSheetNotExists: true })
       }
     }
 

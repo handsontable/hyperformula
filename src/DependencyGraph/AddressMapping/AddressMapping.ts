@@ -15,6 +15,10 @@ import {CellVertex} from '../Vertex'
 import {AlwaysDense, ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {AddressMappingStrategy} from './AddressMappingStrategy'
 
+export interface AddressMappingAddSheetOptions {
+  throwIfSheetNotExists: boolean,
+}
+
 /**
  * Manages cell vertices and provides access to vertex by SimpleCellAddress.
  * For each sheet it stores vertices according to AddressMappingStrategy: DenseStrategy or SparseStrategy.
@@ -69,9 +73,15 @@ export class AddressMapping {
    * @returns {AddressMappingStrategy} The strategy that was added
    * @throws Error if sheet is already added
    */
-  public addSheet(sheetId: number, strategy: AddressMappingStrategy): AddressMappingStrategy {
-    if (this.mapping.has(sheetId)) {
-      throw Error('Sheet already added')
+  public addSheetWithStrategy(sheetId: number, strategy: AddressMappingStrategy, options: AddressMappingAddSheetOptions = { throwIfSheetNotExists: true }): AddressMappingStrategy {
+    const strategyFound = this.mapping.get(sheetId)
+
+    if (strategyFound) {
+      if (options.throwIfSheetNotExists) {
+        throw Error('Sheet already added')
+      }
+
+      return strategyFound
     }
 
     this.mapping.set(sheetId, strategy)
@@ -79,14 +89,16 @@ export class AddressMapping {
   }
 
   /**
-   * Adds a sheet with a strategy chosen based on sheet boundaries.
+   * Adds a sheet and sets the strategy based on the sheet boundaries.
    * @param {number} sheetId - The sheet identifier
    * @param {SheetBoundaries} sheetBoundaries - The boundaries of the sheet (height, width, fill)
+   * @param {AddressMappingAddSheetOptions} options - The options for adding the sheet
+   * @throws {Error} if sheet doesn't exist and throwIfSheetNotExists is true
    */
-  public autoAddSheet(sheetId: number, sheetBoundaries: SheetBoundaries) {
+  public addSheetAndSetStrategyBasedOnBounderies(sheetId: number, sheetBoundaries: SheetBoundaries, options: AddressMappingAddSheetOptions = { throwIfSheetNotExists: true }) {
     const {height, width, fill} = sheetBoundaries
     const strategyConstructor = this.policy.call(fill)
-    this.addSheet(sheetId, new strategyConstructor(width, height))
+    this.addSheetWithStrategy(sheetId, new strategyConstructor(width, height), options)
   }
 
   /**
