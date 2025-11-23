@@ -60,12 +60,12 @@ export class SheetMapping {
   }
 
   /**
-   * Returns sheet ID for the given name (case-insensitive). Excludes not added sheets.
+   * Returns sheet ID for the given name (case-insensitive). By default excludes not added sheets.
    *
    * @returns {Maybe<number>} the sheet ID, or undefined if not found.
    */
-  public getSheetId(sheetName: string): Maybe<number> {
-    return this._getSheetByName(sheetName, {})?.id
+  public getSheetId(sheetName: string, options: SheetMappingQueryOptions = {}): Maybe<number> {
+    return this._getSheetByName(sheetName, options)?.id
   }
 
   /**

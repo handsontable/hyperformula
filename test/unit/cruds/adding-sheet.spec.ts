@@ -107,7 +107,7 @@ describe('add sheet to engine', () => {
     }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 
-  it('recalculates the cells referencing the new sheet (#1116)', () => {
+  it.only('recalculates the cells referencing the new sheet (#1116)', () => {
     const  engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
     const table2Name = 'table2'
@@ -346,3 +346,11 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
   })
 })
+
+// IMPLEMENTATION PLAN:
+// - [x] during parseing dont create ERROR vertex
+// - [ ] handle this non-error vertec when reading cell (similar to not-added named expressions?)
+// - [ ] handle addSheet, removeSheet, renameSheet
+// - [ ] handle undo-redo
+
+//TODO: testy: ranges, rename sheet, remove sheet, sheet name in quotes

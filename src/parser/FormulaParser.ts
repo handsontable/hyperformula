@@ -21,7 +21,6 @@ import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
-  SheetMappingFn,
 } from './addressRepresentationConverters'
 import {
   ArrayAst,
@@ -201,8 +200,8 @@ export class FormulaParser extends EmbeddedActionsParser {
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
     const range = this.CONSUME(ColumnRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
-    const firstAddress = this.ACTION(() => columnAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), startImage, this.formulaAddress))
-    const secondAddress = this.ACTION(() => columnAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), endImage, this.formulaAddress))
+    const firstAddress = this.ACTION(() => columnAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), startImage, this.formulaAddress))
+    const secondAddress = this.ACTION(() => columnAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), endImage, this.formulaAddress))
 
     if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
@@ -227,8 +226,8 @@ export class FormulaParser extends EmbeddedActionsParser {
   private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
     const range = this.CONSUME(RowRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
-    const firstAddress = this.ACTION(() => rowAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), startImage, this.formulaAddress))
-    const secondAddress = this.ACTION(() => rowAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), endImage, this.formulaAddress))
+    const firstAddress = this.ACTION(() => rowAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), startImage, this.formulaAddress))
+    const secondAddress = this.ACTION(() => rowAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), endImage, this.formulaAddress))
 
     if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
@@ -253,7 +252,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference) as ExtendedToken
     const address = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), cell.image, this.formulaAddress)
+      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress)
     })
     if (address === undefined) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
@@ -271,10 +270,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     const end = this.CONSUME(CellReference) as ExtendedToken
 
     const startAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), start.image, this.formulaAddress)
+      return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
     })
     const endAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), end.image, this.formulaAddress)
+      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
     })
 
     if (startAddress === undefined || endAddress === undefined) {
@@ -307,7 +306,7 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => {
           const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
           const startAddress = this.ACTION(() => {
-            return cellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), start.image, this.formulaAddress)
+            return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
           })
           if (startAddress === undefined) {
             return buildCellErrorAst(new CellError(ErrorType.REF))
@@ -338,7 +337,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const end = this.CONSUME(CellReference) as ExtendedToken
 
     const endAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), end.image, this.formulaAddress)
+      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
     })
 
     if (endAddress === undefined) {
@@ -864,6 +863,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     } else {
       return RangeSheetReferenceType.BOTH_ABSOLUTE
     }
+  }
+
+  private getSheetIdIncludingNotAdded(sheetName: string): Maybe<number> {
+    return this.sheetMapping.getSheetId(sheetName, {includeNotAdded: true})
   }
 }
 

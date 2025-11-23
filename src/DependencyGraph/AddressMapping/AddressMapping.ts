@@ -10,10 +10,11 @@ import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {Maybe} from '../../Maybe'
 import {SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
-import {ArrayVertex, ValueCellVertex} from '../index'
+import {ArrayVertex, DenseStrategy, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {AddressMappingStrategy} from './AddressMappingStrategy'
+
 
 export class AddressMapping {
   private mapping: Map<number, AddressMappingStrategy> = new Map()
@@ -27,7 +28,7 @@ export class AddressMapping {
   public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
     const sheetMapping = this.mapping.get(address.sheet)
     if (sheetMapping === undefined) {
-      throw new NoSheetWithIdError(address.sheet)
+      throw new NoSheetWithIdError(address.sheet) // WHEN CAN I ADD SHEET TO ADDRESS MAPPING?
     }
     return sheetMapping.getCell(address)
   }
@@ -53,12 +54,13 @@ export class AddressMapping {
     return strategy
   }
 
-  public addSheet(sheetId: number, strategy: AddressMappingStrategy) {
+  public addSheet(sheetId: number, strategy: AddressMappingStrategy): AddressMappingStrategy {
     if (this.mapping.has(sheetId)) {
       throw Error('Sheet already added')
     }
 
     this.mapping.set(sheetId, strategy)
+    return strategy
   }
 
   public autoAddSheet(sheetId: number, sheetBoundaries: SheetBoundaries) {
@@ -92,9 +94,10 @@ export class AddressMapping {
 
   /** @inheritDoc */
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
-    const sheetMapping = this.mapping.get(address.sheet)
+    let sheetMapping = this.mapping.get(address.sheet)
     if (!sheetMapping) {
-      throw Error('Sheet not initialized')
+      sheetMapping = this.addSheet(address.sheet, new DenseStrategy(1, 1)) // TEMPORARY
+      // throw Error('Sheet not initialized')
     }
     sheetMapping.setCell(address, newVertex)
   }

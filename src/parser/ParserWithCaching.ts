@@ -11,7 +11,6 @@ import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
-  SheetMappingFn,
 } from './addressRepresentationConverters'
 import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
@@ -30,6 +29,7 @@ import {formatNumber} from './Unparser'
 import {ColumnAddress} from './ColumnAddress'
 import {RowAddress} from './RowAddress'
 import { SheetMapping } from '../DependencyGraph/SheetMapping'
+import { Maybe } from '../Maybe'
 
 export interface ParsingResult {
   ast: Ast,
@@ -233,7 +233,7 @@ export class ParserWithCaching {
     while (idx < tokens.length) {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
-        const cellAddress = cellAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), token.image, baseAddress)
+        const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
         if (cellAddress === undefined) {
           hash = hash.concat(token.image)
         } else {
@@ -245,8 +245,8 @@ export class ParserWithCaching {
         hash = hash.concat(canonicalProcedureName, '(')
       } else if (tokenMatcher(token, ColumnRange)) {
         const [start, end] = token.image.split(':')
-        const startAddress = columnAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), start, baseAddress)
-        const endAddress = columnAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), end, baseAddress)
+        const startAddress = columnAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), start, baseAddress)
+        const endAddress = columnAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), end, baseAddress)
         if (startAddress === undefined || endAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
@@ -254,8 +254,8 @@ export class ParserWithCaching {
         }
       } else if (tokenMatcher(token, RowRange)) {
         const [start, end] = token.image.split(':')
-        const startAddress = rowAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), start, baseAddress)
-        const endAddress = rowAddressFromString(this.sheetMapping.getSheetId.bind(this.sheetMapping), end, baseAddress)
+        const startAddress = rowAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), start, baseAddress)
+        const endAddress = rowAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), end, baseAddress)
         if (startAddress === undefined || endAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
@@ -366,5 +366,9 @@ export class ParserWithCaching {
 
   public tokenizeFormula(text: string): ILexingResult {
     return this.lexer.tokenizeFormula(text)
+  }
+
+  private getSheetIdIncludingNotAdded(sheetName: string): Maybe<number> {
+    return this.sheetMapping.getSheetId(sheetName, {includeNotAdded: true})
   }
 }
