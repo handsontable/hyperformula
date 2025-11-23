@@ -88,9 +88,15 @@ export class Interpreter {
       }
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
+
         if (invalidSimpleCellAddress(address)) {
           return new CellError(ErrorType.REF, ErrorMessage.BadRef)
         }
+
+        if (!this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         return this.dependencyGraph.getCellValue(address)
       }
       case AstNodeType.NUMBER:
@@ -465,4 +471,3 @@ function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): In
   }
   return val
 }
-

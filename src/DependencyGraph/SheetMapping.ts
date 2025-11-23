@@ -126,10 +126,10 @@ export class SheetMapping {
   }
 
   /**
-   * Checks if sheet with given ID exists. Excludes not added sheets.
+   * Checks if sheet with given ID exists. By default excludes not added sheets.
    */
-  public hasSheetWithId(sheetId: number): boolean {
-    return this._getSheet(sheetId, {}) !== undefined
+  public hasSheetWithId(sheetId: number, options: SheetMappingQueryOptions = {}): boolean {
+    return this._getSheet(sheetId, options) !== undefined
   }
 
   /**

@@ -348,7 +348,7 @@ describe('add sheet to engine', () => {
 })
 
 // IMPLEMENTATION PLAN:
-// - [x] during parseing dont create ERROR vertex
+// - [x] during parseing dont create ERROR vertex - instead add a placeholder shett to sheetMapping and addressMapping
 // - [ ] handle this non-error vertec when reading cell (similar to not-added named expressions?)
 // - [ ] handle addSheet, removeSheet, renameSheet
 // - [ ] handle undo-redo

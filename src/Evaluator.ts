@@ -46,35 +46,8 @@ export class Evaluator {
 
     this.stats.measure(StatType.EVALUATION, () => {
       this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
-        (vertex: Vertex) => {
-          if (vertex instanceof FormulaVertex) {
-            const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
-            const newCellValue = this.recomputeFormulaVertexValue(vertex)
-            if (newCellValue !== currentValue) {
-              const address = vertex.getAddress(this.lazilyTransformingAstService)
-              changes.addChange(newCellValue, address)
-              this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
-              return true
-            }
-            return false
-          } else if (vertex instanceof RangeVertex) {
-            vertex.clearCache()
-            return true
-          } else {
-            return true
-          }
-        },
-        (vertex: Vertex) => {
-          if (vertex instanceof RangeVertex) {
-            vertex.clearCache()
-          } else if (vertex instanceof FormulaVertex) {
-            const address = vertex.getAddress(this.lazilyTransformingAstService)
-            this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
-            const error = new CellError(ErrorType.CYCLE, undefined, vertex)
-            vertex.setCellValue(error)
-            changes.addChange(error, address)
-          }
-        },
+        (vertex: Vertex) => this.recomputeVertex(vertex, changes),
+        (vertex: Vertex) => this.processVertexOnCycle(vertex, changes),
       )
     })
     return changes
@@ -99,6 +72,37 @@ export class Evaluator {
     })
 
     return ret
+  }
+
+  private recomputeVertex(vertex: Vertex, changes: ContentChanges): boolean {
+    if (vertex instanceof FormulaVertex) {
+      const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
+      const newCellValue = this.recomputeFormulaVertexValue(vertex)
+      if (newCellValue !== currentValue) {
+        const address = vertex.getAddress(this.lazilyTransformingAstService)
+        changes.addChange(newCellValue, address)
+        this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
+        return true
+      }
+      return false
+    } else if (vertex instanceof RangeVertex) {
+      vertex.clearCache()
+      return true
+    } else {
+      return true
+    }
+  }
+
+  private processVertexOnCycle(vertex: Vertex, changes: ContentChanges): void {
+    if (vertex instanceof RangeVertex) {
+      vertex.clearCache()
+    } else if (vertex instanceof FormulaVertex) {
+      const address = vertex.getAddress(this.lazilyTransformingAstService)
+      this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
+      const error = new CellError(ErrorType.CYCLE, undefined, vertex)
+      vertex.setCellValue(error)
+      changes.addChange(error, address)
+    }
   }
 
   /**
