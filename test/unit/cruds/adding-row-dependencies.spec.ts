@@ -343,9 +343,9 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [2, 1])
 
-    const a4 = engine.addressMapping.fetchCell(adr('A4'))
-    const a3 = engine.addressMapping.fetchCell(adr('A3'))
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a4 = engine.addressMapping.getCellOrThrowError(adr('A4'))
+    const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
+    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
     const a1a4 = engine.rangeMapping.fetchRange(adr('A1'), adr('A4')) // A1:A4
     const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3')) // A1:A4
     const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2')) // A1:A4
@@ -415,7 +415,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [1, 1])
 
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A5'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a2, range)).toBe(true)
@@ -486,7 +486,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [1, 1])
 
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
 
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
@@ -512,7 +512,7 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [1, 1])
 
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
 
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A4'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)

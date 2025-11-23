@@ -546,7 +546,7 @@ export class DependencyGraph {
   }
 
   public fetchCell(address: SimpleCellAddress): CellVertex {
-    return this.addressMapping.fetchCell(address)
+    return this.addressMapping.getCellOrThrowError(address)
   }
 
   public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
@@ -578,11 +578,11 @@ export class DependencyGraph {
   }
 
   public getSheetHeight(sheet: number): number {
-    return this.addressMapping.getHeight(sheet)
+    return this.addressMapping.getSheetHeight(sheet)
   }
 
   public getSheetWidth(sheet: number): number {
-    return this.addressMapping.getWidth(sheet)
+    return this.addressMapping.getSheetWidth(sheet)
   }
 
   public getArray(range: AbsoluteCellRange): Maybe<ArrayVertex> {
@@ -753,9 +753,9 @@ export class DependencyGraph {
             return [dependency.start, this.rangeMapping.fetchRange(dependency.start, dependency.end)]
           } else if (dependency instanceof NamedExpressionDependency) {
             const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
-            return [namedExpression.address, this.addressMapping.fetchCell(namedExpression.address)]
+            return [namedExpression.address, this.addressMapping.getCellOrThrowError(namedExpression.address)]
           } else {
-            return [dependency, this.addressMapping.fetchCell(dependency)]
+            return [dependency, this.addressMapping.getCellOrThrowError(dependency)]
           }
         })
       } else {

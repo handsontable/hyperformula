@@ -571,7 +571,7 @@ describe('Removing rows - arrays', () => {
 
     engine.removeRows(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.fetchCell(adr('A3')) as ArrayVertex
+    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('A3')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A3'))
   })
 
@@ -737,7 +737,7 @@ describe('Removing rows - graph', function() {
 
     engine.removeRows(0, [2, 1])
 
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
+    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
     expect(engine.graph.adjacentNodes(a2)).toEqual(new Set())
   })
 
@@ -773,7 +773,7 @@ describe('Removing rows - range mapping', function() {
 
     engine.removeRows(0, [0, 1])
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 
@@ -786,7 +786,7 @@ describe('Removing rows - range mapping', function() {
 
     engine.removeRows(0, [1, 2])
     const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
+    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
 

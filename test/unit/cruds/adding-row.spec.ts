@@ -256,10 +256,10 @@ describe('Adding row - FormulaCellVertex#address update', () => {
       ['=SUM(1, 2)'],
     ])
 
-    let vertex = engine.addressMapping.fetchCell(adr('A1')) as FormulaCellVertex
+    let vertex = engine.addressMapping.getCellOrThrowError(adr('A1')) as FormulaCellVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1'))
     engine.addRows(0, [0, 1])
-    vertex = engine.addressMapping.fetchCell(adr('A2')) as FormulaCellVertex
+    vertex = engine.addressMapping.getCellOrThrowError(adr('A2')) as FormulaCellVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A2'))
   })
 
@@ -276,7 +276,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
     engine.addRows(0, [0, 1])
 
-    const formulaVertex = engine.addressMapping.fetchCell(adr('A1', 1)) as FormulaCellVertex
+    const formulaVertex = engine.addressMapping.getCellOrThrowError(adr('A1', 1)) as FormulaCellVertex
 
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
@@ -475,7 +475,7 @@ describe('Adding row - arrays', () => {
 
     engine.addRows(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.fetchCell(adr('A4')) as ArrayVertex
+    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('A4')) as ArrayVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A4'))
   })
 })

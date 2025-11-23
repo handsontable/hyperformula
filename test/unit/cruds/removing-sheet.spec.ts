@@ -156,8 +156,8 @@ describe('remove sheet - adjust edges', () => {
 
     engine.removeSheet(1)
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
+    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
   })
@@ -172,8 +172,8 @@ describe('remove sheet - adjust edges', () => {
       ],
     })
 
-    const a1From0 = engine.addressMapping.fetchCell(adr('A1'))
-    const a1From1 = engine.addressMapping.fetchCell(adr('A1', 1))
+    const a1From0 = engine.addressMapping.getCellOrThrowError(adr('A1'))
+    const a1From1 = engine.addressMapping.getCellOrThrowError(adr('A1', 1))
     expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(true)
 
     engine.removeSheet(1)
@@ -245,7 +245,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet(0)
 
-    expect(() => engine.addressMapping.strategyFor(0)).toThrowError("There's no sheet with id = 0")
+    expect(() => engine.addressMapping.getStrategyForSheet(0)).toThrowError("There's no sheet with id = 0")
   })
 })
 

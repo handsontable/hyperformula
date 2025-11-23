@@ -44,10 +44,10 @@ export class EngineComparator {
     const actualSheetName = this.actual.getSheetName(sheet)
     equal(expectedSheetName, actualSheetName, `Expected sheet name '${expectedSheetName}', actual '${actualSheetName}'`)
 
-    const expectedWidth = this.expected.addressMapping.getWidth(sheet)
-    const expectedHeight = this.expected.addressMapping.getHeight(sheet)
-    const actualWidth = this.actual.addressMapping.getWidth(sheet)
-    const actualHeight = this.actual.addressMapping.getHeight(sheet)
+    const expectedWidth = this.expected.addressMapping.getSheetWidth(sheet)
+    const expectedHeight = this.expected.addressMapping.getSheetHeight(sheet)
+    const actualWidth = this.actual.addressMapping.getSheetWidth(sheet)
+    const actualHeight = this.actual.addressMapping.getSheetHeight(sheet)
 
     this.compareMatrixMappings()
 

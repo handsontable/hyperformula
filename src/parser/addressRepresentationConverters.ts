@@ -5,7 +5,7 @@
 
 import {simpleCellRange, SimpleCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
-import { SheetMapping } from '../DependencyGraph'
+import { AddressMapping, SheetMapping } from '../DependencyGraph'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
@@ -28,12 +28,20 @@ const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
  * @param baseAddress - base address for R0C0 conversion
  * @returns object representation of address
  */
-export const cellAddressFromString = (sheetMapping: SheetMapping, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<CellAddress> => {
+export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, sheetMapping: SheetMapping, addressMapping: AddressMapping): Maybe<CellAddress> => {
   const result = addressRegex.exec(stringAddress)!
   const col = columnLabelToIndex(result[6])
   const row = Number(result[8]) - 1
   const sheetName = extractSheetName(result)
-  const sheet = sheetName ? sheetMapping.reserveSheetName(sheetName) : undefined
+  let sheet: Maybe<number>
+
+  // TODO: refactor
+  if (sheetName) {
+    sheet = sheetMapping.reserveSheetName(sheetName)
+    addressMapping.addSheetStrategyPlaceholderIfNotExists(sheet)
+  } else {
+    sheet = undefined
+  }
 
   if (result[5] === ABSOLUTE_OPERATOR && result[7] === ABSOLUTE_OPERATOR) {
     return CellAddress.absolute(col, row, sheet)

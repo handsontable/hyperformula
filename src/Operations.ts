@@ -681,7 +681,7 @@ export class Operations {
    * @param {number} sheet - sheet ID number
    */
   public rowEffectivelyNotInSheet(row: number, sheet: number): boolean {
-    const height = this.dependencyGraph.addressMapping.getHeight(sheet)
+    const height = this.dependencyGraph.addressMapping.getSheetHeight(sheet)
     return row >= height
   }
 
@@ -824,7 +824,7 @@ export class Operations {
    * @param {number} sheet - sheet ID number
    */
   private columnEffectivelyNotInSheet(column: number, sheet: number): boolean {
-    const width = this.dependencyGraph.addressMapping.getWidth(sheet)
+    const width = this.dependencyGraph.addressMapping.getSheetWidth(sheet)
     return column >= width
   }
 
@@ -879,7 +879,7 @@ export class Operations {
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
     for (const formulaAddress of targetRange.addresses(this.dependencyGraph)) {
-      const vertex = this.addressMapping.fetchCell(formulaAddress)
+      const vertex = this.addressMapping.getCellOrThrowError(formulaAddress)
       if (vertex instanceof FormulaCellVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
         const ast = vertex.getFormula(this.lazilyTransformingAstService)
         const { dependencies } = this.parser.fetchCachedResultForAst(ast)
@@ -896,7 +896,7 @@ export class Operations {
     }
 
     const addedGlobalNamedExpressions: string[] = []
-    const vertex = this.addressMapping.fetchCell(targetAddress)
+    const vertex = this.addressMapping.getCellOrThrowError(targetAddress)
 
     for (const namedExpressionDependency of absolutizeDependencies(dependencies, targetAddress)) {
       if (!(namedExpressionDependency instanceof NamedExpressionDependency)) {

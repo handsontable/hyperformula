@@ -96,6 +96,7 @@ import {
 } from './LexerConfig'
 import {AddressWithSheet} from './Address'
 import { SheetMapping } from '../DependencyGraph/SheetMapping'
+import { AddressMapping } from '../DependencyGraph'
 
 export interface FormulaParserResult {
   ast: Ast,
@@ -130,12 +131,22 @@ export class FormulaParser extends EmbeddedActionsParser {
 
   private customParsingError?: ParsingError
 
-  private readonly sheetMapping: SheetMapping
-
   /**
    * Cache for positiveAtomicExpression alternatives
    */
   private atomicExpCache: Maybe<OrArg>
+
+  constructor(
+    lexerConfig: LexerConfig,
+    private readonly sheetMapping: SheetMapping,
+    private readonly addressMapping: AddressMapping,
+  ) {
+    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
+    this.lexerConfig = lexerConfig
+    this.formulaAddress = simpleCellAddress(0, 0, 0)
+    this.performSelfAnalysis()
+  }
+
   private booleanExpressionOrEmpty: AstRule = this.RULE('booleanExpressionOrEmpty', () => {
     return this.OR([
       {ALT: () => this.SUBRULE(this.booleanExpression)},
@@ -252,7 +263,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference) as ExtendedToken
     const address = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, cell.image, this.formulaAddress)
+      return cellAddressFromString(cell.image, this.formulaAddress, this.sheetMapping, this.addressMapping)
     })
     if (address === undefined) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
@@ -270,10 +281,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     const end = this.CONSUME(CellReference) as ExtendedToken
 
     const startAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+      return cellAddressFromString(start.image, this.formulaAddress, this.sheetMapping, this.addressMapping)
     })
     const endAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
+      return cellAddressFromString(end.image, this.formulaAddress, this.sheetMapping, this.addressMapping)
     })
 
     if (startAddress === undefined || endAddress === undefined) {
@@ -306,7 +317,7 @@ export class FormulaParser extends EmbeddedActionsParser {
         ALT: () => {
           const offsetProcedure = this.SUBRULE(this.offsetProcedureExpression)
           const startAddress = this.ACTION(() => {
-            return cellAddressFromString(this.sheetMapping, start.image, this.formulaAddress)
+            return cellAddressFromString(start.image, this.formulaAddress, this.sheetMapping, this.addressMapping)
           })
           if (startAddress === undefined) {
             return buildCellErrorAst(new CellError(ErrorType.REF))
@@ -337,7 +348,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const end = this.CONSUME(CellReference) as ExtendedToken
 
     const endAddress = this.ACTION(() => {
-      return cellAddressFromString(this.sheetMapping, end.image, this.formulaAddress)
+      return cellAddressFromString(end.image, this.formulaAddress, this.sheetMapping, this.addressMapping)
     })
 
     if (endAddress === undefined) {
@@ -450,14 +461,6 @@ export class FormulaParser extends EmbeddedActionsParser {
       }
     ]) as Ast
   })
-
-  constructor(lexerConfig: LexerConfig, sheetMapping: SheetMapping) {
-    super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
-    this.lexerConfig = lexerConfig
-    this.sheetMapping = sheetMapping
-    this.formulaAddress = simpleCellAddress(0, 0, 0)
-    this.performSelfAnalysis()
-  }
 
   /**
    * Parses tokenized formula and builds abstract syntax tree
