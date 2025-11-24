@@ -12,9 +12,12 @@ import {SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {ArrayVertex, DenseStrategy, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
-import {AlwaysDense, ChooseAddressMapping} from './ChooseAddressMappingPolicy'
+import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {AddressMappingStrategy} from './AddressMappingStrategy'
 
+/**
+ * Options for adding a sheet to the address mapping.
+ */
 export interface AddressMappingAddSheetOptions {
   throwIfSheetNotExists: boolean,
 }
@@ -70,6 +73,7 @@ export class AddressMapping {
    * Adds a new sheet with the specified strategy.
    * @param {number} sheetId - The sheet identifier
    * @param {AddressMappingStrategy} strategy - The address mapping strategy to use for this sheet
+   * @param {AddressMappingAddSheetOptions} options - The options for adding the sheet
    * @returns {AddressMappingStrategy} The strategy that was added
    * @throws Error if sheet is already added
    */

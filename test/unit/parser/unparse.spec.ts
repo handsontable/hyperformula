@@ -9,7 +9,7 @@ import {adr, unregisterAllLanguages} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 
 describe('Unparse', () => {
-  const config = new Config()
+  const config = new Config({ maxRows: 10 })
   const lexerConfig = buildLexerConfig(config)
   const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
   sheetMapping.addSheet('Sheet1')
@@ -130,12 +130,14 @@ describe('Unparse', () => {
   })
 
   it('#unparse error with data input', () => {
-    const formula = '=NotExistingSheet!A1'
-    const ast = parser.parse(formula, adr('A1')).ast
-    const unparsed = unparser.unparse(ast, adr('A1'))
+    const cellReferenceExceedingMaxRowsLimit = '=A100'
+    const ast = parser.parse(cellReferenceExceedingMaxRowsLimit, adr('A1')).ast
 
     expect(ast.type).toEqual(AstNodeType.ERROR_WITH_RAW_INPUT)
-    expect(unparsed).toEqual('=NotExistingSheet!A1')
+
+    const unparsed = unparser.unparse(ast, adr('A1'))
+
+    expect(unparsed).toEqual('=A100')
   })
 
   it('#unparse with known error with translation', () => {

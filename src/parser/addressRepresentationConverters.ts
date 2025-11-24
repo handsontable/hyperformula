@@ -28,7 +28,7 @@ const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
  * @param baseAddress - base address for R0C0 conversion
  * @returns object representation of address
  */
-export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, sheetMapping: SheetMapping, addressMapping: AddressMapping): Maybe<CellAddress> => {
+export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, sheetMapping: SheetMapping, addressMapping: AddressMapping): CellAddress => {
   const result = addressRegex.exec(stringAddress)!
   const col = columnLabelToIndex(result[6])
   const row = Number(result[8]) - 1

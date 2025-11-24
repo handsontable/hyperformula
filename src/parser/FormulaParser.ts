@@ -265,6 +265,7 @@ export class FormulaParser extends EmbeddedActionsParser {
     const address = this.ACTION(() => {
       return cellAddressFromString(cell.image, this.formulaAddress, this.sheetMapping, this.addressMapping)
     })
+
     if (address === undefined) {
       return buildErrorWithRawInputAst(cell.image, new CellError(ErrorType.REF), cell.leadingWhitespace)
     } else if (address.exceedsSheetSizeLimits(this.lexerConfig.maxColumns, this.lexerConfig.maxRows)) {
