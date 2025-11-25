@@ -687,6 +687,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     } else {
       actualRange = range
     }
+
     for (const cellFromRange of actualRange.addresses(this.dependencyGraph)) {
       const val = coercionFunction(this.dependencyGraph.getScalarValue(cellFromRange))
       if (val instanceof CellError) {

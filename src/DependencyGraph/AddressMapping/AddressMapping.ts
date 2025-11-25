@@ -3,17 +3,18 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {SimpleCellAddress} from '../../Cell'
+import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {RawCellContent} from '../../CellContentParser'
 import {NoSheetWithIdError} from '../../errors'
 import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {Maybe} from '../../Maybe'
 import {SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
-import {ArrayVertex, DenseStrategy, ValueCellVertex} from '../index'
+import {ArrayVertex, DenseStrategy, SheetMapping, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {AddressMappingStrategy} from './AddressMappingStrategy'
+import { ErrorMessage } from '../../error-message'
 
 /**
  * Options for adding a sheet to the address mapping.
@@ -30,12 +31,12 @@ export class AddressMapping {
   private mapping: Map<number, AddressMappingStrategy> = new Map()
 
   constructor(
-    private readonly policy: ChooseAddressMapping
+    private readonly policy: ChooseAddressMapping,
   ) {}
 
   /** @inheritDoc */
   public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
-    const sheetMapping = this.getStrategyForSheet(address.sheet) // WHEN can I add a new sheet?
+    const sheetMapping = this.getStrategyForSheet(address.sheet)
     return sheetMapping.getCell(address)
   }
 

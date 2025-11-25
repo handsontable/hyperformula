@@ -554,14 +554,26 @@ export class DependencyGraph {
   }
 
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
+    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+    }
+
     return this.addressMapping.getCellValue(address)
   }
 
   public getRawValue(address: SimpleCellAddress): RawCellContent {
+    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+      return null
+    }
+
     return this.addressMapping.getRawValue(address)
   }
 
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
+    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+      return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+    }
+
     const value = this.addressMapping.getCellValue(address)
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)

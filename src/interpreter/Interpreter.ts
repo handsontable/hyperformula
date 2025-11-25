@@ -40,6 +40,8 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
+import { CellAddress } from '../parser/CellAddress'
+import { AddressWithSheet } from '../parser/Address'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
@@ -93,7 +95,7 @@ export class Interpreter {
           return new CellError(ErrorType.REF, ErrorMessage.BadRef)
         }
 
-        if (!this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+        if (this.isSheetJustReserved(ast.reference)) {
           return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
         }
 
@@ -195,11 +197,17 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
+        if (this.isSheetJustReserved(ast.start) || this.isSheetJustReserved(ast.end)) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
+
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
         const arrayVertex = this.dependencyGraph.getArray(range)
+
         if (arrayVertex) {
           const array = arrayVertex.array
           if (array instanceof NotComputedArray) {
@@ -211,11 +219,15 @@ export class Interpreter {
           } else {
             throw new Error('Unknown array')
           }
-        } else {
-          return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
+
+        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.COLUMN_RANGE: {
+        if (this.isSheetJustReserved(ast.start) || this.isSheetJustReserved(ast.end)) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
@@ -223,6 +235,10 @@ export class Interpreter {
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
+        if (this.isSheetJustReserved(ast.start) || this.isSheetJustReserved(ast.end)) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
@@ -269,6 +285,10 @@ export class Interpreter {
         return ast.error
       }
     }
+  }
+
+  private isSheetJustReserved(address: AddressWithSheet): boolean {
+    return address.sheet !== undefined && address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {

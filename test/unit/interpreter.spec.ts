@@ -177,4 +177,172 @@ describe('Interpreter', () => {
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
   })
+
+  it('should return #REF when referencing non-existing sheet - just cell reference', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NonExistingSheet!A1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - cell reference inside a formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=ABS(NonExistingSheet!A1)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - cell reference inside a numeric aggregation formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(NonExistingSheet!A1, 0)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - cell range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(NonExistingSheet!C4:F16)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - cell range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(NonExistingSheet!C4:F16)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(NonExistingSheet!1:2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - row range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(NonExistingSheet!1:2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(NonExistingSheet!A:B)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when referencing non-existing sheet - column range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(NonExistingSheet!A:B)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range starts with non-existing sheet - cell range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(NonExistingSheet!A1:Sheet1!B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range starts with non-existing sheet - cell range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(NonExistingSheet!A1:Sheet1!B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range ends with non-existing sheet - cell range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(Sheet1!A1:NonExistingSheet!B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range ends with non-existing sheet - cell range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(Sheet1!A1:NonExistingSheet!B2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range starts with non-existing sheet - row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(NonExistingSheet!1:Sheet1!2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range starts with non-existing sheet - row range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(NonExistingSheet!1:Sheet1!2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range ends with non-existing sheet - row range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(Sheet1!1:NonExistingSheet!2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range ends with non-existing sheet - row range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(Sheet1!1:NonExistingSheet!2)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range starts with non-existing sheet - column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(NonExistingSheet!A:Sheet1!B)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range starts with non-existing sheet - column range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(NonExistingSheet!A:Sheet1!B)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range ends with non-existing sheet - column range', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=MEDIAN(Sheet1!A:NonExistingSheet!B)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
+
+  it('should return #REF when range ends with non-existing sheet - column range - numeric aggregation function', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(Sheet1!A:NonExistingSheet!B)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF))
+  })
 })

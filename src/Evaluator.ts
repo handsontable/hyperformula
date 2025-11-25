@@ -74,6 +74,9 @@ export class Evaluator {
     return ret
   }
 
+  /**
+   * Recalculates the value of a single vertex assuming its dependencies have already been recalculated
+   */
   private recomputeVertex(vertex: Vertex, changes: ContentChanges): boolean {
     if (vertex instanceof FormulaVertex) {
       const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
@@ -93,6 +96,9 @@ export class Evaluator {
     }
   }
 
+  /**
+   * Processes a vertex that is part of a cycle in dependency graph
+   */
   private processVertexOnCycle(vertex: Vertex, changes: ContentChanges): void {
     if (vertex instanceof RangeVertex) {
       vertex.clearCache()
