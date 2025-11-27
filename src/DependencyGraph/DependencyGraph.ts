@@ -285,6 +285,12 @@ export class DependencyGraph {
     }
   }
 
+  public addSheet(sheetId: number) {
+    for (const [_, vertex] of this.addressMapping.sheetEntries(sheetId)) {
+      this.graph.markNodeAsDirty(vertex)
+    }
+  }
+
   public removeSheet(removedSheetId: number) {
     this.clearSheet(removedSheetId)
 

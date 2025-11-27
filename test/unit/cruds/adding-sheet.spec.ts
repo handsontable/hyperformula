@@ -107,7 +107,26 @@ describe('add sheet to engine', () => {
     }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 
-  it('recalculates the cells referencing the new sheet (#1116)', () => {
+  it('recalculates the cells referencing the new sheet without quotes (#1116)', () => {
+    const  engine = HyperFormula.buildEmpty()
+    const table1Name = 'table1'
+    const table2Name = 'table2'
+
+    engine.addSheet(table1Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `=${table2Name}!A1`)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(table2Name)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBeNull()
+
+    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
+  })
+
+  it('recalculates the cells referencing the new sheet with quotes (#1116)', () => {
     const  engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
     const table2Name = 'table2'
@@ -164,13 +183,13 @@ describe('add sheet to engine', () => {
 
     engine.addSheet(sheet3Name)
 
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBeNull()
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBeNull()
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBe(0)
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(2)
 
     engine.setCellContents(adr('A1', engine.getSheetId(sheet3Name)), 42)
 
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(86)
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBe(84)
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(86)
   })
 
   it('recalculates nested dependencies within same sheet referencing new sheet (#1116)', () => {
@@ -252,7 +271,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet(sheet1Name)
     engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), `=SUM('${dataSheetName}'!A1:B5)`)
-    engine.setCellContents(adr('A2', engine.getSheetId(sheet1Name)), `=COUNT('${dataSheetName}'!A1:B5)`)
+    engine.setCellContents(adr('A2', engine.getSheetId(sheet1Name)), `=MEDIAN('${dataSheetName}'!A1:B5)`)
 
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
@@ -271,7 +290,7 @@ describe('add sheet to engine', () => {
     engine.setCellContents(adr('B5', dataSheetId), 10)
 
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(55)
-    expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(10)
+    expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(5.5)
   })
 
   it('recalculates named expressions referencing new sheet (#1116)', () => {
@@ -280,7 +299,7 @@ describe('add sheet to engine', () => {
     const newSheetName = 'NewSheet'
 
     engine.addSheet(sheet1Name)
-    engine.addNamedExpression('MyValue', `='${newSheetName}'!A1`)
+    engine.addNamedExpression('MyValue', `='${newSheetName}'!$A$1`)
     engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), '=MyValue')
     engine.setCellContents(adr('A2', engine.getSheetId(sheet1Name)), '=MyValue*2')
 
@@ -350,7 +369,11 @@ describe('add sheet to engine', () => {
 // IMPLEMENTATION PLAN:
 // - [x] during parseing dont create ERROR vertex - instead add a placeholder shett to sheetMapping and addressMapping
 // - [x] handle this non-error vertec when reading cell (similar to not-added named expressions?)
-// - [ ] handle addSheet, removeSheet, renameSheet
+// - [x] unit tests: addSheet + ranges, with and without quotes
+// - [x] handle addSheet
+// - [ ] unit tests: removeSheet + ranges, with and without quotes
+// - [ ] handle removeSheet
+// - [ ] unit tests: renameSheet + ranges, with and without quotes
+// - [ ] handle renameSheet
+// - [ ] unit tests: undo-redo
 // - [ ] handle undo-redo
-
-//TODO: testy: ranges, rename sheet, remove sheet, sheet name in quotes

@@ -249,6 +249,7 @@ export class Operations {
     const sheetId = this.sheetMapping.addSheet(name)
     const sheet: Sheet = []
     this.dependencyGraph.addressMapping.addSheetAndSetStrategyBasedOnBounderies(sheetId, findBoundaries(sheet), { throwIfSheetNotExists: false })
+    this.dependencyGraph.addSheet(sheetId)
     return this.sheetMapping.getSheetNameOrThrowError(sheetId)
   }
 
