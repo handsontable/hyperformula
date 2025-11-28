@@ -44,6 +44,7 @@ import {
 import { EmptyValue, getRawValue } from './interpreter/InterpreterValue'
 import { LazilyTransformingAstService } from './LazilyTransformingAstService'
 import { ColumnSearchStrategy } from './Lookup/SearchStrategy'
+import { Maybe } from './Maybe'
 import {
   doesContainRelativeReferences,
   InternalNamedExpression,
@@ -217,22 +218,14 @@ export class Operations {
     return columnsRemovals
   }
 
-  public removeSheet(sheetId: number) {
+  public removeSheet(sheetId: number): { version: number, scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][] } {
     this.dependencyGraph.removeSheet(sheetId)
-
-    let version = 0
-    this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-      const transformation = new RemoveSheetTransformer(sheetId)
-      transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-      version = this.lazilyTransformingAstService.addTransformation(transformation)
-    })
-
     this.sheetMapping.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
     const scopedNamedExpressions = this.namedExpressions.getAllNamedExpressionsForScope(sheetId).map(
       (namedExpression) => this.removeNamedExpression(namedExpression.normalizeExpressionName(), sheetId)
     )
-    return { version: version, scopedNamedExpressions }
+    return { version: 0, scopedNamedExpressions }
   }
 
   public removeSheetByName(sheetName: string) {
@@ -245,15 +238,13 @@ export class Operations {
     this.columnSearch.removeSheet(sheetId)
   }
 
-  public addSheet(name?: string) {
+  public addSheet(name?: string): string {
     const sheetId = this.sheetMapping.addSheet(name)
-    const sheet: Sheet = []
-    this.dependencyGraph.addressMapping.addSheetAndSetStrategyBasedOnBounderies(sheetId, findBoundaries(sheet), { throwIfSheetNotExists: false })
     this.dependencyGraph.addSheet(sheetId)
     return this.sheetMapping.getSheetNameOrThrowError(sheetId)
   }
 
-  public renameSheet(sheetId: number, newName: string) {
+  public renameSheet(sheetId: number, newName: string): Maybe<string> {
     return this.sheetMapping.renameSheet(sheetId, newName)
   }
 

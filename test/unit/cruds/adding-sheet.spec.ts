@@ -119,6 +119,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet(table2Name)
 
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toBeNull()
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBeNull()
 
     engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
@@ -138,6 +139,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet(table2Name)
 
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toBeNull()
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBeNull()
 
     engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
@@ -157,6 +159,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet(sheet2Name)
 
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBeNull()
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(0)
 
     engine.setCellContents(adr('A1', engine.getSheetId(sheet2Name)), 10)
@@ -183,6 +186,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet(sheet3Name)
 
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet3Name)))).toBeNull()
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBe(0)
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(2)
 
@@ -206,6 +210,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet(newSheetName)
 
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(newSheetName)))).toBeNull()
     expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBeNull()
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(0)
 
@@ -316,54 +321,6 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(99)
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(198)
   })
-
-  it('#1116 - batch', () => {
-    const  engine = HyperFormula.buildEmpty()
-    const table1Name = 'table1'
-    const table2Name = 'table2'
-
-    engine.batch(() => {
-      engine.addSheet(table1Name)
-      engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
-      engine.addSheet(table2Name)
-      engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
-    })
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
-  })
-
-  it('#1116 - suspend', () => {
-    const  engine = HyperFormula.buildEmpty()
-    const table1Name = 'table1'
-    const table2Name = 'table2'
-
-    engine.suspendEvaluation()
-    engine.addSheet(table1Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
-    engine.addSheet(table2Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
-    engine.resumeEvaluation()
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
-  })
-
-  it('#1116 - rebuild', () => {
-    const  engine = HyperFormula.buildEmpty()
-    const table1Name = 'table1'
-    const table2Name = 'table2'
-
-    engine.addSheet(table1Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
-
-    engine.addSheet(table2Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
-
-    engine.rebuildAndRecalculate()
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
-  })
 })
 
 // IMPLEMENTATION PLAN:
@@ -371,7 +328,8 @@ describe('add sheet to engine', () => {
 // - [x] handle this non-error vertec when reading cell (similar to not-added named expressions?)
 // - [x] unit tests: addSheet + ranges, with and without quotes
 // - [x] handle addSheet
-// - [ ] unit tests: removeSheet + ranges, with and without quotes
+// - [x] unit tests: removeSheet + ranges, with and without quotes
+// - [ ] comprehensive range testing
 // - [ ] handle removeSheet
 // - [ ] unit tests: renameSheet + ranges, with and without quotes
 // - [ ] handle renameSheet

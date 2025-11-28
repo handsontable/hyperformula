@@ -46,6 +46,7 @@ import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
 import {RawAndParsedValue} from './ValueCellVertex'
 import {TopSortResult} from './TopSort'
+import { findBoundaries } from '../Sheet'
 
 export class DependencyGraph {
   public readonly graph: Graph<Vertex>
@@ -286,6 +287,8 @@ export class DependencyGraph {
   }
 
   public addSheet(sheetId: number) {
+    this.addressMapping.addSheetAndSetStrategyBasedOnBounderies(sheetId, findBoundaries([]), { throwIfSheetNotExists: false })
+
     for (const [_, vertex] of this.addressMapping.sheetEntries(sheetId)) {
       this.graph.markNodeAsDirty(vertex)
     }

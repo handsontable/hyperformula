@@ -195,7 +195,7 @@ export class SheetMapping {
       --this.lastSheetId
     }
     this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
-    this.allSheets.delete(sheet.id)
+    this.allSheets.set(sheet.id, new Sheet(sheet.id, sheet.displayName, false))
   }
 
   /**
@@ -255,7 +255,7 @@ export class SheetMapping {
       return undefined
     }
 
-    return options.includeNotAdded || retrievedSheet.isAdded ? retrievedSheet : undefined
+    return (options.includeNotAdded || retrievedSheet.isAdded) ? retrievedSheet : undefined
   }
 
   /**

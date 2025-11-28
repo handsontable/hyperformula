@@ -1168,7 +1168,7 @@ describe('Named expressions - evaluation', () => {
       expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
     })
 
-    it('named expressions are transformed during CRUDs', () => {
+    it('named expression returns REF error after removing referenced sheet', () => {
       const engine = HyperFormula.buildFromArray([
         ['=42']
       ])
@@ -1176,7 +1176,8 @@ describe('Named expressions - evaluation', () => {
 
       engine.removeSheet(0)
 
-      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
+      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=Sheet1!$A$1 + 10')
+      expect(engine.getNamedExpressionValue('FOO')).toEqualError(detailedError(ErrorType.REF))
     })
 
     it('local named expression shadows global one', () => {
@@ -1330,7 +1331,8 @@ describe('Named expressions - evaluation', () => {
 
       engine.removeSheet(0)
 
-      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
+      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=Sheet1!$A$1 + 10')
+      expect(engine.getNamedExpressionValue('FOO')).toEqualError(detailedError(ErrorType.REF))
     })
 
     it('local named expression shadows global one', () => {
