@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {ErrorType, HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
 import {plPL} from '../../../src/i18n/languages'
 import {adr, detailedError} from '../testUtils'
@@ -106,8 +107,10 @@ describe('add sheet to engine', () => {
       engine.addSheet('bar')
     }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
+})
 
-  it('recalculates the cells referencing the new sheet without quotes (#1116)', () => {
+describe('recalculates formulas after adding new sheet (issue #1116)', () => {
+  it('recalculates single cell reference without quotes', () => {
     const  engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
     const table2Name = 'table2'
@@ -127,7 +130,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
   })
 
-  it('recalculates the cells referencing the new sheet with quotes (#1116)', () => {
+  it('recalculates single cell reference with quotes', () => {
     const  engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
     const table2Name = 'table2'
@@ -147,7 +150,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
   })
 
-  it('recalculates formulas with range references and aggregate functions (#1116)', () => {
+  it('recalculates an aggregate function with range reference', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const sheet2Name = 'Sheet2'
@@ -170,7 +173,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(100)
   })
 
-  it('recalculates chained dependencies across multiple sheets (#1116)', () => {
+  it('recalculates chained dependencies across multiple sheets', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const sheet2Name = 'Sheet2'
@@ -196,7 +199,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(86)
   })
 
-  it('recalculates nested dependencies within same sheet referencing new sheet (#1116)', () => {
+  it('recalculates nested dependencies within same sheet', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const newSheetName = 'NewSheet'
@@ -220,7 +223,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(30)
   })
 
-  it('recalculates multiple cells from different sheets referencing new sheet (#1116)', () => {
+  it('recalculates multiple cells from different sheets', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const sheet2Name = 'Sheet2'
@@ -248,7 +251,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet2Name)))).toBe(27)
   })
 
-  it('recalculates formulas with mixed operations combining new sheet references (#1116)', () => {
+  it('recalculates formulas with mixed operations', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const newSheetName = 'NewSheet'
@@ -269,7 +272,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(50)
   })
 
-  it('recalculates formulas with multi-cell ranges from new sheet (#1116)', () => {
+  it('recalculates formulas with range references', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const dataSheetName = 'DataSheet'
@@ -298,7 +301,7 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(5.5)
   })
 
-  it('recalculates named expressions referencing new sheet (#1116)', () => {
+  it('recalculates named expressions', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const newSheetName = 'NewSheet'
@@ -321,6 +324,260 @@ describe('add sheet to engine', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(99)
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(198)
   })
+
+  describe('complex range scenarios', () => {
+    it('function using `runFunction` (with array arithmetic off)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [['=MEDIAN(NewSheet!A1:A1)', '=MEDIAN(NewSheet!A1:A2)', '=MEDIAN(NewSheet!A1:A3)', '=MEDIAN(NewSheet!A1:A4)']]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: false})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(2)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(2.5)
+    })
+
+    it('function using `runFunction` (with array arithmetic on)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [['=MEDIAN(NewSheet!A1:A1)', '=MEDIAN(NewSheet!A1:A2)', '=MEDIAN(NewSheet!A1:A3)', '=MEDIAN(NewSheet!A1:A4)']]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: true})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(2)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(2.5)
+    })
+
+    it('function not using `runFunction` (with array arithmetic off)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [['=SUM(NewSheet!A1:A1)', '=SUM(NewSheet!A1:A2)', '=SUM(NewSheet!A1:A3)', '=SUM(NewSheet!A1:A4)']]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: false})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(3)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(6)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(10)
+    })
+
+    it('function not using `runFunction` (with array arithmetic on)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [['=SUM(NewSheet!A1:A1)', '=SUM(NewSheet!A1:A2)', '=SUM(NewSheet!A1:A3)', '=SUM(NewSheet!A1:A4)']]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: true})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(3)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(6)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(10)
+    })
+
+    it('function using `runFunction` referencing range indirectly (with array arithmetic off)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [
+        ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
+        [`='${sheet2Name}'!A1:A1`, `='${sheet2Name}'!A1:B2`, `='${sheet2Name}'!A1:A3`, `='${sheet2Name}'!A1:A4`],
+    ]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: false})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(2)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(2.5)
+    })
+
+    it('function using `runFunction` referencing range indirectly (with array arithmetic on)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [
+        ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
+        [`='${sheet2Name}'!A1:A1`, `='${sheet2Name}'!A1:B2`, `='${sheet2Name}'!A1:A3`, `='${sheet2Name}'!A1:A4`],
+    ]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: true})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(2)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(2.5)
+    })
+
+    it('function not using `runFunction` referencing range indirectly (with array arithmetic off)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [
+        ['=SUM(A2)', '=SUM(B2)', '=SUM(C2)', '=SUM(D2)'],
+        [`='${sheet2Name}'!A1:A1`, `='${sheet2Name}'!A1:B2`, `='${sheet2Name}'!A1:A3`, `='${sheet2Name}'!A1:A4`],
+    ]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: false})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(3)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(6)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(10)
+    })
+
+    it('function not using `runFunction` referencing range indirectly (with array arithmetic on)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [
+        ['=SUM(A2)', '=SUM(B2)', '=SUM(C2)', '=SUM(D2)'],
+        [`='${sheet2Name}'!A1:A1`, `='${sheet2Name}'!A1:B2`, `='${sheet2Name}'!A1:A3`, `='${sheet2Name}'!A1:A4`],
+    ]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: true})
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(1)
+      expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(3)
+      expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(6)
+      expect(engine.getCellValue(adr('D1', engine.getSheetId(sheet1Name)))).toBe(10)
+    })
+
+    it('function calling a named expression (with array arithmetic off)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [[`='${sheet2Name}'!A1:A4`]]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: false}, [
+        { name: 'ExprA', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$1)` },
+        { name: 'ExprB', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$2)` },
+        { name: 'ExprC', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$3)` },
+        { name: 'ExprD', expression: `=MEDIAN(${sheet1Name}!$A$1)` }
+      ])
+
+      expect(engine.getNamedExpressionValue('ExprA')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprB')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprC')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprD')).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getNamedExpressionValue('ExprA')).toBe(1)
+      expect(engine.getNamedExpressionValue('ExprB')).toBe(1.5)
+      expect(engine.getNamedExpressionValue('ExprC')).toBe(2)
+      expect(engine.getNamedExpressionValue('ExprD')).toBe(2.5)
+    })
+
+    it('function calling a named expression (with array arithmetic on)', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [[`='${sheet2Name}'!A1:A4`]]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+      }, {useArrayArithmetic: true}, [
+        { name: 'ExprA', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$1)` },
+        { name: 'ExprB', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$2)` },
+        { name: 'ExprC', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$3)` },
+        { name: 'ExprD', expression: `=MEDIAN(${sheet1Name}!$A$1)` }
+      ])
+
+      expect(engine.getNamedExpressionValue('ExprA')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprB')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprC')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprD')).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet(sheet2Name)
+      engine.setSheetContent(engine.getSheetId(sheet2Name)!, sheet2Data)
+
+      expect(engine.getNamedExpressionValue('ExprA')).toBe(1)
+      expect(engine.getNamedExpressionValue('ExprB')).toBe(1.5)
+      expect(engine.getNamedExpressionValue('ExprC')).toBe(2)
+      expect(engine.getNamedExpressionValue('ExprD')).toBe(2.5)
+    })
+  })
 })
 
 // IMPLEMENTATION PLAN:
@@ -328,10 +585,10 @@ describe('add sheet to engine', () => {
 // - [x] handle this non-error vertec when reading cell (similar to not-added named expressions?)
 // - [x] unit tests: addSheet + ranges, with and without quotes
 // - [x] handle addSheet
-// - [x] unit tests: removeSheet + ranges, with and without quotes
-// - [ ] comprehensive range testing
+// - [x] comprehensive range testing
+// - [ ] unit tests: removeSheet + ranges
 // - [ ] handle removeSheet
-// - [ ] unit tests: renameSheet + ranges, with and without quotes
+// - [ ] unit tests: renameSheet + ranges
 // - [ ] handle renameSheet
 // - [ ] unit tests: undo-redo
 // - [ ] handle undo-redo
