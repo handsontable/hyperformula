@@ -201,7 +201,8 @@ describe('remove sheet - adjust formula dependencies', () => {
     const reference = extractReference(engine, adr('B1'))
 
     expect(reference).toEqual(CellAddress.relative(-1, 0))
-    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([['1', '=A1']]))
+    expect(engine.getAllSheetsSerialized()).toEqual({Sheet1: [['1', '=A1']]})
+    expect(engine.getAllSheetsValues()).toEqual({Sheet1: [[1, 1]]})
   })
 
   it('should be #REF after removing sheet', () => {
@@ -284,7 +285,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toEqualError(detailedError(ErrorType.REF))
   })
 
-  it.only('returns REF error for formulas with range references and aggregate functions (#1116)', () => {
+  it('returns REF error for formulas with range references and aggregate functions (#1116)', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const sheet2Name = 'Sheet2'
@@ -474,6 +475,7 @@ describe('remove sheet - adjust formula dependencies', () => {
     const newSheet2Id = engine.getSheetId(sheet2Name)!
     engine.setCellContents(adr('A1', newSheet2Id), 100)
 
+    expect(newSheet2Id).toBe(oldSheet2Id)
     expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(100)
     expect(engine.getCellValue(adr('A1', newSheet2Id))).toBe(100)
   })

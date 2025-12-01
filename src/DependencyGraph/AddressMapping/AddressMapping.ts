@@ -247,14 +247,6 @@ export class AddressMapping {
   }
 
   /**
-   * Removes a sheet from the address mapping.
-   * @param {number} sheetId - The sheet identifier to remove
-   */
-  public removeSheet(sheetId: number) {
-    this.mapping.delete(sheetId)
-  }
-
-  /**
    * Adds columns to a sheet starting at the specified column index.
    * @param {number} sheet - The sheet identifier
    * @param {number} column - The column index where columns should be added

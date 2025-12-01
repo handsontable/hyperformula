@@ -190,12 +190,7 @@ export class SheetMapping {
    */
   public removeSheet(sheetId: number): void {
     const sheet = this._getSheetOrThrowError(sheetId, {})
-
-    if (sheetId == this.lastSheetId) {
-      --this.lastSheetId
-    }
-    this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
-    this.allSheets.set(sheet.id, new Sheet(sheet.id, sheet.displayName, false))
+    sheet.isAdded = false
   }
 
   /**

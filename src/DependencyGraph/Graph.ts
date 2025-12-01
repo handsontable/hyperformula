@@ -204,6 +204,25 @@ export class Graph<Node> {
     return dependencies
   }
 
+  public softRemoveNode(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
+    const id = this.getNodeId(node)
+
+    if (id === undefined) {
+      throw this.missingNodeError(node)
+    }
+
+    if (this.edgesSparseArray[id].length > 0) {
+      this.edgesSparseArray[id].forEach(adjacentId => this.dirtyAndVolatileNodeIds.rawValue.dirty.push(adjacentId))
+      this.dirtyAndVolatileNodeIds.markAsModified()
+    }
+
+    const dependencies = this.removeDependencies(node)
+
+    this.infiniteRangeIds.delete(id)
+
+    return dependencies
+  }
+
   /**
    * Removes edge between nodes.
    */

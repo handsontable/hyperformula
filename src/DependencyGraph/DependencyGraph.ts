@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {ArraySize} from '../ArraySize'
 import {CellError, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from '../Cell'
@@ -301,19 +301,18 @@ export class DependencyGraph {
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsDirty(adjacentNode)
       }
-      this.removeVertex(vertex)
-      this.addressMapping.removeCell(adr)
+
+      const wasRemoved = this.softRemoveVertex(vertex)
+      if (wasRemoved) {
+        this.addressMapping.removeCell(adr)
+      }
     }
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
       const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
       for (const range of rangesToRemove) {
-        this.removeVertex(range)
+        this.softRemoveVertex(range)
       }
-
-      this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
-        this.addressMapping.removeSheet(removedSheetId)
-      })
     })
   }
 
@@ -1121,6 +1120,52 @@ export class DependencyGraph {
     if (vertex instanceof RangeVertex) {
       this.rangeMapping.removeRange(vertex)
     }
+  }
+
+  private softRemoveVertex(inputVertex: Vertex): boolean {
+    const dependents = this.getAdjacentNodesAddresses(inputVertex)
+
+    const hasDependentInExistingSheet = dependents.some(addr => {
+      if (isSimpleCellAddress(addr)) {
+        return this.sheetMapping.hasSheetWithId(addr.sheet, { includeNotAdded: false })
+      }
+
+      if (isSimpleCellRange(addr)) {
+        return this.sheetMapping.hasSheetWithId(addr.start.sheet, { includeNotAdded: false }) || this.sheetMapping.hasSheetWithId(addr.end.sheet, { includeNotAdded: false })
+      }
+
+      return false
+    })
+
+    let dependencies: Set<[SimpleCellAddress | SimpleCellRange, Vertex]>
+
+    if (hasDependentInExistingSheet) {
+      dependencies = new Set(this.graph.softRemoveNode(inputVertex))
+    } else {
+      dependencies = new Set(this.graph.removeNode(inputVertex))
+    }
+
+    while (dependencies.size > 0) {
+      const dependency = dependencies.values().next().value
+      dependencies.delete(dependency)
+      const [address, vertex] = dependency
+      if (this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
+        if (vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
+          this.graph.removeNode(vertex).forEach((candidate) => dependencies.add(candidate))
+        }
+        if (vertex instanceof RangeVertex) {
+          this.rangeMapping.removeRange(vertex)
+        } else if (vertex instanceof EmptyCellVertex) {
+          this.addressMapping.removeCell(address)
+        }
+      }
+    }
+
+    if (inputVertex instanceof RangeVertex) {
+      this.rangeMapping.removeRange(inputVertex)
+    }
+
+    return !hasDependentInExistingSheet
   }
 
   private mergeRangeVertices(existingVertex: RangeVertex, newVertex: RangeVertex) {
