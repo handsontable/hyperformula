@@ -6,6 +6,7 @@ import {
   NamedExpressionDoesNotExistError,
 } from '../../src'
 import {Events} from '../../src/Emitter'
+import { ErrorMessage } from '../../src/error-message'
 
 import {adr, detailedErrorWithOrigin} from './testUtils'
 
@@ -32,7 +33,7 @@ describe('Events', () => {
     engine.removeSheet(1)
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1', ErrorMessage.SheetRef))])
   })
 
   it('sheetRemoved name contains actual display name', function() {
@@ -46,7 +47,7 @@ describe('Events', () => {
     engine.removeSheet(1)
 
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1'))])
+    expect(handler).toHaveBeenCalledWith('Sheet2', [new ExportedCellChange(adr('A1'), detailedErrorWithOrigin(ErrorType.REF, 'Sheet1!A1', ErrorMessage.SheetRef))])
   })
 
   it('sheetRenamed works', () => {

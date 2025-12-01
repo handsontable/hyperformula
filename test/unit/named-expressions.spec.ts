@@ -1324,7 +1324,7 @@ describe('Named expressions - evaluation', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(52)
     })
 
-    it('named expressions are transformed during CRUDs', () => {
+    it('named expression returns REF error after removing referenced sheet', () => {
       const engine = HyperFormula.buildFromArray([
         ['=42']
       ], {}, [{ name: 'FOO', expression: '=Sheet1!$A$1 + 10' }])
