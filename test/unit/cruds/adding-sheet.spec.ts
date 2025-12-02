@@ -333,7 +333,7 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
       const sheet2Data = [[1], [2], [3], [4]]
       const engine = HyperFormula.buildFromSheets({
         [sheet1Name]: sheet1Data,
-      }, {useArrayArithmetic: false})
+      })
 
       expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
@@ -586,9 +586,9 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
 // - [x] unit tests: addSheet + ranges, with and without quotes
 // - [x] handle addSheet
 // - [x] comprehensive range testing
-// - [ ] unit tests: removeSheet + ranges
-// - [ ] handle removeSheet
-// - [ ] unit tests: renameSheet + ranges
+// - [x] unit tests: removeSheet + ranges
+// - [x] handle removeSheet
+// - [x] unit tests: renameSheet + ranges
 // - [ ] handle renameSheet
 // - [ ] refactor
 // - [ ] unit tests: undo-redo

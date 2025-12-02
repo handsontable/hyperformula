@@ -457,6 +457,9 @@ describe('remove sheet - issue #1116', () => {
 
     engine.addSheet(sheet2Name)
     const oldSheet2Id = engine.getSheetId(sheet2Name)!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toBeNull()
+
     engine.setCellContents(adr('A1', oldSheet2Id), 42)
 
     expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(42)
@@ -500,6 +503,148 @@ describe('remove sheet - issue #1116', () => {
     expect(newSheet2Id).toBe(oldSheet2Id)
     expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(45)
     expect(engine.getCellValue(adr('A1', newSheet2Id))).toBe(45)
+  })
+
+  describe('complex range scenarios', () => {
+    it('function using `runFunction`', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [['=MEDIAN(NewSheet!A1:A1)', '=MEDIAN(NewSheet!A1:A2)', '=MEDIAN(NewSheet!A1:A3)', '=MEDIAN(NewSheet!A1:A4)']]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+        [sheet2Name]: sheet2Data,
+      })
+
+      const sheet1Id = engine.getSheetId(sheet1Name)!
+      const sheet2Id = engine.getSheetId(sheet2Name)!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(2)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(2.5)
+
+      engine.removeSheet(sheet2Id)
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+    })
+
+    it('function not using `runFunction`', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [['=SUM(NewSheet!A1:A1)', '=SUM(NewSheet!A1:A2)', '=SUM(NewSheet!A1:A3)', '=SUM(NewSheet!A1:A4)']]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+        [sheet2Name]: sheet2Data,
+      })
+
+      const sheet1Id = engine.getSheetId(sheet1Name)!
+      const sheet2Id = engine.getSheetId(sheet2Name)!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(3)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(6)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(10)
+
+      engine.removeSheet(sheet2Id)
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+    })
+
+    it('function using `runFunction` referencing range indirectly', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [
+        ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
+        [`='${sheet2Name}'!A1:A1`, `='${sheet2Name}'!A1:B2`, `='${sheet2Name}'!A1:A3`, `='${sheet2Name}'!A1:A4`],
+      ]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+        [sheet2Name]: sheet2Data,
+      })
+
+      const sheet1Id = engine.getSheetId(sheet1Name)!
+      const sheet2Id = engine.getSheetId(sheet2Name)!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(2)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(2.5)
+
+      engine.removeSheet(sheet2Id)
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+    })
+
+    it('function not using `runFunction` referencing range indirectly', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [
+        ['=SUM(A2)', '=SUM(B2)', '=SUM(C2)', '=SUM(D2)'],
+        [`='${sheet2Name}'!A1:A1`, `='${sheet2Name}'!A1:B2`, `='${sheet2Name}'!A1:A3`, `='${sheet2Name}'!A1:A4`],
+      ]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+        [sheet2Name]: sheet2Data,
+      })
+
+      const sheet1Id = engine.getSheetId(sheet1Name)!
+      const sheet2Id = engine.getSheetId(sheet2Name)!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(3)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(6)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(10)
+
+      engine.removeSheet(sheet2Id)
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+    })
+
+    it('function calling a named expression', () => {
+      const sheet1Name = 'FirstSheet'
+      const sheet2Name = 'NewSheet'
+      const sheet1Data = [[`='${sheet2Name}'!A1:A4`]]
+      const sheet2Data = [[1], [2], [3], [4]]
+      const engine = HyperFormula.buildFromSheets({
+        [sheet1Name]: sheet1Data,
+        [sheet2Name]: sheet2Data,
+      }, {}, [
+        { name: 'ExprA', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$1)` },
+        { name: 'ExprB', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$2)` },
+        { name: 'ExprC', expression: `=MEDIAN(${sheet2Name}!$A$1:$A$3)` },
+        { name: 'ExprD', expression: `=MEDIAN(${sheet1Name}!$A$1)` }
+      ])
+
+      const sheet2Id = engine.getSheetId(sheet2Name)!
+
+      expect(engine.getNamedExpressionValue('ExprA')).toBe(1)
+      expect(engine.getNamedExpressionValue('ExprB')).toBe(1.5)
+      expect(engine.getNamedExpressionValue('ExprC')).toBe(2)
+      expect(engine.getNamedExpressionValue('ExprD')).toBe(2.5)
+
+      engine.removeSheet(sheet2Id)
+
+      expect(engine.getNamedExpressionValue('ExprA')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprB')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprC')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprD')).toEqualError(detailedError(ErrorType.REF))
+    })
   })
 })
 
