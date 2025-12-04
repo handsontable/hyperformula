@@ -263,7 +263,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference) as ExtendedToken
     const address = this.ACTION(() => {
-      return cellAddressFromString(cell.image, this.formulaAddress, this.resolveSheetReference)
+      return cellAddressFromString(cell.image, this.formulaAddress, this. )
     })
 
     if (address === undefined) {
@@ -867,10 +867,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     } else {
       return RangeSheetReferenceType.BOTH_ABSOLUTE
     }
-  }
-
-  private getSheetIdIncludingNotAdded(sheetName: string): Maybe<number> {
-    return this.sheetMapping.getSheetId(sheetName, {includeNotAdded: true})
   }
 }
 

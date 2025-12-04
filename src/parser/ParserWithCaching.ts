@@ -369,8 +369,4 @@ export class ParserWithCaching {
   public tokenizeFormula(text: string): ILexingResult {
     return this.lexer.tokenizeFormula(text)
   }
-
-  private getSheetIdIncludingNotAdded(sheetName: string): Maybe<number> {
-    return this.sheetMapping.getSheetId(sheetName, {includeNotAdded: true})
-  }
 }
