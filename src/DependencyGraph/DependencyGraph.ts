@@ -44,6 +44,7 @@ import {FormulaVertex} from './FormulaCellVertex'
 import {DependencyQuery, Graph} from './Graph'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
+import {SheetReferenceRegistrar} from './SheetReferenceRegistrar'
 import {RawAndParsedValue} from './ValueCellVertex'
 import {TopSortResult} from './TopSort'
 import { findBoundaries } from '../Sheet'
@@ -51,6 +52,7 @@ import { findBoundaries } from '../Sheet'
 export class DependencyGraph {
   public readonly graph: Graph<Vertex>
   private changes: ContentChanges = ContentChanges.empty()
+  public readonly sheetReferenceRegistrar: SheetReferenceRegistrar
 
   constructor(
     public readonly addressMapping: AddressMapping,
@@ -63,6 +65,7 @@ export class DependencyGraph {
     public readonly namedExpressions: NamedExpressions,
   ) {
     this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
+    this.sheetReferenceRegistrar = new SheetReferenceRegistrar(sheetMapping, addressMapping)
   }
 
   /**

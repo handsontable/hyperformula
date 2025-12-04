@@ -11,6 +11,7 @@ import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
+  SheetReferenceResolver,
 } from './addressRepresentationConverters'
 import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
@@ -30,7 +31,6 @@ import {ColumnAddress} from './ColumnAddress'
 import {RowAddress} from './RowAddress'
 import { SheetMapping } from '../DependencyGraph/SheetMapping'
 import { Maybe } from '../Maybe'
-import { AddressMapping } from '../DependencyGraph'
 
 export interface ParsingResult {
   ast: Ast,
@@ -55,11 +55,11 @@ export class ParserWithCaching {
     private readonly config: ParserConfig,
     private readonly functionRegistry: FunctionRegistry,
     private readonly sheetMapping: SheetMapping,
-    private readonly addressMapping: AddressMapping,
+    private readonly sheetReferenceResolver: SheetReferenceResolver,
   ) {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
-    this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping, this.addressMapping)
+    this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping, this.sheetReferenceResolver)
     this.cache = new Cache(this.functionRegistry)
   }
 
@@ -235,7 +235,7 @@ export class ParserWithCaching {
     while (idx < tokens.length) {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
-        const cellAddress = cellAddressFromString(token.image, baseAddress, this.sheetMapping, this.addressMapping)
+        const cellAddress = cellAddressFromString(token.image, baseAddress, this.sheetReferenceResolver)
         if (cellAddress === undefined) {
           hash = hash.concat(token.image)
         } else {

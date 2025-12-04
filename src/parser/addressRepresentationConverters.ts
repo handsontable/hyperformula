@@ -5,7 +5,6 @@
 
 import {simpleCellRange, SimpleCellRange} from '../AbsoluteCellRange'
 import {simpleCellAddress, SimpleCellAddress} from '../Cell'
-import { AddressMapping, SheetMapping } from '../DependencyGraph'
 import {Maybe} from '../Maybe'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
@@ -14,6 +13,7 @@ import {RowAddress} from './RowAddress'
 
 export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
+export type SheetReferenceResolver = (sheetName: string) => Maybe<number>
 
 const addressRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
 const columnRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)$`)
@@ -28,7 +28,7 @@ const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
  * @param baseAddress - base address for R0C0 conversion
  * @returns object representation of address
  */
-export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, sheetMapping: SheetMapping, addressMapping: AddressMapping): CellAddress => {
+export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, resolveSheetReference: SheetReferenceResolver): CellAddress => {
   const result = addressRegex.exec(stringAddress)!
   const col = columnLabelToIndex(result[6])
   const row = Number(result[8]) - 1
@@ -37,8 +37,11 @@ export const cellAddressFromString = (stringAddress: string, baseAddress: Simple
 
   // TODO: refactor getter/converter should not do actions like reserve/add
   if (sheetName) {
-    sheet = sheetMapping.reserveSheetName(sheetName)
-    addressMapping.addSheetStrategyPlaceholderIfNotExists(sheet)
+    sheet = resolveSheetReference(sheetName)
+
+    if (sheet === undefined) {
+      throw new Error(`Cannot resolve sheet reference "${sheetName}"`)
+    }
   } else {
     sheet = undefined
   }

@@ -590,6 +590,6 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
 // - [x] handle removeSheet
 // - [x] unit tests: renameSheet + ranges
 // - [ ] handle renameSheet
-// - [ ] refactor
+// - [ ] refactor, self-review
 // - [ ] unit tests: undo-redo
 // - [ ] handle undo-redo

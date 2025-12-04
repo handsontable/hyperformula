@@ -91,7 +91,12 @@ export class BuildEngineFactory {
       }
     }
 
-    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping, addressMapping)
+    const parser = new ParserWithCaching(
+      config,
+      functionRegistry,
+      sheetMapping,
+      dependencyGraph.sheetReferenceRegistrar.ensureSheetRegistered.bind(dependencyGraph.sheetReferenceRegistrar)
+    )
     lazilyTransformingAstService.parser = parser
     const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping, namedExpressions)
     const dateTimeHelper = new DateTimeHelper(config)

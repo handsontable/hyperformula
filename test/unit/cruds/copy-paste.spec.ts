@@ -447,11 +447,15 @@ describe('Copy - paste integration - actions at the Operations layer', () => {
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping
-    const addressMapping = dependencyGraph.addressMapping
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
-    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping, addressMapping)
+    const parser = new ParserWithCaching(
+      config,
+      functionRegistry,
+      sheetMapping,
+      dependencyGraph.sheetReferenceRegistrar.ensureSheetRegistered.bind(dependencyGraph.sheetReferenceRegistrar)
+    )
     const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
     operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
   })
