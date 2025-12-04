@@ -203,17 +203,25 @@ export class SheetMapping {
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
    * @returns {Maybe<string>} the old name, or undefined if the name was not changed.
    */
-  public renameSheet(sheetId: number, newDisplayName: string): Maybe<string> {
+  public renameSheet(sheetId: number, newDisplayName: string): { previousDisplayName: Maybe<string>, mergedSheetWith?: number } {
     const sheet = this._getSheetOrThrowError(sheetId, {})
 
     const currentDisplayName = sheet.displayName
     if (currentDisplayName === newDisplayName) {
-      return undefined
+      return { previousDisplayName: undefined }
     }
 
+    let mergedSheetWith: number | undefined = undefined
     const sheetWithConflictingName = this._getSheetByName(newDisplayName, { includeNotAdded: true })
+
     if (sheetWithConflictingName !== undefined && sheetWithConflictingName.id !== sheet.id) {
-      throw new SheetNameAlreadyTakenError(newDisplayName)
+      if (sheetWithConflictingName.isAdded) {
+        throw new SheetNameAlreadyTakenError(newDisplayName)
+      } else {
+        this.mappingFromCanonicalNameToId.delete(sheetWithConflictingName.canonicalName)
+        this.allSheets.delete(sheetWithConflictingName.id)
+        mergedSheetWith = sheetWithConflictingName.id
+      }
     }
 
     const currentCanonicalName = sheet.canonicalName
@@ -221,7 +229,7 @@ export class SheetMapping {
 
     sheet.displayName = newDisplayName
     this.storeSheetInMappings(sheet)
-    return currentDisplayName
+    return { previousDisplayName: currentDisplayName, mergedSheetWith }
   }
 
   /**

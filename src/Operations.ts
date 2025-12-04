@@ -33,6 +33,7 @@ import { MoveCellsTransformer } from './dependencyTransformers/MoveCellsTransfor
 import { RemoveColumnsTransformer } from './dependencyTransformers/RemoveColumnsTransformer'
 import { RemoveRowsTransformer } from './dependencyTransformers/RemoveRowsTransformer'
 import { RemoveSheetTransformer } from './dependencyTransformers/RemoveSheetTransformer'
+import { RenameSheetTransformer } from './dependencyTransformers/RenameSheetTransformer'
 import {
   InvalidArgumentsError,
   NamedExpressionDoesNotExistError,
@@ -245,7 +246,18 @@ export class Operations {
   }
 
   public renameSheet(sheetId: number, newName: string): Maybe<string> {
-    return this.sheetMapping.renameSheet(sheetId, newName)
+    const { previousDisplayName, mergedSheetWith } = this.sheetMapping.renameSheet(sheetId, newName)
+
+    if (mergedSheetWith !== undefined) {
+      this.dependencyGraph.mergeSheets(sheetId, mergedSheetWith)
+      this.stats.measure(StatType.TRANSFORM_ASTS, () => {
+        const transformation = new RenameSheetTransformer(sheetId, mergedSheetWith)
+        transformation.performEagerTransformations(this.dependencyGraph, this.parser)
+        this.lazilyTransformingAstService.addTransformation(transformation)
+      })
+    }
+
+    return previousDisplayName
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {

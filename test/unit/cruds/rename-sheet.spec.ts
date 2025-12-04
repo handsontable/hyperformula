@@ -275,6 +275,55 @@ describe('rename sheet - issue #1116', () => {
     expect(engine.getCellValue(adr('A2', sheet1Id))).toBe(198)
   })
 
+  it('recalculates column and row ranges', () => {
+    const sheet1Name = 'Sheet1'
+    const oldName = 'OldName'
+    const newName = 'NewName'
+    const engine = HyperFormula.buildFromSheets({
+      [sheet1Name]: [
+        [`=SUM('${newName}'!A:A)`],
+        [`=SUM('${newName}'!1:2)`],
+      ],
+      [oldName]: [
+        [1, 2],
+        [3, 4],
+      ],
+    })
+    const sheet1Id = engine.getSheetId(sheet1Name)!
+    const oldNameId = engine.getSheetId(oldName)!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.renameSheet(oldNameId, newName)
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(4)
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toBe(10)
+  })
+
+  it('keeps existing dependencies and dependents when renaming a sheet', () => {
+    const mainSheetName = 'Sheet1'
+    const secondarySheetName = 'Sheet2'
+    const newNameForSecondarySheet = 'Sheet3'
+    const engine = HyperFormula.buildFromSheets({
+      [mainSheetName]: [['main sheet', `=${secondarySheetName}!A1`, `=${newNameForSecondarySheet}!A1`]],
+      [secondarySheetName]: [['secondary sheet', `=${mainSheetName}!A1`]],
+    })
+    const mainSheetId = engine.getSheetId(mainSheetName)!
+    const secondarySheetId = engine.getSheetId(secondarySheetName)!
+
+    expect(engine.getCellValue(adr('B1', mainSheetId))).toBe('secondary sheet')
+    expect(engine.getCellValue(adr('C1', mainSheetId))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('B1', secondarySheetId))).toBe('main sheet')
+
+    engine.renameSheet(secondarySheetId, newNameForSecondarySheet)
+
+    expect(engine.getSheetId(newNameForSecondarySheet)).toBe(secondarySheetId)
+    expect(engine.getCellValue(adr('B1', mainSheetId))).toBe('secondary sheet')
+    expect(engine.getCellValue(adr('C1', mainSheetId))).toBe('secondary sheet')
+    expect(engine.getCellValue(adr('B1', secondarySheetId))).toBe('main sheet')
+  })
+
   it('removing renamed sheet returns REF error', () => {
     const sheet1Name = 'Sheet1'
     const oldName = 'OldName'

@@ -3532,13 +3532,16 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Sheets
    */
-  public renameSheet(sheetId: number, newName: string): void {
+  public renameSheet(sheetId: number, newName: string): ExportedChange[] {
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(newName, 'string', 'newName')
     const oldName = this._crudOperations.renameSheet(sheetId, newName)
+    const changes = this.recomputeIfDependencyGraphNeedsIt()
     if (oldName !== undefined) {
       this._emitter.emit(Events.SheetRenamed, oldName, newName)
     }
+
+    return changes
   }
 
   /**

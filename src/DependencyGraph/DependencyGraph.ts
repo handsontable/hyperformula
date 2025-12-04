@@ -316,6 +316,20 @@ export class DependencyGraph {
     })
   }
 
+  public mergeSheets(sheetToKeep: number, sheetToDelete: number): void {
+    const sheetToDeleteVertices = this.addressMapping.sheetEntries(sheetToDelete)
+
+    for (const [addressToDelete, vertexToDelete] of sheetToDeleteVertices) {
+      const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
+      const { vertex: vertexToKeep } = this.fetchCellOrCreateEmpty(addressToKeep)
+      this.mergeVertices(vertexToKeep, vertexToDelete)
+      this.graph.markNodeAsDirty(vertexToKeep)
+    }
+
+    this.rangeMapping.moveRangesBetweenSheets(sheetToDelete, sheetToKeep)
+    this.addressMapping.removeSheet(sheetToDelete)
+  }
+
   public clearSheet(sheetId: number) {
     const arrays: Set<ArrayVertex> = new Set()
     for (const [address, vertex] of this.addressMapping.sheetEntries(sheetId)) {
@@ -1021,7 +1035,7 @@ export class DependencyGraph {
       verticesWithChangedSize
     } = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
-      this.mergeRangeVertices(existingVertex, mergedVertex)
+      this.mergeVertices(existingVertex, mergedVertex)
     }
     for (const rangeVertex of verticesToRemove) {
       this.removeVertexAndCleanupDependencies(rangeVertex)
@@ -1168,14 +1182,14 @@ export class DependencyGraph {
     return !hasDependentInExistingSheet
   }
 
-  private mergeRangeVertices(existingVertex: RangeVertex, newVertex: RangeVertex) {
-    const adjNodesStored = this.graph.adjacentNodes(newVertex)
+  private mergeVertices(vertexToKeep: Vertex, vertexToDelete: Vertex) {
+    const adjNodesStored = this.graph.adjacentNodes(vertexToDelete)
 
-    this.removeVertexAndCleanupDependencies(newVertex)
-    this.graph.removeEdgeIfExists(existingVertex, newVertex)
+    this.removeVertexAndCleanupDependencies(vertexToDelete)
+    this.graph.removeEdgeIfExists(vertexToKeep, vertexToDelete)
     adjNodesStored.forEach((adjacentNode) => {
       if (this.graph.hasNode(adjacentNode)) {
-        this.graph.addEdge(existingVertex, adjacentNode)
+        this.graph.addEdge(vertexToKeep, adjacentNode)
       }
     })
   }

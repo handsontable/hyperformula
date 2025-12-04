@@ -195,6 +195,21 @@ export class RangeMapping {
     yield* sheetMap.values()
   }
 
+  public moveRangesBetweenSheets(sourceSheet: number, targetSheet: number): void {
+    if (sourceSheet === targetSheet) {
+      return
+    }
+    const sheetMap = this.rangeMapping.get(sourceSheet)
+    if (!sheetMap) {
+      return
+    }
+    this.rangeMapping.delete(sourceSheet)
+    for (const [, vertex] of sheetMap) {
+      vertex.range.moveToSheet(targetSheet)
+      this.setRange(vertex)
+    }
+  }
+
   public* rangeVerticesContainedInRange(sourceRange: AbsoluteCellRange): IterableIterator<RangeVertex> {
     for (const rangeVertex of this.rangesInSheet(sourceRange.sheet)) {
       if (sourceRange.containsRange(rangeVertex.range)) {

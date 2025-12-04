@@ -118,6 +118,10 @@ export class AddressMapping {
     this.mapping.set(sheetId, new DenseStrategy(0, 0))
   }
 
+  public removeSheet(sheetId: number): void {
+    this.mapping.delete(sheetId)
+  }
+
   /**
    * Gets the interpreter value of a cell at the specified address.
    * @param {SimpleCellAddress} address - The cell address
