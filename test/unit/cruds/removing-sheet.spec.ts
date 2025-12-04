@@ -423,7 +423,7 @@ describe('remove sheet - issue #1116', () => {
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
   })
 
-  it.only('returns REF error for named expressions referencing removed sheet', () => {
+  it('returns REF error for named expressions referencing removed sheet', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const removedSheetName = 'RemovedSheet'
@@ -649,12 +649,47 @@ describe('remove sheet - issue #1116', () => {
 })
 
 describe('remove sheet - adjust address mapping', () => {
-  it('should not remove sheet from address mapping', () => {
-    const engine = HyperFormula.buildFromArray([])
+  it('should remove sheet from address mapping if nothing depends on it', () => {
+    const sheet1Name = 'Sheet1'
 
-    engine.removeSheet(0)
+    const engine = HyperFormula.buildFromSheets({
+      [sheet1Name]: [[42]]
+    })
 
-    expect(engine.addressMapping.getStrategyForSheet(0)).toBeDefined()
+    engine.removeSheet(engine.getSheetId(sheet1Name)!)
+
+    expect(() => engine.addressMapping.getStrategyForSheet(engine.getSheetId(sheet1Name)!)).toThrow(NoSheetWithIdError)
+  })
+
+  it('should not remove sheet from address mapping if another sheet depends on it', () => {
+    const sheet1Name = 'Sheet1'
+    const sheet2Name = 'Sheet2'
+
+    const engine = HyperFormula.buildFromSheets({
+      [sheet1Name]: [[42]],
+      [sheet2Name]: [[`='${sheet1Name}'!A1`]],
+    })
+
+    const sheet1Id = engine.getSheetId(sheet1Name)!
+
+    engine.removeSheet(sheet1Id)
+
+    expect(engine.addressMapping.getStrategyForSheet(sheet1Id)).toBeDefined()
+  })
+
+  it('should not remove sheet from address mapping if a named expression depends on it', () => {
+    const sheet1Name = 'Sheet1'
+    const engine = HyperFormula.buildFromSheets({
+      [sheet1Name]: [[42]],
+    }, {}, [
+      { name: 'namedExpressionName', expression: `='${sheet1Name}'!$A$1` },
+    ])
+
+    const sheet1Id = engine.getSheetId(sheet1Name)!
+
+    engine.removeSheet(sheet1Id)
+
+    expect(engine.addressMapping.getStrategyForSheet(sheet1Id)).toBeDefined()
   })
 })
 

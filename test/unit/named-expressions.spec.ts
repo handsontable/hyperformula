@@ -1168,7 +1168,7 @@ describe('Named expressions - evaluation', () => {
       expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
     })
 
-    it.only('named expression returns REF error after removing referenced sheet', () => {
+    it('named expression returns REF error after removing referenced sheet', () => {
       const engine = HyperFormula.buildFromArray([
         ['=42']
       ])

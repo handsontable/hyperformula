@@ -21,7 +21,7 @@ import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
-  SheetReferenceResolver,
+  ResolveSheetReferenceFn,
 } from './addressRepresentationConverters'
 import {
   ArrayAst,
@@ -139,7 +139,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   constructor(
     lexerConfig: LexerConfig,
     private readonly sheetMapping: SheetMapping,
-    private readonly resolveSheetReference: SheetReferenceResolver,
+    private readonly resolveSheetReference: ResolveSheetReferenceFn,
   ) {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
     this.lexerConfig = lexerConfig
@@ -211,8 +211,8 @@ export class FormulaParser extends EmbeddedActionsParser {
   private columnRangeExpression: AstRule = this.RULE('columnRangeExpression', () => {
     const range = this.CONSUME(ColumnRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
-    const firstAddress = this.ACTION(() => columnAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), startImage, this.formulaAddress))
-    const secondAddress = this.ACTION(() => columnAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), endImage, this.formulaAddress))
+    const firstAddress = this.ACTION(() => columnAddressFromString(startImage, this.formulaAddress, this.resolveSheetReference))
+    const secondAddress = this.ACTION(() => columnAddressFromString(endImage, this.formulaAddress, this.resolveSheetReference))
 
     if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
@@ -237,8 +237,8 @@ export class FormulaParser extends EmbeddedActionsParser {
   private rowRangeExpression: AstRule = this.RULE('rowRangeExpression', () => {
     const range = this.CONSUME(RowRange) as ExtendedToken
     const [startImage, endImage] = range.image.split(':')
-    const firstAddress = this.ACTION(() => rowAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), startImage, this.formulaAddress))
-    const secondAddress = this.ACTION(() => rowAddressFromString(this.getSheetIdIncludingNotAdded.bind(this), endImage, this.formulaAddress))
+    const firstAddress = this.ACTION(() => rowAddressFromString(startImage, this.formulaAddress, this.resolveSheetReference))
+    const secondAddress = this.ACTION(() => rowAddressFromString(endImage, this.formulaAddress, this.resolveSheetReference))
 
     if (firstAddress === undefined || secondAddress === undefined) {
       return buildCellErrorAst(new CellError(ErrorType.REF))
