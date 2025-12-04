@@ -190,6 +190,12 @@ export class SheetMapping {
    */
   public removeSheet(sheetId: number): void {
     const sheet = this._getSheetOrThrowError(sheetId, {})
+    this.allSheets.delete(sheetId)
+    this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
+  }
+
+  public softRemoveSheet(sheetId: number): void {
+    const sheet = this._getSheetOrThrowError(sheetId, {})
     sheet.isAdded = false
   }
 

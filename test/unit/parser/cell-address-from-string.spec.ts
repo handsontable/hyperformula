@@ -53,4 +53,10 @@ describe('cellAddressFromString', () => {
     expect(cellAddressFromString('Sheet2!B3', adr('A1', sheet1), resolveSheetReference)).toEqual(CellAddress.relative(1, 2, sheet2))
     expect(cellAddressFromString("'~`!@#$%^&*()_-+_=/|?{}[]\"'!B3", adr('A1', sheet1), resolveSheetReference)).toEqual(CellAddress.relative(1, 2, sheet3))
   })
+
+  it('returns undefined when sheet resolver fails', () => {
+    const failingResolver = () => undefined
+
+    expect(cellAddressFromString('Ghost!A1', adr('A1'), failingResolver)).toBeUndefined()
+  })
 })

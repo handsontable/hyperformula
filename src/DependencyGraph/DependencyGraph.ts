@@ -297,10 +297,11 @@ export class DependencyGraph {
     }
   }
 
-  public removeSheet(removedSheetId: number) {
-    this.clearSheet(removedSheetId)
+  public removeSheet(sheetBeingRemoved: number) {
+    this.clearSheet(sheetBeingRemoved)
 
-    for (const [adr, vertex] of this.addressMapping.sheetEntries(removedSheetId)) {
+    let shouldRemoveSheet = true
+    for (const [adr, vertex] of this.addressMapping.sheetEntries(sheetBeingRemoved)) {
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsDirty(adjacentNode)
       }
@@ -309,10 +310,21 @@ export class DependencyGraph {
       if (wasRemoved) {
         this.addressMapping.removeCell(adr)
       }
+
+      if (!wasRemoved) {
+        shouldRemoveSheet = false
+      }
+    }
+
+    if (shouldRemoveSheet) {
+      this.sheetMapping.removeSheet(sheetBeingRemoved)
+      this.addressMapping.removeSheet(sheetBeingRemoved)
+    } else {
+      this.sheetMapping.softRemoveSheet(sheetBeingRemoved)
     }
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      const rangesToRemove = this.rangeMapping.removeRangesInSheet(removedSheetId)
+      const rangesToRemove = this.rangeMapping.removeRangesInSheet(sheetBeingRemoved)
       for (const range of rangesToRemove) {
         this.softRemoveVertex(range)
       }
@@ -1144,7 +1156,7 @@ export class DependencyGraph {
 
     const hasDependentInExistingSheet = dependents.some(addr => {
       if (isSimpleCellAddress(addr)) {
-        return this.sheetMapping.hasSheetWithId(addr.sheet, { includeNotAdded: false })
+        return addr.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.sheetMapping.hasSheetWithId(addr.sheet, { includeNotAdded: false })
       }
 
       if (isSimpleCellRange(addr)) {

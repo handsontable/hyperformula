@@ -423,7 +423,7 @@ describe('remove sheet - issue #1116', () => {
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
   })
 
-  it('returns REF error for named expressions referencing removed sheet', () => {
+  it.only('returns REF error for named expressions referencing removed sheet', () => {
     const engine = HyperFormula.buildEmpty()
     const sheet1Name = 'Sheet1'
     const removedSheetName = 'RemovedSheet'

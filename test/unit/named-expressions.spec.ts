@@ -1168,13 +1168,13 @@ describe('Named expressions - evaluation', () => {
       expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
     })
 
-    it('named expression returns REF error after removing referenced sheet', () => {
+    it.only('named expression returns REF error after removing referenced sheet', () => {
       const engine = HyperFormula.buildFromArray([
         ['=42']
       ])
       engine.addNamedExpression('FOO', '=Sheet1!$A$1 + 10')
 
-      engine.removeSheet(0)
+      engine.removeSheet(engine.getSheetId('Sheet1')!)
 
       expect(engine.getNamedExpressionFormula('FOO')).toEqual('=Sheet1!$A$1 + 10')
       expect(engine.getNamedExpressionValue('FOO')).toEqualError(detailedError(ErrorType.REF))

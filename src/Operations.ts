@@ -221,7 +221,6 @@ export class Operations {
 
   public removeSheet(sheetId: number): { version: number, scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][] } {
     this.dependencyGraph.removeSheet(sheetId)
-    this.sheetMapping.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
     const scopedNamedExpressions = this.namedExpressions.getAllNamedExpressionsForScope(sheetId).map(
       (namedExpression) => this.removeNamedExpression(namedExpression.normalizeExpressionName(), sheetId)
