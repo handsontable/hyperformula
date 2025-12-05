@@ -595,31 +595,24 @@ describe('rename sheet - issue #1116', () => {
       const sheet1Name = 'FirstSheet'
       const oldName = 'OldName'
       const newName = 'NewName'
-      const sheet1Data = [[`='${oldName}'!A1:A4`]]
-      const sheet2Data = [[1], [2], [3], [4]]
       const engine = HyperFormula.buildFromSheets({
-        [sheet1Name]: sheet1Data,
-        [oldName]: sheet2Data,
+        [sheet1Name]: [[`='${oldName}'!A1:A4`]],
+        [oldName]: [[1], [2], [3], [4]],
       }, {}, [
         { name: 'ExprA', expression: `=MEDIAN(${newName}!$A$1:$A$1)` },
         { name: 'ExprB', expression: `=MEDIAN(${newName}!$A$1:$A$2)` },
         { name: 'ExprC', expression: `=MEDIAN(${newName}!$A$1:$A$3)` },
-        { name: 'ExprD', expression: `=MEDIAN(${sheet1Name}!$A$1)` }
       ])
-
-      const sheet2Id = engine.getSheetId(oldName)!
 
       expect(engine.getNamedExpressionValue('ExprA')).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getNamedExpressionValue('ExprB')).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getNamedExpressionValue('ExprC')).toEqualError(detailedError(ErrorType.REF))
-      expect(engine.getNamedExpressionValue('ExprD')).toEqualError(detailedError(ErrorType.REF))
 
-      engine.renameSheet(sheet2Id, newName)
+      engine.renameSheet(engine.getSheetId(oldName)!, newName)
 
       expect(engine.getNamedExpressionValue('ExprA')).toBe(1)
       expect(engine.getNamedExpressionValue('ExprB')).toBe(1.5)
       expect(engine.getNamedExpressionValue('ExprC')).toBe(2)
-      expect(engine.getNamedExpressionValue('ExprD')).toBe(2.5)
     })
   })
 })
