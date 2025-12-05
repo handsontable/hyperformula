@@ -54,12 +54,11 @@ export class ParserWithCaching {
   constructor(
     private readonly config: ParserConfig,
     private readonly functionRegistry: FunctionRegistry,
-    private readonly sheetMapping: SheetMapping,
     private readonly resolveSheetReference: ResolveSheetReferenceFn,
   ) {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
-    this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping, this.resolveSheetReference)
+    this.formulaParser = new FormulaParser(this.lexerConfig, this.resolveSheetReference)
     this.cache = new Cache(this.functionRegistry)
   }
 

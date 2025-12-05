@@ -275,7 +275,7 @@ describe('rename sheet - issue #1116', () => {
     expect(engine.getCellValue(adr('A2', sheet1Id))).toBe(198)
   })
 
-  it.only('recalculates column and row ranges', () => {
+  it('recalculates column and row ranges', () => {
     const sheet1Name = 'Sheet1'
     const oldName = 'OldName'
     const newName = 'NewName'

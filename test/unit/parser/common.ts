@@ -13,7 +13,6 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
   return new ParserWithCaching(
     config,
     new FunctionRegistry(config),
-    sheetMapping,
     registrar.ensureSheetRegistered.bind(registrar)
   )
 }

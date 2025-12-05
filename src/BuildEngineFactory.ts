@@ -94,7 +94,6 @@ export class BuildEngineFactory {
     const parser = new ParserWithCaching(
       config,
       functionRegistry,
-      sheetMapping,
       dependencyGraph.sheetReferenceRegistrar.ensureSheetRegistered.bind(dependencyGraph.sheetReferenceRegistrar)
     )
     lazilyTransformingAstService.parser = parser

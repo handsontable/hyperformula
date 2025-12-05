@@ -138,7 +138,6 @@ export class FormulaParser extends EmbeddedActionsParser {
 
   constructor(
     lexerConfig: LexerConfig,
-    private readonly sheetMapping: SheetMapping,
     private readonly resolveSheetReference: ResolveSheetReferenceFn,
   ) {
     super(lexerConfig.allTokens, {outputCst: false, maxLookahead: 7})
@@ -263,7 +262,7 @@ export class FormulaParser extends EmbeddedActionsParser {
   private cellReference: AstRule = this.RULE('cellReference', () => {
     const cell = this.CONSUME(CellReference) as ExtendedToken
     const address = this.ACTION(() => {
-      return cellAddressFromString(cell.image, this.formulaAddress, this. )
+      return cellAddressFromString(cell.image, this.formulaAddress, this.resolveSheetReference)
     })
 
     if (address === undefined) {

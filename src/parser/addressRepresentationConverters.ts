@@ -34,7 +34,6 @@ export const cellAddressFromString = (stringAddress: string, baseAddress: Simple
   const sheetName = extractSheetName(result)
   let sheet: Maybe<number>
 
-  // TODO: refactor getter/converter should not do actions like reserve/add
   if (sheetName) {
     sheet = resolveSheetReference(sheetName)
 

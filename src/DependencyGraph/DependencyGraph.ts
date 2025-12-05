@@ -295,6 +295,8 @@ export class DependencyGraph {
     for (const [_, vertex] of this.addressMapping.sheetEntries(sheetId)) {
       this.graph.markNodeAsDirty(vertex)
     }
+
+    // TODO: adjust arrayMapping
   }
 
   public removeSheet(sheetBeingRemoved: number) {
@@ -329,20 +331,30 @@ export class DependencyGraph {
         this.softRemoveVertex(range)
       }
     })
+
+    // TODO: adjust arrayMapping
   }
 
   public mergeSheets(sheetToKeep: number, sheetToDelete: number): void {
-    const sheetToDeleteVertices = this.addressMapping.sheetEntries(sheetToDelete)
+    const cellsFromSheetToDelete = this.addressMapping.sheetEntries(sheetToDelete)
+    const rangesFromSheetToDelete = this.rangeMapping.rangesInSheet(sheetToDelete)
 
-    for (const [addressToDelete, vertexToDelete] of sheetToDeleteVertices) {
+    for (const [addressToDelete, vertexToDelete] of cellsFromSheetToDelete) {
       const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
       const { vertex: vertexToKeep } = this.fetchCellOrCreateEmpty(addressToKeep)
       this.mergeVertices(vertexToKeep, vertexToDelete)
       this.graph.markNodeAsDirty(vertexToKeep)
     }
 
+    for (const rangeVertex of rangesFromSheetToDelete) {
+      // TODO: adjust range mapping
+      this.graph.markNodeAsDirty(rangeVertex)
+    }
+
     this.rangeMapping.moveRangesBetweenSheets(sheetToDelete, sheetToKeep)
     this.addressMapping.removeSheet(sheetToDelete)
+
+    // TODO: adjust arrayMapping
   }
 
   public clearSheet(sheetId: number) {
@@ -1151,6 +1163,13 @@ export class DependencyGraph {
     }
   }
 
+  /**
+   * - If vertex has dependents in other sheets, changes it to EmptyCellVertex and returns false
+   * - Otherwise, removes it from the graph, cleans up its dependencies and returns true
+   *
+   * @param inputVertex - The vertex to remove.
+   * @returns True if the vertex was removed, false if it was changed to EmptyCellVertex.
+   */
   private softRemoveVertex(inputVertex: Vertex): boolean {
     const dependents = this.getAdjacentNodesAddresses(inputVertex)
 
