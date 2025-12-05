@@ -290,7 +290,7 @@ export class DependencyGraph {
   }
 
   public addSheet(sheetId: number) {
-    this.addressMapping.addSheetAndSetStrategyBasedOnBounderies(sheetId, findBoundaries([]), { throwIfSheetNotExists: false })
+    this.addressMapping.addSheetOrChangeStrategy(sheetId, findBoundaries([]))
 
     for (const [_, vertex] of this.addressMapping.sheetEntries(sheetId)) {
       this.graph.markNodeAsDirty(vertex)

@@ -25,6 +25,7 @@ export interface AddressMappingAddSheetOptions {
 /**
  * Manages cell vertices and provides access to vertex by SimpleCellAddress.
  * For each sheet it stores vertices according to AddressMappingStrategy: DenseStrategy or SparseStrategy.
+ * It also stores placeholder entries (DenseStrategy) for sheets that are used in formulas but not yet added.
  */
 export class AddressMapping {
   private mapping: Map<number, AddressMappingStrategy> = new Map()
@@ -93,6 +94,35 @@ export class AddressMapping {
   }
 
   /**
+   * Adds a sheet or changes the strategy for an existing sheet.
+   */
+  public addSheetOrChangeStrategy(sheetId: number, sheetBoundaries: SheetBoundaries): AddressMappingStrategy {
+    const newStrategy = this.createStrategyBasedOnBoundaries(sheetBoundaries)
+    const strategyPlaceholder = this.mapping.get(sheetId)
+
+    if (!strategyPlaceholder) {
+      this.mapping.set(sheetId, newStrategy)
+      return newStrategy
+    }
+
+    if (newStrategy instanceof DenseStrategy) { // new startegy is the same as the placeholder
+      return strategyPlaceholder
+    }
+
+    this.moveStrategyContent(strategyPlaceholder, newStrategy, sheetId)
+    this.mapping.set(sheetId, newStrategy)
+
+    return newStrategy
+  }
+
+  private moveStrategyContent(sourceStrategy: AddressMappingStrategy, targetStrategy: AddressMappingStrategy, sheetContext: number) {
+    const sourceVertices = sourceStrategy.getEntries(sheetContext)
+    for (const [address, vertex] of sourceVertices) {
+      targetStrategy.setCell(address, vertex)
+    }
+  }
+
+  /**
    * Adds a sheet and sets the strategy based on the sheet boundaries.
    * @param {number} sheetId - The sheet identifier
    * @param {SheetBoundaries} sheetBoundaries - The boundaries of the sheet (height, width, fill)
@@ -100,13 +130,17 @@ export class AddressMapping {
    * @throws {Error} if sheet doesn't exist and throwIfSheetNotExists is true
    */
   public addSheetAndSetStrategyBasedOnBounderies(sheetId: number, sheetBoundaries: SheetBoundaries, options: AddressMappingAddSheetOptions = { throwIfSheetNotExists: true }) {
+    this.addSheetWithStrategy(sheetId, this.createStrategyBasedOnBoundaries(sheetBoundaries), options)
+  }
+
+  private createStrategyBasedOnBoundaries(sheetBoundaries: SheetBoundaries): AddressMappingStrategy {
     const {height, width, fill} = sheetBoundaries
     const strategyConstructor = this.policy.call(fill)
-    this.addSheetWithStrategy(sheetId, new strategyConstructor(width, height), options)
+    return new strategyConstructor(width, height)
   }
 
   /**
-   * Adds a placeholder strategy for a sheet. If the sheet already exists, does nothing.
+   * Adds a placeholder strategy (DenseStrategy) for a sheet. If the sheet already exists, does nothing.
    * @param {number} sheetId - The sheet identifier
    */
   public addSheetStrategyPlaceholderIfNotExists(sheetId: number): void {
