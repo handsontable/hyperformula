@@ -4,10 +4,10 @@
  */
 
 import {ErrorType, SimpleCellAddress} from '../Cell'
-import { SheetMapping } from '../DependencyGraph/SheetMapping'
+import {SheetMapping} from '../DependencyGraph/SheetMapping'
 import {NoSheetWithIdError} from '../index'
 import {NamedExpressions} from '../NamedExpressions'
-import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
+import {sheetIndexToString} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
@@ -18,13 +18,11 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {LexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
-    private readonly lexerConfig: LexerConfig,
     private readonly sheetMapping: SheetMapping,
     private readonly namedExpressions: NamedExpressions,
   ) {

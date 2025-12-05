@@ -156,7 +156,7 @@ export class Serialization {
   }
 
   public withNewConfig(newConfig: Config, namedExpressions: NamedExpressions): Serialization {
-    const newUnparser = new Unparser(newConfig, buildLexerConfig(newConfig), this.dependencyGraph.sheetMapping, namedExpressions)
+    const newUnparser = new Unparser(newConfig, this.dependencyGraph.sheetMapping, namedExpressions)
     return new Serialization(this.dependencyGraph, newUnparser, this.exporter)
   }
 }

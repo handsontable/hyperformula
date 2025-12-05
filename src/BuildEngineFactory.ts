@@ -97,7 +97,7 @@ export class BuildEngineFactory {
       dependencyGraph.sheetReferenceRegistrar.ensureSheetRegistered.bind(dependencyGraph.sheetReferenceRegistrar)
     )
     lazilyTransformingAstService.parser = parser
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping, namedExpressions)
+    const unparser = new Unparser(config, sheetMapping, namedExpressions)
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralHelper)
