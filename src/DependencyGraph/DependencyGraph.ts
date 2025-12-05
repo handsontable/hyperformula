@@ -176,7 +176,7 @@ export class DependencyGraph {
         let rangeVertex = this.getRange(range.start, range.end)
         if (rangeVertex === undefined) {
           rangeVertex = new RangeVertex(range)
-          this.rangeMapping.setRange(rangeVertex)
+          this.rangeMapping.addOrUpdateVertex(rangeVertex)
         }
 
         this.graph.addNodeAndReturnId(rangeVertex)
@@ -337,7 +337,7 @@ export class DependencyGraph {
 
   public mergeSheets(sheetToKeep: number, sheetToDelete: number): void {
     const cellsFromSheetToDelete = this.addressMapping.sheetEntries(sheetToDelete)
-    const rangesFromSheetToDelete = this.rangeMapping.rangesInSheet(sheetToDelete)
+    const rangesFromSheetToDelete = Array.from(this.rangeMapping.rangesInSheet(sheetToDelete))
 
     for (const [addressToDelete, vertexToDelete] of cellsFromSheetToDelete) {
       const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
@@ -346,12 +346,33 @@ export class DependencyGraph {
       this.graph.markNodeAsDirty(vertexToKeep)
     }
 
-    for (const rangeVertex of rangesFromSheetToDelete) {
-      // TODO: adjust range mapping
-      this.graph.markNodeAsDirty(rangeVertex)
+    for (const vertexToDelete of rangesFromSheetToDelete) {
+      if (!(vertexToDelete instanceof RangeVertex)) {
+        continue
+      }
+
+      const start = vertexToDelete.getStart()
+      const end = vertexToDelete.getEnd()
+
+      if (start.sheet !== sheetToDelete && end.sheet !== sheetToDelete) {
+        continue
+      }
+
+      const targetStart = simpleCellAddress(sheetToKeep, start.col, start.row)
+      const targetEnd = simpleCellAddress(sheetToKeep, end.col, end.row)
+      const vertexToKeep = this.rangeMapping.getRangeVertex(targetStart, targetEnd)
+
+      if (vertexToKeep !== undefined) {
+        this.mergeVertices(vertexToKeep, vertexToDelete)
+        this.graph.markNodeAsDirty(vertexToKeep)
+      } else {
+        this.rangeMapping.removeVertexIfExists(vertexToDelete)
+        vertexToDelete.range.moveToSheet(sheetToKeep)
+        this.rangeMapping.addOrUpdateVertex(vertexToDelete)
+        this.graph.markNodeAsDirty(vertexToDelete)
+      }
     }
 
-    this.rangeMapping.moveRangesBetweenSheets(sheetToDelete, sheetToKeep)
     this.addressMapping.removeSheet(sheetToDelete)
 
     // TODO: adjust arrayMapping
@@ -419,7 +440,7 @@ export class DependencyGraph {
     })
 
     const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      const result = this.rangeMapping.moveAllRangesInSheetAfterRowByRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
+      const result = this.rangeMapping.moveAllRangesInSheetAfterAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       this.fixRangesWhenAddingRows(addedRows.sheet, addedRows.rowStart, addedRows.numberOfRows)
       return this.getArrayVerticesRelatedToRanges(result.verticesWithChangedSize)
     })
@@ -443,7 +464,7 @@ export class DependencyGraph {
     })
 
     const affectedArrays = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      const result = this.rangeMapping.moveAllRangesInSheetAfterColumnByColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
+      const result = this.rangeMapping.moveAllRangesInSheetAfterAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
       this.fixRangesWhenAddingColumns(addedColumns.sheet, addedColumns.columnStart, addedColumns.numberOfColumns)
       return this.getArrayVerticesRelatedToRanges(result.verticesWithChangedSize)
     })
@@ -651,7 +672,7 @@ export class DependencyGraph {
   }
 
   public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
-    return this.rangeMapping.getRange(start, end)
+    return this.rangeMapping.getRangeVertex(start, end)
   }
 
   public topSortWithScc(): TopSortResult<Vertex> {
@@ -811,7 +832,7 @@ export class DependencyGraph {
         const [address, dependencies] = dependenciesResult
         return dependencies.map((dependency: CellDependency) => {
           if (dependency instanceof AbsoluteCellRange) {
-            return [dependency.start, this.rangeMapping.fetchRange(dependency.start, dependency.end)]
+            return [dependency.start, this.rangeMapping.getVertexOrThrow(dependency.start, dependency.end)]
           } else if (dependency instanceof NamedExpressionDependency) {
             const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
             return [namedExpression.address, this.addressMapping.getCellOrThrowError(namedExpression.address)]
@@ -965,7 +986,7 @@ export class DependencyGraph {
           }
           while (find.smallerRangeVertex === undefined) {
             const newRangeVertex = new RangeVertex(AbsoluteCellRange.spanFrom(currentRangeVertex.range.start, currentRangeVertex.range.width(), currentRangeVertex.range.height() - 1))
-            this.rangeMapping.setRange(newRangeVertex)
+            this.rangeMapping.addOrUpdateVertex(newRangeVertex)
             this.graph.addNodeAndReturnId(newRangeVertex)
             const restRange = new AbsoluteCellRange(simpleCellAddress(currentRangeVertex.range.start.sheet, currentRangeVertex.range.start.col, currentRangeVertex.range.end.row), currentRangeVertex.range.end)
             this.addAllFromRange(restRange, currentRangeVertex)
@@ -1159,7 +1180,7 @@ export class DependencyGraph {
   private removeVertex(vertex: Vertex) {
     this.removeVertexAndCleanupDependencies(vertex)
     if (vertex instanceof RangeVertex) {
-      this.rangeMapping.removeRange(vertex)
+      this.rangeMapping.removeVertexIfExists(vertex)
     }
   }
 
@@ -1202,7 +1223,7 @@ export class DependencyGraph {
           this.graph.removeNode(vertex).forEach((candidate) => dependencies.add(candidate))
         }
         if (vertex instanceof RangeVertex) {
-          this.rangeMapping.removeRange(vertex)
+          this.rangeMapping.removeVertexIfExists(vertex)
         } else if (vertex instanceof EmptyCellVertex) {
           this.addressMapping.removeCell(address)
         }
@@ -1210,7 +1231,7 @@ export class DependencyGraph {
     }
 
     if (inputVertex instanceof RangeVertex) {
-      this.rangeMapping.removeRange(inputVertex)
+      this.rangeMapping.removeVertexIfExists(inputVertex)
     }
 
     return !hasDependentInExistingSheet
@@ -1239,7 +1260,7 @@ export class DependencyGraph {
           this.graph.removeNode(vertex).forEach((candidate) => dependencies.add(candidate))
         }
         if (vertex instanceof RangeVertex) {
-          this.rangeMapping.removeRange(vertex)
+          this.rangeMapping.removeVertexIfExists(vertex)
         } else if (vertex instanceof EmptyCellVertex) {
           this.addressMapping.removeCell(address)
         }

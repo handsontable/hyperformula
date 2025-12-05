@@ -275,6 +275,60 @@ describe('rename sheet - issue #1116', () => {
     expect(engine.getCellValue(adr('A2', sheet1Id))).toBe(198)
   })
 
+  it('moves reserved range vertices onto renamed sheet', () => {
+    const formulaSheet = 'FormulaSheet'
+    const oldName = 'SourceSheet'
+    const newName = 'GhostSheet'
+    const engine = HyperFormula.buildFromSheets({
+      [formulaSheet]: [[`=SUM('${newName}'!A1:B1)`]],
+      [oldName]: [[1, 2]],
+    })
+    const formulaSheetId = engine.getSheetId(formulaSheet)!
+    const oldNameId = engine.getSheetId(oldName)!
+
+    expect(engine.getCellValue(adr('A1', formulaSheetId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.renameSheet(oldNameId, newName)
+
+    const renamedSheetId = engine.getSheetId(newName)!
+    expect(engine.getCellValue(adr('A1', formulaSheetId))).toBe(3)
+
+    const movedRange = engine.rangeMapping.getRangeVertex(adr('A1', renamedSheetId), adr('B1', renamedSheetId))
+    expect(movedRange).not.toBeUndefined()
+    expect(movedRange?.sheet).toBe(renamedSheetId)
+    expect(Array.from(engine.rangeMapping.rangesInSheet(renamedSheetId))).toHaveLength(1)
+  })
+
+  it('merges duplicate range vertices after renaming into reserved name', () => {
+    const oldName = 'OldName'
+    const newName = 'GhostSheet'
+    const usesOld = 'UsesOld'
+    const usesNew = 'UsesNew'
+    const engine = HyperFormula.buildFromSheets({
+      [usesOld]: [[`=SUM('${oldName}'!A1:A2)`]],
+      [usesNew]: [[`=SUM('${newName}'!A1:A2)`]],
+      [oldName]: [[5], [7]],
+    })
+    const usesOldId = engine.getSheetId(usesOld)!
+    const usesNewId = engine.getSheetId(usesNew)!
+    const oldNameId = engine.getSheetId(oldName)!
+
+    expect(engine.getCellValue(adr('A1', usesOldId))).toBe(12)
+    expect(engine.getCellValue(adr('A1', usesNewId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.renameSheet(oldNameId, newName)
+
+    const renamedSheetId = engine.getSheetId(newName)!
+
+    expect(engine.getCellValue(adr('A1', usesOldId))).toBe(12)
+    expect(engine.getCellValue(adr('A1', usesNewId))).toBe(12)
+
+    engine.setCellContents(adr('A1', renamedSheetId), 100)
+
+    expect(engine.getCellValue(adr('A1', usesOldId))).toBe(107)
+    expect(engine.getCellValue(adr('A1', usesNewId))).toBe(107)
+  })
+
   it('recalculates column and row ranges', () => {
     const sheet1Name = 'Sheet1'
     const oldName = 'OldName'

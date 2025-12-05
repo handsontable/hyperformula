@@ -323,7 +323,7 @@ describe('Copy - paste integration', () => {
     engine.copy(AbsoluteCellRange.spanFrom(adr('C1'), 1, 1))
     engine.paste(adr('A3'))
 
-    const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
+    const range = engine.rangeMapping.getVertexOrThrow(rowStart(2), rowEnd(3))
     const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
     const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
     expect(engine.graph.existsEdge(a2, range)).toBe(true)

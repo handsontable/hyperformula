@@ -436,7 +436,7 @@ describe('moving ranges', () => {
 
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
-    const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
+    const a1a2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
@@ -457,7 +457,7 @@ describe('moving ranges', () => {
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2), adr('B1'))
 
-    expect(engine.rangeMapping.getRange(adr('B1'), adr('B2'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(adr('B1'), adr('B2'))).not.toBe(undefined)
 
     const range = extractRange(engine, adr('A3'))
     expect(range.start).toEqual(adr('B1'))
@@ -508,7 +508,7 @@ describe('moving ranges', () => {
     const b2 = engine.addressMapping.getCellOrThrowError(adr('B2'))
     const source = engine.addressMapping.getCellOrThrowError(adr('A1'))
     const target = engine.addressMapping.getCellOrThrowError(adr('A2'))
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
 
     expect(source).toBeInstanceOf(EmptyCellVertex)
     expect(source.getCellValue()).toBe(EmptyValue)
@@ -548,7 +548,7 @@ describe('moving ranges', () => {
     const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
     const c1 = engine.addressMapping.getCellOrThrowError(adr('C1'))
     const c2 = engine.addressMapping.getCellOrThrowError(adr('C2'))
-    const range = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('C1'), adr('C2'))
 
     expect(a1).toBe(undefined)
     expect(a2).toBe(undefined)
@@ -594,8 +594,8 @@ describe('moving ranges', () => {
     ))
 
     /* edges */
-    const c1c2 = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))
-    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const c1c2 = engine.rangeMapping.getVertexOrThrow(adr('C1'), adr('C2'))
+    const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     expect(engine.graph.existsEdge(c1c2, a1a3)).toBe(false)
 
     expect(engine.graph.existsEdge(engine.addressMapping.getCellOrThrowError(adr('A1')), a1a3)).toBe(true)
@@ -623,9 +623,9 @@ describe('moving ranges', () => {
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 3), adr('C1'))
 
     /* edges */
-    const c1c2 = engine.rangeMapping.fetchRange(adr('C1'), adr('C2'))
-    const c1c3 = engine.rangeMapping.fetchRange(adr('C1'), adr('C3'))
-    const a1a4 = engine.rangeMapping.fetchRange(adr('A1'), adr('A4'))
+    const c1c2 = engine.rangeMapping.getVertexOrThrow(adr('C1'), adr('C2'))
+    const c1c3 = engine.rangeMapping.getVertexOrThrow(adr('C1'), adr('C3'))
+    const a1a4 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A4'))
 
     expect(engine.graph.existsEdge(c1c2, c1c3)).toBe(true)
     expect(engine.graph.existsEdge(c1c3, a1a4)).toBe(false)
@@ -1035,7 +1035,7 @@ describe('column ranges', () => {
 
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
-    const ab = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    const ab = engine.rangeMapping.getVertexOrThrow(colStart('A'), colEnd('B'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, ab)).toBe(true)
     expect(engine.graph.existsEdge(b1, ab)).toBe(true)
@@ -1081,7 +1081,7 @@ describe('row ranges', () => {
 
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
-    const ab = engine.rangeMapping.fetchRange(rowStart(1), rowEnd(2))
+    const ab = engine.rangeMapping.getVertexOrThrow(rowStart(1), rowEnd(2))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1, ab)).toBe(true)
     expect(engine.graph.existsEdge(a2, ab)).toBe(true)

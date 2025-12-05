@@ -702,7 +702,7 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, [0, 1])
 
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
@@ -716,7 +716,7 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, [1, 2])
 
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
@@ -726,7 +726,7 @@ describe('Removing columns - ranges', function() {
       ['1', '2', '3', '=SUM(A1:C1)'],
       /*          */
     ])
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('C1')) as RangeVertex
+    const range = engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1')) as RangeVertex
 
     engine.removeColumns(0, [0, 3])
 
@@ -885,7 +885,7 @@ describe('Removing columns - merge ranges', () => {
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should merge ranges in proper order', () => {

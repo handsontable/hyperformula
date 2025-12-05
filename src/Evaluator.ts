@@ -60,7 +60,7 @@ export class Evaluator {
         const range = dep
         if (this.dependencyGraph.getRange(range.start, range.end) === undefined) {
           const rangeVertex = new RangeVertex(range)
-          this.dependencyGraph.rangeMapping.setRange(rangeVertex)
+          this.dependencyGraph.rangeMapping.addOrUpdateVertex(rangeVertex)
           tmpRanges.push(rangeVertex)
         }
       }
@@ -68,7 +68,7 @@ export class Evaluator {
     const ret = this.evaluateAstToCellValue(ast, new InterpreterState(address, this.config.useArrayArithmetic))
 
     tmpRanges.forEach((rangeVertex) => {
-      this.dependencyGraph.rangeMapping.removeRange(rangeVertex)
+      this.dependencyGraph.rangeMapping.removeVertexIfExists(rangeVertex)
     })
 
     return ret

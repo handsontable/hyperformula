@@ -772,7 +772,7 @@ describe('Removing rows - range mapping', function() {
     ])
 
     engine.removeRows(0, [0, 1])
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
@@ -785,7 +785,7 @@ describe('Removing rows - range mapping', function() {
     ])
 
     engine.removeRows(0, [1, 2])
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     expect(engine.graph.existsEdge(a1, range)).toBe(true)
   })
@@ -798,7 +798,7 @@ describe('Removing rows - range mapping', function() {
       ['=SUM(A1:A3)'],
     ])
 
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     engine.removeRows(0, [0, 3])
     const ranges = Array.from(engine.rangeMapping.rangesInSheet(0))
     expect(ranges.length).toBe(0)
@@ -814,10 +814,10 @@ describe('Removing rows - range mapping', function() {
       ['=SUM(A1:A3)'],
     ])
 
-    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     expect(graphReversedAdjacentNodes(engine.graph, a1a3).length).toBe(2)
     engine.removeRows(0, [0, 2])
-    const a1a1 = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
+    const a1a1 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
     expect(a1a1).toBe(a1a3)
     expect(graphReversedAdjacentNodes(engine.graph, a1a1).length).toBe(1)
   })
@@ -1028,7 +1028,7 @@ describe('Removing rows - merge ranges', () => {
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should merge ranges in proper order', () => {

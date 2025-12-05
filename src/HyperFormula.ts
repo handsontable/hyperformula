@@ -3049,7 +3049,7 @@ export class HyperFormula implements TypedEmitter {
     if (isSimpleCellAddress(address)) {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
     } else if (isSimpleCellRange(address)) {
-      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      vertex = this._dependencyGraph.rangeMapping.getRangeVertex(address.start, address.end)
     } else {
       throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
     }
@@ -3087,7 +3087,7 @@ export class HyperFormula implements TypedEmitter {
     if (isSimpleCellAddress(address)) {
       vertex = this._dependencyGraph.addressMapping.getCell(address)
     } else if (isSimpleCellRange(address)) {
-      vertex = this._dependencyGraph.rangeMapping.getRange(address.start, address.end)
+      vertex = this._dependencyGraph.rangeMapping.getRangeVertex(address.start, address.end)
     } else {
       throw new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', address)
     }

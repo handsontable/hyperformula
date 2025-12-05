@@ -42,7 +42,7 @@ describe('GraphBuilder', () => {
 
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
-    const a1b2 = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
+    const a1b2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
     const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
     expect(engine.graph.adjacentNodes(a1)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(b1)).toContain(a1b2)
@@ -56,7 +56,7 @@ describe('GraphBuilder', () => {
 
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
-    const ab = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
+    const ab = engine.rangeMapping.getVertexOrThrow(colStart('A'), colEnd('B'))
     const c1 = engine.addressMapping.getCellOrThrowError(adr('C1'))
     expect(engine.graph.adjacentNodes(a1)).toContain(ab)
     expect(engine.graph.adjacentNodes(b1)).toContain(ab)
@@ -72,7 +72,7 @@ describe('GraphBuilder', () => {
 
     const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
     const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
-    const a1b2 = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
+    const a1b2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
     const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
     const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
 
@@ -94,8 +94,8 @@ describe('GraphBuilder', () => {
     ])
 
     const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
-    const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
-    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const a1a2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
+    const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
 
     expect(engine.graph.existsEdge(a3, a1a3)).toBe(true)
     expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(true)
@@ -130,8 +130,8 @@ describe('GraphBuilder', () => {
       ['5', '=A1:A2'],
     ])
 
-    const a1a2 = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
-    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const a1a2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
+    const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
     expect(engine.graph.existsEdge(a2, a1a3)).toBe(true)
     expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
