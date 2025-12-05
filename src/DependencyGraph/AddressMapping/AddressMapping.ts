@@ -25,7 +25,7 @@ export interface AddressMappingAddSheetOptions {
 /**
  * Manages cell vertices and provides access to vertex by SimpleCellAddress.
  * For each sheet it stores vertices according to AddressMappingStrategy: DenseStrategy or SparseStrategy.
- * It also stores placeholder entries (DenseStrategy) for sheets that are used in formulas but not yet added.
+ * It also stores placeholder entries (DenseStrategy(0, 0)) for sheets that are used in formulas but not yet added.
  */
 export class AddressMapping {
   private mapping: Map<number, AddressMappingStrategy> = new Map()
@@ -34,7 +34,9 @@ export class AddressMapping {
     private readonly policy: ChooseAddressMapping,
   ) {}
 
-  /** @inheritDoc */
+  /**
+   * Gets the cell vertex at the specified address.
+   */
   public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
     const sheetMapping = this.getStrategyForSheet(address.sheet)
     return sheetMapping.getCell(address)
@@ -42,9 +44,6 @@ export class AddressMapping {
 
   /**
    * Gets the cell vertex at the specified address or throws an error if not found.
-   * @param {SimpleCellAddress} address - The cell address to retrieve
-   * @returns {CellVertex} The cell vertex at the specified address
-   * @throws Error if vertex is missing in AddressMapping
    */
   public getCellOrThrowError(address: SimpleCellAddress): CellVertex {
     const vertex = this.getCell(address)
@@ -57,8 +56,6 @@ export class AddressMapping {
 
   /**
    * Gets the address mapping strategy for the specified sheet.
-   * @param {number} sheetId - The sheet identifier
-   * @returns {AddressMappingStrategy} The address mapping strategy for the sheet
    * @throws NoSheetWithIdError if sheet doesn't exist
    */
   public getStrategyForSheet(sheetId: number): AddressMappingStrategy {
@@ -72,11 +69,7 @@ export class AddressMapping {
 
   /**
    * Adds a new sheet with the specified strategy.
-   * @param {number} sheetId - The sheet identifier
-   * @param {AddressMappingStrategy} strategy - The address mapping strategy to use for this sheet
-   * @param {AddressMappingAddSheetOptions} options - The options for adding the sheet
-   * @returns {AddressMappingStrategy} The strategy that was added
-   * @throws Error if sheet is already added
+   * @throws {Error} if sheet is already added and throwIfSheetNotExists is true
    */
   public addSheetWithStrategy(sheetId: number, strategy: AddressMappingStrategy, options: AddressMappingAddSheetOptions = { throwIfSheetNotExists: true }): AddressMappingStrategy {
     const strategyFound = this.mapping.get(sheetId)
@@ -95,6 +88,7 @@ export class AddressMapping {
 
   /**
    * Adds a sheet or changes the strategy for an existing sheet.
+   * Designed for the purpose of exchanging the placeholder strategy for a real strategy.
    */
   public addSheetOrChangeStrategy(sheetId: number, sheetBoundaries: SheetBoundaries): AddressMappingStrategy {
     const newStrategy = this.createStrategyBasedOnBoundaries(sheetBoundaries)
@@ -115,6 +109,9 @@ export class AddressMapping {
     return newStrategy
   }
 
+  /**
+   * Moves the content of the source strategy to the target strategy.
+   */
   private moveStrategyContent(sourceStrategy: AddressMappingStrategy, targetStrategy: AddressMappingStrategy, sheetContext: number) {
     const sourceVertices = sourceStrategy.getEntries(sheetContext)
     for (const [address, vertex] of sourceVertices) {
@@ -124,15 +121,15 @@ export class AddressMapping {
 
   /**
    * Adds a sheet and sets the strategy based on the sheet boundaries.
-   * @param {number} sheetId - The sheet identifier
-   * @param {SheetBoundaries} sheetBoundaries - The boundaries of the sheet (height, width, fill)
-   * @param {AddressMappingAddSheetOptions} options - The options for adding the sheet
    * @throws {Error} if sheet doesn't exist and throwIfSheetNotExists is true
    */
   public addSheetAndSetStrategyBasedOnBounderies(sheetId: number, sheetBoundaries: SheetBoundaries, options: AddressMappingAddSheetOptions = { throwIfSheetNotExists: true }) {
     this.addSheetWithStrategy(sheetId, this.createStrategyBasedOnBoundaries(sheetBoundaries), options)
   }
 
+  /**
+   * Creates a strategy based on the sheet boundaries.
+   */
   private createStrategyBasedOnBoundaries(sheetBoundaries: SheetBoundaries): AddressMappingStrategy {
     const {height, width, fill} = sheetBoundaries
     const strategyConstructor = this.policy.call(fill)
@@ -141,7 +138,6 @@ export class AddressMapping {
 
   /**
    * Adds a placeholder strategy (DenseStrategy) for a sheet. If the sheet already exists, does nothing.
-   * @param {number} sheetId - The sheet identifier
    */
   public addSheetStrategyPlaceholderIfNotExists(sheetId: number): void {
     if (this.mapping.has(sheetId)) {
@@ -151,13 +147,15 @@ export class AddressMapping {
     this.mapping.set(sheetId, new DenseStrategy(0, 0))
   }
 
+  /**
+   * Removes a sheet from the address mapping.
+   */
   public removeSheet(sheetId: number): void {
     this.mapping.delete(sheetId)
   }
 
   /**
    * Gets the interpreter value of a cell at the specified address.
-   * @param {SimpleCellAddress} address - The cell address
    * @returns {InterpreterValue} The interpreter value (returns EmptyValue if cell doesn't exist)
    */
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
@@ -174,7 +172,6 @@ export class AddressMapping {
 
   /**
    * Gets the raw cell content at the specified address.
-   * @param {SimpleCellAddress} address - The cell address
    * @returns {RawCellContent} The raw cell content or null if cell doesn't exist or is not a value cell
    */
   public getRawValue(address: SimpleCellAddress): RawCellContent {
@@ -188,7 +185,10 @@ export class AddressMapping {
     }
   }
 
-  /** @inheritDoc */
+  /**
+   * Sets a cell vertex at the specified address.
+   * @throws {Error} if sheet not initialized
+   */
   public setCell(address: SimpleCellAddress, newVertex: CellVertex) {
     const sheetMapping = this.mapping.get(address.sheet)
 
@@ -200,9 +200,10 @@ export class AddressMapping {
 
   /**
    * Moves a cell from source address to destination address within the same sheet.
-   * @param {SimpleCellAddress} source - The source cell address
-   * @param {SimpleCellAddress} destination - The destination cell address
-   * @throws Error if sheet not initialized, addresses on different sheets, destination occupied, or source cell doesn't exist
+   * @throws {Error} if sheet not initialized
+   * @throws {Error} if addresses on different sheets
+   * @throws {Error} if destination occupied
+   * @throws {Error} if source cell doesn't exist
    */
   public moveCell(source: SimpleCellAddress, destination: SimpleCellAddress) {
     const sheetMapping = this.mapping.get(source.sheet)
@@ -231,7 +232,6 @@ export class AddressMapping {
 
   /**
    * Removes a cell at the specified address.
-   * @param {SimpleCellAddress} address - The cell address to remove
    * @throws Error if sheet not initialized
    */
   public removeCell(address: SimpleCellAddress) {
@@ -242,7 +242,9 @@ export class AddressMapping {
     sheetMapping.removeCell(address)
   }
 
-  /** @inheritDoc */
+  /**
+   * Checks if a cell exists at the specified address.
+   */
   public has(address: SimpleCellAddress): boolean {
     const sheetMapping = this.mapping.get(address.sheet)
     if (sheetMapping === undefined) {
@@ -251,23 +253,24 @@ export class AddressMapping {
     return sheetMapping.has(address)
   }
 
-  /** @inheritDoc */
+  /**
+   * Gets the height of the specified sheet.
+   */
   public getSheetHeight(sheetId: number): number {
     const sheetMapping = this.getStrategyForSheet(sheetId)
     return sheetMapping.getHeight()
   }
 
-  /** @inheritDoc */
-  public getSheetWidth(sheetId: number): number {
-    const sheetMapping = this.getStrategyForSheet(sheetId)
+  /**
+   * Gets the width of the specified sheet.
+   */
+  public getSheetWidth(sheet: number): number {
+    const sheetMapping = this.getStrategyForSheet(sheet)
     return sheetMapping.getWidth()
   }
 
   /**
-   * Adds rows to a sheet starting at the specified row index.
-   * @param {number} sheet - The sheet identifier
-   * @param {number} row - The row index where rows should be added
-   * @param {number} numberOfRows - The number of rows to add
+   * Adds rows to a sheet.
    */
   public addRows(sheet: number, row: number, numberOfRows: number) {
     const sheetMapping = this.getStrategyForSheet(sheet)
@@ -276,7 +279,6 @@ export class AddressMapping {
 
   /**
    * Removes rows from a sheet.
-   * @param {RowsSpan} removedRows - The span of rows to remove
    */
   public removeRows(removedRows: RowsSpan) {
     const sheetMapping = this.getStrategyForSheet(removedRows.sheet)
@@ -285,9 +287,6 @@ export class AddressMapping {
 
   /**
    * Adds columns to a sheet starting at the specified column index.
-   * @param {number} sheet - The sheet identifier
-   * @param {number} column - The column index where columns should be added
-   * @param {number} numberOfColumns - The number of columns to add
    */
   public addColumns(sheet: number, column: number, numberOfColumns: number) {
     const sheetMapping = this.getStrategyForSheet(sheet)
@@ -296,7 +295,6 @@ export class AddressMapping {
 
   /**
    * Removes columns from a sheet.
-   * @param {ColumnsSpan} removedColumns - The span of columns to remove
    */
   public removeColumns(removedColumns: ColumnsSpan) {
     const sheetMapping = this.getStrategyForSheet(removedColumns.sheet)
@@ -305,8 +303,6 @@ export class AddressMapping {
 
   /**
    * Returns an iterator of cell vertices within the specified rows span.
-   * @param {RowsSpan} rowsSpan - The span of rows to iterate over
-   * @returns {IterableIterator<CellVertex>} Iterator of cell vertices
    */
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
     yield* this.mapping.get(rowsSpan.sheet)!.verticesFromRowsSpan(rowsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
@@ -314,8 +310,6 @@ export class AddressMapping {
 
   /**
    * Returns an iterator of cell vertices within the specified columns span.
-   * @param {ColumnsSpan} columnsSpan - The span of columns to iterate over
-   * @returns {IterableIterator<CellVertex>} Iterator of cell vertices
    */
   public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
     yield* this.mapping.get(columnsSpan.sheet)!.verticesFromColumnsSpan(columnsSpan) // eslint-disable-line @typescript-eslint/no-non-null-assertion
@@ -323,8 +317,6 @@ export class AddressMapping {
 
   /**
    * Returns an iterator of address-vertex pairs within the specified rows span.
-   * @param {RowsSpan} rowsSpan - The span of rows to iterate over
-   * @returns {IterableIterator<[SimpleCellAddress, CellVertex]>} Iterator of [address, vertex] tuples
    */
   public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const sheetMapping = this.getStrategyForSheet(rowsSpan.sheet)
@@ -333,8 +325,6 @@ export class AddressMapping {
 
   /**
    * Returns an iterator of address-vertex pairs within the specified columns span.
-   * @param {ColumnsSpan} columnsSpan - The span of columns to iterate over
-   * @returns {IterableIterator<[SimpleCellAddress, CellVertex]>} Iterator of [address, vertex] tuples
    */
   public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const sheetMapping = this.getStrategyForSheet(columnsSpan.sheet)
@@ -353,7 +343,6 @@ export class AddressMapping {
 
   /**
    * Returns an iterator of address-vertex pairs for a specific sheet.
-   * @param {number} sheet - The sheet identifier
    * @returns {IterableIterator<[SimpleCellAddress, CellVertex]>} Iterator of [address, vertex] tuples
    * @throws NoSheetWithIdError if sheet doesn't exist
    */
