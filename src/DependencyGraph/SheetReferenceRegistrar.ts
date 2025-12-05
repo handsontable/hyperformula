@@ -23,7 +23,7 @@ export class SheetReferenceRegistrar {
    * @returns the sheet identifier that represents the referenced sheet
    */
   public ensureSheetRegistered(sheetName: string): number {
-    const sheetId = this.sheetMapping.reserveSheetName(sheetName)
+    const sheetId = this.sheetMapping.addPlaceholderIfNotExists(sheetName)
     this.addressMapping.addSheetStrategyPlaceholderIfNotExists(sheetId)
     return sheetId
   }

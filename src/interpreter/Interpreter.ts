@@ -288,7 +288,7 @@ export class Interpreter {
   }
 
   private isSheetJustReserved(address: AddressWithSheet): boolean {
-    return address.sheet !== undefined && address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })
+    return address.sheet !== undefined && address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {

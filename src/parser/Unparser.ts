@@ -109,7 +109,7 @@ export class Unparser {
   }
 
   private unparseSheetName(sheetId: number): string {
-    const sheetName = sheetIndexToString(sheetId, id => this.sheetMapping.getSheetNameOrThrowError(id, { includeNotAdded: true }))
+    const sheetName = sheetIndexToString(sheetId, id => this.sheetMapping.getSheetNameOrThrowError(id, { includePlaceholders: true }))
     if (sheetName === undefined) {
       throw new NoSheetWithIdError(sheetId)
     }

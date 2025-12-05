@@ -21,8 +21,8 @@ export class EngineComparator {
   }
 
   public compare(): void {
-    const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets({includeNotAdded: true})
-    const numberOfSheets = this.actual.sheetMapping.numberOfSheets({includeNotAdded: true})
+    const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets({includePlaceholders: true})
+    const numberOfSheets = this.actual.sheetMapping.numberOfSheets({includePlaceholders: true})
 
     if (expectedNumberOfSheets !== numberOfSheets) {
       throw Error(`Expected number of sheets ${expectedNumberOfSheets}, actual: ${numberOfSheets}`)

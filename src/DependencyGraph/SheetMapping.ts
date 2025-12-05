@@ -11,7 +11,7 @@ import {Maybe} from '../Maybe'
  * Options for querying the sheet mapping.
  */
 export interface SheetMappingQueryOptions {
-  includeNotAdded?: boolean,
+  includePlaceholders?: boolean,
 }
 
 /**
@@ -21,12 +21,8 @@ class Sheet {
   constructor(
     public readonly id: number,
     public displayName: string,
-    /**
-     * Whether the sheet has been explicitly added to the instance either on initialization or via addSheet method.
-     */
-    public isAdded: boolean = true,
-  ) {
-  }
+    public isPlaceholder: boolean = false,
+  ) {}
 
   /**
    * Returns the canonical (normalized) name of the sheet.
@@ -39,9 +35,9 @@ class Sheet {
 /**
  * Manages the sheets in the instance.
  * Can convert between sheet names and ids and vice versa.
- * Also stores placeholders for sheets that are used in formulas but not yet added. They are marked as isAdded=false.
+ * Also stores placeholders for sheets that are used in formulas but not yet added. They are marked as isPlaceholder=true.
  * Sheetnames thet differ only in case are considered the same. (See: canonicalizeSheetName)
-*/
+ */
 export class SheetMapping {
   /**
    * Prefix for new sheet names if no name is provided by the user
@@ -73,16 +69,14 @@ export class SheetMapping {
   }
 
   /**
-   * Returns sheet ID for the given name (case-insensitive). By default excludes not added sheets.
-   *
-   * @returns {Maybe<number>} the sheet ID, or undefined if not found.
+   * Returns sheet ID for the given name. By default excludes placeholders.
    */
   public getSheetId(sheetName: string, options: SheetMappingQueryOptions = {}): Maybe<number> {
     return this._getSheetByName(sheetName, options)?.id
   }
 
   /**
-   * Returns sheet ID for the given name. Excludes not added sheets.
+   * Returns sheet ID for the given name. Excludes placeholders.
    *
    * @throws {NoSheetWithNameError} if the sheet with the given name does not exist.
    */
@@ -96,7 +90,7 @@ export class SheetMapping {
   }
 
   /**
-   * Returns display name for the given sheet ID. Excludes not added sheets.
+   * Returns display name for the given sheet ID. Excludes placeholders.
    *
    * @returns {Maybe<string>} the display name, or undefined if the sheet with the given ID does not exist.
    */
@@ -105,7 +99,7 @@ export class SheetMapping {
   }
 
   /**
-   * Returns display name for the given sheet ID. Excludes not added sheets.
+   * Returns display name for the given sheet ID. Excludes placeholders.
    *
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
    */
@@ -114,39 +108,39 @@ export class SheetMapping {
   }
 
   /**
-   * Iterates over all sheet display names. By default excludes not added sheets.
+   * Iterates over all sheet display names. By default excludes placeholders.
    */
   public* iterateSheetNames(options: SheetMappingQueryOptions = {}): IterableIterator<string> {
     for (const sheet of this.allSheets.values()) {
-      if (options.includeNotAdded || sheet.isAdded) {
+      if (options.includePlaceholders || !sheet.isPlaceholder) {
         yield sheet.displayName
       }
     }
   }
 
   /**
-   * Returns array of all sheet display names. By default excludes not added sheets.
+   * Returns array of all sheet display names. By default excludes placeholders.
    */
   public getSheetNames(options: SheetMappingQueryOptions = {}): string[] {
     return Array.from(this.iterateSheetNames(options))
   }
 
   /**
-   * Returns total count of sheets. By default excludes not added sheets.
+   * Returns total count of sheets. By default excludes placeholders.
    */
   public numberOfSheets(options: SheetMappingQueryOptions = {}): number {
     return this.getSheetNames(options).length
   }
 
   /**
-   * Checks if sheet with given ID exists. By default excludes not added sheets.
+   * Checks if sheet with given ID exists. By default excludes placeholders.
    */
   public hasSheetWithId(sheetId: number, options: SheetMappingQueryOptions = {}): boolean {
     return this._getSheet(sheetId, options) !== undefined
   }
 
   /**
-   * Checks if sheet with given name exists (case-insensitive). Excludes not added sheets.
+   * Checks if sheet with given name exists (case-insensitive). Excludes placeholders.
    */
   public hasSheetWithName(sheetName: string): boolean {
     return this._getSheetByName(sheetName, {}) !== undefined
@@ -154,20 +148,19 @@ export class SheetMapping {
 
   /**
    * Adds new sheet with optional name and returns its ID.
-   * If called with a reserved sheet name (sheet name of some sheet present in the mapping but not added yet), adds the reserved sheet.
+   * If called with a name of placeholder sheet, adds the real sheet.
    *
    * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
-   * @returns {number} the ID of the new sheet.
    */
   public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
-    const sheetWithConflictingName = this._getSheetByName(newSheetDisplayName, { includeNotAdded: true })
+    const sheetWithConflictingName = this._getSheetByName(newSheetDisplayName, { includePlaceholders: true })
 
     if (sheetWithConflictingName) {
-      if (sheetWithConflictingName.isAdded) {
+      if (!sheetWithConflictingName.isPlaceholder) {
         throw new SheetNameAlreadyTakenError(newSheetDisplayName)
       }
 
-      sheetWithConflictingName.isAdded = true
+      sheetWithConflictingName.isPlaceholder = false
       return sheetWithConflictingName.id
     }
 
@@ -178,49 +171,48 @@ export class SheetMapping {
   }
 
   /**
-   * Stores the sheet in the mapping with flag isAdded=false.
-   * If such sheet name is already present in the mapping, does nothing.
-   *
-   * @returns {number} the ID of the reserved sheet.
+   * Adds a placeholder sheet with the given name if it does not exist yet
    */
-  public reserveSheetName(sheetName: string): number {
-    const sheetWithConflictingName = this._getSheetByName(sheetName, { includeNotAdded: true })
+  public addPlaceholderIfNotExists(sheetName: string): number {
+    const sheetWithConflictingName = this._getSheetByName(sheetName, { includePlaceholders: true })
 
     if (sheetWithConflictingName) {
       return sheetWithConflictingName.id
     }
 
     this.lastSheetId++
-    const sheet = new Sheet(this.lastSheetId, sheetName, false)
+    const sheet = new Sheet(this.lastSheetId, sheetName, true)
     this.storeSheetInMappings(sheet)
     return sheet.id
   }
 
   /**
-   * Removes sheet with given ID. Ignores not added sheets.
-   *
-   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist or is not added yet.
+   * Removes sheet with given ID. Ignores placeholders
+   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist or is a placeholder
    */
   public removeSheet(sheetId: number): void {
-    const sheet = this._getSheetOrThrowError(sheetId, {})
+    const sheet = this._getSheetOrThrowError(sheetId, { includePlaceholders: false })
     this.allSheets.delete(sheetId)
     this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
   }
 
-  public softRemoveSheet(sheetId: number): void {
+  /**
+   * Marks sheet with given ID as a placeholder.
+   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist
+   */
+  public markSheetAsPlaceholder(sheetId: number): void {
     const sheet = this._getSheetOrThrowError(sheetId, {})
-    sheet.isAdded = false
+    sheet.isPlaceholder = true
   }
 
   /**
    * Renames sheet.
-   * If called with sheetId of a not added sheet, throws {NoSheetWithIdError}.
+   * If called with sheetId of a placeholder sheet, throws {NoSheetWithIdError}.
    * If newDisplayName is conflicting with an existing sheet, throws {SheetNameAlreadyTakenError}.
-   * If newDisplayName is conflicting with a reserved sheet name (name of a non-added sheet), throws {SheetNameAlreadyTakenError}.
+   * If newDisplayName is conflicting with a placeholder sheet name, throws {SheetNameAlreadyTakenError}.
    *
    * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
-   * @returns {Maybe<string>} the old name, or undefined if the name was not changed.
    */
   public renameSheet(sheetId: number, newDisplayName: string): { previousDisplayName: Maybe<string>, mergedSheetWith?: number } {
     const sheet = this._getSheetOrThrowError(sheetId, {})
@@ -230,11 +222,11 @@ export class SheetMapping {
       return { previousDisplayName: undefined }
     }
 
+    const sheetWithConflictingName = this._getSheetByName(newDisplayName, { includePlaceholders: true })
     let mergedSheetWith: number | undefined = undefined
-    const sheetWithConflictingName = this._getSheetByName(newDisplayName, { includeNotAdded: true })
 
     if (sheetWithConflictingName !== undefined && sheetWithConflictingName.id !== sheet.id) {
-      if (sheetWithConflictingName.isAdded) {
+      if (!sheetWithConflictingName.isPlaceholder) {
         throw new SheetNameAlreadyTakenError(newDisplayName)
       } else {
         this.mappingFromCanonicalNameToId.delete(sheetWithConflictingName.canonicalName)
@@ -277,7 +269,7 @@ export class SheetMapping {
       return undefined
     }
 
-    return (options.includeNotAdded || retrievedSheet.isAdded) ? retrievedSheet : undefined
+    return (options.includePlaceholders || !retrievedSheet.isPlaceholder) ? retrievedSheet : undefined
   }
 
   /**

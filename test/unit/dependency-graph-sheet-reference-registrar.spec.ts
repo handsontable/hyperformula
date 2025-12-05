@@ -13,7 +13,7 @@ describe('SheetReferenceRegistrar', () => {
     const secondSheetId = registrar.ensureSheetRegistered('Ghost')
 
     expect(firstSheetId).toBe(secondSheetId)
-    expect(sheetMapping.getSheetId('Ghost', {includeNotAdded: true})).toBe(firstSheetId)
+    expect(sheetMapping.getSheetId('Ghost', {includePlaceholders: true})).toBe(firstSheetId)
     expect(() => addressMapping.getStrategyForSheet(firstSheetId)).not.toThrow()
   })
 })

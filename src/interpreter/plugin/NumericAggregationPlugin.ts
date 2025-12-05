@@ -629,7 +629,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       }
     }
 
-    if (!this.dependencyGraph.sheetMapping.hasSheetWithId(range.start.sheet, { includeNotAdded: false }) || !this.dependencyGraph.sheetMapping.hasSheetWithId(range.end.sheet, { includeNotAdded: false })) {
+    if (!this.dependencyGraph.sheetMapping.hasSheetWithId(range.start.sheet, { includePlaceholders: false }) || !this.dependencyGraph.sheetMapping.hasSheetWithId(range.end.sheet, { includePlaceholders: false })) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
     }
 

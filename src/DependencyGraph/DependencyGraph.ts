@@ -322,7 +322,7 @@ export class DependencyGraph {
       this.sheetMapping.removeSheet(sheetBeingRemoved)
       this.addressMapping.removeSheet(sheetBeingRemoved)
     } else {
-      this.sheetMapping.softRemoveSheet(sheetBeingRemoved)
+      this.sheetMapping.markSheetAsPlaceholder(sheetBeingRemoved)
     }
 
     this.stats.measure(StatType.ADJUSTING_RANGES, () => {
@@ -624,7 +624,7 @@ export class DependencyGraph {
   }
 
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
-    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
     }
 
@@ -632,7 +632,7 @@ export class DependencyGraph {
   }
 
   public getRawValue(address: SimpleCellAddress): RawCellContent {
-    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })) {
       return null
     }
 
@@ -640,7 +640,7 @@ export class DependencyGraph {
   }
 
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
-    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includeNotAdded: false })) {
+    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
     }
 
@@ -1196,11 +1196,11 @@ export class DependencyGraph {
 
     const hasDependentInExistingSheet = dependents.some(addr => {
       if (isSimpleCellAddress(addr)) {
-        return addr.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.sheetMapping.hasSheetWithId(addr.sheet, { includeNotAdded: false })
+        return addr.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.sheetMapping.hasSheetWithId(addr.sheet, { includePlaceholders: false })
       }
 
       if (isSimpleCellRange(addr)) {
-        return this.sheetMapping.hasSheetWithId(addr.start.sheet, { includeNotAdded: false }) || this.sheetMapping.hasSheetWithId(addr.end.sheet, { includeNotAdded: false })
+        return this.sheetMapping.hasSheetWithId(addr.start.sheet, { includePlaceholders: false }) || this.sheetMapping.hasSheetWithId(addr.end.sheet, { includePlaceholders: false })
       }
 
       return false
