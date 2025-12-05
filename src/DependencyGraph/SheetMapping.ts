@@ -38,14 +38,26 @@ class Sheet {
 
 /**
  * Manages the sheets in the instance.
- * Stores ids, names and the mapping between them.
- *
- * TODO: describe isAdded: false situation
- */
+ * Can convert between sheet names and ids and vice versa.
+ * Also stores placeholders for sheets that are used in formulas but not yet added. They are marked as isAdded=false.
+ * Sheetnames thet differ only in case are considered the same. (See: canonicalizeSheetName)
+*/
 export class SheetMapping {
+  /**
+   * Prefix for new sheet names if no name is provided by the user
+   */
   private readonly sheetNamePrefix: string
+  /**
+   * Last used sheet ID. Used to generate new sheet IDs.
+   */
   private lastSheetId = -1
+  /**
+   * Mapping from canonical sheet name to sheet ID.
+   */
   private mappingFromCanonicalNameToId: Map<string, number> = new Map()
+  /**
+   * Mapping from sheet ID to sheet.
+   */
   private allSheets: Map<number, Sheet> = new Map()
 
   constructor(languages: TranslationPackage) {
@@ -54,6 +66,7 @@ export class SheetMapping {
 
   /**
    * Converts sheet name to canonical/normalized form.
+   * @static
    */
   public static canonicalizeSheetName(sheetDisplayName: string): string {
     return sheetDisplayName.toLowerCase()
