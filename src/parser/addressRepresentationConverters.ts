@@ -32,16 +32,10 @@ export const cellAddressFromString = (stringAddress: string, baseAddress: Simple
   const col = columnLabelToIndex(result[6])
   const row = Number(result[8]) - 1
   const sheetName = extractSheetName(result)
-  let sheet: Maybe<number>
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
 
-  if (sheetName) {
-    sheet = resolveSheetReference(sheetName)
-
-    if (sheet === undefined) {
-      return undefined
-    }
-  } else {
-    sheet = undefined
+  if (sheet === null) {
+    return undefined
   }
 
   if (result[5] === ABSOLUTE_OPERATOR && result[7] === ABSOLUTE_OPERATOR) {
@@ -59,16 +53,10 @@ export const columnAddressFromString = (stringAddress: string, baseAddress: Simp
   const result = columnRegex.exec(stringAddress)!
   const col = columnLabelToIndex(result[6])
   const sheetName = extractSheetName(result)
-  let sheet: Maybe<number>
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
 
-  if (sheetName) {
-    sheet = resolveSheetReference(sheetName)
-
-    if (sheet === undefined) {
-      return undefined
-    }
-  } else {
-    sheet = undefined
+  if (sheet === null) {
+    return undefined
   }
 
   if (result[5] === ABSOLUTE_OPERATOR) {
@@ -82,16 +70,10 @@ export const rowAddressFromString = (stringAddress: string, baseAddress: SimpleC
   const result = rowRegex.exec(stringAddress)!
   const row = Number(result[6]) - 1
   const sheetName = extractSheetName(result)
-  let sheet: Maybe<number>
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
 
-  if (sheetName) {
-    sheet = resolveSheetReference(sheetName)
-
-    if (sheet === undefined) {
-      return undefined
-    }
-  } else {
-    sheet = undefined
+  if (sheet === null) {
+    return undefined
   }
 
   if (result[5] === ABSOLUTE_OPERATOR) {
@@ -121,19 +103,15 @@ export const simpleCellAddressFromString = (resolveSheetReference: ResolveSheetR
   const col = columnLabelToIndex(regExpExecArray[6])
   const row = Number(regExpExecArray[8]) - 1
   const sheetName = extractSheetName(regExpExecArray)
-  let sheet: Maybe<number>
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
 
-  if (sheetName) {
-    sheet = resolveSheetReference(sheetName)
-
-    if (sheet === undefined) {
-      return undefined
-    }
-  } else {
-    sheet = contextSheetId
+  if (sheet === null) {
+    return undefined
   }
 
-  return simpleCellAddress(sheet, col, row)
+  const effectiveSheet = sheet === undefined ? contextSheetId : sheet
+
+  return simpleCellAddress(effectiveSheet, col, row)
 }
 
 export const simpleCellRangeFromString = (resolveSheetReference: ResolveSheetReferenceFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellRange> => {
@@ -240,4 +218,21 @@ function extractSheetName(regexResult: RegExpExecArray): string | null {
   const maybeSheetName = regexResult[3] ?? regexResult[2]
 
   return maybeSheetName ? maybeSheetName.replace(/''/g, "'") : null
+}
+
+/**
+ * Resolves sheet name to sheet id.
+ *
+ * @param sheetName - extracted sheet name or null when not provided.
+ * @param resolveSheetReference - mapping function resolving sheet name to id.
+ * @returns sheet id, undefined when sheet name absent, null when resolution fails.
+ */
+function sheetNameToId(sheetName: string | null, resolveSheetReference: ResolveSheetReferenceFn): Maybe<number> | null {
+  if (!sheetName) {
+    return undefined
+  }
+
+  const sheetId = resolveSheetReference(sheetName)
+
+  return sheetId === undefined ? null : sheetId
 }
