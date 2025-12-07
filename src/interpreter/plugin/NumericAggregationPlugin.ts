@@ -609,13 +609,13 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
   /**
    * Performs range operation on given range
    *
-   * @param ast - cell range ast
-   * @param state
-   * @param initialAccValue - initial accumulator value for reducing function
-   * @param functionName - function name to use as cache key
-   * @param reducingFunction - reducing function
-   * @param mapFunction
-   * @param coercionFunction
+   * @param {CellRangeAst | ColumnRangeAst | RowRangeAst} ast - cell range ast
+   * @param {InterpreterState} state - interpreter state
+   * @param {T} initialAccValue - initial accumulator value for reducing function
+   * @param {string} functionName - function name to use as cache key
+   * @param {BinaryOperation<T>} reducingFunction - reducing function
+   * @param {MapOperation<T>} mapFunction - mapper transforming coerced scalar
+   * @param {coercionOperation} coercionFunction - scalar-to-number coercer
    */
   private evaluateRange<T>(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, state: InterpreterState, initialAccValue: T, functionName: string, reducingFunction: BinaryOperation<T>, mapFunction: MapOperation<T>, coercionFunction: coercionOperation): T | CellError {
     let range
@@ -629,7 +629,7 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
       }
     }
 
-    if (!this.dependencyGraph.sheetMapping.hasSheetWithId(range.start.sheet, { includePlaceholders: false }) || !this.dependencyGraph.sheetMapping.hasSheetWithId(range.end.sheet, { includePlaceholders: false })) {
+    if (!this.isSheetValid(range)) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
     }
 
@@ -655,6 +655,16 @@ export class NumericAggregationPlugin extends FunctionPlugin implements Function
     }
 
     return value
+  }
+
+  /**
+   * Checks whether both ends of a range point to existing sheets (placeholders excluded).
+   */
+  private isSheetValid(range: AbsoluteCellRange): boolean {
+    return (
+      this.dependencyGraph.sheetMapping.hasSheetWithId(range.start.sheet, {includePlaceholders: false}) &&
+      this.dependencyGraph.sheetMapping.hasSheetWithId(range.end.sheet, {includePlaceholders: false})
+    )
   }
 
   /**
