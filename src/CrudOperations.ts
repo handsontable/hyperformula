@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {isColOrRowInvalid, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {Config} from './Config'
@@ -495,8 +495,8 @@ export class CrudOperations {
 
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
-      || invalidSimpleCellAddress(sourceStart)
-      || invalidSimpleCellAddress(targetStart)
+      || isColOrRowInvalid(sourceStart)
+      || isColOrRowInvalid(targetStart)
       || !isPositiveInteger(numberOfRows)
       || (targetRow <= startRow + numberOfRows && targetRow >= startRow)
     ) {
@@ -522,8 +522,8 @@ export class CrudOperations {
 
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
-      || invalidSimpleCellAddress(sourceStart)
-      || invalidSimpleCellAddress(targetStart)
+      || isColOrRowInvalid(sourceStart)
+      || isColOrRowInvalid(targetStart)
       || !isPositiveInteger(numberOfColumns)
       || (targetColumn <= startColumn + numberOfColumns && targetColumn >= startColumn)
     ) {
@@ -559,7 +559,7 @@ export class CrudOperations {
   }
 
   public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
-    if (invalidSimpleCellAddress(address)) {
+    if (isColOrRowInvalid(address)) {
       throw new InvalidAddressError(address)
     }
     if (!this.sheetMapping.hasSheetWithId(address.sheet)) {

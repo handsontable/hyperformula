@@ -6,7 +6,7 @@
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
-import {CellError, ErrorType, invalidSimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
@@ -40,7 +40,6 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
-import { CellAddress } from '../parser/CellAddress'
 import { AddressWithSheet } from '../parser/Address'
 
 export class Interpreter {
@@ -80,8 +79,8 @@ export class Interpreter {
   /**
    * Calculates cell value from formula abstract syntax tree
    *
-   * @param formula - abstract syntax tree of formula
-   * @param formulaAddress - address of the cell in which formula is located
+   * @param {Ast} ast - abstract syntax tree of formula
+   * @param {InterpreterState} state - interpreter state
    */
   private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState): InterpreterValue {
     switch (ast.type) {
@@ -91,11 +90,11 @@ export class Interpreter {
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
 
-        if (invalidSimpleCellAddress(address)) {
+        if (isColOrRowInvalid(address)) {
           return new CellError(ErrorType.REF, ErrorMessage.BadRef)
         }
 
-        if (this.isSheetJustReserved(ast.reference)) {
+        if (!this.isSheetValid(ast.reference)) {
           return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
         }
 
@@ -197,7 +196,7 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
-        if (this.isSheetJustReserved(ast.start) || this.isSheetJustReserved(ast.end)) {
+        if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
           return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
         }
 
@@ -224,7 +223,7 @@ export class Interpreter {
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.COLUMN_RANGE: {
-        if (this.isSheetJustReserved(ast.start) || this.isSheetJustReserved(ast.end)) {
+        if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
           return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
         }
 
@@ -235,7 +234,7 @@ export class Interpreter {
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
-        if (this.isSheetJustReserved(ast.start) || this.isSheetJustReserved(ast.end)) {
+        if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
           return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
         }
 
@@ -287,8 +286,8 @@ export class Interpreter {
     }
   }
 
-  private isSheetJustReserved(address: AddressWithSheet): boolean {
-    return address.sheet !== undefined && address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })
+  private isSheetValid(address: AddressWithSheet): boolean {
+    return address.sheet === undefined || address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {

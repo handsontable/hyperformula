@@ -6,7 +6,7 @@
 import { AbsoluteCellRange } from './AbsoluteCellRange'
 import { absolutizeDependencies, filterDependenciesOutOfScope } from './absolutizeDependencies'
 import { ArraySize, ArraySizePredictor } from './ArraySize'
-import { equalSimpleCellAddress, invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress } from './Cell'
+import { equalSimpleCellAddress, isColOrRowInvalid, simpleCellAddress, SimpleCellAddress } from './Cell'
 import { CellContent, CellContentParser, RawCellContent } from './CellContentParser'
 import { ClipboardCell, ClipboardCellType } from './ClipboardOperations'
 import { Config } from './Config'
@@ -422,9 +422,9 @@ export class Operations {
 
   public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     if (
-      invalidSimpleCellAddress(sourceLeftCorner) ||
+      isColOrRowInvalid(sourceLeftCorner) ||
       !((isPositiveInteger(width) && isPositiveInteger(height)) || isRowOrColumnRange(sourceLeftCorner, width, height)) ||
-      invalidSimpleCellAddress(destinationLeftCorner) ||
+      isColOrRowInvalid(destinationLeftCorner) ||
       !this.sheetMapping.hasSheetWithId(sourceLeftCorner.sheet) ||
       !this.sheetMapping.hasSheetWithId(destinationLeftCorner.sheet)
     ) {
