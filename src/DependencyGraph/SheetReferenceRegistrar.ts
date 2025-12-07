@@ -7,7 +7,7 @@ import {AddressMapping} from './AddressMapping/AddressMapping'
 import {SheetMapping} from './SheetMapping'
 
 /**
- * Handles lazy registration of sheets referenced inside formulas.
+ * Converts sheet names to ids and adds placeholder sheets if they don't exist.
  */
 export class SheetReferenceRegistrar {
   constructor(
@@ -16,11 +16,8 @@ export class SheetReferenceRegistrar {
   ) {}
 
   /**
-   * Ensures that a sheet referenced by name has both a reserved entry in {@link SheetMapping}
-   * and a placeholder strategy in {@link AddressMapping}.
-   *
-   * @param sheetName - display name of the referenced sheet
-   * @returns the sheet identifier that represents the referenced sheet
+   * Adds placeholder sheet if it doesn't exist and adds placeholder strategy to address mapping.
+   * @returns {number} sheet id
    */
   public ensureSheetRegistered(sheetName: string): number {
     const sheetId = this.sheetMapping.addPlaceholderIfNotExists(sheetName)
