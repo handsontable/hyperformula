@@ -29,8 +29,6 @@ import {ParserConfig} from './ParserConfig'
 import {formatNumber} from './Unparser'
 import {ColumnAddress} from './ColumnAddress'
 import {RowAddress} from './RowAddress'
-import { SheetMapping } from '../DependencyGraph/SheetMapping'
-import { Maybe } from '../Maybe'
 
 export interface ParsingResult {
   ast: Ast,

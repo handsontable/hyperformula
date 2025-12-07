@@ -96,7 +96,6 @@ import {
   TimesOp,
 } from './LexerConfig'
 import {AddressWithSheet} from './Address'
-import { SheetMapping } from '../DependencyGraph/SheetMapping'
 
 export interface FormulaParserResult {
   ast: Ast,
