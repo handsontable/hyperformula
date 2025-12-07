@@ -1209,7 +1209,7 @@ export class DependencyGraph {
     let dependencies: Set<[SimpleCellAddress | SimpleCellRange, Vertex]>
 
     if (hasDependentInExistingSheet) {
-      dependencies = new Set(this.graph.softRemoveNode(inputVertex))
+      dependencies = new Set(this.graph.removeDependencies(inputVertex))
     } else {
       dependencies = new Set(this.graph.removeNode(inputVertex))
     }

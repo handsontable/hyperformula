@@ -204,25 +204,6 @@ export class Graph<Node> {
     return dependencies
   }
 
-  public softRemoveNode(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
-    const id = this.getNodeId(node)
-
-    if (id === undefined) {
-      throw this.missingNodeError(node)
-    }
-
-    if (this.edgesSparseArray[id].length > 0) {
-      this.edgesSparseArray[id].forEach(adjacentId => this.dirtyAndVolatileNodeIds.rawValue.dirty.push(adjacentId))
-      this.dirtyAndVolatileNodeIds.markAsModified()
-    }
-
-    const dependencies = this.removeDependencies(node)
-
-    this.infiniteRangeIds.delete(id)
-
-    return dependencies
-  }
-
   /**
    * Removes edge between nodes.
    */
@@ -409,7 +390,7 @@ export class Graph<Node> {
   /**
    * Removes edges from the given node to its dependencies based on the dependencyQuery function.
    */
-  private removeDependencies(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
+  public removeDependencies(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
     const dependencies = this.dependencyQuery(node)
 
     dependencies.forEach(([_, dependency]) => {
@@ -433,6 +414,6 @@ export class Graph<Node> {
    * Returns error for missing node.
    */
   private missingNodeError(node: Node): Error {
-    return new Error(`Unknown node ${node}`)
+    return new Error(`Unknown node ${JSON.stringify(node)}`)
   }
 }
