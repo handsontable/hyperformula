@@ -217,17 +217,26 @@ export class Operations {
     return columnsRemovals
   }
 
+  /**
+   * Clears the sheet content.
+   */
   public clearSheet(sheetId: number) {
     this.dependencyGraph.clearSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
   }
 
+  /**
+   * Adds a new sheet to the workbook.
+   */
   public addSheet(name?: string): string {
     const sheetId = this.sheetMapping.addSheet(name)
     this.dependencyGraph.addSheet(sheetId)
     return this.sheetMapping.getSheetNameOrThrowError(sheetId)
   }
 
+  /**
+   * Removes a sheet from the workbook.
+   */
   public removeSheet(sheetId: number): { version: number, scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][] } {
     this.dependencyGraph.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
@@ -237,12 +246,18 @@ export class Operations {
     return { version: 0, scopedNamedExpressions }
   }
 
+  /**
+   * Removes a sheet from the workbook by name.
+   */
   public removeSheetByName(sheetName: string) {
     const sheetId = this.sheetMapping.getSheetIdOrThrowError(sheetName)
     return this.removeSheet(sheetId)
   }
 
-  public renameSheet(sheetId: number, newName: string): Maybe<string> { // TODO: refactor
+  /**
+   * Renames a sheet in the workbook.
+   */
+  public renameSheet(sheetId: number, newName: string): Maybe<string> {
     const { previousDisplayName, mergedSheetWith } = this.sheetMapping.renameSheet(sheetId, newName)
 
     if (mergedSheetWith !== undefined) {

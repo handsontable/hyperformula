@@ -659,17 +659,6 @@ export class DependencyGraph {
     }
   }
 
-  /**
-   * Iterator over all formula nodes in the graph.
-   */
-  public* formulaNodes(): IterableIterator<FormulaVertex> {
-    for (const vertex of this.graph.getNodes()) {
-      if (vertex instanceof FormulaVertex) {
-        yield vertex
-      }
-    }
-  }
-
   public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     yield* this.addressMapping.entriesFromRowsSpan(rowsSpan)
   }
@@ -686,8 +675,16 @@ export class DependencyGraph {
     return this.addressMapping.getCell(address)
   }
 
+  /**
+   * Checks if the given sheet ID refers to a placeholder sheet (doesn't exist but is referenced by other sheets)
+   */
+  private isPlaceholder(sheetId: number): boolean {
+    return sheetId !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS &&
+      !this.sheetMapping.hasSheetWithId(sheetId, { includePlaceholders: false })
+  }
+
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
-    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })) {
+    if (this.isPlaceholder(address.sheet)) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
     }
 
@@ -695,7 +692,7 @@ export class DependencyGraph {
   }
 
   public getRawValue(address: SimpleCellAddress): RawCellContent {
-    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })) {
+    if (this.isPlaceholder(address.sheet)) {
       return null
     }
 
@@ -703,7 +700,7 @@ export class DependencyGraph {
   }
 
   public getScalarValue(address: SimpleCellAddress): InternalScalarValue {
-    if (address.sheet !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS && !this.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })) {
+    if (this.isPlaceholder(address.sheet)) {
       return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
     }
 
@@ -1258,7 +1255,7 @@ export class DependencyGraph {
 
     const hasDependentInExistingSheet = dependents.some(addr => {
       if (isSimpleCellAddress(addr)) {
-        return addr.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.sheetMapping.hasSheetWithId(addr.sheet, { includePlaceholders: false })
+        return !this.isPlaceholder(addr.sheet)
       }
 
       if (isSimpleCellRange(addr)) {
