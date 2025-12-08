@@ -242,7 +242,7 @@ export class Operations {
     return this.removeSheet(sheetId)
   }
 
-  public renameSheet(sheetId: number, newName: string): Maybe<string> {
+  public renameSheet(sheetId: number, newName: string): Maybe<string> { // TODO: refactor
     const { previousDisplayName, mergedSheetWith } = this.sheetMapping.renameSheet(sheetId, newName)
 
     if (mergedSheetWith !== undefined) {

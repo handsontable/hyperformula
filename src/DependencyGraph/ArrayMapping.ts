@@ -9,6 +9,17 @@ import {Maybe} from '../Maybe'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {ArrayFormulaVertex} from './'
 
+/**
+ * Maps top-left corner addresses to their ArrayFormulaVertex instances.
+ * An ArrayFormulaVertex is created for formulas that output multiple values (e.g., MMULT, TRANSPOSE, array literals).
+ * The same ArrayFormulaVertex is referenced in AddressMapping for all cells within its spill range.
+ * ArrayFormulaVertex lifecycle:
+ * - Prediction (ArraySizePredictor.checkArraySize) → determines if formula will produce array
+ * - Creation → new ArrayFormulaVertex(...) added via addArrayFormulaVertex()
+ * - Address registration → setAddressMappingForArrayFormulaVertex() sets the vertex for all cells in range
+ * - Evaluation → computes actual values, stores in ArrayFormulaVertex.array
+ * - Shrinking → if content placed in array area, array shrinks via shrinkArrayToCorner()
+ */
 export class ArrayMapping {
   public readonly arrayMapping: Map<string, ArrayFormulaVertex> = new Map()
 

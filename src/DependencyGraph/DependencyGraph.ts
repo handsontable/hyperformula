@@ -289,53 +289,110 @@ export class DependencyGraph {
     }
   }
 
-  public addSheet(sheetId: number) {
-    this.addressMapping.addSheetOrChangeStrategy(sheetId, findBoundaries([]))
+  /**
+   * Adds a new sheet to the graph.
+   * If the sheetId was a placeholder sheet, marks its vertices as dirty.
+   */
+  public addSheet(sheetId: number): void {
+    this.stats.measure(StatType.ADJUSTING_ADDRESS_MAPPING, () => {
+      this.adjustAddressMappingAfterAddingSheet(sheetId)
+    })
 
-    for (const [_, vertex] of this.addressMapping.sheetEntries(sheetId)) {
-      this.graph.markNodeAsDirty(vertex)
-    }
-
-    // TODO: adjust arrayMapping
+    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      this.adjustRangeMappingAfterAddingSheet(sheetId)
+    })
   }
 
-  public removeSheet(sheetBeingRemoved: number) {
-    this.clearSheet(sheetBeingRemoved)
+  private adjustAddressMappingAfterAddingSheet(sheetId: number) {
+    this.addressMapping.addSheetOrChangeStrategy(sheetId, findBoundaries([]))
 
-    let shouldRemoveSheet = true
-    for (const [adr, vertex] of this.addressMapping.sheetEntries(sheetBeingRemoved)) {
+    const emptyVerticesInPlaceholderSheet = this.addressMapping.sheetEntries(sheetId)
+    for (const [_, vertex] of emptyVerticesInPlaceholderSheet) {
+      this.graph.markNodeAsDirty(vertex)
+    }
+  }
+
+  private adjustRangeMappingAfterAddingSheet(sheetId: number) {
+    const rangeVerticesInPlaceholderSheet = this.rangeMapping.rangesInSheet(sheetId)
+
+    for (const vertex of rangeVerticesInPlaceholderSheet) {
+      this.graph.markNodeAsDirty(vertex)
+    }
+  }
+
+  private removeCellVertices(sheetId: number): boolean {
+    let allVerticesRemoved = true
+    const sheetVertices = this.addressMapping.sheetEntries(sheetId)
+
+    for (const [adr, vertex] of sheetVertices) {
       for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
         this.graph.markNodeAsDirty(adjacentNode)
       }
 
-      const wasRemoved = this.softRemoveVertex(vertex)
+      const wasRemoved = this.removeVertexIfNoDependentsInOtherSheets(vertex)
+
       if (wasRemoved) {
         this.addressMapping.removeCell(adr)
-      }
-
-      if (!wasRemoved) {
-        shouldRemoveSheet = false
+      } else {
+        allVerticesRemoved = false
       }
     }
 
-    if (shouldRemoveSheet) {
+    return allVerticesRemoved
+  }
+
+  private removeRangeVertices(sheetId: number): boolean {
+    let allRangesRemoved = true
+    const sheetRanges = this.rangeMapping.rangesInSheet(sheetId)
+
+    for (const range of sheetRanges) {
+      for (const adjacentNode of this.graph.adjacentNodes(range)) {
+        this.graph.markNodeAsDirty(adjacentNode)
+      }
+
+      const wasRemoved = this.removeVertexIfNoDependentsInOtherSheets(range)
+
+      if (wasRemoved) {
+        this.rangeMapping.removeVertexIfExists(range)
+      } else {
+        allRangesRemoved = false
+      }
+    }
+
+    return allRangesRemoved
+  }
+
+  /**
+   * Removes a sheet from the graph.
+   * - clears address mapping
+   * - clears range mapping
+   * - clears array mapping
+   * - if sheet has a dependents in other sheets, marks it as placeholder
+   * - otherwise, removes the sheet from sheet mapping and address mapping
+   */
+  public removeSheet(sheetBeingRemoved: number) {
+    this.clearSheet(sheetBeingRemoved) // what it does? dont duplicate
+
+    const addressMappingCleared = this.stats.measure(StatType.ADJUSTING_GRAPH, () => {
+      return this.removeCellVertices(sheetBeingRemoved)
+    })
+
+    const rangeMappingCleared = this.stats.measure(StatType.ADJUSTING_RANGES, () => {
+      return this.removeRangeVertices(sheetBeingRemoved)
+    })
+
+    if (addressMappingCleared && rangeMappingCleared) {
       this.sheetMapping.removeSheet(sheetBeingRemoved)
       this.addressMapping.removeSheet(sheetBeingRemoved)
     } else {
       this.sheetMapping.markSheetAsPlaceholder(sheetBeingRemoved)
     }
-
-    this.stats.measure(StatType.ADJUSTING_RANGES, () => {
-      const rangesToRemove = this.rangeMapping.removeRangesInSheet(sheetBeingRemoved)
-      for (const range of rangesToRemove) {
-        this.softRemoveVertex(range)
-      }
-    })
-
-    // TODO: adjust arrayMapping
   }
 
-  public mergeSheets(sheetToKeep: number, sheetToDelete: number): void {
+  /**
+   * TODO
+   */
+  public mergeSheets(sheetToKeep: number, sheetToDelete: number): void { // TODO: refactor
     const cellsFromSheetToDelete = this.addressMapping.sheetEntries(sheetToDelete)
     const rangesFromSheetToDelete = Array.from(this.rangeMapping.rangesInSheet(sheetToDelete))
 
@@ -376,8 +433,14 @@ export class DependencyGraph {
     this.addressMapping.removeSheet(sheetToDelete)
 
     // TODO: adjust arrayMapping
+
+    this.addStructuralNodesToChangeSet()
   }
 
+  /**
+   * Clears the sheet content.
+   *
+   */
   public clearSheet(sheetId: number) {
     const arrays: Set<ArrayFormulaVertex> = new Set()
     for (const [address, vertex] of this.addressMapping.sheetEntries(sheetId)) {
@@ -1188,10 +1251,9 @@ export class DependencyGraph {
    * - If vertex has dependents in other sheets, changes it to EmptyCellVertex and returns false
    * - Otherwise, removes it from the graph, cleans up its dependencies and returns true
    *
-   * @param inputVertex - The vertex to remove.
    * @returns True if the vertex was removed, false if it was changed to EmptyCellVertex.
    */
-  private softRemoveVertex(inputVertex: Vertex): boolean {
+  private removeVertexIfNoDependentsInOtherSheets(inputVertex: Vertex): boolean {
     const dependents = this.getAdjacentNodesAddresses(inputVertex)
 
     const hasDependentInExistingSheet = dependents.some(addr => {
