@@ -7,11 +7,11 @@ import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
 import {CellValue} from './CellValue'
 import {Config} from './Config'
-import {ArrayVertex, DependencyGraph, FormulaCellVertex, ParsingErrorVertex} from './DependencyGraph'
+import {ArrayFormulaVertex, DependencyGraph, ScalarFormulaVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Exporter} from './Exporter'
 import {Maybe} from './Maybe'
 import {NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
-import {buildLexerConfig, ProcedureAst, Unparser} from './parser'
+import {ProcedureAst, Unparser} from './parser'
 
 export interface SerializedNamedExpression {
   name: string,
@@ -30,7 +30,7 @@ export class Serialization {
 
   public getCellHyperlink(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
-    if (formulaVertex instanceof FormulaCellVertex) {
+    if (formulaVertex instanceof ScalarFormulaVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService) as ProcedureAst
        if ('HYPERLINK' === formula.procedureName) {
         return formula.hyperlink
@@ -41,11 +41,11 @@ export class Serialization {
 
   public getCellFormula(address: SimpleCellAddress, targetAddress?: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
-    if (formulaVertex instanceof FormulaCellVertex) {
+    if (formulaVertex instanceof ScalarFormulaVertex) {
       const formula = formulaVertex.getFormula(this.dependencyGraph.lazilyTransformingAstService)
       targetAddress = targetAddress ?? address
       return this.unparser.unparse(formula, targetAddress)
-    } else if (formulaVertex instanceof ArrayVertex) {
+    } else if (formulaVertex instanceof ArrayFormulaVertex) {
       const arrayVertexAddress = formulaVertex.getAddress(this.dependencyGraph.lazilyTransformingAstService)
       if (arrayVertexAddress.row !== address.row || arrayVertexAddress.col !== address.col || arrayVertexAddress.sheet !== address.sheet) {
         return undefined

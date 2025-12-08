@@ -1,7 +1,7 @@
 import {ExportedCellChange, HyperFormula, SheetSizeLimitExceededError} from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {Config} from '../../../src/Config'
-import {ArrayVertex, FormulaCellVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex, ScalarFormulaVertex} from '../../../src/DependencyGraph'
 import {AlwaysDense} from '../../../src/DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {adr, expectArrayWithSameContent, expectEngineToBeTheSameAs, extractMatrixRange} from '../testUtils'
@@ -249,17 +249,17 @@ describe('Adding row - reevaluation', () => {
   })
 })
 
-describe('Adding row - FormulaCellVertex#address update', () => {
+describe('Adding row - ScalarFormulaVertex#address update', () => {
   it('insert row, formula vertex address shifted', () => {
     const engine = HyperFormula.buildFromArray([
       // new row
       ['=SUM(1, 2)'],
     ])
 
-    let vertex = engine.addressMapping.getCellOrThrowError(adr('A1')) as FormulaCellVertex
+    let vertex = engine.addressMapping.getCellOrThrowError(adr('A1')) as ScalarFormulaVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1'))
     engine.addRows(0, [0, 1])
-    vertex = engine.addressMapping.getCellOrThrowError(adr('A2')) as FormulaCellVertex
+    vertex = engine.addressMapping.getCellOrThrowError(adr('A2')) as ScalarFormulaVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A2'))
   })
 
@@ -276,7 +276,7 @@ describe('Adding row - FormulaCellVertex#address update', () => {
 
     engine.addRows(0, [0, 1])
 
-    const formulaVertex = engine.addressMapping.getCellOrThrowError(adr('A1', 1)) as FormulaCellVertex
+    const formulaVertex = engine.addressMapping.getCellOrThrowError(adr('A1', 1)) as ScalarFormulaVertex
 
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
@@ -438,7 +438,7 @@ describe('Adding row - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('ArrayVertex#formula should be updated', () => {
+  it('ArrayFormulaVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -450,7 +450,7 @@ describe('Adding row - arrays', () => {
     expect(extractMatrixRange(engine, adr('A4'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
+  it('ArrayFormulaVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
@@ -466,7 +466,7 @@ describe('Adding row - arrays', () => {
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B3')))
   })
 
-  it('ArrayVertex#address should be updated', () => {
+  it('ArrayFormulaVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -475,7 +475,7 @@ describe('Adding row - arrays', () => {
 
     engine.addRows(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('A4')) as ArrayVertex
+    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('A4')) as ArrayFormulaVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A4'))
   })
 })

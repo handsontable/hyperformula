@@ -1,6 +1,6 @@
 import {AlwaysDense, AlwaysSparse, ExportedCellChange, HyperFormula} from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
-import {ArrayVertex, RangeVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex, RangeVertex} from '../../../src/DependencyGraph'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../../src/parser'
 import {
@@ -492,7 +492,7 @@ describe('Removing columns - reevaluation', () => {
 })
 
 describe('Removing rows - arrays', () => {
-  it('ArrayVertex#formula should be updated', () => {
+  it('ArrayFormulaVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
       ['4', '5', '6'],
@@ -503,7 +503,7 @@ describe('Removing rows - arrays', () => {
     expect(extractMatrixRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 
-  it('ArrayVertex#address should be updated', () => {
+  it('ArrayFormulaVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
       ['4', '5', '6'],
@@ -511,11 +511,11 @@ describe('Removing rows - arrays', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('C1')) as ArrayVertex
+    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('C1')) as ArrayFormulaVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
+  it('ArrayFormulaVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2', '3'],

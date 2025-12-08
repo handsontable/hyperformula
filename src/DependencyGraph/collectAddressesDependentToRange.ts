@@ -9,7 +9,7 @@ import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {AddressDependency, Ast, collectDependencies} from '../parser'
 import {DependencyGraph} from './DependencyGraph'
-import {FormulaVertex} from './FormulaCellVertex'
+import {FormulaVertex} from './FormulaVertex'
 import {RangeVertex} from './RangeVertex'
 import {Vertex} from './Vertex'
 

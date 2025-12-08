@@ -7,7 +7,7 @@ import {
 } from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {Config} from '../../../src/Config'
-import {ArrayVertex, FormulaCellVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex, ScalarFormulaVertex} from '../../../src/DependencyGraph'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {
   adr,
@@ -233,7 +233,7 @@ describe('Adding column - reevaluation', () => {
   })
 })
 
-describe('Adding column - FormulaCellVertex#address update', () => {
+describe('Adding column - ScalarFormulaVertex#address update', () => {
   it('updates addresses in formulas', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', /* new col */ '=A1'],
@@ -241,8 +241,8 @@ describe('Adding column - FormulaCellVertex#address update', () => {
 
     engine.addColumns(0, [1, 1])
 
-    const c1 = engine.addressMapping.getCell(adr('C1')) as FormulaCellVertex
-    expect(c1).toBeInstanceOf(FormulaCellVertex)
+    const c1 = engine.addressMapping.getCell(adr('C1')) as ScalarFormulaVertex
+    expect(c1).toBeInstanceOf(ScalarFormulaVertex)
     expect(c1.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 })
@@ -275,7 +275,7 @@ describe('different sheet', () => {
 
     engine.addColumns(0, [0, 1])
 
-    const formulaVertex = engine.addressMapping.getCellOrThrowError(adr('A1', 1)) as FormulaCellVertex
+    const formulaVertex = engine.addressMapping.getCellOrThrowError(adr('A1', 1)) as ScalarFormulaVertex
 
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
@@ -388,7 +388,7 @@ describe('Adding column - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('ArrayVertex#formula should be updated', () => {
+  it('ArrayFormulaVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=TRANSPOSE(A1:B2)'],
       [3, 4],
@@ -399,7 +399,7 @@ describe('Adding column - arrays', () => {
     expect(extractMatrixRange(engine, adr('D1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
+  it('ArrayFormulaVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],
@@ -415,7 +415,7 @@ describe('Adding column - arrays', () => {
     expect(extractMatrixRange(engine, adr('A1', 1))).toEqual(new AbsoluteCellRange(adr('A1'), adr('C2')))
   })
 
-  it('ArrayVertex#address should be updated', () => {
+  it('ArrayFormulaVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       [1, 2, '=TRANSPOSE(A1:B2)'],
       [3, 4],
@@ -423,7 +423,7 @@ describe('Adding column - arrays', () => {
 
     engine.addColumns(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('D1')) as ArrayVertex
+    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('D1')) as ArrayFormulaVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
   })
 })

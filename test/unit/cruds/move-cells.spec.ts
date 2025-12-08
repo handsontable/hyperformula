@@ -2,7 +2,7 @@ import {ErrorType, HyperFormula, SimpleCellAddress, SimpleCellRange} from '../..
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../../src/Cell'
 import {Config} from '../../../src/Config'
-import {EmptyCellVertex, FormulaCellVertex} from '../../../src/DependencyGraph'
+import {EmptyCellVertex, ScalarFormulaVertex} from '../../../src/DependencyGraph'
 import {SheetSizeLimitExceededError} from '../../../src/errors'
 import {EmptyValue} from '../../../src/interpreter/InterpreterValue'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
@@ -248,7 +248,7 @@ describe('Move cells', () => {
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A2'), 1, 1), adr('B1', 1))
 
-    const vertex = engine.dependencyGraph.fetchCell(adr('B1', 1)) as FormulaCellVertex
+    const vertex = engine.dependencyGraph.fetchCell(adr('B1', 1)) as ScalarFormulaVertex
     expect(vertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('B1', 1))
   })
 
@@ -833,7 +833,7 @@ describe('overlapping areas', () => {
     ]))
   })
 
-  it('ArrayVertex#formula should be updated', () => {
+  it('ArrayFormulaVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -845,7 +845,7 @@ describe('overlapping areas', () => {
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('C1'), adr('D2')))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
+  it('ArrayFormulaVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2'],

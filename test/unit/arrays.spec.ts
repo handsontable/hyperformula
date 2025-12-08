@@ -1,6 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
 import {ArraySize} from '../../src/ArraySize'
-import {ArrayVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {ArrayFormulaVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError, detailedErrorWithOrigin, expectVerticesOfTypes, noSpace} from './testUtils'
 
@@ -363,8 +363,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
     ])
   })
 
@@ -375,9 +375,9 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, undefined],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [undefined, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, undefined],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [undefined, ArrayFormulaVertex, ArrayFormulaVertex],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
   })
@@ -389,8 +389,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
       [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([
@@ -431,8 +431,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
     ])
 
   })
@@ -445,7 +445,7 @@ describe('build from array', () => {
 
     expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, undefined],
+      [ArrayFormulaVertex, undefined],
       [ValueCellVertex, undefined],
     ])
   })

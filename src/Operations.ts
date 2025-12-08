@@ -14,17 +14,17 @@ import { ContentChanges } from './ContentChanges'
 import { ColumnRowIndex } from './CrudOperations'
 import {
   AddressMapping,
-  ArrayVertex,
+  ArrayFormulaVertex,
   CellVertex,
   DependencyGraph,
   EmptyCellVertex,
-  FormulaCellVertex,
+  ScalarFormulaVertex,
   ParsingErrorVertex,
   SheetMapping,
   SparseStrategy,
   ValueCellVertex,
 } from './DependencyGraph'
-import { FormulaVertex } from './DependencyGraph/FormulaCellVertex'
+import { FormulaVertex } from './DependencyGraph/FormulaVertex'
 import { RawAndParsedValue, ValueCellVertexValue } from './DependencyGraph/ValueCellVertex'
 import { AddColumnsTransformer } from './dependencyTransformers/AddColumnsTransformer'
 import { AddRowsTransformer } from './dependencyTransformers/AddRowsTransformer'
@@ -217,6 +217,17 @@ export class Operations {
     return columnsRemovals
   }
 
+  public clearSheet(sheetId: number) {
+    this.dependencyGraph.clearSheet(sheetId)
+    this.columnSearch.removeSheet(sheetId)
+  }
+
+  public addSheet(name?: string): string {
+    const sheetId = this.sheetMapping.addSheet(name)
+    this.dependencyGraph.addSheet(sheetId)
+    return this.sheetMapping.getSheetNameOrThrowError(sheetId)
+  }
+
   public removeSheet(sheetId: number): { version: number, scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][] } {
     this.dependencyGraph.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
@@ -229,17 +240,6 @@ export class Operations {
   public removeSheetByName(sheetName: string) {
     const sheetId = this.sheetMapping.getSheetIdOrThrowError(sheetName)
     return this.removeSheet(sheetId)
-  }
-
-  public clearSheet(sheetId: number) {
-    this.dependencyGraph.clearSheet(sheetId)
-    this.columnSearch.removeSheet(sheetId)
-  }
-
-  public addSheet(name?: string): string {
-    const sheetId = this.sheetMapping.addSheet(name)
-    this.dependencyGraph.addSheet(sheetId)
-    return this.sheetMapping.getSheetNameOrThrowError(sheetId)
   }
 
   public renameSheet(sheetId: number, newName: string): Maybe<string> {
@@ -508,13 +508,13 @@ export class Operations {
       return { type: ClipboardCellType.EMPTY }
     } else if (vertex instanceof ValueCellVertex) {
       return { type: ClipboardCellType.VALUE, ...vertex.getValues() }
-    } else if (vertex instanceof ArrayVertex) {
+    } else if (vertex instanceof ArrayFormulaVertex) {
       const val = vertex.getArrayCellValue(address)
       if (val === EmptyValue) {
         return { type: ClipboardCellType.EMPTY }
       }
       return { type: ClipboardCellType.VALUE, parsedValue: val, rawValue: vertex.getArrayCellRawValue(address) }
-    } else if (vertex instanceof FormulaCellVertex) {
+    } else if (vertex instanceof ScalarFormulaVertex) {
       return {
         type: ClipboardCellType.FORMULA,
         hash: this.parser.computeHashFromAst(vertex.getFormula(this.lazilyTransformingAstService))
@@ -613,7 +613,7 @@ export class Operations {
 
   /**
    * Sets cell content to a formula.
-   * Creates a FormulaCellVertex and updates the dependency graph and column search index.
+   * Creates a ScalarFormulaVertex and updates the dependency graph and column search index.
    */
   public setFormulaToCell(address: SimpleCellAddress, size: ArraySize, {
     ast,
@@ -784,7 +784,7 @@ export class Operations {
     this.rewriteAffectedArrays(affectedArrays)
   }
 
-  private rewriteAffectedArrays(affectedArrays: Set<ArrayVertex>) {
+  private rewriteAffectedArrays(affectedArrays: Set<ArrayFormulaVertex>) {
     for (const arrayVertex of affectedArrays.values()) {
       if (arrayVertex.array.size.isRef) {
         continue
@@ -841,7 +841,7 @@ export class Operations {
     const globalVertexId = maybeGlobalVertexId ?? this.dependencyGraph.graph.getNodeId(globalVertex)
 
     for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
-      if (adjacentNode instanceof FormulaCellVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
+      if (adjacentNode instanceof ScalarFormulaVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
         const ast = adjacentNode.getFormula(this.lazilyTransformingAstService)
         const formulaAddress = adjacentNode.getAddress(this.lazilyTransformingAstService)
         const { dependencies } = this.parser.fetchCachedResultForAst(ast)
@@ -881,7 +881,7 @@ export class Operations {
 
     for (const formulaAddress of targetRange.addresses(this.dependencyGraph)) {
       const vertex = this.addressMapping.getCellOrThrowError(formulaAddress)
-      if (vertex instanceof FormulaCellVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
+      if (vertex instanceof ScalarFormulaVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
         const ast = vertex.getFormula(this.lazilyTransformingAstService)
         const { dependencies } = this.parser.fetchCachedResultForAst(ast)
         addedGlobalNamedExpressions.push(...this.updateNamedExpressionsForTargetAddress(sourceLeftCorner.sheet, formulaAddress, dependencies))
@@ -930,7 +930,7 @@ export class Operations {
     if (expression === undefined) {
       expression = this.namedExpressions.addNamedExpression(expressionName)
       addedNamedExpressions.push(expression.normalizeExpressionName())
-      if (sourceVertex instanceof FormulaCellVertex) {
+      if (sourceVertex instanceof ScalarFormulaVertex) {
         const parsingResult = this.parser.fetchCachedResultForAst(sourceVertex.getFormula(this.lazilyTransformingAstService))
         const { ast, hasVolatileFunction, hasStructuralChangeFunction, dependencies } = parsingResult
         this.dependencyGraph.setFormulaToCell(expression.address, ast, absolutizeDependencies(dependencies, expression.address), ArraySize.scalar(), hasVolatileFunction, hasStructuralChangeFunction)
@@ -970,7 +970,7 @@ export class Operations {
   }
 
   /**
-   * Checks if the FormulaCellVertex or ArrayVertex at the given address is not computed.
+   * Checks if the ScalarFormulaVertex or ArrayFormulaVertex at the given address is not computed.
    */
   private isNotComputed(address: SimpleCellAddress): boolean {
     const vertex = this.dependencyGraph.getCell(address)

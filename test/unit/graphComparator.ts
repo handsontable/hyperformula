@@ -3,9 +3,9 @@ import {CellError, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../../src/Cell'
 import {
-  ArrayVertex,
+  ArrayFormulaVertex,
   EmptyCellVertex,
-  FormulaCellVertex,
+  ScalarFormulaVertex,
   ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
@@ -59,8 +59,8 @@ export class EngineComparator {
         if (expectedVertex === undefined && actualVertex === undefined) {
           continue
         } else if (
-          (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) ||
-          (expectedVertex instanceof ArrayVertex && actualVertex instanceof ArrayVertex)
+          (expectedVertex instanceof ScalarFormulaVertex && actualVertex instanceof ScalarFormulaVertex) ||
+          (expectedVertex instanceof ArrayFormulaVertex && actualVertex instanceof ArrayFormulaVertex)
         ) {
           const actualVertexAddress = actualVertex.getAddress(this.actual.dependencyGraph.lazilyTransformingAstService)
           const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)

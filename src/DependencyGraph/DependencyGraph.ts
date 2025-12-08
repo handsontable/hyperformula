@@ -28,10 +28,10 @@ import {Ast, collectDependencies, NamedExpressionDependency} from '../parser'
 import {ColumnsSpan, RowsSpan, Span} from '../Span'
 import {Statistics, StatType} from '../statistics'
 import {
-  ArrayVertex,
+  ArrayFormulaVertex,
   CellVertex,
   EmptyCellVertex,
-  FormulaCellVertex,
+  ScalarFormulaVertex,
   ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
@@ -40,7 +40,7 @@ import {
 import {AddressMapping} from './AddressMapping/AddressMapping'
 import {ArrayMapping} from './ArrayMapping'
 import {collectAddressesDependentToRange} from './collectAddressesDependentToRange'
-import {FormulaVertex} from './FormulaCellVertex'
+import {FormulaVertex} from './FormulaVertex'
 import {DependencyQuery, Graph} from './Graph'
 import {RangeMapping} from './RangeMapping'
 import {SheetMapping} from './SheetMapping'
@@ -113,7 +113,7 @@ export class DependencyGraph {
   public setValueToCell(address: SimpleCellAddress, value: RawAndParsedValue): ContentChanges {
     const vertex = this.shrinkPossibleArrayAndGetCell(address)
 
-    if (vertex instanceof ArrayVertex) {
+    if (vertex instanceof ArrayFormulaVertex) {
       this.arrayMapping.removeArray(vertex.getRange())
     }
 
@@ -214,7 +214,7 @@ export class DependencyGraph {
           this.correctInfiniteRangesDependenciesByRangeVertex(rangeVertex)
         }
       } else if (dep instanceof NamedExpressionDependency) {
-        const sheetOfVertex = (endVertex as FormulaCellVertex).getAddress(this.lazilyTransformingAstService).sheet
+        const sheetOfVertex = (endVertex as ScalarFormulaVertex).getAddress(this.lazilyTransformingAstService).sheet
         const { vertex, id } = this.fetchNamedExpressionVertex(dep.name, sheetOfVertex)
         this.graph.addEdge(id ?? vertex, endVertexId)
       } else {
@@ -256,7 +256,7 @@ export class DependencyGraph {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsDirty(adjacentNode)
         }
-        if (vertex instanceof ArrayVertex) {
+        if (vertex instanceof ArrayFormulaVertex) {
           if (vertex.isLeftCorner(address)) {
             this.shrinkArrayToCorner(vertex)
             this.arrayMapping.removeArray(vertex.getRange())
@@ -379,9 +379,9 @@ export class DependencyGraph {
   }
 
   public clearSheet(sheetId: number) {
-    const arrays: Set<ArrayVertex> = new Set()
+    const arrays: Set<ArrayFormulaVertex> = new Set()
     for (const [address, vertex] of this.addressMapping.sheetEntries(sheetId)) {
-      if (vertex instanceof ArrayVertex) {
+      if (vertex instanceof ArrayFormulaVertex) {
         arrays.add(vertex)
       } else {
         this.setCellEmpty(address)
@@ -401,7 +401,7 @@ export class DependencyGraph {
         for (const adjacentNode of this.graph.adjacentNodes(vertex)) {
           this.graph.markNodeAsDirty(adjacentNode)
         }
-        if (vertex instanceof ArrayVertex) {
+        if (vertex instanceof ArrayFormulaVertex) {
           if (vertex.isLeftCorner(address)) {
             this.shrinkArrayToCorner(vertex)
             this.arrayMapping.removeArray(vertex.getRange())
@@ -482,7 +482,7 @@ export class DependencyGraph {
     return {affectedArrays, contentChanges: this.getAndClearContentChanges()}
   }
 
-  public isThereSpaceForArray(arrayVertex: ArrayVertex): boolean {
+  public isThereSpaceForArray(arrayVertex: ArrayFormulaVertex): boolean {
     const range = arrayVertex.getRangeOrUndef()
     if (range === undefined) {
       return false
@@ -552,7 +552,7 @@ export class DependencyGraph {
     this.rangeMapping.moveRangesInsideSourceRange(sourceRange, toRight, toBottom, toSheet)
   }
 
-  public setArrayEmpty(arrayVertex: ArrayVertex) {
+  public setArrayEmpty(arrayVertex: ArrayFormulaVertex) {
     const arrayRange = AbsoluteCellRange.spanFrom(arrayVertex.getAddress(this.lazilyTransformingAstService), arrayVertex.width, arrayVertex.height)
     const adjacentNodes = this.graph.adjacentNodes(arrayVertex)
 
@@ -580,7 +580,7 @@ export class DependencyGraph {
     this.addressMapping.setCell(address, vertex)
   }
 
-  public addArrayVertex(address: SimpleCellAddress, vertex: ArrayVertex): void {
+  public addArrayVertex(address: SimpleCellAddress, vertex: ArrayFormulaVertex): void {
     this.graph.addNodeAndReturnId(vertex)
     this.setAddressMappingForArrayVertex(vertex, address)
   }
@@ -588,9 +588,9 @@ export class DependencyGraph {
   /**
    * Iterator over all array formula nodes in the graph.
    */
-  public* arrayFormulaNodes(): IterableIterator<ArrayVertex> {
+  public* arrayFormulaNodes(): IterableIterator<ArrayFormulaVertex> {
     for (const vertex of this.graph.getNodes()) {
-      if (vertex instanceof ArrayVertex) {
+      if (vertex instanceof ArrayFormulaVertex) {
         yield vertex
       }
     }
@@ -667,7 +667,7 @@ export class DependencyGraph {
     return this.addressMapping.getSheetWidth(sheet)
   }
 
-  public getArray(range: AbsoluteCellRange): Maybe<ArrayVertex> {
+  public getArray(range: AbsoluteCellRange): Maybe<ArrayFormulaVertex> {
     return this.arrayMapping.getArray(range)
   }
 
@@ -689,7 +689,7 @@ export class DependencyGraph {
 
   public forceApplyPostponedTransformations() {
     for (const vertex of this.graph.getNodes()) {
-      if (vertex instanceof FormulaCellVertex) {
+      if (vertex instanceof ScalarFormulaVertex) {
         vertex.ensureRecentData(this.lazilyTransformingAstService)
       }
     }
@@ -735,7 +735,7 @@ export class DependencyGraph {
     return values
   }
 
-  public shrinkArrayToCorner(array: ArrayVertex) {
+  public shrinkArrayToCorner(array: ArrayFormulaVertex) {
     this.cleanAddressMappingUnderArray(array)
     for (const adjacentVertex of this.adjacentArrayVertices(array)) {
       let relevantDependencies
@@ -761,7 +761,7 @@ export class DependencyGraph {
 
   public isArrayInternalCell(address: SimpleCellAddress): boolean {
     const vertex = this.getCell(address)
-    return vertex instanceof ArrayVertex && !vertex.isLeftCorner(address)
+    return vertex instanceof ArrayFormulaVertex && !vertex.isLeftCorner(address)
   }
 
   public getAndClearContentChanges(): ContentChanges {
@@ -774,7 +774,7 @@ export class DependencyGraph {
     const deps = this.graph.adjacentNodes(inputVertex)
     const ret: (SimpleCellRange | SimpleCellAddress)[] = []
     deps.forEach((vertex: Vertex) => {
-      const castVertex = vertex as RangeVertex | FormulaCellVertex | ArrayVertex
+      const castVertex = vertex as RangeVertex | ScalarFormulaVertex | ArrayFormulaVertex
       if (castVertex instanceof RangeVertex) {
         ret.push(simpleCellRange(castVertex.start, castVertex.end))
       } else {
@@ -795,7 +795,7 @@ export class DependencyGraph {
     })
   }
 
-  private setArray(range: AbsoluteCellRange, vertex: ArrayVertex): void {
+  private setArray(range: AbsoluteCellRange, vertex: ArrayFormulaVertex): void {
     this.arrayMapping.setArray(range, vertex)
   }
 
@@ -846,8 +846,8 @@ export class DependencyGraph {
     }
   }
 
-  private getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayVertex> {
-    const arrayVertices = new Set<ArrayVertex>()
+  private getArrayVerticesRelatedToRanges(ranges: RangeVertex[]): Set<ArrayFormulaVertex> {
+    const arrayVertices = new Set<ArrayFormulaVertex>()
 
     ranges.forEach(range => {
       if (!this.graph.hasNode(range)) {
@@ -855,7 +855,7 @@ export class DependencyGraph {
       }
 
       this.graph.adjacentNodes(range).forEach(adjacentVertex => {
-        if (adjacentVertex instanceof ArrayVertex) {
+        if (adjacentVertex instanceof ArrayFormulaVertex) {
           arrayVertices.add(adjacentVertex)
         }
       })
@@ -880,7 +880,7 @@ export class DependencyGraph {
       })
   }
 
-  private cleanAddressMappingUnderArray(vertex: ArrayVertex) {
+  private cleanAddressMappingUnderArray(vertex: ArrayFormulaVertex) {
     const arrayRange = vertex.getRange()
     for (const address of arrayRange.addresses(this)) {
       const oldValue = vertex.getArrayCellValue(address)
@@ -897,7 +897,7 @@ export class DependencyGraph {
     }
   }
 
-  private* formulaDirectDependenciesToArray(vertex: FormulaVertex, array: ArrayVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
+  private* formulaDirectDependenciesToArray(vertex: FormulaVertex, array: ArrayFormulaVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const [, formulaDependencies] = this.formulaDependencyQuery(vertex) ?? []
     if (formulaDependencies === undefined) {
       return
@@ -913,7 +913,7 @@ export class DependencyGraph {
     }
   }
 
-  private* rangeDirectDependenciesToArray(vertex: RangeVertex, array: ArrayVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
+  private* rangeDirectDependenciesToArray(vertex: RangeVertex, array: ArrayFormulaVertex): IterableIterator<[SimpleCellAddress, CellVertex]> {
     const {restRange: range} = this.rangeMapping.findSmallerRange(vertex.range)
     for (const address of range.addresses(this)) {
       if (array.getRange().addressInRange(address)) {
@@ -923,7 +923,7 @@ export class DependencyGraph {
     }
   }
 
-  private* adjacentArrayVertices(vertex: ArrayVertex): IterableIterator<FormulaVertex | RangeVertex> {
+  private* adjacentArrayVertices(vertex: ArrayFormulaVertex): IterableIterator<FormulaVertex | RangeVertex> {
     const adjacentNodes = this.graph.adjacentNodes(vertex)
     for (const item of adjacentNodes) {
       if (item instanceof FormulaVertex || item instanceof RangeVertex) {
@@ -1030,13 +1030,13 @@ export class DependencyGraph {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
     const range = AbsoluteCellRange.spanFrom(address, vertex.width, vertex.height)
     const oldNode = this.shrinkPossibleArrayAndGetCell(address)
-    if (vertex instanceof ArrayVertex) {
+    if (vertex instanceof ArrayFormulaVertex) {
       this.setArray(range, vertex)
     }
     this.exchangeOrAddGraphNode(oldNode, vertex)
     this.addressMapping.setCell(address, vertex)
 
-    if (vertex instanceof ArrayVertex) {
+    if (vertex instanceof ArrayFormulaVertex) {
       if (!this.isThereSpaceForArray(vertex)) {
         return
       }
@@ -1057,7 +1057,7 @@ export class DependencyGraph {
   private setAddressMappingForArrayVertex(vertex: CellVertex, formulaAddress: SimpleCellAddress): void {
     this.addressMapping.setCell(formulaAddress, vertex)
 
-    if (!(vertex instanceof ArrayVertex)) {
+    if (!(vertex instanceof ArrayFormulaVertex)) {
       return
     }
 
@@ -1163,7 +1163,7 @@ export class DependencyGraph {
 
   private shrinkPossibleArrayAndGetCell(address: SimpleCellAddress): Maybe<CellVertex> {
     const vertex = this.getCell(address)
-    if (!(vertex instanceof ArrayVertex)) {
+    if (!(vertex instanceof ArrayFormulaVertex)) {
       return vertex
     }
     this.setNoSpaceIfArray(vertex)
@@ -1171,7 +1171,7 @@ export class DependencyGraph {
   }
 
   private setNoSpaceIfArray(vertex: Maybe<Vertex>) {
-    if (vertex instanceof ArrayVertex) {
+    if (vertex instanceof ArrayFormulaVertex) {
       this.shrinkArrayToCorner(vertex)
       vertex.setNoSpace()
     }
@@ -1270,7 +1270,7 @@ export class DependencyGraph {
 }
 
 export interface ArrayAffectingGraphChangeResult {
-  affectedArrays: Set<ArrayVertex>,
+  affectedArrays: Set<ArrayFormulaVertex>,
 }
 
 export interface EagerChangesGraphChangeResult extends ArrayAffectingGraphChangeResult {

@@ -1,6 +1,6 @@
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {ArraySize} from '../../src/ArraySize'
-import {ArrayMapping, ArrayVertex} from '../../src/DependencyGraph'
+import {ArrayMapping, ArrayFormulaVertex} from '../../src/DependencyGraph'
 import {buildNumberAst} from '../../src/parser/Ast'
 import {adr} from './testUtils'
 
@@ -13,7 +13,7 @@ describe('MatrixMapping', () => {
   it('should set matrix', () => {
     const matrixMapping = new ArrayMapping()
 
-    const vertex = new ArrayVertex(buildNumberAst(1), adr('A1'), new ArraySize(2, 2))
+    const vertex = new ArrayFormulaVertex(buildNumberAst(1), adr('A1'), new ArraySize(2, 2))
     const range = AbsoluteCellRange.spanFrom(adr('A1'), 2, 2)
     matrixMapping.setArray(range, vertex)
 
@@ -23,7 +23,7 @@ describe('MatrixMapping', () => {
 
   it('should answer some questions', () => {
     const matrixMapping = new ArrayMapping()
-    const vertex = new ArrayVertex(buildNumberAst(1), adr('B2'), new ArraySize(2, 2))
+    const vertex = new ArrayFormulaVertex(buildNumberAst(1), adr('B2'), new ArraySize(2, 2))
     const range = AbsoluteCellRange.spanFrom(adr('B2'), 2, 2)
     matrixMapping.setArray(range, vertex)
 
@@ -42,9 +42,9 @@ describe('MatrixMapping', () => {
 
   it('should move matrices below row', () => {
     const matrixMapping = new ArrayMapping()
-    const vertex1 = new ArrayVertex(buildNumberAst(1), adr('B1'), new ArraySize(2, 2))
+    const vertex1 = new ArrayFormulaVertex(buildNumberAst(1), adr('B1'), new ArraySize(2, 2))
     const range1 = AbsoluteCellRange.spanFrom(adr('B1'), 2, 2)
-    const vertex2 = new ArrayVertex(buildNumberAst(1), adr('D2'), new ArraySize(2, 2))
+    const vertex2 = new ArrayFormulaVertex(buildNumberAst(1), adr('D2'), new ArraySize(2, 2))
     const range2 = AbsoluteCellRange.spanFrom(adr('D2'), 2, 2)
     matrixMapping.setArray(range1, vertex1)
     matrixMapping.setArray(range2, vertex2)

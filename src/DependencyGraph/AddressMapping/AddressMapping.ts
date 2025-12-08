@@ -10,7 +10,7 @@ import {EmptyValue, InterpreterValue} from '../../interpreter/InterpreterValue'
 import {Maybe} from '../../Maybe'
 import {SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
-import {ArrayVertex, DenseStrategy, ValueCellVertex} from '../index'
+import {ArrayFormulaVertex, DenseStrategy, ValueCellVertex} from '../index'
 import {CellVertex} from '../Vertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {AddressMappingStrategy} from './AddressMappingStrategy'
@@ -163,7 +163,7 @@ export class AddressMapping {
 
     if (vertex === undefined) {
       return EmptyValue
-    } else if (vertex instanceof ArrayVertex) {
+    } else if (vertex instanceof ArrayFormulaVertex) {
       return vertex.getArrayCellValue(address)
     } else {
       return vertex.getCellValue()
@@ -178,7 +178,7 @@ export class AddressMapping {
     const vertex = this.getCell(address)
     if (vertex instanceof ValueCellVertex) {
       return vertex.getValues().rawValue
-    } else if (vertex instanceof ArrayVertex) {
+    } else if (vertex instanceof ArrayFormulaVertex) {
       return vertex.getArrayCellRawValue(address)
     } else {
       return null

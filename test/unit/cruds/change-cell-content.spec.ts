@@ -13,7 +13,7 @@ import {
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../../src/Cell'
 import {Config} from '../../../src/Config'
-import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex, EmptyCellVertex, ValueCellVertex} from '../../../src/DependencyGraph'
 import {ErrorMessage} from '../../../src/error-message'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {
@@ -884,7 +884,7 @@ describe('arrays', () => {
 
     expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, undefined],
+      [ArrayFormulaVertex, undefined],
       [ValueCellVertex, undefined],
     ])
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -902,9 +902,9 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, undefined],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [undefined, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, undefined],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [undefined, ArrayFormulaVertex, ArrayFormulaVertex],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
   })
@@ -921,8 +921,8 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
       [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([

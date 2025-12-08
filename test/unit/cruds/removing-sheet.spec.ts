@@ -2,7 +2,7 @@
 import {ExportedCellChange, HyperFormula, NoSheetWithIdError} from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {ErrorType} from '../../../src/Cell'
-import {ArrayVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex} from '../../../src/DependencyGraph'
 import { ErrorMessage } from '../../../src/error-message'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../../src/parser'
@@ -728,12 +728,12 @@ describe('remove sheet - adjust matrix mapping', () => {
         ['=TRANSPOSE(A1:B1)'],
       ],
     })
-    expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeInstanceOf(ArrayVertex)
+    expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeInstanceOf(ArrayFormulaVertex)
 
     engine.removeSheet(0)
 
     expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeUndefined()
-    expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2', 1), 1, 2))).toBeInstanceOf(ArrayVertex)
+    expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2', 1), 1, 2))).toBeInstanceOf(ArrayFormulaVertex)
   })
 })
 
