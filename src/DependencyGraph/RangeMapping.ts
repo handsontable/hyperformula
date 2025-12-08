@@ -35,8 +35,8 @@ type AdjustVerticesOperation = (key: string, vertex: RangeVertex) => Maybe<Adjus
  */
 export class RangeMapping {
     /**
-   * Map sheetId -> address of start and end (as string) -> vertex
-   */
+     * Map sheetId -> address of start and end (as string) -> vertex
+     */
     private rangeMapping: Map<number, Map<string, RangeVertex>> = new Map()
 
   /**
@@ -210,21 +210,6 @@ export class RangeMapping {
       return
     }
     yield* sheetMap.values()
-  }
-
-  public moveRangesBetweenSheets(sourceSheet: number, targetSheet: number): void {
-    if (sourceSheet === targetSheet) {
-      return
-    }
-    const sheetMap = this.rangeMapping.get(sourceSheet)
-    if (!sheetMap) {
-      return
-    }
-    this.rangeMapping.delete(sourceSheet)
-    for (const [, vertex] of sheetMap) {
-      vertex.range.moveToSheet(targetSheet)
-      this.addOrUpdateVertex(vertex)
-    }
   }
 
   public* rangeVerticesContainedInRange(sourceRange: AbsoluteCellRange): IterableIterator<RangeVertex> {

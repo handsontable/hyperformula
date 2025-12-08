@@ -32,7 +32,6 @@ import { CleanOutOfScopeDependenciesTransformer } from './dependencyTransformers
 import { MoveCellsTransformer } from './dependencyTransformers/MoveCellsTransformer'
 import { RemoveColumnsTransformer } from './dependencyTransformers/RemoveColumnsTransformer'
 import { RemoveRowsTransformer } from './dependencyTransformers/RemoveRowsTransformer'
-import { RemoveSheetTransformer } from './dependencyTransformers/RemoveSheetTransformer'
 import { RenameSheetTransformer } from './dependencyTransformers/RenameSheetTransformer'
 import {
   InvalidArgumentsError,
@@ -55,7 +54,6 @@ import {
 import { NamedExpressionDependency, ParserWithCaching, ParsingErrorType, RelativeDependency } from './parser'
 import { ParsingError } from './parser/Ast'
 import { ParsingResult } from './parser/ParserWithCaching'
-import { findBoundaries, Sheet } from './Sheet'
 import { ColumnsSpan, RowsSpan } from './Span'
 import { Statistics, StatType } from './statistics'
 
