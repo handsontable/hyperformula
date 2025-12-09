@@ -311,28 +311,7 @@ export class DependencyGraph {
   }
 
   /**
-   * Marks all cell vertices in the sheet as dirty.
-   */
-  private markAllCellsAsDirtyInSheet(sheetId: number): void {
-    const sheetCells = this.addressMapping.sheetEntries(sheetId)
-    for (const [_, vertex] of sheetCells) {
-      this.graph.markNodeAsDirty(vertex)
-    }
-  }
-
-  /**
-   * Marks all range verticesin the sheet as dirty.
-   */
-  private markAllRangesAsDirtyInSheet(sheetId: number): void {
-    const sheetRanges = this.rangeMapping.rangesInSheet(sheetId)
-
-    for (const vertex of sheetRanges) {
-      this.graph.markNodeAsDirty(vertex)
-    }
-  }
-
-  /**
-   * - Removes all vertices without dependents in other sheets from address mapping, range mapping and array mapping.
+   * Removes all vertices without dependents in other sheets from address mapping, range mapping and array mapping.
    * - If nothing is left, removes the sheet from sheet mapping and address mapping.
    * - Otherwise, marks it as placeholder.
    */
@@ -350,7 +329,7 @@ export class DependencyGraph {
   }
 
   /**
-   * Removed placeholderSheetToDelete and reroutes edges to the corresponding vertices in sheetToKeep
+   * Removes placeholderSheetToDelete and reroutes edges to the corresponding vertices in sheetToKeep
    *
    * Assumptions about placeholderSheetToDelete:
    * - is empty (contains only empty cell vertices and range vertices),
@@ -363,70 +342,6 @@ export class DependencyGraph {
     this.adjustCellVerticesWhenMergingSheets(sheetToKeep, placeholderSheetToDelete)
     this.addressMapping.removeSheet(placeholderSheetToDelete)
     this.addStructuralNodesToChangeSet()
-  }
-
-  /**
-   * For each range vertex in placeholderSheetToDelete:
-   * - reroutes dependencies and dependents of range vertex to the corresponding vertex in sheetToKeep
-   * - removes range vertex from graph and range mapping
-   * - cleans up dependencies of the removed vertex
-   */
-  private adjustRangeVerticesWhenMergingSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
-    const rangeVertices = Array.from(this.rangeMapping.rangesInSheet(placeholderSheetToDelete))
-
-    for (const vertexToDelete of rangeVertices) {
-      if (!this.graph.hasNode(vertexToDelete)) {
-        continue
-      }
-
-      const start = vertexToDelete.start
-      const end = vertexToDelete.end
-
-      if (start.sheet !== placeholderSheetToDelete && end.sheet !== placeholderSheetToDelete) {
-        continue
-      }
-
-      const targetStart = simpleCellAddress(sheetToKeep, start.col, start.row)
-      const targetEnd = simpleCellAddress(sheetToKeep, end.col, end.row)
-      const vertexToKeep = this.rangeMapping.getRangeVertex(targetStart, targetEnd)
-
-      if (vertexToKeep) {
-        this.rerouteDependents(vertexToDelete, vertexToKeep)
-        this.removeVertexAndRerouteDependencies(vertexToDelete, vertexToKeep)
-        this.rangeMapping.removeVertexIfExists(vertexToDelete)
-        this.graph.markNodeAsDirty(vertexToKeep)
-      } else {
-        this.rangeMapping.removeVertexIfExists(vertexToDelete)
-        vertexToDelete.range.moveToSheet(sheetToKeep)
-        this.rangeMapping.addOrUpdateVertex(vertexToDelete)
-        this.graph.markNodeAsDirty(vertexToDelete)
-      }
-    }
-  }
-
-  /**
-   * For each cell vertex in placeholderSheetToDelete:
-   * - reroutes dependents of cell vertex to the corresponding vertex in sheetToKeep
-   * - removes cell vertex from graph and address mapping
-   * - cleans up dependencies of the removed vertex
-   */
-  private adjustCellVerticesWhenMergingSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
-    const cellVertices = Array.from(this.addressMapping.sheetEntries(placeholderSheetToDelete))
-
-    for (const [addressToDelete, vertexToDelete] of cellVertices) {
-      const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
-      const vertexToKeep = this.getCell(addressToKeep)
-
-      if (vertexToKeep) {
-        this.rerouteDependents(vertexToDelete, vertexToKeep)
-        this.removeVertexAndCleanupDependencies(vertexToDelete)
-        this.addressMapping.removeCell(addressToDelete)
-        this.graph.markNodeAsDirty(vertexToKeep)
-      } else {
-        this.addressMapping.moveCell(addressToDelete, addressToKeep)
-        this.graph.markNodeAsDirty(vertexToDelete)
-      }
-    }
   }
 
   /**
@@ -610,7 +525,7 @@ export class DependencyGraph {
   }
 
   /**
-   * Sets an array empty..
+   * Sets an array empty.
    * - removes all corresponding entries from address mapping
    * - reroutes the edges
    * - removes vertex from graph and cleans up its dependencies
@@ -618,13 +533,13 @@ export class DependencyGraph {
    */
   public setArrayEmpty(arrayVertex: ArrayFormulaVertex) {
     const arrayRange = AbsoluteCellRange.spanFrom(arrayVertex.getAddress(this.lazilyTransformingAstService), arrayVertex.width, arrayVertex.height)
-    const adjacentNodes = this.graph.adjacentNodes(arrayVertex) // dependents
+    const dependentVertices = this.graph.adjacentNodes(arrayVertex)
 
     for (const address of arrayRange.addresses(this)) {
       this.addressMapping.removeCell(address)
     }
 
-    for (const adjacentNode of adjacentNodes.values()) {
+    for (const adjacentNode of dependentVertices.values()) {
       const nodeDependencies = collectAddressesDependentToRange(this.functionRegistry, adjacentNode, arrayVertex.getRange(), this.lazilyTransformingAstService, this)
       for (const address of nodeDependencies) {
         const { vertex, id } = this.fetchCellOrCreateEmpty(address)
@@ -674,14 +589,6 @@ export class DependencyGraph {
 
   public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
     return this.addressMapping.getCell(address)
-  }
-
-  /**
-   * Checks if the given sheet ID refers to a placeholder sheet (doesn't exist but is referenced by other sheets)
-   */
-  private isPlaceholder(sheetId: number): boolean {
-    return sheetId !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS &&
-      !this.sheetMapping.hasSheetWithId(sheetId, { includePlaceholders: false })
   }
 
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
@@ -843,6 +750,99 @@ export class DependencyGraph {
       }
     })
     return ret
+  }
+
+  /**
+   * Marks all cell vertices in the sheet as dirty.
+   */
+  private markAllCellsAsDirtyInSheet(sheetId: number): void {
+    const sheetCells = this.addressMapping.sheetEntries(sheetId)
+    for (const [_, vertex] of sheetCells) {
+      this.graph.markNodeAsDirty(vertex)
+    }
+  }
+
+  /**
+   * Marks all range vertices in the sheet as dirty.
+   */
+  private markAllRangesAsDirtyInSheet(sheetId: number): void {
+    const sheetRanges = this.rangeMapping.rangesInSheet(sheetId)
+
+    for (const vertex of sheetRanges) {
+      this.graph.markNodeAsDirty(vertex)
+    }
+  }
+
+  /**
+   * For each range vertex in placeholderSheetToDelete:
+   * - reroutes dependencies and dependents of range vertex to the corresponding vertex in sheetToKeep
+   * - removes range vertex from graph and range mapping
+   * - cleans up dependencies of the removed vertex
+   */
+  private adjustRangeVerticesWhenMergingSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
+    const rangeVertices = Array.from(this.rangeMapping.rangesInSheet(placeholderSheetToDelete))
+
+    for (const vertexToDelete of rangeVertices) {
+      if (!this.graph.hasNode(vertexToDelete)) {
+        continue
+      }
+
+      const start = vertexToDelete.start
+      const end = vertexToDelete.end
+
+      if (start.sheet !== placeholderSheetToDelete && end.sheet !== placeholderSheetToDelete) {
+        continue
+      }
+
+      const targetStart = simpleCellAddress(sheetToKeep, start.col, start.row)
+      const targetEnd = simpleCellAddress(sheetToKeep, end.col, end.row)
+      const vertexToKeep = this.rangeMapping.getRangeVertex(targetStart, targetEnd)
+
+      if (vertexToKeep) {
+        this.rerouteDependents(vertexToDelete, vertexToKeep)
+        this.removeVertexAndRerouteDependencies(vertexToDelete, vertexToKeep)
+        this.rangeMapping.removeVertexIfExists(vertexToDelete)
+        this.graph.markNodeAsDirty(vertexToKeep)
+      } else {
+        this.rangeMapping.removeVertexIfExists(vertexToDelete)
+        vertexToDelete.range.moveToSheet(sheetToKeep)
+        this.rangeMapping.addOrUpdateVertex(vertexToDelete)
+        this.graph.markNodeAsDirty(vertexToDelete)
+      }
+    }
+  }
+
+  /**
+   * For each cell vertex in placeholderSheetToDelete:
+   * - reroutes dependents of cell vertex to the corresponding vertex in sheetToKeep
+   * - removes cell vertex from graph and address mapping
+   * - cleans up dependencies of the removed vertex
+   */
+  private adjustCellVerticesWhenMergingSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
+    const cellVertices = Array.from(this.addressMapping.sheetEntries(placeholderSheetToDelete))
+
+    for (const [addressToDelete, vertexToDelete] of cellVertices) {
+      const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
+      const vertexToKeep = this.getCell(addressToKeep)
+
+      if (vertexToKeep) {
+        this.rerouteDependents(vertexToDelete, vertexToKeep)
+        this.removeVertexAndCleanupDependencies(vertexToDelete)
+        this.addressMapping.removeCell(addressToDelete)
+        this.graph.markNodeAsDirty(vertexToKeep)
+      } else {
+        this.addressMapping.moveCell(addressToDelete, addressToKeep)
+        this.graph.markNodeAsDirty(vertexToDelete)
+      }
+    }
+  }
+
+  /**
+   * Checks if the given sheet ID refers to a placeholder sheet (doesn't exist but is referenced by other sheets)
+   */
+  private isPlaceholder(sheetId: number): boolean {
+    return sheetId !== NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS &&
+      !this.sheetMapping.hasSheetWithId(sheetId, { includePlaceholders: false })
   }
 
   private exchangeGraphNode(oldNode: Vertex, newNode: Vertex) {
