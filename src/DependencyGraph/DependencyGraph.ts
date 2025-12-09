@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {AbsoluteCellRange, isSimpleCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
+import {AbsoluteCellRange, SimpleCellRange, simpleCellRange} from '../AbsoluteCellRange'
 import {absolutizeDependencies} from '../absolutizeDependencies'
 import {ArraySize} from '../ArraySize'
 import {CellError, ErrorType, isSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from '../Cell'
@@ -172,7 +172,11 @@ export class DependencyGraph {
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
-    const endVertexId = this.graph.getNodeId(endVertex)!
+    const endVertexId = this.graph.getNodeId(endVertex)
+
+    if (endVertexId === undefined) {
+      throw new Error('End vertex not found')
+    }
 
     cellDependencies.forEach((dep: CellDependency) => {
       if (dep instanceof AbsoluteCellRange) {
@@ -185,7 +189,11 @@ export class DependencyGraph {
         }
 
         this.graph.addNodeAndReturnId(rangeVertex)
-        const rangeVertexId = this.graph.getNodeId(rangeVertex)!
+        const rangeVertexId = this.graph.getNodeId(rangeVertex)
+
+        if (rangeVertexId === undefined) {
+          throw new Error('Range vertex not found')
+        }
 
         if (!range.isFinite()) {
           this.graph.markNodeAsInfiniteRange(rangeVertexId)
@@ -757,7 +765,7 @@ export class DependencyGraph {
    */
   private markAllCellsAsDirtyInSheet(sheetId: number): void {
     const sheetCells = this.addressMapping.sheetEntries(sheetId)
-    for (const [_, vertex] of sheetCells) {
+    for (const [, vertex] of sheetCells) {
       this.graph.markNodeAsDirty(vertex)
     }
   }
@@ -869,7 +877,11 @@ export class DependencyGraph {
     }
 
     const { vertex, id: maybeVertexId } = this.fetchCellOrCreateEmpty(address)
-    const vertexId = maybeVertexId ?? this.graph.getNodeId(vertex)!
+    const vertexId = maybeVertexId ?? this.graph.getNodeId(vertex)
+
+    if (vertexId === undefined) {
+      throw new Error('Vertex not found')
+    }
 
     relevantInfiniteRanges.forEach(({ id }) => {
       this.graph.addEdge(vertexId, id)
@@ -1289,7 +1301,12 @@ export class DependencyGraph {
     const dependencies = new Set(this.graph.removeNode(inputVertex))
 
     while (dependencies.size > 0) {
-      const dependency = dependencies.values().next().value
+      const dependency = dependencies.values().next().value as [SimpleCellAddress | SimpleCellRange, Vertex] | undefined
+
+      if (dependency === undefined) {
+        continue
+      }
+
       dependencies.delete(dependency)
       const [address, vertex] = dependency
       if (this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
@@ -1298,7 +1315,7 @@ export class DependencyGraph {
         }
         if (vertex instanceof RangeVertex) {
           this.rangeMapping.removeVertexIfExists(vertex)
-        } else if (vertex instanceof EmptyCellVertex) {
+        } else if (vertex instanceof EmptyCellVertex && isSimpleCellAddress(address)) {
           this.addressMapping.removeCell(address)
         }
       }

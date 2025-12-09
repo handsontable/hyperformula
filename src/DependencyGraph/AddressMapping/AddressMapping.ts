@@ -352,7 +352,7 @@ export class AddressMapping {
    * @throws {NoSheetWithIdError} if sheet doesn't exist
    */
   public hasAnyEntries(sheetId: number): boolean {
-    for (const _ of this.sheetEntries(sheetId)) {
+    for (const [,] of this.sheetEntries(sheetId)) {
       return true
     }
 
