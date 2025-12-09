@@ -258,12 +258,12 @@ export class Operations {
    * Renames a sheet in the workbook.
    */
   public renameSheet(sheetId: number, newName: string): Maybe<string> {
-    const { previousDisplayName, mergedSheetWith } = this.sheetMapping.renameSheet(sheetId, newName)
+    const { previousDisplayName, mergedWithPlaceholderSheet } = this.sheetMapping.renameSheet(sheetId, newName)
 
-    if (mergedSheetWith !== undefined) {
-      this.dependencyGraph.mergeSheets(sheetId, mergedSheetWith)
+    if (mergedWithPlaceholderSheet !== undefined) {
+      this.dependencyGraph.mergeSheets(sheetId, mergedWithPlaceholderSheet)
       this.stats.measure(StatType.TRANSFORM_ASTS, () => {
-        const transformation = new RenameSheetTransformer(sheetId, mergedSheetWith)
+        const transformation = new RenameSheetTransformer(sheetId, mergedWithPlaceholderSheet)
         transformation.performEagerTransformations(this.dependencyGraph, this.parser)
         this.lazilyTransformingAstService.addTransformation(transformation)
       })

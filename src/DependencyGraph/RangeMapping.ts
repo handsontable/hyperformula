@@ -50,12 +50,12 @@ export class RangeMapping {
    * Adds or updates vertex in the mapping
    */
   public addOrUpdateVertex(vertex: RangeVertex): void {
-    let sheetMap = this.rangeMapping.get(vertex.getStart().sheet)
+    let sheetMap = this.rangeMapping.get(vertex.sheet)
     if (sheetMap === undefined) {
       sheetMap = new Map()
-      this.rangeMapping.set(vertex.getStart().sheet, sheetMap)
+      this.rangeMapping.set(vertex.sheet, sheetMap)
     }
-    const key = RangeMapping.calculateRangeKey(vertex.getStart(), vertex.getEnd())
+    const key = RangeMapping.calculateRangeKey(vertex.start, vertex.end)
     sheetMap.set(key, vertex)
   }
 
@@ -63,12 +63,12 @@ export class RangeMapping {
    * Removes vertex from the mapping if it exists
    */
   public removeVertexIfExists(vertex: RangeVertex): void {
-    const sheet = vertex.getStart().sheet
+    const sheet = vertex.sheet
     const sheetMap = this.rangeMapping.get(sheet)
     if (sheetMap === undefined) {
       return
     }
-    const key = RangeMapping.calculateRangeKey(vertex.getStart(), vertex.getEnd())
+    const key = RangeMapping.calculateRangeKey(vertex.start, vertex.end)
     sheetMap.delete(key)
     if (sheetMap.size === 0) {
       this.rangeMapping.delete(sheet)

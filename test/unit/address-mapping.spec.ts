@@ -425,11 +425,14 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrowError('Cannot move cell. Destination already occupied.')
   })
 
-  it('should throw error when trying to move vertices between sheets', () => {
+  it('should move vertices between sheets', () => {
     const mapping = builder(1, 2)
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
 
-    expect(() => mapping.moveCell(adr('A1', 0), adr('A2', 1))).toThrowError('Cannot move cells between sheets.')
+    mapping.moveCell(adr('A1', 0), adr('A2', 1))
+
+    expect(mapping.has(adr('A1', 0))).toEqual(false)
+    expect(mapping.has(adr('A2', 1))).toEqual(true)
   })
 
   it('should throw error when trying to move vertices in non-existing sheet', () => {

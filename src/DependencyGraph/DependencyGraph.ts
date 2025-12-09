@@ -310,6 +310,9 @@ export class DependencyGraph {
     })
   }
 
+  /**
+   * Marks all cell vertices in the sheet as dirty.
+   */
   private markAllCellsAsDirtyInSheet(sheetId: number): void {
     const sheetCells = this.addressMapping.sheetEntries(sheetId)
     for (const [_, vertex] of sheetCells) {
@@ -317,6 +320,9 @@ export class DependencyGraph {
     }
   }
 
+  /**
+   * Marks all range verticesin the sheet as dirty.
+   */
   private markAllRangesAsDirtyInSheet(sheetId: number): void {
     const sheetRanges = this.rangeMapping.rangesInSheet(sheetId)
 
@@ -344,28 +350,34 @@ export class DependencyGraph {
   }
 
   /**
-   * TODO
+   * TODO: implement
+   *
+   * sheetToKeep:
+   * - existing,
+   * - contains cell vertices,
+   * - contains range vertices,
+   * - contains array formula vertices,
+   * - has dependencies and depentents
+   *
+   * sheetToDelete:
+   * - placeholder,
+   * - contains only empty cell vertices,
+   * - contains range vertices,
+   * - has dependents in other sheets,
+   * - has dependencies only in same sheet (ranges)
    */
-  public mergeSheets(sheetToKeep: number, sheetToDelete: number): void { // TODO: refactor
-    const cellsFromSheetToDelete = this.addressMapping.sheetEntries(sheetToDelete)
-    const rangesFromSheetToDelete = Array.from(this.rangeMapping.rangesInSheet(sheetToDelete))
+  public mergeSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
+    const rangeVertices = Array.from(this.rangeMapping.rangesInSheet(placeholderSheetToDelete))
 
-    for (const [addressToDelete, vertexToDelete] of cellsFromSheetToDelete) {
-      const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
-      const { vertex: vertexToKeep } = this.fetchCellOrCreateEmpty(addressToKeep)
-      this.mergeVertices(vertexToKeep, vertexToDelete)
-      this.graph.markNodeAsDirty(vertexToKeep)
-    }
-
-    for (const vertexToDelete of rangesFromSheetToDelete) {
-      if (!(vertexToDelete instanceof RangeVertex)) {
+    for (const vertexToDelete of rangeVertices) {
+      if (!this.graph.hasNode(vertexToDelete)) {
         continue
       }
 
-      const start = vertexToDelete.getStart()
-      const end = vertexToDelete.getEnd()
+      const start = vertexToDelete.start
+      const end = vertexToDelete.end
 
-      if (start.sheet !== sheetToDelete && end.sheet !== sheetToDelete) {
+      if (start.sheet !== placeholderSheetToDelete && end.sheet !== placeholderSheetToDelete) {
         continue
       }
 
@@ -373,8 +385,10 @@ export class DependencyGraph {
       const targetEnd = simpleCellAddress(sheetToKeep, end.col, end.row)
       const vertexToKeep = this.rangeMapping.getRangeVertex(targetStart, targetEnd)
 
-      if (vertexToKeep !== undefined) {
-        this.mergeVertices(vertexToKeep, vertexToDelete)
+      if (vertexToKeep) {
+        this.rerouteDependents(vertexToDelete, vertexToKeep)
+        this.removeVertexAndRerouteDependencies(vertexToDelete, vertexToKeep)
+        this.rangeMapping.removeVertexIfExists(vertexToDelete)
         this.graph.markNodeAsDirty(vertexToKeep)
       } else {
         this.rangeMapping.removeVertexIfExists(vertexToDelete)
@@ -384,10 +398,24 @@ export class DependencyGraph {
       }
     }
 
-    this.addressMapping.removeSheet(sheetToDelete)
+    const cellVertices = Array.from(this.addressMapping.sheetEntries(placeholderSheetToDelete))
 
-    // TODO: adjust arrayMapping
+    for (const [addressToDelete, vertexToDelete] of cellVertices) {
+      const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
+      const vertexToKeep = this.getCell(addressToKeep)
 
+      if (vertexToKeep) {
+        this.rerouteDependents(vertexToDelete, vertexToKeep)
+        this.removeVertexAndCleanupDependencies(vertexToDelete)
+        this.addressMapping.removeCell(addressToDelete)
+        this.graph.markNodeAsDirty(vertexToKeep)
+      } else {
+        this.addressMapping.moveCell(addressToDelete, addressToKeep)
+        this.graph.markNodeAsDirty(vertexToDelete)
+      }
+    }
+
+    this.addressMapping.removeSheet(placeholderSheetToDelete)
     this.addStructuralNodesToChangeSet()
   }
 
@@ -572,7 +600,7 @@ export class DependencyGraph {
   }
 
   /**
-   * Sets an array formula vertex to empty.
+   * Sets an array empty..
    * - removes all corresponding entries from address mapping
    * - reroutes the edges
    * - removes vertex from graph and cleans up its dependencies
@@ -959,12 +987,14 @@ export class DependencyGraph {
     const allDeps: [(SimpleCellAddress | AbsoluteCellRange), Vertex][] = []
     const {smallerRangeVertex, restRange} = this.rangeMapping.findSmallerRange((vertex as RangeVertex).range) //checking whether this range was splitted by bruteForce or not
     let range
+
     if (smallerRangeVertex !== undefined && this.graph.adjacentNodes(smallerRangeVertex).has(vertex)) {
       range = restRange
       allDeps.push([new AbsoluteCellRange(smallerRangeVertex.start, smallerRangeVertex.end), smallerRangeVertex])
     } else { //did we ever need to use full range
       range = (vertex as RangeVertex).range
     }
+
     for (const address of range.addresses(this)) {
       const cell = this.addressMapping.getCell(address)
       if (cell !== undefined) {
@@ -1106,7 +1136,8 @@ export class DependencyGraph {
       verticesWithChangedSize
     } = this.rangeMapping.truncateRanges(span, coordinate)
     for (const [existingVertex, mergedVertex] of verticesToMerge) {
-      this.mergeVertices(existingVertex, mergedVertex)
+      this.rerouteDependents(mergedVertex, existingVertex)
+      this.removeVertexAndCleanupDependencies(mergedVertex)
     }
     for (const rangeVertex of verticesToRemove) {
       this.removeVertexAndCleanupDependencies(rangeVertex)
@@ -1211,65 +1242,31 @@ export class DependencyGraph {
   }
 
   /**
-   * - If vertex has dependents in other sheets, changes it to EmptyCellVertex and returns false
-   * - Otherwise, removes it from the graph, cleans up its dependencies and returns true
-   *
-   * @returns True if the vertex was removed, false if it was changed to EmptyCellVertex.
+   * Reroutes dependent vertices of source to target. Also removes the edge target -> source if it exists.
    */
-  private removeVertexIfNoDependentsInOtherSheets(inputVertex: Vertex): boolean {
-    const dependents = this.getAdjacentNodesAddresses(inputVertex)
+  private rerouteDependents(source: Vertex, target: Vertex) {
+    const dependents = this.graph.adjacentNodes(source)
+    this.graph.removeEdgeIfExists(target, source)
 
-    const hasDependentInExistingSheet = dependents.some(addr => {
-      if (isSimpleCellAddress(addr)) {
-        return !this.isPlaceholder(addr.sheet)
+    dependents.forEach((adjacentNode) => {
+      if (this.graph.hasNode(adjacentNode)) {
+        this.graph.addEdge(target, adjacentNode)
       }
-
-      if (isSimpleCellRange(addr)) {
-        return this.sheetMapping.hasSheetWithId(addr.start.sheet, { includePlaceholders: false }) || this.sheetMapping.hasSheetWithId(addr.end.sheet, { includePlaceholders: false })
-      }
-
-      return false
     })
 
-    let dependencies: Set<[SimpleCellAddress | SimpleCellRange, Vertex]>
-
-    if (hasDependentInExistingSheet) {
-      dependencies = new Set(this.graph.removeDependencies(inputVertex))
-    } else {
-      dependencies = new Set(this.graph.removeNode(inputVertex))
-    }
-
-    while (dependencies.size > 0) {
-      const dependency = dependencies.values().next().value
-      dependencies.delete(dependency)
-      const [address, vertex] = dependency
-      if (this.graph.hasNode(vertex) && this.graph.adjacentNodesCount(vertex) === 0) {
-        if (vertex instanceof RangeVertex || vertex instanceof EmptyCellVertex) {
-          this.graph.removeNode(vertex).forEach((candidate) => dependencies.add(candidate))
-        }
-        if (vertex instanceof RangeVertex) {
-          this.rangeMapping.removeVertexIfExists(vertex)
-        } else if (vertex instanceof EmptyCellVertex) {
-          this.addressMapping.removeCell(address)
-        }
-      }
-    }
-
-    if (inputVertex instanceof RangeVertex) {
-      this.rangeMapping.removeVertexIfExists(inputVertex)
-    }
-
-    return !hasDependentInExistingSheet
   }
 
-  private mergeVertices(vertexToKeep: Vertex, vertexToDelete: Vertex) {
-    const adjNodesStored = this.graph.adjacentNodes(vertexToDelete)
+  /**
+   * Removes a vertex from graph and reroutes its dependencies to other vertex. Also removes the edge vertexToKeep -> vertexToDelete if it exists.
+   */
+  private removeVertexAndRerouteDependencies(vertexToDelete: Vertex, vertexToKeep: Vertex) {
+    const dependencies = this.graph.removeNode(vertexToDelete)
 
-    this.removeVertexAndCleanupDependencies(vertexToDelete)
     this.graph.removeEdgeIfExists(vertexToKeep, vertexToDelete)
-    adjNodesStored.forEach((adjacentNode) => {
-      if (this.graph.hasNode(adjacentNode)) {
-        this.graph.addEdge(vertexToKeep, adjacentNode)
+
+    dependencies.forEach(([_, dependency]) => {
+      if (this.graph.hasNode(dependency)) {
+        this.graph.addEdge(dependency, vertexToKeep)
       }
     })
   }
@@ -1280,6 +1277,7 @@ export class DependencyGraph {
    */
   private removeVertexAndCleanupDependencies(inputVertex: Vertex) {
     const dependencies = new Set(this.graph.removeNode(inputVertex))
+
     while (dependencies.size > 0) {
       const dependency = dependencies.values().next().value
       dependencies.delete(dependency)

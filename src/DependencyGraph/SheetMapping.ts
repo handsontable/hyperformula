@@ -209,12 +209,12 @@ export class SheetMapping {
    * Renames sheet.
    * If called with sheetId of a placeholder sheet, throws {NoSheetWithIdError}.
    * If newDisplayName is conflicting with an existing sheet, throws {SheetNameAlreadyTakenError}.
-   * If newDisplayName is conflicting with a placeholder sheet name, throws {SheetNameAlreadyTakenError}.
+   * If newDisplayName is conflicting with a placeholder sheet name, deletes the placeholder sheet and returns its id as mergedWithPlaceholderSheet.
    *
    * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
    */
-  public renameSheet(sheetId: number, newDisplayName: string): { previousDisplayName: Maybe<string>, mergedSheetWith?: number } {
+  public renameSheet(sheetId: number, newDisplayName: string): { previousDisplayName: Maybe<string>, mergedWithPlaceholderSheet?: number } {
     const sheet = this._getSheetOrThrowError(sheetId, {})
 
     const currentDisplayName = sheet.displayName
@@ -223,7 +223,7 @@ export class SheetMapping {
     }
 
     const sheetWithConflictingName = this._getSheetByName(newDisplayName, { includePlaceholders: true })
-    let mergedSheetWith: number | undefined = undefined
+    let mergedWithPlaceholderSheet: number | undefined = undefined
 
     if (sheetWithConflictingName !== undefined && sheetWithConflictingName.id !== sheet.id) {
       if (!sheetWithConflictingName.isPlaceholder) {
@@ -231,7 +231,7 @@ export class SheetMapping {
       } else {
         this.mappingFromCanonicalNameToId.delete(sheetWithConflictingName.canonicalName)
         this.allSheets.delete(sheetWithConflictingName.id)
-        mergedSheetWith = sheetWithConflictingName.id
+        mergedWithPlaceholderSheet = sheetWithConflictingName.id
       }
     }
 
@@ -240,7 +240,7 @@ export class SheetMapping {
 
     sheet.displayName = newDisplayName
     this.storeSheetInMappings(sheet)
-    return { previousDisplayName: currentDisplayName, mergedSheetWith }
+    return { previousDisplayName: currentDisplayName, mergedWithPlaceholderSheet }
   }
 
   /**

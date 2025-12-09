@@ -535,14 +535,12 @@ describe('rename sheet - issue #1116', () => {
       const sheet1Name = 'FirstSheet'
       const oldName = 'OldName'
       const newName = 'NewName'
-      const sheet1Data = [
-        ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
-        [`='${newName}'!A1:A1`, `='${newName}'!A1:B2`, `='${newName}'!A1:A3`, `='${newName}'!A1:A4`],
-      ]
-      const sheet2Data = [[1], [2], [3], [4]]
       const engine = HyperFormula.buildFromSheets({
-        [sheet1Name]: sheet1Data,
-        [oldName]: sheet2Data,
+        [sheet1Name]: [
+          ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
+          [`='${newName}'!A1:A1`, `='${newName}'!A1:B2`, `='${newName}'!A1:A3`, `='${newName}'!A1:A4`],
+        ],
+        [oldName]: [[1], [2], [3], [4]],
       })
 
       const sheet1Id = engine.getSheetId(sheet1Name)!
