@@ -350,23 +350,28 @@ export class DependencyGraph {
   }
 
   /**
-   * TODO: implement
+   * Removed placeholderSheetToDelete and reroutes edges to the corresponding vertices in sheetToKeep
    *
-   * sheetToKeep:
-   * - existing,
-   * - contains cell vertices,
-   * - contains range vertices,
-   * - contains array formula vertices,
-   * - has dependencies and depentents
-   *
-   * sheetToDelete:
-   * - placeholder,
-   * - contains only empty cell vertices,
-   * - contains range vertices,
-   * - has dependents in other sheets,
-   * - has dependencies only in same sheet (ranges)
+   * Assumptions about placeholderSheetToDelete:
+   * - is empty (contains only empty cell vertices and range vertices),
+   * - empty cell vertices have no dependencies,
+   * - range vertices have dependencies only in placeholderSheetToDelete,
+   * - vertices may have dependents in placeholderSheetToDelete and other sheets,
    */
   public mergeSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
+    this.adjustRangeVerticesWhenMergingSheets(sheetToKeep, placeholderSheetToDelete)
+    this.adjustCellVerticesWhenMergingSheets(sheetToKeep, placeholderSheetToDelete)
+    this.addressMapping.removeSheet(placeholderSheetToDelete)
+    this.addStructuralNodesToChangeSet()
+  }
+
+  /**
+   * For each range vertex in placeholderSheetToDelete:
+   * - reroutes dependencies and dependents of range vertex to the corresponding vertex in sheetToKeep
+   * - removes range vertex from graph and range mapping
+   * - cleans up dependencies of the removed vertex
+   */
+  private adjustRangeVerticesWhenMergingSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
     const rangeVertices = Array.from(this.rangeMapping.rangesInSheet(placeholderSheetToDelete))
 
     for (const vertexToDelete of rangeVertices) {
@@ -397,7 +402,15 @@ export class DependencyGraph {
         this.graph.markNodeAsDirty(vertexToDelete)
       }
     }
+  }
 
+  /**
+   * For each cell vertex in placeholderSheetToDelete:
+   * - reroutes dependents of cell vertex to the corresponding vertex in sheetToKeep
+   * - removes cell vertex from graph and address mapping
+   * - cleans up dependencies of the removed vertex
+   */
+  private adjustCellVerticesWhenMergingSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
     const cellVertices = Array.from(this.addressMapping.sheetEntries(placeholderSheetToDelete))
 
     for (const [addressToDelete, vertexToDelete] of cellVertices) {
@@ -414,9 +427,6 @@ export class DependencyGraph {
         this.graph.markNodeAsDirty(vertexToDelete)
       }
     }
-
-    this.addressMapping.removeSheet(placeholderSheetToDelete)
-    this.addStructuralNodesToChangeSet()
   }
 
   /**
