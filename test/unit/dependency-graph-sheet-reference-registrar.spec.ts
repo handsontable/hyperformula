@@ -14,6 +14,6 @@ describe('SheetReferenceRegistrar', () => {
 
     expect(firstSheetId).toBe(secondSheetId)
     expect(sheetMapping.getSheetId('Ghost', {includePlaceholders: true})).toBe(firstSheetId)
-    expect(() => addressMapping.getStrategyForSheet(firstSheetId)).not.toThrow()
+    expect(() => addressMapping.getStrategyForSheetOrThrow(firstSheetId)).not.toThrow()
   })
 })

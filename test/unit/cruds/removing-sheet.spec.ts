@@ -658,7 +658,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet(engine.getSheetId(sheet1Name)!)
 
-    expect(() => engine.addressMapping.getStrategyForSheet(engine.getSheetId(sheet1Name)!)).toThrow(NoSheetWithIdError)
+    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(engine.getSheetId(sheet1Name)!)).toThrow(NoSheetWithIdError)
   })
 
   it('should not remove sheet from address mapping if another sheet depends on it', () => {
@@ -674,7 +674,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet(sheet1Id)
 
-    expect(engine.addressMapping.getStrategyForSheet(sheet1Id)).toBeDefined()
+    expect(engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toBeDefined()
   })
 
   it('should not remove sheet from address mapping if a named expression depends on it', () => {
@@ -689,7 +689,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet(sheet1Id)
 
-    expect(engine.addressMapping.getStrategyForSheet(sheet1Id)).toBeDefined()
+    expect(engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toBeDefined()
   })
 })
 

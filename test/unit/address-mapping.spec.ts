@@ -695,7 +695,7 @@ describe('AddressMapping', () => {
     ]
     addressMapping.addSheetAndSetStrategyBasedOnBounderies(0, findBoundaries(sheet))
 
-    expect(addressMapping.getStrategyForSheet(0)).toBeInstanceOf(SparseStrategy)
+    expect(addressMapping.getStrategyForSheetOrThrow(0)).toBeInstanceOf(SparseStrategy)
   })
 
   it('#buildAddresMapping - when dense matrix', () => {
@@ -706,6 +706,6 @@ describe('AddressMapping', () => {
     ]
     addressMapping.addSheetAndSetStrategyBasedOnBounderies(0, findBoundaries(sheet))
 
-    expect(addressMapping.getStrategyForSheet(0)).toBeInstanceOf(DenseStrategy)
+    expect(addressMapping.getStrategyForSheetOrThrow(0)).toBeInstanceOf(DenseStrategy)
   })
 })

@@ -38,7 +38,7 @@ export class AddressMapping {
    * Gets the cell vertex at the specified address.
    */
   public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
-    const sheetMapping = this.getStrategyForSheet(address.sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(address.sheet)
     return sheetMapping.getCell(address)
   }
 
@@ -56,9 +56,9 @@ export class AddressMapping {
 
   /**
    * Gets the address mapping strategy for the specified sheet.
-   * @throws NoSheetWithIdError if sheet doesn't exist
+   * @throws {NoSheetWithIdError} if sheet doesn't exist
    */
-  public getStrategyForSheet(sheetId: number): AddressMappingStrategy {
+  public getStrategyForSheetOrThrow(sheetId: number): AddressMappingStrategy {
     const strategy = this.mapping.get(sheetId)
     if (strategy === undefined) {
       throw new NoSheetWithIdError(sheetId)
@@ -257,7 +257,7 @@ export class AddressMapping {
    * Gets the height of the specified sheet.
    */
   public getSheetHeight(sheetId: number): number {
-    const sheetMapping = this.getStrategyForSheet(sheetId)
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheetId)
     return sheetMapping.getHeight()
   }
 
@@ -265,7 +265,7 @@ export class AddressMapping {
    * Gets the width of the specified sheet.
    */
   public getSheetWidth(sheet: number): number {
-    const sheetMapping = this.getStrategyForSheet(sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheet)
     return sheetMapping.getWidth()
   }
 
@@ -273,7 +273,7 @@ export class AddressMapping {
    * Adds rows to a sheet.
    */
   public addRows(sheet: number, row: number, numberOfRows: number) {
-    const sheetMapping = this.getStrategyForSheet(sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheet)
     sheetMapping.addRows(row, numberOfRows)
   }
 
@@ -281,7 +281,7 @@ export class AddressMapping {
    * Removes rows from a sheet.
    */
   public removeRows(removedRows: RowsSpan) {
-    const sheetMapping = this.getStrategyForSheet(removedRows.sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(removedRows.sheet)
     sheetMapping.removeRows(removedRows)
   }
 
@@ -289,7 +289,7 @@ export class AddressMapping {
    * Adds columns to a sheet starting at the specified column index.
    */
   public addColumns(sheet: number, column: number, numberOfColumns: number) {
-    const sheetMapping = this.getStrategyForSheet(sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheet)
     sheetMapping.addColumns(column, numberOfColumns)
   }
 
@@ -297,7 +297,7 @@ export class AddressMapping {
    * Removes columns from a sheet.
    */
   public removeColumns(removedColumns: ColumnsSpan) {
-    const sheetMapping = this.getStrategyForSheet(removedColumns.sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(removedColumns.sheet)
     sheetMapping.removeColumns(removedColumns)
   }
 
@@ -319,7 +319,7 @@ export class AddressMapping {
    * Returns an iterator of address-vertex pairs within the specified rows span.
    */
   public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
-    const sheetMapping = this.getStrategyForSheet(rowsSpan.sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(rowsSpan.sheet)
     yield* sheetMapping.entriesFromRowsSpan(rowsSpan)
   }
 
@@ -327,7 +327,7 @@ export class AddressMapping {
    * Returns an iterator of address-vertex pairs within the specified columns span.
    */
   public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
-    const sheetMapping = this.getStrategyForSheet(columnsSpan.sheet)
+    const sheetMapping = this.getStrategyForSheetOrThrow(columnsSpan.sheet)
     yield* sheetMapping.entriesFromColumnsSpan(columnsSpan)
   }
 
@@ -344,14 +344,22 @@ export class AddressMapping {
   /**
    * Returns an iterator of address-vertex pairs for a specific sheet.
    * @returns {IterableIterator<[SimpleCellAddress, CellVertex]>} Iterator of [address, vertex] tuples
-   * @throws NoSheetWithIdError if sheet doesn't exist
+   * @throws {NoSheetWithIdError} if sheet doesn't exist
    */
-  public* sheetEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
-    const sheetMapping = this.mapping.get(sheet)
-    if (sheetMapping !== undefined) {
-      yield* sheetMapping.getEntries(sheet)
-    } else {
-      throw new NoSheetWithIdError(sheet)
+  public* sheetEntries(sheetId: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheetId)
+    yield* sheetMapping.getEntries(sheetId)
+  }
+
+  /**
+   * Checks if a sheet is empty.
+   * @throws {NoSheetWithIdError} if sheet doesn't exist
+   */
+  public hasAnyEntries(sheetId: number): boolean {
+    for (const _ of this.sheetEntries(sheetId)) {
+      return true
     }
+
+    return false
   }
 }
