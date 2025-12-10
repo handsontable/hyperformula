@@ -245,7 +245,6 @@ export class RemoveSheetUndoEntry extends BaseUndoEntry {
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
     public readonly scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][],
-    public readonly version: number,
   ) {
     super()
   }
@@ -584,8 +583,8 @@ export class UndoRedo {
 
   public undoRemoveSheet(operation: RemoveSheetUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
-    const {oldSheetContent, sheetId} = operation
-    this.operations.addSheetWithId(sheetId, operation.sheetName)
+    const {oldSheetContent, sheetId, scopedNamedExpressions, sheetName} = operation
+    this.operations.addSheetWithId(sheetId, sheetName)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
       for (let col = 0; col < row.length; col++) {
@@ -595,11 +594,9 @@ export class UndoRedo {
       }
     }
 
-    for (const [namedexpression, content] of operation.scopedNamedExpressions) {
+    for (const [namedexpression, content] of scopedNamedExpressions) {
       this.operations.restoreNamedExpression(namedexpression, content, sheetId)
     }
-
-    this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   public undoRenameSheet(operation: RenameSheetUndoEntry) {

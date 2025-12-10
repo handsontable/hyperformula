@@ -245,13 +245,13 @@ export class Operations {
   /**
    * Removes a sheet from the workbook.
    */
-  public removeSheet(sheetId: number): { version: number, scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][] } {
+  public removeSheet(sheetId: number): [InternalNamedExpression, ClipboardCell][] {
     this.dependencyGraph.removeSheet(sheetId)
     this.columnSearch.removeSheet(sheetId)
     const scopedNamedExpressions = this.namedExpressions.getAllNamedExpressionsForScope(sheetId).map(
       (namedExpression) => this.removeNamedExpression(namedExpression.normalizeExpressionName(), sheetId)
     )
-    return { version: 0, scopedNamedExpressions }
+    return scopedNamedExpressions
   }
 
   /**

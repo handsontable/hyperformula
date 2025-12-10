@@ -466,6 +466,82 @@ describe('Undo - removing sheet', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
   })
+
+  it('works with multiple undo/redo cycles', () => {
+    const sheets = {
+      Sheet1: [['1', '2']],
+      Sheet2: [['3', '4']],
+    }
+    const engine = HyperFormula.buildFromSheets(sheets)
+    engine.removeSheet(1)
+
+    engine.undo()
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
+
+    engine.redo()
+    expect(engine.getSheetNames()).toEqual(['Sheet1'])
+
+    engine.undo()
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
+  })
+
+  it('works after row removal operation', () => {
+    const sheets = {
+      Sheet1: [['1'], ['2'], ['=Sheet2!A1']],
+      Sheet2: [['42']],
+    }
+    const engine = HyperFormula.buildFromSheets(sheets)
+    engine.removeRows(0, [0, 1])
+    engine.removeSheet(1)
+
+    engine.undo()
+    expect(engine.getSheetNames()).toEqual(['Sheet1', 'Sheet2'])
+    expect(engine.getCellValue(adr('A2'))).toEqual(42)
+
+    engine.undo()
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toEqual(2)
+    expect(engine.getCellValue(adr('A3'))).toEqual(42)
+  })
+
+  it('works after column removal operation', () => {
+    const sheets = {
+      Sheet1: [['1', '2', '=Sheet2!A1']],
+      Sheet2: [['42']],
+    }
+    const engine = HyperFormula.buildFromSheets(sheets)
+    engine.removeColumns(0, [0, 1])
+    engine.removeSheet(1)
+
+    engine.undo()
+    expect(engine.getSheetNames()).toEqual(['Sheet1', 'Sheet2'])
+    expect(engine.getCellValue(adr('B1'))).toEqual(42)
+
+    engine.undo()
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+    expect(engine.getCellValue(adr('C1'))).toEqual(42)
+  })
+
+  it('restores scoped named expressions', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=MyName']],
+      Sheet2: [['1']],
+    })
+    engine.addNamedExpression('MyName', '=42', 0)
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    expect(engine.listNamedExpressions(0)).toContain('MyName')
+
+    engine.removeSheet(0)
+    expect(engine.getSheetNames()).toEqual(['Sheet2'])
+
+    engine.undo()
+
+    expect(engine.getSheetNames()).toContain('Sheet1')
+    expect(engine.getSheetNames()).toContain('Sheet2')
+    expect(engine.listNamedExpressions(0)).toContain('MyName')
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+  })
 })
 
 describe('Undo - renaming sheet', () => {
@@ -1357,6 +1433,50 @@ describe('Redo - removing sheet', () => {
     engine.removeSheet(0)
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+
+  it('redo with cross-sheet formula dependencies', () => {
+    const sheets = {
+      Sheet1: [['=Sheet2!A1']],
+      Sheet2: [['42']],
+    }
+    const engine = HyperFormula.buildFromSheets(sheets)
+    engine.removeSheet(1)
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetNames()).toEqual(['Sheet1'])
+    expect(engine.getCellValue(adr('A1'))).toBeInstanceOf(Object) // #REF! error
+  })
+
+  it('works with multiple undo/redo cycles', () => {
+    const sheets = {
+      Sheet1: [['1']],
+      Sheet2: [['2']],
+    }
+    const engine = HyperFormula.buildFromSheets(sheets)
+    engine.removeSheet(1)
+
+    engine.undo()
+    engine.redo()
+    engine.undo()
+    engine.redo()
+
+    expect(engine.getSheetNames()).toEqual(['Sheet1'])
+  })
+
+  it('redo removes scoped named expressions', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [['=MyName']],
+    })
+    engine.addNamedExpression('MyName', '=42', 0)
+    engine.removeSheet(0)
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.listNamedExpressions().length).toEqual(0)
   })
 })
 
