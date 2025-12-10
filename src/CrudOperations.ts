@@ -206,9 +206,9 @@ export class CrudOperations {
       this.ensureItIsPossibleToAddSheet(name)
     }
     this.undoRedo.clearRedoStack()
-    const addedSheetName = this.operations.addSheet(name)
-    this.undoRedo.saveOperation(new AddSheetUndoEntry(addedSheetName))
-    return addedSheetName
+    const { sheetName, sheetId } = this.operations.addSheet(name)
+    this.undoRedo.saveOperation(new AddSheetUndoEntry(sheetName, sheetId))
+    return sheetName
   }
 
   public removeSheet(sheetId: number): void {

@@ -550,7 +550,44 @@ describe('Undo - adding sheet', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([]))
   })
 
-  // TODO: more tests
+  it('works with auto-generated name', () => {
+    const engine = HyperFormula.buildFromArray([])
+    engine.addSheet()
+
+    engine.undo()
+
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([]))
+  })
+
+  it('restores cross-sheet reference error after undo', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NewSheet!A1']
+    ])
+    engine.addSheet('NewSheet')
+    engine.setCellContents({sheet: 1, col: 0, row: 0}, '42')
+
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+
+    engine.undo() // undo setCellContents
+    engine.undo() // undo addSheet
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+  })
+
+  it('formulas are built correctly when there was a pause in computation', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NewSheet!A1']
+    ])
+    engine.suspendEvaluation()
+    engine.addSheet('NewSheet')
+    engine.setCellContents({sheet: 1, col: 0, row: 0}, '42')
+
+    engine.undo() // undo setCellContents
+    engine.undo() // undo addSheet
+    engine.resumeEvaluation()
+
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+  })
 })
 
 describe('Undo - clearing sheet', () => {
@@ -1008,8 +1045,8 @@ describe('UndoRedo - at the Operations layer', () => {
 
   it('clearUndoStack should clear out all undo entries', () => {
     expect(undoRedo.isUndoStackEmpty()).toBe(true)
-    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 1'))
-    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 2'))
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 1', 1))
+    undoRedo.saveOperation(new AddSheetUndoEntry('Sheet 2', 2))
 
     expect(undoRedo.isUndoStackEmpty()).toBe(false)
 
@@ -1356,6 +1393,36 @@ describe('Redo - adding sheet', () => {
     engine.addSheet()
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+
+  it('restores cross-sheet reference after redo', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NewSheet!A1']
+    ])
+    engine.addSheet('NewSheet')
+    engine.setCellContents({sheet: 1, col: 0, row: 0}, '42')
+    engine.undo() // undo setCellContents
+    engine.undo() // undo addSheet
+
+    engine.redo() // redo addSheet
+
+    expect(engine.getSheetName(1)).toEqual('NewSheet')
+  })
+
+  it('formulas are built correctly when there was a pause in computation', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=NewSheet!A1']
+    ])
+    engine.addSheet('NewSheet')
+    const snapshot = engine.getAllSheetsSerialized()
+    engine.undo()
+    engine.suspendEvaluation()
+
+    engine.redo()
+    engine.resumeEvaluation()
+
+    expect(engine.getSheetName(1)).toEqual('NewSheet')
+    expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(snapshot))
   })
 })
 

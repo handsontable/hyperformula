@@ -228,10 +228,18 @@ export class Operations {
   /**
    * Adds a new sheet to the workbook.
    */
-  public addSheet(name?: string): string {
+  public addSheet(name?: string): { sheetName: string, sheetId: number } {
     const sheetId = this.sheetMapping.addSheet(name)
     this.dependencyGraph.addSheet(sheetId)
-    return this.sheetMapping.getSheetNameOrThrowError(sheetId)
+    return { sheetName: this.sheetMapping.getSheetNameOrThrowError(sheetId), sheetId }
+  }
+
+  /**
+   * Adds a sheet with a specific ID for redo operations.
+   */
+  public addSheetWithId(sheetId: number, name: string): void {
+    this.sheetMapping.addSheetWithId(sheetId, name)
+    this.dependencyGraph.addSheet(sheetId)
   }
 
   /**

@@ -171,6 +171,35 @@ export class SheetMapping {
   }
 
   /**
+   * Adds a sheet with a specific ID and name. Used for redo operations.
+   * Updates lastSheetId if necessary to maintain consistency.
+   *
+   * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
+   */
+  public addSheetWithId(sheetId: number, sheetDisplayName: string): void {
+    const sheetWithConflictingName = this._getSheetByName(sheetDisplayName, { includePlaceholders: true })
+
+    if (sheetWithConflictingName) {
+      if (sheetWithConflictingName.id !== sheetId) {
+        throw new SheetNameAlreadyTakenError(sheetDisplayName)
+      }
+
+      if (!sheetWithConflictingName.isPlaceholder) {
+        throw new SheetNameAlreadyTakenError(sheetDisplayName)
+      }
+
+      sheetWithConflictingName.isPlaceholder = false
+      return
+    }
+
+    if (sheetId > this.lastSheetId) {
+      this.lastSheetId = sheetId
+    }
+    const sheet = new Sheet(sheetId, sheetDisplayName)
+    this.storeSheetInMappings(sheet)
+  }
+
+  /**
    * Adds a placeholder sheet with the given name if it does not exist yet
    */
   public addPlaceholderIfNotExists(sheetName: string): number {
