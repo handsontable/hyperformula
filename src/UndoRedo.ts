@@ -613,22 +613,11 @@ export class UndoRedo {
 
   public undoRenameSheet(operation: RenameSheetUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
+    this.operations.renameSheet(operation.sheetId, operation.oldName)
 
-    const shouldRestorePlaceholder = operation.mergedPlaceholderSheetId !== undefined && operation.version !== undefined
-
-    try {
-      this.operations.renameSheet(operation.sheetId, operation.oldName)
-    } catch (e) {
-      if (shouldRestorePlaceholder) {
-        // If rename fails but we were supposed to restore a placeholder, rethrow to avoid inconsistent state
-        throw e
-      }
-      throw e
-    }
-
-    if (shouldRestorePlaceholder) {
-      this.operations.addPlaceholderSheetWithId(operation.mergedPlaceholderSheetId!, operation.newName)
-      this.restoreOldDataFromVersion(operation.version! - 1)
+    if (operation.mergedPlaceholderSheetId !== undefined && operation.version !== undefined) {
+      this.operations.addPlaceholderSheetWithId(operation.mergedPlaceholderSheetId, operation.newName)
+      this.restoreOldDataFromVersion(operation.version - 1)
     }
   }
 

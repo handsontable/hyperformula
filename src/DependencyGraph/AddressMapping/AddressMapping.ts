@@ -99,7 +99,7 @@ export class AddressMapping {
       return newStrategy
     }
 
-    if (newStrategy instanceof DenseStrategy) { // new startegy is the same as the placeholder
+    if (newStrategy instanceof DenseStrategy) { // new strategy is the same as the placeholder
       return strategyPlaceholder
     }
 

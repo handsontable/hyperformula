@@ -349,6 +349,7 @@ export class DependencyGraph {
     if (!this.isPlaceholder(placeholderSheetToDelete)) {
       throw new Error(`Cannot merge sheets: sheet ${placeholderSheetToDelete} is not a placeholder`)
     }
+
     this.mergeRangeVertices(sheetToKeep, placeholderSheetToDelete)
     this.mergeCellVertices(sheetToKeep, placeholderSheetToDelete)
     this.addressMapping.removeSheet(placeholderSheetToDelete)
@@ -830,7 +831,7 @@ export class DependencyGraph {
    * - cleans up dependencies of the removed vertex
    */
   private mergeCellVertices(sheetToKeep: number, placeholderSheetToDelete: number): void {
-    const cellVertices = Array.from(this.addressMapping.sheetEntries(placeholderSheetToDelete))
+    const cellVertices = Array.from(this.addressMapping.sheetEntries(placeholderSheetToDelete)) // placeholder sheet contains only EmptyCellVertex-es
 
     for (const [addressToDelete, vertexToDelete] of cellVertices) {
       const addressToKeep = simpleCellAddress(sheetToKeep, addressToDelete.col, addressToDelete.row)
