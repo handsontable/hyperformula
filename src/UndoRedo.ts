@@ -258,6 +258,16 @@ export class RemoveSheetUndoEntry extends BaseUndoEntry {
   }
 }
 
+/**
+ * Undo entry for renaming a sheet.
+ *
+ * When renaming a sheet to a name that was previously referenced (but didn't exist),
+ * a placeholder sheet gets merged into the renamed sheet. In this case:
+ * - `version` contains the transformation version for restoring formulas during undo
+ * - `mergedPlaceholderSheetId` contains the ID of the placeholder sheet that was merged
+ *
+ * When renaming to a name not previously referenced, both optional params are undefined.
+ */
 export class RenameSheetUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetId: number,
@@ -603,11 +613,22 @@ export class UndoRedo {
 
   public undoRenameSheet(operation: RenameSheetUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
-    this.operations.renameSheet(operation.sheetId, operation.oldName)
 
-    if (operation.mergedPlaceholderSheetId !== undefined && operation.version !== undefined) {
-      this.operations.addPlaceholderSheetWithId(operation.mergedPlaceholderSheetId, operation.newName)
-      this.restoreOldDataFromVersion(operation.version - 1)
+    const shouldRestorePlaceholder = operation.mergedPlaceholderSheetId !== undefined && operation.version !== undefined
+
+    try {
+      this.operations.renameSheet(operation.sheetId, operation.oldName)
+    } catch (e) {
+      if (shouldRestorePlaceholder) {
+        // If rename fails but we were supposed to restore a placeholder, rethrow to avoid inconsistent state
+        throw e
+      }
+      throw e
+    }
+
+    if (shouldRestorePlaceholder) {
+      this.operations.addPlaceholderSheetWithId(operation.mergedPlaceholderSheetId!, operation.newName)
+      this.restoreOldDataFromVersion(operation.version! - 1)
     }
   }
 

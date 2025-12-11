@@ -243,7 +243,7 @@ export class RangeMapping {
    */
   private static compareBy(left: RangeVertex, right: RangeVertex, coordinate: (address: SimpleCellAddress) => number): number {
     const leftStart = coordinate(left.range.start)
-    const rightStart = coordinate(left.range.start)
+    const rightStart = coordinate(right.range.start)
     if (leftStart === rightStart) {
       const leftEnd = coordinate(left.range.end)
       const rightEnd = coordinate(right.range.end)

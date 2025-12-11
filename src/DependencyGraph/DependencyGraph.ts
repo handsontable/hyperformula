@@ -346,6 +346,9 @@ export class DependencyGraph {
    * - vertices may have dependents in placeholderSheetToDelete and other sheets,
    */
   public mergeSheets(sheetToKeep: number, placeholderSheetToDelete: number): void {
+    if (!this.isPlaceholder(placeholderSheetToDelete)) {
+      throw new Error(`Cannot merge sheets: sheet ${placeholderSheetToDelete} is not a placeholder`)
+    }
     this.mergeRangeVertices(sheetToKeep, placeholderSheetToDelete)
     this.mergeCellVertices(sheetToKeep, placeholderSheetToDelete)
     this.addressMapping.removeSheet(placeholderSheetToDelete)

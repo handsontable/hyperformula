@@ -102,7 +102,7 @@ describe('rename sheet - issue #1116', () => {
 
     expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
 
-    engine.renameSheet(oldNameId, newName) // trudny case: trzeba przepiac krawedzie w grafie z zarezerwowanego sheeta na ten renamowany
+    engine.renameSheet(oldNameId, newName)
 
     expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(42)
   })

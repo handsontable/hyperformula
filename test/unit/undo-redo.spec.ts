@@ -648,26 +648,78 @@ describe('Undo - renaming sheet', () => {
   })
 
   it('restores the dependency graph structure on undo', () => {
+    // Complex dependency structure:
+    // Sheet1!A1 -> OldName!A1 (direct reference to real sheet)
+    // Sheet1!B1 -> NewName!A1 (direct reference to placeholder - should be REF)
+    // Sheet1!C1 -> SUM(OldName!A1:B2) (range reference to real sheet)
+    // Sheet1!D1 -> SUM(NewName!A1:B2) (range reference to placeholder - should be REF)
+    // Sheet1!A2 -> Sheet1!A1 * 2 (indirect dependency on OldName via A1)
+    // Sheet1!B2 -> Sheet1!B1 + 10 (indirect dependency on placeholder via B1 - should be REF)
+    // Sheet1!C2 -> Sheet1!C1 + Sheet1!A1 (depends on both range and direct ref to real sheet)
+    // Sheet1!D2 -> Sheet1!D1 + Sheet1!B1 (depends on both range and direct ref to placeholder - should be REF)
     const engine = HyperFormula.buildFromSheets({
-      'Sheet1': [['=OldName!A1', '=NewName!A1']],
-      'OldName': [[42]],
+      'Sheet1': [
+        ['=OldName!A1', '=NewName!A1', '=SUM(OldName!A1:B2)', '=SUM(NewName!A1:B2)'],
+        ['=A1*2', '=B1+10', '=C1+A1', '=D1+B1'],
+      ],
+      'OldName': [[1, 2], [3, 4]],
     })
     const sheet1Id = engine.getSheetId('Sheet1')!
     const oldNameId = engine.getSheetId('OldName')!
+
+    // Before rename: OldName refs work, NewName refs are REF errors
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(1)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('C1', sheet1Id))).toEqual(10) // 1+2+3+4
+    expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(2) // 1*2
+    expect(engine.getCellValue(adr('B2', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('C2', sheet1Id))).toEqual(11) // 10+1
+    expect(engine.getCellValue(adr('D2', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    // Rename OldName -> NewName (merges with placeholder)
     engine.renameSheet(oldNameId, 'NewName')
+
+    // After rename: all refs now work (NewName is the real sheet)
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(1)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqual(1)
+    expect(engine.getCellValue(adr('C1', sheet1Id))).toEqual(10)
+    expect(engine.getCellValue(adr('D1', sheet1Id))).toEqual(10)
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(2)
+    expect(engine.getCellValue(adr('B2', sheet1Id))).toEqual(11)
+    expect(engine.getCellValue(adr('C2', sheet1Id))).toEqual(11)
+    expect(engine.getCellValue(adr('D2', sheet1Id))).toEqual(11)
+
+    // Undo the rename
     engine.undo()
 
+    // After undo: OldName refs work, NewName refs are REF errors again
     expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=OldName!A1')
     expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=NewName!A1')
-    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(1)
     expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('C1', sheet1Id))).toEqual(10)
+    expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(2)
+    expect(engine.getCellValue(adr('B2', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('C2', sheet1Id))).toEqual(11)
+    expect(engine.getCellValue(adr('D2', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
 
+    // Modify data in OldName - should propagate through direct and indirect dependencies
     engine.setCellContents(adr('A1', oldNameId), 100)
 
-    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=OldName!A1')
-    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=NewName!A1')
-    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
-    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))  })
+    // Cells referencing OldName (directly or indirectly) should update
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100) // direct ref updated
+    expect(engine.getCellValue(adr('C1', sheet1Id))).toEqual(109) // range ref updated: 100+2+3+4
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(200) // indirect via A1: 100*2
+    expect(engine.getCellValue(adr('C2', sheet1Id))).toEqual(209) // indirect via C1+A1: 109+100
+
+    // Cells referencing NewName (placeholder) should still be REF errors
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('B2', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getCellValue(adr('D2', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+  })
 
   it('multiple undo/redo cycles for rename', () => {
     const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
@@ -798,6 +850,108 @@ describe('Undo - renaming sheet', () => {
     expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(1)
     expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(2)
     expect(engine.getCellValue(adr('A3', sheet1Id))).toEqual(42)
+  })
+
+  it('undo rename sheet that merged with placeholder restores placeholder', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=PlaceholderName!A1']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(oldNameId, 'PlaceholderName')
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getSheetName(oldNameId)).toEqual('PlaceholderName')
+
+    engine.undo()
+
+    expect(engine.getSheetName(oldNameId)).toEqual('OldName')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+  })
+
+  it('redo rename sheet that merged with placeholder works correctly', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=PlaceholderName!A1']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(oldNameId, 'PlaceholderName')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+
+    engine.undo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.redo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getSheetName(oldNameId)).toEqual('PlaceholderName')
+  })
+
+  it('multiple undo/redo cycles with placeholder sheet merge', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=GhostSheet!A1']],
+      'RealSheet': [[100]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const realSheetId = engine.getSheetId('RealSheet')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(realSheetId, 'GhostSheet')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+
+    // First undo/redo cycle
+    engine.undo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getSheetName(realSheetId)).toEqual('RealSheet')
+
+    engine.redo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getSheetName(realSheetId)).toEqual('GhostSheet')
+
+    // Second undo/redo cycle
+    engine.undo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getSheetName(realSheetId)).toEqual('RealSheet')
+
+    engine.redo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getSheetName(realSheetId)).toEqual('GhostSheet')
+
+    // Third undo/redo cycle
+    engine.undo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.redo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+  })
+
+  it('undo rename with range reference to placeholder sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=SUM(PlaceholderName!A1:B2)']],
+      'OldName': [[1, 2], [3, 4]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(oldNameId, 'PlaceholderName')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(10)
+
+    engine.undo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+    expect(engine.getSheetName(oldNameId)).toEqual('OldName')
+
+    engine.redo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(10)
   })
 })
 

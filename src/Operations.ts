@@ -245,6 +245,10 @@ export class Operations {
   /**
    * Adds a placeholder sheet with a specific ID for undo operations.
    * Used to restore previously merged placeholder sheets.
+   *
+   * Note: Unlike `addSheetWithId`, this does NOT call `dependencyGraph.addSheet()`
+   * because placeholders don't need dirty marking or strategy changes - they only
+   * need to exist in the mappings so formulas can reference them again.
    */
   public addPlaceholderSheetWithId(sheetId: number, name: string): void {
     this.sheetMapping.addPlaceholderWithId(sheetId, name)

@@ -696,7 +696,7 @@ describe('AddressMapping', () => {
       [null, null, null],
       [null, null, '1'],
     ]
-    addressMapping.addSheetAndSetStrategyBasedOnBounderies(0, findBoundaries(sheet))
+    addressMapping.addSheetAndSetStrategyBasedOnBoundaries(0, findBoundaries(sheet))
 
     expect(addressMapping.getStrategyForSheetOrThrow(0)).toBeInstanceOf(SparseStrategy)
   })
@@ -707,7 +707,7 @@ describe('AddressMapping', () => {
       ['1', '1'],
       ['1', '1'],
     ]
-    addressMapping.addSheetAndSetStrategyBasedOnBounderies(0, findBoundaries(sheet))
+    addressMapping.addSheetAndSetStrategyBasedOnBoundaries(0, findBoundaries(sheet))
 
     expect(addressMapping.getStrategyForSheetOrThrow(0)).toBeInstanceOf(DenseStrategy)
   })

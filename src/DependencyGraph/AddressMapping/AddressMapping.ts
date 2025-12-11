@@ -19,7 +19,7 @@ import {AddressMappingStrategy} from './AddressMappingStrategy'
  * Options for adding a sheet to the address mapping.
  */
 export interface AddressMappingAddSheetOptions {
-  throwIfSheetNotExists: boolean,
+  throwIfSheetAlreadyExists: boolean,
 }
 
 /**
@@ -69,13 +69,13 @@ export class AddressMapping {
 
   /**
    * Adds a new sheet with the specified strategy.
-   * @throws {Error} if sheet is already added and throwIfSheetNotExists is true
+   * @throws {Error} if sheet is already added and throwIfSheetAlreadyExists is true
    */
-  public addSheetWithStrategy(sheetId: number, strategy: AddressMappingStrategy, options: AddressMappingAddSheetOptions = { throwIfSheetNotExists: true }): AddressMappingStrategy {
+  public addSheetWithStrategy(sheetId: number, strategy: AddressMappingStrategy, options: AddressMappingAddSheetOptions = { throwIfSheetAlreadyExists: true }): AddressMappingStrategy {
     const strategyFound = this.mapping.get(sheetId)
 
     if (strategyFound) {
-      if (options.throwIfSheetNotExists) {
+      if (options.throwIfSheetAlreadyExists) {
         throw Error('Sheet already added')
       }
 
@@ -121,9 +121,9 @@ export class AddressMapping {
 
   /**
    * Adds a sheet and sets the strategy based on the sheet boundaries.
-   * @throws {Error} if sheet doesn't exist and throwIfSheetNotExists is true
+   * @throws {Error} if sheet already exists and throwIfSheetAlreadyExists is true
    */
-  public addSheetAndSetStrategyBasedOnBounderies(sheetId: number, sheetBoundaries: SheetBoundaries, options: AddressMappingAddSheetOptions = { throwIfSheetNotExists: true }) {
+  public addSheetAndSetStrategyBasedOnBoundaries(sheetId: number, sheetBoundaries: SheetBoundaries, options: AddressMappingAddSheetOptions = { throwIfSheetAlreadyExists: true }) {
     this.addSheetWithStrategy(sheetId, this.createStrategyBasedOnBoundaries(sheetBoundaries), options)
   }
 
@@ -348,14 +348,11 @@ export class AddressMapping {
   }
 
   /**
-   * Checks if a sheet is empty.
+   * Checks if a sheet has any entries.
    * @throws {NoSheetWithIdError} if sheet doesn't exist
    */
   public hasAnyEntries(sheetId: number): boolean {
-    for (const [,] of this.sheetEntries(sheetId)) {
-      return true
-    }
-
-    return false
+    const iterator = this.sheetEntries(sheetId)
+    return !iterator.next().done
   }
 }
