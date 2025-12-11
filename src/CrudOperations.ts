@@ -223,12 +223,18 @@ export class CrudOperations {
 
   public renameSheet(sheetId: number, newName: string): Maybe<string> {
     this.ensureItIsPossibleToRenameSheet(sheetId, newName)
-    const oldName = this.operations.renameSheet(sheetId, newName)
-    if (oldName !== undefined) {
+    const { previousDisplayName, version, mergedPlaceholderSheetId } = this.operations.renameSheet(sheetId, newName)
+    if (previousDisplayName !== undefined) {
       this.undoRedo.clearRedoStack()
-      this.undoRedo.saveOperation(new RenameSheetUndoEntry(sheetId, oldName, newName))
+      this.undoRedo.saveOperation(new RenameSheetUndoEntry(
+        sheetId,
+        previousDisplayName,
+        newName,
+        version,
+        mergedPlaceholderSheetId,
+      ))
     }
-    return oldName
+    return previousDisplayName
   }
 
   public clearSheet(sheetId: number): void {

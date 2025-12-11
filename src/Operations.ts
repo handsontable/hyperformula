@@ -243,6 +243,15 @@ export class Operations {
   }
 
   /**
+   * Adds a placeholder sheet with a specific ID for undo operations.
+   * Used to restore previously merged placeholder sheets.
+   */
+  public addPlaceholderSheetWithId(sheetId: number, name: string): void {
+    this.sheetMapping.addPlaceholderWithId(sheetId, name)
+    this.addressMapping.addSheetStrategyPlaceholderIfNotExists(sheetId)
+  }
+
+  /**
    * Removes a sheet from the workbook.
    */
   public removeSheet(sheetId: number): [InternalNamedExpression, ClipboardCell][] {
@@ -265,19 +274,28 @@ export class Operations {
   /**
    * Renames a sheet in the workbook.
    */
-  public renameSheet(sheetId: number, newName: string): Maybe<string> {
+  public renameSheet(sheetId: number, newName: string): {
+    previousDisplayName: Maybe<string>,
+    version?: number,
+    mergedPlaceholderSheetId?: number,
+  } {
     const { previousDisplayName, mergedWithPlaceholderSheet } = this.sheetMapping.renameSheet(sheetId, newName)
 
+    let version: number | undefined
     if (mergedWithPlaceholderSheet !== undefined) {
       this.dependencyGraph.mergeSheets(sheetId, mergedWithPlaceholderSheet)
       this.stats.measure(StatType.TRANSFORM_ASTS, () => {
         const transformation = new RenameSheetTransformer(sheetId, mergedWithPlaceholderSheet)
         transformation.performEagerTransformations(this.dependencyGraph, this.parser)
-        this.lazilyTransformingAstService.addTransformation(transformation)
+        version = this.lazilyTransformingAstService.addTransformation(transformation)
       })
     }
 
-    return previousDisplayName
+    return {
+      previousDisplayName,
+      version,
+      mergedPlaceholderSheetId: mergedWithPlaceholderSheet,
+    }
   }
 
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {

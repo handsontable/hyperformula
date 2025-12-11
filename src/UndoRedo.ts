@@ -263,6 +263,8 @@ export class RenameSheetUndoEntry extends BaseUndoEntry {
     public readonly sheetId: number,
     public readonly oldName: string,
     public readonly newName: string,
+    public readonly version?: number,
+    public readonly mergedPlaceholderSheetId?: number,
   ) {
     super()
   }
@@ -600,7 +602,13 @@ export class UndoRedo {
   }
 
   public undoRenameSheet(operation: RenameSheetUndoEntry) {
+    this.operations.forceApplyPostponedTransformations()
     this.operations.renameSheet(operation.sheetId, operation.oldName)
+
+    if (operation.mergedPlaceholderSheetId !== undefined && operation.version !== undefined) {
+      this.operations.addPlaceholderSheetWithId(operation.mergedPlaceholderSheetId, operation.newName)
+      this.restoreOldDataFromVersion(operation.version - 1)
+    }
   }
 
   public undoClearSheet(operation: ClearSheetUndoEntry) {

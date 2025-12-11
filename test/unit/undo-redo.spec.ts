@@ -647,6 +647,28 @@ describe('Undo - renaming sheet', () => {
     expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
   })
 
+  it('restores the dependency graph structure on undo', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=OldName!A1', '=NewName!A1']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+    engine.renameSheet(oldNameId, 'NewName')
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=OldName!A1')
+    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=NewName!A1')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.setCellContents(adr('A1', oldNameId), 100)
+
+    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=OldName!A1')
+    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=NewName!A1')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))  })
+
   it('multiple undo/redo cycles for rename', () => {
     const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
     engine.renameSheet(0, 'Renamed')

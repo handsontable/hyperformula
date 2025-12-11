@@ -216,6 +216,30 @@ export class SheetMapping {
   }
 
   /**
+   * Adds a placeholder sheet with a specific ID and name.
+   * Used for undo operations to restore previously merged placeholder sheets.
+   *
+   * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
+   */
+  public addPlaceholderWithId(sheetId: number, sheetDisplayName: string): void {
+    const sheetWithConflictingName = this._getSheetByName(sheetDisplayName, { includePlaceholders: true })
+
+    if (sheetWithConflictingName) {
+      throw new SheetNameAlreadyTakenError(sheetDisplayName)
+    }
+
+    if (this.hasSheetWithId(sheetId, { includePlaceholders: true })) {
+      throw new Error(`Sheet with id ${sheetId} already exists`)
+    }
+
+    if (sheetId > this.lastSheetId) {
+      this.lastSheetId = sheetId
+    }
+    const sheet = new Sheet(sheetId, sheetDisplayName, true)
+    this.storeSheetInMappings(sheet)
+  }
+
+  /**
    * Removes sheet with given ID. Ignores placeholders
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist or is a placeholder
    */
