@@ -579,18 +579,3 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
     })
   })
 })
-
-// IMPLEMENTATION PLAN:
-// - [x] during parseing dont create ERROR vertex - instead add a placeholder shett to sheetMapping and addressMapping
-// - [x] handle this non-error vertec when reading cell (similar to not-added named expressions?)
-// - [x] unit tests: addSheet + ranges, with and without quotes (completed a week ago)
-// - [x] handle addSheet
-// - [x] comprehensive range testing
-// - [x] unit tests: removeSheet + ranges
-// - [x] handle removeSheet
-// - [x] unit tests: renameSheet + ranges
-// - [x] handle renameSheet
-// - [x] refactor
-// - [ ] unit tests: undo-redo
-// - [ ] handle undo-redo
-// - [ ] agent review

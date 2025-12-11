@@ -564,6 +564,219 @@ describe('Undo - renaming sheet', () => {
 
     expect(engine.getSheetName(0)).toEqual('Sheet1')
   })
+
+  it('undo rename with case change only', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.renameSheet(0, 'SHEET1')
+
+    engine.undo()
+
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+  })
+
+  it('undo rename preserves cell values', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[42], ['=A1*2']]})
+    engine.renameSheet(0, 'NewName')
+
+    engine.undo()
+
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    expect(engine.getCellValue(adr('A2'))).toEqual(84)
+  })
+
+  it('undo rename with suspended evaluation', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.suspendEvaluation()
+    engine.renameSheet(0, 'Foo')
+
+    engine.undo()
+    engine.resumeEvaluation()
+
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+  })
+
+  it('undo rename that merged with placeholder sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=OldName!A1', '=NewName!A1']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(oldNameId, 'NewName')
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqual(42)
+
+    engine.undo()
+
+    expect(engine.getSheetName(oldNameId)).toEqual('OldName')
+    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=OldName!A1')
+    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=NewName!A1')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+  })
+
+  it('undo rename with range reference updates formula (merged with placeholder sheet)', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=SUM(OldName!A1:B2)', '=SUM(NewName!A1:B2)']],
+      'OldName': [[10, 20], [30, 40]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(oldNameId, 'NewName')
+
+    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=SUM(NewName!A1:B2)')
+    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=SUM(NewName!A1:B2)')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqual(100)
+
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=SUM(OldName!A1:B2)')
+    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=SUM(NewName!A1:B2)')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+  })
+
+  it('multiple undo/redo cycles for rename', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.renameSheet(0, 'Renamed')
+
+    engine.undo()
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+
+    engine.redo()
+    expect(engine.getSheetName(0)).toEqual('Renamed')
+
+    engine.undo()
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+
+    engine.redo()
+    expect(engine.getSheetName(0)).toEqual('Renamed')
+  })
+
+  it('undo multiple sequential renames', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.renameSheet(0, 'Name1')
+    engine.renameSheet(0, 'Name2')
+    engine.renameSheet(0, 'Name3')
+
+    engine.undo()
+    expect(engine.getSheetName(0)).toEqual('Name2')
+
+    engine.undo()
+    expect(engine.getSheetName(0)).toEqual('Name1')
+
+    engine.undo()
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+  })
+
+  it('undo rename combined with cell content changes', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.setCellContents(adr('A1'), 10)
+    engine.renameSheet(0, 'NewName')
+    engine.setCellContents(adr('A1'), 100)
+
+    engine.undo() // undo setCellContents
+    expect(engine.getCellValue(adr('A1'))).toEqual(10)
+    expect(engine.getSheetName(0)).toEqual('NewName')
+
+    engine.undo() // undo renameSheet
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+
+    engine.undo() // undo first setCellContents
+    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+  })
+
+  it('undo rename in batch mode', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]], 'Sheet2': [[2]]})
+    engine.batch(() => {
+      engine.renameSheet(0, 'NewName1')
+      engine.renameSheet(1, 'NewName2')
+    })
+
+    engine.undo()
+
+    expect(engine.getSheetName(0)).toEqual('Sheet1')
+    expect(engine.getSheetName(1)).toEqual('Sheet2')
+  })
+
+  it('undo rename with chained dependencies across sheets', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=Sheet2!A1+2']],
+      'Sheet2': [['=OldName!A1*2']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const sheet2Id = engine.getSheetId('Sheet2')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet2Id))).toEqual(84)
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(86)
+
+    engine.renameSheet(oldNameId, 'NewName')
+    expect(engine.getCellFormula(adr('A1', sheet2Id))).toEqual('=NewName!A1*2')
+
+    engine.undo()
+
+    expect(engine.getCellFormula(adr('A1', sheet2Id))).toEqual('=OldName!A1*2')
+    expect(engine.getCellValue(adr('A1', sheet2Id))).toEqual(84)
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(86)
+  })
+
+  it('undo rename with named expressions', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=MyValue']],
+      'OldName': [[99]],
+    }, {}, [
+      { name: 'MyValue', expression: '=OldName!$A$1' }
+    ])
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(99)
+
+    engine.renameSheet(oldNameId, 'NewName')
+    expect(engine.getNamedExpressionFormula('MyValue')).toEqual('=NewName!$A$1')
+
+    engine.undo()
+
+    expect(engine.getNamedExpressionFormula('MyValue')).toEqual('=OldName!$A$1')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(99)
+  })
+
+  it('undo rename after row removal', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [[1], [2], ['=OldName!A1']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    engine.removeRows(sheet1Id, [0, 1])
+    engine.renameSheet(oldNameId, 'NewName')
+
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(42)
+    expect(engine.getCellFormula(adr('A2', sheet1Id))).toEqual('=NewName!A1')
+
+    engine.undo() // undo rename
+    expect(engine.getCellFormula(adr('A2', sheet1Id))).toEqual('=OldName!A1')
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(42)
+
+    engine.undo() // undo removeRows
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(1)
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toEqual(2)
+    expect(engine.getCellValue(adr('A3', sheet1Id))).toEqual(42)
+  })
 })
 
 describe('Undo - setting cell content', () => {
@@ -1565,6 +1778,250 @@ describe('Redo - renaming sheet', () => {
     engine.renameSheet(0, 'Foo')
 
     expect(engine.isThereSomethingToRedo()).toBe(false)
+  })
+
+  it('redo rename with case change only', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.renameSheet(0, 'SHEET1')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetName(0)).toEqual('SHEET1')
+  })
+
+  it('redo rename preserves cell values', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[42], ['=A1*2']]})
+    engine.renameSheet(0, 'NewName')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetName(0)).toEqual('NewName')
+    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    expect(engine.getCellValue(adr('A2'))).toEqual(84)
+  })
+
+  it('redo rename with suspended evaluation', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.renameSheet(0, 'Foo')
+    engine.undo()
+    engine.suspendEvaluation()
+
+    engine.redo()
+    engine.resumeEvaluation()
+
+    expect(engine.getSheetName(0)).toEqual('Foo')
+  })
+
+  it('redo rename that merged with placeholder sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=OldName!A1', '=NewName!A1']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(oldNameId, 'NewName')
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqual(42)
+
+    engine.undo()
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.redo()
+
+    expect(engine.getSheetName(oldNameId)).toEqual('NewName')
+    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=NewName!A1')
+    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=NewName!A1')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqual(42)
+  })
+
+  it('redo rename with range reference updates formula (merged with placeholder sheet)', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=SUM(OldName!A1:B2)', '=SUM(NewName!A1:B2)']],
+      'OldName': [[10, 20], [30, 40]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.renameSheet(oldNameId, 'NewName')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqual(100)
+
+    engine.undo()
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.SheetRef))
+
+    engine.redo()
+
+    expect(engine.getCellFormula(adr('A1', sheet1Id))).toEqual('=SUM(NewName!A1:B2)')
+    expect(engine.getCellFormula(adr('B1', sheet1Id))).toEqual('=SUM(NewName!A1:B2)')
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toEqual(100)
+  })
+
+  it('redo multiple sequential renames', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.renameSheet(0, 'Name1')
+    engine.renameSheet(0, 'Name2')
+    engine.renameSheet(0, 'Name3')
+    engine.undo()
+    engine.undo()
+    engine.undo()
+
+    engine.redo()
+    expect(engine.getSheetName(0)).toEqual('Name1')
+
+    engine.redo()
+    expect(engine.getSheetName(0)).toEqual('Name2')
+
+    engine.redo()
+    expect(engine.getSheetName(0)).toEqual('Name3')
+  })
+
+  it('redo rename combined with cell content changes', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]]})
+    engine.setCellContents(adr('A1'), 10)
+    engine.renameSheet(0, 'NewName')
+    engine.setCellContents(adr('A1'), 100)
+    engine.undo()
+    engine.undo()
+    engine.undo()
+
+    engine.redo() // redo first setCellContents
+    expect(engine.getCellValue(adr('A1'))).toEqual(10)
+
+    engine.redo() // redo renameSheet
+    expect(engine.getSheetName(0)).toEqual('NewName')
+
+    engine.redo() // redo second setCellContents
+    expect(engine.getCellValue(adr('A1'))).toEqual(100)
+  })
+
+  it('redo rename in batch mode', () => {
+    const engine = HyperFormula.buildFromSheets({'Sheet1': [[1]], 'Sheet2': [[2]]})
+    engine.batch(() => {
+      engine.renameSheet(0, 'NewName1')
+      engine.renameSheet(1, 'NewName2')
+    })
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getSheetName(0)).toEqual('NewName1')
+    expect(engine.getSheetName(1)).toEqual('NewName2')
+  })
+
+  it('redo rename with chained dependencies across sheets', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=Sheet2!A1+2']],
+      'Sheet2': [['=NewName!A1*2']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const sheet2Id = engine.getSheetId('Sheet2')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    engine.renameSheet(oldNameId, 'NewName')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getCellValue(adr('A1', sheet2Id))).toEqual(84)
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(86)
+  })
+
+  it('redo rename with named expressions referencing placeholder', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=MyValue']],
+      'OldName': [[99]],
+    }, {}, [
+      { name: 'MyValue', expression: '=NewName!$A$1' }
+    ])
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    engine.renameSheet(oldNameId, 'NewName')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(99)
+  })
+
+  it('redo rename after undo of combined operations', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=NewName!A1']],
+      'OldName': [[42]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    engine.renameSheet(oldNameId, 'NewName')
+    engine.setCellContents(adr('A1', oldNameId), 100)
+    engine.undo() // undo setCellContents
+    engine.undo() // undo rename
+
+    engine.redo() // redo rename
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(42)
+
+    engine.redo() // redo setCellContents
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toEqual(100)
+  })
+
+  it('redo rename with multiple cells referencing placeholder', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [['=NewName!A1', '=NewName!B1']],
+      'Sheet2': [['=NewName!A1+10', '=NewName!B1+20']],
+      'OldName': [[5, 7]],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const sheet2Id = engine.getSheetId('Sheet2')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    engine.renameSheet(oldNameId, 'NewName')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(5)
+    expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(7)
+    expect(engine.getCellValue(adr('A1', sheet2Id))).toBe(15)
+    expect(engine.getCellValue(adr('B1', sheet2Id))).toBe(27)
+  })
+
+  it('redo rename with column and row ranges', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Sheet1': [
+        ['=SUM(NewName!A:A)'],
+        ['=SUM(NewName!1:2)'],
+      ],
+      'OldName': [
+        [1, 2],
+        [3, 4],
+      ],
+    })
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const oldNameId = engine.getSheetId('OldName')!
+
+    engine.renameSheet(oldNameId, 'NewName')
+    engine.undo()
+
+    engine.redo()
+
+    expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(4)
+    expect(engine.getCellValue(adr('A2', sheet1Id))).toBe(10)
   })
 })
 
