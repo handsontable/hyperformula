@@ -19,12 +19,12 @@ export interface TruncateRangesResult extends AdjustRangesResult {
   verticesWithChangedSize: RangeVertex[],
 }
 
-type AdjustVeticesOperationResult = {
+type AdjustVerticesOperationResult = {
   changedSize: boolean,
   vertex: RangeVertex,
 }
 
-type AdjustVerticesOperation = (key: string, vertex: RangeVertex) => Maybe<AdjustVeticesOperationResult>
+type AdjustVerticesOperation = (key: string, vertex: RangeVertex) => Maybe<AdjustVerticesOperationResult>
 
 /**
  * Maintains a per-sheet map from serialized start/end coordinates to `RangeVertex`.
@@ -275,7 +275,7 @@ export class RangeMapping {
   }
 
   private updateVerticesFromSheet(sheet: number, fn: AdjustVerticesOperation): AdjustRangesResult {
-    const updated = Array<AdjustVeticesOperationResult>()
+    const updated = Array<AdjustVerticesOperationResult>()
 
     for (const [key, vertex] of this.entriesFromSheet(sheet)) {
       const result = fn(key, vertex)

@@ -596,7 +596,7 @@ export class DependencyGraph {
   }
 
   public fetchCell(address: SimpleCellAddress): CellVertex {
-    return this.addressMapping.getCell(address, { throwIfCellNotExists: true }) as CellVertex
+    return this.addressMapping.getCellOrThrow(address)
   }
 
   /**
@@ -758,11 +758,10 @@ export class DependencyGraph {
     const deps = this.graph.adjacentNodes(inputVertex)
     const ret: (SimpleCellRange | SimpleCellAddress)[] = []
     deps.forEach((vertex: Vertex) => {
-      const castVertex = vertex as RangeVertex | ScalarFormulaVertex | ArrayFormulaVertex
-      if (castVertex instanceof RangeVertex) {
-        ret.push(simpleCellRange(castVertex.start, castVertex.end))
-      } else {
-        ret.push(castVertex.getAddress(this.lazilyTransformingAstService))
+      if (vertex instanceof RangeVertex) {
+        ret.push(simpleCellRange(vertex.start, vertex.end))
+      } else if (vertex instanceof FormulaVertex) {
+        ret.push(vertex.getAddress(this.lazilyTransformingAstService))
       }
     })
     return ret
@@ -916,9 +915,9 @@ export class DependencyGraph {
             return [dependency.start, this.rangeMapping.getVertexOrThrow(dependency.start, dependency.end)]
           } else if (dependency instanceof NamedExpressionDependency) {
             const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
-            return [namedExpression.address, this.addressMapping.getCell(namedExpression.address, { throwIfCellNotExists: true }) as CellVertex]
+            return [namedExpression.address, this.addressMapping.getCellOrThrow(namedExpression.address)]
           } else {
-            return [dependency, this.addressMapping.getCell(dependency, { throwIfCellNotExists: true }) as CellVertex]
+            return [dependency, this.addressMapping.getCellOrThrow(dependency)]
           }
         })
       } else {
@@ -1309,11 +1308,7 @@ export class DependencyGraph {
     const dependencies = new Set(this.graph.removeNode(inputVertex))
 
     while (dependencies.size > 0) {
-      const dependency = dependencies.values().next().value as [SimpleCellAddress | SimpleCellRange, Vertex] | undefined
-
-      if (dependency === undefined) {
-        continue
-      }
+      const dependency = dependencies.values().next().value as [SimpleCellAddress | SimpleCellRange, Vertex]
 
       dependencies.delete(dependency)
       const [address, vertex] = dependency

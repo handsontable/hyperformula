@@ -48,6 +48,7 @@ export class AddressMapping {
    */
   public getCell(address: SimpleCellAddress, options: AddressMappingGetCellOptions = {}): Maybe<CellVertex> {
     const sheetMapping = this.mapping.get(address.sheet)
+
     if (!sheetMapping) {
       if (options.throwIfSheetNotExists) {
         throw new NoSheetWithIdError(address.sheet)
@@ -58,6 +59,26 @@ export class AddressMapping {
     const cell = sheetMapping.getCell(address)
 
     if (!cell && options.throwIfCellNotExists) {
+      throw Error('Vertex for address missing in AddressMapping')
+    }
+
+    return cell
+  }
+
+  /**
+   * Gets the cell vertex at the specified address or throws if it doesn't exist.
+   * @throws {NoSheetWithIdError} if sheet doesn't exist
+   * @throws {Error} if cell doesn't exist
+   */
+  public getCellOrThrow(address: SimpleCellAddress): CellVertex {
+    const sheetMapping = this.mapping.get(address.sheet)
+
+    if (!sheetMapping) {
+      throw new NoSheetWithIdError(address.sheet)
+    }
+
+    const cell = sheetMapping.getCell(address)
+    if (!cell) {
       throw Error('Vertex for address missing in AddressMapping')
     }
 
@@ -209,9 +230,9 @@ export class AddressMapping {
   }
 
   /**
-   * Moves a cell from source address to destination address within the same sheet.
-   * @throws {Error} if sheet not initialized
-   * @throws {Error} if addresses on different sheets
+   * Moves a cell from source address to destination address.
+   * Supports cross-sheet moves (used for placeholder sheet merging).
+   * @throws {Error} if source sheet not initialized
    * @throws {Error} if destination occupied
    * @throws {Error} if source cell doesn't exist
    */
@@ -270,16 +291,16 @@ export class AddressMapping {
   /**
    * Gets the width of the specified sheet.
    */
-  public getSheetWidth(sheet: number): number {
-    const sheetMapping = this.getStrategyForSheetOrThrow(sheet)
+  public getSheetWidth(sheetId: number): number {
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheetId)
     return sheetMapping.getWidth()
   }
 
   /**
    * Adds rows to a sheet.
    */
-  public addRows(sheet: number, row: number, numberOfRows: number) {
-    const sheetMapping = this.getStrategyForSheetOrThrow(sheet)
+  public addRows(sheetId: number, row: number, numberOfRows: number) {
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheetId)
     sheetMapping.addRows(row, numberOfRows)
   }
 
@@ -294,8 +315,8 @@ export class AddressMapping {
   /**
    * Adds columns to a sheet starting at the specified column index.
    */
-  public addColumns(sheet: number, column: number, numberOfColumns: number) {
-    const sheetMapping = this.getStrategyForSheetOrThrow(sheet)
+  public addColumns(sheetId: number, column: number, numberOfColumns: number) {
+    const sheetMapping = this.getStrategyForSheetOrThrow(sheetId)
     sheetMapping.addColumns(column, numberOfColumns)
   }
 

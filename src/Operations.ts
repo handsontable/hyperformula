@@ -942,7 +942,7 @@ export class Operations {
     }
 
     const addedGlobalNamedExpressions: string[] = []
-    const vertex = this.addressMapping.getCell(targetAddress, { throwIfCellNotExists: true }) as CellVertex
+    const vertex = this.addressMapping.getCellOrThrow(targetAddress)
 
     for (const namedExpressionDependency of absolutizeDependencies(dependencies, targetAddress)) {
       if (!(namedExpressionDependency instanceof NamedExpressionDependency)) {
