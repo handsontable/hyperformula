@@ -1303,9 +1303,11 @@ export class DependencyGraph {
   /**
    * Removes a vertex from graph and cleans up its dependencies.
    * Dependency clean up = remove all RangeVertex and EmptyCellVertex dependencies if no other vertex depends on them.
+   * Also cleans up placeholder sheets that have no remaining vertices (not needed anymore)
    */
   private removeVertexAndCleanupDependencies(inputVertex: Vertex) {
     const dependencies = new Set(this.graph.removeNode(inputVertex))
+    const affectedSheets = new Set<number>()
 
     while (dependencies.size > 0) {
       const dependency = dependencies.values().next().value as [SimpleCellAddress | SimpleCellRange, Vertex]
@@ -1318,9 +1320,27 @@ export class DependencyGraph {
         }
         if (vertex instanceof RangeVertex) {
           this.rangeMapping.removeVertexIfExists(vertex)
+          affectedSheets.add(vertex.sheet)
         } else if (vertex instanceof EmptyCellVertex && isSimpleCellAddress(address)) {
           this.addressMapping.removeCell(address)
+          affectedSheets.add(address.sheet)
         }
+      }
+    }
+
+    this.cleanupPlaceholderSheets(affectedSheets)
+  }
+
+  /**
+   * Removes placeholder sheets that have no remaining vertices.
+   */
+  private cleanupPlaceholderSheets(sheetIds: Set<number>): void {
+    for (const sheetId of sheetIds) {
+      if (this.isPlaceholder(sheetId) &&
+          !this.addressMapping.hasAnyEntries(sheetId) &&
+          this.rangeMapping.getNumberOfRangesInSheet(sheetId) === 0) {
+        this.sheetMapping.removeSheet(sheetId, { includePlaceholders: true })
+        this.addressMapping.removeSheet(sheetId)
       }
     }
   }
