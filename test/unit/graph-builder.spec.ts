@@ -10,9 +10,9 @@ describe('GraphBuilder', () => {
       ['42'],
     ])
 
-    const vertex = engine.addressMapping.getCellOrThrowError(adr('A1'))
+    const vertex = engine.addressMapping.getCell(adr('A1'))
     expect(vertex).toBeInstanceOf(ValueCellVertex)
-    expect(vertex.getCellValue()).toBe(42)
+    expect(vertex!.getCellValue()).toBe(42)
   })
 
   it('build sheet with simple string cell', () => {
@@ -20,9 +20,9 @@ describe('GraphBuilder', () => {
       ['foo'],
     ])
 
-    const vertex = engine.addressMapping.getCellOrThrowError(adr('A1'))
+    const vertex = engine.addressMapping.getCell(adr('A1'))
     expect(vertex).toBeInstanceOf(ValueCellVertex)
-    expect(vertex.getCellValue()).toBe('foo')
+    expect(vertex!.getCellValue()).toBe('foo')
   })
 
   it('building for cell with null should give empty vertex', () => {
@@ -30,7 +30,7 @@ describe('GraphBuilder', () => {
       [null, '=A1'],
     ])
 
-    const vertex = engine.addressMapping.getCellOrThrowError(adr('A1'))
+    const vertex = engine.addressMapping.getCell(adr('A1'))
     expect(vertex).toBeInstanceOf(EmptyCellVertex)
   })
 
@@ -40,12 +40,12 @@ describe('GraphBuilder', () => {
       ['=A1:B1'],
     ])
 
-    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     const a1b2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
-    expect(engine.graph.adjacentNodes(a1)).toContain(a1b2)
-    expect(engine.graph.adjacentNodes(b1)).toContain(a1b2)
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    expect(engine.graph.adjacentNodes(a1!)).toContain(a1b2)
+    expect(engine.graph.adjacentNodes(b1!)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(a1b2)).toContain(a2)
   })
 
@@ -54,12 +54,12 @@ describe('GraphBuilder', () => {
       ['1', '2', '=A:B'],
     ])
 
-    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     const ab = engine.rangeMapping.getVertexOrThrow(colStart('A'), colEnd('B'))
-    const c1 = engine.addressMapping.getCellOrThrowError(adr('C1'))
-    expect(engine.graph.adjacentNodes(a1)).toContain(ab)
-    expect(engine.graph.adjacentNodes(b1)).toContain(ab)
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    expect(engine.graph.adjacentNodes(a1!)).toContain(ab)
+    expect(engine.graph.adjacentNodes(b1!)).toContain(ab)
     expect(engine.graph.adjacentNodes(ab)).toContain(c1)
   })
 
@@ -70,16 +70,16 @@ describe('GraphBuilder', () => {
       ['=A1:B1'],
     ])
 
-    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     const a1b2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
-    const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    const a3 = engine.addressMapping.getCell(adr('A3'))
 
-    expect(engine.graph.existsEdge(a1, a1b2)).toBe(true)
-    expect(engine.graph.existsEdge(b1, a1b2)).toBe(true)
-    expect(engine.graph.existsEdge(a1b2, a2)).toBe(true)
-    expect(engine.graph.existsEdge(a1b2, a3)).toBe(true)
+    expect(engine.graph.existsEdge(a1!, a1b2)).toBe(true)
+    expect(engine.graph.existsEdge(b1!, a1b2)).toBe(true)
+    expect(engine.graph.existsEdge(a1b2, a2!)).toBe(true)
+    expect(engine.graph.existsEdge(a1b2, a3!)).toBe(true)
     expect(engine.graph.getNodes().length).toBe(
       4 + // for cells above
       1,  // for both ranges (reuse same ranges)
@@ -93,11 +93,11 @@ describe('GraphBuilder', () => {
       ['5', '=A1:A3'],
     ])
 
-    const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
+    const a3 = engine.addressMapping.getCell(adr('A3'))
     const a1a2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
     const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
 
-    expect(engine.graph.existsEdge(a3, a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(a3!, a1a3)).toBe(true)
     expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(true)
     expect(graphEdgesCount(engine.graph)).toBe(
       2 + // from cells to range(A1:A2)
@@ -132,9 +132,9 @@ describe('GraphBuilder', () => {
 
     const a1a2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
     const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
-    expect(engine.graph.existsEdge(a2, a1a3)).toBe(true)
-    expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    expect(engine.graph.existsEdge(a2!, a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(a2!, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(false)
     expect(graphEdgesCount(engine.graph)).toBe(
       3 + // from 3 cells to range(A1:A2)

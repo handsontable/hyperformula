@@ -112,7 +112,7 @@ export class EngineComparator {
     expect(actual.size).toEqual(expected.size)
 
     for (const [key, value] of expected.entries()) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       const actualEntry = actual.get(key)!
       expect(actualEntry).toBeDefined()
       expect(actualEntry.array.size.isRef).toBe(value.array.size.isRef)

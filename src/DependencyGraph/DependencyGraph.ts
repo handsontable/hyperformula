@@ -596,11 +596,15 @@ export class DependencyGraph {
   }
 
   public fetchCell(address: SimpleCellAddress): CellVertex {
-    return this.addressMapping.getCellOrThrowError(address)
+    return this.addressMapping.getCell(address, { throwIfCellNotExists: true }) as CellVertex
   }
 
+  /**
+   * Gets the cell vertex at the specified address.
+   * @throws {NoSheetWithIdError} if sheet doesn't exist
+   */
   public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
-    return this.addressMapping.getCell(address)
+    return this.addressMapping.getCell(address, { throwIfSheetNotExists: true })
   }
 
   public getCellValue(address: SimpleCellAddress): InterpreterValue {
@@ -912,9 +916,9 @@ export class DependencyGraph {
             return [dependency.start, this.rangeMapping.getVertexOrThrow(dependency.start, dependency.end)]
           } else if (dependency instanceof NamedExpressionDependency) {
             const namedExpression = this.namedExpressions.namedExpressionOrPlaceholder(dependency.name, address.sheet)
-            return [namedExpression.address, this.addressMapping.getCellOrThrowError(namedExpression.address)]
+            return [namedExpression.address, this.addressMapping.getCell(namedExpression.address, { throwIfCellNotExists: true }) as CellVertex]
           } else {
-            return [dependency, this.addressMapping.getCellOrThrowError(dependency)]
+            return [dependency, this.addressMapping.getCell(dependency, { throwIfCellNotExists: true }) as CellVertex]
           }
         })
       } else {

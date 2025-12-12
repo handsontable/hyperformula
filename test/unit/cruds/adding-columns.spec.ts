@@ -275,7 +275,7 @@ describe('different sheet', () => {
 
     engine.addColumns(0, [0, 1])
 
-    const formulaVertex = engine.addressMapping.getCellOrThrowError(adr('A1', 1)) as ScalarFormulaVertex
+    const formulaVertex = engine.addressMapping.getCell(adr('A1', 1)) as ScalarFormulaVertex
 
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
     formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
@@ -423,7 +423,7 @@ describe('Adding column - arrays', () => {
 
     engine.addColumns(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('D1')) as ArrayFormulaVertex
+    const matrixVertex = engine.addressMapping.getCell(adr('D1')) as ArrayFormulaVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
   })
 })

@@ -324,10 +324,10 @@ describe('Copy - paste integration', () => {
     engine.paste(adr('A3'))
 
     const range = engine.rangeMapping.getVertexOrThrow(rowStart(2), rowEnd(3))
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
-    const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
-    expect(engine.graph.existsEdge(a2, range)).toBe(true)
-    expect(engine.graph.existsEdge(a3, range)).toBe(true)
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    const a3 = engine.addressMapping.getCell(adr('A3'))
+    expect(engine.graph.existsEdge(a2!, range)).toBe(true)
+    expect(engine.graph.existsEdge(a3!, range)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 

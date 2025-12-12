@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {HyperFormula} from '../../src'
 import {plPL} from '../../src/i18n/languages'
 import {adr} from './testUtils'

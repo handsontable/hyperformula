@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {ErrorType, HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
 import {plPL} from '../../../src/i18n/languages'
 import {adr, detailedError} from '../testUtils'

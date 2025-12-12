@@ -324,13 +324,13 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, [2, 1])
 
-    const c1 = engine.addressMapping.getCellOrThrowError(adr('C1'))
+    const c1 = engine.addressMapping.getCell(adr('C1'))
     const a1d1 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('D1'))
     const a1e1 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('E1'))
 
-    expect(engine.graph.existsEdge(c1, a1d1)).toBe(true)
-    expect(engine.graph.existsEdge(c1, a1e1)).toBe(true)
-    expect(engine.graph.adjacentNodesCount(c1)).toBe(2)
+    expect(engine.graph.existsEdge(c1!, a1d1)).toBe(true)
+    expect(engine.graph.existsEdge(c1!, a1e1)).toBe(true)
+    expect(engine.graph.adjacentNodesCount(c1!)).toBe(2)
   })
 
   it('range start in column', () => {
@@ -358,10 +358,10 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, [1, 1])
 
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('E1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(b1, range)).toBe(true)
+    expect(engine.graph.existsEdge(b1!, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -411,11 +411,11 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, [1, 1])
 
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('C1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(b1, range)).toBe(true)
+    expect(engine.graph.existsEdge(b1!, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -431,11 +431,11 @@ describe('Adding column, fixing ranges', () => {
 
     engine.addColumns(0, [1, 1])
 
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('D1'))
     expect(b1).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(b1, range)).toBe(true)
+    expect(engine.graph.existsEdge(b1!, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],

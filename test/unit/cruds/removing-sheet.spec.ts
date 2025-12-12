@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {ExportedCellChange, HyperFormula, NoSheetWithIdError} from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {ErrorType} from '../../../src/Cell'
@@ -132,10 +131,10 @@ describe('remove sheet - adjust edges', () => {
 
     engine.removeSheet(1)
 
-    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
 
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
   })
 
   it('should remove edge between sheets', () => {
@@ -148,13 +147,13 @@ describe('remove sheet - adjust edges', () => {
       ],
     })
 
-    const a1From0 = engine.addressMapping.getCellOrThrowError(adr('A1'))
-    const a1From1 = engine.addressMapping.getCellOrThrowError(adr('A1', 1))
-    expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(true)
+    const a1From0 = engine.addressMapping.getCell(adr('A1'))
+    const a1From1 = engine.addressMapping.getCell(adr('A1', 1))
+    expect(engine.graph.existsEdge(a1From1!, a1From0!)).toBe(true)
 
     engine.removeSheet(1)
 
-    expect(engine.graph.existsEdge(a1From1, a1From0)).toBe(false)
+    expect(engine.graph.existsEdge(a1From1!, a1From0!)).toBe(false)
   })
 })
 

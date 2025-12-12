@@ -925,7 +925,7 @@ export class Operations {
     const targetRange = AbsoluteCellRange.spanFrom(destinationLeftCorner, width, height)
 
     for (const formulaAddress of targetRange.addresses(this.dependencyGraph)) {
-      const vertex = this.addressMapping.getCellOrThrowError(formulaAddress)
+      const vertex = this.addressMapping.getCell(formulaAddress, { throwIfCellNotExists: true })
       if (vertex instanceof ScalarFormulaVertex && formulaAddress.sheet !== sourceLeftCorner.sheet) {
         const ast = vertex.getFormula(this.lazilyTransformingAstService)
         const { dependencies } = this.parser.fetchCachedResultForAst(ast)
@@ -942,7 +942,7 @@ export class Operations {
     }
 
     const addedGlobalNamedExpressions: string[] = []
-    const vertex = this.addressMapping.getCellOrThrowError(targetAddress)
+    const vertex = this.addressMapping.getCell(targetAddress, { throwIfCellNotExists: true }) as CellVertex
 
     for (const namedExpressionDependency of absolutizeDependencies(dependencies, targetAddress)) {
       if (!(namedExpressionDependency instanceof NamedExpressionDependency)) {

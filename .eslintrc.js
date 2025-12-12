@@ -143,5 +143,11 @@ module.exports = {
         'sort-keys': ['error', 'asc'],
       }
     },
+    {
+      files: ['**/*.spec.ts'],
+      rules: {
+        '@typescript-eslint/no-non-null-assertion': 'off',
+      }
+    }
   ],
 }

@@ -343,19 +343,19 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [2, 1])
 
-    const a4 = engine.addressMapping.getCellOrThrowError(adr('A4'))
-    const a3 = engine.addressMapping.getCellOrThrowError(adr('A3'))
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
+    const a4 = engine.addressMapping.getCell(adr('A4'))
+    const a3 = engine.addressMapping.getCell(adr('A3'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
     const a1a4 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A4')) // A1:A4
     const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3')) // A1:A4
     const a1a2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2')) // A1:A4
 
-    expect(engine.graph.existsEdge(a4, a1a4)).toBe(true)
-    expect(engine.graph.existsEdge(a3, a1a3)).toBe(true)
-    expect(engine.graph.existsEdge(a2, a1a2)).toBe(true)
-    expect(engine.graph.adjacentNodesCount(a4)).toBe(1)
-    expect(engine.graph.adjacentNodesCount(a3)).toBe(1)
-    expect(engine.graph.adjacentNodesCount(a2)).toBe(1)
+    expect(engine.graph.existsEdge(a4!, a1a4)).toBe(true)
+    expect(engine.graph.existsEdge(a3!, a1a3)).toBe(true)
+    expect(engine.graph.existsEdge(a2!, a1a2)).toBe(true)
+    expect(engine.graph.adjacentNodesCount(a4!)).toBe(1)
+    expect(engine.graph.adjacentNodesCount(a3!)).toBe(1)
+    expect(engine.graph.adjacentNodesCount(a2!)).toBe(1)
   })
 
   it('should insert new cell with edge to only one range below, shifted by 1', () => {
@@ -415,10 +415,10 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [1, 1])
 
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A5'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(a2, range)).toBe(true)
+    expect(engine.graph.existsEdge(a2!, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null],
@@ -486,11 +486,11 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [1, 1])
 
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(a2, range)).toBe(true)
+    expect(engine.graph.existsEdge(a2!, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null],
@@ -512,11 +512,11 @@ describe('Adding row, ranges', () => {
 
     engine.addRows(0, [1, 1])
 
-    const a2 = engine.addressMapping.getCellOrThrowError(adr('A2'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A4'))
     expect(a2).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(a2, range)).toBe(true)
+    expect(engine.graph.existsEdge(a2!, range)).toBe(true)
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null],

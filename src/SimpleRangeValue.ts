@@ -112,7 +112,7 @@ export class SimpleRangeValue {
     const ret = []
     for (let i = 0; i < this._data!.length; i++) {
       for (let j = 0; j < this._data![0].length; j++) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
         ret.push(this._data![i][j])
       }
     }

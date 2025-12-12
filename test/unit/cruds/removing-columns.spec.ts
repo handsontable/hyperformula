@@ -511,7 +511,7 @@ describe('Removing rows - arrays', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.getCellOrThrowError(adr('C1')) as ArrayFormulaVertex
+    const matrixVertex = engine.addressMapping.getCell(adr('C1')) as ArrayFormulaVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 
@@ -648,8 +648,8 @@ describe('Removing columns - graph', function() {
 
     engine.removeColumns(0, [2, 1])
 
-    const b1 = engine.addressMapping.getCellOrThrowError(adr('b1'))
-    expect(engine.graph.adjacentNodes(b1)).toEqual(new Set())
+    const b1 = engine.addressMapping.getCell(adr('b1'))
+    expect(engine.graph.adjacentNodes(b1!)).toEqual(new Set())
   })
 
   it('should remove vertices from graph', function() {
@@ -703,8 +703,8 @@ describe('Removing columns - ranges', function() {
     engine.removeColumns(0, [0, 1])
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
-    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
-    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
   it('shift ranges in range mapping, range start before removed columns', () => {
@@ -717,8 +717,8 @@ describe('Removing columns - ranges', function() {
     engine.removeColumns(0, [1, 2])
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
-    const a1 = engine.addressMapping.getCellOrThrowError(adr('A1'))
-    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
   it('shift ranges in range mapping, whole range', () => {

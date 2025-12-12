@@ -16,7 +16,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(address, vertex)
 
-    expect(mapping.getCellOrThrowError(address)).toBe(vertex)
+    expect(mapping.getCell(address)).toBe(vertex)
   })
 
   it('set and using different reference when get', () => {
@@ -25,7 +25,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(adr('A1'), vertex)
 
-    expect(mapping.getCellOrThrowError(adr('A1'))).toBe(vertex)
+    expect(mapping.getCell(adr('A1'))).toBe(vertex)
   })
 
   it("get when there's even no column", () => {
@@ -141,8 +141,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(adr('A2'), vertex1)
 
-    expect(mapping.getCellOrThrowError(adr('A1'))).toBe(vertex0)
-    expect(mapping.getCellOrThrowError(adr('A2'))).toBe(vertex1)
+    expect(mapping.getCell(adr('A1'))).toBe(vertex0)
+    expect(mapping.getCell(adr('A2'))).toBe(vertex1)
   })
 
   it('set overrides old value', () => {
@@ -153,7 +153,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(adr('A1'), vertex1)
 
-    expect(mapping.getCellOrThrowError(adr('A1'))).toBe(vertex1)
+    expect(mapping.getCell(adr('A1'))).toBe(vertex1)
   })
 
   it("has when there's even no column", () => {
@@ -192,7 +192,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.addRows(0, 0, 1)
 
     expect(mapping.getCell(adr('A1'))).toBe(undefined)
-    expect(mapping.getCellOrThrowError(adr('A2'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A2'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getSheetHeight(0)).toEqual(2)
   })
 
@@ -204,9 +204,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.getCellOrThrowError(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
-    expect(mapping.getCellOrThrowError(adr('A3'))).toEqual(new ValueCellVertex(43, 43))
+    expect(mapping.getCell(adr('A3'))).toEqual(new ValueCellVertex(43, 43))
     expect(mapping.getSheetHeight(0)).toEqual(3)
   })
 
@@ -217,7 +217,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.getCellOrThrowError(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.getSheetHeight(0)).toEqual(2)
   })
@@ -230,11 +230,11 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 3)
 
-    expect(mapping.getCellOrThrowError(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.getCell(adr('A3'))).toBe(undefined)
     expect(mapping.getCell(adr('A4'))).toBe(undefined)
-    expect(mapping.getCellOrThrowError(adr('A5'))).toEqual(new ValueCellVertex(43, 43))
+    expect(mapping.getCell(adr('A5'))).toEqual(new ValueCellVertex(43, 43))
     expect(mapping.getSheetHeight(0)).toEqual(5)
   })
 
@@ -248,12 +248,12 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.getCellOrThrowError(adr('A1'))).toEqual(new ValueCellVertex(11, 11))
-    expect(mapping.getCellOrThrowError(adr('B1'))).toEqual(new ValueCellVertex(12, 12))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(11, 11))
+    expect(mapping.getCell(adr('B1'))).toEqual(new ValueCellVertex(12, 12))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.getCell(adr('B2'))).toBe(undefined)
-    expect(mapping.getCellOrThrowError(adr('A3'))).toEqual(new ValueCellVertex(21, 21))
-    expect(mapping.getCellOrThrowError(adr('B3'))).toEqual(new ValueCellVertex(22, 22))
+    expect(mapping.getCell(adr('A3'))).toEqual(new ValueCellVertex(21, 21))
+    expect(mapping.getCell(adr('B3'))).toEqual(new ValueCellVertex(22, 22))
     expect(mapping.getSheetHeight(0)).toEqual(3)
   })
 

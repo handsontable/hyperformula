@@ -22,10 +22,19 @@ export interface AddressMappingAddSheetOptions {
   throwIfSheetAlreadyExists: boolean,
 }
 
+export interface AddressMappingGetCellOptions {
+  throwIfSheetNotExists?: boolean,
+  throwIfCellNotExists?: boolean,
+}
+
 /**
  * Manages cell vertices and provides access to vertex by SimpleCellAddress.
  * For each sheet it stores vertices according to AddressMappingStrategy: DenseStrategy or SparseStrategy.
- * It also stores placeholder entries (DenseStrategy(0, 0)) for sheets that are used in formulas but not yet added.
+ *
+ * Pleceholder sheets:
+ * - for placeholders sheets (sheets that are used in formulas but not yet added), it stores placeholder strategy entries (DenseStrategy(0, 0))
+ * - placeholder strategy entries may contain EmptyCellVertex-es but never ValueCellVertex or FormulaVertex as they content is empty
+ * - vertices in placeholder strategy entries are used only for dependency tracking
  */
 export class AddressMapping {
   private mapping: Map<number, AddressMappingStrategy> = new Map()
@@ -37,21 +46,22 @@ export class AddressMapping {
   /**
    * Gets the cell vertex at the specified address.
    */
-  public getCell(address: SimpleCellAddress): Maybe<CellVertex> {
-    const sheetMapping = this.getStrategyForSheetOrThrow(address.sheet)
-    return sheetMapping.getCell(address)
-  }
+  public getCell(address: SimpleCellAddress, options: AddressMappingGetCellOptions = {}): Maybe<CellVertex> {
+    const sheetMapping = this.mapping.get(address.sheet)
+    if (!sheetMapping) {
+      if (options.throwIfSheetNotExists) {
+        throw new NoSheetWithIdError(address.sheet)
+      }
+      return undefined
+    }
 
-  /**
-   * Gets the cell vertex at the specified address or throws an error if not found.
-   */
-  public getCellOrThrowError(address: SimpleCellAddress): CellVertex {
-    const vertex = this.getCell(address)
+    const cell = sheetMapping.getCell(address)
 
-    if (!vertex) {
+    if (!cell && options.throwIfCellNotExists) {
       throw Error('Vertex for address missing in AddressMapping')
     }
-    return vertex
+
+    return cell
   }
 
   /**

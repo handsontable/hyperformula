@@ -119,7 +119,7 @@ describe('processWhitespaces', () => {
     const tokens = parser.tokenizeFormula('= SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     expect(processed[1].leadingWhitespace!.image).toBe(' ')
     expectArrayWithSameContent(
       [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
@@ -131,7 +131,7 @@ describe('processWhitespaces', () => {
     const tokens = parser.tokenizeFormula('=    SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     expect(processed[1].leadingWhitespace!.image).toBe('    ')
     expectArrayWithSameContent(
       [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
@@ -143,7 +143,7 @@ describe('processWhitespaces', () => {
     const tokens = parser.tokenizeFormula(' =SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     expect(processed[0].leadingWhitespace!.image).toBe(' ')
     expectArrayWithSameContent(
       [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
