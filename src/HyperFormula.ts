@@ -3510,6 +3510,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Renames a specified sheet.
    *
+   * Note that this method may trigger dependency graph recalculation.
+   *
    * @param {number} sheetId - a sheet ID
    * @param {string} newName - a name of the sheet to be given, if is the same as the old one the method does nothing
    *

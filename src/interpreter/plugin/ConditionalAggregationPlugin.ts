@@ -48,7 +48,7 @@ class AverageResult {
 /** Computes key for criterion function cache */
 function conditionalAggregationFunctionCacheKey(functionName: string): (conditions: Condition[]) => string {
   return (conditions: Condition[]): string => {
-
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const conditionsStrings = conditions.map((c) => `${c.conditionRange.range!.sheet},${c.conditionRange.range!.start.col},${c.conditionRange.range!.start.row}`)
     return [functionName, ...conditionsStrings].join(',')
   }

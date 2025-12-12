@@ -831,7 +831,6 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
     if (cellArg.reference.type === CellReferenceType.CELL_REFERENCE_RELATIVE
       || cellArg.reference.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW) {
-
       absoluteCol = absoluteCol + this.formulaAddress.col
     }
 

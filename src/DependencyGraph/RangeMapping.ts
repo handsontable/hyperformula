@@ -28,10 +28,10 @@ type AdjustVerticesOperation = (key: string, vertex: RangeVertex) => Maybe<Adjus
 
 /**
  * Maintains a per-sheet map from serialized start/end coordinates to `RangeVertex`.
- * Every range vertex in dependency graph should be stored in this mapping.
- * Guarantees uniqueness: one vertex per distinct rectangle, enabling cache reuse.
- * Implements "smaller prefix + tail row" optimization: if A1:A4 exists, A1:A5 depends on it + only A5.
- * RangeVertex stores cached results for associative aggregates (SUM, COUNT) and criterion functions.
+ * - Every range vertex in dependency graph should be stored in this mapping.
+ * - Guarantees uniqueness: one vertex per distinct rectangle, enabling cache reuse.
+ * - Implements "smaller prefix + tail row" optimization: if A1:A4 exists, A1:A5 depends on it + only A5.
+ * - RangeVertex stores cached results for associative aggregates (SUM, COUNT) and criterion functions.
  */
 export class RangeMapping {
     /**
@@ -261,8 +261,13 @@ export class RangeMapping {
     yield* sheetMap.entries()
   }
 
-  private removeByKey(sheet: number, key: string) {
-    this.rangeMapping.get(sheet)!.delete(key)
+  private removeByKey(sheet: number, key: string): void {
+    const sheetMap = this.rangeMapping.get(sheet)
+
+    if (!sheetMap) {
+      throw new Error(`Sheet ${sheet} not found`)
+    }
+    sheetMap.delete(key)
   }
 
   private getByKey(sheet: number, key: string): RangeVertex | undefined {

@@ -34,9 +34,9 @@ class Sheet {
 
 /**
  * Manages the sheets in the instance.
- * Can convert between sheet names and ids and vice versa.
- * Also stores placeholders for sheets that are used in formulas but not yet added. They are marked as isPlaceholder=true.
- * Sheetnames thet differ only in case are considered the same. (See: canonicalizeSheetName)
+ * - Can convert between sheet names and ids and vice versa.
+ * - Also stores placeholders for sheets that are used in formulas but not yet added. They are marked as isPlaceholder=true.
+ * - Sheetnames thet differ only in case are considered the same. (See: canonicalizeSheetName)
  */
 export class SheetMapping {
   /**
@@ -148,7 +148,7 @@ export class SheetMapping {
 
   /**
    * Adds new sheet with optional name and returns its ID.
-   * If called with a name of placeholder sheet, adds the real sheet.
+   * If called with a name of an existing placeholder sheet, converts the placeholder sheet to a real sheet.
    *
    * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
    */
@@ -172,7 +172,7 @@ export class SheetMapping {
 
   /**
    * Adds a sheet with a specific ID and name. Used for redo operations.
-   * Updates lastSheetId if necessary to maintain consistency.
+   * If called with a name of an existing placeholder sheet, converts the placeholder sheet to a real sheet.
    *
    * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
    */
@@ -195,6 +195,7 @@ export class SheetMapping {
     if (sheetId > this.lastSheetId) {
       this.lastSheetId = sheetId
     }
+
     const sheet = new Sheet(sheetId, sheetDisplayName)
     this.storeSheetInMappings(sheet)
   }
@@ -260,9 +261,9 @@ export class SheetMapping {
 
   /**
    * Renames sheet.
-   * If called with sheetId of a placeholder sheet, throws {NoSheetWithIdError}.
-   * If newDisplayName is conflicting with an existing sheet, throws {SheetNameAlreadyTakenError}.
-   * If newDisplayName is conflicting with a placeholder sheet name, deletes the placeholder sheet and returns its id as mergedWithPlaceholderSheet.
+   * - If called with sheetId of a placeholder sheet, throws {NoSheetWithIdError}.
+   * - If newDisplayName is conflicting with an existing sheet, throws {SheetNameAlreadyTakenError}.
+   * - If newDisplayName is conflicting with a placeholder sheet name, deletes the placeholder sheet and returns its id as mergedWithPlaceholderSheet.
    *
    * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
@@ -298,9 +299,8 @@ export class SheetMapping {
 
   /**
    * Stores sheet in both internal mappings.
-   *
-   * If ID exists, it is updated. If not, it is added.
-   * If canonical name exists, it is updated. If not, it is added.
+   * - If ID exists, it is updated. If not, it is added.
+   * - If canonical name exists, it is updated. If not, it is added.
    *
    * @internal
    */

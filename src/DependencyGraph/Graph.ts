@@ -390,7 +390,7 @@ export class Graph<Node> {
   /**
    * Removes edges from the given node to its dependencies based on the dependencyQuery function.
    */
-  public removeDependencies(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
+  private removeDependencies(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
     const dependencies = this.dependencyQuery(node)
 
     dependencies.forEach(([_, dependency]) => {

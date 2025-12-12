@@ -286,6 +286,13 @@ export class Interpreter {
     }
   }
 
+  /**
+   * Sheet is valid if:
+   * - sheet is undefined OR
+   * - sheet is a named expressions store OR
+   * - sheet exists in sheet mapping
+   * - sheet is not a placeholder
+   */
   private isSheetValid(address: AddressWithSheet): boolean {
     return address.sheet === undefined || address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })
   }
