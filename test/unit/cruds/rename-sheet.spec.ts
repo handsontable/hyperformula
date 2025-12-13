@@ -30,7 +30,7 @@ describe('Is it possible to rename sheet', () => {
 })
 
 describe('Rename sheet', () => {
-  it('works', () => {
+  it('renames sheet and updates sheet mapping', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addSheet('foo')
 
@@ -41,7 +41,7 @@ describe('Rename sheet', () => {
     expect(engine.doesSheetExist('bar')).toBe(true)
   })
 
-  it('error when there is no sheet with given ID', () => {
+  it('throws error when sheet with given ID does not exist', () => {
     const engine = HyperFormula.buildEmpty()
 
     expect(() => {
@@ -49,7 +49,7 @@ describe('Rename sheet', () => {
     }).toThrow(new NoSheetWithIdError(0))
   })
 
-  it('error when new sheet name is already taken', () => {
+  it('throws error when new sheet name is already taken', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addSheet()
     engine.addSheet('bar')
@@ -59,7 +59,7 @@ describe('Rename sheet', () => {
     }).toThrow(new SheetNameAlreadyTakenError('bar'))
   })
 
-  it('change for the same name', () => {
+  it('allows renaming to the same name (no-op)', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addSheet('foo')
 
@@ -69,7 +69,7 @@ describe('Rename sheet', () => {
     expect(engine.doesSheetExist('foo')).toBe(true)
   })
 
-  it('change for the same canonical name', () => {
+  it('allows changing case of the same canonical name', () => {
     const engine = HyperFormula.buildEmpty()
     engine.addSheet('Foo')
 
@@ -478,25 +478,19 @@ describe('rename sheet - issue #1116', () => {
 
   describe('complex range scenarios', () => {
     it('function using `runFunction`', () => {
-      const sheet1Name = 'FirstSheet'
-      const oldName = 'OldName'
-      const newName = 'NewName'
-      const sheet1Data = [[`=MEDIAN(${newName}!A1:A1)`, `=MEDIAN(${newName}!A1:A2)`, `=MEDIAN(${newName}!A1:A3)`, `=MEDIAN(${newName}!A1:A4)`]]
-      const sheet2Data = [[1], [2], [3], [4]]
       const engine = HyperFormula.buildFromSheets({
-        [sheet1Name]: sheet1Data,
-        [oldName]: sheet2Data,
+        'FirstSheet': [['=MEDIAN(NewName!A1:A1)', '=MEDIAN(NewName!A1:A2)', '=MEDIAN(NewName!A1:A3)', '=MEDIAN(NewName!A1:A4)']],
+        'OldName': [[1], [2], [3], [4]],
       })
-
-      const sheet1Id = engine.getSheetId(sheet1Name)!
-      const sheet2Id = engine.getSheetId(oldName)!
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+      const sheet2Id = engine.getSheetId('OldName')!
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
 
-      engine.renameSheet(sheet2Id, newName)
+      engine.renameSheet(sheet2Id, 'NewName')
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
       expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(1.5)
@@ -505,25 +499,19 @@ describe('rename sheet - issue #1116', () => {
     })
 
     it('function not using `runFunction`', () => {
-      const sheet1Name = 'FirstSheet'
-      const oldName = 'OldName'
-      const newName = 'NewName'
-      const sheet1Data = [[`=SUM(${newName}!A1:A1)`, `=SUM(${newName}!A1:A2)`, `=SUM(${newName}!A1:A3)`, `=SUM(${newName}!A1:A4)`]]
-      const sheet2Data = [[1], [2], [3], [4]]
       const engine = HyperFormula.buildFromSheets({
-        [sheet1Name]: sheet1Data,
-        [oldName]: sheet2Data,
+        'FirstSheet': [['=SUM(NewName!A1:A1)', '=SUM(NewName!A1:A2)', '=SUM(NewName!A1:A3)', '=SUM(NewName!A1:A4)']],
+        'OldName': [[1], [2], [3], [4]],
       })
-
-      const sheet1Id = engine.getSheetId(sheet1Name)!
-      const sheet2Id = engine.getSheetId(oldName)!
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+      const sheet2Id = engine.getSheetId('OldName')!
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
 
-      engine.renameSheet(sheet2Id, newName)
+      engine.renameSheet(sheet2Id, 'NewName')
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
       expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(3)
@@ -532,26 +520,22 @@ describe('rename sheet - issue #1116', () => {
     })
 
     it('function using `runFunction` referencing range indirectly', () => {
-      const sheet1Name = 'FirstSheet'
-      const oldName = 'OldName'
-      const newName = 'NewName'
       const engine = HyperFormula.buildFromSheets({
-        [sheet1Name]: [
+        'FirstSheet': [
           ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
-          [`='${newName}'!A1:A1`, `='${newName}'!A1:B2`, `='${newName}'!A1:A3`, `='${newName}'!A1:A4`],
+          [`='NewName'!A1:A1`, `='NewName'!A1:B2`, `='NewName'!A1:A3`, `='NewName'!A1:A4`],
         ],
-        [oldName]: [[1], [2], [3], [4]],
+        'OldName': [[1], [2], [3], [4]],
       })
-
-      const sheet1Id = engine.getSheetId(sheet1Name)!
-      const sheet2Id = engine.getSheetId(oldName)!
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+      const sheet2Id = engine.getSheetId('OldName')!
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
 
-      engine.renameSheet(sheet2Id, newName)
+      engine.renameSheet(sheet2Id, 'NewName')
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
       expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(1.5)
@@ -560,28 +544,22 @@ describe('rename sheet - issue #1116', () => {
     })
 
     it('function not using `runFunction` referencing range indirectly', () => {
-      const sheet1Name = 'FirstSheet'
-      const oldName = 'OldName'
-      const newName = 'NewName'
-      const sheet1Data = [
-        ['=SUM(A2)', '=SUM(B2)', '=SUM(C2)', '=SUM(D2)'],
-        [`='${newName}'!A1:A1`, `='${newName}'!A1:B2`, `='${newName}'!A1:A3`, `='${newName}'!A1:A4`],
-      ]
-      const sheet2Data = [[1], [2], [3], [4]]
       const engine = HyperFormula.buildFromSheets({
-        [sheet1Name]: sheet1Data,
-        [oldName]: sheet2Data,
+        'FirstSheet': [
+          ['=SUM(A2)', '=SUM(B2)', '=SUM(C2)', '=SUM(D2)'],
+          [`='NewName'!A1:A1`, `='NewName'!A1:B2`, `='NewName'!A1:A3`, `='NewName'!A1:A4`],
+        ],
+        'OldName': [[1], [2], [3], [4]],
       })
-
-      const sheet1Id = engine.getSheetId(sheet1Name)!
-      const sheet2Id = engine.getSheetId(oldName)!
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+      const sheet2Id = engine.getSheetId('OldName')!
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
 
-      engine.renameSheet(sheet2Id, newName)
+      engine.renameSheet(sheet2Id, 'NewName')
 
       expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
       expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(3)
@@ -590,27 +568,219 @@ describe('rename sheet - issue #1116', () => {
     })
 
     it('function calling a named expression', () => {
-      const sheet1Name = 'FirstSheet'
-      const oldName = 'OldName'
-      const newName = 'NewName'
       const engine = HyperFormula.buildFromSheets({
-        [sheet1Name]: [[`='${oldName}'!A1:A4`]],
-        [oldName]: [[1], [2], [3], [4]],
+        'FirstSheet': [[`='OldName'!A1:A4`]],
+        'OldName': [[1], [2], [3], [4]],
       }, {}, [
-        { name: 'ExprA', expression: `=MEDIAN(${newName}!$A$1:$A$1)` },
-        { name: 'ExprB', expression: `=MEDIAN(${newName}!$A$1:$A$2)` },
-        { name: 'ExprC', expression: `=MEDIAN(${newName}!$A$1:$A$3)` },
+        { name: 'ExprA', expression: '=MEDIAN(NewName!$A$1:$A$1)' },
+        { name: 'ExprB', expression: '=MEDIAN(NewName!$A$1:$A$2)' },
+        { name: 'ExprC', expression: '=MEDIAN(NewName!$A$1:$A$3)' },
       ])
 
       expect(engine.getNamedExpressionValue('ExprA')).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getNamedExpressionValue('ExprB')).toEqualError(detailedError(ErrorType.REF))
       expect(engine.getNamedExpressionValue('ExprC')).toEqualError(detailedError(ErrorType.REF))
 
-      engine.renameSheet(engine.getSheetId(oldName)!, newName)
+      engine.renameSheet(engine.getSheetId('OldName')!, 'NewName')
 
       expect(engine.getNamedExpressionValue('ExprA')).toBe(1)
       expect(engine.getNamedExpressionValue('ExprB')).toBe(1.5)
       expect(engine.getNamedExpressionValue('ExprC')).toBe(2)
+    })
+  })
+
+  describe('edge cases', () => {
+    it('chain renaming resolves multiple placeholder references sequentially', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'Main': [['=SheetB!A1', '=SheetC!A1']],
+        'SheetA': [[10]],
+      })
+      const mainId = engine.getSheetId('Main')!
+      const sheetAId = engine.getSheetId('SheetA')!
+
+      // Both are initially REF errors (placeholders)
+      expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+      // Rename SheetA → SheetB: resolves first placeholder
+      engine.renameSheet(sheetAId, 'SheetB')
+
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(10)
+      expect(engine.getCellValue(adr('B1', mainId))).toEqualError(detailedError(ErrorType.REF))
+      // Formula A1 now references SheetB (follows the rename)
+      expect(engine.getCellFormula(adr('A1', mainId))).toBe('=SheetB!A1')
+
+      // Add a new sheet named SheetC to resolve second placeholder
+      engine.addSheet('SheetC')
+      engine.setCellContents(adr('A1', engine.getSheetId('SheetC')!), 20)
+
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(10)
+      expect(engine.getCellValue(adr('B1', mainId))).toBe(20)
+    })
+
+    it('renaming sheet with circular formula does not break engine', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'Sheet1': [['=Sheet2!A1']],
+        'Sheet2': [['=Sheet1!A1']],
+      })
+      const sheet1Id = engine.getSheetId('Sheet1')!
+      const sheet2Id = engine.getSheetId('Sheet2')!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.CYCLE))
+      expect(engine.getCellValue(adr('A1', sheet2Id))).toEqualError(detailedError(ErrorType.CYCLE))
+
+      engine.renameSheet(sheet1Id, 'RenamedSheet1')
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.CYCLE))
+      expect(engine.getCellValue(adr('A1', sheet2Id))).toEqualError(detailedError(ErrorType.CYCLE))
+      expect(engine.getCellFormula(adr('A1', sheet2Id))).toBe('=RenamedSheet1!A1')
+    })
+
+    it('multiple formulas referencing same placeholder all resolve after rename', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'Sheet1': [['=Ghost!A1'], ['=Ghost!A1+1'], ['=SUM(Ghost!A1:A2)']],
+        'Sheet2': [['=Ghost!A1*2'], ['=Ghost!B1']],
+        'RealSheet': [[100, 200], [300]],
+      })
+      const sheet1Id = engine.getSheetId('Sheet1')!
+      const sheet2Id = engine.getSheetId('Sheet2')!
+      const realSheetId = engine.getSheetId('RealSheet')!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A2', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A3', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A1', sheet2Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A2', sheet2Id))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.renameSheet(realSheetId, 'Ghost')
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(100)
+      expect(engine.getCellValue(adr('A2', sheet1Id))).toBe(101)
+      expect(engine.getCellValue(adr('A3', sheet1Id))).toBe(400)
+      expect(engine.getCellValue(adr('A1', sheet2Id))).toBe(200)
+      expect(engine.getCellValue(adr('A2', sheet2Id))).toBe(200)
+    })
+
+    it('REF error propagates through dependency chain when source sheet is removed', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'Main': [['=Intermediate!A1*2']],
+        'Intermediate': [['=Source!A1+10']],
+        'Source': [[5]],
+      })
+      const mainId = engine.getSheetId('Main')!
+      const intermediateId = engine.getSheetId('Intermediate')!
+      const sourceId = engine.getSheetId('Source')!
+
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(30)
+      expect(engine.getCellValue(adr('A1', intermediateId))).toBe(15)
+
+      // Remove source sheet - error should propagate through chain
+      engine.removeSheet(sourceId)
+
+      expect(engine.getCellValue(adr('A1', intermediateId))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+      // Re-add the sheet to resolve the errors
+      engine.addSheet('Source')
+      engine.setCellContents(adr('A1', engine.getSheetId('Source')!), 5)
+
+      expect(engine.getCellValue(adr('A1', intermediateId))).toBe(15)
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(30)
+    })
+
+    it('setCellContents adds formula referencing existing sheet after it was added', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'Main': [[1]],
+      })
+      const mainId = engine.getSheetId('Main')!
+
+      engine.addSheet('NewSheet')
+      const newSheetId = engine.getSheetId('NewSheet')!
+      engine.setCellContents(adr('A1', newSheetId), 42)
+
+      engine.setCellContents(adr('B1', mainId), '=NewSheet!A1')
+
+      expect(engine.getCellValue(adr('B1', mainId))).toBe(42)
+
+      engine.setCellContents(adr('C1', mainId), '=FutureSheet!A1')
+
+      expect(engine.getCellValue(adr('C1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet('FutureSheet')
+      engine.setCellContents(adr('A1', engine.getSheetId('FutureSheet')!), 99)
+
+      expect(engine.getCellValue(adr('C1', mainId))).toBe(99)
+    })
+
+    it('when new name is already referenced, engine merges both sheet names', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'Main': [['=Source!A1', '=Target!A1']],
+        'Source': [[42]],
+      })
+      const mainId = engine.getSheetId('Main')!
+      const sourceId = engine.getSheetId('Source')!
+
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(42)
+      expect(engine.getCellValue(adr('B1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.renameSheet(sourceId, 'Target')
+
+      expect(engine.getCellFormula(adr('A1', mainId))).toBe('=Target!A1')
+      expect(engine.getCellFormula(adr('B1', mainId))).toBe('=Target!A1')
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(42)
+      expect(engine.getCellValue(adr('B1', mainId))).toBe(42)
+
+      engine.setCellContents(adr('A1', sourceId), 100)
+
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(100)
+      expect(engine.getCellValue(adr('B1', mainId))).toBe(100)
+    })
+
+    it('handles deeply nested REF error propagation', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'L1': [['=L2!A1+1']],
+        'L2': [['=L3!A1+1']],
+        'L3': [['=L4!A1+1']],
+        'L4': [['=Ghost!A1']],
+        'Source': [[100]],
+      })
+      const l1Id = engine.getSheetId('L1')!
+      const l2Id = engine.getSheetId('L2')!
+      const l3Id = engine.getSheetId('L3')!
+      const l4Id = engine.getSheetId('L4')!
+      const sourceId = engine.getSheetId('Source')!
+
+      expect(engine.getCellValue(adr('A1', l1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A1', l2Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A1', l3Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('A1', l4Id))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.renameSheet(sourceId, 'Ghost')
+
+      expect(engine.getCellValue(adr('A1', l4Id))).toBe(100)
+      expect(engine.getCellValue(adr('A1', l3Id))).toBe(101)
+      expect(engine.getCellValue(adr('A1', l2Id))).toBe(102)
+      expect(engine.getCellValue(adr('A1', l1Id))).toBe(103)
+    })
+
+    it('removing sheet creates REF and adding it back resolves it', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'Main': [['=Data!A1']],
+        'Data': [[42]],
+      })
+      const mainId = engine.getSheetId('Main')!
+      const dataId = engine.getSheetId('Data')!
+
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(42)
+
+      engine.removeSheet(dataId)
+
+      expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet('Data')
+      engine.setCellContents(adr('A1', engine.getSheetId('Data')!), 99)
+
+      expect(engine.getCellValue(adr('A1', mainId))).toBe(99)
     })
   })
 })

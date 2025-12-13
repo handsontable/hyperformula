@@ -467,7 +467,7 @@ describe('Undo - removing sheet', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
   })
 
-  it('works with multiple undo/redo cycles', () => {
+  it('restores sheet correctly after multiple undo/redo cycles', () => {
     const sheets = {
       Sheet1: [['1', '2']],
       Sheet2: [['3', '4']],
@@ -485,7 +485,7 @@ describe('Undo - removing sheet', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromSheets(sheets))
   })
 
-  it('works after row removal operation', () => {
+  it('restores sheet and cross-sheet references after row removal', () => {
     const sheets = {
       Sheet1: [['1'], ['2'], ['=Sheet2!A1']],
       Sheet2: [['42']],
@@ -504,7 +504,7 @@ describe('Undo - removing sheet', () => {
     expect(engine.getCellValue(adr('A3'))).toEqual(42)
   })
 
-  it('works after column removal operation', () => {
+  it('restores sheet and cross-sheet references after column removal', () => {
     const sheets = {
       Sheet1: [['1', '2', '=Sheet2!A1']],
       Sheet2: [['42']],
@@ -1015,7 +1015,7 @@ describe('Undo - adding sheet', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([]))
   })
 
-  it('works with auto-generated name', () => {
+  it('removes auto-generated sheet on undo', () => {
     const engine = HyperFormula.buildFromArray([])
     engine.addSheet()
 
@@ -1839,7 +1839,7 @@ describe('Redo - removing sheet', () => {
     expect(engine.getCellValue(adr('A1'))).toBeInstanceOf(Object) // #REF! error
   })
 
-  it('works with multiple undo/redo cycles', () => {
+  it('removes sheet correctly after multiple undo/redo cycles', () => {
     const sheets = {
       Sheet1: [['1']],
       Sheet2: [['2']],
