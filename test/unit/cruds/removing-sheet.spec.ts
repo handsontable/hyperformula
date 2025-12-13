@@ -10,8 +10,6 @@ import {
   detailedError,
   detailedErrorWithOrigin,
   expectArrayWithSameContent,
-  expectEngineToBeTheSameAs,
-  expectReferenceToHaveRefError,
   extractReference,
 } from '../testUtils'
 
@@ -19,13 +17,13 @@ describe('Removing sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveSheet(1)).toEqual(false)
+    expect(engine.isItPossibleToRemoveSheet(1)).toBe(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveSheet(0)).toEqual(true)
+    expect(engine.isItPossibleToRemoveSheet(0)).toBe(true)
   })
 })
 
@@ -116,6 +114,70 @@ describe('remove sheet', () => {
     expect(engine.getCellValue(adr('A2', 1))).toBe(2)
     expect(engine.getCellValue(adr('A3', 1))).toBe(3)
   })
+
+  it('converts sheet to placeholder if other sheet depends on it', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [[42]],
+      Sheet2: [['=Sheet1!A1']],
+    })
+
+    const sheet1Id = engine.getSheetId('Sheet1')!
+
+    engine.removeSheet(sheet1Id)
+
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: false })).toBe(false)
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: true })).toBe(true)
+  })
+
+  it('removes sheet completely if nothing depends on it', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [[42]],
+      Sheet2: [[100]],
+    })
+
+    const sheet1Id = engine.getSheetId('Sheet1')!
+
+    engine.removeSheet(sheet1Id)
+
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: false })).toBe(false)
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: true })).toBe(false)
+  })
+
+  it('removes the placeholder sheet if nothing depends on it any longer', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [[42]],
+      Sheet2: [['=Sheet1!A1']],
+    })
+
+    const sheet1Id = engine.getSheetId('Sheet1')!
+    const sheet2Id = engine.getSheetId('Sheet2')!
+
+    engine.removeSheet(sheet1Id)
+
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: false })).toBe(false)
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: true })).toBe(true)
+
+    engine.setCellContents(adr('A1', sheet2Id), 100)
+
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: false })).toBe(false)
+    expect(engine.sheetMapping.hasSheetWithId(sheet1Id, { includePlaceholders: true })).toBe(false)
+  })
+
+  it('decreases lastSheetId if removed sheet was the last one', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [[1]],
+      Sheet2: [[2]],
+    })
+
+    const sheet2Id = engine.getSheetId('Sheet2')!
+
+    engine.removeSheet(sheet2Id)
+
+    engine.addSheet('Sheet3')
+    const sheet3Id = engine.getSheetId('Sheet3')!
+
+    expect(sheet3Id).toBe(sheet2Id) // new sheet reuses the ID
+  })
 })
 
 describe('remove sheet - adjust edges', () => {
@@ -149,6 +211,7 @@ describe('remove sheet - adjust edges', () => {
 
     const a1From0 = engine.addressMapping.getCell(adr('A1'))
     const a1From1 = engine.addressMapping.getCell(adr('A1', 1))
+
     expect(engine.graph.existsEdge(a1From1!, a1From0!)).toBe(true)
 
     engine.removeSheet(1)
@@ -221,7 +284,7 @@ describe('remove sheet - adjust formula dependencies', () => {
 
 })
 
-describe('remove sheet - issue #1116', () => {
+describe('removeSheet() recalculates formulas (issue #1116)', () => {
   it('returns REF error after removing sheet referenced without quotes', () => {
     const engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
@@ -727,6 +790,7 @@ describe('remove sheet - adjust matrix mapping', () => {
         ['=TRANSPOSE(A1:B1)'],
       ],
     })
+
     expect(engine.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))).toBeInstanceOf(ArrayFormulaVertex)
 
     engine.removeSheet(0)
@@ -746,7 +810,7 @@ describe('remove sheet - adjust column index', () => {
 
     engine.removeSheet(0)
 
-    expect(removeSheetSpy).toHaveBeenCalled()
+    expect(removeSheetSpy).toHaveBeenCalledWith(0)
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
   })
 })

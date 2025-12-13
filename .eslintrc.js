@@ -128,7 +128,7 @@ module.exports = {
     'jest/no-standalone-expect': 'warn',
     'jest/no-test-prefixes': 'off',
     'jest/prefer-to-be': 'warn',
-    'jest/prefer-to-have-length': 'warn',
+    'jest/prefer-to-have-length': 'off',
   },
   overrides: [
     {

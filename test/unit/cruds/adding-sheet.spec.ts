@@ -326,7 +326,7 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
       const engine = HyperFormula.buildFromSheets({
         'FirstSheet': [
           ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
-          [`='NewSheet'!A1:A1`, `='NewSheet'!A1:B2`, `='NewSheet'!A1:A3`, `='NewSheet'!A1:A4`],
+          ['=\'NewSheet\'!A1:A1', '=\'NewSheet\'!A1:B2', '=\'NewSheet\'!A1:A3', '=\'NewSheet\'!A1:A4'],
         ],
       }, {useArrayArithmetic: false})
       const sheet1Id = engine.getSheetId('FirstSheet')!
@@ -349,7 +349,7 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
       const engine = HyperFormula.buildFromSheets({
         'FirstSheet': [
           ['=SUM(A2)', '=SUM(B2)', '=SUM(C2)', '=SUM(D2)'],
-          [`='NewSheet'!A1:A1`, `='NewSheet'!A1:B2`, `='NewSheet'!A1:A3`, `='NewSheet'!A1:A4`],
+          ['=\'NewSheet\'!A1:A1', '=\'NewSheet\'!A1:B2', '=\'NewSheet\'!A1:A3', '=\'NewSheet\'!A1:A4'],
         ],
       }, {useArrayArithmetic: false})
       const sheet1Id = engine.getSheetId('FirstSheet')!
@@ -370,7 +370,7 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
 
     it('function calling a named expression', () => {
       const engine = HyperFormula.buildFromSheets({
-        'FirstSheet': [[`='NewSheet'!A1:A4`]],
+        'FirstSheet': [['=\'NewSheet\'!A1:A4']],
       }, {useArrayArithmetic: false}, [
         { name: 'ExprA', expression: '=MEDIAN(NewSheet!$A$1:$A$1)' },
         { name: 'ExprB', expression: '=MEDIAN(NewSheet!$A$1:$A$2)' },

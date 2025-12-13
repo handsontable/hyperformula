@@ -323,14 +323,14 @@ export class DependencyGraph {
    * - If nothing is left, removes the sheet from sheet mapping and address mapping.
    * - Otherwise, marks it as placeholder.
    */
-  public removeSheet(sheetId: number) {
+  public removeSheet(sheetId: number): void {
     this.clearSheet(sheetId)
     const addressMappingCleared = !this.addressMapping.hasAnyEntries(sheetId)
     const rangeMappingCleared = this.rangeMapping.getNumberOfRangesInSheet(sheetId) === 0
 
     if (addressMappingCleared && rangeMappingCleared) {
-      this.sheetMapping.removeSheet(sheetId)
-      this.addressMapping.removeSheet(sheetId)
+      this.sheetMapping.removeSheetIfExists(sheetId)
+      this.addressMapping.removeSheetIfExists(sheetId)
     } else {
       this.sheetMapping.markSheetAsPlaceholder(sheetId)
     }
@@ -352,7 +352,7 @@ export class DependencyGraph {
 
     this.mergeRangeVertices(sheetToKeep, placeholderSheetToDelete)
     this.mergeCellVertices(sheetToKeep, placeholderSheetToDelete)
-    this.addressMapping.removeSheet(placeholderSheetToDelete)
+    this.addressMapping.removeSheetIfExists(placeholderSheetToDelete)
     this.addStructuralNodesToChangeSet()
   }
 
@@ -1340,7 +1340,7 @@ export class DependencyGraph {
           !this.addressMapping.hasAnyEntries(sheetId) &&
           this.rangeMapping.getNumberOfRangesInSheet(sheetId) === 0) {
         this.sheetMapping.removeSheet(sheetId, { includePlaceholders: true })
-        this.addressMapping.removeSheet(sheetId)
+        this.addressMapping.removeSheetIfExists(sheetId)
       }
     }
   }

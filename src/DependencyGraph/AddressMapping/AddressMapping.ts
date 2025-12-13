@@ -180,9 +180,11 @@ export class AddressMapping {
 
   /**
    * Removes a sheet from the address mapping.
+   * If sheet does not exist, does nothing.
+   * @returns {boolean} true if sheet was removed, false if it did not exist.
    */
-  public removeSheet(sheetId: number): void {
-    this.mapping.delete(sheetId)
+  public removeSheetIfExists(sheetId: number): boolean {
+    return this.mapping.delete(sheetId)
   }
 
   /**

@@ -166,7 +166,7 @@ export class SheetMapping {
 
     this.lastSheetId++
     const sheet = new Sheet(this.lastSheetId, newSheetDisplayName)
-    this.storeSheetInMappings(sheet)
+    this._storeSheetInMappings(sheet)
     return sheet.id
   }
 
@@ -197,7 +197,7 @@ export class SheetMapping {
     }
 
     const sheet = new Sheet(sheetId, sheetDisplayName)
-    this.storeSheetInMappings(sheet)
+    this._storeSheetInMappings(sheet)
   }
 
   /**
@@ -212,7 +212,7 @@ export class SheetMapping {
 
     this.lastSheetId++
     const sheet = new Sheet(this.lastSheetId, sheetName, true)
-    this.storeSheetInMappings(sheet)
+    this._storeSheetInMappings(sheet)
     return sheet.id
   }
 
@@ -237,17 +237,44 @@ export class SheetMapping {
       this.lastSheetId = sheetId
     }
     const sheet = new Sheet(sheetId, sheetDisplayName, true)
-    this.storeSheetInMappings(sheet)
+    this._storeSheetInMappings(sheet)
   }
 
   /**
-   * Removes sheet with given ID. Ignores placeholders
+   * Removes sheet with given ID.
    * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist or is a placeholder
    */
   public removeSheet(sheetId: number, options: SheetMappingQueryOptions = {}): void {
     const sheet = this._getSheetOrThrowError(sheetId, options)
     this.allSheets.delete(sheetId)
     this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
+
+    if (sheetId === this.lastSheetId) {
+      this.lastSheetId--
+    }
+  }
+
+  /**
+   *
+   * Removes sheet with given ID.
+   * If sheet does not exist, does nothing.
+   * @returns {boolean} true if sheet was removed, false if it did not exist.
+   */
+  public removeSheetIfExists(sheetId: number, options: SheetMappingQueryOptions = {}): boolean {
+    const sheet = this._getSheet(sheetId, options)
+
+    if (!sheet) {
+      return false
+    }
+
+    this.allSheets.delete(sheetId)
+    this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
+
+    if (sheetId === this.lastSheetId) {
+      this.lastSheetId--
+    }
+
+    return true
   }
 
   /**
@@ -285,6 +312,11 @@ export class SheetMapping {
       } else {
         this.mappingFromCanonicalNameToId.delete(sheetWithConflictingName.canonicalName)
         this.allSheets.delete(sheetWithConflictingName.id)
+
+        if (sheetWithConflictingName.id === this.lastSheetId) {
+          this.lastSheetId--
+        }
+
         mergedWithPlaceholderSheet = sheetWithConflictingName.id
       }
     }
@@ -293,7 +325,7 @@ export class SheetMapping {
     this.mappingFromCanonicalNameToId.delete(currentCanonicalName)
 
     sheet.displayName = newDisplayName
-    this.storeSheetInMappings(sheet)
+    this._storeSheetInMappings(sheet)
     return { previousDisplayName: currentDisplayName, mergedWithPlaceholderSheet }
   }
 
@@ -304,7 +336,7 @@ export class SheetMapping {
    *
    * @internal
    */
-  private storeSheetInMappings(sheet: Sheet): void {
+  private _storeSheetInMappings(sheet: Sheet): void {
     this.allSheets.set(sheet.id, sheet)
     this.mappingFromCanonicalNameToId.set(sheet.canonicalName, sheet.id)
   }
