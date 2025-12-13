@@ -281,6 +281,30 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(198)
   })
 
+  it('setCellContents adds formula referencing existing sheet after it was added', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Main': [[1]],
+    })
+    const mainId = engine.getSheetId('Main')!
+
+    engine.addSheet('NewSheet')
+    const newSheetId = engine.getSheetId('NewSheet')!
+    engine.setCellContents(adr('A1', newSheetId), 42)
+
+    engine.setCellContents(adr('B1', mainId), '=NewSheet!A1')
+
+    expect(engine.getCellValue(adr('B1', mainId))).toBe(42)
+
+    engine.setCellContents(adr('C1', mainId), '=FutureSheet!A1')
+
+    expect(engine.getCellValue(adr('C1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('FutureSheet')
+    engine.setCellContents(adr('A1', engine.getSheetId('FutureSheet')), 99)
+
+    expect(engine.getCellValue(adr('C1', mainId))).toBe(99)
+  })
+
   describe('when using ranges with', () => {
     it('function using `runFunction`', () => {
       const engine = HyperFormula.buildFromSheets({

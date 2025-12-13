@@ -484,6 +484,53 @@ describe('removeSheet() recalculates formulas (issue #1116)', () => {
     expect(engine.getCellValue(adr('A1', newSheet2Id))).toBe(45)
   })
 
+  it('REF error propagates through dependency chain when source sheet is removed', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Main': [['=Intermediate!A1*2']],
+      'Intermediate': [['=Source!A1+10']],
+      'Source': [[5]],
+    })
+    const mainId = engine.getSheetId('Main')!
+    const intermediateId = engine.getSheetId('Intermediate')!
+    const sourceId = engine.getSheetId('Source')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(30)
+    expect(engine.getCellValue(adr('A1', intermediateId))).toBe(15)
+
+    // Remove source sheet - error should propagate through chain
+    engine.removeSheet(sourceId)
+
+    expect(engine.getCellValue(adr('A1', intermediateId))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    // Re-add the sheet to resolve the errors
+    engine.addSheet('Source')
+    engine.setCellContents(adr('A1', engine.getSheetId('Source')), 5)
+
+    expect(engine.getCellValue(adr('A1', intermediateId))).toBe(15)
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(30)
+  })
+
+  it('removing sheet creates REF and adding it back resolves it', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Main': [['=Data!A1']],
+      'Data': [[42]],
+    })
+    const mainId = engine.getSheetId('Main')!
+    const dataId = engine.getSheetId('Data')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(42)
+
+    engine.removeSheet(dataId)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('Data')
+    engine.setCellContents(adr('A1', engine.getSheetId('Data')), 99)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(99)
+  })
+
   describe('when using ranges with', () => {
     it('function using `runFunction`', () => {
       const sheet1Name = 'FirstSheet'
