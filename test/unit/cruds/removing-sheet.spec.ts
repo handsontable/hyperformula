@@ -285,26 +285,7 @@ describe('remove sheet - adjust formula dependencies', () => {
 })
 
 describe('removeSheet() recalculates formulas (issue #1116)', () => {
-  it('returns REF error after removing sheet referenced without quotes', () => {
-    const engine = HyperFormula.buildEmpty()
-    const table1Name = 'table1'
-    const table2Name = 'table2'
-
-    engine.addSheet(table1Name)
-    engine.addSheet(table2Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
-    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `=${table2Name}!A1`)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toBe(10)
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
-
-    engine.removeSheet(engine.getSheetId(table2Name)!)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toEqualError(detailedError(ErrorType.REF))
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
-  })
-
-  it('returns REF error after removing sheet referenced with quotes', () => {
+  it('returns REF error if other sheet depends on the removed one', () => {
     const engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
     const table2Name = 'table2'
@@ -321,46 +302,6 @@ describe('removeSheet() recalculates formulas (issue #1116)', () => {
 
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toEqualError(detailedError(ErrorType.REF))
-  })
-
-  it('returns REF error for formulas with range references and function using runFunction helper', () => {
-    const engine = HyperFormula.buildEmpty()
-    const sheet1Name = 'Sheet1'
-    const sheet2Name = 'Sheet2'
-
-    engine.addSheet(sheet1Name)
-    engine.addSheet(sheet2Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(sheet2Name)), 10)
-    engine.setCellContents(adr('B1', engine.getSheetId(sheet2Name)), 20)
-    engine.setCellContents(adr('A2', engine.getSheetId(sheet2Name)), 30)
-    engine.setCellContents(adr('B2', engine.getSheetId(sheet2Name)), 40)
-    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), `=MEDIAN('${sheet2Name}'!A1:B2)`)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(25)
-
-    engine.removeSheet(engine.getSheetId(sheet2Name)!)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
-  })
-
-  it('returns REF error for formulas with range references and function not using runFunction helper', () => {
-    const engine = HyperFormula.buildEmpty()
-    const sheet1Name = 'Sheet1'
-    const sheet2Name = 'Sheet2'
-
-    engine.addSheet(sheet1Name)
-    engine.addSheet(sheet2Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(sheet2Name)), 10)
-    engine.setCellContents(adr('B1', engine.getSheetId(sheet2Name)), 20)
-    engine.setCellContents(adr('A2', engine.getSheetId(sheet2Name)), 30)
-    engine.setCellContents(adr('B2', engine.getSheetId(sheet2Name)), 40)
-    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), `=SUM('${sheet2Name}'!A1:B2)`)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(100)
-
-    engine.removeSheet(engine.getSheetId(sheet2Name)!)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
   })
 
   it('returns REF error for chained dependencies across multiple sheets', () => {
@@ -567,7 +508,7 @@ describe('removeSheet() recalculates formulas (issue #1116)', () => {
     expect(engine.getCellValue(adr('A1', newSheet2Id))).toBe(45)
   })
 
-  describe('complex range scenarios', () => {
+  describe('when using ranges with', () => {
     it('function using `runFunction`', () => {
       const sheet1Name = 'FirstSheet'
       const sheet2Name = 'NewSheet'
@@ -736,7 +677,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet(sheet1Id)
 
-    expect(engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toBeDefined()
+    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).not.toThrow()
   })
 
   it('should not remove sheet from address mapping if a named expression depends on it', () => {
@@ -751,7 +692,28 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.removeSheet(sheet1Id)
 
-    expect(engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toBeDefined()
+    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).not.toThrow()
+  })
+
+  it('removes the placeholder sheet from address mapping if nothing depends on it any longer', () => {
+    const sheet1Name = 'Sheet1'
+    const sheet2Name = 'Sheet2'
+
+    const engine = HyperFormula.buildFromSheets({
+      [sheet1Name]: [[42]],
+      [sheet2Name]: [[`='${sheet1Name}'!A1`]],
+    })
+
+    const sheet1Id = engine.getSheetId(sheet1Name)!
+    const sheet2Id = engine.getSheetId(sheet2Name)!
+
+    engine.removeSheet(sheet1Id)
+
+    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).not.toThrow()
+
+    engine.setCellContents(adr('A1', sheet2Id), 100)
+
+    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toThrow(NoSheetWithIdError)
   })
 })
 
