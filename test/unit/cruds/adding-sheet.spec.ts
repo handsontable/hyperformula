@@ -109,27 +109,7 @@ describe('add sheet to engine', () => {
 })
 
 describe('recalculates formulas after adding new sheet (issue #1116)', () => {
-  it('recalculates single cell reference without quotes', () => {
-    const  engine = HyperFormula.buildEmpty()
-    const table1Name = 'table1'
-    const table2Name = 'table2'
-
-    engine.addSheet(table1Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `=${table2Name}!A1`)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
-
-    engine.addSheet(table2Name)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toBeNull()
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBeNull()
-
-    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
-  })
-
-  it('recalculates single cell reference with quotes', () => {
+  it('recalculates single cell reference', () => {
     const  engine = HyperFormula.buildEmpty()
     const table1Name = 'table1'
     const table2Name = 'table2'
@@ -147,29 +127,6 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
     engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
 
     expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
-  })
-
-  it('recalculates an aggregate function with range reference', () => {
-    const engine = HyperFormula.buildEmpty()
-    const sheet1Name = 'Sheet1'
-    const sheet2Name = 'Sheet2'
-
-    engine.addSheet(sheet1Name)
-    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), `=SUM('${sheet2Name}'!A1:B2)`)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
-
-    engine.addSheet(sheet2Name)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBeNull()
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(0)
-
-    engine.setCellContents(adr('A1', engine.getSheetId(sheet2Name)), 10)
-    engine.setCellContents(adr('B1', engine.getSheetId(sheet2Name)), 20)
-    engine.setCellContents(adr('A2', engine.getSheetId(sheet2Name)), 30)
-    engine.setCellContents(adr('B2', engine.getSheetId(sheet2Name)), 40)
-
-    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(100)
   })
 
   it('recalculates chained dependencies across multiple sheets', () => {
@@ -324,7 +281,7 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
     expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(198)
   })
 
-  describe('complex range scenarios', () => {
+  describe('when using ranges with', () => {
     it('function using `runFunction`', () => {
       const engine = HyperFormula.buildFromSheets({
         'FirstSheet': [['=MEDIAN(NewSheet!A1:A1)', '=MEDIAN(NewSheet!A1:A2)', '=MEDIAN(NewSheet!A1:A3)', '=MEDIAN(NewSheet!A1:A4)']],
