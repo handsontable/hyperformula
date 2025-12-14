@@ -19,7 +19,6 @@ import {ParserWithCaching} from '../../src/parser'
 import {ArraySizePredictor} from '../../src/ArraySize'
 
 describe('Undo - removing rows', () => {
-
   it('works for empty row', () => {
     const sheet = [
       ['1'],
@@ -33,7 +32,6 @@ describe('Undo - removing rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('works for simple values', () => {
     const sheet = [
@@ -49,7 +47,6 @@ describe('Undo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('works with formula in removed row', () => {
     const sheet = [
       ['1'],
@@ -64,7 +61,6 @@ describe('Undo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('restores dependent cell formulas', () => {
     const sheet = [
       ['=A2'],
@@ -78,7 +74,6 @@ describe('Undo - removing rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('formulas are built correctly when there was a pause in computation', () => {
     const sheet = [
@@ -96,7 +91,6 @@ describe('Undo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('restores ranges when removing rows', () => {
     const sheet = [
       ['=SUM(A2:A3)'],
@@ -111,7 +105,6 @@ describe('Undo - removing rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('dummy operation removeRows should also be undoable', () => {
     const sheet = [
       ['1']
@@ -123,7 +116,6 @@ describe('Undo - removing rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('works for more removal segments', () => {
     const sheet = [
@@ -142,7 +134,6 @@ describe('Undo - removing rows', () => {
 })
 
 describe('Undo - adding rows', () => {
-
   it('restores original state after adding single row', () => {
     const sheet = [
       ['1'], // add after that
@@ -156,7 +147,6 @@ describe('Undo - adding rows', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('dummy operation addRows should also be undoable', () => {
     const sheet = [
       ['1']
@@ -168,7 +158,6 @@ describe('Undo - adding rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('works for more addition segments', () => {
     const sheet = [
@@ -186,7 +175,6 @@ describe('Undo - adding rows', () => {
 })
 
 describe('Undo - moving rows', () => {
-
   it('restores original row order after move', () => {
     const sheet = [
       [0], [1], [2], [3], [4], [5], [6], [7],
@@ -197,7 +185,6 @@ describe('Undo - moving rows', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('restores original row order when moving rows backward', () => {
     const sheet = [
@@ -235,7 +222,6 @@ describe('Undo - moving rows', () => {
 })
 
 describe('Undo - moving columns', () => {
-
   it('restores original column order after move', () => {
     const sheet = [
       [0, 1, 2, 3, 4, 5, 6, 7],
@@ -246,7 +232,6 @@ describe('Undo - moving columns', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('restores original column order when moving columns backward', () => {
     const sheet = [
@@ -284,7 +269,6 @@ describe('Undo - moving columns', () => {
 })
 
 describe('Undo - adding columns', () => {
-
   it('restores original state after adding single column', () => {
     const sheet = [
       ['1', /* */ '3'],
@@ -297,7 +281,6 @@ describe('Undo - adding columns', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('dummy operation addColumns should also be undoable', () => {
     const sheet = [
       ['1']
@@ -309,7 +292,6 @@ describe('Undo - adding columns', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('restores state after adding multiple column segments', () => {
     const sheet = [
@@ -325,7 +307,6 @@ describe('Undo - adding columns', () => {
 })
 
 describe('Undo - removing columns', () => {
-
   it('works for empty column', () => {
     const sheet = [
       ['1', null, '3'],
@@ -337,7 +318,6 @@ describe('Undo - removing columns', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('restores column with simple values', () => {
     const sheet = [
@@ -351,7 +331,6 @@ describe('Undo - removing columns', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('works with formula in removed columns', () => {
     const sheet = [
       ['1', '=SUM(A1)', '3'],
@@ -364,7 +343,6 @@ describe('Undo - removing columns', () => {
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
 
-
   it('restores dependent cell formulas after column removal', () => {
     const sheet = [
       ['=A2', '42', '3'],
@@ -376,7 +354,6 @@ describe('Undo - removing columns', () => {
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray(sheet))
   })
-
 
   it('builds formulas correctly with suspended evaluation during column removal', () => {
     const sheet = [
