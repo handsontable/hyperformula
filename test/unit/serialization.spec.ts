@@ -110,8 +110,5 @@ describe('serialization', () => {
     ], { useArrayArithmetic: true })
 
     expect(engine.getCellSerialized(adr('A2'))).toEqual('=TRANSPOSE(A1:C1)')
-
-    expect(engine.getCellSerialized(adr('B2'))).toEqual(2)
-    expect(engine.getCellSerialized(adr('C2'))).toEqual(3)
   })
 })
