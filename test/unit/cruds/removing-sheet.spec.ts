@@ -1,4 +1,4 @@
-import {ExportedCellChange, HyperFormula, NoSheetWithIdError} from '../../../src'
+import {ExportedCellChange, HyperFormula, NoSheetWithIdError, CellValueType} from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {ErrorType} from '../../../src/Cell'
 import {ArrayFormulaVertex} from '../../../src/DependencyGraph'
@@ -797,5 +797,63 @@ describe('remove sheet - adjust column index', () => {
 
     expect(removeSheetSpy).toHaveBeenCalledWith(0)
     expectArrayWithSameContent([], index.getValueIndex(0, 0, 1).index)
+  })
+})
+
+describe('remove sheet - placeholder sheet behavior', () => {
+  it('should return ERROR type when getting cell value from a placeholder sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [[42]],
+      Sheet2: [['=Sheet1!A1']],
+    })
+
+    const sheet1Id = engine.getSheetId('Sheet1')!
+
+    engine.removeSheet(sheet1Id)
+
+    expect(engine.getCellValueType(adr('A1', sheet1Id))).toBe('ERROR')
+  })
+
+  it('should return null when getting serialized cell from a placeholder sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [[42]],
+      Sheet2: [['=Sheet1!A1']],
+    })
+
+    const sheet1Id = engine.getSheetId('Sheet1')!
+
+    engine.removeSheet(sheet1Id)
+
+    const result = engine.getCellSerialized(adr('A1', sheet1Id))
+    expect(result).toBeNull()
+  })
+
+  it('should remove range vertices when clearing formulas that use ranges', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, 3],
+      ['=SUM(A1:C1)'],
+    ])
+
+    expect(engine.rangeMapping.getNumberOfRangesInSheet(0)).toBe(1)
+
+    engine.setCellContents(adr('A2'), null)
+
+    expect(engine.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
+  })
+
+  it('should remove range vertices when removing sheet with ranges', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Sheet1: [
+        [1, 2, 3],
+        ['=SUM(A1:C1)'],
+      ],
+      Sheet2: [[100]],
+    })
+
+    expect(engine.rangeMapping.getNumberOfRangesInSheet(0)).toBe(1)
+
+    engine.removeSheet(0)
+
+    expect(engine.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 })

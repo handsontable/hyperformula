@@ -58,4 +58,17 @@ describe('Row ranges', () => {
     expect(engine.graph.existsEdge(z7, rowRange47)).toBe(true)
     expect(engine.graph.existsEdge(z8, rowRange47)).toBe(false)
   })
+
+  it('should correctly handle infinite row ranges when setting cell values (line 890)', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(3:4)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+
+    engine.setCellContents(adr('E3'), 100)
+    engine.setCellContents(adr('F4'), 200)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(300)
+  })
 })

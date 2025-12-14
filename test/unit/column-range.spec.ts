@@ -81,4 +81,17 @@ describe('Column ranges', () => {
     expect(range.start).toEqual(colStart('A'))
     expect(range.end).toEqual(colEnd('B'))
   })
+
+  it('should correctly handle infinite column ranges when setting cell values (line 890)', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(C:D)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+
+    engine.setCellContents(adr('C5'), 10)
+    engine.setCellContents(adr('D5'), 20)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(30)
+  })
 })

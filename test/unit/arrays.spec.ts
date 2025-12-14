@@ -507,4 +507,31 @@ describe('column ranges', () => {
 
     expect(engine.getCellValue(adr('D1'))).toEqual(3)
   })
+
+  it('should handle array shrinking when dependent is a value cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)'],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(2)
+    expect(engine.getCellValue(adr('B3'))).toBe(3)
+    expect(engine.getCellValue(adr('B4'))).toBe(4)
+
+    engine.setCellContents(adr('B3'), 'obstructing value')
+
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
+  })
+
+  it('should correctly set address mapping for scalar formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=1+1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.addressMapping.getCell(adr('A1'))).toBeDefined()
+    expect(engine.addressMapping.getCell(adr('B1'))).toBeUndefined()
+  })
 })

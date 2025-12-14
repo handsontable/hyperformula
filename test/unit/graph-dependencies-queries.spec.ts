@@ -138,5 +138,32 @@ describe('address queries', () => {
         engine.getCellPrecedents(malformedAddress)
       }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', malformedAddress.toString()))
     })
+
+    it('should correctly process cell dependencies with multiple range types', () => {
+      const engine = HyperFormula.buildFromArray([
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        ['=SUM(A1:D1)', '=SUM(A2:D2)', '=SUM(A1:D2)', '=A1+B1'],
+      ])
+
+      expect(engine.getCellValue(adr('A3'))).toBe(10)
+      expect(engine.getCellValue(adr('B3'))).toBe(26)
+      expect(engine.getCellValue(adr('C3'))).toBe(36)
+      expect(engine.getCellValue(adr('D3'))).toBe(3)
+    })
+
+    it('should correctly process named expression dependencies', () => {
+      const engine = HyperFormula.buildFromArray([
+        [42],
+        ['=MyValue * 2'],
+      ], {}, [
+        {name: 'MyValue', expression: '=Sheet1!$A$1'},
+      ])
+
+      expect(engine.getCellValue(adr('A2'))).toBe(84)
+
+      engine.setCellContents(adr('A1'), 100)
+      expect(engine.getCellValue(adr('A2'))).toBe(200)
+    })
   })
 })

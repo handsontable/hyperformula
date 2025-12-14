@@ -433,4 +433,63 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
 
     expect(engine.getCellValue(adr('A1', mainId))).toBe(42)
   })
+
+  it('should handle adding sheet that resolves references with ranges in placeholder', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Main: [['=SUM(Data!A1:A3)']],
+    })
+
+    const mainId = engine.getSheetId('Main')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('Data')
+    const dataId = engine.getSheetId('Data')!
+    engine.setCellContents(adr('A1', dataId), 1)
+    engine.setCellContents(adr('A2', dataId), 2)
+    engine.setCellContents(adr('A3', dataId), 3)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(6)
+  })
+
+  it('should handle remove and add sheet cycle with range references', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Main: [['=SUM(Data!A1:A3)']],
+      Data: [[1], [2], [3]],
+    })
+
+    const mainId = engine.getSheetId('Main')!
+    const dataId = engine.getSheetId('Data')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(6)
+
+    engine.removeSheet(dataId)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('Data')
+    const newDataId = engine.getSheetId('Data')!
+    engine.setCellContents(adr('A1', newDataId), 10)
+    engine.setCellContents(adr('A2', newDataId), 20)
+    engine.setCellContents(adr('A3', newDataId), 30)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(60)
+  })
+
+  it('should correctly merge sheets when adding sheet that was previously referenced', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Main: [['=NewSheet!A1 + NewSheet!B1']],
+    })
+
+    const mainId = engine.getSheetId('Main')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('NewSheet')
+    const newSheetId = engine.getSheetId('NewSheet')!
+    engine.setCellContents(adr('A1', newSheetId), 100)
+    engine.setCellContents(adr('B1', newSheetId), 50)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(150)
+  })
 })
