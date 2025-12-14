@@ -79,6 +79,13 @@ describe('address queries', () => {
       }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', malformedAddress.toString()))
     })
 
+    it('should return empty array when sheet does not exist', () => {
+      const engine = HyperFormula.buildFromArray([[1]])
+
+      const nonExistentSheetId = 999
+
+      expect(engine.getCellDependents({ sheet: nonExistentSheetId, col: 0, row: 0 })).toEqual([])
+    })
   })
 
   describe('getCellPrecedents', () => {

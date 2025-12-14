@@ -102,4 +102,16 @@ describe('serialization', () => {
     expect(engine1.getCellValueFormat(adr('K1'))).toEqual('Date()')
     expect(engine1.getCellValueDetailedType(adr('K1'))).toEqual(CellValueDetailedType.NUMBER_DATE)
   })
+
+  it('should return raw value for array formula spill cells', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2, 3],
+      ['=TRANSPOSE(A1:C1)'],
+    ], { useArrayArithmetic: true })
+
+    expect(engine.getCellSerialized(adr('A2'))).toEqual('=TRANSPOSE(A1:C1)')
+
+    expect(engine.getCellSerialized(adr('B2'))).toEqual(2)
+    expect(engine.getCellSerialized(adr('C2'))).toEqual(3)
+  })
 })

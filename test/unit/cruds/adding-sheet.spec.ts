@@ -1,4 +1,4 @@
-import {ErrorType, HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
+import {AlwaysSparse, ErrorType, HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
 import {plPL} from '../../../src/i18n/languages'
 import {adr, detailedError} from '../testUtils'
 
@@ -415,5 +415,22 @@ describe('recalculates formulas after adding new sheet (issue #1116)', () => {
       expect(engine.getNamedExpressionValue('ExprC')).toBe(2)
       expect(engine.getNamedExpressionValue('ExprD')).toBe(2.5)
     })
+  })
+
+  it('should convert placeholder sheet strategy when adding referenced sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'MainSheet': [['=PlaceholderSheet!A1']],
+    }, { chooseAddressMappingPolicy: new AlwaysSparse()})
+
+    const mainId = engine.getSheetId('MainSheet')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('PlaceholderSheet')
+    const placeholderId = engine.getSheetId('PlaceholderSheet')!
+
+    engine.setCellContents(adr('A1', placeholderId), 42)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(42)
   })
 })
