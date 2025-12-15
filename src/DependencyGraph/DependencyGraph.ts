@@ -1339,7 +1339,7 @@ export class DependencyGraph {
       if (this.isPlaceholder(sheetId) &&
           !this.addressMapping.hasAnyEntries(sheetId) &&
           this.rangeMapping.getNumberOfRangesInSheet(sheetId) === 0) {
-        this.sheetMapping.removeSheet(sheetId, { includePlaceholders: true })
+        this.sheetMapping.removeSheetIfExists(sheetId, { includePlaceholders: true })
         this.addressMapping.removeSheetIfExists(sheetId)
       }
     }

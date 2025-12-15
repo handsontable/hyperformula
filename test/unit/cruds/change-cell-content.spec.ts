@@ -152,15 +152,15 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const a1 = engine.addressMapping.getCell(adr('A1'))
-    const b1 = engine.addressMapping.getCell(adr('B1'))
+    const a1 = engine.addressMapping.getCellOrThrow(adr('A1'))
+    const b1 = engine.addressMapping.getCellOrThrow(adr('B1'))
 
-    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
+    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [[null]])
     expect(engine.getCellValue(adr('B1'))).toBe(null)
     expect([ ...engine.graph.getNodes() ]).not.toContain(b1)
-    expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
+    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
 
   it('update value cell to formula', () => {

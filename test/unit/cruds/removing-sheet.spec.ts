@@ -682,9 +682,10 @@ describe('remove sheet - adjust address mapping', () => {
       [sheet1Name]: [[42]]
     })
 
-    engine.removeSheet(engine.getSheetId(sheet1Name)!)
+    const sheet1Id = engine.getSheetId(sheet1Name)!
+    engine.removeSheet(sheet1Id)
 
-    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(engine.getSheetId(sheet1Name)!)).toThrow(NoSheetWithIdError)
+    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toThrow(new NoSheetWithIdError(sheet1Id))
   })
 
   it('should not remove sheet from address mapping if another sheet depends on it', () => {
@@ -736,7 +737,7 @@ describe('remove sheet - adjust address mapping', () => {
 
     engine.setCellContents(adr('A1', sheet2Id), 100)
 
-    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toThrow(NoSheetWithIdError)
+    expect(() => engine.addressMapping.getStrategyForSheetOrThrow(sheet1Id)).toThrow(new NoSheetWithIdError(sheet1Id))
   })
 })
 

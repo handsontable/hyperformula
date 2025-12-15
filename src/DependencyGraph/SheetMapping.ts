@@ -241,20 +241,6 @@ export class SheetMapping {
   }
 
   /**
-   * Removes sheet with given ID.
-   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist or is a placeholder
-   */
-  public removeSheet(sheetId: number, options: SheetMappingQueryOptions = {}): void {
-    const sheet = this._getSheetOrThrowError(sheetId, options)
-    this.allSheets.delete(sheetId)
-    this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
-
-    if (sheetId === this.lastSheetId) {
-      this.lastSheetId--
-    }
-  }
-
-  /**
    *
    * Removes sheet with given ID.
    * If sheet does not exist, does nothing.
