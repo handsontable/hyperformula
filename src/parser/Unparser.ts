@@ -4,9 +4,10 @@
  */
 
 import {ErrorType, SimpleCellAddress} from '../Cell'
+import {SheetMapping} from '../DependencyGraph/SheetMapping'
 import {NoSheetWithIdError} from '../index'
 import {NamedExpressions} from '../NamedExpressions'
-import {SheetIndexMappingFn, sheetIndexToString} from './addressRepresentationConverters'
+import {sheetIndexToString} from './addressRepresentationConverters'
 import {
   Ast,
   AstNodeType,
@@ -17,14 +18,12 @@ import {
   RowRangeAst,
 } from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
-import {LexerConfig} from './LexerConfig'
 import {ParserConfig} from './ParserConfig'
 
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
-    private readonly lexerConfig: LexerConfig,
-    private readonly sheetMappingFn: SheetIndexMappingFn,
+    private readonly sheetMapping: SheetMapping,
     private readonly namedExpressions: NamedExpressions,
   ) {
   }
@@ -109,8 +108,13 @@ export class Unparser {
     }
   }
 
+  /**
+   * Unparses a sheet name.
+   * @param {number} sheetId - the ID of the sheet
+   * @returns {string} the unparsed sheet name
+   */
   private unparseSheetName(sheetId: number): string {
-    const sheetName = sheetIndexToString(sheetId, this.sheetMappingFn)
+    const sheetName = sheetIndexToString(sheetId, id => this.sheetMapping.getSheetNameOrThrowError(id, { includePlaceholders: true }))
     if (sheetName === undefined) {
       throw new NoSheetWithIdError(sheetId)
     }

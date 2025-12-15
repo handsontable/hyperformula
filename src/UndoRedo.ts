@@ -225,6 +225,7 @@ export class RemoveColumnsUndoEntry extends BaseUndoEntry {
 export class AddSheetUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetName: string,
+    public readonly sheetId: number,
   ) {
     super()
   }
@@ -244,7 +245,6 @@ export class RemoveSheetUndoEntry extends BaseUndoEntry {
     public readonly sheetId: number,
     public readonly oldSheetContent: ClipboardCell[][],
     public readonly scopedNamedExpressions: [InternalNamedExpression, ClipboardCell][],
-    public readonly version: number,
   ) {
     super()
   }
@@ -258,11 +258,23 @@ export class RemoveSheetUndoEntry extends BaseUndoEntry {
   }
 }
 
+/**
+ * Undo entry for renaming a sheet.
+ *
+ * When renaming a sheet to a name that was previously referenced (but didn't exist),
+ * a placeholder sheet gets merged into the renamed sheet. In this case:
+ * - `version` contains the transformation version for restoring formulas during undo
+ * - `mergedPlaceholderSheetId` contains the ID of the placeholder sheet that was merged
+ *
+ * When renaming to a name not previously referenced, both optional params are undefined.
+ */
 export class RenameSheetUndoEntry extends BaseUndoEntry {
   constructor(
     public readonly sheetId: number,
     public readonly oldName: string,
     public readonly newName: string,
+    public readonly version?: number,
+    public readonly mergedPlaceholderSheetId?: number,
   ) {
     super()
   }
@@ -583,8 +595,8 @@ export class UndoRedo {
 
   public undoRemoveSheet(operation: RemoveSheetUndoEntry) {
     this.operations.forceApplyPostponedTransformations()
-    const {oldSheetContent, sheetId} = operation
-    this.operations.addSheet(operation.sheetName)
+    const {oldSheetContent, sheetId, scopedNamedExpressions, sheetName} = operation
+    this.operations.addSheetWithId(sheetId, sheetName)
     for (let rowIndex = 0; rowIndex < oldSheetContent.length; rowIndex++) {
       const row = oldSheetContent[rowIndex]
       for (let col = 0; col < row.length; col++) {
@@ -594,15 +606,19 @@ export class UndoRedo {
       }
     }
 
-    for (const [namedexpression, content] of operation.scopedNamedExpressions) {
+    for (const [namedexpression, content] of scopedNamedExpressions) {
       this.operations.restoreNamedExpression(namedexpression, content, sheetId)
     }
-
-    this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   public undoRenameSheet(operation: RenameSheetUndoEntry) {
+    this.operations.forceApplyPostponedTransformations()
     this.operations.renameSheet(operation.sheetId, operation.oldName)
+
+    if (operation.mergedPlaceholderSheetId !== undefined && operation.version !== undefined) {
+      this.operations.addPlaceholderSheetWithId(operation.mergedPlaceholderSheetId, operation.newName)
+      this.restoreOldDataFromVersion(operation.version - 1)
+    }
   }
 
   public undoClearSheet(operation: ClearSheetUndoEntry) {
@@ -711,7 +727,7 @@ export class UndoRedo {
   }
 
   public redoAddSheet(operation: AddSheetUndoEntry) {
-    this.operations.addSheet(operation.sheetName)
+    this.operations.addSheetWithId(operation.sheetId, operation.sheetName)
   }
 
   public redoRenameSheet(operation: RenameSheetUndoEntry) {

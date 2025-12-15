@@ -4,7 +4,7 @@
  */
 
 import {SimpleCellAddress} from '../Cell'
-import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
+import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 
 export class InterpreterState {
   constructor(
@@ -14,4 +14,3 @@ export class InterpreterState {
   ) {
   }
 }
-

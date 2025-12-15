@@ -56,14 +56,16 @@ describe('Building engine from arrays', () => {
   })
 
   it('should allow to create sheets with a delay', () => {
-    const engine1 = HyperFormula.buildFromArray([['=Sheet2!A1']])
+    const sheetName = 'Sheet2'
+    const engine = HyperFormula.buildFromArray([[`=${sheetName}!A1`]])
 
-    engine1.addSheet('Sheet2')
-    engine1.setSheetContent(1, [['1']])
-    engine1.rebuildAndRecalculate()
+    engine.addSheet(sheetName)
+    const sheetId = engine.getSheetId(sheetName)!
+    engine.setSheetContent(sheetId, [['1']])
+    engine.rebuildAndRecalculate()
 
-    expect(engine1.getCellValue(adr('A1', 1))).toBe(1)
-    expect(engine1.getCellValue(adr('A1', 0))).toBe(1)
+    expect(engine.getCellValue(adr('A1', sheetId))).toBe(1)
+    expect(engine.getCellValue(adr('A1', 0))).toBe(1)
   })
 
   it('corrupted sheet definition', () => {

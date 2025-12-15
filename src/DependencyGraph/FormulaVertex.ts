@@ -33,9 +33,9 @@ export abstract class FormulaVertex {
 
   static fromAst(formula: Ast, address: SimpleCellAddress, size: ArraySize, version: number) {
     if (size.isScalar()) {
-      return new FormulaCellVertex(formula, address, version)
+      return new ScalarFormulaVertex(formula, address, version)
     } else {
-      return new ArrayVertex(formula, address, size, version)
+      return new ArrayFormulaVertex(formula, address, size, version)
     }
   }
 
@@ -79,7 +79,7 @@ export abstract class FormulaVertex {
   public abstract isComputed(): boolean
 }
 
-export class ArrayVertex extends FormulaVertex {
+export class ArrayFormulaVertex extends FormulaVertex {
   array: CellArray
 
   constructor(formula: Ast, cellAddress: SimpleCellAddress, size: ArraySize, version: number = 0) {
@@ -223,7 +223,7 @@ export class ArrayVertex extends FormulaVertex {
 /**
  * Represents vertex which keeps formula
  */
-export class FormulaCellVertex extends FormulaVertex {
+export class ScalarFormulaVertex extends FormulaVertex {
   /** Most recently computed value of this formula. */
   private cachedCellValue?: InterpreterValue
 

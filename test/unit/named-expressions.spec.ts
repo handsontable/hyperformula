@@ -1168,15 +1168,16 @@ describe('Named expressions - evaluation', () => {
       expect(engine.graph.adjacentNodes(fooVertex).size).toBe(0)
     })
 
-    it('named expressions are transformed during CRUDs', () => {
+    it('named expression returns REF error after removing referenced sheet', () => {
       const engine = HyperFormula.buildFromArray([
         ['=42']
       ])
       engine.addNamedExpression('FOO', '=Sheet1!$A$1 + 10')
 
-      engine.removeSheet(0)
+      engine.removeSheet(engine.getSheetId('Sheet1')!)
 
-      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
+      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=Sheet1!$A$1 + 10')
+      expect(engine.getNamedExpressionValue('FOO')).toEqualError(detailedError(ErrorType.REF))
     })
 
     it('local named expression shadows global one', () => {
@@ -1323,14 +1324,15 @@ describe('Named expressions - evaluation', () => {
       expect(engine.getCellValue(adr('A1'))).toEqual(52)
     })
 
-    it('named expressions are transformed during CRUDs', () => {
+    it('named expression returns REF error after removing referenced sheet', () => {
       const engine = HyperFormula.buildFromArray([
         ['=42']
       ], {}, [{ name: 'FOO', expression: '=Sheet1!$A$1 + 10' }])
 
       engine.removeSheet(0)
 
-      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=#REF! + 10')
+      expect(engine.getNamedExpressionFormula('FOO')).toEqual('=Sheet1!$A$1 + 10')
+      expect(engine.getNamedExpressionValue('FOO')).toEqualError(detailedError(ErrorType.REF))
     })
 
     it('local named expression shadows global one', () => {
@@ -1911,11 +1913,14 @@ describe('Named expressions - actions at the Operations layer', () => {
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
-    const sheetMapping = dependencyGraph.sheetMapping
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
-    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const parser = new ParserWithCaching(
+      config,
+      functionRegistry,
+      dependencyGraph.sheetReferenceRegistrar.ensureSheetRegistered.bind(dependencyGraph.sheetReferenceRegistrar)
+    )
     const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
     operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
   })

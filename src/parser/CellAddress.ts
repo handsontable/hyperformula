@@ -5,7 +5,7 @@
 
 import {
   absoluteSheetReference,
-  invalidSimpleCellAddress,
+  isColOrRowInvalid,
   simpleCellAddress,
   SimpleCellAddress,
   simpleColumnAddress,
@@ -155,7 +155,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
   }
 
   public isInvalid(baseAddress: SimpleCellAddress): boolean {
-    return invalidSimpleCellAddress(this.toSimpleCellAddress(baseAddress))
+    return isColOrRowInvalid(this.toSimpleCellAddress(baseAddress))
   }
 
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {
@@ -190,7 +190,7 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
 
   public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleCellAddress(baseAddress)
-    if (invalidSimpleCellAddress(simpleAddress)) {
+    if (isColOrRowInvalid(simpleAddress)) {
       return undefined
     }
     const column = columnIndexToLabel(simpleAddress.col)

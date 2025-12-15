@@ -24,6 +24,7 @@ import {
 import {columnIndexToLabel} from '../../../src/parser/addressRepresentationConverters'
 import {
   ArrayAst,
+  buildCellRangeAst,
   buildCellReferenceAst,
   buildColumnRangeAst,
   buildErrorWithRawInputAst,
@@ -197,14 +198,13 @@ describe('ParserWithCaching', () => {
     expect(ast).toEqual(buildCellErrorAst(new CellError(ErrorType.REF)))
   })
 
-  it('reference to address in nonexisting range returns ref error with data input ast', () => {
+  it('reference to address in nonexisting sheet returns cell reference ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
-
     const ast = parser.parse('=Sheet2!A1', adr('A1')).ast
 
-    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1', new CellError(ErrorType.REF)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 0, 1)))
   })
 })
 
@@ -373,16 +373,16 @@ describe('cell references and ranges', () => {
     const sheetName = 'Sheet3'
 
     expect(() => {
-      sheetMapping.fetch('Sheet3')
+      sheetMapping.getSheetIdOrThrowError('Sheet3')
     }).toThrow(new NoSheetWithNameError(sheetName))
   })
 
-  it('using unknown sheet gives REF', () => {
+  it('using unknown sheet gives cell reference ast', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=Sheet2!A1', adr('A1')).ast
 
-    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1', new CellError(ErrorType.REF)))
+    expect(ast).toEqual(buildCellReferenceAst(CellAddress.relative(0, 0, 0)))
   })
 
   it('sheet name with other characters', () => {
@@ -517,7 +517,7 @@ describe('cell references and ranges', () => {
     expect(ast.reference.sheet).toBe(undefined)
   })
 
-  it('cell range with nonexsiting start sheet should return REF error with data input', () => {
+  it('cell range with nonexsiting start sheet should return cell range ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
@@ -525,10 +525,10 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=Sheet3!A1:Sheet2!B2', adr('A1')).ast
 
-    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet3!A1:Sheet2!B2', new CellError(ErrorType.REF)))
+    expect(ast).toEqual(buildCellRangeAst(CellAddress.relative(0, 0, 1), CellAddress.relative(1, 1, 2), RangeSheetReferenceType.BOTH_ABSOLUTE))
   })
 
-  it('cell range with nonexsiting end sheet should return REF error with data input', () => {
+  it('cell range with nonexsiting end sheet should return cell range ast', () => {
     const sheetMapping = new SheetMapping(buildTranslationPackage(enGB))
     sheetMapping.addSheet('Sheet1')
     sheetMapping.addSheet('Sheet2')
@@ -536,7 +536,7 @@ describe('cell references and ranges', () => {
 
     const ast = parser.parse('=Sheet2!A1:Sheet3!B2', adr('A1')).ast
 
-    expect(ast).toEqual(buildErrorWithRawInputAst('Sheet2!A1:Sheet3!B2', new CellError(ErrorType.REF)))
+    expect(ast).toEqual(buildCellRangeAst(CellAddress.relative(0, 0, 1), CellAddress.relative(1, 1, 2), RangeSheetReferenceType.BOTH_ABSOLUTE))
   })
 
   it('cell reference beyond maximum row limit is #NAME', () => {

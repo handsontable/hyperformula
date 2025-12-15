@@ -13,7 +13,7 @@ import {
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
 import {simpleCellAddress} from '../../../src/Cell'
 import {Config} from '../../../src/Config'
-import {ArrayVertex, EmptyCellVertex, ValueCellVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex, EmptyCellVertex, ValueCellVertex} from '../../../src/DependencyGraph'
 import {ErrorMessage} from '../../../src/error-message'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {
@@ -87,18 +87,18 @@ describe('changing cell content', () => {
       ['1', '2', '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    let c1 = engine.addressMapping.fetchCell(adr('C1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    let c1 = engine.addressMapping.getCell(adr('C1'))
 
-    expect(engine.graph.existsEdge(a1, c1)).toBe(true)
+    expect(engine.graph.existsEdge(a1!, c1!)).toBe(true)
     expect(engine.getCellValue(adr('C1'))).toBe(1)
 
     engine.setCellContents(adr('C1'), [['=B1']])
 
-    c1 = engine.addressMapping.fetchCell(adr('C1'))
-    expect(engine.graph.existsEdge(a1, c1)).toBe(false)
-    expect(engine.graph.existsEdge(b1, c1)).toBe(true)
+    c1 = engine.addressMapping.getCell(adr('C1'))
+    expect(engine.graph.existsEdge(a1!, c1!)).toBe(false)
+    expect(engine.graph.existsEdge(b1!, c1!)).toBe(true)
 
     expect(engine.getCellValue(adr('C1'))).toBe(2)
   })
@@ -108,14 +108,14 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
 
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [['7']])
     expect(engine.getCellValue(adr('B1'))).toBe(7)
-    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
   })
 
   it('update formula to plain text cell vertex', () => {
@@ -123,14 +123,14 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
 
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [['foo']])
     expect(engine.getCellValue(adr('B1'))).toBe('foo')
-    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
   })
 
   it('set vertex with edge to empty cell', () => {
@@ -140,10 +140,10 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), [[null]])
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const a2 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const a2 = engine.addressMapping.getCell(adr('B1'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(a1, a2)).toBe(true)
+    expect(engine.graph.existsEdge(a1!, a2!)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toBe(null)
   })
 
@@ -152,8 +152,8 @@ describe('changing cell content', () => {
       ['1', '=A1'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1 = engine.addressMapping.getCellOrThrow(adr('A1'))
+    const b1 = engine.addressMapping.getCellOrThrow(adr('B1'))
 
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
@@ -168,15 +168,15 @@ describe('changing cell content', () => {
       ['1', '2'],
     ]
     const engine = HyperFormula.buildFromArray(sheet)
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    let b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    let b1 = engine.addressMapping.getCell(adr('B1'))
 
-    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), [['=A1']])
 
-    b1 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    b1 = engine.addressMapping.getCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
   })
 
@@ -290,9 +290,9 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('B1'), '=A1')
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(42)
   })
 
@@ -338,11 +338,11 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('B1'), '=A1')
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    const c1 = engine.addressMapping.fetchCell(adr('C1'))
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
-    expect(engine.graph.existsEdge(b1, c1)).toBe(true)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
+    expect(engine.graph.existsEdge(b1!, c1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(42)
     expect(engine.getCellValue(adr('C1'))).toBe(42)
   })
@@ -355,10 +355,10 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), null)
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
     expect(a1).toBeInstanceOf(EmptyCellVertex)
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
   })
 
   it('change EMPTY to NUMBER', () => {
@@ -369,9 +369,9 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '7')
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toBe(7)
   })
 
@@ -383,9 +383,9 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), 'foo')
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toBe('foo')
   })
 
@@ -502,9 +502,9 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '=SUM(')
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(engine.graph.existsEdge(a1, b1)).toBe(true)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
@@ -517,9 +517,9 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(')
 
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(engine.graph.existsEdge(a1, b1)).toBe(false)
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(1)
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
@@ -761,9 +761,9 @@ describe('column ranges', () => {
 
     engine.setCellContents(adr('A2'), '3')
 
-    const range = engine.rangeMapping.fetchRange(colStart('A'), colEnd('B'))
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
-    expect(engine.graph.existsEdge(a2, range)).toEqual(true)
+    const range = engine.rangeMapping.getVertexOrThrow(colStart('A'), colEnd('B'))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    expect(engine.graph.existsEdge(a2!, range)).toEqual(true)
     expect(engine.getCellValue(adr('C1'))).toEqual(6)
   })
 
@@ -776,11 +776,11 @@ describe('column ranges', () => {
 
     engine.setCellContents(adr('B1'), '=TRANSPOSE(A2:A3)')
 
-    const range = engine.rangeMapping.fetchRange(colStart('B'), colEnd('C'))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    const c1 = engine.addressMapping.fetchCell(adr('C1'))
-    expect(engine.graph.existsEdge(b1, range)).toEqual(true)
-    expect(engine.graph.existsEdge(c1, range)).toEqual(true)
+    const range = engine.rangeMapping.getVertexOrThrow(colStart('B'), colEnd('C'))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    const c1 = engine.addressMapping.getCell(adr('C1'))
+    expect(engine.graph.existsEdge(b1!, range)).toEqual(true)
+    expect(engine.graph.existsEdge(c1!, range)).toEqual(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 })
@@ -807,9 +807,9 @@ describe('row ranges', () => {
 
     engine.setCellContents(adr('B1'), '3')
 
-    const range = engine.rangeMapping.fetchRange(rowStart(1), rowEnd(2))
-    const b1 = engine.addressMapping.fetchCell(adr('B1'))
-    expect(engine.graph.existsEdge(b1, range)).toEqual(true)
+    const range = engine.rangeMapping.getVertexOrThrow(rowStart(1), rowEnd(2))
+    const b1 = engine.addressMapping.getCell(adr('B1'))
+    expect(engine.graph.existsEdge(b1!, range)).toEqual(true)
     expect(engine.getCellValue(adr('A3'))).toEqual(6)
   })
 
@@ -820,11 +820,11 @@ describe('row ranges', () => {
 
     engine.setCellContents(adr('A2'), '=TRANSPOSE(B1:C1)')
 
-    const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
-    const a3 = engine.addressMapping.fetchCell(adr('A3'))
-    expect(engine.graph.existsEdge(a2, range)).toEqual(true)
-    expect(engine.graph.existsEdge(a3, range)).toEqual(true)
+    const range = engine.rangeMapping.getVertexOrThrow(rowStart(2), rowEnd(3))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    const a3 = engine.addressMapping.getCell(adr('A3'))
+    expect(engine.graph.existsEdge(a2!, range)).toEqual(true)
+    expect(engine.graph.existsEdge(a3!, range)).toEqual(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(3)
   })
 })
@@ -884,7 +884,7 @@ describe('arrays', () => {
 
     expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, undefined],
+      [ArrayFormulaVertex, undefined],
       [ValueCellVertex, undefined],
     ])
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
@@ -902,9 +902,9 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, undefined],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [undefined, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, undefined],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [undefined, ArrayFormulaVertex, ArrayFormulaVertex],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
   })
@@ -921,8 +921,8 @@ describe('arrays', () => {
     ])
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
       [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([
@@ -1068,8 +1068,8 @@ describe('arrays', () => {
     const b1 = engine.dependencyGraph.getCell(adr('b1'))!
     const b2 = engine.dependencyGraph.getCell(adr('b2'))!
     const b3 = engine.dependencyGraph.getCell(adr('b3'))!
-    const b1b2 = engine.rangeMapping.getRange(adr('b1'), adr('b2'))!
-    const b1b3 = engine.rangeMapping.getRange(adr('b1'), adr('b3'))!
+    const b1b2 = engine.rangeMapping.getRangeVertex(adr('b1'), adr('b2'))!
+    const b1b3 = engine.rangeMapping.getRangeVertex(adr('b1'), adr('b3'))!
 
     expect(engine.graph.existsEdge(b1, b1b2)).toBe(true)
     expect(engine.graph.existsEdge(b2, b1b2)).toBe(true)

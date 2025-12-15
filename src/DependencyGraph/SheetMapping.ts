@@ -7,126 +7,371 @@ import {NoSheetWithIdError, NoSheetWithNameError, SheetNameAlreadyTakenError} fr
 import {TranslationPackage, UIElement} from '../i18n'
 import {Maybe} from '../Maybe'
 
-function canonicalize(sheetDisplayName: string): string {
-  return sheetDisplayName.toLowerCase()
+/**
+ * Options for querying the sheet mapping.
+ */
+export interface SheetMappingQueryOptions {
+  includePlaceholders?: boolean,
 }
 
+/**
+ * Representation of a sheet internal to SheetMapping. Not exported outside of this file.
+ */
 class Sheet {
   constructor(
     public readonly id: number,
     public displayName: string,
-  ) {
-  }
+    public isPlaceholder: boolean = false,
+  ) {}
 
-  public get canonicalName() {
-    return canonicalize(this.displayName)
+  /**
+   * Returns the canonical (normalized) name of the sheet.
+   */
+  public get canonicalName(): string {
+    return SheetMapping.canonicalizeSheetName(this.displayName)
   }
 }
 
+/**
+ * Manages the sheets in the instance.
+ * - Can convert between sheet names and ids and vice versa.
+ * - Also stores placeholders for sheets that are used in formulas but not yet added. They are marked as isPlaceholder=true.
+ * - Sheetnames thet differ only in case are considered the same. (See: canonicalizeSheetName)
+ */
 export class SheetMapping {
-  private readonly mappingFromCanonicalName: Map<string, Sheet> = new Map()
-  private readonly mappingFromId: Map<number, Sheet> = new Map()
+  /**
+   * Prefix for new sheet names if no name is provided by the user
+   */
   private readonly sheetNamePrefix: string
+  /**
+   * Last used sheet ID. Used to generate new sheet IDs.
+   */
   private lastSheetId = -1
+  /**
+   * Mapping from canonical sheet name to sheet ID.
+   */
+  private mappingFromCanonicalNameToId: Map<string, number> = new Map()
+  /**
+   * Mapping from sheet ID to sheet.
+   */
+  private allSheets: Map<number, Sheet> = new Map()
 
-  constructor(private languages: TranslationPackage) {
+  constructor(languages: TranslationPackage) {
     this.sheetNamePrefix = languages.getUITranslation(UIElement.NEW_SHEET_PREFIX)
   }
 
-  public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
-    const newSheetCanonicalName = canonicalize(newSheetDisplayName)
-    if (this.mappingFromCanonicalName.has(newSheetCanonicalName)) {
-      throw new SheetNameAlreadyTakenError(newSheetDisplayName)
-    }
-
-    this.lastSheetId++
-    const sheet = new Sheet(this.lastSheetId, newSheetDisplayName)
-    this.store(sheet)
-    return sheet.id
+  /**
+   * Converts sheet name to canonical/normalized form.
+   * @static
+   */
+  public static canonicalizeSheetName(sheetDisplayName: string): string {
+    return sheetDisplayName.toLowerCase()
   }
 
-  public removeSheet(sheetId: number) {
-    const sheet = this.fetchSheetById(sheetId)
-    if (sheetId == this.lastSheetId) {
-      --this.lastSheetId
-    }
-    this.mappingFromCanonicalName.delete(sheet.canonicalName)
-    this.mappingFromId.delete(sheet.id)
+  /**
+   * Returns sheet ID for the given name. By default excludes placeholders.
+   */
+  public getSheetId(sheetName: string, options: SheetMappingQueryOptions = {}): Maybe<number> {
+    return this._getSheetByName(sheetName, options)?.id
   }
 
-  public fetch = (sheetName: string): number => {
-    const sheet = this.mappingFromCanonicalName.get(canonicalize(sheetName))
+  /**
+   * Returns sheet ID for the given name. Excludes placeholders.
+   *
+   * @throws {NoSheetWithNameError} if the sheet with the given name does not exist.
+   */
+  public getSheetIdOrThrowError(sheetName: string): number {
+    const sheet = this._getSheetByName(sheetName, {})
+
     if (sheet === undefined) {
       throw new NoSheetWithNameError(sheetName)
     }
     return sheet.id
   }
 
-  public get = (sheetName: string): Maybe<number> => {
-    return this.mappingFromCanonicalName.get(canonicalize(sheetName))?.id
+  /**
+   * Returns display name for the given sheet ID. Excludes placeholders.
+   *
+   * @returns {Maybe<string>} the display name, or undefined if the sheet with the given ID does not exist.
+   */
+  public getSheetName(sheetId: number): Maybe<string> {
+    return this._getSheet(sheetId, {})?.displayName
   }
 
-  public fetchDisplayName = (sheetId: number): string => {
-    return this.fetchSheetById(sheetId).displayName
+  /**
+   * Returns display name for the given sheet ID. Excludes placeholders.
+   *
+   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
+   */
+  public getSheetNameOrThrowError(sheetId: number, options: SheetMappingQueryOptions = {}): string {
+    return this._getSheetOrThrowError(sheetId, options).displayName
   }
 
-  public getDisplayName(sheetId: number): Maybe<string> {
-    return this.mappingFromId.get(sheetId)?.displayName
-  }
-
-  public* displayNames(): IterableIterator<string> {
-    for (const sheet of this.mappingFromCanonicalName.values()) {
-      yield sheet.displayName
+  /**
+   * Iterates over all sheet display names. By default excludes placeholders.
+   */
+  public* iterateSheetNames(options: SheetMappingQueryOptions = {}): IterableIterator<string> {
+    for (const sheet of this.allSheets.values()) {
+      if (options.includePlaceholders || !sheet.isPlaceholder) {
+        yield sheet.displayName
+      }
     }
   }
 
-  public numberOfSheets(): number {
-    return this.mappingFromCanonicalName.size
+  /**
+   * Returns array of all sheet display names. By default excludes placeholders.
+   */
+  public getSheetNames(options: SheetMappingQueryOptions = {}): string[] {
+    return Array.from(this.iterateSheetNames(options))
   }
 
-  public hasSheetWithId(sheetId: number): boolean {
-    return this.mappingFromId.has(sheetId)
+  /**
+   * Returns total count of sheets. By default excludes placeholders.
+   */
+  public numberOfSheets(options: SheetMappingQueryOptions = {}): number {
+    return this.getSheetNames(options).length
   }
 
+  /**
+   * Checks if sheet with given ID exists. By default excludes placeholders.
+   */
+  public hasSheetWithId(sheetId: number, options: SheetMappingQueryOptions = {}): boolean {
+    return this._getSheet(sheetId, options) !== undefined
+  }
+
+  /**
+   * Checks if sheet with given name exists (case-insensitive). Excludes placeholders.
+   */
   public hasSheetWithName(sheetName: string): boolean {
-    return this.mappingFromCanonicalName.has(canonicalize(sheetName))
+    return this._getSheetByName(sheetName, {}) !== undefined
   }
 
-  public renameSheet(sheetId: number, newDisplayName: string): Maybe<string> {
-    const sheet = this.fetchSheetById(sheetId)
+  /**
+   * Adds new sheet with optional name and returns its ID.
+   * If called with a name of an existing placeholder sheet, converts the placeholder sheet to a real sheet.
+   *
+   * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
+   */
+  public addSheet(newSheetDisplayName: string = `${this.sheetNamePrefix}${this.lastSheetId + 2}`): number {
+    const sheetWithConflictingName = this._getSheetByName(newSheetDisplayName, { includePlaceholders: true })
+
+    if (sheetWithConflictingName) {
+      if (!sheetWithConflictingName.isPlaceholder) {
+        throw new SheetNameAlreadyTakenError(newSheetDisplayName)
+      }
+
+      sheetWithConflictingName.isPlaceholder = false
+      return sheetWithConflictingName.id
+    }
+
+    this.lastSheetId++
+    const sheet = new Sheet(this.lastSheetId, newSheetDisplayName)
+    this._storeSheetInMappings(sheet)
+    return sheet.id
+  }
+
+  /**
+   * Adds a sheet with a specific ID and name. Used for redo operations.
+   * If called with a name of an existing placeholder sheet, converts the placeholder sheet to a real sheet.
+   *
+   * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
+   */
+  public addSheetWithId(sheetId: number, sheetDisplayName: string): void {
+    const sheetWithConflictingName = this._getSheetByName(sheetDisplayName, { includePlaceholders: true })
+
+    if (sheetWithConflictingName) {
+      if (sheetWithConflictingName.id !== sheetId) {
+        throw new SheetNameAlreadyTakenError(sheetDisplayName)
+      }
+
+      if (!sheetWithConflictingName.isPlaceholder) {
+        throw new SheetNameAlreadyTakenError(sheetDisplayName)
+      }
+
+      sheetWithConflictingName.isPlaceholder = false
+      return
+    }
+
+    if (sheetId > this.lastSheetId) {
+      this.lastSheetId = sheetId
+    }
+
+    const sheet = new Sheet(sheetId, sheetDisplayName)
+    this._storeSheetInMappings(sheet)
+  }
+
+  /**
+   * Adds a placeholder sheet with the given name if it does not exist yet
+   */
+  public addPlaceholderIfNotExists(sheetName: string): number {
+    const sheetWithConflictingName = this._getSheetByName(sheetName, { includePlaceholders: true })
+
+    if (sheetWithConflictingName) {
+      return sheetWithConflictingName.id
+    }
+
+    this.lastSheetId++
+    const sheet = new Sheet(this.lastSheetId, sheetName, true)
+    this._storeSheetInMappings(sheet)
+    return sheet.id
+  }
+
+  /**
+   * Adds a placeholder sheet with a specific ID and name.
+   * Used for undo operations to restore previously merged placeholder sheets.
+   *
+   * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
+   */
+  public addPlaceholderWithId(sheetId: number, sheetDisplayName: string): void {
+    const sheetWithConflictingName = this._getSheetByName(sheetDisplayName, { includePlaceholders: true })
+
+    if (sheetWithConflictingName) {
+      throw new SheetNameAlreadyTakenError(sheetDisplayName)
+    }
+
+    if (this.hasSheetWithId(sheetId, { includePlaceholders: true })) {
+      throw new Error(`Sheet with id ${sheetId} already exists`)
+    }
+
+    if (sheetId > this.lastSheetId) {
+      this.lastSheetId = sheetId
+    }
+    const sheet = new Sheet(sheetId, sheetDisplayName, true)
+    this._storeSheetInMappings(sheet)
+  }
+
+  /**
+   *
+   * Removes sheet with given ID.
+   * If sheet does not exist, does nothing.
+   * @returns {boolean} true if sheet was removed, false if it did not exist.
+   */
+  public removeSheetIfExists(sheetId: number, options: SheetMappingQueryOptions = {}): boolean {
+    const sheet = this._getSheet(sheetId, options)
+
+    if (!sheet) {
+      return false
+    }
+
+    this.allSheets.delete(sheetId)
+    this.mappingFromCanonicalNameToId.delete(sheet.canonicalName)
+
+    if (sheetId === this.lastSheetId) {
+      this.lastSheetId--
+    }
+
+    return true
+  }
+
+  /**
+   * Marks sheet with given ID as a placeholder.
+   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist
+   */
+  public markSheetAsPlaceholder(sheetId: number): void {
+    const sheet = this._getSheetOrThrowError(sheetId, {})
+    sheet.isPlaceholder = true
+  }
+
+  /**
+   * Renames sheet.
+   * - If called with sheetId of a placeholder sheet, throws {NoSheetWithIdError}.
+   * - If newDisplayName is conflicting with an existing sheet, throws {SheetNameAlreadyTakenError}.
+   * - If newDisplayName is conflicting with a placeholder sheet name, deletes the placeholder sheet and returns its id as mergedWithPlaceholderSheet.
+   *
+   * @throws {SheetNameAlreadyTakenError} if the sheet with the given name already exists.
+   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
+   */
+  public renameSheet(sheetId: number, newDisplayName: string): { previousDisplayName: Maybe<string>, mergedWithPlaceholderSheet?: number } {
+    const sheet = this._getSheetOrThrowError(sheetId, {})
 
     const currentDisplayName = sheet.displayName
     if (currentDisplayName === newDisplayName) {
-      return undefined
+      return { previousDisplayName: undefined }
     }
 
-    const sheetWithThisCanonicalName = this.mappingFromCanonicalName.get(canonicalize(newDisplayName))
-    if (sheetWithThisCanonicalName !== undefined && sheetWithThisCanonicalName.id !== sheet.id) {
-      throw new SheetNameAlreadyTakenError(newDisplayName)
+    const sheetWithConflictingName = this._getSheetByName(newDisplayName, { includePlaceholders: true })
+    let mergedWithPlaceholderSheet: number | undefined = undefined
+
+    if (sheetWithConflictingName !== undefined && sheetWithConflictingName.id !== sheet.id) {
+      if (!sheetWithConflictingName.isPlaceholder) {
+        throw new SheetNameAlreadyTakenError(newDisplayName)
+      } else {
+        this.mappingFromCanonicalNameToId.delete(sheetWithConflictingName.canonicalName)
+        this.allSheets.delete(sheetWithConflictingName.id)
+
+        if (sheetWithConflictingName.id === this.lastSheetId) {
+          this.lastSheetId--
+        }
+
+        mergedWithPlaceholderSheet = sheetWithConflictingName.id
+      }
     }
 
     const currentCanonicalName = sheet.canonicalName
-    this.mappingFromCanonicalName.delete(currentCanonicalName)
+    this.mappingFromCanonicalNameToId.delete(currentCanonicalName)
 
     sheet.displayName = newDisplayName
-    this.store(sheet)
-    return currentDisplayName
+    this._storeSheetInMappings(sheet)
+    return { previousDisplayName: currentDisplayName, mergedWithPlaceholderSheet }
   }
 
-  public sheetNames(): string[] {
-    return Array.from(this.mappingFromId.values()).map((s) => s.displayName)
+  /**
+   * Stores sheet in both internal mappings.
+   * - If ID exists, it is updated. If not, it is added.
+   * - If canonical name exists, it is updated. If not, it is added.
+   *
+   * @internal
+   */
+  private _storeSheetInMappings(sheet: Sheet): void {
+    this.allSheets.set(sheet.id, sheet)
+    this.mappingFromCanonicalNameToId.set(sheet.canonicalName, sheet.id)
   }
 
-  private store(sheet: Sheet): void {
-    this.mappingFromId.set(sheet.id, sheet)
-    this.mappingFromCanonicalName.set(sheet.canonicalName, sheet)
+  /**
+   * Returns sheet by ID
+   *
+   * @returns {Maybe<Sheet>} the sheet, or undefined if not found.
+   * @internal
+   */
+  private _getSheet(sheetId: number, options: SheetMappingQueryOptions): Maybe<Sheet> {
+    const retrievedSheet = this.allSheets.get(sheetId)
+
+    if (retrievedSheet === undefined) {
+      return undefined
+    }
+
+    return (options.includePlaceholders || !retrievedSheet.isPlaceholder) ? retrievedSheet : undefined
   }
 
-  private fetchSheetById(sheetId: number): Sheet {
-    const sheet = this.mappingFromId.get(sheetId)
+  /**
+   * Returns sheet by name
+   *
+   * @returns {Maybe<Sheet>} the sheet, or undefined if not found.
+   * @internal
+   */
+  private _getSheetByName(sheetName: string, options: SheetMappingQueryOptions): Maybe<Sheet> {
+    const sheetId = this.mappingFromCanonicalNameToId.get(SheetMapping.canonicalizeSheetName(sheetName))
+
+    if (sheetId === undefined) {
+      return undefined
+    }
+
+    return this._getSheet(sheetId, options)
+  }
+
+  /**
+   * Returns sheet by ID
+   *
+   * @throws {NoSheetWithIdError} if the sheet with the given ID does not exist.
+   * @internal
+   */
+  private _getSheetOrThrowError(sheetId: number, options: SheetMappingQueryOptions): Sheet {
+    const sheet = this._getSheet(sheetId, options)
+
     if (sheet === undefined) {
       throw new NoSheetWithIdError(sheetId)
     }
+
     return sheet
   }
 }

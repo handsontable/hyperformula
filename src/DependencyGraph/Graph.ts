@@ -414,6 +414,6 @@ export class Graph<Node> {
    * Returns error for missing node.
    */
   private missingNodeError(node: Node): Error {
-    return new Error(`Unknown node ${node}`)
+    return new Error(`Unknown node ${JSON.stringify(node)}`)
   }
 }

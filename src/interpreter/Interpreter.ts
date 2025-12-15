@@ -6,11 +6,11 @@
 import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../AbsoluteCellRange'
 import {ArraySizePredictor} from '../ArraySize'
 import {ArrayValue, NotComputedArray} from '../ArrayValue'
-import {CellError, ErrorType, invalidSimpleCellAddress} from '../Cell'
+import {CellError, ErrorType, isColOrRowInvalid} from '../Cell'
 import {Config} from '../Config'
 import {DateTimeHelper} from '../DateTimeHelper'
 import {DependencyGraph} from '../DependencyGraph'
-import {FormulaVertex} from '../DependencyGraph/FormulaCellVertex'
+import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
@@ -40,6 +40,7 @@ import {
   isExtendedNumber,
 } from './InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
+import { AddressWithSheet } from '../parser/Address'
 
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
@@ -78,8 +79,8 @@ export class Interpreter {
   /**
    * Calculates cell value from formula abstract syntax tree
    *
-   * @param formula - abstract syntax tree of formula
-   * @param formulaAddress - address of the cell in which formula is located
+   * @param {Ast} ast - abstract syntax tree of formula
+   * @param {InterpreterState} state - interpreter state
    */
   private evaluateAstWithoutPostprocessing(ast: Ast, state: InterpreterState): InterpreterValue {
     switch (ast.type) {
@@ -88,9 +89,15 @@ export class Interpreter {
       }
       case AstNodeType.CELL_REFERENCE: {
         const address = ast.reference.toSimpleCellAddress(state.formulaAddress)
-        if (invalidSimpleCellAddress(address)) {
+
+        if (isColOrRowInvalid(address)) {
           return new CellError(ErrorType.REF, ErrorMessage.BadRef)
         }
+
+        if (!this.isSheetValid(ast.reference)) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         return this.dependencyGraph.getCellValue(address)
       }
       case AstNodeType.NUMBER:
@@ -189,11 +196,17 @@ export class Interpreter {
         }
       }
       case AstNodeType.CELL_RANGE: {
+        if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
+
         const range = AbsoluteCellRange.fromCellRange(ast, state.formulaAddress)
         const arrayVertex = this.dependencyGraph.getArray(range)
+
         if (arrayVertex) {
           const array = arrayVertex.array
           if (array instanceof NotComputedArray) {
@@ -205,11 +218,15 @@ export class Interpreter {
           } else {
             throw new Error('Unknown array')
           }
-        } else {
-          return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
         }
+
+        return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.COLUMN_RANGE: {
+        if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
@@ -217,6 +234,10 @@ export class Interpreter {
         return SimpleRangeValue.onlyRange(range, this.dependencyGraph)
       }
       case AstNodeType.ROW_RANGE: {
+        if (!this.isSheetValid(ast.start) || !this.isSheetValid(ast.end)) {
+          return new CellError(ErrorType.REF, ErrorMessage.SheetRef)
+        }
+
         if (!this.rangeSpansOneSheet(ast)) {
           return new CellError(ErrorType.REF, ErrorMessage.RangeManySheets)
         }
@@ -263,6 +284,17 @@ export class Interpreter {
         return ast.error
       }
     }
+  }
+
+  /**
+   * Sheet is valid if:
+   * - sheet is undefined OR
+   * - sheet is a named expressions store OR
+   * - sheet exists in sheet mapping
+   * - sheet is not a placeholder
+   */
+  private isSheetValid(address: AddressWithSheet): boolean {
+    return address.sheet === undefined || address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })
   }
 
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
@@ -465,4 +497,3 @@ function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): In
   }
   return val
 }
-

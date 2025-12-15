@@ -323,11 +323,11 @@ describe('Copy - paste integration', () => {
     engine.copy(AbsoluteCellRange.spanFrom(adr('C1'), 1, 1))
     engine.paste(adr('A3'))
 
-    const range = engine.rangeMapping.fetchRange(rowStart(2), rowEnd(3))
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
-    const a3 = engine.addressMapping.fetchCell(adr('A3'))
-    expect(engine.graph.existsEdge(a2, range)).toBe(true)
-    expect(engine.graph.existsEdge(a3, range)).toBe(true)
+    const range = engine.rangeMapping.getVertexOrThrow(rowStart(2), rowEnd(3))
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    const a3 = engine.addressMapping.getCell(adr('A3'))
+    expect(engine.graph.existsEdge(a2!, range)).toBe(true)
+    expect(engine.graph.existsEdge(a3!, range)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqual(4)
   })
 
@@ -446,11 +446,14 @@ describe('Copy - paste integration - actions at the Operations layer', () => {
     const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
-    const sheetMapping = dependencyGraph.sheetMapping
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const cellContentParser = new CellContentParser(config, dateTimeHelper, numberLiteralHelper)
-    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const parser = new ParserWithCaching(
+      config,
+      functionRegistry,
+      dependencyGraph.sheetReferenceRegistrar.ensureSheetRegistered.bind(dependencyGraph.sheetReferenceRegistrar)
+    )
     const arraySizePredictor = new ArraySizePredictor(config, functionRegistry)
     operations = new Operations(config, dependencyGraph, columnSearch, cellContentParser, parser, stats, lazilyTransformingAstService, namedExpressions, arraySizePredictor)
   })

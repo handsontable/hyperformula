@@ -1,13 +1,13 @@
-import {HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
+import {AlwaysSparse, ErrorType, HyperFormula, SheetNameAlreadyTakenError} from '../../../src'
 import {plPL} from '../../../src/i18n/languages'
-import {adr} from '../testUtils'
+import {adr, detailedError} from '../testUtils'
 
 describe('Adding sheet - checking if its possible', () => {
   it('yes', () => {
     const engine = HyperFormula.buildEmpty()
 
-    expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(true)
-    expect(engine.isItPossibleToAddSheet('~`!@#$%^&*()_-+_=/|?{}[]\\"')).toEqual(true)
+    expect(engine.isItPossibleToAddSheet('Sheet1')).toBe(true)
+    expect(engine.isItPossibleToAddSheet('~`!@#$%^&*()_-+_=/|?{}[]\\"')).toBe(true)
   })
 
   it('no', () => {
@@ -16,8 +16,8 @@ describe('Adding sheet - checking if its possible', () => {
       Foo: [],
     })
 
-    expect(engine.isItPossibleToAddSheet('Sheet1')).toEqual(false)
-    expect(engine.isItPossibleToAddSheet('Foo')).toEqual(false)
+    expect(engine.isItPossibleToAddSheet('Sheet1')).toBe(false)
+    expect(engine.isItPossibleToAddSheet('Foo')).toBe(false)
   })
 })
 
@@ -27,8 +27,8 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1'])
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['Sheet1'])
   })
 
   it('should add sheet to engine with one sheet', function() {
@@ -38,8 +38,8 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(2)
-    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Sheet1', 'Sheet2'])
+    expect(engine.sheetMapping.numberOfSheets()).toBe(2)
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['Sheet1', 'Sheet2'])
   })
 
   it('should be possible to fetch empty cell from newly added sheet', function() {
@@ -47,7 +47,7 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.getCellValue(adr('A1', 0))).toBe(null)
+    expect(engine.getCellValue(adr('A1', 0))).toBeNull()
   })
 
   it('should add sheet with translated sheet name', function() {
@@ -56,8 +56,8 @@ describe('add sheet to engine', () => {
 
     engine.addSheet()
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['Arkusz1'])
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['Arkusz1'])
   })
 
   it('should add sheet with given name', function() {
@@ -65,8 +65,8 @@ describe('add sheet to engine', () => {
 
     engine.addSheet('foo')
 
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['foo'])
   })
 
   it('cannot add another sheet with same lowercased name', function() {
@@ -76,8 +76,9 @@ describe('add sheet to engine', () => {
     expect(() => {
       engine.addSheet('FOO')
     }).toThrowError(/already exists/)
-    expect(engine.sheetMapping.numberOfSheets()).toEqual(1)
-    expect(Array.from(engine.sheetMapping.displayNames())).toEqual(['foo'])
+
+    expect(engine.sheetMapping.numberOfSheets()).toBe(1)
+    expect(Array.from(engine.sheetMapping.iterateSheetNames())).toEqual(['foo'])
   })
 
   it('should return given name', function() {
@@ -85,7 +86,7 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet('foo')
 
-    expect(sheetName).toEqual('foo')
+    expect(sheetName).toBe('foo')
 
   })
 
@@ -94,7 +95,7 @@ describe('add sheet to engine', () => {
 
     const sheetName = engine.addSheet()
 
-    expect(sheetName).toEqual('Sheet1')
+    expect(sheetName).toBe('Sheet1')
   })
 
   it('should throw error when sheet name is already taken', () => {
@@ -104,5 +105,391 @@ describe('add sheet to engine', () => {
     expect(() => {
       engine.addSheet('bar')
     }).toThrow(new SheetNameAlreadyTakenError('bar'))
+  })
+})
+
+describe('recalculates formulas after adding new sheet (issue #1116)', () => {
+  it('recalculates single cell reference', () => {
+    const  engine = HyperFormula.buildEmpty()
+    const table1Name = 'table1'
+    const table2Name = 'table2'
+
+    engine.addSheet(table1Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(table1Name)), `='${table2Name}'!A1`)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(table2Name)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table2Name)))).toBeNull()
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBeNull()
+
+    engine.setCellContents(adr('A1', engine.getSheetId(table2Name)), 10)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(table1Name)))).toBe(10)
+  })
+
+  it('recalculates chained dependencies across multiple sheets', () => {
+    const engine = HyperFormula.buildEmpty()
+    const sheet1Name = 'Sheet1'
+    const sheet2Name = 'Sheet2'
+    const sheet3Name = 'Sheet3'
+
+    engine.addSheet(sheet1Name)
+    engine.addSheet(sheet2Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), `='${sheet2Name}'!A1+2`)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet2Name)), `='${sheet3Name}'!A1*2`)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(sheet3Name)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet3Name)))).toBeNull()
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBe(0)
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(2)
+
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet3Name)), 42)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBe(84)
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(86)
+  })
+
+  it('recalculates nested dependencies within same sheet', () => {
+    const engine = HyperFormula.buildEmpty()
+    const sheet1Name = 'Sheet1'
+    const newSheetName = 'NewSheet'
+
+    engine.addSheet(sheet1Name)
+    engine.setCellContents(adr('B1', engine.getSheetId(sheet1Name)), `='${newSheetName}'!A1`)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), '=B1*2')
+
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(newSheetName)
+
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(newSheetName)))).toBeNull()
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBeNull()
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(0)
+
+    engine.setCellContents(adr('A1', engine.getSheetId(newSheetName)), 15)
+
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(15)
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(30)
+  })
+
+  it('recalculates multiple cells from different sheets', () => {
+    const engine = HyperFormula.buildEmpty()
+    const sheet1Name = 'Sheet1'
+    const sheet2Name = 'Sheet2'
+    const targetSheetName = 'TargetSheet'
+
+    engine.addSheet(sheet1Name)
+    engine.addSheet(sheet2Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), `='${targetSheetName}'!A1`)
+    engine.setCellContents(adr('B1', engine.getSheetId(sheet1Name)), `='${targetSheetName}'!B1`)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet2Name)), `='${targetSheetName}'!A1+10`)
+    engine.setCellContents(adr('B1', engine.getSheetId(sheet2Name)), `='${targetSheetName}'!B1+20`)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet2Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(targetSheetName)
+    engine.setCellContents(adr('A1', engine.getSheetId(targetSheetName)), 5)
+    engine.setCellContents(adr('B1', engine.getSheetId(targetSheetName)), 7)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(5)
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(7)
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet2Name)))).toBe(15)
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet2Name)))).toBe(27)
+  })
+
+  it('recalculates formulas with mixed operations', () => {
+    const engine = HyperFormula.buildEmpty()
+    const sheet1Name = 'Sheet1'
+    const newSheetName = 'NewSheet'
+
+    engine.addSheet(sheet1Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), 100)
+    engine.setCellContents(adr('B1', engine.getSheetId(sheet1Name)), `='${newSheetName}'!A1 + A1`)
+    engine.setCellContents(adr('C1', engine.getSheetId(sheet1Name)), `='${newSheetName}'!B1 * 2`)
+
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(newSheetName)
+    engine.setCellContents(adr('A1', engine.getSheetId(newSheetName)), 50)
+    engine.setCellContents(adr('B1', engine.getSheetId(newSheetName)), 25)
+
+    expect(engine.getCellValue(adr('B1', engine.getSheetId(sheet1Name)))).toBe(150)
+    expect(engine.getCellValue(adr('C1', engine.getSheetId(sheet1Name)))).toBe(50)
+  })
+
+  it('recalculates formulas with range references', () => {
+    const engine = HyperFormula.buildEmpty()
+    const sheet1Name = 'Sheet1'
+    const dataSheetName = 'DataSheet'
+
+    engine.addSheet(sheet1Name)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), `=SUM('${dataSheetName}'!A1:B5)`)
+    engine.setCellContents(adr('A2', engine.getSheetId(sheet1Name)), `=MEDIAN('${dataSheetName}'!A1:B5)`)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(dataSheetName)
+    const dataSheetId = engine.getSheetId(dataSheetName)
+    engine.setCellContents(adr('A1', dataSheetId), 1)
+    engine.setCellContents(adr('B1', dataSheetId), 2)
+    engine.setCellContents(adr('A2', dataSheetId), 3)
+    engine.setCellContents(adr('B2', dataSheetId), 4)
+    engine.setCellContents(adr('A3', dataSheetId), 5)
+    engine.setCellContents(adr('B3', dataSheetId), 6)
+    engine.setCellContents(adr('A4', dataSheetId), 7)
+    engine.setCellContents(adr('B4', dataSheetId), 8)
+    engine.setCellContents(adr('A5', dataSheetId), 9)
+    engine.setCellContents(adr('B5', dataSheetId), 10)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(55)
+    expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(5.5)
+  })
+
+  it('recalculates named expressions', () => {
+    const engine = HyperFormula.buildEmpty()
+    const sheet1Name = 'Sheet1'
+    const newSheetName = 'NewSheet'
+
+    engine.addSheet(sheet1Name)
+    engine.addNamedExpression('MyValue', `='${newSheetName}'!$A$1`)
+    engine.setCellContents(adr('A1', engine.getSheetId(sheet1Name)), '=MyValue')
+    engine.setCellContents(adr('A2', engine.getSheetId(sheet1Name)), '=MyValue*2')
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+    expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet(newSheetName)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBeNull()
+    expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(0)
+
+    engine.setCellContents(adr('A1', engine.getSheetId(newSheetName)), 99)
+
+    expect(engine.getCellValue(adr('A1', engine.getSheetId(sheet1Name)))).toBe(99)
+    expect(engine.getCellValue(adr('A2', engine.getSheetId(sheet1Name)))).toBe(198)
+  })
+
+  it('setCellContents adds formula referencing existing sheet after it was added', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'Main': [[1]],
+    })
+    const mainId = engine.getSheetId('Main')!
+
+    engine.addSheet('NewSheet')
+    const newSheetId = engine.getSheetId('NewSheet')!
+    engine.setCellContents(adr('A1', newSheetId), 42)
+
+    engine.setCellContents(adr('B1', mainId), '=NewSheet!A1')
+
+    expect(engine.getCellValue(adr('B1', mainId))).toBe(42)
+
+    engine.setCellContents(adr('C1', mainId), '=FutureSheet!A1')
+
+    expect(engine.getCellValue(adr('C1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('FutureSheet')
+    engine.setCellContents(adr('A1', engine.getSheetId('FutureSheet')), 99)
+
+    expect(engine.getCellValue(adr('C1', mainId))).toBe(99)
+  })
+
+  describe('when using ranges with', () => {
+    it('function using `runFunction`', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'FirstSheet': [['=MEDIAN(NewSheet!A1:A1)', '=MEDIAN(NewSheet!A1:A2)', '=MEDIAN(NewSheet!A1:A3)', '=MEDIAN(NewSheet!A1:A4)']],
+      })
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet('NewSheet')
+      engine.setSheetContent(engine.getSheetId('NewSheet')!, [[1], [2], [3], [4]])
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(2)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(2.5)
+    })
+
+    it('function not using `runFunction`', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'FirstSheet': [['=SUM(NewSheet!A1:A1)', '=SUM(NewSheet!A1:A2)', '=SUM(NewSheet!A1:A3)', '=SUM(NewSheet!A1:A4)']],
+      }, {useArrayArithmetic: false})
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet('NewSheet')
+      engine.setSheetContent(engine.getSheetId('NewSheet')!, [[1], [2], [3], [4]])
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(3)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(6)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(10)
+    })
+
+    it('function using `runFunction` referencing range indirectly', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'FirstSheet': [
+          ['=MEDIAN(A2)', '=MEDIAN(B2)', '=MEDIAN(C2)', '=MEDIAN(D2)'],
+          ['=\'NewSheet\'!A1:A1', '=\'NewSheet\'!A1:B2', '=\'NewSheet\'!A1:A3', '=\'NewSheet\'!A1:A4'],
+        ],
+      }, {useArrayArithmetic: false})
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet('NewSheet')
+      engine.setSheetContent(engine.getSheetId('NewSheet')!, [[1], [2], [3], [4]])
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(1.5)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(2)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(2.5)
+    })
+
+    it('function not using `runFunction` referencing range indirectly', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'FirstSheet': [
+          ['=SUM(A2)', '=SUM(B2)', '=SUM(C2)', '=SUM(D2)'],
+          ['=\'NewSheet\'!A1:A1', '=\'NewSheet\'!A1:B2', '=\'NewSheet\'!A1:A3', '=\'NewSheet\'!A1:A4'],
+        ],
+      }, {useArrayArithmetic: false})
+      const sheet1Id = engine.getSheetId('FirstSheet')!
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet('NewSheet')
+      engine.setSheetContent(engine.getSheetId('NewSheet')!, [[1], [2], [3], [4]])
+
+      expect(engine.getCellValue(adr('A1', sheet1Id))).toBe(1)
+      expect(engine.getCellValue(adr('B1', sheet1Id))).toBe(3)
+      expect(engine.getCellValue(adr('C1', sheet1Id))).toBe(6)
+      expect(engine.getCellValue(adr('D1', sheet1Id))).toBe(10)
+    })
+
+    it('function calling a named expression', () => {
+      const engine = HyperFormula.buildFromSheets({
+        'FirstSheet': [['=\'NewSheet\'!A1:A4']],
+      }, {useArrayArithmetic: false}, [
+        { name: 'ExprA', expression: '=MEDIAN(NewSheet!$A$1:$A$1)' },
+        { name: 'ExprB', expression: '=MEDIAN(NewSheet!$A$1:$A$2)' },
+        { name: 'ExprC', expression: '=MEDIAN(NewSheet!$A$1:$A$3)' },
+        { name: 'ExprD', expression: '=MEDIAN(FirstSheet!$A$1)' },
+      ])
+
+      expect(engine.getNamedExpressionValue('ExprA')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprB')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprC')).toEqualError(detailedError(ErrorType.REF))
+      expect(engine.getNamedExpressionValue('ExprD')).toEqualError(detailedError(ErrorType.REF))
+
+      engine.addSheet('NewSheet')
+      engine.setSheetContent(engine.getSheetId('NewSheet')!, [[1], [2], [3], [4]])
+
+      expect(engine.getNamedExpressionValue('ExprA')).toBe(1)
+      expect(engine.getNamedExpressionValue('ExprB')).toBe(1.5)
+      expect(engine.getNamedExpressionValue('ExprC')).toBe(2)
+      expect(engine.getNamedExpressionValue('ExprD')).toBe(2.5)
+    })
+  })
+
+  it('should convert placeholder sheet strategy when adding referenced sheet', () => {
+    const engine = HyperFormula.buildFromSheets({
+      'MainSheet': [['=PlaceholderSheet!A1']],
+    }, { chooseAddressMappingPolicy: new AlwaysSparse()})
+
+    const mainId = engine.getSheetId('MainSheet')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('PlaceholderSheet')
+    const placeholderId = engine.getSheetId('PlaceholderSheet')!
+
+    engine.setCellContents(adr('A1', placeholderId), 42)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(42)
+  })
+
+  it('should handle adding sheet that resolves references with ranges in placeholder', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Main: [['=SUM(Data!A1:A3)']],
+    })
+
+    const mainId = engine.getSheetId('Main')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('Data')
+    const dataId = engine.getSheetId('Data')!
+    engine.setCellContents(adr('A1', dataId), 1)
+    engine.setCellContents(adr('A2', dataId), 2)
+    engine.setCellContents(adr('A3', dataId), 3)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(6)
+  })
+
+  it('should handle remove and add sheet cycle with range references', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Main: [['=SUM(Data!A1:A3)']],
+      Data: [[1], [2], [3]],
+    })
+
+    const mainId = engine.getSheetId('Main')!
+    const dataId = engine.getSheetId('Data')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(6)
+
+    engine.removeSheet(dataId)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('Data')
+    const newDataId = engine.getSheetId('Data')!
+    engine.setCellContents(adr('A1', newDataId), 10)
+    engine.setCellContents(adr('A2', newDataId), 20)
+    engine.setCellContents(adr('A3', newDataId), 30)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(60)
+  })
+
+  it('should correctly merge sheets when adding sheet that was previously referenced', () => {
+    const engine = HyperFormula.buildFromSheets({
+      Main: [['=NewSheet!A1 + NewSheet!B1']],
+    })
+
+    const mainId = engine.getSheetId('Main')!
+
+    expect(engine.getCellValue(adr('A1', mainId))).toEqualError(detailedError(ErrorType.REF))
+
+    engine.addSheet('NewSheet')
+    const newSheetId = engine.getSheetId('NewSheet')!
+    engine.setCellContents(adr('A1', newSheetId), 100)
+    engine.setCellContents(adr('B1', newSheetId), 50)
+
+    expect(engine.getCellValue(adr('A1', mainId))).toBe(150)
   })
 })

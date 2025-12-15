@@ -17,7 +17,7 @@ describe('Column ranges', () => {
       ['=SUM(C:D)', '=SUM(C5:D6)'],
     ])
 
-    const cd = engine.rangeMapping.getRange(colStart('C'), colEnd('D')) as RangeVertex
+    const cd = engine.rangeMapping.getRangeVertex(colStart('C'), colEnd('D')) as RangeVertex
 
     const c5 = engine.dependencyGraph.fetchCell(adr('C5'))
     const c6 = engine.dependencyGraph.fetchCell(adr('C6'))
@@ -38,8 +38,8 @@ describe('Column ranges', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(D42:H42)')
 
-    const ce = engine.rangeMapping.getRange(colStart('C'), colEnd('E')) as RangeVertex
-    const dg = engine.rangeMapping.getRange(colStart('D'), colEnd('G')) as RangeVertex
+    const ce = engine.rangeMapping.getRangeVertex(colStart('C'), colEnd('E')) as RangeVertex
+    const dg = engine.rangeMapping.getRangeVertex(colStart('D'), colEnd('G')) as RangeVertex
 
     const d42 = engine.dependencyGraph.fetchCell(adr('D42'))
     const e42 = engine.dependencyGraph.fetchCell(adr('E42'))
@@ -80,5 +80,18 @@ describe('Column ranges', () => {
     const range = extractColumnRange(engine, adr('E1'))
     expect(range.start).toEqual(colStart('A'))
     expect(range.end).toEqual(colEnd('B'))
+  })
+
+  it('should correctly handle infinite column ranges when setting cell values (line 890)', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(C:D)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+
+    engine.setCellContents(adr('C5'), 10)
+    engine.setCellContents(adr('D5'), 20)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(30)
   })
 })

@@ -3,8 +3,8 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import { SimpleCellAddress } from '..'
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
-import {SimpleCellAddress} from '../Cell'
 import {CriterionLambda} from '../interpreter/Criterion'
 
 /**
@@ -30,15 +30,15 @@ export class RangeVertex {
     this.bruteForce = false
   }
 
-  public get start() {
+  public get start(): SimpleCellAddress {
     return this.range.start
   }
 
-  public get end() {
+  public get end(): SimpleCellAddress {
     return this.range.end
   }
 
-  public get sheet() {
+  public get sheet(): number {
     return this.range.start.sheet
   }
 
@@ -104,19 +104,5 @@ export class RangeVertex {
     this.criterionFunctionCache.clear()
     this.dependentCacheRanges.forEach(range => range.criterionFunctionCache.clear())
     this.dependentCacheRanges.clear()
-  }
-
-  /**
-   * Returns start of the range (it's top-left corner)
-   */
-  public getStart(): SimpleCellAddress {
-    return this.start
-  }
-
-  /**
-   * Returns end of the range (it's bottom-right corner)
-   */
-  public getEnd(): SimpleCellAddress {
-    return this.end
   }
 }

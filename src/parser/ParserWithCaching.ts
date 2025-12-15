@@ -11,7 +11,7 @@ import {
   cellAddressFromString,
   columnAddressFromString,
   rowAddressFromString,
-  SheetMappingFn,
+  ResolveSheetReferenceFn,
 } from './addressRepresentationConverters'
 import {Ast, imageWithWhitespace, ParsingError, ParsingErrorType, RangeSheetReferenceType} from './Ast'
 import {binaryOpTokenMap} from './binaryOpTokenMap'
@@ -52,11 +52,11 @@ export class ParserWithCaching {
   constructor(
     private readonly config: ParserConfig,
     private readonly functionRegistry: FunctionRegistry,
-    private readonly sheetMapping: SheetMappingFn,
+    private readonly resolveSheetReference: ResolveSheetReferenceFn,
   ) {
     this.lexerConfig = buildLexerConfig(config)
     this.lexer = new FormulaLexer(this.lexerConfig)
-    this.formulaParser = new FormulaParser(this.lexerConfig, this.sheetMapping)
+    this.formulaParser = new FormulaParser(this.lexerConfig, this.resolveSheetReference)
     this.cache = new Cache(this.functionRegistry)
   }
 
@@ -232,7 +232,7 @@ export class ParserWithCaching {
     while (idx < tokens.length) {
       const token = tokens[idx]
       if (tokenMatcher(token, CellReference)) {
-        const cellAddress = cellAddressFromString(this.sheetMapping, token.image, baseAddress)
+        const cellAddress = cellAddressFromString(token.image, baseAddress, this.resolveSheetReference)
         if (cellAddress === undefined) {
           hash = hash.concat(token.image)
         } else {
@@ -244,8 +244,8 @@ export class ParserWithCaching {
         hash = hash.concat(canonicalProcedureName, '(')
       } else if (tokenMatcher(token, ColumnRange)) {
         const [start, end] = token.image.split(':')
-        const startAddress = columnAddressFromString(this.sheetMapping, start, baseAddress)
-        const endAddress = columnAddressFromString(this.sheetMapping, end, baseAddress)
+        const startAddress = columnAddressFromString(start, baseAddress, this.resolveSheetReference)
+        const endAddress = columnAddressFromString(end, baseAddress, this.resolveSheetReference)
         if (startAddress === undefined || endAddress === undefined) {
           hash = hash.concat('!REF')
         } else {
@@ -253,8 +253,8 @@ export class ParserWithCaching {
         }
       } else if (tokenMatcher(token, RowRange)) {
         const [start, end] = token.image.split(':')
-        const startAddress = rowAddressFromString(this.sheetMapping, start, baseAddress)
-        const endAddress = rowAddressFromString(this.sheetMapping, end, baseAddress)
+        const startAddress = rowAddressFromString(start, baseAddress, this.resolveSheetReference)
+        const endAddress = rowAddressFromString(end, baseAddress, this.resolveSheetReference)
         if (startAddress === undefined || endAddress === undefined) {
           hash = hash.concat('!REF')
         } else {

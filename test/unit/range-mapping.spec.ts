@@ -8,7 +8,7 @@ describe('RangeMapping', () => {
     const start = adr('A1')
     const end = adr('U50')
 
-    expect(mapping.getRange(start, end)).toBe(undefined)
+    expect(mapping.getRangeVertex(start, end)).toBe(undefined)
   })
 
   it('setting range mapping', () => {
@@ -17,9 +17,9 @@ describe('RangeMapping', () => {
     const end = adr('U50')
     const vertex = new RangeVertex(new AbsoluteCellRange(start, end))
 
-    mapping.setRange(vertex)
+    mapping.addOrUpdateVertex(vertex)
 
-    expect(mapping.getRange(start, end)).toBe(vertex)
+    expect(mapping.getRangeVertex(start, end)).toBe(vertex)
   })
 
   it('set column range', () => {
@@ -28,8 +28,8 @@ describe('RangeMapping', () => {
     const end = colEnd('U')
     const vertex = new RangeVertex(new AbsoluteColumnRange(start.sheet, start.col, end.col))
 
-    mapping.setRange(vertex)
+    mapping.addOrUpdateVertex(vertex)
 
-    expect(mapping.getRange(start, end)).toBe(vertex)
+    expect(mapping.getRangeVertex(start, end)).toBe(vertex)
   })
 })
