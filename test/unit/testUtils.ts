@@ -3,7 +3,7 @@ import {AbsoluteCellRange, AbsoluteColumnRange, AbsoluteRowRange} from '../../sr
 import {CellError, SimpleCellAddress, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
-import {ArrayVertex, FormulaCellVertex, Graph, RangeVertex} from '../../src/DependencyGraph'
+import {ArrayFormulaVertex, ScalarFormulaVertex, Graph, RangeVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {defaultStringifyDateTime} from '../../src/format/format'
 import {complex} from '../../src/interpreter/ArithmeticHelper'
@@ -21,41 +21,41 @@ import {ColumnRangeAst, RowRangeAst} from '../../src/parser/Ast'
 import {EngineComparator} from './graphComparator'
 
 export const extractReference = (engine: HyperFormula, address: SimpleCellAddress): CellAddress => {
-  return ((engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
+  return ((engine.addressMapping.getCell(address) as ScalarFormulaVertex).getFormula(engine.lazilyTransformingAstService) as CellReferenceAst).reference
 }
 
 export const extractRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
-  const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
+  const formula = (engine.addressMapping.getCell(address) as ScalarFormulaVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as CellRangeAst
   return new AbsoluteCellRange(rangeAst.start.toSimpleCellAddress(address), rangeAst.end.toSimpleCellAddress(address))
 }
 
 export const extractColumnRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteColumnRange => {
-  const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
+  const formula = (engine.addressMapping.getCell(address) as ScalarFormulaVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as ColumnRangeAst
   return AbsoluteColumnRange.fromColumnRange(rangeAst, address)
 }
 
 export const extractRowRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteRowRange => {
-  const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
+  const formula = (engine.addressMapping.getCell(address) as ScalarFormulaVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as RowRangeAst
   return AbsoluteRowRange.fromRowRangeAst(rangeAst, address)
 }
 
 export const extractMatrixRange = (engine: HyperFormula, address: SimpleCellAddress): AbsoluteCellRange => {
-  const formula = (engine.addressMapping.fetchCell(address) as ArrayVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
+  const formula = (engine.addressMapping.getCell(address) as ArrayFormulaVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const rangeAst = formula.args[0] as CellRangeAst
   return AbsoluteCellRange.fromCellRange(rangeAst, address)
 }
 
 export const expectReferenceToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
-  const errorAst = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ErrorAst
+  const errorAst = (engine.addressMapping.getCell(address) as ScalarFormulaVertex).getFormula(engine.lazilyTransformingAstService) as ErrorAst
   expect(errorAst.type).toEqual(AstNodeType.ERROR)
   expect(errorAst.error).toEqualError(new CellError(ErrorType.REF))
 }
 
 export const expectFunctionToHaveRefError = (engine: HyperFormula, address: SimpleCellAddress) => {
-  const formula = (engine.addressMapping.fetchCell(address) as FormulaCellVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
+  const formula = (engine.addressMapping.getCell(address) as ScalarFormulaVertex).getFormula(engine.lazilyTransformingAstService) as ProcedureAst
   const errorAst = formula.args.find((arg) => arg !== undefined && arg.type === AstNodeType.ERROR) as ErrorAst
   expect(errorAst.type).toEqual(AstNodeType.ERROR)
   expect(errorAst.error).toEqualError(new CellError(ErrorType.REF))
@@ -117,19 +117,19 @@ export const rowEnd = (input: number, sheet: number = 0): SimpleCellAddress => {
 }
 
 export const colStart = (input: string, sheet: number = 0): SimpleCellAddress => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
   const result = /^(\$?)([A-Za-z]+)/.exec(input)!
   return simpleCellAddress(sheet, colNumber(result[2]), 0)
 }
 
 export const colEnd = (input: string, sheet: number = 0): SimpleCellAddress => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
   const result = /^(\$?)([A-Za-z]+)/.exec(input)!
   return simpleCellAddress(sheet, colNumber(result[2]), Number.POSITIVE_INFINITY)
 }
 
 export const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
   const result = /^(\$([A-Za-z0-9_]+)\.)?(\$?)([A-Za-z]+)(\$?)([0-9]+)$/.exec(stringAddress)!
   const row = Number(result[6]) - 1
   return simpleCellAddress(sheet, colNumber(result[4]), row)
@@ -213,7 +213,7 @@ export function columnIndexToSheet(columnIndex: ColumnIndex, width: number, heig
       for (const row of index) {
         result[row] = result[row] ?? []
         if (result[row][col] !== undefined) {
-          throw new Error('ColumnIndex ambiguity.')
+          throw new Error(`ColumnIndex ambiguity. Expected ${JSON.stringify(result[row][col])}, but found ${JSON.stringify(value)} at row ${JSON.stringify(row)}, column ${JSON.stringify(col)}`)
         }
         result[row][col] = value
       }

@@ -1,6 +1,6 @@
 import {ExportedCellChange, HyperFormula, InvalidArgumentsError} from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
-import {ArrayVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex} from '../../../src/DependencyGraph'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../../src/parser'
 import {
@@ -255,7 +255,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
 })
 
 describe('Address dependencies, Case 3: formula in different sheet', () => {
-  it('case ARa: relative/absolute dependency below removed row should be shifted ', () => {
+  it('case ARa: relative/absolute dependency below removed row should be shifted', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!A3'],
@@ -548,7 +548,7 @@ describe('Removing rows - reevaluation', () => {
 })
 
 describe('Removing rows - arrays', () => {
-  it('ArrayVertex#formula should be updated', () => {
+  it('ArrayFormulaVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '4'],
       ['2', '5'],
@@ -561,7 +561,7 @@ describe('Removing rows - arrays', () => {
     expect(extractMatrixRange(engine, adr('A3'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 
-  it('ArrayVertex#address should be updated', () => {
+  it('ArrayFormulaVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '4'],
       ['2', '5'],
@@ -571,11 +571,11 @@ describe('Removing rows - arrays', () => {
 
     engine.removeRows(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.fetchCell(adr('A3')) as ArrayVertex
+    const matrixVertex = engine.addressMapping.getCell(adr('A3')) as ArrayFormulaVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A3'))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
+  it('ArrayFormulaVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '4'],
@@ -648,7 +648,7 @@ describe('Removing rows - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('it should be REF if no space after removing row', () => {
+  it('should be REF if no space after removing row', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-B3:B4'],
       [],
@@ -672,7 +672,7 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should be REF, not CYCLE, after removing rows', () => {
+  it('should be REF, not CYCLE, after removing rows', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-A3:A4'],
       [],
@@ -696,7 +696,7 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should remove array when removing row with left corner', () => {
+  it('should remove array when removing row with left corner', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -711,7 +711,7 @@ describe('Removing rows - arrays', () => {
     ]))
   })
 
-  it('it should remove array when removing rows with whole matrix', () => {
+  it('should remove array when removing rows with whole matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2'],
       ['3', '4'],
@@ -737,8 +737,8 @@ describe('Removing rows - graph', function() {
 
     engine.removeRows(0, [2, 1])
 
-    const a2 = engine.addressMapping.fetchCell(adr('A2'))
-    expect(engine.graph.adjacentNodes(a2)).toEqual(new Set())
+    const a2 = engine.addressMapping.getCell(adr('A2'))
+    expect(engine.graph.adjacentNodes(a2!)).toEqual(new Set())
   })
 
   it('should remove vertices from graph', function() {
@@ -772,9 +772,9 @@ describe('Removing rows - range mapping', function() {
     ])
 
     engine.removeRows(0, [0, 1])
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A2'))
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
   it('shift ranges in range mapping, range start above removed rows', () => {
@@ -785,9 +785,9 @@ describe('Removing rows - range mapping', function() {
     ])
 
     engine.removeRows(0, [1, 2])
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
   it('shift ranges in range mapping, whole range', () => {
@@ -798,7 +798,7 @@ describe('Removing rows - range mapping', function() {
       ['=SUM(A1:A3)'],
     ])
 
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     engine.removeRows(0, [0, 3])
     const ranges = Array.from(engine.rangeMapping.rangesInSheet(0))
     expect(ranges.length).toBe(0)
@@ -814,10 +814,10 @@ describe('Removing rows - range mapping', function() {
       ['=SUM(A1:A3)'],
     ])
 
-    const a1a3 = engine.rangeMapping.fetchRange(adr('A1'), adr('A3'))
+    const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     expect(graphReversedAdjacentNodes(engine.graph, a1a3).length).toBe(2)
     engine.removeRows(0, [0, 2])
-    const a1a1 = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
+    const a1a1 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
     expect(a1a1).toBe(a1a3)
     expect(graphReversedAdjacentNodes(engine.graph, a1a1).length).toBe(1)
   })
@@ -1028,7 +1028,7 @@ describe('Removing rows - merge ranges', () => {
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should merge ranges in proper order', () => {

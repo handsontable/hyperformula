@@ -11,8 +11,8 @@ import {ColumnAddress} from './ColumnAddress'
 import {ABSOLUTE_OPERATOR, RANGE_OPERATOR, SHEET_NAME_PATTERN, UNQUOTED_SHEET_NAME_PATTERN} from './parser-consts'
 import {RowAddress} from './RowAddress'
 
-export type SheetMappingFn = (sheetName: string) => Maybe<number>
 export type SheetIndexMappingFn = (sheetIndex: number) => Maybe<string>
+export type ResolveSheetReferenceFn = (sheetName: string) => Maybe<number>
 
 const addressRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)(\\${ABSOLUTE_OPERATOR}?)([0-9]+)$`)
 const columnRegex = new RegExp(`^(${SHEET_NAME_PATTERN})?(\\${ABSOLUTE_OPERATOR}?)([A-Za-z]+)$`)
@@ -22,26 +22,27 @@ const simpleSheetNameRegex = new RegExp(`^${UNQUOTED_SHEET_NAME_PATTERN}$`)
 /**
  * Computes R0C0 representation of cell address based on it's string representation and base address.
  *
- * @param sheetMapping - mapping function needed to change name of a sheet to index
- * @param stringAddress - string representation of cell address, e.g., 'C64'
- * @param baseAddress - base address for R0C0 conversion
- * @returns object representation of address
+ * @param {string} stringAddress - string representation of cell address, e.g., 'C64'
+ * @param {SimpleCellAddress} baseAddress - base address for R0C0 conversion
+ * @param {ResolveSheetReferenceFn} resolveSheetReference - mapping function needed to change name of a sheet to index
+ * @returns {Maybe<CellAddress>} object representation of address or `undefined` if the sheet cannot be resolved
  */
-export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<CellAddress> => {
-  const result = addressRegex.exec(stringAddress)!
+export const cellAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, resolveSheetReference: ResolveSheetReferenceFn): Maybe<CellAddress> => {
+  const result = addressRegex.exec(stringAddress)
 
-  const col = columnLabelToIndex(result[6])
-
-  let sheet = extractSheetNumber(result, sheetMapping)
-  if (sheet === undefined) {
+  if (!result) {
     return undefined
   }
 
+  const col = columnLabelToIndex(result[6])
+  const row = Number(result[8]) - 1
+  const sheetName = extractSheetName(result)
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
+
   if (sheet === null) {
-    sheet = undefined
+    return undefined
   }
 
-  const row = Number(result[8]) - 1
   if (result[5] === ABSOLUTE_OPERATOR && result[7] === ABSOLUTE_OPERATOR) {
     return CellAddress.absolute(col, row, sheet)
   } else if (result[5] === ABSOLUTE_OPERATOR) {
@@ -53,19 +54,20 @@ export const cellAddressFromString = (sheetMapping: SheetMappingFn, stringAddres
   }
 }
 
-export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<ColumnAddress> => {
-  const result = columnRegex.exec(stringAddress)!
+export const columnAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, resolveSheetReference: ResolveSheetReferenceFn): Maybe<ColumnAddress> => {
+  const result = columnRegex.exec(stringAddress)
 
-  let sheet = extractSheetNumber(result, sheetMapping)
-  if (sheet === undefined) {
+  if (!result) {
     return undefined
   }
 
-  if (sheet === null) {
-    sheet = undefined
-  }
-
   const col = columnLabelToIndex(result[6])
+  const sheetName = extractSheetName(result)
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
+
+  if (sheet === null) {
+    return undefined
+  }
 
   if (result[5] === ABSOLUTE_OPERATOR) {
     return ColumnAddress.absolute(col, sheet)
@@ -74,19 +76,20 @@ export const columnAddressFromString = (sheetMapping: SheetMappingFn, stringAddr
   }
 }
 
-export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, baseAddress: SimpleCellAddress): Maybe<RowAddress> => {
-  const result = rowRegex.exec(stringAddress)!
+export const rowAddressFromString = (stringAddress: string, baseAddress: SimpleCellAddress, resolveSheetReference: ResolveSheetReferenceFn): Maybe<RowAddress> => {
+  const result = rowRegex.exec(stringAddress)
 
-  let sheet = extractSheetNumber(result, sheetMapping)
-  if (sheet === undefined) {
+  if (!result) {
     return undefined
   }
 
-  if (sheet === null) {
-    sheet = undefined
-  }
-
   const row = Number(result[6]) - 1
+  const sheetName = extractSheetName(result)
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
+
+  if (sheet === null) {
+    return undefined
+  }
 
   if (result[5] === ABSOLUTE_OPERATOR) {
     return RowAddress.absolute(row, sheet)
@@ -100,44 +103,43 @@ export const rowAddressFromString = (sheetMapping: SheetMappingFn, stringAddress
  * - If sheet name is present in the string representation but is not present in sheet mapping, returns `undefined`.
  * - If sheet name is not present in the string representation, returns {@param contextSheetId} as sheet number.
  *
- * @param sheetMapping - mapping function needed to change name of a sheet to index
- * @param stringAddress - string representation of cell address, e.g., 'C64'
- * @param contextSheetId - sheet in context of which we should parse the address
- * @returns absolute representation of address, e.g., { sheet: 0, col: 1, row: 1 }
+ * @param {ResolveSheetReferenceFn} resolveSheetReference - mapping function needed to change name of a sheet to index
+ * @param {string} stringAddress - string representation of cell address, e.g., 'C64'
+ * @param {number} contextSheetId - sheet in context of which we should parse the address
+ * @returns {Maybe<SimpleCellAddress>} absolute representation of address, e.g., { sheet: 0, col: 1, row: 1 }
  */
-export const simpleCellAddressFromString = (sheetMapping: SheetMappingFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellAddress> => {
-  const regExpExecArray = addressRegex.exec(stringAddress)!
+export const simpleCellAddressFromString = (resolveSheetReference: ResolveSheetReferenceFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellAddress> => {
+  const regExpExecArray = addressRegex.exec(stringAddress)
 
   if (!regExpExecArray) {
     return undefined
   }
 
   const col = columnLabelToIndex(regExpExecArray[6])
+  const row = Number(regExpExecArray[8]) - 1
+  const sheetName = extractSheetName(regExpExecArray)
+  const sheet = sheetNameToId(sheetName, resolveSheetReference)
 
-  let sheet = extractSheetNumber(regExpExecArray, sheetMapping)
-  if (sheet === undefined) {
+  if (sheet === null) {
     return undefined
   }
 
-  if (sheet === null) {
-    sheet = contextSheetId
-  }
+  const effectiveSheet = sheet === undefined ? contextSheetId : sheet
 
-  const row = Number(regExpExecArray[8]) - 1
-  return simpleCellAddress(sheet, col, row)
+  return simpleCellAddress(effectiveSheet, col, row)
 }
 
-export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellRange> => {
+export const simpleCellRangeFromString = (resolveSheetReference: ResolveSheetReferenceFn, stringAddress: string, contextSheetId: number): Maybe<SimpleCellRange> => {
   const split = stringAddress.split(RANGE_OPERATOR)
   if (split.length !== 2) {
     return undefined
   }
   const [startString, endString] = split
-  const start = simpleCellAddressFromString(sheetMapping, startString, contextSheetId)
+  const start = simpleCellAddressFromString(resolveSheetReference, startString, contextSheetId)
   if (start === undefined) {
     return undefined
   }
-  const end = simpleCellAddressFromString(sheetMapping, endString, start.sheet)
+  const end = simpleCellAddressFromString(resolveSheetReference, endString, start.sheet)
   if (end === undefined) {
     return undefined
   }
@@ -150,10 +152,6 @@ export const simpleCellRangeFromString = (sheetMapping: SheetMappingFn, stringAd
 /**
  * Returns string representation of absolute address
  * If sheet index is not present in sheet mapping, returns undefined
- *
- * @param sheetIndexMapping - mapping function needed to change sheet index to sheet name
- * @param address - object representation of absolute address
- * @param sheetIndex - if is not equal with address sheet index, string representation will contain sheet name
  */
 export const simpleCellAddressToString = (sheetIndexMapping: SheetIndexMappingFn, address: SimpleCellAddress, sheetIndex: number): Maybe<string> => {
   const column = columnIndexToLabel(address.col)
@@ -227,13 +225,25 @@ export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMa
   }
 }
 
-function extractSheetNumber(regexResult: RegExpExecArray, sheetMapping: SheetMappingFn): number | null | undefined {
-  let maybeSheetName = regexResult[3] ?? regexResult[2]
+function extractSheetName(regexResult: RegExpExecArray): string | null {
+  const maybeSheetName = regexResult[3] ?? regexResult[2]
 
-  if (maybeSheetName) {
-    maybeSheetName = maybeSheetName.replace(/''/g, "'")
-    return sheetMapping(maybeSheetName)
-  } else {
-    return null
+  return maybeSheetName ? maybeSheetName.replace(/''/g, "'") : null
+}
+
+/**
+ * Resolves sheet name to sheet id.
+ *
+ * @param sheetName - extracted sheet name or null when not provided.
+ * @param resolveSheetReference - mapping function resolving sheet name to id.
+ * @returns sheet id, undefined when sheet name absent, null when resolution fails.
+ */
+function sheetNameToId(sheetName: string | null, resolveSheetReference: ResolveSheetReferenceFn): Maybe<number> | null {
+  if (!sheetName) {
+    return undefined
   }
+
+  const sheetId = resolveSheetReference(sheetName)
+
+  return sheetId === undefined ? null : sheetId
 }

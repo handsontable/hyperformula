@@ -12,7 +12,8 @@ import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber} from './int
 import {SimpleRangeValue} from './SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {NamedExpressions} from './NamedExpressions'
-import {SheetIndexMappingFn, simpleCellAddressToString} from './parser/addressRepresentationConverters'
+import {simpleCellAddressToString} from './parser/addressRepresentationConverters'
+import { SheetMapping } from './DependencyGraph/SheetMapping'
 
 export type ExportedChange = ExportedCellChange | ExportedNamedExpressionChange
 
@@ -55,7 +56,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
   constructor(
     private readonly config: Config,
     private readonly namedExpressions: NamedExpressions,
-    private readonly sheetIndexMapping: SheetIndexMappingFn,
+    private readonly sheetMapping: SheetMapping,
     private readonly lazilyTransformingService: LazilyTransformingAstService,
   ) {
   }
@@ -119,7 +120,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
       if (originAddress.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS) {
         address = this.namedExpressions.namedExpressionInAddress(originAddress.row)?.displayName
       } else {
-        address = simpleCellAddressToString(this.sheetIndexMapping, originAddress, -1)
+        address = simpleCellAddressToString(this.sheetMapping.getSheetNameOrThrowError.bind(this.sheetMapping), originAddress, -1)
       }
     }
     return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type), address)

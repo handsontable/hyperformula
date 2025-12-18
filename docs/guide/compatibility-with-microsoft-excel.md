@@ -13,6 +13,17 @@ That said, there are cases when HyperFormula can't be compatible with all three 
 
 Still, with the right configuration, you can achieve nearly full compatibility.
 
+### Excel function coverage
+
+HyperFormula implements **350 out of 515 Excel functions** (68% coverage), as of version 3.1.0 and Excel 2024. This means that **165 Excel functions** (32%) are not yet available in HyperFormula.
+
+Additionally, HyperFormula includes some functions that are not part of Excel's standard function set, bringing the total number of available functions to **{{ $page.functionsCount }}**.
+
+For a complete list of supported functions, see the [built-in functions](built-in-functions.md) page.
+
+If you need any of the missing Excel functions, you can [contact us](contact.md) or implement them as [custom functions](custom-functions.md), extending HyperFormula's capabilities to meet your specific requirements.
+
+
 ## Configure compatibility with Microsoft Excel
 
 ### String comparison rules

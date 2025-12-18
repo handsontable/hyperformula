@@ -7,6 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.1.1] - 2025-12-18
+
+### Fixed
+
+- Fixed an issue where cells were not recalculated after adding, removing and renaming sheets. [#1116](https://github.com/handsontable/hyperformula/issues/1116)
+- Fixed an issue where overwriting a non-computed cell caused the `Value of the formula cell is not computed` error. [#1194](https://github.com/handsontable/hyperformula/issues/1194)
+
 ## [3.1.0] - 2025-10-14
 
 ### Changed

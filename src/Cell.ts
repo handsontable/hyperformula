@@ -3,8 +3,8 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {ArrayVertex, CellVertex, FormulaCellVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
-import {FormulaVertex} from './DependencyGraph/FormulaCellVertex'
+import {ArrayFormulaVertex, CellVertex, ScalarFormulaVertex, ParsingErrorVertex, ValueCellVertex} from './DependencyGraph'
+import {FormulaVertex} from './DependencyGraph/FormulaVertex'
 import {ErrorMessage} from './error-message'
 import {
   EmptyValue,
@@ -59,14 +59,14 @@ export enum CellType {
 }
 
 export const getCellType = (vertex: Maybe<CellVertex>, address: SimpleCellAddress): CellType => {
-  if (vertex instanceof ArrayVertex) {
+  if (vertex instanceof ArrayFormulaVertex) {
     if (vertex.isLeftCorner(address)) {
       return CellType.ARRAYFORMULA
     } else {
       return CellType.ARRAY
     }
   }
-  if (vertex instanceof FormulaCellVertex || vertex instanceof ParsingErrorVertex) {
+  if (vertex instanceof ScalarFormulaVertex || vertex instanceof ParsingErrorVertex) {
     return CellType.FORMULA
   }
   if (vertex instanceof ValueCellVertex) {
@@ -196,7 +196,12 @@ export interface SimpleCellAddress {
 }
 
 export const simpleCellAddress = (sheet: number, col: number, row: number): SimpleCellAddress => ({sheet, col, row})
-export const invalidSimpleCellAddress = (address: SimpleCellAddress): boolean => (address.col < 0 || address.row < 0)
+
+/**
+ * Checks if the column or row id is negative.
+ */
+export const isColOrRowInvalid = (address: SimpleCellAddress): boolean => (address.col < 0 || address.row < 0)
+
 export const movedSimpleCellAddress = (address: SimpleCellAddress, toSheet: number, toRight: number, toBottom: number): SimpleCellAddress => {
   return simpleCellAddress(toSheet, address.col + toRight, address.row + toBottom)
 }

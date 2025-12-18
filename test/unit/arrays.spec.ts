@@ -1,6 +1,6 @@
 import {ErrorType, HyperFormula} from '../../src'
 import {ArraySize} from '../../src/ArraySize'
-import {ArrayVertex, ValueCellVertex} from '../../src/DependencyGraph'
+import {ArrayFormulaVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {ErrorMessage} from '../../src/error-message'
 import {adr, detailedError, detailedErrorWithOrigin, expectVerticesOfTypes, noSpace} from './testUtils'
 
@@ -363,8 +363,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
     ])
   })
 
@@ -375,12 +375,11 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, undefined],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [undefined, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, undefined],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [undefined, ArrayFormulaVertex, ArrayFormulaVertex],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
-    expect(engine.getSheetValues(0))
   })
 
   it('should REF last array', () => {
@@ -390,8 +389,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
       [undefined, undefined],
     ])
     expect(engine.getSheetValues(0)).toEqual([
@@ -399,7 +398,6 @@ describe('build from array', () => {
       [noSpace(), 2, 2, 1, 2],
     ])
     expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
-    expect(engine.getSheetValues(0))
   })
 
   it('array should work with different types of data', () => {
@@ -433,8 +431,8 @@ describe('build from array', () => {
     ], {useArrayArithmetic: true})
 
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, ArrayVertex],
-      [ArrayVertex, ArrayVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
+      [ArrayFormulaVertex, ArrayFormulaVertex],
     ])
 
   })
@@ -447,7 +445,7 @@ describe('build from array', () => {
 
     expect(engine.arrayMapping.getArrayByCorner(adr('A1'))?.array.size).toEqual(ArraySize.error())
     expectVerticesOfTypes(engine, [
-      [ArrayVertex, undefined],
+      [ArrayFormulaVertex, undefined],
       [ValueCellVertex, undefined],
     ])
   })
@@ -490,15 +488,6 @@ describe('column ranges', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
   })
 
-  it('arithmetic should work for row range', () => {
-    const engine = HyperFormula.buildFromArray([
-      ['=2*(2:2)', null],
-      [1, 2],
-    ], {useArrayArithmetic: true})
-
-    expect(engine.getSheetValues(0)).toEqual([[2, 4], [1, 2]])
-  })
-
   it('arithmetic for shifted row range -- error', () => {
     const engine = HyperFormula.buildFromArray([
       [null, '=2*(2:2)'],
@@ -517,5 +506,32 @@ describe('column ranges', () => {
     )
 
     expect(engine.getCellValue(adr('D1'))).toEqual(3)
+  })
+
+  it('should handle array shrinking when dependent is a value cell', () => {
+    const engine = HyperFormula.buildFromArray([
+      [1, 2],
+      [3, 4],
+      ['=TRANSPOSE(A1:B2)'],
+    ], {useArrayArithmetic: true})
+
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(2)
+    expect(engine.getCellValue(adr('B3'))).toBe(3)
+    expect(engine.getCellValue(adr('B4'))).toBe(4)
+
+    engine.setCellContents(adr('B3'), 'obstructing value')
+
+    expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult))
+  })
+
+  it('should correctly set address mapping for scalar formula', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=1+1'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.addressMapping.getCell(adr('A1'))).toBeDefined()
+    expect(engine.addressMapping.getCell(adr('B1'))).toBeUndefined()
   })
 })

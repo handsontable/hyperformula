@@ -1,6 +1,6 @@
 import {AlwaysDense, AlwaysSparse, ExportedCellChange, HyperFormula} from '../../../src'
 import {AbsoluteCellRange} from '../../../src/AbsoluteCellRange'
-import {ArrayVertex, RangeVertex} from '../../../src/DependencyGraph'
+import {ArrayFormulaVertex, RangeVertex} from '../../../src/DependencyGraph'
 import {ColumnIndex} from '../../../src/Lookup/ColumnIndex'
 import {CellAddress} from '../../../src/parser'
 import {
@@ -317,7 +317,7 @@ describe('Address dependencies, Case 2: formula in sheet where we make crud with
 })
 
 describe('Address dependencies, Case 3: formula in different sheet', () => {
-  it('case ARa: relative/absolute dependency after removed column should be shifted ', () => {
+  it('case ARa: relative/absolute dependency after removed column should be shifted', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['=Sheet2!C1', '=Sheet2!C1', '=Sheet2!C1', '=Sheet2!$C1'],
@@ -492,7 +492,7 @@ describe('Removing columns - reevaluation', () => {
 })
 
 describe('Removing rows - arrays', () => {
-  it('ArrayVertex#formula should be updated', () => {
+  it('ArrayFormulaVertex#formula should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
       ['4', '5', '6'],
@@ -503,7 +503,7 @@ describe('Removing rows - arrays', () => {
     expect(extractMatrixRange(engine, adr('C1'))).toEqual(new AbsoluteCellRange(adr('A1'), adr('B2')))
   })
 
-  it('ArrayVertex#address should be updated', () => {
+  it('ArrayFormulaVertex#address should be updated', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '3', '=TRANSPOSE(A1:C2)'],
       ['4', '5', '6'],
@@ -511,11 +511,11 @@ describe('Removing rows - arrays', () => {
 
     engine.removeColumns(0, [1, 1])
 
-    const matrixVertex = engine.addressMapping.fetchCell(adr('C1')) as ArrayVertex
+    const matrixVertex = engine.addressMapping.getCell(adr('C1')) as ArrayFormulaVertex
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 
-  it('ArrayVertex#formula should be updated when different sheets', () => {
+  it('ArrayFormulaVertex#formula should be updated when different sheets', () => {
     const engine = HyperFormula.buildFromSheets({
       Sheet1: [
         ['1', '2', '3'],
@@ -573,7 +573,7 @@ describe('Removing rows - arrays', () => {
     ], {useArrayArithmetic: true}))
   })
 
-  it('it should be REF if no space after removing column', () => {
+  it('should be REF if no space after removing column', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-C2:D2', null, 1],
       [null, null, 1, 2]
@@ -594,7 +594,7 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should be REF, not CYCLE, after removing columns', () => {
+  it('should be REF, not CYCLE, after removing columns', () => {
     const engine = HyperFormula.buildFromArray([
       ['=-C1:D1', null, 1, 2]
     ], {useArrayArithmetic: true})
@@ -611,7 +611,7 @@ describe('Removing rows - arrays', () => {
     expectEngineToBeTheSameAs(engine, expected)
   })
 
-  it('it should remove array when removing column with left corner', () => {
+  it('should remove array when removing column with left corner', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=MMULT(A1:B2, A1:B2)'],
       ['3', '4'],
@@ -625,7 +625,7 @@ describe('Removing rows - arrays', () => {
     ]))
   })
 
-  it('it should remove array when removing columns with whole matrix', () => {
+  it('should remove array when removing columns with whole matrix', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=MMULT(A1:B2, A1:B2)'],
       ['3', '4'],
@@ -648,8 +648,8 @@ describe('Removing columns - graph', function() {
 
     engine.removeColumns(0, [2, 1])
 
-    const b1 = engine.addressMapping.fetchCell(adr('b1'))
-    expect(engine.graph.adjacentNodes(b1)).toEqual(new Set())
+    const b1 = engine.addressMapping.getCell(adr('b1'))
+    expect(engine.graph.adjacentNodes(b1!)).toEqual(new Set())
   })
 
   it('should remove vertices from graph', function() {
@@ -702,9 +702,9 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, [0, 1])
 
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('B1'))
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
   it('shift ranges in range mapping, range start before removed columns', () => {
@@ -716,9 +716,9 @@ describe('Removing columns - ranges', function() {
 
     engine.removeColumns(0, [1, 2])
 
-    const range = engine.rangeMapping.fetchRange(adr('A1'), adr('A1'))
-    const a1 = engine.addressMapping.fetchCell(adr('A1'))
-    expect(engine.graph.existsEdge(a1, range)).toBe(true)
+    const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
+    const a1 = engine.addressMapping.getCell(adr('A1'))
+    expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
   it('shift ranges in range mapping, whole range', () => {
@@ -726,7 +726,7 @@ describe('Removing columns - ranges', function() {
       ['1', '2', '3', '=SUM(A1:C1)'],
       /*          */
     ])
-    const range = engine.rangeMapping.getRange(adr('A1'), adr('C1')) as RangeVertex
+    const range = engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1')) as RangeVertex
 
     engine.removeColumns(0, [0, 3])
 
@@ -885,7 +885,7 @@ describe('Removing columns - merge ranges', () => {
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should merge ranges in proper order', () => {

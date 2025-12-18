@@ -87,13 +87,17 @@ export class BuildEngineFactory {
           throw new SheetSizeLimitExceededError()
         }
         const sheetId = sheetMapping.addSheet(sheetName)
-        addressMapping.autoAddSheet(sheetId, boundaries)
+        addressMapping.addSheetAndSetStrategyBasedOnBoundaries(sheetId, boundaries, { throwIfSheetAlreadyExists: true })
       }
     }
 
-    const parser = new ParserWithCaching(config, functionRegistry, sheetMapping.get)
+    const parser = new ParserWithCaching(
+      config,
+      functionRegistry,
+      dependencyGraph.sheetReferenceRegistrar.ensureSheetRegistered.bind(dependencyGraph.sheetReferenceRegistrar)
+    )
     lazilyTransformingAstService.parser = parser
-    const unparser = new Unparser(config, buildLexerConfig(config), sheetMapping.fetchDisplayName, namedExpressions)
+    const unparser = new Unparser(config, sheetMapping, namedExpressions)
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralHelper)
@@ -106,7 +110,7 @@ export class BuildEngineFactory {
     const clipboardOperations = new ClipboardOperations(config, dependencyGraph, operations)
     const crudOperations = new CrudOperations(config, operations, undoRedo, clipboardOperations, dependencyGraph, columnSearch, parser, cellContentParser, lazilyTransformingAstService, namedExpressions)
 
-    const exporter = new Exporter(config, namedExpressions, sheetMapping.fetchDisplayName, lazilyTransformingAstService)
+    const exporter = new Exporter(config, namedExpressions, sheetMapping, lazilyTransformingAstService)
     const serialization = new Serialization(dependencyGraph, unparser, exporter)
 
     const interpreter = new Interpreter(config, dependencyGraph, columnSearch, stats, arithmeticHelper, functionRegistry, namedExpressions, serialization, arraySizePredictor, dateTimeHelper)

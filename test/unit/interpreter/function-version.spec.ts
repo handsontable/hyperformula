@@ -81,7 +81,7 @@ describe('Function VERSION', () => {
       }).toThrow(ProtectedFunctionError.cannotRegisterFunctionWithId('VERSION'))
     })
 
-    it('should be available even if anyone unregistered ', () => {
+    it('should be available even if anyone unregistered', () => {
       expect(() => {
         HyperFormula.unregisterFunction('VERSION')
       }).toThrow(ProtectedFunctionError.cannotUnregisterFunctionWithId('VERSION'))

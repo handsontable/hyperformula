@@ -18,7 +18,7 @@ describe('Row ranges', () => {
       ['=SUM(C3:D4)'],
     ])
 
-    const rowRange = engine.rangeMapping.getRange(rowStart(3), rowEnd(4))!
+    const rowRange = engine.rangeMapping.getRangeVertex(rowStart(3), rowEnd(4))!
 
     const c3 = engine.dependencyGraph.fetchCell(adr('C3'))
     const c4 = engine.dependencyGraph.fetchCell(adr('C4'))
@@ -39,8 +39,8 @@ describe('Row ranges', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(Z4:Z8)')
 
-    const rowRange35 = engine.rangeMapping.getRange(rowStart(3), rowEnd(5))!
-    const rowRange47 = engine.rangeMapping.getRange(rowStart(4), rowEnd(7))!
+    const rowRange35 = engine.rangeMapping.getRangeVertex(rowStart(3), rowEnd(5))!
+    const rowRange47 = engine.rangeMapping.getRangeVertex(rowStart(4), rowEnd(7))!
 
     const z4 = engine.dependencyGraph.fetchCell(adr('Z4'))
     const z5 = engine.dependencyGraph.fetchCell(adr('Z5'))
@@ -57,5 +57,18 @@ describe('Row ranges', () => {
     expect(engine.graph.existsEdge(z6, rowRange47)).toBe(true)
     expect(engine.graph.existsEdge(z7, rowRange47)).toBe(true)
     expect(engine.graph.existsEdge(z8, rowRange47)).toBe(false)
+  })
+
+  it('should correctly handle infinite row ranges when setting cell values (line 890)', () => {
+    const engine = HyperFormula.buildFromArray([
+      ['=SUM(3:4)'],
+    ])
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+
+    engine.setCellContents(adr('E3'), 100)
+    engine.setCellContents(adr('F4'), 200)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(300)
   })
 })

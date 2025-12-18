@@ -7,13 +7,13 @@ describe('AbsoluteCellRange', () => {
     it('true in simplest case', () => {
       const range = AbsoluteCellRange.fromCoordinates(0, 0, 0, 0, 0)
 
-      expect(range.addressInRange(adr('A1')))
+      expect(range.addressInRange(adr('A1'))).toBe(true)
     })
 
     it('false if different sheets', () => {
       const range = AbsoluteCellRange.fromCoordinates(1, 0, 0, 0, 0)
 
-      expect(range.addressInRange(adr('A1')))
+      expect(range.addressInRange(adr('A1'))).toBe(false)
     })
   })
 

@@ -1,7 +1,5 @@
 import {HyperFormula} from '../../../src'
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 describe('Function aliases', () => {
   const engine = HyperFormula.buildEmpty()
   it('NEGBINOMDIST should be an alias of NEGBINOM.DIST', () => {

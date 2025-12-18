@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {invalidSimpleCellAddress, SimpleCellAddress} from './Cell'
+import {isColOrRowInvalid, SimpleCellAddress} from './Cell'
 import {CellDependency} from './CellDependency'
 import {NamedExpressionDependency, RelativeDependency} from './parser'
 
@@ -24,9 +24,9 @@ export const filterDependenciesOutOfScope = (deps: CellDependency[]) => {
       return true
     }
     if (dep instanceof AbsoluteCellRange) {
-      return !(invalidSimpleCellAddress(dep.start) || invalidSimpleCellAddress(dep.end))
+      return !(isColOrRowInvalid(dep.start) || isColOrRowInvalid(dep.end))
     } else {
-      return !invalidSimpleCellAddress(dep)
+      return !isColOrRowInvalid(dep)
     }
   })
 }

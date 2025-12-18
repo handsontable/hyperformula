@@ -4,7 +4,7 @@
  */
 
 import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {invalidSimpleCellAddress, simpleCellAddress, SimpleCellAddress} from './Cell'
+import {isColOrRowInvalid, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
 import {ClipboardCell, ClipboardOperations} from './ClipboardOperations'
 import {Config} from './Config'
@@ -206,29 +206,35 @@ export class CrudOperations {
       this.ensureItIsPossibleToAddSheet(name)
     }
     this.undoRedo.clearRedoStack()
-    const addedSheetName = this.operations.addSheet(name)
-    this.undoRedo.saveOperation(new AddSheetUndoEntry(addedSheetName))
-    return addedSheetName
+    const { sheetName, sheetId } = this.operations.addSheet(name)
+    this.undoRedo.saveOperation(new AddSheetUndoEntry(sheetName, sheetId))
+    return sheetName
   }
 
   public removeSheet(sheetId: number): void {
     this.ensureScopeIdIsValid(sheetId)
     this.undoRedo.clearRedoStack()
     this.clipboardOperations.abortCut()
-    const originalName = this.sheetMapping.fetchDisplayName(sheetId)
+    const originalName = this.sheetMapping.getSheetNameOrThrowError(sheetId)
     const oldSheetContent = this.operations.getSheetClipboardCells(sheetId)
-    const {version, scopedNamedExpressions} = this.operations.removeSheet(sheetId)
-    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, scopedNamedExpressions, version))
+    const scopedNamedExpressions = this.operations.removeSheet(sheetId)
+    this.undoRedo.saveOperation(new RemoveSheetUndoEntry(originalName, sheetId, oldSheetContent, scopedNamedExpressions))
   }
 
   public renameSheet(sheetId: number, newName: string): Maybe<string> {
     this.ensureItIsPossibleToRenameSheet(sheetId, newName)
-    const oldName = this.operations.renameSheet(sheetId, newName)
-    if (oldName !== undefined) {
+    const { previousDisplayName, version, mergedPlaceholderSheetId } = this.operations.renameSheet(sheetId, newName)
+    if (previousDisplayName !== undefined) {
       this.undoRedo.clearRedoStack()
-      this.undoRedo.saveOperation(new RenameSheetUndoEntry(sheetId, oldName, newName))
+      this.undoRedo.saveOperation(new RenameSheetUndoEntry(
+        sheetId,
+        previousDisplayName,
+        newName,
+        version,
+        mergedPlaceholderSheetId,
+      ))
     }
-    return oldName
+    return previousDisplayName
   }
 
   public clearSheet(sheetId: number): void {
@@ -495,8 +501,8 @@ export class CrudOperations {
 
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
-      || invalidSimpleCellAddress(sourceStart)
-      || invalidSimpleCellAddress(targetStart)
+      || isColOrRowInvalid(sourceStart)
+      || isColOrRowInvalid(targetStart)
       || !isPositiveInteger(numberOfRows)
       || (targetRow <= startRow + numberOfRows && targetRow >= startRow)
     ) {
@@ -522,8 +528,8 @@ export class CrudOperations {
 
     if (
       !this.sheetMapping.hasSheetWithId(sheet)
-      || invalidSimpleCellAddress(sourceStart)
-      || invalidSimpleCellAddress(targetStart)
+      || isColOrRowInvalid(sourceStart)
+      || isColOrRowInvalid(targetStart)
       || !isPositiveInteger(numberOfColumns)
       || (targetColumn <= startColumn + numberOfColumns && targetColumn >= startColumn)
     ) {
@@ -552,14 +558,14 @@ export class CrudOperations {
       throw new NoSheetWithIdError(sheetId)
     }
 
-    const existingSheetId = this.sheetMapping.get(name)
+    const existingSheetId = this.sheetMapping.getSheetId(name)
     if (existingSheetId !== undefined && existingSheetId !== sheetId) {
       throw new SheetNameAlreadyTakenError(name)
     }
   }
 
   public ensureItIsPossibleToChangeContent(address: SimpleCellAddress): void {
-    if (invalidSimpleCellAddress(address)) {
+    if (isColOrRowInvalid(address)) {
       throw new InvalidAddressError(address)
     }
     if (!this.sheetMapping.hasSheetWithId(address.sheet)) {

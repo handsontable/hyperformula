@@ -3,9 +3,9 @@ import {CellError, HyperFormula} from '../../src'
 import {AbsoluteCellRange} from '../../src/AbsoluteCellRange'
 import {SimpleCellAddress, simpleCellAddress} from '../../src/Cell'
 import {
-  ArrayVertex,
+  ArrayFormulaVertex,
   EmptyCellVertex,
-  FormulaCellVertex,
+  ScalarFormulaVertex,
   ParsingErrorVertex,
   RangeVertex,
   ValueCellVertex,
@@ -20,9 +20,9 @@ export class EngineComparator {
               private actual: HyperFormula) {
   }
 
-  public compare() {
-    const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets()
-    const numberOfSheets = this.actual.sheetMapping.numberOfSheets()
+  public compare(): void {
+    const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets({includePlaceholders: true})
+    const numberOfSheets = this.actual.sheetMapping.numberOfSheets({includePlaceholders: true})
 
     if (expectedNumberOfSheets !== numberOfSheets) {
       throw Error(`Expected number of sheets ${expectedNumberOfSheets}, actual: ${numberOfSheets}`)
@@ -36,7 +36,7 @@ export class EngineComparator {
     }
   }
 
-  private compareSheet(sheet: number) {
+  private compareSheet(sheet: number): void {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
 
@@ -44,10 +44,10 @@ export class EngineComparator {
     const actualSheetName = this.actual.getSheetName(sheet)
     equal(expectedSheetName, actualSheetName, `Expected sheet name '${expectedSheetName}', actual '${actualSheetName}'`)
 
-    const expectedWidth = this.expected.addressMapping.getWidth(sheet)
-    const expectedHeight = this.expected.addressMapping.getHeight(sheet)
-    const actualWidth = this.actual.addressMapping.getWidth(sheet)
-    const actualHeight = this.actual.addressMapping.getHeight(sheet)
+    const expectedWidth = this.expected.addressMapping.getSheetWidth(sheet)
+    const expectedHeight = this.expected.addressMapping.getSheetHeight(sheet)
+    const actualWidth = this.actual.addressMapping.getSheetWidth(sheet)
+    const actualHeight = this.actual.addressMapping.getSheetHeight(sheet)
 
     this.compareMatrixMappings()
 
@@ -59,8 +59,8 @@ export class EngineComparator {
         if (expectedVertex === undefined && actualVertex === undefined) {
           continue
         } else if (
-          (expectedVertex instanceof FormulaCellVertex && actualVertex instanceof FormulaCellVertex) ||
-          (expectedVertex instanceof ArrayVertex && actualVertex instanceof ArrayVertex)
+          (expectedVertex instanceof ScalarFormulaVertex && actualVertex instanceof ScalarFormulaVertex) ||
+          (expectedVertex instanceof ArrayFormulaVertex && actualVertex instanceof ArrayFormulaVertex)
         ) {
           const actualVertexAddress = actualVertex.getAddress(this.actual.dependencyGraph.lazilyTransformingAstService)
           const expectedVertexAddress = expectedVertex.getAddress(this.expected.dependencyGraph.lazilyTransformingAstService)
@@ -87,7 +87,9 @@ export class EngineComparator {
           actualAdjacentAddresses.add(this.getAddressOfVertex(this.actual, adjacentNode))
         }
         const sheetMapping = this.expected.sheetMapping
-        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${simpleCellAddressToString(sheetMapping.fetchDisplayName, address, 0)} (Sheet '${sheetMapping.fetchDisplayName(address.sheet)}') are not same`)
+        deepStrictEqual(actualAdjacentAddresses, expectedAdjacentAddresses, `Dependent vertices of ${
+          simpleCellAddressToString(sheetMapping.getSheetName.bind(sheetMapping), address, 0) ?? 'ERROR'
+        } (Sheet '${sheetMapping.getSheetName(address.sheet) ?? 'Unknown sheet'}') are not same`)
       }
     }
   }
@@ -110,7 +112,7 @@ export class EngineComparator {
     expect(actual.size).toEqual(expected.size)
 
     for (const [key, value] of expected.entries()) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       const actualEntry = actual.get(key)!
       expect(actualEntry).toBeDefined()
       expect(actualEntry.array.size.isRef).toBe(value.array.size.isRef)

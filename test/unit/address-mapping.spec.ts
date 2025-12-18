@@ -16,7 +16,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(address, vertex)
 
-    expect(mapping.fetchCell(address)).toBe(vertex)
+    expect(mapping.getCell(address)).toBe(vertex)
   })
 
   it('set and using different reference when get', () => {
@@ -25,7 +25,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(adr('A1'), vertex)
 
-    expect(mapping.fetchCell(adr('A1'))).toBe(vertex)
+    expect(mapping.getCell(adr('A1'))).toBe(vertex)
   })
 
   it("get when there's even no column", () => {
@@ -141,8 +141,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(adr('A2'), vertex1)
 
-    expect(mapping.fetchCell(adr('A1'))).toBe(vertex0)
-    expect(mapping.fetchCell(adr('A2'))).toBe(vertex1)
+    expect(mapping.getCell(adr('A1'))).toBe(vertex0)
+    expect(mapping.getCell(adr('A2'))).toBe(vertex1)
   })
 
   it('set overrides old value', () => {
@@ -153,7 +153,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.setCell(adr('A1'), vertex1)
 
-    expect(mapping.fetchCell(adr('A1'))).toBe(vertex1)
+    expect(mapping.getCell(adr('A1'))).toBe(vertex1)
   })
 
   it("has when there's even no column", () => {
@@ -192,8 +192,8 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.addRows(0, 0, 1)
 
     expect(mapping.getCell(adr('A1'))).toBe(undefined)
-    expect(mapping.fetchCell(adr('A2'))).toEqual(new ValueCellVertex(42, 42))
-    expect(mapping.getHeight(0)).toEqual(2)
+    expect(mapping.getCell(adr('A2'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getSheetHeight(0)).toEqual(2)
   })
 
   it('addRows in the middle of a mapping', () => {
@@ -204,10 +204,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
-    expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(43, 43))
-    expect(mapping.getHeight(0)).toEqual(3)
+    expect(mapping.getCell(adr('A3'))).toEqual(new ValueCellVertex(43, 43))
+    expect(mapping.getSheetHeight(0)).toEqual(3)
   })
 
   it('addRows in the end of a mapping', () => {
@@ -217,9 +217,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
-    expect(mapping.getHeight(0)).toEqual(2)
+    expect(mapping.getSheetHeight(0)).toEqual(2)
   })
 
   it('addRows more than one row', () => {
@@ -230,12 +230,12 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 3)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(42, 42))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.getCell(adr('A3'))).toBe(undefined)
     expect(mapping.getCell(adr('A4'))).toBe(undefined)
-    expect(mapping.fetchCell(adr('A5'))).toEqual(new ValueCellVertex(43, 43))
-    expect(mapping.getHeight(0)).toEqual(5)
+    expect(mapping.getCell(adr('A5'))).toEqual(new ValueCellVertex(43, 43))
+    expect(mapping.getSheetHeight(0)).toEqual(5)
   })
 
   it('addRows when more than one column present', () => {
@@ -248,13 +248,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.addRows(0, 1, 1)
 
-    expect(mapping.fetchCell(adr('A1'))).toEqual(new ValueCellVertex(11, 11))
-    expect(mapping.fetchCell(adr('B1'))).toEqual(new ValueCellVertex(12, 12))
+    expect(mapping.getCell(adr('A1'))).toEqual(new ValueCellVertex(11, 11))
+    expect(mapping.getCell(adr('B1'))).toEqual(new ValueCellVertex(12, 12))
     expect(mapping.getCell(adr('A2'))).toBe(undefined)
     expect(mapping.getCell(adr('B2'))).toBe(undefined)
-    expect(mapping.fetchCell(adr('A3'))).toEqual(new ValueCellVertex(21, 21))
-    expect(mapping.fetchCell(adr('B3'))).toEqual(new ValueCellVertex(22, 22))
-    expect(mapping.getHeight(0)).toEqual(3)
+    expect(mapping.getCell(adr('A3'))).toEqual(new ValueCellVertex(21, 21))
+    expect(mapping.getCell(adr('B3'))).toEqual(new ValueCellVertex(22, 22))
+    expect(mapping.getSheetHeight(0)).toEqual(3)
   })
 
   it('removeRows - one row', () => {
@@ -264,9 +264,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
     mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
-    expect(mapping.getHeight(0)).toBe(2)
+    expect(mapping.getSheetHeight(0)).toBe(2)
     mapping.removeRows(new RowsSpan(0, 0, 0))
-    expect(mapping.getHeight(0)).toBe(1)
+    expect(mapping.getSheetHeight(0)).toBe(1)
     expect(mapping.getCellValue(adr('A1'))).toBe(21)
     expect(mapping.getCellValue(adr('B1'))).toBe(22)
   })
@@ -282,9 +282,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('A4'), new ValueCellVertex(41, 41))
     mapping.setCell(adr('B4'), new ValueCellVertex(42, 42))
 
-    expect(mapping.getHeight(0)).toBe(4)
+    expect(mapping.getSheetHeight(0)).toBe(4)
     mapping.removeRows(new RowsSpan(0, 1, 2))
-    expect(mapping.getHeight(0)).toBe(2)
+    expect(mapping.getSheetHeight(0)).toBe(2)
     expect(mapping.getCellValue(adr('A1'))).toBe(11)
     expect(mapping.getCellValue(adr('A2'))).toBe(41)
   })
@@ -296,9 +296,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
     mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
-    expect(mapping.getHeight(0)).toBe(2)
+    expect(mapping.getSheetHeight(0)).toBe(2)
     mapping.removeRows(new RowsSpan(0, 0, 5))
-    expect(mapping.getHeight(0)).toBe(0)
+    expect(mapping.getSheetHeight(0)).toBe(0)
     expect(mapping.has(adr('A1'))).toBe(false)
   })
 
@@ -311,7 +311,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.removeRows(new RowsSpan(0, 1, 5))
 
-    expect(mapping.getHeight(0)).toBe(1)
+    expect(mapping.getSheetHeight(0)).toBe(1)
     expect(mapping.has(adr('A1'))).toBe(true)
     expect(mapping.has(adr('A2'))).toBe(false)
   })
@@ -325,7 +325,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.removeRows(new RowsSpan(0, 2, 3))
 
-    expect(mapping.getHeight(0)).toBe(2)
+    expect(mapping.getSheetHeight(0)).toBe(2)
     expect(mapping.has(adr('A1'))).toBe(true)
     expect(mapping.has(adr('A2'))).toBe(true)
   })
@@ -341,9 +341,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('D1'), new ValueCellVertex(41, 41))
     mapping.setCell(adr('D2'), new ValueCellVertex(42, 42))
 
-    expect(mapping.getWidth(0)).toBe(4)
+    expect(mapping.getSheetWidth(0)).toBe(4)
     mapping.removeColumns(new ColumnsSpan(0, 1, 2))
-    expect(mapping.getWidth(0)).toBe(2)
+    expect(mapping.getSheetWidth(0)).toBe(2)
     expect(mapping.getCellValue(adr('A1'))).toBe(11)
     expect(mapping.getCellValue(adr('B1'))).toBe(41)
   })
@@ -355,9 +355,9 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     mapping.setCell(adr('A2'), new ValueCellVertex(21, 21))
     mapping.setCell(adr('B2'), new ValueCellVertex(22, 22))
 
-    expect(mapping.getHeight(0)).toBe(2)
+    expect(mapping.getSheetHeight(0)).toBe(2)
     mapping.removeColumns(new ColumnsSpan(0, 0, 5))
-    expect(mapping.getWidth(0)).toBe(0)
+    expect(mapping.getSheetWidth(0)).toBe(0)
     expect(mapping.has(adr('A1'))).toBe(false)
   })
 
@@ -370,7 +370,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.removeColumns(new ColumnsSpan(0, 1, 5))
 
-    expect(mapping.getWidth(0)).toBe(1)
+    expect(mapping.getSheetWidth(0)).toBe(1)
     expect(mapping.has(adr('A1'))).toBe(true)
     expect(mapping.has(adr('B1'))).toBe(false)
   })
@@ -384,7 +384,7 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
     mapping.removeColumns(new ColumnsSpan(0, 2, 3))
 
-    expect(mapping.getWidth(0)).toBe(2)
+    expect(mapping.getSheetWidth(0)).toBe(2)
     expect(mapping.has(adr('A1'))).toBe(true)
     expect(mapping.has(adr('B1'))).toBe(true)
   })
@@ -392,13 +392,13 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
   it('should expand columns when adding cell', () => {
     const mapping = builder(2, 2)
     mapping.setCell(adr('C1'), new EmptyCellVertex())
-    expect(mapping.getWidth(0)).toBe(3)
+    expect(mapping.getSheetWidth(0)).toBe(3)
   })
 
   it('should expand rows when adding cell', () => {
     const mapping = builder(2, 2)
     mapping.setCell(adr('A3'), new EmptyCellVertex())
-    expect(mapping.getHeight(0)).toBe(3)
+    expect(mapping.getSheetHeight(0)).toBe(3)
   })
 
   it('should move cell from source to destination', () => {
@@ -425,11 +425,14 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
     expect(() => mapping.moveCell(adr('A1'), adr('A2'))).toThrowError('Cannot move cell. Destination already occupied.')
   })
 
-  it('should throw error when trying to move vertices between sheets', () => {
+  it('should move vertices between sheets', () => {
     const mapping = builder(1, 2)
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
 
-    expect(() => mapping.moveCell(adr('A1', 0), adr('A2', 1))).toThrowError('Cannot move cells between sheets.')
+    mapping.moveCell(adr('A1', 0), adr('A2', 1))
+
+    expect(mapping.has(adr('A1', 0))).toEqual(false)
+    expect(mapping.has(adr('A2', 1))).toEqual(true)
   })
 
   it('should throw error when trying to move vertices in non-existing sheet', () => {
@@ -441,10 +444,10 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 
   it('entriesFromColumnsSpan returns the same result regardless of the strategy', () => {
     const denseMapping = new AddressMapping(new AlwaysDense())
-    denseMapping.addSheet(0, new DenseStrategy(5, 5))
+    denseMapping.addSheetWithStrategy(0, new DenseStrategy(5, 5))
 
     const sparseMapping = new AddressMapping(new AlwaysSparse())
-    sparseMapping.addSheet(0, new SparseStrategy(5, 5))
+    sparseMapping.addSheetWithStrategy(0, new SparseStrategy(5, 5))
 
     const mappingsAndResults: { mapping: AddressMapping, results: String[][] }[] = [
       {
@@ -487,25 +490,25 @@ const sharedExamples = (builder: (width: number, height: number) => AddressMappi
 describe('SparseStrategy', () => {
   sharedExamples((maxCol: number, maxRow: number) => {
     const mapping = new AddressMapping(new AlwaysSparse())
-    mapping.addSheet(0, new SparseStrategy(maxCol, maxRow))
-    mapping.addSheet(1, new SparseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(0, new SparseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(1, new SparseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
-    mapping.addSheet(0, new SparseStrategy(4, 16))
+    mapping.addSheetWithStrategy(0, new SparseStrategy(4, 16))
 
     mapping.setCell(adr('D16'), new ValueCellVertex(42, 42))
 
-    expect(mapping.getHeight(0)).toEqual(16)
-    expect(mapping.getWidth(0)).toEqual(4)
+    expect(mapping.getSheetHeight(0)).toEqual(16)
+    expect(mapping.getSheetWidth(0)).toEqual(4)
   })
 
   it('get all vertices', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
-    mapping.addSheet(0, sparseStrategy)
+    mapping.addSheetWithStrategy(0, sparseStrategy)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -530,7 +533,7 @@ describe('SparseStrategy', () => {
   it('get all vertices - from column', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
-    mapping.addSheet(0, sparseStrategy)
+    mapping.addSheetWithStrategy(0, sparseStrategy)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -559,7 +562,7 @@ describe('SparseStrategy', () => {
   it('get all vertices - from row', () => {
     const mapping = new AddressMapping(new AlwaysSparse())
     const sparseStrategy = new SparseStrategy(3, 3)
-    mapping.addSheet(0, sparseStrategy)
+    mapping.addSheetWithStrategy(0, sparseStrategy)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -589,23 +592,23 @@ describe('SparseStrategy', () => {
 describe('DenseStrategy', () => {
   sharedExamples((maxCol, maxRow) => {
     const mapping = new AddressMapping(new AlwaysDense())
-    mapping.addSheet(0, new DenseStrategy(maxCol, maxRow))
-    mapping.addSheet(1, new DenseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(0, new DenseStrategy(maxCol, maxRow))
+    mapping.addSheetWithStrategy(1, new DenseStrategy(maxCol, maxRow))
     return mapping
   })
 
   it('returns maximum row/col for simplest case', () => {
     const mapping = new AddressMapping(new AlwaysDense())
-    mapping.addSheet(0, new DenseStrategy(1, 2))
+    mapping.addSheetWithStrategy(0, new DenseStrategy(1, 2))
 
-    expect(mapping.getHeight(0)).toEqual(2)
-    expect(mapping.getWidth(0)).toEqual(1)
+    expect(mapping.getSheetHeight(0)).toEqual(2)
+    expect(mapping.getSheetWidth(0)).toEqual(1)
   })
 
   it('get all vertices', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
-    mapping.addSheet(0, denseStratgey)
+    mapping.addSheetWithStrategy(0, denseStratgey)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -630,7 +633,7 @@ describe('DenseStrategy', () => {
   it('get all vertices - from column', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
-    mapping.addSheet(0, denseStratgey)
+    mapping.addSheetWithStrategy(0, denseStratgey)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -659,7 +662,7 @@ describe('DenseStrategy', () => {
   it('get all vertices - from row', () => {
     const mapping = new AddressMapping(new AlwaysDense())
     const denseStratgey = new DenseStrategy(3, 3)
-    mapping.addSheet(0, denseStratgey)
+    mapping.addSheetWithStrategy(0, denseStratgey)
 
     mapping.setCell(adr('A1', 0), new ValueCellVertex(42, 42))
     mapping.setCell(adr('A2', 0), new ValueCellVertex(43, 43))
@@ -693,9 +696,9 @@ describe('AddressMapping', () => {
       [null, null, null],
       [null, null, '1'],
     ]
-    addressMapping.autoAddSheet(0, findBoundaries(sheet))
+    addressMapping.addSheetAndSetStrategyBasedOnBoundaries(0, findBoundaries(sheet))
 
-    expect(addressMapping.strategyFor(0)).toBeInstanceOf(SparseStrategy)
+    expect(addressMapping.getStrategyForSheetOrThrow(0)).toBeInstanceOf(SparseStrategy)
   })
 
   it('#buildAddresMapping - when dense matrix', () => {
@@ -704,8 +707,8 @@ describe('AddressMapping', () => {
       ['1', '1'],
       ['1', '1'],
     ]
-    addressMapping.autoAddSheet(0, findBoundaries(sheet))
+    addressMapping.addSheetAndSetStrategyBasedOnBoundaries(0, findBoundaries(sheet))
 
-    expect(addressMapping.strategyFor(0)).toBeInstanceOf(DenseStrategy)
+    expect(addressMapping.getStrategyForSheetOrThrow(0)).toBeInstanceOf(DenseStrategy)
   })
 })

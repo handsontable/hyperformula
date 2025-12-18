@@ -19,39 +19,56 @@ export interface TruncateRangesResult extends AdjustRangesResult {
   verticesWithChangedSize: RangeVertex[],
 }
 
+type AdjustVerticesOperationResult = {
+  changedSize: boolean,
+  vertex: RangeVertex,
+}
+
+type AdjustVerticesOperation = (key: string, vertex: RangeVertex) => Maybe<AdjustVerticesOperationResult>
+
 /**
- * Mapping from address ranges to range vertices
+ * Maintains a per-sheet map from serialized start/end coordinates to `RangeVertex`.
+ * - Every range vertex in dependency graph should be stored in this mapping.
+ * - Guarantees uniqueness: one vertex per distinct rectangle, enabling cache reuse.
+ * - Implements "smaller prefix + tail row" optimization: if A1:A4 exists, A1:A5 depends on it + only A5.
+ * - RangeVertex stores cached results for associative aggregates (SUM, COUNT) and criterion functions.
  */
 export class RangeMapping {
-  /** Map in which actual data is stored. */
-  private rangeMapping: Map<number, Map<string, RangeVertex>> = new Map()
+    /**
+     * Map sheetId -> address of start and end (as string) -> vertex
+     */
+    private rangeMapping: Map<number, Map<string, RangeVertex>> = new Map()
 
-  public getMappingSize(sheet: number): Maybe<number> {
+  /**
+   * Returns number of ranges in the sheet or 0 if the sheet does not exist
+   */
+  public getNumberOfRangesInSheet(sheet: number): number {
     return this.rangeMapping.get(sheet)?.size ?? 0
   }
 
   /**
-   * Saves range vertex
-   *
-   * @param vertex - vertex to save
+   * Adds or updates vertex in the mapping
    */
-  public setRange(vertex: RangeVertex) {
-    let sheetMap = this.rangeMapping.get(vertex.getStart().sheet)
+  public addOrUpdateVertex(vertex: RangeVertex): void {
+    let sheetMap = this.rangeMapping.get(vertex.sheet)
     if (sheetMap === undefined) {
       sheetMap = new Map()
-      this.rangeMapping.set(vertex.getStart().sheet, sheetMap)
+      this.rangeMapping.set(vertex.sheet, sheetMap)
     }
-    const key = keyFromAddresses(vertex.getStart(), vertex.getEnd())
+    const key = RangeMapping.calculateRangeKey(vertex.start, vertex.end)
     sheetMap.set(key, vertex)
   }
 
-  public removeRange(vertex: RangeVertex) {
-    const sheet = vertex.getStart().sheet
+  /**
+   * Removes vertex from the mapping if it exists
+   */
+  public removeVertexIfExists(vertex: RangeVertex): void {
+    const sheet = vertex.sheet
     const sheetMap = this.rangeMapping.get(sheet)
     if (sheetMap === undefined) {
       return
     }
-    const key = keyFromAddresses(vertex.getStart(), vertex.getEnd())
+    const key = RangeMapping.calculateRangeKey(vertex.start, vertex.end)
     sheetMap.delete(key)
     if (sheetMap.size === 0) {
       this.rangeMapping.delete(sheet)
@@ -60,18 +77,18 @@ export class RangeMapping {
 
   /**
    * Returns associated vertex for given range
-   *
-   * @param start - top-left corner of the range
-   * @param end - bottom-right corner of the range
    */
-  public getRange(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
+  public getRangeVertex(start: SimpleCellAddress, end: SimpleCellAddress): Maybe<RangeVertex> {
     const sheetMap = this.rangeMapping.get(start.sheet)
-    const key = keyFromAddresses(start, end)
+    const key = RangeMapping.calculateRangeKey(start, end)
     return sheetMap?.get(key)
   }
 
-  public fetchRange(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex {
-    const maybeRange = this.getRange(start, end)
+  /**
+   * Returns associated vertex for given range or throws an error if not found
+   */
+  public getVertexOrThrow(start: SimpleCellAddress, end: SimpleCellAddress): RangeVertex {
+    const maybeRange = this.getRangeVertex(start, end)
     if (!maybeRange) {
       throw Error('Range does not exist')
     }
@@ -99,9 +116,9 @@ export class RangeMapping {
     }
 
     const verticesToMerge: [RangeVertex, RangeVertex][] = []
-    updated.sort((left, right) => compareBy(left[1], right[1], coordinate))
+    updated.sort((left, right) => RangeMapping.compareBy(left[1], right[1], coordinate))
     for (const [oldKey, vertex] of updated) {
-      const newKey = keyFromRange(vertex.range)
+      const newKey = RangeMapping.calculateRangeKey(vertex.range.start, vertex.range.end)
       if (newKey === oldKey) {
         continue
       }
@@ -111,7 +128,7 @@ export class RangeMapping {
       if (existingVertex !== undefined && vertex != existingVertex) {
         verticesToMerge.push([existingVertex, vertex])
       } else {
-        this.setRange(vertex)
+        this.addOrUpdateVertex(vertex)
       }
     }
 
@@ -122,7 +139,7 @@ export class RangeMapping {
     }
   }
 
-  public moveAllRangesInSheetAfterRowByRows(sheet: number, row: number, numberOfRows: number): AdjustRangesResult {
+  public moveAllRangesInSheetAfterAddingRows(sheet: number, row: number, numberOfRows: number): AdjustRangesResult {
     return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex) => {
       if (row <= vertex.start.row) {
         vertex.range.shiftByRows(numberOfRows)
@@ -142,7 +159,7 @@ export class RangeMapping {
     })
   }
 
-  public moveAllRangesInSheetAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number): AdjustRangesResult {
+  public moveAllRangesInSheetAfterAddingColumns(sheet: number, column: number, numberOfColumns: number): AdjustRangesResult {
     return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex) => {
       if (column <= vertex.start.col) {
         vertex.range.shiftByColumns(numberOfColumns)
@@ -178,15 +195,6 @@ export class RangeMapping {
     })
   }
 
-  public removeRangesInSheet(sheet: number): IterableIterator<RangeVertex> {
-    if (this.rangeMapping.has(sheet)) {
-      const ranges = this.rangeMapping.get(sheet)!.values()
-      this.rangeMapping.delete(sheet)
-      return ranges
-    }
-    return [][Symbol.iterator]()
-  }
-
   public* rangesInSheet(sheet: number): IterableIterator<RangeVertex> {
     const sheetMap = this.rangeMapping.get(sheet)
     if (!sheetMap) {
@@ -204,14 +212,12 @@ export class RangeMapping {
   }
 
   /**
-   * Finds smaller range does have own vertex.
-   *
-   * @param range
+   * Finds smaller range if exists.
    */
   public findSmallerRange(range: AbsoluteCellRange): { smallerRangeVertex?: RangeVertex, restRange: AbsoluteCellRange } {
     if (range.height() > 1 && Number.isFinite(range.height())) {
       const valuesRangeEndRowLess = simpleCellAddress(range.end.sheet, range.end.col, range.end.row - 1)
-      const rowLessVertex = this.getRange(range.start, valuesRangeEndRowLess)
+      const rowLessVertex = this.getRangeVertex(range.start, valuesRangeEndRowLess)
       if (rowLessVertex !== undefined) {
         const restRange = AbsoluteCellRange.fromSimpleCellAddresses(simpleCellAddress(range.start.sheet, range.start.col, range.end.row), range.end)
         return {
@@ -225,6 +231,28 @@ export class RangeMapping {
     }
   }
 
+  /**
+   * Calculates a string key from start and end addresses
+   */
+  private static calculateRangeKey(start: SimpleCellAddress, end: SimpleCellAddress): string {
+    return `${start.col},${start.row},${end.col},${end.row}`
+  }
+
+  /**
+   * Compares two range vertices by their start and end addresses using the provided coordinate function
+   */
+  private static compareBy(left: RangeVertex, right: RangeVertex, coordinate: (address: SimpleCellAddress) => number): number {
+    const leftStart = coordinate(left.range.start)
+    const rightStart = coordinate(right.range.start)
+    if (leftStart === rightStart) {
+      const leftEnd = coordinate(left.range.end)
+      const rightEnd = coordinate(right.range.end)
+      return leftEnd - rightEnd
+    } else {
+      return leftStart - rightStart
+    }
+  }
+
   private* entriesFromSheet(sheet: number): IterableIterator<[string, RangeVertex]> {
     const sheetMap = this.rangeMapping.get(sheet)
     if (!sheetMap) {
@@ -233,8 +261,13 @@ export class RangeMapping {
     yield* sheetMap.entries()
   }
 
-  private removeByKey(sheet: number, key: string) {
-    this.rangeMapping.get(sheet)!.delete(key)
+  private removeByKey(sheet: number, key: string): void {
+    const sheetMap = this.rangeMapping.get(sheet)
+
+    if (!sheetMap) {
+      throw new Error(`Sheet ${sheet} not found`)
+    }
+    sheetMap.delete(key)
   }
 
   private getByKey(sheet: number, key: string): RangeVertex | undefined {
@@ -242,7 +275,7 @@ export class RangeMapping {
   }
 
   private updateVerticesFromSheet(sheet: number, fn: AdjustVerticesOperation): AdjustRangesResult {
-    const updated = Array<AdjustVeticesOperationResult>()
+    const updated = Array<AdjustVerticesOperationResult>()
 
     for (const [key, vertex] of this.entriesFromSheet(sheet)) {
       const result = fn(key, vertex)
@@ -253,7 +286,7 @@ export class RangeMapping {
     }
 
     updated.forEach(entry => {
-      this.setRange(entry.vertex)
+      this.addOrUpdateVertex(entry.vertex)
     })
 
     return {
@@ -261,32 +294,5 @@ export class RangeMapping {
         .filter(entry => entry.changedSize)
         .map(entry => entry.vertex)
     }
-  }
-}
-
-type AdjustVeticesOperationResult = {
-  changedSize: boolean,
-  vertex: RangeVertex,
-}
-
-type AdjustVerticesOperation = (key: string, vertex: RangeVertex) => Maybe<AdjustVeticesOperationResult>
-
-function keyFromAddresses(start: SimpleCellAddress, end: SimpleCellAddress): string {
-  return `${start.col},${start.row},${end.col},${end.row}`
-}
-
-function keyFromRange(range: AbsoluteCellRange): string {
-  return keyFromAddresses(range.start, range.end)
-}
-
-const compareBy = (left: RangeVertex, right: RangeVertex, coordinate: (address: SimpleCellAddress) => number) => {
-  const leftStart = coordinate(left.range.start)
-  const rightStart = coordinate(left.range.start)
-  if (leftStart === rightStart) {
-    const leftEnd = coordinate(left.range.end)
-    const rightEnd = coordinate(right.range.end)
-    return leftEnd - rightEnd
-  } else {
-    return leftStart - rightStart
   }
 }

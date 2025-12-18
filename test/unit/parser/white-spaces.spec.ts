@@ -55,7 +55,7 @@ describe('tokenizeFormula', () => {
     expectArrayWithSameContent(tokenTypes, ['EqualsOp', 'ProcedureName', 'CellReference', 'ArrayColSep', 'WhiteSpace', 'CellReference', 'RParen'])
   })
 
-  it('should not skip whitespace when there is empty argument ', () => {
+  it('should not skip whitespace when there is empty argument', () => {
     const tokens = lexer.tokenizeFormula('=PV(A1 ,   ,A2)').tokens
     const tokenTypes = tokens.map(token => token.tokenType.name)
 
@@ -77,7 +77,7 @@ describe('tokenizeFormula', () => {
     expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
   })
 
-  it('should treat line feed (U+000A) as whitespace ', () => {
+  it('should treat line feed (U+000A) as whitespace', () => {
     const tokens = lexer.tokenizeFormula('=\n1').tokens
     expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
   })
@@ -119,7 +119,7 @@ describe('processWhitespaces', () => {
     const tokens = parser.tokenizeFormula('= SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     expect(processed[1].leadingWhitespace!.image).toBe(' ')
     expectArrayWithSameContent(
       [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
@@ -131,7 +131,7 @@ describe('processWhitespaces', () => {
     const tokens = parser.tokenizeFormula('=    SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     expect(processed[1].leadingWhitespace!.image).toBe('    ')
     expectArrayWithSameContent(
       [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],
@@ -143,7 +143,7 @@ describe('processWhitespaces', () => {
     const tokens = parser.tokenizeFormula(' =SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
     expect(processed.length).toBe(6)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     expect(processed[0].leadingWhitespace!.image).toBe(' ')
     expectArrayWithSameContent(
       [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],

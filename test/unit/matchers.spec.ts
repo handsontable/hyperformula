@@ -1,7 +1,7 @@
 import {DetailedCellError} from '../../src'
 import {ArraySize} from '../../src/ArraySize'
 import {CellError, ErrorType} from '../../src/Cell'
-import {FormulaVertex} from '../../src/DependencyGraph/FormulaCellVertex'
+import {FormulaVertex} from '../../src/DependencyGraph/FormulaVertex'
 import {buildNumberAst} from '../../src/parser/Ast'
 import {adr} from './testUtils'
 

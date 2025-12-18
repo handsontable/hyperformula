@@ -9,9 +9,9 @@ import {SimpleCellAddress, simpleCellAddress} from './Cell'
 import {CellContent, CellContentParser} from './CellContentParser'
 import {CellDependency} from './CellDependency'
 import {
-  ArrayVertex,
+  ArrayFormulaVertex,
   DependencyGraph,
-  FormulaCellVertex,
+  ScalarFormulaVertex,
   ParsingErrorVertex,
   ValueCellVertex,
   Vertex
@@ -99,7 +99,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
               this.shrinkArrayIfNeeded(address)
               const size = this.arraySizePredictor.checkArraySize(parseResult.ast, address)
               if (size.isScalar()) {
-                const vertex = new FormulaCellVertex(parseResult.ast, address, 0)
+                const vertex = new ScalarFormulaVertex(parseResult.ast, address, 0)
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addVertex(address, vertex)
                 if (parseResult.hasVolatileFunction) {
@@ -109,7 +109,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
                   this.dependencyGraph.markAsDependentOnStructureChange(vertex)
                 }
               } else {
-                const vertex = new ArrayVertex(parseResult.ast, address, new ArraySize(size.width, size.height))
+                const vertex = new ArrayFormulaVertex(parseResult.ast, address, new ArraySize(size.width, size.height))
                 dependencies.set(vertex, absolutizeDependencies(parseResult.dependencies, address))
                 this.dependencyGraph.addArrayVertex(address, vertex)
               }
@@ -131,7 +131,7 @@ export class SimpleStrategy implements GraphBuilderStrategy {
 
   private shrinkArrayIfNeeded(address: SimpleCellAddress) {
     const vertex = this.dependencyGraph.getCell(address)
-    if (vertex instanceof ArrayVertex) {
+    if (vertex instanceof ArrayFormulaVertex) {
       this.dependencyGraph.shrinkArrayToCorner(vertex)
     }
   }

@@ -32,4 +32,4 @@ jobs:
 
       - name: Run audit
         run: |
-          npm audit --omit='dev'
+          npm run audit

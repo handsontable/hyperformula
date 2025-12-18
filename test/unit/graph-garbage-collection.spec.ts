@@ -32,9 +32,9 @@ describe('range mapping', () => {
       ['1', '2'],
       ['3', '4']
     ])
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
     engine.calculateFormula('=SUM(A1:B2)', 0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('cruds', () => {
@@ -42,11 +42,11 @@ describe('range mapping', () => {
       ['1', '2'],
       ['3', '4']
     ])
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
     engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(1)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(1)
     engine.setCellContents(adr('A1'), 1)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 })
 
@@ -76,7 +76,7 @@ describe('larger tests', () => {
       }
     }
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('large fixed #2', () => {
@@ -93,7 +93,7 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('large fixed #3', () => {
@@ -107,7 +107,7 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 0, row: 0}, null)
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('large fixed #4', () => {
@@ -124,7 +124,7 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 4, row: 0}, null)
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('repeat the same crud', () => {
@@ -157,7 +157,7 @@ describe('larger tests', () => {
       }
     }
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 })
 
@@ -176,7 +176,7 @@ describe('cruds', () => {
     engine.removeRows(0, [2, 2])
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #2', () => {
@@ -193,7 +193,7 @@ describe('cruds', () => {
     engine.removeRows(0, [2, 2])
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #3', () => {
@@ -209,7 +209,7 @@ describe('cruds', () => {
     engine.removeRows(0, [4, 2])
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #4', () => {
@@ -230,7 +230,7 @@ describe('cruds', () => {
     engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #5', () => {
@@ -251,7 +251,7 @@ describe('cruds', () => {
     engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #6', () => {
@@ -270,7 +270,7 @@ describe('cruds', () => {
     engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('should collect empty vertices when bigger range is no longer bind to smaller range #7', () => {
@@ -293,7 +293,7 @@ describe('cruds', () => {
     engine.removeRows(0, [0, 6])
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('column adding', () => {
@@ -330,7 +330,7 @@ describe('cruds', () => {
     engine.setCellContents(adr('A6'), null)
 
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
-    expect(engine.dependencyGraph.rangeMapping.getMappingSize(0)).toBe(0)
+    expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
   it('addColumns after addRows', () => {

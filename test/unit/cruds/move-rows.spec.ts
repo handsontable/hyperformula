@@ -163,7 +163,7 @@ describe('Move rows', () => {
     expect(engine.getCellValue(adr('A5'))).toEqual(3)
   })
 
-  it('should adjust reference when swapping formula with dependency ', () => {
+  it('should adjust reference when swapping formula with dependency', () => {
     const engine = HyperFormula.buildFromArray([
       ['1'],
       ['=A1'],

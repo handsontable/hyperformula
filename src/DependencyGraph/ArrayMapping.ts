@@ -7,12 +7,23 @@ import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {addressKey, SimpleCellAddress} from '../Cell'
 import {Maybe} from '../Maybe'
 import {ColumnsSpan, RowsSpan} from '../Span'
-import {ArrayVertex} from './'
+import {ArrayFormulaVertex} from './'
 
+/**
+ * Maps top-left corner addresses to their ArrayFormulaVertex instances.
+ * An ArrayFormulaVertex is created for formulas that output multiple values (e.g., MMULT, TRANSPOSE, array literals).
+ * The same ArrayFormulaVertex is referenced in AddressMapping for all cells within its spill range.
+ * ArrayFormulaVertex lifecycle:
+ * - Prediction (ArraySizePredictor.checkArraySize) → determines if formula will produce array
+ * - Creation → new ArrayFormulaVertex(...) added via addArrayFormulaVertex()
+ * - Address registration → setAddressMappingForArrayFormulaVertex() sets the vertex for all cells in range
+ * - Evaluation → computes actual values, stores in ArrayFormulaVertex.array
+ * - Shrinking → if content placed in array area, array shrinks via shrinkArrayToCorner()
+ */
 export class ArrayMapping {
-  public readonly arrayMapping: Map<string, ArrayVertex> = new Map()
+  public readonly arrayMapping: Map<string, ArrayFormulaVertex> = new Map()
 
-  public getArray(range: AbsoluteCellRange): Maybe<ArrayVertex> {
+  public getArray(range: AbsoluteCellRange): Maybe<ArrayFormulaVertex> {
     const array = this.getArrayByCorner(range.start)
     if (array?.getRange().sameAs(range)) {
       return array
@@ -20,11 +31,11 @@ export class ArrayMapping {
     return
   }
 
-  public getArrayByCorner(address: SimpleCellAddress): Maybe<ArrayVertex> {
+  public getArrayByCorner(address: SimpleCellAddress): Maybe<ArrayFormulaVertex> {
     return this.arrayMapping.get(addressKey(address))
   }
 
-  public setArray(range: AbsoluteCellRange, vertex: ArrayVertex) {
+  public setArray(range: AbsoluteCellRange, vertex: ArrayFormulaVertex) {
     this.arrayMapping.set(addressKey(range.start), vertex)
   }
 
@@ -40,7 +51,7 @@ export class ArrayMapping {
     return this.arrayMapping.size
   }
 
-  public* arraysInRows(rowsSpan: RowsSpan): IterableIterator<[string, ArrayVertex]> {
+  public* arraysInRows(rowsSpan: RowsSpan): IterableIterator<[string, ArrayFormulaVertex]> {
     for (const [mtxKey, mtx] of this.arrayMapping.entries()) {
       if (mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd)) {
         yield [mtxKey, mtx]
@@ -48,7 +59,7 @@ export class ArrayMapping {
     }
   }
 
-  public* arraysInCols(col: ColumnsSpan): IterableIterator<[string, ArrayVertex]> {
+  public* arraysInCols(col: ColumnsSpan): IterableIterator<[string, ArrayFormulaVertex]> {
     for (const [mtxKey, mtx] of this.arrayMapping.entries()) {
       if (mtx.spansThroughSheetColumn(col.sheet, col.columnStart, col.columnEnd)) {
         yield [mtxKey, mtx]
@@ -113,21 +124,21 @@ export class ArrayMapping {
   }
 
   public moveArrayVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
-    this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
+    this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayFormulaVertex) => {
       const range = vertex.getRange()
       return row <= range.start.row ? [range.shifted(0, numberOfRows), vertex] : undefined
     })
   }
 
   public moveArrayVerticesAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
-    this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayVertex) => {
+    this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayFormulaVertex) => {
       const range = vertex.getRange()
       return column <= range.start.col ? [range.shifted(numberOfColumns, 0), vertex] : undefined
     })
   }
 
-  private updateArrayVerticesInSheet(sheet: number, fn: (key: string, vertex: ArrayVertex) => Maybe<[AbsoluteCellRange, ArrayVertex]>) {
-    const updated = Array<[AbsoluteCellRange, ArrayVertex]>()
+  private updateArrayVerticesInSheet(sheet: number, fn: (key: string, vertex: ArrayFormulaVertex) => Maybe<[AbsoluteCellRange, ArrayFormulaVertex]>) {
+    const updated = Array<[AbsoluteCellRange, ArrayFormulaVertex]>()
 
     for (const [key, vertex] of this.arrayMapping.entries()) {
       if (vertex.sheet !== sheet) {

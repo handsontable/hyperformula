@@ -33,7 +33,7 @@ describe('Function FILTER', () => {
     expect(engine.getSheetValues(0)).toEqual([[1], [1, 2, 3], [true, false, true], [true, true, false]])
   })
 
-  it('should filter a vertical range ', () => {
+  it('should filter a vertical range', () => {
     const engine = HyperFormula.buildFromArray([['=FILTER(B1:B3,C1:C3)', 1, true], [undefined, 2, false], [undefined, 3, true]])
 
     expect(engine.getSheetValues(0)).toEqual([[1, 1, true], [3, 2, false], [null, 3, true]])

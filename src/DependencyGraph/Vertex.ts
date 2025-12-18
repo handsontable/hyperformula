@@ -4,7 +4,7 @@
  */
 
 import {EmptyCellVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex} from './'
-import {FormulaVertex} from './FormulaCellVertex'
+import {FormulaVertex} from './FormulaVertex'
 
 /**
  * Represents vertex which keeps values of one or more cells

@@ -3,7 +3,7 @@ import {adr} from '../testUtils'
 import {buildEmptyParserWithCaching} from './common'
 
 describe('ParserWithCaching - caching', () => {
-  it('it use cache for similar formulas', () => {
+  it('use cache for similar formulas', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast1 = parser.parse('=A1', adr('A1')).ast
