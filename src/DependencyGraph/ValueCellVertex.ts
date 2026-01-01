@@ -18,6 +18,8 @@ export interface RawAndParsedValue {
  * Represents vertex which keeps static cell value
  */
 export class ValueCellVertex {
+  public _graphId?: number
+
   /** Static cell value. */
   constructor(private parsedValue: ValueCellVertexValue, private rawValue: RawCellContent) {
   }

@@ -10,6 +10,8 @@ import {ParsingError} from '../parser/Ast'
  * Represents a cell that contains a parsing error.
  */
 export class ParsingErrorVertex {
+  public _graphId?: number
+
   /**
    * Constructor
    */

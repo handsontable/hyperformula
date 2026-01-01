@@ -16,6 +16,7 @@ export type CriterionCache = Map<string, [any, CriterionLambda[]]>
  * Represents vertex bound to range
  */
 export class RangeVertex {
+  public _graphId?: number
   public bruteForce: boolean
   /** Cache for associative aggregate functions. */
   private functionCache: Map<string, any>

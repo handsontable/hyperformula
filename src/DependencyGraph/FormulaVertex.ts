@@ -16,6 +16,8 @@ import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
 export abstract class FormulaVertex {
+  public _graphId?: number
+
   protected constructor(
     protected formula: Ast,
     protected cellAddress: SimpleCellAddress,
