@@ -142,7 +142,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
 
     this.nodesSparseArray[newId] = node
     this.edgesSparseArray[newId] = []
-    node._graphId = newId;
+    node._graphId = newId
     return newId
   }
 
