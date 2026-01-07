@@ -437,14 +437,13 @@ describe('Function IRR', () => {
       // NPV at IRR rate should be very close to zero
       // Note: This depends on how NPV is implemented - it may need adjustment
       const npvValue = engine.getCellValue(adr('A8'))
-      if (typeof npvValue === 'number') {
-        expect(Math.abs(npvValue)).toBeLessThan(0.01)
-      }
+
+      expect(Math.abs(npvValue as number)).toBeLessThan(0.01)
     })
   })
 
   describe('scenarios with no solution or multiple solutions', () => {
-    it('should handle edge case with potential multiple solutions', () => {
+    it('should return either #NUM! or one of the solutions', () => {
       // Non-conventional cash flows may have multiple IRRs
       // Cash flow {-1000, 3000, -2500} has two valid IRRs: ~0.25 (25%) and ~1.0 (100%)
       const engine = HyperFormula.buildFromArray([
@@ -453,15 +452,7 @@ describe('Function IRR', () => {
 
       const result = engine.getCellValue(adr('A1'))
 
-      if (typeof result === 'number') {
-        // Should be one of the two valid solutions
-        const isFirstSolution = Math.abs(result - 0.25) < 0.01
-        const isSecondSolution = Math.abs(result - 1.0) < 0.01
-        expect(isFirstSolution || isSecondSolution).toBe(true)
-      } else {
-        // Or #NUM! if algorithm cannot converge
-        expect(result).toEqualError(detailedError(ErrorType.NUM))
-      }
+      expect(result).toEqualError(detailedError(ErrorType.NUM))
     })
   })
 })

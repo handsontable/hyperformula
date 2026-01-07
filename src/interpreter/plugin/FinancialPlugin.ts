@@ -759,6 +759,12 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  /**
+   * Calculates the internal rate of return for a series of cash flows.
+   * @param {ProcedureAst} ast - The AST node representing the function call.
+   * @param {InterpreterState} state - The interpreter state.
+   * @returns {InterpreterValue} The internal rate of return.
+   */
   public irr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IRR'),
       (range: SimpleRangeValue, guess: number) => {
