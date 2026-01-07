@@ -777,10 +777,6 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
           return vals
         }
 
-        if (vals.length < 1) {
-          return new CellError(ErrorType.NUM)
-        }
-
         // Check for at least one positive and one negative value
         const hasPositive = vals.some(val => val > 0)
         const hasNegative = vals.some(val => val < 0)
