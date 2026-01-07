@@ -176,6 +176,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | FV          | Returns the future value of an investment.                                                                                 | FV(Rate, Nper, Pmt[, Pv,[ Type]])          |
 | FVSCHEDULE  | Returns the future value of an investment based on a rate schedule.                                                        | FV(Pv, Schedule)                           |
 | IPMT        | Returns the interest portion of a given loan payment in a given payment period.                                            | IPMT(Rate, Per, Nper, Pv[, Fv[, Type]])    |
+| IRR         | Returns the internal rate of return for a series of cash flows.                                                            | IRR(Values[, Guess])                       |
 | ISPMT       | Returns the interest paid for a given period of an investment with equal principal payments.                               | ISPMT(Rate, Per, Nper, Value)              |
 | MIRR        | Returns modified internal value for cashflows.                                                                             | MIRR(Flows, FRate, RRate)                  |
 | NOMINAL     | Returns the nominal interest rate.                                                                                         | NOMINAL(Effect_rate, Npery)                |
