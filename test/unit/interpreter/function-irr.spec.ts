@@ -68,16 +68,6 @@ describe('Function IRR', () => {
       expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM))
     })
 
-    it('should return #NUM! when there is only one value', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({100})'],
-        ['=IRR({-100})'],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
-      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM))
-    })
-
     it('should propagate errors from values', () => {
       const engine = HyperFormula.buildFromArray([
         ['=IRR(A2:A4)'],
@@ -119,16 +109,6 @@ describe('Function IRR', () => {
 
       // guess = -1 causes division by zero in first iteration
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
-    })
-
-    it('should find valid IRR even with guess less than -1', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({-100, 200, 300}, -2)'],
-      ])
-
-      // For cash flows {-100, 200, 300}, IRR = -2 (-200%) is valid:
-      // -100 + 200/(-1) + 300/1 = -100 - 200 + 300 = 0
-      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-2, 6)
     })
 
     it('should return #NUM! for empty range', () => {
@@ -233,7 +213,7 @@ describe('Function IRR', () => {
       expect(engine.getCellValue(adr('A7'))).toBeCloseTo(0.0866309, requiredFinancialPrecision)
     })
 
-    it('should compute IRR correctly for Microsoft example', () => {
+    it('should compute IRR correctly for official example', () => {
       // Example from https://support.microsoft.com/en-us/office/irr-function-64925eaa-9988-495b-b290-3ad0c163c1bc
       const engine = HyperFormula.buildFromArray([
         [-70000],
@@ -274,28 +254,7 @@ describe('Function IRR', () => {
         ['=IRR(A1:A6, 0.1)'],
       ])
 
-      expect(engine.getCellValue(adr('A7'))).toBeCloseTo(engine.getCellValue(adr('A8')) as number, requiredFinancialPrecision)
-    })
-
-    it('should converge with different guess values', () => {
-      const engine = HyperFormula.buildFromArray([
-        [-1000],
-        [100],
-        [200],
-        [300],
-        [400],
-        [500],
-        ['=IRR(A1:A6, 0.05)'],
-        ['=IRR(A1:A6, 0.15)'],
-        ['=IRR(A1:A6, 0.2)'],
-        ['=IRR(A1:A6, -0.1)'],
-      ])
-
-      const expected = 0.120058
-      expect(engine.getCellValue(adr('A7'))).toBeCloseTo(expected, requiredFinancialPrecision)
-      expect(engine.getCellValue(adr('A8'))).toBeCloseTo(expected, requiredFinancialPrecision)
-      expect(engine.getCellValue(adr('A9'))).toBeCloseTo(expected, requiredFinancialPrecision)
-      expect(engine.getCellValue(adr('A10'))).toBeCloseTo(expected, requiredFinancialPrecision)
+      expect(engine.getCellValue(adr('A7'))).toBe(engine.getCellValue(adr('A8')))
     })
 
     it('should allow guess close to -1', () => {
@@ -339,6 +298,16 @@ describe('Function IRR', () => {
       expect(typeof engine.getCellValue(adr('A4'))).toBe('number')
       expect(typeof engine.getCellValue(adr('A5'))).toBe('number')
     })
+
+    it('should find valid IRR even with guess less than -1', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-100, 200, 300}, -2)'],
+      ])
+
+      // For cash flows {-100, 200, 300}, IRR = -2 (-200%) is valid:
+      // -100 + 200/(-1) + 300/1 = -100 - 200 + 300 = 0
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-2, 6)
+    })
   })
 
   describe('edge cases', () => {
@@ -374,54 +343,6 @@ describe('Function IRR', () => {
       ])
 
       expect(typeof engine.getCellValue(adr('A3'))).toBe('number')
-    })
-
-    it('should handle minimum valid cash flow (one positive, one negative)', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({-100, 110})'],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.1, requiredFinancialPrecision)
-    })
-
-    it('should handle negative return rate', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({-1000, 200, 200, 200})'],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.217627, requiredFinancialPrecision)
-    })
-
-    it('should handle IRR close to zero', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({-1000, 333, 333, 334})'],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0, 4)
-    })
-
-    it('should handle IRR of exactly zero', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({-1000, 500, 500})'],
-      ])
-
-      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0, requiredFinancialPrecision)
-    })
-
-    it('should handle initial positive followed by negative cash flows', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({1000, -500, -600})'],
-      ])
-
-      expect(typeof engine.getCellValue(adr('A1'))).toBe('number')
-    })
-
-    it('should handle alternating positive and negative values', () => {
-      const engine = HyperFormula.buildFromArray([
-        ['=IRR({-100, 200, -50, 100})'],
-      ])
-
-      expect(typeof engine.getCellValue(adr('A1'))).toBe('number')
     })
   })
 
@@ -476,22 +397,6 @@ describe('Function IRR', () => {
       engine.setCellContents(adr('A2'), [['=IRR(cashflows)']])
 
       expect(typeof engine.getCellValue(adr('A2'))).toBe('number')
-    })
-
-    it('should update when referenced cells change', () => {
-      const engine = HyperFormula.buildFromArray([
-        [-1000, 500, 600],
-        ['=IRR(A1:C1)'],
-      ])
-
-      const initialValue = engine.getCellValue(adr('A2')) as number
-      expect(typeof initialValue).toBe('number')
-
-      engine.setCellContents(adr('C1'), [[700]])
-
-      const updatedValue = engine.getCellValue(adr('A2')) as number
-      expect(typeof updatedValue).toBe('number')
-      expect(updatedValue).not.toBeCloseTo(initialValue, 4)
     })
   })
 

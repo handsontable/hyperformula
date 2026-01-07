@@ -759,7 +759,6 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
-  // Newton's method: https://en.wikipedia.org/wiki/Newton%27s_method
   public irr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IRR'),
       (range: SimpleRangeValue, guess: number) => {
