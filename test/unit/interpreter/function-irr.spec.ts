@@ -374,6 +374,54 @@ describe('Function IRR', () => {
 
       expect(typeof engine.getCellValue(adr('A3'))).toBe('number')
     })
+
+    it('should handle minimum valid cash flow (one positive, one negative)', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-100, 110})'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.1, requiredFinancialPrecision)
+    })
+
+    it('should handle negative return rate', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-1000, 200, 200, 200})'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.217627, requiredFinancialPrecision)
+    })
+
+    it('should handle IRR close to zero', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-1000, 333, 333, 334})'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0, 4)
+    })
+
+    it('should handle IRR of exactly zero', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-1000, 500, 500})'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0, requiredFinancialPrecision)
+    })
+
+    it('should handle initial positive followed by negative cash flows', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({1000, -500, -600})'],
+      ])
+
+      expect(typeof engine.getCellValue(adr('A1'))).toBe('number')
+    })
+
+    it('should handle alternating positive and negative values', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-100, 200, -50, 100})'],
+      ])
+
+      expect(typeof engine.getCellValue(adr('A1'))).toBe('number')
+    })
   })
 
   describe('vertical and horizontal ranges', () => {
@@ -427,6 +475,22 @@ describe('Function IRR', () => {
       engine.setCellContents(adr('A2'), [['=IRR(cashflows)']])
 
       expect(typeof engine.getCellValue(adr('A2'))).toBe('number')
+    })
+
+    it('should update when referenced cells change', () => {
+      const engine = HyperFormula.buildFromArray([
+        [-1000, 500, 600],
+        ['=IRR(A1:C1)'],
+      ])
+
+      const initialValue = engine.getCellValue(adr('A2')) as number
+      expect(typeof initialValue).toBe('number')
+
+      engine.setCellContents(adr('C1'), [[700]])
+
+      const updatedValue = engine.getCellValue(adr('A2')) as number
+      expect(typeof updatedValue).toBe('number')
+      expect(updatedValue).not.toBeCloseTo(initialValue, 4)
     })
   })
 
