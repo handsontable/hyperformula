@@ -112,22 +112,23 @@ describe('Function IRR', () => {
       expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
 
-    it('should return #VALUE! error when guess is -1', () => {
+    it('should return #NUM! error when guess is -1 (division by zero)', () => {
       const engine = HyperFormula.buildFromArray([
         ['=IRR({-100, 200, 300}, -1)'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE))
+      // guess = -1 causes division by zero in first iteration
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
     })
 
-    it('should return #VALUE! error when guess is less than -1', () => {
+    it('should find valid IRR even with guess less than -1', () => {
       const engine = HyperFormula.buildFromArray([
         ['=IRR({-100, 200, 300}, -2)'],
-        ['=IRR({-100, 200, 300}, -100)'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE))
-      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE))
+      // For cash flows {-100, 200, 300}, IRR = -2 (-200%) is valid:
+      // -100 + 200/(-1) + 300/1 = -100 - 200 + 300 = 0
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-2, 6)
     })
 
     it('should return #NUM! for empty range', () => {

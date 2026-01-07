@@ -763,10 +763,6 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   public irr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IRR'),
       (range: SimpleRangeValue, guess: number) => {
-        if (guess <= -1) {
-          return new CellError(ErrorType.VALUE)
-        }
-
         const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
         if (vals instanceof CellError) {
           return vals
@@ -777,18 +773,8 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         }
 
         // Check for at least one positive and one negative value
-        let hasPositive = false
-        let hasNegative = false
-        for (const val of vals) {
-          if (val > 0) {
-            hasPositive = true
-          } else if (val < 0) {
-            hasNegative = true
-          }
-          if (hasPositive && hasNegative) {
-            break
-          }
-        }
+        const hasPositive = vals.some(val => val > 0)
+        const hasNegative = vals.some(val => val < 0)
         if (!hasPositive || !hasNegative) {
           return new CellError(ErrorType.NUM)
         }
