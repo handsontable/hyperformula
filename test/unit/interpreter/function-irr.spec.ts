@@ -77,6 +77,15 @@ describe('Function IRR', () => {
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
     })
 
+    it('should return #NUM! when rate causes factor overflow', () => {
+      // Very large guess with multiple periods causes Math.pow(1+rate, i) to overflow to Infinity
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 1e100)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
+    })
+
     it('should return #NUM! when values do not contain at least one positive and one negative value', () => {
       const engine = HyperFormula.buildFromArray([
         ['=IRR({1, 2, 3})'],
