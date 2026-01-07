@@ -123,13 +123,12 @@ describe('Function IRR', () => {
       expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
 
-    it('should return #NUM! error when guess is -1 (division by zero)', () => {
+    it('should return #VALUE! error when guess is -1', () => {
       const engine = HyperFormula.buildFromArray([
         ['=IRR({-100, 200, 300}, -1)'],
       ])
 
-      // guess = -1 causes division by zero in first iteration
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE))
     })
 
     it('should return #NUM! for empty range', () => {
