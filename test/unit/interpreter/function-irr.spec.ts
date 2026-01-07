@@ -56,6 +56,27 @@ describe('Function IRR', () => {
       expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM))
     })
 
+    it('should return #NUM! when derivative is too small', () => {
+      // At r=0 with cash flows {-0.5, 2, -1}:
+      // dnpv = -1*2/(1+0)^2 - 2*(-1)/(1+0)^3 = -2 + 2 = 0
+      // npv = -0.5 + 2 - 1 = 0.5 != 0
+      // So derivative is zero but NPV is not, Newton-Raphson cannot proceed
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-0.5, 2, -1}, 0)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
+    })
+
+    it('should return #NUM! when max iterations reached', () => {
+      // Cash flows that cause oscillation without convergence
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-1, 2, -1.0001}, 0.9)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
+    })
+
     it('should return #NUM! when values do not contain at least one positive and one negative value', () => {
       const engine = HyperFormula.buildFromArray([
         ['=IRR({1, 2, 3})'],
