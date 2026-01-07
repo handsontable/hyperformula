@@ -111,6 +111,32 @@ describe('Function IRR', () => {
 
       expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
+
+    it('should return #VALUE! error when guess is -1', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-100, 200, 300}, -1)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE))
+    })
+
+    it('should return #VALUE! error when guess is less than -1', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR({-100, 200, 300}, -2)'],
+        ['=IRR({-100, 200, 300}, -100)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE))
+      expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE))
+    })
+
+    it('should return #NUM! for empty range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=IRR(B1:B5)'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM))
+    })
   })
 
   describe('value type', () => {
@@ -391,6 +417,16 @@ describe('Function IRR', () => {
       ])
 
       expect(typeof engine.getCellValue(adr('D1'))).toBe('number')
+    })
+
+    it('should work with named ranges', () => {
+      const engine = HyperFormula.buildFromArray([
+        [-1000, 500, 600],
+      ])
+      engine.addNamedExpression('cashflows', '=Sheet1!$A$1:$C$1')
+      engine.setCellContents(adr('A2'), [['=IRR(cashflows)']])
+
+      expect(typeof engine.getCellValue(adr('A2'))).toBe('number')
     })
   })
 
