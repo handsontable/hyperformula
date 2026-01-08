@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'TAMSAYI',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'FAİZTUTARI',
+    IRR: 'İÇ_VERİM_ORANI',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'EBOŞSA',
     ISERR: 'EHATA',

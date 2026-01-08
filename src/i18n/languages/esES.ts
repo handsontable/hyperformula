@@ -111,6 +111,7 @@ export const dictionary: RawTranslationPackage = {
     INT: 'ENTERO',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'PAGOINT',
+    IRR: 'TIR',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ESBLANCO',
     ISERR: 'ESERR',
