@@ -9,6 +9,8 @@ import {EmptyValue, EmptyValueType} from '../interpreter/InterpreterValue'
  * Represents singleton vertex bound to all empty cells
  */
 export class EmptyCellVertex {
+  public _graphId?: number
+
   constructor() {}
 
   /**

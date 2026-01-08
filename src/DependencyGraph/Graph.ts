@@ -18,7 +18,7 @@ export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | Simp
  * Idea for performance improvement:
  * - use Set<Node>[] instead of NodeId[][] for edgesSparseArray
  */
-export class Graph<Node> {
+export class Graph<Node extends { _graphId?: NodeId }> {
   /**
    * A sparse array. The value nodesSparseArray[n] exists if and only if node n is in the graph.
    * @private
@@ -31,12 +31,6 @@ export class Graph<Node> {
    * @private
    */
   private edgesSparseArray: NodeId[][] = []
-
-  /**
-   * A mapping from node to its id. The value nodesIds.get(node) exists if and only if node is in the graph.
-   * @private
-   */
-  private nodesIds: Map<Node, NodeId> = new Map()
 
   /**
    * A ProcessableValue object.
@@ -78,7 +72,7 @@ export class Graph<Node> {
    * @param node - node to check
    */
   public hasNode(node: Node): boolean {
-    return this.nodesIds.has(node)
+    return node._graphId !== undefined
   }
 
   /**
@@ -137,7 +131,7 @@ export class Graph<Node> {
    * @param node - a node to be added
    */
   public addNodeAndReturnId(node: Node): NodeId {
-    const idOfExistingNode = this.nodesIds.get(node)
+    const idOfExistingNode = node._graphId
 
     if (idOfExistingNode !== undefined) {
       return idOfExistingNode
@@ -148,7 +142,7 @@ export class Graph<Node> {
 
     this.nodesSparseArray[newId] = node
     this.edgesSparseArray[newId] = []
-    this.nodesIds.set(node, newId)
+    node._graphId = newId
     return newId
   }
 
@@ -183,7 +177,7 @@ export class Graph<Node> {
    * Removes node from graph
    */
   public removeNode(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
-    const id = this.getNodeId(node)
+    const id = node._graphId
 
     if (id === undefined) {
       throw this.missingNodeError(node)
@@ -199,7 +193,7 @@ export class Graph<Node> {
     delete this.nodesSparseArray[id]
     delete this.edgesSparseArray[id]
     this.infiniteRangeIds.delete(id)
-    this.nodesIds.delete(node)
+    node._graphId = undefined
 
     return dependencies
   }
@@ -368,14 +362,14 @@ export class Graph<Node> {
    * Returns the internal id of a node.
    */
   public getNodeId(node: Node): NodeId | undefined {
-    return this.nodesIds.get(node)
+    return node._graphId
   }
 
   /**
    *
    */
   private getNodeIdIfNotNumber(node: Node | NodeId): NodeId | undefined {
-    return typeof node === 'number' ? node : this.nodesIds.get(node)
+    return typeof node === 'number' ? node : node._graphId
   }
 
   /**
