@@ -63,6 +63,11 @@ module.exports = {
   ],
   base: '/',
   plugins: [
+    ['sitemap', {
+      hostname: 'https://hyperformula.handsontable.com',
+      exclude: ['/404.html'],
+      changefreq: 'weekly'
+    }],
     searchBoxPlugin,
     ['container', examples()],
     {
