@@ -9,7 +9,7 @@ HyperFormula is a headless spreadsheet engine written in TypeScript. It parses a
 ## Build & Development Commands
 
 ```bash
-npm install                   # Install dependencies
+npm install                  # Install dependencies
 npm run compile              # TypeScript compilation to lib/
 npm run bundle-all           # Full build: compile + bundle all formats
 npm run lint                 # Run ESLint
@@ -90,6 +90,6 @@ The build produces multiple output formats:
 
 ## Code Style
 
-- When generating code, prefare functional approach whenever possible (in JS/TS use filter, map and reduce functions).
+- When generating code, prefer functional approach whenever possible (in JS/TS use filter, map and reduce functions).
 - Make the code self-documenting. Use meaningfull names for classes, functions, valiables etc. Add code comments only when necessary.
 - Add jsdocs to all classes and functions.
