@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'INTERESSI',
+    IRR: 'TIR.COST',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'VAL.VUOTO',
     ISERR: 'VAL.ERR',

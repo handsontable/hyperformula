@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'KOKONAISLUKU',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'IPMT',
+    IRR: 'SISÄINEN.KORKO',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ONTYHJÄ',
     ISERR: 'ONVIRH',

@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'CELÁ.ČÁST',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'PLATBA.ÚROK',
+    IRR: 'MÍRA.VÝNOSNOSTI',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'JE.PRÁZDNÉ',
     ISERR: 'JE.CHYBA',
