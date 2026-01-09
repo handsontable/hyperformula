@@ -139,6 +139,7 @@
     "eslint-plugin-jsdoc": "^50.5.0",
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",
+    "esm": "^3.2.25",
     "exceljs": "^4.4.0",
     "full-icu": "^1.5.0",
     "jasmine": "^5.4.0",
@@ -168,6 +169,7 @@
     "typedoc-plugin-markdown": "^2.4.2",
     "typescript": "^4.0.8",
     "vuepress": "^1.9.10",
+    "vuepress-plugin-sitemap": "^2.3.1",
     "webpack": "^4.47.0",
     "webpack-cli": "^4.10.0",
     "webpackbar": "^6.0.1"
