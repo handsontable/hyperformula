@@ -3,8 +3,8 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import { InterpreterValue } from '../interpreter/InterpreterValue'
-import { Vertex } from './Vertex'
+import {InterpreterValue} from '../interpreter/InterpreterValue'
+import {Vertex} from './Vertex'
 
 /**
  * Represents vertex which keeps values of one or more cells

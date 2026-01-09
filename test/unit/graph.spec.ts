@@ -572,4 +572,41 @@ describe('Graph class', () => {
       expect(graph.getInfiniteRanges()).toEqual([])
     })
   })
+
+  describe('idInGraph property', () => {
+    it('is set when node is added to graph', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString('foo')
+
+      expect(node.idInGraph).toBeUndefined()
+
+      graph.addNodeAndReturnId(node)
+
+      expect(node.idInGraph).toBeDefined()
+    })
+
+    it('is reset to undefined when node is removed from graph', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString('foo')
+
+      graph.addNodeAndReturnId(node)
+      expect(node.idInGraph).toBeDefined()
+
+      graph.removeNode(node)
+
+      expect(node.idInGraph).toBeUndefined()
+    })
+
+    it('allows node to be re-added after removal', () => {
+      const graph = new Graph<IdentifiableString>(dummyDependencyQuery)
+      const node = new IdentifiableString('foo')
+
+      graph.addNodeAndReturnId(node)
+      graph.removeNode(node)
+      graph.addNodeAndReturnId(node)
+
+      expect(graph.hasNode(node)).toBe(true)
+      expect(node.idInGraph).toBeDefined()
+    })
+  })
 })

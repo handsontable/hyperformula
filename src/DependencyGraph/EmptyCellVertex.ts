@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import { CellVertex } from './CellVertex'
+import {CellVertex} from './CellVertex'
 import {EmptyValue, EmptyValueType} from '../interpreter/InterpreterValue'
 
 /**

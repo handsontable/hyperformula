@@ -5,7 +5,7 @@
 
 import {CellError} from '../Cell'
 import {ParsingError} from '../parser/Ast'
-import { CellVertex } from './CellVertex'
+import {CellVertex} from './CellVertex'
 
 /**
  * Represents a cell that contains a parsing error.

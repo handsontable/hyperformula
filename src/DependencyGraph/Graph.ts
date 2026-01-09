@@ -11,6 +11,10 @@ import { ProcessableValue } from './ProcessableValue'
 export type NodeId = number
 export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | SimpleCellRange), Node][]
 
+/**
+ * Interface for nodes that can be stored in the Graph.
+ * The idInGraph property is managed by the Graph class and should not be set externally.
+ */
 export interface GraphNode {
   idInGraph?: NodeId,
 }

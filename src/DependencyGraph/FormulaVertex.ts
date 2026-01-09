@@ -14,7 +14,7 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
-import { CellVertex } from './CellVertex'
+import {CellVertex} from './CellVertex'
 
 export abstract class FormulaVertex extends CellVertex {
   protected constructor(
