@@ -76,7 +76,7 @@ export class Graph<Node extends GraphNode> {
   /**
    * Checks whether a node is present in graph
    *
-   * @param node - node to check
+   * @param {Node} node - node to check
    */
   public hasNode(node: Node): boolean {
     const id = node.idInGraph
@@ -86,8 +86,8 @@ export class Graph<Node extends GraphNode> {
   /**
    * Checks whether exists edge between nodes. If one or both of nodes are not present in graph, returns false.
    *
-   * @param fromNode - node from which edge is outcoming
-   * @param toNode - node to which edge is incoming
+   * @param {Node} fromNode - node from which edge is outcoming
+   * @param {Node} toNode - node to which edge is incoming
    */
   public existsEdge(fromNode: Node, toNode: Node): boolean {
     const fromId = fromNode.idInGraph
@@ -103,7 +103,7 @@ export class Graph<Node extends GraphNode> {
   /**
    * Returns nodes adjacent to given node. May contain removed nodes.
    *
-   * @param node - node to which adjacent nodes we want to retrieve
+   * @param {Node} node - node to which adjacent nodes we want to retrieve
    *
    * Idea for performance improvement:
    * - return an array instead of set
@@ -121,7 +121,7 @@ export class Graph<Node extends GraphNode> {
   /**
    * Returns number of nodes adjacent to given node. Contrary to adjacentNodes(), this method returns only nodes that are present in graph.
    *
-   * @param node - node to which adjacent nodes we want to retrieve
+   * @param {Node} node - node to which adjacent nodes we want to retrieve
    */
   public adjacentNodesCount(node: Node): number {
     const id = node.idInGraph
@@ -160,8 +160,8 @@ export class Graph<Node extends GraphNode> {
    *
    * The nodes had to be added to the graph before, or the error will be raised
    *
-   * @param fromNode - node from which edge is outcoming
-   * @param toNode - node to which edge is incoming
+   * @param {Node | NodeId} fromNode - node from which edge is outcoming
+   * @param {Node | NodeId} toNode - node to which edge is incoming
    */
   public addEdge(fromNode: Node | NodeId, toNode: Node | NodeId): void {
     const fromId = this.getNodeIdIfNotNumber(fromNode)
@@ -265,9 +265,9 @@ export class Graph<Node extends GraphNode> {
   /**
    * Sorts the graph topologically. Nodes that are on cycles are kept separate.
    *
-   * @param modifiedNodes - seed for computation. The algorithm assumes that only these nodes have changed since the last run.
-   * @param operatingFunction - recomputes value of a node, and returns whether a change occurred
-   * @param onCycle - action to be performed when node is on cycle
+   * @param {Node[]} modifiedNodes - seed for computation. The algorithm assumes that only these nodes have changed since the last run.
+   * @param {(node: Node) => boolean} operatingFunction - recomputes value of a node, and returns whether a change occurred
+   * @param {(node: Node) => void} onCycle - action to be performed when node is on cycle
    */
   public getTopSortedWithSccSubgraphFrom(
     modifiedNodes: Node[],

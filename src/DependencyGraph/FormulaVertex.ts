@@ -16,6 +16,14 @@ import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 import {CellVertex} from './CellVertex'
 
+
+/**
+ * Abstract base class for vertices that contain formulas in the dependency graph.
+ *
+ * Stores formula AST, cell address, and version for lazy transformation support.
+ * Has two concrete implementations: {@link ScalarFormulaVertex} for single-cell formulas
+ * and {@link ArrayFormulaVertex} for array formulas that span multiple cells.
+ */
 export abstract class FormulaVertex extends CellVertex {
   protected constructor(
     protected formula: Ast,
@@ -81,6 +89,12 @@ export abstract class FormulaVertex extends CellVertex {
   public abstract isComputed(): boolean
 }
 
+/**
+ * Represents a formula vertex that produces an array result spanning multiple cells.
+ *
+ * Array formulas are transformed eagerly (unlike scalar formulas) and store their
+ * computed values in a {@link CellArray} structure.
+ */
 export class ArrayFormulaVertex extends FormulaVertex {
   array: CellArray
 
@@ -223,7 +237,10 @@ export class ArrayFormulaVertex extends FormulaVertex {
 }
 
 /**
- * Represents vertex which keeps formula
+ * Represents a formula vertex that produces a single scalar value.
+ *
+ * Unlike {@link ArrayFormulaVertex}, scalar formulas are transformed lazily
+ * and cache their computed value for retrieval.
  */
 export class ScalarFormulaVertex extends FormulaVertex {
   /** Most recently computed value of this formula. */
