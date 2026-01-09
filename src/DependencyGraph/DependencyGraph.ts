@@ -188,7 +188,7 @@ export class DependencyGraph {
           this.rangeMapping.addOrUpdateVertex(rangeVertex)
         }
 
-        this.graph.addNodeAndReturnId(rangeVertex)
+        this.graph.addNodeIfNotExists(rangeVertex)
         const rangeVertexId = rangeVertex.idInGraph
 
         if (rangeVertexId === undefined) {
@@ -257,7 +257,7 @@ export class DependencyGraph {
     }
 
     const newVertex = new EmptyCellVertex()
-    const newVertexId = this.graph.addNodeAndReturnId(newVertex)
+    const newVertexId = this.graph.addNodeIfNotExists(newVertex)
     this.addressMapping.setCell(address, newVertex)
 
     return { vertex: newVertex, id: newVertexId }
@@ -567,12 +567,12 @@ export class DependencyGraph {
   }
 
   public addVertex(address: SimpleCellAddress, vertex: CellVertex): void {
-    this.graph.addNodeAndReturnId(vertex)
+    this.graph.addNodeIfNotExists(vertex)
     this.addressMapping.setCell(address, vertex)
   }
 
   public addArrayVertex(address: SimpleCellAddress, vertex: ArrayFormulaVertex): void {
-    this.graph.addNodeAndReturnId(vertex)
+    this.graph.addNodeIfNotExists(vertex)
     this.setAddressMappingForArrayVertex(vertex, address)
   }
 
@@ -861,7 +861,7 @@ export class DependencyGraph {
   }
 
   private exchangeGraphNode(oldNode: Vertex, newNode: Vertex) {
-    this.graph.addNodeAndReturnId(newNode)
+    this.graph.addNodeIfNotExists(newNode)
     const adjNodesStored = this.graph.adjacentNodes(oldNode)
     this.removeVertex(oldNode)
     adjNodesStored.forEach((adjacentNode) => {
@@ -899,7 +899,7 @@ export class DependencyGraph {
     if (oldNode) {
       this.exchangeGraphNode(oldNode, newNode)
     } else {
-      this.graph.addNodeAndReturnId(newNode)
+      this.graph.addNodeIfNotExists(newNode)
     }
   }
 
@@ -1069,7 +1069,7 @@ export class DependencyGraph {
           while (find.smallerRangeVertex === undefined) {
             const newRangeVertex = new RangeVertex(AbsoluteCellRange.spanFrom(currentRangeVertex.range.start, currentRangeVertex.range.width(), currentRangeVertex.range.height() - 1))
             this.rangeMapping.addOrUpdateVertex(newRangeVertex)
-            this.graph.addNodeAndReturnId(newRangeVertex)
+            this.graph.addNodeIfNotExists(newRangeVertex)
             const restRange = new AbsoluteCellRange(simpleCellAddress(currentRangeVertex.range.start.sheet, currentRangeVertex.range.start.col, currentRangeVertex.range.end.row), currentRangeVertex.range.end)
             this.addAllFromRange(restRange, currentRangeVertex)
             this.graph.addEdge(newRangeVertex, currentRangeVertex)

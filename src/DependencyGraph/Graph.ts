@@ -134,11 +134,12 @@ export class Graph<Node extends GraphNode> {
   }
 
   /**
-   * Adds node to a graph
+   * Adds node to a graph if it does not exist yet.
    *
-   * @param node - a node to be added
+   * @param {Node} node - a node to be added
+   * @returns {NodeId} - the id of the added node
    */
-  public addNodeAndReturnId(node: Node): NodeId {
+  public addNodeIfNotExists(node: Node): NodeId {
     const idOfExistingNode = node.idInGraph
 
     if (idOfExistingNode !== undefined) {
