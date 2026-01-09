@@ -6,7 +6,7 @@
 import {SheetCellAddress, simpleCellAddress, SimpleCellAddress} from '../../Cell'
 import {Maybe} from '../../Maybe'
 import {ColumnsSpan, RowsSpan} from '../../Span'
-import {CellVertex} from '../Vertex'
+import {CellVertex} from '../CellVertex'
 import {AddressMappingStrategy} from './AddressMappingStrategy'
 
 /**
