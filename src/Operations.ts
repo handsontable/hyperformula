@@ -879,11 +879,11 @@ export class Operations {
       return
     }
     const { vertex: localVertex, id: maybeLocalVertexId } = this.dependencyGraph.fetchCellOrCreateEmpty(namedExpression.address)
-    const localVertexId = maybeLocalVertexId ?? this.dependencyGraph.graph.getNodeId(localVertex)
+    const localVertexId = maybeLocalVertexId ?? localVertex.idInGraph
 
     const globalNamedExpression = this.namedExpressions.workbookNamedExpressionOrPlaceholder(expressionName)
     const { vertex: globalVertex, id: maybeGlobalVertexId } = this.dependencyGraph.fetchCellOrCreateEmpty(globalNamedExpression.address)
-    const globalVertexId = maybeGlobalVertexId ?? this.dependencyGraph.graph.getNodeId(globalVertex)
+    const globalVertexId = maybeGlobalVertexId ?? globalVertex.idInGraph
 
     for (const adjacentNode of this.dependencyGraph.graph.adjacentNodes(globalVertex)) {
       if (adjacentNode instanceof ScalarFormulaVertex && adjacentNode.getAddress(this.lazilyTransformingAstService).sheet === sheetId) {
@@ -1024,7 +1024,7 @@ export class Operations {
       return false
     }
 
-    return 'isComputed' in vertex && !vertex.isComputed()
+    return vertex instanceof FormulaVertex && !vertex.isComputed()
   }
 }
 

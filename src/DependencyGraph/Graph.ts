@@ -9,8 +9,11 @@ import { TopSort, TopSortResult } from './TopSort'
 import { ProcessableValue } from './ProcessableValue'
 
 export type NodeId = number
-export type NodeAndId<Node> = { node: Node, id: NodeId }
 export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | SimpleCellRange), Node][]
+
+export interface GraphNode {
+  idInGraph?: NodeId,
+}
 
 /**
  * Provides directed graph structure.
@@ -18,7 +21,7 @@ export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | Simp
  * Idea for performance improvement:
  * - use Set<Node>[] instead of NodeId[][] for edgesSparseArray
  */
-export class Graph<Node extends { _graphId?: NodeId }> {
+export class Graph<Node extends GraphNode> {
   /**
    * A sparse array. The value nodesSparseArray[n] exists if and only if node n is in the graph.
    * @private
@@ -72,7 +75,8 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * @param node - node to check
    */
   public hasNode(node: Node): boolean {
-    return node._graphId !== undefined
+    const id = node.idInGraph
+    return id !== undefined && this.nodesSparseArray[id] !== undefined
   }
 
   /**
@@ -82,8 +86,8 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * @param toNode - node to which edge is incoming
    */
   public existsEdge(fromNode: Node, toNode: Node): boolean {
-    const fromId = this.getNodeId(fromNode)
-    const toId = this.getNodeId(toNode)
+    const fromId = fromNode.idInGraph
+    const toId = toNode.idInGraph
 
     if (fromId === undefined || toId === undefined) {
       return false
@@ -101,13 +105,13 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * - return an array instead of set
    */
   public adjacentNodes(node: Node): Set<Node> {
-    const id = this.getNodeId(node)
+    const id = node.idInGraph
 
     if (id === undefined) {
       throw this.missingNodeError(node)
     }
 
-    return new Set(this.edgesSparseArray[id].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]))
+    return new Set(this.edgesSparseArray[id].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]).filter(node => node !== undefined))
   }
 
   /**
@@ -116,7 +120,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * @param node - node to which adjacent nodes we want to retrieve
    */
   public adjacentNodesCount(node: Node): number {
-    const id = this.getNodeId(node)
+    const id = node.idInGraph
 
     if (id === undefined) {
       throw this.missingNodeError(node)
@@ -131,7 +135,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * @param node - a node to be added
    */
   public addNodeAndReturnId(node: Node): NodeId {
-    const idOfExistingNode = node._graphId
+    const idOfExistingNode = node.idInGraph
 
     if (idOfExistingNode !== undefined) {
       return idOfExistingNode
@@ -142,7 +146,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
 
     this.nodesSparseArray[newId] = node
     this.edgesSparseArray[newId] = []
-    node._graphId = newId
+    node.idInGraph = newId
     return newId
   }
 
@@ -177,7 +181,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * Removes node from graph
    */
   public removeNode(node: Node): [(SimpleCellAddress | SimpleCellRange), Node][] {
-    const id = node._graphId
+    const id = node.idInGraph
 
     if (id === undefined) {
       throw this.missingNodeError(node)
@@ -193,7 +197,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
     delete this.nodesSparseArray[id]
     delete this.edgesSparseArray[id]
     this.infiniteRangeIds.delete(id)
-    node._graphId = undefined
+    node.idInGraph = undefined
 
     return dependencies
   }
@@ -266,7 +270,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
     onCycle: (node: Node) => void
   ): TopSortResult<Node> {
     const topSortAlgorithm = new TopSort<Node>(this.nodesSparseArray, this.edgesSparseArray)
-    const modifiedNodesIds = modifiedNodes.map(node => this.getNodeId(node)).filter(id => id !== undefined) as NodeId[]
+    const modifiedNodesIds = modifiedNodes.map(node => node.idInGraph).filter(id => id !== undefined) as NodeId[]
     return topSortAlgorithm.getTopSortedWithSccSubgraphFrom(modifiedNodesIds, operatingFunction, onCycle)
   }
 
@@ -274,7 +278,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * Marks node as volatile.
    */
   public markNodeAsVolatile(node: Node): void {
-    const id = this.getNodeId(node)
+    const id = node.idInGraph
 
     if (id === undefined) {
       return
@@ -288,7 +292,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * Marks node as dirty.
    */
   public markNodeAsDirty(node: Node): void {
-    const id = this.getNodeId(node)
+    const id = node.idInGraph
 
     if (id === undefined) {
       return
@@ -317,7 +321,7 @@ export class Graph<Node extends { _graphId?: NodeId }> {
    * Marks node as changingWithStructure.
    */
   public markNodeAsChangingWithStructure(node: Node): void {
-    const id = this.getNodeId(node)
+    const id = node.idInGraph
 
     if (id === undefined) {
       return
@@ -354,22 +358,15 @@ export class Graph<Node extends { _graphId?: NodeId }> {
   /**
    * Returns an array of nodes marked as infinite ranges
    */
-  public getInfiniteRanges(): NodeAndId<Node>[] {
-    return [...this.infiniteRangeIds].map(id => ({ node: this.nodesSparseArray[id], id }))
-  }
-
-  /**
-   * Returns the internal id of a node.
-   */
-  public getNodeId(node: Node): NodeId | undefined {
-    return node._graphId
+  public getInfiniteRanges(): Node[] {
+    return [...this.infiniteRangeIds].map(id => this.nodesSparseArray[id])
   }
 
   /**
    *
    */
   private getNodeIdIfNotNumber(node: Node | NodeId): NodeId | undefined {
-    return typeof node === 'number' ? node : node._graphId
+    return typeof node === 'number' ? node : node.idInGraph
   }
 
   /**

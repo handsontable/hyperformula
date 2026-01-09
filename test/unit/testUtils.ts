@@ -4,6 +4,7 @@ import {CellError, SimpleCellAddress, simpleCellAddress} from '../../src/Cell'
 import {Config} from '../../src/Config'
 import {DateTimeHelper} from '../../src/DateTimeHelper'
 import {ArrayFormulaVertex, ScalarFormulaVertex, Graph, RangeVertex} from '../../src/DependencyGraph'
+import { GraphNode } from '../../src/DependencyGraph/Graph'
 import {ErrorMessage} from '../../src/error-message'
 import {defaultStringifyDateTime} from '../../src/format/format'
 import {complex} from '../../src/interpreter/ArithmeticHelper'
@@ -269,10 +270,10 @@ export function graphEdgesCount<T>(graph: Graph<T>): number {
   , 0)
 }
 
-export function graphReversedAdjacentNodes<T>(graph: Graph<T>, node: T): T[] {
-  const id = (graph as any).nodesIds.get(node)
+export function graphReversedAdjacentNodes<Node extends GraphNode>(graph: Graph<Node>, node: Node): Node[] {
+  const id = node.idInGraph
 
-  return (graph as any).nodesSparseArray.reduce((acc: number[], sourceNode: T, sourceId: number) =>
+  return (graph as any).nodesSparseArray.reduce((acc: number[], sourceNode: Node, sourceId: number) =>
     sourceNode && (graph as any).edgesSparseArray[sourceId].includes(id)
       ? [ ...acc, sourceId ]
       : acc

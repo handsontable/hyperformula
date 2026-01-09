@@ -5,13 +5,12 @@
 
 import {CellError} from '../Cell'
 import {ParsingError} from '../parser/Ast'
+import { CellVertex } from './CellVertex'
 
 /**
  * Represents a cell that contains a parsing error.
  */
-export class ParsingErrorVertex {
-  public _graphId?: number
-
+export class ParsingErrorVertex extends CellVertex {
   /**
    * Constructor
    */
@@ -19,6 +18,7 @@ export class ParsingErrorVertex {
     public readonly errors: ParsingError[],
     public readonly rawInput: string
   ) {
+    super()
   }
 
   /**

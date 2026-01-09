@@ -3,15 +3,15 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {EmptyCellVertex, ParsingErrorVertex, RangeVertex, ValueCellVertex} from './'
-import {FormulaVertex} from './FormulaVertex'
+import { GraphNode } from './Graph'
 
 /**
- * Represents vertex which keeps values of one or more cells
+ * Base class for all types of vertices in the dependency graph
  */
-export type CellVertex = FormulaVertex | ValueCellVertex | EmptyCellVertex | ParsingErrorVertex
+export abstract class Vertex implements GraphNode {
+  public idInGraph?: number
 
-/**
- * Represents any vertex
- */
-export type Vertex = CellVertex | RangeVertex
+  constructor() {
+    this.idInGraph = undefined
+  }
+}

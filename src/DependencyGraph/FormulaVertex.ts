@@ -14,15 +14,15 @@ import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
+import { CellVertex } from './CellVertex'
 
-export abstract class FormulaVertex {
-  public _graphId?: number
-
+export abstract class FormulaVertex extends CellVertex {
   protected constructor(
     protected formula: Ast,
     protected cellAddress: SimpleCellAddress,
     public version: number
   ) {
+    super()
   }
 
   public get width(): number {

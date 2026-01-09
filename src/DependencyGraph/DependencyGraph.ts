@@ -172,7 +172,7 @@ export class DependencyGraph {
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
-    const endVertexId = this.graph.getNodeId(endVertex)
+    const endVertexId = endVertex.idInGraph
 
     if (endVertexId === undefined) {
       throw new Error('End vertex not found')
@@ -189,7 +189,7 @@ export class DependencyGraph {
         }
 
         this.graph.addNodeAndReturnId(rangeVertex)
-        const rangeVertexId = this.graph.getNodeId(rangeVertex)
+        const rangeVertexId = rangeVertex.idInGraph
 
         if (rangeVertexId === undefined) {
           throw new Error('Range vertex not found')
@@ -876,22 +876,22 @@ export class DependencyGraph {
   }
 
   private correctInfiniteRangesDependency(address: SimpleCellAddress) {
-    const relevantInfiniteRanges = (this.graph.getInfiniteRanges())
-    .filter(({ node }) => (node as RangeVertex).range.addressInRange(address))
+    const relevantInfiniteRanges = this.graph.getInfiniteRanges()
+    .filter(node => (node as RangeVertex).range.addressInRange(address))
 
     if (relevantInfiniteRanges.length <= 0) {
       return
     }
 
     const { vertex, id: maybeVertexId } = this.fetchCellOrCreateEmpty(address)
-    const vertexId = maybeVertexId ?? this.graph.getNodeId(vertex)
+    const vertexId = maybeVertexId ?? vertex.idInGraph
 
     if (vertexId === undefined) {
       throw new Error('Vertex not found')
     }
 
-    relevantInfiniteRanges.forEach(({ id }) => {
-      this.graph.addEdge(vertexId, id)
+    relevantInfiniteRanges.forEach((node) => {
+      this.graph.addEdge(vertexId, node)
     })
   }
 
@@ -946,7 +946,7 @@ export class DependencyGraph {
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
     this.graph.getInfiniteRanges()
-      .forEach(({ id: infiniteRangeVertexId, node: infiniteRangeVertex }) => {
+      .forEach((infiniteRangeVertex) => {
         const intersection = vertex.range.intersectionWith((infiniteRangeVertex as RangeVertex).range)
 
         if (intersection === undefined) {
@@ -955,7 +955,7 @@ export class DependencyGraph {
 
         intersection.addresses(this).forEach((address: SimpleCellAddress) => {
           const { vertex, id } = this.fetchCellOrCreateEmpty(address)
-          this.graph.addEdge(id ?? vertex, infiniteRangeVertexId)
+          this.graph.addEdge(id ?? vertex, infiniteRangeVertex)
         })
       })
   }
