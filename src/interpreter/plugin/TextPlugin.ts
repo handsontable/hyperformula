@@ -414,14 +414,14 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         // Try parsing parentheses notation for negative numbers: "(123)" -> -123
         const parenthesesMatch = /^\(([^()]+)\)$/.exec(trimmedArg)
         if (parenthesesMatch) {
-          const innerValue = this.parseStringToNumber(parenthesesMatch[1])
+          const innerValue = this.arithmeticHelper.parseStringToNumber(parenthesesMatch[1])
           if (innerValue !== undefined) {
             return -innerValue
           }
         }
 
         // Try standard parsing
-        const parsedValue = this.parseStringToNumber(trimmedArg)
+        const parsedValue = this.arithmeticHelper.parseStringToNumber(trimmedArg)
         if (parsedValue !== undefined) {
           return parsedValue
         }
@@ -431,37 +431,6 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
       return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
     })
-  }
-
-  /**
-   * Parses a string to a number, supporting percentages, currencies, numeric strings, and date/time formats.
-   */
-  private parseStringToNumber(input: string): ExtendedNumber | undefined {
-    // Try percentage
-    const percentResult = this.arithmeticHelper.coerceStringToMaybePercentNumber(input)
-    if (percentResult !== undefined) {
-      return percentResult
-    }
-
-    // Try currency
-    const currencyResult = this.arithmeticHelper.coerceStringToMaybeCurrencyNumber(input)
-    if (currencyResult !== undefined) {
-      return currencyResult
-    }
-
-    // Try plain number
-    const numberResult = this.arithmeticHelper.numberLiteralsHelper.numericStringToMaybeNumber(input.trim())
-    if (numberResult !== undefined) {
-      return numberResult
-    }
-
-    // Try date/time
-    const dateTimeResult = this.dateTimeHelper.dateStringToDateNumber(input)
-    if (dateTimeResult !== undefined) {
-      return dateTimeResult
-    }
-
-    return undefined
   }
 
   private escapeRegExpSpecialCharacters(text: string): string {

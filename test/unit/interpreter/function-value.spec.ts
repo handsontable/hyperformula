@@ -83,7 +83,7 @@ describe('Function VALUE', () => {
     it('should convert string with thousand separator', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VALUE("1,234")'],
-      ])
+      ], {thousandSeparator: ',', functionArgSeparator: ';'})
 
       expect(engine.getCellValue(adr('A1'))).toBe(1234)
     })
@@ -94,6 +94,22 @@ describe('Function VALUE', () => {
       ])
 
       expect(engine.getCellValue(adr('A1'))).toBe(-123)
+    })
+
+    it('should return VALUE error for nested parentheses', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=VALUE("((123))")'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+    })
+
+    it('should return VALUE error for unbalanced parentheses', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=VALUE("(123")'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
   })
 
@@ -119,7 +135,7 @@ describe('Function VALUE', () => {
     it('should convert currency string with thousand separator and decimal', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VALUE("$1,234.56")'],
-      ])
+      ], {thousandSeparator: ',', functionArgSeparator: ';'})
 
       expect(engine.getCellValue(adr('A1'))).toBe(1234.56)
     })
@@ -204,12 +220,15 @@ describe('Function VALUE', () => {
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
 
-    it('should return VALUE error for 12-hour time format without proper config', () => {
+  })
+
+  describe('12-hour time format', () => {
+    it('should parse 12-hour time format with am/pm', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VALUE("3:00pm")'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.625, 6)
     })
   })
 
@@ -238,9 +257,17 @@ describe('Function VALUE', () => {
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     })
 
-    it('should convert cell reference with numeric string', () => {
+    it('should convert cell reference with string value', () => {
       const engine = HyperFormula.buildFromArray([
-        ['123', '=VALUE(A1)'],
+        ["'123", '=VALUE(A1)'],
+      ])
+
+      expect(engine.getCellValue(adr('B1'))).toBe(123)
+    })
+
+    it('should pass through cell reference with numeric value', () => {
+      const engine = HyperFormula.buildFromArray([
+        [123, '=VALUE(A1)'],
       ])
 
       expect(engine.getCellValue(adr('B1'))).toBe(123)
@@ -251,7 +278,7 @@ describe('Function VALUE', () => {
     it('should respect decimal separator config', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VALUE("123,45")'],
-      ], {decimalSeparator: ',', thousandSeparator: ' '})
+      ], {decimalSeparator: ',', thousandSeparator: ' ', functionArgSeparator: ';'})
 
       expect(engine.getCellValue(adr('A1'))).toBe(123.45)
     })
@@ -259,7 +286,7 @@ describe('Function VALUE', () => {
     it('should respect thousand separator config', () => {
       const engine = HyperFormula.buildFromArray([
         ['=VALUE("1 234,56")'],
-      ], {decimalSeparator: ',', thousandSeparator: ' '})
+      ], {decimalSeparator: ',', thousandSeparator: ' ', functionArgSeparator: ';'})
 
       expect(engine.getCellValue(adr('A1'))).toBe(1234.56)
     })

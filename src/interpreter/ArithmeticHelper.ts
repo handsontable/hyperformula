@@ -47,7 +47,7 @@ export class ArithmeticHelper {
   constructor(
     private readonly config: Config,
     private readonly dateTimeHelper: DateTimeHelper,
-    public readonly numberLiteralsHelper: NumberLiteralHelper,
+    private readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
     this.collator = collatorFromConfig(config)
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
@@ -222,6 +222,41 @@ export class ArithmeticHelper {
     )
   }
 
+  /**
+   * Parses a string to a number, supporting percentages, currencies, numeric strings, and date/time formats.
+   * Unlike coerceNonDateScalarToMaybeNumber, this also handles scientific notation with uppercase E.
+   */
+  public parseStringToNumber(input: string): Maybe<ExtendedNumber> {
+    const trimmedInput = input.trim()
+
+    // Try percentage
+    const percentResult = this.coerceStringToMaybePercentNumber(trimmedInput)
+    if (percentResult !== undefined) {
+      return percentResult
+    }
+
+    // Try currency
+    const currencyResult = this.coerceStringToMaybeCurrencyNumber(trimmedInput)
+    if (currencyResult !== undefined) {
+      return currencyResult
+    }
+
+    // Try plain number (normalize scientific notation E to e)
+    const normalizedInput = trimmedInput.replace(/E/g, 'e')
+    const numberResult = this.numberLiteralsHelper.numericStringToMaybeNumber(normalizedInput)
+    if (numberResult !== undefined) {
+      return numberResult
+    }
+
+    // Try date/time
+    const dateTimeResult = this.dateTimeHelper.dateStringToDateNumber(trimmedInput)
+    if (dateTimeResult !== undefined) {
+      return dateTimeResult
+    }
+
+    return undefined
+  }
+
   public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     if (arg === EmptyValue) {
       return 0
@@ -250,7 +285,7 @@ export class ArithmeticHelper {
     }
   }
 
-  public coerceStringToMaybePercentNumber(input: string): Maybe<PercentNumber> {
+  private coerceStringToMaybePercentNumber(input: string): Maybe<PercentNumber> {
     const trimmedInput = input.trim()
 
     if (trimmedInput.endsWith('%')) {
@@ -264,7 +299,7 @@ export class ArithmeticHelper {
     return undefined
   }
 
-  public coerceStringToMaybeCurrencyNumber(input: string): Maybe<CurrencyNumber> {
+  private coerceStringToMaybeCurrencyNumber(input: string): Maybe<CurrencyNumber> {
     const matchedCurrency = this.currencyMatcher(input.trim())
 
     if (matchedCurrency !== undefined) {
