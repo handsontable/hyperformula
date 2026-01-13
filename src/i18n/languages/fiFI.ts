@@ -149,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MKERRO',
     MOD: 'JAKOJ',
     MONTH: 'KUUKAUSI',
+    N: 'N',
     NA: 'PUUTTUU',
     NETWORKDAYS: 'TYÖPÄIVÄT',
     'NETWORKDAYS.INTL': 'TYÖPÄIVÄT.KANSVÄL',

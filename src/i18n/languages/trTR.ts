@@ -149,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'DÇARP',
     MOD: 'MOD',
     MONTH: 'AY',
+    N: 'S',
     NA: 'YOKSAY',
     NETWORKDAYS: 'TAMİŞGÜNÜ',
     'NETWORKDAYS.INTL': 'TAMİŞGÜNÜ.ULUSL',

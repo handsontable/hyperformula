@@ -149,6 +149,7 @@ export const dictionary: RawTranslationPackage = {
     MMULT: 'MMULT',
     MOD: 'RESIDUO',
     MONTH: 'MES',
+    N: 'N',
     NA: 'NOD',
     NETWORKDAYS: 'DIAS.LAB',
     'NETWORKDAYS.INTL': 'DIAS.LAB.INTL',

@@ -7,7 +7,8 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
@@ -67,6 +68,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       method: 't',
       parameters: [
         {argumentType: FunctionArgumentType.SCALAR}
+      ]
+    },
+    'N': {
+      method: 'n',
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY}
       ]
     },
     'PROPER': {
@@ -332,6 +339,37 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         return arg
       }
       return typeof arg === 'string' ? arg : ''
+    })
+  }
+
+  /**
+   * Corresponds to N(value)
+   *
+   * Converts a value to a number according to Excel specification:
+   * - Numbers return themselves
+   * - Dates return their serial number (stored as numbers internally)
+   * - TRUE returns 1, FALSE returns 0
+   * - Error values propagate
+   * - Anything else (text, empty) returns 0
+   * - For ranges, uses the first cell value
+   *
+   * @param ast
+   * @param state
+   */
+  public n(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('N'), (arg: InternalScalarValue | SimpleRangeValue) => {
+      const value = arg instanceof SimpleRangeValue ? arg.data[0]?.[0] : arg
+
+      if (value instanceof CellError) {
+        return value
+      }
+      if (typeof value === 'number') {
+        return value
+      }
+      if (typeof value === 'boolean') {
+        return value ? 1 : 0
+      }
+      return 0
     })
   }
 
