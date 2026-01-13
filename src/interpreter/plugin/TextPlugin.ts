@@ -352,9 +352,6 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * - Error values propagate
    * - Anything else (text, empty) returns 0
    * - For ranges, uses the first cell value
-   *
-   * @param ast
-   * @param state
    */
   public n(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('N'), (arg: InternalScalarValue | SimpleRangeValue) => {
