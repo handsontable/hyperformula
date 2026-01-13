@@ -329,7 +329,7 @@ describe('Function VALUE', () => {
         dateFormats: ['YYYY-MM-DD'],
       })
 
-      expect(customParseDateTime).toHaveBeenCalled()
+      expect(customParseDateTime).toHaveBeenCalledWith('2026-01-13', 'YYYY-MM-DD', 'hh:mm')
       expect(engine.getCellValue(adr('A1'))).toBe(46035)
     })
 
@@ -353,7 +353,7 @@ describe('Function VALUE', () => {
         timeFormats: ['hh:mm'],
       })
 
-      expect(customParseDateTime).toHaveBeenCalled()
+      expect(customParseDateTime).toHaveBeenCalledWith('14h30m', 'DD/MM/YYYY', 'hh:mm')
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.60416667, 6)
     })
 
@@ -381,7 +381,7 @@ describe('Function VALUE', () => {
         timeFormats: ['hh:mm'],
       })
 
-      expect(customParseDateTime).toHaveBeenCalled()
+      expect(customParseDateTime).toHaveBeenCalledWith('2026-01-13T14:30', 'YYYY-MM-DD', 'hh:mm')
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(46035.60417, 4)
     })
 
@@ -394,7 +394,7 @@ describe('Function VALUE', () => {
         parseDateTime: customParseDateTime,
       })
 
-      expect(customParseDateTime).toHaveBeenCalled()
+      expect(customParseDateTime).toHaveBeenCalledWith('invalid-format', 'DD/MM/YYYY', 'hh:mm')
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     })
   })
