@@ -222,41 +222,6 @@ export class ArithmeticHelper {
     )
   }
 
-  /**
-   * Parses a string to a number, supporting percentages, currencies, numeric strings, and date/time formats.
-   * Unlike coerceNonDateScalarToMaybeNumber, this also handles scientific notation with uppercase E.
-   */
-  public parseStringToNumber(input: string): Maybe<ExtendedNumber> {
-    const trimmedInput = input.trim()
-
-    // Try percentage
-    const percentResult = this.coerceStringToMaybePercentNumber(trimmedInput)
-    if (percentResult !== undefined) {
-      return percentResult
-    }
-
-    // Try currency
-    const currencyResult = this.coerceStringToMaybeCurrencyNumber(trimmedInput)
-    if (currencyResult !== undefined) {
-      return currencyResult
-    }
-
-    // Try plain number (normalize scientific notation E to e)
-    const normalizedInput = trimmedInput.replace(/E/g, 'e')
-    const numberResult = this.numberLiteralsHelper.numericStringToMaybeNumber(normalizedInput)
-    if (numberResult !== undefined) {
-      return numberResult
-    }
-
-    // Try date/time
-    const dateTimeResult = this.dateTimeHelper.dateStringToDateNumber(trimmedInput)
-    if (dateTimeResult !== undefined) {
-      return dateTimeResult
-    }
-
-    return undefined
-  }
-
   public coerceNonDateScalarToMaybeNumber(arg: InternalScalarValue): Maybe<ExtendedNumber> {
     if (arg === EmptyValue) {
       return 0

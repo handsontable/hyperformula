@@ -5,6 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
+import { Maybe } from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
@@ -400,37 +401,37 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         return arg
       }
 
-      if (typeof arg === 'boolean') {
+      if (typeof arg !== 'string') {
         return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
       }
 
-      if (typeof arg === 'string') {
-        if (arg === '') {
-          return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+      const trimmedArg = arg.trim()
+
+      const parenthesesMatch = /^\(([^()]+)\)$/.exec(trimmedArg)
+      if (parenthesesMatch) {
+        const innerValue = this.parseStringToNumber(parenthesesMatch[1])
+        if (innerValue !== undefined) {
+          return -innerValue
         }
+      }
 
-        const trimmedArg = arg.trim()
-
-        // Try parsing parentheses notation for negative numbers: "(123)" -> -123
-        const parenthesesMatch = /^\(([^()]+)\)$/.exec(trimmedArg)
-        if (parenthesesMatch) {
-          const innerValue = this.arithmeticHelper.parseStringToNumber(parenthesesMatch[1])
-          if (innerValue !== undefined) {
-            return -innerValue
-          }
-        }
-
-        // Try standard parsing
-        const parsedValue = this.arithmeticHelper.parseStringToNumber(trimmedArg)
-        if (parsedValue !== undefined) {
-          return parsedValue
-        }
-
-        return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+      const parsedValue = this.parseStringToNumber(trimmedArg)
+      if (parsedValue !== undefined) {
+        return parsedValue
       }
 
       return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
     })
+  }
+
+  private parseStringToNumber(input: string): Maybe<ExtendedNumber> {
+    const trimmedInput = input.trim()
+
+    if (trimmedInput === '') {
+      return undefined
+    }
+
+    return this.arithmeticHelper.coerceToMaybeNumber(trimmedInput)
   }
 
   private escapeRegExpSpecialCharacters(text: string): string {
