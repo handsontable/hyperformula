@@ -139,8 +139,8 @@ export class CellContentParser {
       } else {
         let trimmedContent = content.trim()
         let mode = 0
-        let currency // currency
-        if (trimmedContent.endsWith('%')) { // percentage
+        let currency
+        if (trimmedContent.endsWith('%')) {
           mode = 1
           trimmedContent = trimmedContent.slice(0, trimmedContent.length - 1)
         } else {
