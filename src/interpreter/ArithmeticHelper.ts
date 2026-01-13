@@ -47,7 +47,7 @@ export class ArithmeticHelper {
   constructor(
     private readonly config: Config,
     private readonly dateTimeHelper: DateTimeHelper,
-    private readonly numberLiteralsHelper: NumberLiteralHelper,
+    public readonly numberLiteralsHelper: NumberLiteralHelper,
   ) {
     this.collator = collatorFromConfig(config)
     this.actualEps = config.smartRounding ? config.precisionEpsilon : 0
@@ -250,7 +250,7 @@ export class ArithmeticHelper {
     }
   }
 
-  private coerceStringToMaybePercentNumber(input: string): Maybe<PercentNumber> {
+  public coerceStringToMaybePercentNumber(input: string): Maybe<PercentNumber> {
     const trimmedInput = input.trim()
 
     if (trimmedInput.endsWith('%')) {
@@ -264,7 +264,7 @@ export class ArithmeticHelper {
     return undefined
   }
 
-  private coerceStringToMaybeCurrencyNumber(input: string): Maybe<CurrencyNumber> {
+  public coerceStringToMaybeCurrencyNumber(input: string): Maybe<CurrencyNumber> {
     const matchedCurrency = this.currencyMatcher(input.trim())
 
     if (matchedCurrency !== undefined) {

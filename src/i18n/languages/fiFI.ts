@@ -225,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICODEMERKKI',
     UNICODE: 'UNICODE',
     UPPER: 'ISOT',
+    VALUE: 'ARVO',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARPA',

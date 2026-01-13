@@ -7,8 +7,8 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
@@ -147,6 +147,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       method: 'upper',
       parameters: [
         {argumentType: FunctionArgumentType.STRING}
+      ]
+    },
+    'VALUE': {
+      method: 'value',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
   }
@@ -374,6 +380,88 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     return this.runFunction(ast.args, state, this.metadata('UPPER'), (arg: string) => {
       return arg.toUpperCase()
     })
+  }
+
+  /**
+   * Corresponds to VALUE(text)
+   *
+   * Converts a text string that represents a number to a number.
+   *
+   * @param ast
+   * @param state
+   */
+  public value(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('VALUE'), (arg: RawScalarValue): ExtendedNumber | CellError => {
+      if (arg instanceof CellError) {
+        return arg
+      }
+
+      if (isExtendedNumber(arg)) {
+        return arg
+      }
+
+      if (typeof arg === 'boolean') {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+      }
+
+      if (typeof arg === 'string') {
+        if (arg === '') {
+          return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+        }
+
+        const trimmedArg = arg.trim()
+
+        // Try parsing parentheses notation for negative numbers: "(123)" -> -123
+        const parenthesesMatch = /^\(([^()]+)\)$/.exec(trimmedArg)
+        if (parenthesesMatch) {
+          const innerValue = this.parseStringToNumber(parenthesesMatch[1])
+          if (innerValue !== undefined) {
+            return -innerValue
+          }
+        }
+
+        // Try standard parsing
+        const parsedValue = this.parseStringToNumber(trimmedArg)
+        if (parsedValue !== undefined) {
+          return parsedValue
+        }
+
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+      }
+
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    })
+  }
+
+  /**
+   * Parses a string to a number, supporting percentages, currencies, numeric strings, and date/time formats.
+   */
+  private parseStringToNumber(input: string): ExtendedNumber | undefined {
+    // Try percentage
+    const percentResult = this.arithmeticHelper.coerceStringToMaybePercentNumber(input)
+    if (percentResult !== undefined) {
+      return percentResult
+    }
+
+    // Try currency
+    const currencyResult = this.arithmeticHelper.coerceStringToMaybeCurrencyNumber(input)
+    if (currencyResult !== undefined) {
+      return currencyResult
+    }
+
+    // Try plain number
+    const numberResult = this.arithmeticHelper.numberLiteralsHelper.numericStringToMaybeNumber(input.trim())
+    if (numberResult !== undefined) {
+      return numberResult
+    }
+
+    // Try date/time
+    const dateTimeResult = this.dateTimeHelper.dateStringToDateNumber(input)
+    if (dateTimeResult !== undefined) {
+      return dateTimeResult
+    }
+
+    return undefined
   }
 
   private escapeRegExpSpecialCharacters(text: string): string {
