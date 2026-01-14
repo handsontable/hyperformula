@@ -225,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNIKARAKTER',
     UNICODE: 'UNICODE',
     UPPER: 'NAGYBETŰS',
+    VALUE: 'ÉRTÉK',
     VARA: 'VARA',
     'VAR.P': 'VAR.S',
     VARPA: 'VARPA',

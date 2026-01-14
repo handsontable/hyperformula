@@ -5,10 +5,11 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
+import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
+import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
@@ -149,6 +150,12 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         {argumentType: FunctionArgumentType.STRING}
       ]
     },
+    'VALUE': {
+      method: 'value',
+      parameters: [
+        {argumentType: FunctionArgumentType.SCALAR}
+      ]
+    },
   }
 
   /**
@@ -156,8 +163,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    *
    * Concatenates provided arguments to one string.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
    */
   public concatenate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CONCATENATE'), (...args) => {
@@ -170,8 +177,8 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    *
    * Splits provided string using space separator and returns chunk at zero-based position specified by second argument
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
    */
   public split(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SPLIT'), (stringToSplit: string, indexToUse: number) => {
@@ -374,6 +381,63 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     return this.runFunction(ast.args, state, this.metadata('UPPER'), (arg: string) => {
       return arg.toUpperCase()
     })
+  }
+
+  /**
+   * Corresponds to VALUE(text)
+   *
+   * Converts a text string that represents a number to a number.
+   *
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
+   */
+  public value(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('VALUE'), (arg: RawScalarValue): ExtendedNumber | CellError => {
+      if (arg instanceof CellError) {
+        return arg
+      }
+
+      if (isExtendedNumber(arg)) {
+        return arg
+      }
+
+      if (typeof arg !== 'string') {
+        return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+      }
+
+      const trimmedArg = arg.trim()
+
+      const parenthesesMatch = /^\(([^()]+)\)$/.exec(trimmedArg)
+      if (parenthesesMatch) {
+        const innerValue = this.parseStringToNumber(parenthesesMatch[1])
+        if (innerValue !== undefined) {
+          return -innerValue
+        }
+      }
+
+      const parsedValue = this.parseStringToNumber(trimmedArg)
+      if (parsedValue !== undefined) {
+        return parsedValue
+      }
+
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
+    })
+  }
+
+  /**
+   * Parses a string to a numeric value, handling whitespace trimming and empty string validation.
+   *
+   * @param {string} input - The string to parse
+   * @returns {Maybe<ExtendedNumber>} The parsed number or undefined if parsing fails or input is empty
+   */
+  private parseStringToNumber(input: string): Maybe<ExtendedNumber> {
+    const trimmedInput = input.trim()
+
+    if (trimmedInput === '') {
+      return undefined
+    }
+
+    return this.arithmeticHelper.coerceToMaybeNumber(trimmedInput)
   }
 
   private escapeRegExpSpecialCharacters(text: string): string {

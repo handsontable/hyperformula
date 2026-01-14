@@ -225,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNIZEICHEN',
     UNICODE: 'UNICODE',
     UPPER: 'GROSS',
+    VALUE: 'WERT',
     VARA: 'VARIANZA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARIANZENA',
