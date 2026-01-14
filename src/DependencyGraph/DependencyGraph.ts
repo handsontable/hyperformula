@@ -172,7 +172,7 @@ export class DependencyGraph {
   }
 
   public processCellDependencies(cellDependencies: CellDependency[], endVertex: Vertex) {
-    const endVertexId = this.graph.getNodeId(endVertex)
+    const endVertexId = endVertex.idInGraph
 
     if (endVertexId === undefined) {
       throw new Error('End vertex not found')
@@ -188,8 +188,8 @@ export class DependencyGraph {
           this.rangeMapping.addOrUpdateVertex(rangeVertex)
         }
 
-        this.graph.addNodeAndReturnId(rangeVertex)
-        const rangeVertexId = this.graph.getNodeId(rangeVertex)
+        this.graph.addNodeIfNotExists(rangeVertex)
+        const rangeVertexId = rangeVertex.idInGraph
 
         if (rangeVertexId === undefined) {
           throw new Error('Range vertex not found')
@@ -257,7 +257,7 @@ export class DependencyGraph {
     }
 
     const newVertex = new EmptyCellVertex()
-    const newVertexId = this.graph.addNodeAndReturnId(newVertex)
+    const newVertexId = this.graph.addNodeIfNotExists(newVertex)
     this.addressMapping.setCell(address, newVertex)
 
     return { vertex: newVertex, id: newVertexId }
@@ -567,12 +567,12 @@ export class DependencyGraph {
   }
 
   public addVertex(address: SimpleCellAddress, vertex: CellVertex): void {
-    this.graph.addNodeAndReturnId(vertex)
+    this.graph.addNodeIfNotExists(vertex)
     this.addressMapping.setCell(address, vertex)
   }
 
   public addArrayVertex(address: SimpleCellAddress, vertex: ArrayFormulaVertex): void {
-    this.graph.addNodeAndReturnId(vertex)
+    this.graph.addNodeIfNotExists(vertex)
     this.setAddressMappingForArrayVertex(vertex, address)
   }
 
@@ -861,7 +861,7 @@ export class DependencyGraph {
   }
 
   private exchangeGraphNode(oldNode: Vertex, newNode: Vertex) {
-    this.graph.addNodeAndReturnId(newNode)
+    this.graph.addNodeIfNotExists(newNode)
     const adjNodesStored = this.graph.adjacentNodes(oldNode)
     this.removeVertex(oldNode)
     adjNodesStored.forEach((adjacentNode) => {
@@ -876,22 +876,22 @@ export class DependencyGraph {
   }
 
   private correctInfiniteRangesDependency(address: SimpleCellAddress) {
-    const relevantInfiniteRanges = (this.graph.getInfiniteRanges())
-    .filter(({ node }) => (node as RangeVertex).range.addressInRange(address))
+    const relevantInfiniteRanges = this.graph.getInfiniteRanges()
+    .filter(node => (node as RangeVertex).range.addressInRange(address))
 
     if (relevantInfiniteRanges.length <= 0) {
       return
     }
 
     const { vertex, id: maybeVertexId } = this.fetchCellOrCreateEmpty(address)
-    const vertexId = maybeVertexId ?? this.graph.getNodeId(vertex)
+    const vertexId = maybeVertexId ?? vertex.idInGraph
 
     if (vertexId === undefined) {
       throw new Error('Vertex not found')
     }
 
-    relevantInfiniteRanges.forEach(({ id }) => {
-      this.graph.addEdge(vertexId, id)
+    relevantInfiniteRanges.forEach((node) => {
+      this.graph.addEdge(vertexId, node)
     })
   }
 
@@ -899,7 +899,7 @@ export class DependencyGraph {
     if (oldNode) {
       this.exchangeGraphNode(oldNode, newNode)
     } else {
-      this.graph.addNodeAndReturnId(newNode)
+      this.graph.addNodeIfNotExists(newNode)
     }
   }
 
@@ -946,7 +946,7 @@ export class DependencyGraph {
 
   private correctInfiniteRangesDependenciesByRangeVertex(vertex: RangeVertex) {
     this.graph.getInfiniteRanges()
-      .forEach(({ id: infiniteRangeVertexId, node: infiniteRangeVertex }) => {
+      .forEach((infiniteRangeVertex) => {
         const intersection = vertex.range.intersectionWith((infiniteRangeVertex as RangeVertex).range)
 
         if (intersection === undefined) {
@@ -955,7 +955,7 @@ export class DependencyGraph {
 
         intersection.addresses(this).forEach((address: SimpleCellAddress) => {
           const { vertex, id } = this.fetchCellOrCreateEmpty(address)
-          this.graph.addEdge(id ?? vertex, infiniteRangeVertexId)
+          this.graph.addEdge(id ?? vertex, infiniteRangeVertex)
         })
       })
   }
@@ -1069,7 +1069,7 @@ export class DependencyGraph {
           while (find.smallerRangeVertex === undefined) {
             const newRangeVertex = new RangeVertex(AbsoluteCellRange.spanFrom(currentRangeVertex.range.start, currentRangeVertex.range.width(), currentRangeVertex.range.height() - 1))
             this.rangeMapping.addOrUpdateVertex(newRangeVertex)
-            this.graph.addNodeAndReturnId(newRangeVertex)
+            this.graph.addNodeIfNotExists(newRangeVertex)
             const restRange = new AbsoluteCellRange(simpleCellAddress(currentRangeVertex.range.start.sheet, currentRangeVertex.range.start.col, currentRangeVertex.range.end.row), currentRangeVertex.range.end)
             this.addAllFromRange(restRange, currentRangeVertex)
             this.graph.addEdge(newRangeVertex, currentRangeVertex)

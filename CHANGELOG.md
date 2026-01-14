@@ -13,6 +13,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added a new function: N. [#1585](https://github.com/handsontable/hyperformula/issues/1585)
 - Added a new function: VALUE. [#1592](https://github.com/handsontable/hyperformula/issues/1592)
 
+### Fixed
+
+- Fixed `Error Map maximum size exceeded` error when loading big spreadsheets. [#1602](https://github.com/handsontable/hyperformula/issues/1602)
+
 ## [3.1.1] - 2025-12-18
 
 ### Fixed
