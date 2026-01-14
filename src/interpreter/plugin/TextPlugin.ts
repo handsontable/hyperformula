@@ -5,7 +5,7 @@
 
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
-import { Maybe } from '../../Maybe'
+import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
