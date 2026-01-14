@@ -79,8 +79,7 @@ export class Graph<Node extends GraphNode> {
    * @param {Node} node - node to check
    */
   public hasNode(node: Node): boolean {
-    const id = node.idInGraph
-    return id !== undefined && this.nodesSparseArray[id] !== undefined
+    return node.idInGraph != null
   }
 
   /**
@@ -109,13 +108,13 @@ export class Graph<Node extends GraphNode> {
    * - return an array instead of set
    */
   public adjacentNodes(node: Node): Set<Node> {
-    const id = node.idInGraph
+    const nodeId = node.idInGraph
 
-    if (id === undefined) {
+    if (nodeId === undefined) {
       throw this.missingNodeError(node)
     }
 
-    return new Set(this.edgesSparseArray[id].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]).filter(node => node !== undefined))
+    return new Set(this.edgesSparseArray[nodeId].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]).filter(node => node !== undefined))
   }
 
   /**
