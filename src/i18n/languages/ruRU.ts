@@ -149,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'МУМНОЖ',
     MOD: 'ОСТАТ',
     MONTH: 'МЕСЯЦ',
+    N: 'Ч',
     NA: 'НД',
     NETWORKDAYS: 'ЧИСТРАБДНИ',
     'NETWORKDAYS.INTL': 'ЧИСТРАБДНИ.МЕЖД',

@@ -149,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MPRODUKT',
     MOD: 'REST',
     MONTH: 'MÅNED',
+    N: 'TAL',
     NA: 'IKKE.TILGÆNGELIG',
     NETWORKDAYS: 'ANTAL.ARBEJDSDAGE',
     'NETWORKDAYS.INTL': 'ANTAL.ARBEJDSDAGE.INTL',
