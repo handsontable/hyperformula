@@ -16,24 +16,24 @@ describe('Function TIMEVALUE', () => {
   it('with string arguments', () => {
     const engine = HyperFormula.buildFromArray([['=TIMEVALUE("3:00pm")', '=TIMEVALUE("15:00")', '=TIMEVALUE("21:00:00")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.625)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.625)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_TIME)
-    expect(engine.getCellValue(adr('B1'))).toEqual(0.625)
-    expect(engine.getCellValue(adr('C1'))).toEqual(0.875)
+    expect(engine.getCellValue(adr('B1'))).toBe(0.625)
+    expect(engine.getCellValue(adr('C1'))).toBe(0.875)
   })
 
   it('ignores date', () => {
     const engine = HyperFormula.buildFromArray([['=TIMEVALUE("3:00pm")', '=TIMEVALUE("31/12/2018 3:00pm")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.625)
-    expect(engine.getCellValue(adr('B1'))).toEqual(0.625)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.625)
+    expect(engine.getCellValue(adr('B1'))).toBe(0.625)
   })
 
   it('rollover', () => {
     const engine = HyperFormula.buildFromArray([['=TIMEVALUE("24:00")', '=TIMEVALUE("31/12/2018 24:00")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
   it('propagate errors', () => {

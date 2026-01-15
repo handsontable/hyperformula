@@ -12,8 +12,14 @@ declare global {
 }
 
 export const toEqualErrorMatcher: CustomMatcherFactories = {
+  /**
+   *
+   */
   toEqualError: function(util: MatchersUtil): CustomMatcher {
     return {
+      /**
+       *
+       */
       compare: function(received: any, expected: any): CustomMatcherResult {
         let result
         if (typeof received === 'object' && typeof expected === 'object' && received.message != null && expected.message != null && received.message.includes(expected.message)) {

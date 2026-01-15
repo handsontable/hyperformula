@@ -8,6 +8,9 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class SqrtPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SqrtPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'SQRT': {
@@ -18,6 +21,10 @@ export class SqrtPlugin extends FunctionPlugin implements FunctionPluginTypechec
     },
   }
 
+  
+  /**
+   *
+   */
   public sqrt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SQRT'), Math.sqrt)
   }

@@ -9,28 +9,32 @@ describe('Function ISBLANK', () => {
       [null, '=ISBLANK(A1)', '=ISBLANK(A2)'],
       ['=A1'],
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual(true)
-    expect(engine.getCellValue(adr('C1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
   it('should return false for empty string', () => {
     const engine = HyperFormula.buildFromArray([['', '=ISBLANK(A1)']])
-    expect(engine.getCellValue(adr('B1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
   })
 
   it('should return false if it is not reference to empty cell', () => {
     const engine = HyperFormula.buildFromArray([
       [null, '=ISBLANK("")', '=ISBLANK(4)', '=ISBLANK(CONCATENATE(A1,A1))'],
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual(false)
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
   })
 
   it('takes exactly one argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISBLANK(A3, A2)', '=ISBLANK()'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
@@ -40,7 +44,7 @@ describe('Function ISBLANK', () => {
       ['=ISBLANK(4/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('range value results in VALUE error', () => {

@@ -9,7 +9,7 @@ describe('Function DEGREES', () => {
       ['=DEGREES(0)', '=DEGREES(3.14)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(179.9087477)
   })
 

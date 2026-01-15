@@ -37,7 +37,7 @@ describe('Function MATCH', () => {
       ['=MATCH(42, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('validates that 3rd argument is number', () => {
@@ -79,7 +79,7 @@ describe('Function MATCH', () => {
       ['130'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   describe('when MatchType = 0', () => {
@@ -93,7 +93,7 @@ describe('Function MATCH', () => {
           ['200'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        expect(engine.getCellValue(adr('A1'))).toBe(1)
       })
 
       it('works when the result is in the last cell', () => {
@@ -105,7 +105,7 @@ describe('Function MATCH', () => {
           ['103'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns the relative position in the range', () => {
@@ -121,7 +121,7 @@ describe('Function MATCH', () => {
           ['103'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
 
       it('returns the first matching result', () => {
@@ -133,7 +133,7 @@ describe('Function MATCH', () => {
           ['200'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('doesn\'t return result from outside the search range', () => {
@@ -158,7 +158,7 @@ describe('Function MATCH', () => {
           ['103', '200', '200', '200'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        expect(engine.getCellValue(adr('A1'))).toBe(1)
       })
 
       it('works when the result is in the last cell', () => {
@@ -167,7 +167,7 @@ describe('Function MATCH', () => {
           ['200', '200', '200', '103'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns the relative position in the range', () => {
@@ -176,7 +176,7 @@ describe('Function MATCH', () => {
           ['', '', '', '', '100', '101', '102', '103'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
 
       it('returns the first matching result', () => {
@@ -185,7 +185,7 @@ describe('Function MATCH', () => {
           ['200', '103', '103', '200'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('doesn\'t return result from outside the search range', () => {
@@ -214,7 +214,7 @@ describe('Function MATCH', () => {
       ])
 
       expect(spy).toHaveBeenCalled()
-      expect(engine.getCellValue(adr('A1'))).toEqual(4)
+      expect(engine.getCellValue(adr('A1'))).toBe(4)
     })
 
     it('works for strings, is not case sensitive', () => {
@@ -224,7 +224,7 @@ describe('Function MATCH', () => {
         ['A'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(1)
+      expect(engine.getCellValue(adr('A1'))).toBe(1)
     })
 
     it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
@@ -234,7 +234,7 @@ describe('Function MATCH', () => {
         ['A'],
       ], { caseSensitive: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(1)
+      expect(engine.getCellValue(adr('A1'))).toBe(1)
     })
 
     it('works with dates', () => {
@@ -246,8 +246,9 @@ describe('Function MATCH', () => {
           ['01/03/2012'],
         ]
       )
-      expect(engine.getCellValue(adr('C1'))).toEqual(2)
-      expect(engine.getCellValue(adr('C2'))).toEqual(3)
+
+      expect(engine.getCellValue(adr('C1'))).toBe(2)
+      expect(engine.getCellValue(adr('C2'))).toBe(3)
     })
   })
 
@@ -262,7 +263,7 @@ describe('Function MATCH', () => {
           ['130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('returns the exact match if present in the range', () => {
@@ -274,7 +275,7 @@ describe('Function MATCH', () => {
           ['130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
 
       it('returns the last match if there are duplicates in the search range', () => {
@@ -286,7 +287,7 @@ describe('Function MATCH', () => {
           ['110'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns the last value if all are smaller than the search value', () => {
@@ -298,7 +299,7 @@ describe('Function MATCH', () => {
           ['130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns an error if all are greater than the search value', () => {
@@ -326,7 +327,7 @@ describe('Function MATCH', () => {
           ['130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('doesn\'t return result from outside the search range', () => {
@@ -351,7 +352,7 @@ describe('Function MATCH', () => {
           ['100', '110', '120', '130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('returns the exact match if present in the range', () => {
@@ -360,7 +361,7 @@ describe('Function MATCH', () => {
           ['100', '110', '120', '130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
 
       it('returns the last match if there are duplicates in the search range', () => {
@@ -369,7 +370,7 @@ describe('Function MATCH', () => {
           ['110', '110', '110', '110'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns the last value if all are smaller than the search value', () => {
@@ -378,7 +379,7 @@ describe('Function MATCH', () => {
           ['100', '110', '120', '130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns an error if all are greater than the search value', () => {
@@ -396,7 +397,7 @@ describe('Function MATCH', () => {
           ['', '', '', '', '100', '110', '120', '130'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('doesn\'t return result from outside the search range', () => {
@@ -419,7 +420,7 @@ describe('Function MATCH', () => {
         ['e'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
@@ -431,7 +432,7 @@ describe('Function MATCH', () => {
         ['e'],
       ], { caseSensitive: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('works with dates', () => {
@@ -443,8 +444,9 @@ describe('Function MATCH', () => {
           ['01/04/2012'],
         ]
       )
-      expect(engine.getCellValue(adr('C1'))).toEqual(2)
-      expect(engine.getCellValue(adr('C2'))).toEqual(2)
+
+      expect(engine.getCellValue(adr('C1'))).toBe(2)
+      expect(engine.getCellValue(adr('C2'))).toBe(2)
     })
 
     it('uses binary search', () => {
@@ -460,7 +462,7 @@ describe('Function MATCH', () => {
         ['130'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
       expect(spy).not.toHaveBeenCalled()
     })
   })
@@ -476,7 +478,7 @@ describe('Function MATCH', () => {
           ['100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('returns the exact match if present in the range', () => {
@@ -488,7 +490,7 @@ describe('Function MATCH', () => {
           ['100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('returns the last match if there are duplicates in the search range', () => {
@@ -500,7 +502,7 @@ describe('Function MATCH', () => {
           ['110'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns the last value if all are greater than the search value', () => {
@@ -512,7 +514,7 @@ describe('Function MATCH', () => {
           ['100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns an error if all are smaller than the search value', () => {
@@ -540,7 +542,7 @@ describe('Function MATCH', () => {
           ['100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('doesn\'t return result from outside the search range', () => {
@@ -565,7 +567,7 @@ describe('Function MATCH', () => {
           ['130', '120', '110', '100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('returns the exact match if present in the range', () => {
@@ -574,7 +576,7 @@ describe('Function MATCH', () => {
           ['130', '120', '110', '100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('returns the last match if there are duplicates in the search range', () => {
@@ -583,7 +585,7 @@ describe('Function MATCH', () => {
           ['110', '110', '110', '110'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns the last value if all are greater than the search value', () => {
@@ -592,7 +594,7 @@ describe('Function MATCH', () => {
           ['130', '120', '110', '100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(4)
+        expect(engine.getCellValue(adr('A1'))).toBe(4)
       })
 
       it('returns an error if all are smaller than the search value', () => {
@@ -610,7 +612,7 @@ describe('Function MATCH', () => {
           ['', '', '', '', '130', '120', '110', '100'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(2)
+        expect(engine.getCellValue(adr('A1'))).toBe(2)
       })
 
       it('doesn\'t return result from outside the search range', () => {
@@ -633,7 +635,7 @@ describe('Function MATCH', () => {
         ['a'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
@@ -645,7 +647,7 @@ describe('Function MATCH', () => {
         ['a'],
       ], { caseSensitive: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('works with dates', () => {
@@ -657,8 +659,9 @@ describe('Function MATCH', () => {
           ['01/01/2012'],
         ]
       )
-      expect(engine.getCellValue(adr('C1'))).toEqual(3)
-      expect(engine.getCellValue(adr('C2'))).toEqual(2)
+
+      expect(engine.getCellValue(adr('C1'))).toBe(3)
+      expect(engine.getCellValue(adr('C2'))).toBe(2)
     })
 
     it('uses binary search', () => {
@@ -674,7 +677,7 @@ describe('Function MATCH', () => {
         ['100'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
       expect(spy).not.toHaveBeenCalled()
     })
   })
@@ -690,8 +693,8 @@ describe('Function MATCH', () => {
       ['=MATCH(, A1:A5)'],
     ])
 
-    expect(engine.getCellValue(adr('A6'))).toEqual(3)
-    expect(engine.getCellValue(adr('A7'))).toEqual(3)
+    expect(engine.getCellValue(adr('A6'))).toBe(3)
+    expect(engine.getCellValue(adr('A7'))).toBe(3)
   })
 
   it('should coerce empty arg to zero when useColumnIndex = false', () => {
@@ -702,7 +705,7 @@ describe('Function MATCH', () => {
       [0],
     ], {useColumnIndex: false})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
   })
 
   it('should return NA when range is not a single column or row', () => {

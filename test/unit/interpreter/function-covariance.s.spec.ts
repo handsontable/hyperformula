@@ -29,7 +29,7 @@ describe('COVARIANCE.S', () => {
       ['=COVARIANCE.S(A1:A2, B1:B2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
   })
 
   it('works', () => {
@@ -66,7 +66,7 @@ describe('COVARIANCE.S', () => {
       ['=COVARIANCE.S(A1:A3, B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(20)
+    expect(engine.getCellValue(adr('A4'))).toBe(20)
   })
 
   it('over a range value', () => {
@@ -76,7 +76,7 @@ describe('COVARIANCE.S', () => {
       ['=COVARIANCE.S(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(163)
+    expect(engine.getCellValue(adr('A3'))).toBe(163)
   })
 
   it('propagates errors', () => {

@@ -16,7 +16,10 @@ import {
   getRawValue,
   RawInterpreterValue,
   RawNoErrorScalarValue,
-  RawScalarValue
+  RawScalarValue,
+  isExtendedNumber,
+  getRawPrecisionValue,
+  toNativeNumeric
 } from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
@@ -36,6 +39,9 @@ interface ValueIndex {
 
 type SheetIndex = ColumnMap[]
 
+/**
+ *
+ */
 export class ColumnIndex implements ColumnSearchStrategy {
 
   private readonly index: Map<number, SheetIndex> = new Map()
@@ -51,6 +57,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.binarySearchStrategy = new ColumnBinarySearch(dependencyGraph)
   }
 
+  
+  /**
+   *
+   */
   public add(value: RawInterpreterValue, address: SimpleCellAddress) {
     if (value === EmptyValue || value instanceof CellError) {
       return
@@ -63,6 +73,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public remove(value: RawInterpreterValue | undefined, address: SimpleCellAddress) {
     if (value === undefined) {
       return
@@ -77,6 +91,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public change(oldValue: RawInterpreterValue | undefined, newValue: RawInterpreterValue, address: SimpleCellAddress) {
     if (oldValue === newValue) {
       return
@@ -85,6 +103,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.add(newValue, address)
   }
 
+  
+  /**
+   *
+   */
   public applyChanges(contentChanges: CellValueChange[]) {
     for (const change of contentChanges) {
       if (change.oldValue !== undefined) {
@@ -93,6 +115,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public moveValues(sourceRange: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number) {
     for (const [value, address] of sourceRange) {
       const targetAddress = movedSimpleCellAddress(address, toSheet, toRight, toBottom)
@@ -101,12 +127,20 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {
     for (const [value, address] of range) {
       this.remove(value, address)
     }
   }
 
+  
+  /**
+   *
+   */
   public find(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, { ordering, ifNoMatch, returnOccurrence }: SearchOptions): number {
     if (returnOccurrence == null) {
       returnOccurrence = ordering === 'none' ? 'first' : 'last'
@@ -116,6 +150,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return resultUsingColumnIndex !== undefined ? resultUsingColumnIndex : this.binarySearchStrategy.find(searchKey, rangeValue, { ordering, ifNoMatch, returnOccurrence })
   }
 
+  
+  /**
+   *
+   */
   private findUsingColumnIndex(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, returnOccurrence: 'first' | 'last'): Maybe<number> {
     const range = rangeValue.range
     if (range === undefined) {
@@ -139,6 +177,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return rowNumber !== undefined ? rowNumber - range.start.row : undefined
   }
 
+  
+  /**
+   *
+   */
   private static findRowBelongingToRange(valueIndex: ValueIndex, range: AbsoluteCellRange, returnOccurrence: 'first' | 'last'): Maybe<number> {
     const start = range.start.row
     const end = range.end.row
@@ -158,10 +200,18 @@ export class ColumnIndex implements ColumnSearchStrategy {
   }
 
 
+  
+  /**
+   *
+   */
   public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, range: SimpleRangeValue, options: AdvancedFindOptions = { returnOccurrence: 'first' }): number {
     return this.binarySearchStrategy.advancedFind(keyMatcher, range, options)
   }
 
+  
+  /**
+   *
+   */
   public addColumns(columnsSpan: ColumnsSpan) {
     const sheetIndex = this.index.get(columnsSpan.sheet)
     if (!sheetIndex) {
@@ -171,6 +221,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     sheetIndex.splice(columnsSpan.columnStart, 0, ...Array(columnsSpan.numberOfColumns))
   }
 
+  
+  /**
+   *
+   */
   public removeColumns(columnsSpan: ColumnsSpan) {
     const sheetIndex = this.index.get(columnsSpan.sheet)
     if (!sheetIndex) {
@@ -180,10 +234,18 @@ export class ColumnIndex implements ColumnSearchStrategy {
     sheetIndex.splice(columnsSpan.columnStart, columnsSpan.numberOfColumns)
   }
 
+  
+  /**
+   *
+   */
   public removeSheet(sheetId: number): void {
     this.index.delete(sheetId)
   }
 
+  
+  /**
+   *
+   */
   public getColumnMap(sheet: number, col: number): ColumnMap {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
@@ -199,6 +261,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return columnMap
   }
 
+  
+  /**
+   *
+   */
   public getValueIndex(sheet: number, col: number, value: RawInterpreterValue): ValueIndex {
     const columnMap = this.getColumnMap(sheet, col)
     let index = this.getColumnMap(sheet, col).get(value)
@@ -212,6 +278,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     return index
   }
 
+  
+  /**
+   *
+   */
   public ensureRecentData(sheet: number, col: number, value: RawInterpreterValue) {
     const valueIndex = this.getValueIndex(sheet, col, value)
     const actualVersion = this.transformingService.version()
@@ -231,26 +301,46 @@ export class ColumnIndex implements ColumnSearchStrategy {
     valueIndex.version = actualVersion
   }
 
+  // Helper to normalize values for Map keys - Numeric cannot be used as Map keys
+  
+  /**
+   *
+   */
+  private normalizeValueForIndex(value: RawInterpreterValue): RawInterpreterValue {
+    if (typeof value === 'string') {
+      return forceNormalizeString(value)
+    }
+    // Convert Numeric to native number for Map key usage
+    if (isExtendedNumber(value)) {
+      return toNativeNumeric(getRawPrecisionValue(value as any))
+    }
+    return value
+  }
+
+  
+  /**
+   *
+   */
   private addSingleCellValue(value: RawInterpreterValue, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
-      this.ensureRecentData(address.sheet, address.col, value)
-      if (typeof value === 'string') {
-        value = forceNormalizeString(value)
-      }
-      const valueIndex = this.getValueIndex(address.sheet, address.col, value)
+      const normalizedValue = this.normalizeValueForIndex(value)
+      this.ensureRecentData(address.sheet, address.col, normalizedValue)
+      const valueIndex = this.getValueIndex(address.sheet, address.col, normalizedValue)
       ColumnIndex.addValue(valueIndex, address.row)
     })
   }
 
+  
+  /**
+   *
+   */
   private removeSingleValue(value: RawInterpreterValue, address: SimpleCellAddress) {
     this.stats.measure(StatType.BUILD_COLUMN_INDEX, () => {
-      this.ensureRecentData(address.sheet, address.col, value)
+      const normalizedValue = this.normalizeValueForIndex(value)
+      this.ensureRecentData(address.sheet, address.col, normalizedValue)
 
       const columnMap = this.getColumnMap(address.sheet, address.col)
-      if (typeof value === 'string') {
-        value = forceNormalizeString(value)
-      }
-      const valueIndex = columnMap.get(value)
+      const valueIndex = columnMap.get(normalizedValue)
       if (!valueIndex) {
         return
       }
@@ -261,7 +351,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
       }
 
       if (valueIndex.index.length === 0) {
-        columnMap.delete(value)
+        columnMap.delete(normalizedValue)
       }
 
       if (columnMap.size === 0) {
@@ -270,17 +360,29 @@ export class ColumnIndex implements ColumnSearchStrategy {
     })
   }
 
+  
+  /**
+   *
+   */
   private addRows(col: number, rowsSpan: RowsSpan, value: RawInterpreterValue) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
     ColumnIndex.shiftRows(valueIndex, rowsSpan.rowStart, rowsSpan.numberOfRows)
   }
 
+  
+  /**
+   *
+   */
   private removeRows(col: number, rowsSpan: RowsSpan, value: RawInterpreterValue) {
     const valueIndex = this.getValueIndex(rowsSpan.sheet, col, value)
     ColumnIndex.removeRowsFromValues(valueIndex, rowsSpan)
     ColumnIndex.shiftRows(valueIndex, rowsSpan.rowEnd + 1, -rowsSpan.numberOfRows)
   }
 
+  
+  /**
+   *
+   */
   private static addValue(valueIndex: ValueIndex, rowNumber: number): void {
     const rowIndex = findInOrderedArray(rowNumber, valueIndex.index, 'lowerBound')
     const isRowNumberAlreadyInIndex = valueIndex.index[rowIndex] === rowNumber
@@ -290,6 +392,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   private static removeRowsFromValues(valueIndex: ValueIndex, rowsSpan: RowsSpan) {
     const start = findInOrderedArray(rowsSpan.rowStart, valueIndex.index, 'upperBound')
     const end = findInOrderedArray(rowsSpan.rowEnd, valueIndex.index, 'lowerBound')
@@ -300,6 +406,10 @@ export class ColumnIndex implements ColumnSearchStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   private static shiftRows(valueIndex: ValueIndex, afterRow: number, numberOfRows: number) {
     const positionInIndex = findInOrderedArray(afterRow, valueIndex.index, 'upperBound')
     if (positionInIndex === -1) {
@@ -317,6 +427,9 @@ export class ColumnIndex implements ColumnSearchStrategy {
  * - index of the key, if the key exists in the array,
  * - index of the lower/upper bound (depending on handlingMisses parameter) otherwise.
  * Assumption: The array is ordered ascending and contains no repetitions.
+ */
+/**
+ *
  */
 export function findInOrderedArray(key: number, values: number[], handlingMisses: 'lowerBound' | 'upperBound' = 'upperBound'): number {
   let start = 0

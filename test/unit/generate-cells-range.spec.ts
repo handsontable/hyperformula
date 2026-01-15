@@ -53,18 +53,21 @@ describe('AbsoluteCellRange#sameDimensions', () => {
   it('same width and height', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('L11'), adr('M14'))
+
     expect(range1.sameDimensionsAs(range2)).toBe(true)
   })
 
   it('different width', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('L11'), adr('N14'))
+
     expect(range1.sameDimensionsAs(range2)).toBe(false)
   })
 
   it('different height', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('L11'), adr('M15'))
+
     expect(range1.sameDimensionsAs(range2)).toBe(false)
   })
 })
@@ -73,36 +76,42 @@ describe('AbsoluteCellRange#doesOverlap', () => {
   it('exactly the same', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B1'), adr('C4'))
+
     expect(range1.doesOverlap(range2)).toBe(true)
   })
 
   it('different sheets', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B1', 1), adr('C4', 1))
+
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
   it('second on the right side of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('D1'), adr('E4'))
+
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
   it('second on the left side of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B1'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('A1'), adr('A4'))
+
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
   it('second on the top of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B3'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B1'), adr('C2'))
+
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 
   it('second on the bottom of the first', () => {
     const range1 = new AbsoluteCellRange(adr('B3'), adr('C4'))
     const range2 = new AbsoluteCellRange(adr('B5'), adr('C6'))
+
     expect(range1.doesOverlap(range2)).toBe(false)
   })
 })
@@ -131,6 +140,7 @@ describe('AbsoluteCellRange#removeSpan', () => {
   it('rows below', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A4'))
     range.removeSpan(new RowsSpan(0, 4, 5))
+
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(3)
   })
@@ -138,6 +148,7 @@ describe('AbsoluteCellRange#removeSpan', () => {
   it('rows above', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
     range.removeSpan(new RowsSpan(0, 0, 1))
+
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(2)
   })
@@ -145,6 +156,7 @@ describe('AbsoluteCellRange#removeSpan', () => {
   it('middle of the range', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A5'))
     range.removeSpan(new RowsSpan(0, 1, 2))
+
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(2)
   })
@@ -152,6 +164,7 @@ describe('AbsoluteCellRange#removeSpan', () => {
   it('start above range', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
     range.removeSpan(new RowsSpan(0, 0, 3))
+
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(0)
   })
@@ -159,6 +172,7 @@ describe('AbsoluteCellRange#removeSpan', () => {
   it('end below range', () => {
     const range = new AbsoluteCellRange(adr('A1'), adr('A5'))
     range.removeSpan(new RowsSpan(0, 2, 5))
+
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(1)
   })
@@ -166,6 +180,7 @@ describe('AbsoluteCellRange#removeSpan', () => {
   it('whole range', () => {
     const range = new AbsoluteCellRange(adr('A3'), adr('A5'))
     range.removeSpan(new RowsSpan(0, 0, 5))
+
     expect(range.start.row).toBe(0)
     expect(range.end.row).toBe(-1)
     expect(range.height()).toBe(0)

@@ -1,6 +1,9 @@
 import {ExpectedValue} from '../benchmark'
 import {RawCellContent, Sheet} from '../../../src'
 
+/**
+ *
+ */
 export function sheet(rows: number = 10000): Sheet {
   const sheet: Sheet = []
 
@@ -21,6 +24,9 @@ export function sheet(rows: number = 10000): Sheet {
   return sheet
 }
 
+/**
+ *
+ */
 export function expectedValues(sheet: Sheet): ExpectedValue[] {
   return [
     {address: 'C1', value: `${sheet[0][0]}${sheet[0][1]}`},

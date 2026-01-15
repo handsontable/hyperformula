@@ -20,11 +20,12 @@ describe('Function ROMAN', () => {
       ['=ROMAN(499.9)'],
       ['=ROMAN(499, 1.1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual('CDXCIX')
-    expect(engine.getCellValue(adr('A2'))).toEqual('CDXCIX')
-    expect(engine.getCellValue(adr('A3'))).toEqual('ID')
-    expect(engine.getCellValue(adr('A4'))).toEqual('CDXCIX')
-    expect(engine.getCellValue(adr('A5'))).toEqual('LDVLIV')
+
+    expect(engine.getCellValue(adr('A1'))).toBe('CDXCIX')
+    expect(engine.getCellValue(adr('A2'))).toBe('CDXCIX')
+    expect(engine.getCellValue(adr('A3'))).toBe('ID')
+    expect(engine.getCellValue(adr('A4'))).toBe('CDXCIX')
+    expect(engine.getCellValue(adr('A5'))).toBe('LDVLIV')
   })
 
   it('should throw correct error if arguments are out of bounds', () => {
@@ -36,6 +37,7 @@ describe('Function ROMAN', () => {
       ['=ROMAN(1, 5)'],
       ['=ROMAN(1, -1)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
@@ -46,30 +48,38 @@ describe('Function ROMAN', () => {
 
   it('should output correct value for mode 0', () => {
     const engine = HyperFormula.buildFromArray([input(0)])
+
     expect(engine.getSheetValues(0)).toEqual([mode0])
   })
 
   it('should output correct value for mode 1', () => {
     const engine = HyperFormula.buildFromArray([input(1)])
+
     expect(engine.getSheetValues(0)).toEqual([mode1])
   })
 
   it('should output correct value for mode 2', () => {
     const engine = HyperFormula.buildFromArray([input(2)])
+
     expect(engine.getSheetValues(0)).toEqual([mode2])
   })
 
   it('should output correct value for mode 3', () => {
     const engine = HyperFormula.buildFromArray([input(3)])
+
     expect(engine.getSheetValues(0)).toEqual([mode3])
   })
 
   it('should output correct value for mode 4', () => {
     const engine = HyperFormula.buildFromArray([input(4)])
+
     expect(engine.getSheetValues(0)).toEqual([mode4])
   })
 })
 
+/**
+ *
+ */
 function input(mode: number) {
   const ret = []
   for (let i = 1; i < 4000; i++) {

@@ -21,10 +21,10 @@ describe('Function PROPER', () => {
       ['=PROPER("fOo BAR")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('Foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual('Foo Bar')
-    expect(engine.getCellValue(adr('A3'))).toEqual(' Foo    Bar   ')
-    expect(engine.getCellValue(adr('A4'))).toEqual('Foo Bar')
+    expect(engine.getCellValue(adr('A1'))).toBe('Foo')
+    expect(engine.getCellValue(adr('A2'))).toBe('Foo Bar')
+    expect(engine.getCellValue(adr('A3'))).toBe(' Foo    Bar   ')
+    expect(engine.getCellValue(adr('A4'))).toBe('Foo Bar')
   })
 
   it('should work with punctuation marks and numbers', () => {
@@ -32,7 +32,7 @@ describe('Function PROPER', () => {
       ['=PROPER("123aa123bb.cc.dd")']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('123Aa123Bb.Cc.Dd')
+    expect(engine.getCellValue(adr('A1'))).toBe('123Aa123Bb.Cc.Dd')
   })
 
   it('should work with accents', () => {
@@ -41,8 +41,8 @@ describe('Function PROPER', () => {
       ['=PROPER("MAI CHÍ THỌ")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('Mai Anh Đức')
-    expect(engine.getCellValue(adr('A2'))).toEqual('Mai Chí Thọ')
+    expect(engine.getCellValue(adr('A1'))).toBe('Mai Anh Đức')
+    expect(engine.getCellValue(adr('A2'))).toBe('Mai Chí Thọ')
   })
 
   it('should coerce other types to string', () => {
@@ -52,8 +52,8 @@ describe('Function PROPER', () => {
       ['=PROPER(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('10')
-    expect(engine.getCellValue(adr('A3'))).toEqual('True')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('10')
+    expect(engine.getCellValue(adr('A3'))).toBe('True')
   })
 })

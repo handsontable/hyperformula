@@ -32,6 +32,9 @@ const findSmallerRangeForMany = (dependencyGraph: DependencyGraph, conditionRang
   }
 }
 
+/**
+ *
+ */
 export class CriterionFunctionCompute<T> {
   private readonly dependencyGraph: DependencyGraph
 
@@ -45,6 +48,10 @@ export class CriterionFunctionCompute<T> {
     this.dependencyGraph = this.interpreter.dependencyGraph
   }
 
+  
+  /**
+   *
+   */
   public compute(simpleValuesRange: SimpleRangeValue, conditions: Condition[]): T | CellError {
     for (const condition of conditions) {
       if (!condition.conditionRange.sameDimensionsAs(simpleValuesRange)) {
@@ -85,6 +92,10 @@ export class CriterionFunctionCompute<T> {
     }
   }
 
+  
+  /**
+   *
+   */
   private tryToGetRangeVertexForRangeValue(rangeValue: SimpleRangeValue): Maybe<RangeVertex> {
     const maybeRange = rangeValue.range
     if (maybeRange === undefined) {
@@ -94,6 +105,10 @@ export class CriterionFunctionCompute<T> {
     }
   }
 
+  
+  /**
+   *
+   */
   private reduceFunction(iterable: IterableIterator<T>): T {
     let acc = this.reduceInitialValue
     for (const val of iterable) {
@@ -102,10 +117,18 @@ export class CriterionFunctionCompute<T> {
     return acc
   }
 
+  
+  /**
+   *
+   */
   private findAlreadyComputedValueInCache(rangeVertex: RangeVertex, cacheKey: string, criterionString: string) {
     return rangeVertex.getCriterionFunctionValue(cacheKey, criterionString)
   }
 
+  
+  /**
+   *
+   */
   private evaluateRangeValue(simpleValuesRange: SimpleRangeValue, conditions: Condition[]) {
     const criterionLambdas = conditions.map((condition) => condition.criterionPackage.lambda)
     const values = Array.from(simpleValuesRange.valuesFromTopLeftCorner()).map(this.mapFunction)[Symbol.iterator]()
@@ -114,6 +137,10 @@ export class CriterionFunctionCompute<T> {
     return this.reduceFunction(filteredValues)
   }
 
+  
+  /**
+   *
+   */
   private buildNewCriterionCache(cacheKey: string, simpleConditionRanges: AbsoluteCellRange[], simpleValuesRange: AbsoluteCellRange): CriterionCache {
     const currentRangeVertex = this.dependencyGraph.getRange(simpleValuesRange.start, simpleValuesRange.end)!
     const {smallerRangeVertex, restConditionRanges, restValuesRange} = findSmallerRangeForMany(this.dependencyGraph, simpleConditionRanges, simpleValuesRange)
@@ -137,6 +164,9 @@ export class CriterionFunctionCompute<T> {
   }
 }
 
+/**
+ *
+ */
 export class Condition {
   constructor(
     public readonly conditionRange: SimpleRangeValue,
@@ -145,12 +175,18 @@ export class Condition {
   }
 }
 
+/**
+ *
+ */
 function* getRangeValues(dependencyGraph: DependencyGraph, cellRange: AbsoluteCellRange): IterableIterator<RawScalarValue> {
   for (const cellFromRange of cellRange.addresses(dependencyGraph)) {
     yield getRawValue(dependencyGraph.getScalarValue(cellFromRange))
   }
 }
 
+/**
+ *
+ */
 function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables: IterableIterator<InternalScalarValue>[], computableIterable: IterableIterator<T>): IterableIterator<T> {
   for (const computable of computableIterable) {
     const conditionalSplits = conditionalIterables.map((conditionalIterable) => split(conditionalIterable))
@@ -165,6 +201,9 @@ function* ifFilter<T>(criterionLambdas: CriterionLambda[], conditionalIterables:
   }
 }
 
+/**
+ *
+ */
 function zip<T, U>(arr1: T[], arr2: U[]): [T, U][] {
   const result: [T, U][] = []
   for (let i = 0; i < Math.min(arr1.length, arr2.length); i++) {

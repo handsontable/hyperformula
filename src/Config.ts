@@ -22,10 +22,20 @@ import {TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
-import {ConfigParams, ConfigParamsList} from './ConfigParams'
+import {ConfigParams, ConfigParamsList, NumericImplementation} from './ConfigParams'
+import {
+  RoundingMode,
+  NumericProvider,
+  DecimalNumericFactory,
+  NativeNumericFactory,
+  NumericFactory
+} from './Numeric'
 
 const privatePool: WeakMap<Config, { licenseKeyValidityState: LicenseKeyValidityState }> = new WeakMap()
 
+/**
+ *
+ */
 export class Config implements ConfigParams, ParserConfig {
 
   public static defaultConfig: ConfigParams = {
@@ -56,6 +66,9 @@ export class Config implements ConfigParams, ParserConfig {
     parseDateTime: defaultParseToDateTime,
     precisionEpsilon: 1e-13,
     precisionRounding: 10,
+    numericImplementation: 'precise',
+    numericDigits: 34,
+    numericRounding: RoundingMode.ROUND_HALF_UP,
     smartRounding: true,
     stringifyDateTime: defaultStringifyDateTime,
     stringifyDuration: defaultStringifyDuration,
@@ -122,6 +135,12 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly precisionEpsilon: number
   /** @inheritDoc */
   public readonly precisionRounding: number
+  /** @inheritDoc */
+  public readonly numericImplementation: NumericImplementation
+  /** @inheritDoc */
+  public readonly numericDigits: number
+  /** @inheritDoc */
+  public readonly numericRounding: RoundingMode
   /** @inheritDoc */
   public readonly smartRounding: boolean
   /** @inheritDoc */
@@ -190,6 +209,9 @@ export class Config implements ConfigParams, ParserConfig {
       parseDateTime,
       precisionEpsilon,
       precisionRounding,
+      numericImplementation,
+      numericDigits,
+      numericRounding,
       stringifyDateTime,
       stringifyDuration,
       smartRounding,
@@ -234,6 +256,19 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.precisionRounding, 'precisionRounding', 0)
     this.precisionEpsilon = configValueFromParam(precisionEpsilon, 'number', 'precisionEpsilon')
     validateNumberToBeAtLeast(this.precisionEpsilon, 'precisionEpsilon', 0)
+    this.numericImplementation = configValueFromParam(
+      numericImplementation,
+      ['precise', 'native'],
+      'numericImplementation'
+    )
+    this.numericDigits = configValueFromParam(numericDigits, 'number', 'numericDigits')
+    validateNumberToBeAtLeast(this.numericDigits, 'numericDigits', 1)
+    this.numericRounding = configValueFromParam(numericRounding, 'number', 'numericRounding')
+    validateNumberToBeAtLeast(this.numericRounding, 'numericRounding', 0)
+    validateNumberToBeAtMost(this.numericRounding, 'numericRounding', 8)
+    
+    // Configure the global NumericProvider based on options
+    this.configureNumericProvider()
     this.useColumnIndex = configValueFromParam(useColumnIndex, 'boolean', 'useColumnIndex')
     this.useStats = configValueFromParam(useStats, 'boolean', 'useStats')
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
@@ -271,6 +306,10 @@ export class Config implements ConfigParams, ParserConfig {
     )
   }
 
+  
+  /**
+   *
+   */
   private setupCurrencySymbol(currencySymbol: string[] | undefined): string[] {
     const valueAfterCheck = [...configValueFromParamCheck(currencySymbol, Array.isArray, 'array', 'currencySymbol')]
 
@@ -288,6 +327,32 @@ export class Config implements ConfigParams, ParserConfig {
   }
 
   /**
+   * Configures the global NumericProvider based on the config options.
+   * This sets up the precision number factory used for all arithmetic operations.
+   */
+  private configureNumericProvider(): void {
+    const factory = this.createPrecisionFactory()
+    factory.configure({
+      precision: this.numericDigits,
+      rounding: this.numericRounding,
+    })
+    NumericProvider.setGlobalFactory(factory)
+  }
+
+  /**
+   * Creates the appropriate precision number factory based on the implementation option.
+   */
+  private createPrecisionFactory(): NumericFactory {
+    switch (this.numericImplementation) {
+      case 'native':
+        return new NativeNumericFactory()
+      case 'precise':
+      default:
+        return new DecimalNumericFactory()
+    }
+  }
+
+  /**
    * Proxied property to its private counterpart. This makes the property
    * as accessible as the other Config options but without ability to change the value.
    *
@@ -297,10 +362,18 @@ export class Config implements ConfigParams, ParserConfig {
     return (privatePool.get(this) as Config).licenseKeyValidityState
   }
 
+  
+  /**
+   *
+   */
   public getConfig(): ConfigParams {
     return getFullConfigFromPartial(this)
   }
 
+  
+  /**
+   *
+   */
   public mergeConfig(init: Partial<ConfigParams>): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
@@ -309,12 +382,20 @@ export class Config implements ConfigParams, ParserConfig {
     return new Config(mergedConfig, false)
   }
 
+  
+  /**
+   *
+   */
   private static warnDeprecatedOptions(options: Partial<ConfigParams>) {
     // an example of deprecation warning
     // Config.warnDeprecatedIfUsed(options.binarySearchThreshold, 'binarySearchThreshold', '1.1')
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  
+  /**
+   *
+   */
   private static warnDeprecatedIfUsed(inputValue: any, paramName: string, fromVersion: string, replacementName?: string) {
     if (inputValue !== undefined) {
       if (replacementName === undefined) {
@@ -326,6 +407,9 @@ export class Config implements ConfigParams, ParserConfig {
   }
 }
 
+/**
+ *
+ */
 function getFullConfigFromPartial(partialConfig: Partial<ConfigParams>): ConfigParams {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ret: { [key: string]: any } = {}
@@ -340,6 +424,9 @@ function getFullConfigFromPartial(partialConfig: Partial<ConfigParams>): ConfigP
   return ret as ConfigParams
 }
 
+/**
+ *
+ */
 export function getDefaultConfig(): ConfigParams {
   return getFullConfigFromPartial({})
 }

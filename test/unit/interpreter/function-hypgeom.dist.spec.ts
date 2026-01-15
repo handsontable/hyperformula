@@ -86,21 +86,21 @@ describe('Function HYPGEOM.DIST', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.0000225475753840604, 6)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
     //product #2 returns value here
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A5'))).toEqual(1)
+    expect(engine.getCellValue(adr('A5'))).toBe(1)
     //product #2 returns value here
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A7'))).toEqual(1)
+    expect(engine.getCellValue(adr('A7'))).toBe(1)
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A9'))).toEqual(1)
+    expect(engine.getCellValue(adr('A9'))).toBe(1)
     expect(engine.getCellValue(adr('A10'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A11'))).toBeCloseTo(0.00614930629923134, 6)
     //product #2 returns value here
     expect(engine.getCellValue(adr('A12'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
-    expect(engine.getCellValue(adr('A13'))).toEqual(1)
+    expect(engine.getCellValue(adr('A13'))).toBe(1)
     //value should be 0 or Error, product #1 gives different answer
-    expect(engine.getCellValue(adr('A14'))).toEqual(0)
+    expect(engine.getCellValue(adr('A14'))).toBe(0)
   })
 })

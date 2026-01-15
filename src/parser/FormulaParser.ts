@@ -17,6 +17,7 @@ import {
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from '../Cell'
 import {ErrorMessage} from '../error-message'
 import {Maybe} from '../Maybe'
+import {Numeric, NumericProvider} from '../Numeric'
 import {
   cellAddressFromString,
   columnAddressFromString,
@@ -495,14 +496,29 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
   }
 
+  
+  /**
+   *
+   */
   public reset() {
     super.reset()
     this.customParsingError = undefined
   }
 
-  public numericStringToNumber = (input: string): number => {
+  /**
+   * Converts a numeric string from the formula to an Numeric.
+   * Uses the global precision provider.
+   * During Chevrotain's grammar recording phase, input may be a placeholder token,
+   * so we return zero in that case.
+   */
+  public numericStringToNumber = (input: string): Numeric => {
+    // During grammar recording phase, Chevrotain passes placeholder tokens
+    // that contain special recording phase messages. Return zero in that case.
+    if (typeof input !== 'string' || input === '' || input.includes('Recording Phase')) {
+      return NumericProvider.getGlobalFactory().zero()
+    }
     const normalized = input.replace(this.lexerConfig.decimalSeparator, '.')
-    return Number(normalized)
+    return NumericProvider.getGlobalFactory().fromString(normalized)
   }
 
   /**
@@ -735,6 +751,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     return this.formula()
   }
 
+  
+  /**
+   *
+   */
   private buildCellRange(firstAddress: CellAddress, secondAddress: CellAddress, leadingWhitespace?: string): Ast {
     if (firstAddress.sheet === undefined && secondAddress.sheet !== undefined) {
       return this.parsingError(ParsingErrorType.ParserError, 'Malformed range expression')
@@ -745,6 +765,10 @@ export class FormulaParser extends EmbeddedActionsParser {
     return buildCellRangeAst(firstEnd, secondEnd, sheetRefType, leadingWhitespace)
   }
 
+  
+  /**
+   *
+   */
   private static fixSheetIdsForRangeEnds<T extends AddressWithSheet>(firstEnd: T, secondEnd: T): { firstEnd: T, secondEnd: T, sheetRefType: RangeSheetReferenceType } {
     const sheetRefType = FormulaParser.rangeSheetReferenceType(firstEnd.sheet, secondEnd.sheet)
     const secondEndFixed = (firstEnd.sheet !== undefined && secondEnd.sheet === undefined)
@@ -765,52 +789,54 @@ export class FormulaParser extends EmbeddedActionsParser {
       return this.parsingError(ParsingErrorType.StaticOffsetError, 'First argument to OFFSET is not a reference')
     }
     const rowsArg = args[1]
-    let rowShift
-    if (rowsArg.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value)) {
-      rowShift = rowsArg.value
-    } else if (rowsArg.type === AstNodeType.PLUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
-      rowShift = rowsArg.value.value
-    } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && Number.isInteger(rowsArg.value.value)) {
-      rowShift = -rowsArg.value.value
+    let rowShift: number
+    if (rowsArg.type === AstNodeType.NUMBER && rowsArg.value.isInteger()) {
+      rowShift = rowsArg.value.toNumber()
+    } else if (rowsArg.type === AstNodeType.PLUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && rowsArg.value.value.isInteger()) {
+      rowShift = rowsArg.value.value.toNumber()
+    } else if (rowsArg.type === AstNodeType.MINUS_UNARY_OP && rowsArg.value.type === AstNodeType.NUMBER && rowsArg.value.value.isInteger()) {
+      rowShift = -rowsArg.value.value.toNumber()
     } else {
       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Second argument to OFFSET is not a static number')
     }
     const columnsArg = args[2]
-    let colShift
-    if (columnsArg.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value)) {
-      colShift = columnsArg.value
-    } else if (columnsArg.type === AstNodeType.PLUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
-      colShift = columnsArg.value.value
-    } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && Number.isInteger(columnsArg.value.value)) {
-      colShift = -columnsArg.value.value
+    let colShift: number
+    if (columnsArg.type === AstNodeType.NUMBER && columnsArg.value.isInteger()) {
+      colShift = columnsArg.value.toNumber()
+    } else if (columnsArg.type === AstNodeType.PLUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && columnsArg.value.value.isInteger()) {
+      colShift = columnsArg.value.value.toNumber()
+    } else if (columnsArg.type === AstNodeType.MINUS_UNARY_OP && columnsArg.value.type === AstNodeType.NUMBER && columnsArg.value.value.isInteger()) {
+      colShift = -columnsArg.value.value.toNumber()
     } else {
       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Third argument to OFFSET is not a static number')
     }
     const heightArg = args[3]
-    let height
+    let height: number
     if (heightArg === undefined) {
       height = 1
     } else if (heightArg.type === AstNodeType.NUMBER) {
-      height = heightArg.value
-      if (height < 1) {
+      const heightVal = heightArg.value.toNumber()
+      if (heightVal < 1) {
         return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is too small number')
-      } else if (!Number.isInteger(height)) {
+      } else if (!heightArg.value.isInteger()) {
         return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not integer')
       }
+      height = heightVal
     } else {
       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fourth argument to OFFSET is not a static number')
     }
     const widthArg = args[4]
-    let width
+    let width: number
     if (widthArg === undefined) {
       width = 1
     } else if (widthArg.type === AstNodeType.NUMBER) {
-      width = widthArg.value
-      if (width < 1) {
+      const widthVal = widthArg.value.toNumber()
+      if (widthVal < 1) {
         return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is too small number')
-      } else if (!Number.isInteger(width)) {
+      } else if (!widthArg.value.isInteger()) {
         return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not integer')
       }
+      width = widthVal
     } else {
       return this.parsingError(ParsingErrorType.StaticOffsetError, 'Fifth argument to OFFSET is not a static number')
     }
@@ -851,11 +877,19 @@ export class FormulaParser extends EmbeddedActionsParser {
     }
   }
 
+  
+  /**
+   *
+   */
   private parsingError(type: ParsingErrorType, message: string): ErrorAst {
     this.customParsingError = parsingError(type, message)
     return buildParsingErrorAst()
   }
 
+  
+  /**
+   *
+   */
   private static rangeSheetReferenceType(start?: number, end?: number): RangeSheetReferenceType {
     if (start === undefined) {
       return RangeSheetReferenceType.RELATIVE
@@ -875,6 +909,9 @@ export interface ExtendedToken extends IToken {
   leadingWhitespace?: IToken,
 }
 
+/**
+ *
+ */
 export class FormulaLexer {
   private readonly lexer: Lexer
 
@@ -898,6 +935,10 @@ export class FormulaLexer {
     return lexingResult
   }
 
+  
+  /**
+   *
+   */
   private skipWhitespacesInsideRanges(tokens: IToken[]): IToken[] {
     return FormulaLexer.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return (tokenMatcher(previous, CellReference) || tokenMatcher(previous, RangeSeparator))
@@ -906,6 +947,10 @@ export class FormulaLexer {
     })
   }
 
+  
+  /**
+   *
+   */
   private skipWhitespacesBeforeArgSeparators(tokens: IToken[]): IToken[] {
     return FormulaLexer.filterTokensByNeighbors(tokens, (previous: IToken, current: IToken, next: IToken) => {
       return !tokenMatcher(previous, this.lexerConfig.ArgSeparator)
@@ -914,6 +959,10 @@ export class FormulaLexer {
     })
   }
 
+  
+  /**
+   *
+   */
   private static filterTokensByNeighbors(tokens: IToken[], shouldBeSkipped: (previous: IToken, current: IToken, next: IToken) => boolean): IToken[] {
     if (tokens.length < 3) {
       return tokens
@@ -934,6 +983,10 @@ export class FormulaLexer {
     return filteredTokens
   }
 
+  
+  /**
+   *
+   */
   private trimTrailingWhitespaces(tokens: IToken[]): IToken[] {
     if (tokens.length > 0 && tokenMatcher(tokens[tokens.length - 1], this.lexerConfig.WhiteSpace)) {
       tokens.pop()

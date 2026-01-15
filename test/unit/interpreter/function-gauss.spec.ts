@@ -30,7 +30,7 @@ describe('Function GAUSS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(-0.5, 6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.341344746068543, 6)
   })
 })

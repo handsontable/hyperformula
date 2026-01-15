@@ -16,14 +16,16 @@ describe('Function VAR.P', () => {
       ['=VAR.P(2, 3)'],
       ['=VAR.P(1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.25)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0.25)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
   })
 
   it('should coerce explicit argument to numbers', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VAR.P(2, 3, 4, TRUE(), FALSE(), "1",)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.95918367346939, 6) //inconsistency with product #1
   })
 
@@ -31,6 +33,7 @@ describe('Function VAR.P', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VAR.P(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.666666666666667, 6)
   })
 
@@ -38,6 +41,7 @@ describe('Function VAR.P', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VAR.P(B1:I1)', 2, 3, 4, '=NA()', false, 'a', '\'1', null],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

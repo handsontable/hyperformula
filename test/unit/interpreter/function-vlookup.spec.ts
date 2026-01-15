@@ -107,7 +107,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(2, A1:B5, 2)'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
     })
 
     it('should find value in sorted range using linearSearch', () => {
@@ -120,7 +120,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
     })
 
     it('should return a single value even if there are more matching values', () => {
@@ -133,9 +133,9 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())']
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
-      expect(engine.getCellValue(adr('B6'))).toEqual(null)
-      expect(engine.getCellValue(adr('A7'))).toEqual(null)
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
+      expect(engine.getCellValue(adr('B6'))).toBeNull()
+      expect(engine.getCellValue(adr('A7'))).toBeNull()
     })
 
     it('should return the first matching value if RangeLookup = FALSE', () => {
@@ -148,7 +148,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())']
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
     })
 
     it('should return the last matching value if RangeLookup = TRUE', () => {
@@ -161,7 +161,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, TRUE())']
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('e')
+      expect(engine.getCellValue(adr('A6'))).toBe('e')
     })
 
     it('works with wildcards', () => {
@@ -174,7 +174,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP("*c*", A1:B5, 2, FALSE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('e')
+      expect(engine.getCellValue(adr('A6'))).toBe('e')
     })
 
     it('on sorted data ignores wildcards', () => {
@@ -187,7 +187,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP("*c*", A1:B5, 2, TRUE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('c')
+      expect(engine.getCellValue(adr('A6'))).toBe('c')
     })
 
     it('should find value in unsorted range using linearSearch', () => {
@@ -200,7 +200,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toBe('d')
     })
 
     it('should find value in sorted range with different types', () => {
@@ -213,7 +213,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(TRUE(), A1:B5, 2, FALSE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toBe('d')
     })
 
     it('should find value in unsorted range with different types', () => {
@@ -226,7 +226,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toBe('d')
     })
 
     it('should return the lower bound for sorted values', () => {
@@ -237,7 +237,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A4'))).toEqual('b')
+      expect(engine.getCellValue(adr('A4'))).toBe('b')
     })
 
     it('should return the lower bound for sorted values if all are smaller than the search value', () => {
@@ -248,7 +248,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A4'))).toEqual('c')
+      expect(engine.getCellValue(adr('A4'))).toBe('c')
     })
 
     it('should return error when all values are greater', () => {
@@ -294,7 +294,7 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(1, A1:B3, 2, TRUE())'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A4'))).toEqual('b')
+      expect(engine.getCellValue(adr('A4'))).toBe('b')
     })
 
     it('should properly calculate absolute row index', () => {
@@ -306,7 +306,7 @@ describe('ColumnIndex strategy', () => {
         ['3'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(3)
+      expect(engine.getCellValue(adr('A1'))).toBe(3)
     })
 
     it('should work for standard matrices', () => {
@@ -317,7 +317,7 @@ describe('ColumnIndex strategy', () => {
         ['=TRANSPOSE(A2:C3)'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(6)
+      expect(engine.getCellValue(adr('A1'))).toBe(6)
     })
 
     it('should work after updating standard matrix', () => {
@@ -328,11 +328,11 @@ describe('ColumnIndex strategy', () => {
         ['=TRANSPOSE(A2:C3)'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(6)
+      expect(engine.getCellValue(adr('A1'))).toBe(6)
 
       engine.setCellContents(adr('C2'), '5')
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(5)
+      expect(engine.getCellValue(adr('A1'))).toBe(5)
     })
 
     it('should coerce empty arg to 0', () => {
@@ -346,8 +346,8 @@ describe('ColumnIndex strategy', () => {
         ['=VLOOKUP(, A1:B5, 2)'],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('a')
-      expect(engine.getCellValue(adr('A7'))).toEqual('a')
+      expect(engine.getCellValue(adr('A6'))).toBe('a')
+      expect(engine.getCellValue(adr('A7'))).toBe('a')
     })
   })
 })
@@ -444,7 +444,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(2, A1:B5, 2)'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
     })
 
     it('should find value in sorted range using linearSearch', () => {
@@ -457,7 +457,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
     })
 
     it('should return a single value even if there are more matching values', () => {
@@ -470,9 +470,9 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())']
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
-      expect(engine.getCellValue(adr('B6'))).toEqual(null)
-      expect(engine.getCellValue(adr('A7'))).toEqual(null)
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
+      expect(engine.getCellValue(adr('B6'))).toBeNull()
+      expect(engine.getCellValue(adr('A7'))).toBeNull()
     })
 
     it('should return the first matching value if RangeLookup = FALSE', () => {
@@ -485,7 +485,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())']
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('b')
+      expect(engine.getCellValue(adr('A6'))).toBe('b')
     })
 
     it('should return the last matching value if RangeLookup = TRUE', () => {
@@ -498,7 +498,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, TRUE())']
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('e')
+      expect(engine.getCellValue(adr('A6'))).toBe('e')
     })
 
     it('works with wildcards', () => {
@@ -511,7 +511,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP("*c*", A1:B5, 2, FALSE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('e')
+      expect(engine.getCellValue(adr('A6'))).toBe('e')
     })
 
     it('returns error when there is no matching value for the wildcard pattern', () => {
@@ -537,7 +537,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP("*c*", A1:B5, 2, TRUE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('c')
+      expect(engine.getCellValue(adr('A6'))).toBe('c')
     })
 
     it('should find value in unsorted range using linearSearch', () => {
@@ -550,7 +550,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toBe('d')
     })
 
     it('should find value in sorted range with different types', () => {
@@ -563,7 +563,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(TRUE(), A1:B5, 2, FALSE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toBe('d')
     })
 
     it('should find value in unsorted range with different types', () => {
@@ -576,7 +576,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(2, A1:B5, 2, FALSE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('d')
+      expect(engine.getCellValue(adr('A6'))).toBe('d')
     })
 
     it('should return the lower bound for sorted values', () => {
@@ -587,7 +587,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A4'))).toEqual('b')
+      expect(engine.getCellValue(adr('A4'))).toBe('b')
     })
 
     it('should return the lower bound for sorted values if all are smaller than the search value', () => {
@@ -598,7 +598,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(4, A1:B3, 2, TRUE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A4'))).toEqual('c')
+      expect(engine.getCellValue(adr('A4'))).toBe('c')
     })
 
     it('should return error when all values are greater', () => {
@@ -644,7 +644,7 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(1, A1:B3, 2, TRUE())'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A4'))).toEqual('b')
+      expect(engine.getCellValue(adr('A4'))).toBe('b')
     })
 
     it('should properly calculate absolute row index', () => {
@@ -656,7 +656,7 @@ describe('BinarySearchStrategy', () => {
         ['3'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(3)
+      expect(engine.getCellValue(adr('A1'))).toBe(3)
     })
 
     it('should work for standard matrices', () => {
@@ -667,7 +667,7 @@ describe('BinarySearchStrategy', () => {
         ['=TRANSPOSE(A2:C3)'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(6)
+      expect(engine.getCellValue(adr('A1'))).toBe(6)
     })
 
     it('should work after updating standard matrix', () => {
@@ -678,11 +678,11 @@ describe('BinarySearchStrategy', () => {
         ['=TRANSPOSE(A2:C3)'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(6)
+      expect(engine.getCellValue(adr('A1'))).toBe(6)
 
       engine.setCellContents(adr('C2'), '5')
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(5)
+      expect(engine.getCellValue(adr('A1'))).toBe(5)
     })
 
     it('should coerce empty arg to 0', () => {
@@ -696,8 +696,8 @@ describe('BinarySearchStrategy', () => {
         ['=VLOOKUP(, A1:B5, 2)'],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('a')
-      expect(engine.getCellValue(adr('A7'))).toEqual('a')
+      expect(engine.getCellValue(adr('A6'))).toBe('a')
+      expect(engine.getCellValue(adr('A7'))).toBe('a')
     })
   })
 
@@ -714,7 +714,7 @@ describe('BinarySearchStrategy', () => {
       ['5'],
     ], {useColumnIndex: false})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(4)
   })
 
   it('should calculate indexes properly when using naive approach', () => {
@@ -730,7 +730,7 @@ describe('BinarySearchStrategy', () => {
       ['5'],
     ], {useColumnIndex: false})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(4)
   })
 
   it('should coerce null to zero when using naive approach', () => {
@@ -741,7 +741,7 @@ describe('BinarySearchStrategy', () => {
       [0],
     ], {useColumnIndex: false})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('should work on column ranges', () => {
@@ -750,7 +750,8 @@ describe('BinarySearchStrategy', () => {
       [null, 2, 'b'],
       [null, 3, 'c'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual('b')
+
+    expect(engine.getCellValue(adr('A1'))).toBe('b')
   })
 
   it('works for strings, is not case sensitive', () => {
@@ -763,7 +764,7 @@ describe('BinarySearchStrategy', () => {
       ['=VLOOKUP("A", A1:B5, 2, FALSE())']
     ], {caseSensitive: false})
 
-    expect(engine.getCellValue(adr('A6'))).toEqual(1)
+    expect(engine.getCellValue(adr('A6'))).toBe(1)
   })
 
   it('works for strings, is not case sensitive even if config defines case sensitivity', () => {
@@ -776,7 +777,7 @@ describe('BinarySearchStrategy', () => {
       ['=VLOOKUP("A", A1:B5, 2, FALSE())']
     ], {useColumnIndex: false, caseSensitive: true})
 
-    expect(engine.getCellValue(adr('A6'))).toEqual(1)
+    expect(engine.getCellValue(adr('A6'))).toBe(1)
   })
 
   it('should find value in sorted range', () => {
@@ -788,7 +789,8 @@ describe('BinarySearchStrategy', () => {
       ['e', '5'],
       ['=VLOOKUP("b", A1:B5, 2)'],
     ], {useColumnIndex: false, caseSensitive: false})
-    expect(engine.getCellValue(adr('A6'))).toEqual(2)
+
+    expect(engine.getCellValue(adr('A6'))).toBe(2)
   })
 
   it('should properly report no match', () => {
@@ -812,7 +814,7 @@ describe('BinarySearchStrategy', () => {
       ['\'1'],
     ], { useColumnIndex: false })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
   })
 
   it('works with a column range reference to an empty sheet', () => {

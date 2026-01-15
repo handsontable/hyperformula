@@ -32,7 +32,7 @@ describe('Function TBILLEQ', () => {
     //inconsistency with product #1 (returns #NUM!)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(38.5277777777778, 6)
     //inconsistency with product #1 (returns #NUM!)
-    expect(engine.getCellValue(adr('B3'))).toEqual(0)
+    expect(engine.getCellValue(adr('B3'))).toBe(0)
     expect(engine.getCellValue(adr('C3'))).toEqualError(detailedError(ErrorType.NUM))
     //inconsistency with products #1 & #2
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(0.112828438948995, 6)

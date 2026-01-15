@@ -18,6 +18,9 @@ export interface FormatToken {
   value: string,
 }
 
+/**
+ *
+ */
 export function formatToken(type: TokenType, value: string): FormatToken {
   return {
     type,
@@ -36,6 +39,9 @@ export interface FormatExpression {
   tokens: FormatToken[],
 }
 
+/**
+ *
+ */
 function matchDateFormat(str: string): RegExpExecArray[] {
   dateFormatRegex.lastIndex = 0
   const tokens: RegExpExecArray[] = []
@@ -52,6 +58,9 @@ function matchDateFormat(str: string): RegExpExecArray[] {
   return tokens
 }
 
+/**
+ *
+ */
 function matchNumberFormat(str: string): RegExpExecArray[] {
   numberFormatRegex.lastIndex = 0
   const numberFormatToken = numberFormatRegex.exec(str)
@@ -63,6 +72,9 @@ function matchNumberFormat(str: string): RegExpExecArray[] {
   }
 }
 
+/**
+ *
+ */
 function createTokens(regexTokens: RegExpExecArray[], str: string) {
   const tokens = []
 
@@ -93,6 +105,9 @@ function createTokens(regexTokens: RegExpExecArray[], str: string) {
   return tokens
 }
 
+/**
+ *
+ */
 export function parseForDateTimeFormat(str: string): Maybe<FormatExpression> {
   const dateFormatTokens = matchDateFormat(str)
 
@@ -106,6 +121,9 @@ export function parseForDateTimeFormat(str: string): Maybe<FormatExpression> {
   }
 }
 
+/**
+ *
+ */
 export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
   const numberFormatTokens = matchNumberFormat(str)
   if (numberFormatTokens.every((elem) => isEscapeToken(elem))) {
@@ -118,6 +136,9 @@ export function parseForNumberFormat(str: string): Maybe<FormatExpression> {
   }
 }
 
+/**
+ *
+ */
 export function parse(str: string): FormatExpression {
   return parseForDateTimeFormat(str) ?? parseForNumberFormat(str) ?? {
     type: FormatExpressionType.STRING,
@@ -128,6 +149,9 @@ export function parse(str: string): FormatExpression {
   }
 }
 
+/**
+ *
+ */
 export function isEscapeToken(token: RegExpExecArray): boolean {
   return token[0].startsWith('\\')
 }

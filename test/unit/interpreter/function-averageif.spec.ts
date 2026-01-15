@@ -60,7 +60,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(0, ">1", 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    expect(engine.getCellValue(adr('A1'))).toBe(42)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
@@ -97,7 +97,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(A1, ">1", B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
   })
 
   it('works with range values', () => {
@@ -109,9 +109,9 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(MMULT(A1:B2, A1:B2), "=2", C1:D2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(76)
-    expect(engine.getCellValue(adr('A4'))).toEqual(76)
-    expect(engine.getCellValue(adr('A5'))).toEqual(6)
+    expect(engine.getCellValue(adr('A3'))).toBe(76)
+    expect(engine.getCellValue(adr('A4'))).toBe(76)
+    expect(engine.getCellValue(adr('A5'))).toBe(6)
   })
 
   it('works for mixed reference/range arguments', () => {
@@ -121,8 +121,8 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(A1, ">1", B1:B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 
   it('works for 2 arguments', () => {
@@ -131,7 +131,7 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(A1:C1, ">15")'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(25)
+    expect(engine.getCellValue(adr('A2'))).toBe(25)
   })
 
   it('works for matrices', () => {
@@ -142,6 +142,6 @@ describe('Function AVERAGEIF - argument validations and combinations', () => {
       ['=AVERAGEIF(A2:A3, ">0", A2:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1.5)
+    expect(engine.getCellValue(adr('A4'))).toBe(1.5)
   })
 })

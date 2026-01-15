@@ -5,6 +5,9 @@ import {FunctionPlugin, FunctionPluginTypecheck} from '../../src/interpreter/plu
 import {ProcedureAst} from '../../src/parser'
 import {adr, detailedError} from './testUtils'
 
+/**
+ *
+ */
 class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin> {
   public static implementedFunctions = {
     'FOO': {
@@ -12,6 +15,9 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     },
   }
 
+  /**
+   *
+   */
   public foo(_ast: ProcedureAst, _state: InterpreterState) {
     return 42
   }

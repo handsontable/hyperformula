@@ -12,6 +12,9 @@ import {RowAddress} from '../parser/RowAddress'
 import {RowsSpan} from '../Span'
 import {Transformer} from './Transformer'
 
+/**
+ *
+ */
 export class RemoveRowsTransformer extends Transformer {
   constructor(
     public readonly rowsSpan: RowsSpan
@@ -19,18 +22,34 @@ export class RemoveRowsTransformer extends Transformer {
     super()
   }
 
+  
+  /**
+   *
+   */
   public get sheet(): number {
     return this.rowsSpan.sheet
   }
 
+  
+  /**
+   *
+   */
   public isIrreversible() {
     return true
   }
 
+  
+  /**
+   *
+   */
   protected transformColumnRangeAst(ast: ColumnRangeAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 
+  
+  /**
+   *
+   */
   protected transformCellAddress<T extends AddressWithRow>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {
     const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
     // Case 4
@@ -91,18 +110,34 @@ export class RemoveRowsTransformer extends Transformer {
     return ErrorType.REF
   }
 
+  
+  /**
+   *
+   */
   protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
     return this.transformRange(start, end, formulaAddress)
   }
 
+  
+  /**
+   *
+   */
   protected transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
     return this.transformRange(start, end, formulaAddress)
   }
 
+  
+  /**
+   *
+   */
   protected transformColumnRange(_start: ColumnAddress, _end: ColumnAddress, _formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
     throw Error('Not implemented')
   }
 
+  
+  /**
+   *
+   */
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
     if (this.rowsSpan.sheet === address.sheet && this.rowsSpan.rowStart <= address.row) {
       return {
@@ -114,6 +149,10 @@ export class RemoveRowsTransformer extends Transformer {
     }
   }
 
+  
+  /**
+   *
+   */
   private transformRange<T extends AddressWithRow>(start: T, end: T, formulaAddress: SimpleCellAddress): [T, T] | ErrorType.REF | false {
     const startSheet = absoluteSheetReference(start, formulaAddress)
 

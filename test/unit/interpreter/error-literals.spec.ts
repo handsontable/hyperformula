@@ -13,9 +13,9 @@ describe('Error literals', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A2'))).toEqual(true)
-    expect(engine.getCellValue(adr('B2'))).toEqual(true)
-    expect(engine.getCellValue(adr('C2'))).toEqual(true)
+    expect(engine.getCellValue(adr('A2'))).toBe(true)
+    expect(engine.getCellValue(adr('B2'))).toBe(true)
+    expect(engine.getCellValue(adr('C2'))).toBe(true)
   })
 
   it('should return error when unknown error literal in formula', () => {
@@ -23,7 +23,7 @@ describe('Error literals', () => {
       ['#UNKNOWN!', '=#UNKNOWN!']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('#UNKNOWN!')
+    expect(engine.getCellValue(adr('A1'))).toBe('#UNKNOWN!')
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
@@ -31,6 +31,7 @@ describe('Error literals', () => {
     const engine = HyperFormula.buildFromArray([
       ['#N/A', 0, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
     ])
+
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NA)) // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NA)) // GT
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.NA)) // LT
@@ -52,6 +53,7 @@ describe('Error literals', () => {
     const engine = HyperFormula.buildFromArray([
       ['#DIV/0!', null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
     ])
+
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))  // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // GT
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // LT
@@ -73,6 +75,7 @@ describe('Error literals', () => {
     const engine = HyperFormula.buildFromArray([
       ['#CYCLE!', null, '=A1=B1', '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1<>B1', '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=A1&B1', '=+A1', '=-A1', '=A1%']
     ])
+
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.CYCLE))  // EQUAL
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.CYCLE)) // GT
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.CYCLE)) // LT

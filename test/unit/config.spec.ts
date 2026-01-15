@@ -28,7 +28,7 @@ describe('Config', () => {
   it('can translate functions', () => {
     const config = new Config({language: 'plPL'})
 
-    expect(config.translationPackage.getFunctionTranslation('SUM')).toEqual('SUMA')
+    expect(config.translationPackage.getFunctionTranslation('SUM')).toBe('SUMA')
   })
 
   it('validation: boolean params', () => {
@@ -99,12 +99,14 @@ describe('Config', () => {
   it('should return the specified context', () => {
     const context ={a: 1, b: 2}
     const config = new Config({context})
+
     expect(config.context).toBe(context)
   })
 
   it('should throw error when Function Translation cannot be found', () => {
     const config = new Config()
     const functionName = '0123456ABCDEFGH'
+
     expect(() => {
       config.translationPackage.getFunctionTranslation(functionName)
     }).toThrow(new MissingTranslationError(`functions.${functionName}`))
@@ -113,6 +115,7 @@ describe('Config', () => {
   it('should throw error when Error Translation cannot be found', () => {
     const config = new Config()
     const errorType = '0123456ABCDEFGH'
+
     expect(() => {
       config.translationPackage.getErrorTranslation(errorType as ErrorType)
     }).toThrow(new MissingTranslationError(`errors.${errorType}`))
@@ -121,6 +124,7 @@ describe('Config', () => {
   it('should throw error when UI Translation cannot be found', () => {
     const config = new Config()
     const uiElement = '0123456ABCDEFGH'
+
     expect(() => {
       config.translationPackage.getUITranslation(uiElement as UIElement)
     }).toThrow(new MissingTranslationError(`ui.${uiElement}`))
@@ -130,15 +134,19 @@ describe('Config', () => {
     expect(() => {
       new Config({decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ' '})
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator]')
+
     expect(() => {
       new Config({decimalSeparator: ',', functionArgSeparator: ';', thousandSeparator: ','})
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,thousandSeparator]')
+
     expect(() => {
       new Config({decimalSeparator: '.', functionArgSeparator: ',', thousandSeparator: ','})
     }).toThrowError('Config initialization failed. Parameters in conflict: [functionArgSeparator,thousandSeparator]')
+
     expect(() => {
       new Config({decimalSeparator: ',', functionArgSeparator: ',', thousandSeparator: ','})
     }).toThrowError('Config initialization failed. Parameters in conflict: [decimalSeparator,functionArgSeparator,thousandSeparator]')
+
     expect(() => {
       new Config({arrayColumnSeparator: ';', arrayRowSeparator: ';'})
     }).toThrowError('Config initialization failed. Parameters in conflict: [arrayColumnSeparator,arrayRowSeparator]')
@@ -267,21 +275,21 @@ describe('Config', () => {
       ]], { dateFormats })
 
       expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('A1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('A1'))).toBe('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('B1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('B1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('B1'))).toBe('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('C1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('C1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('C1'))).toBe('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('D1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('D1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('D1'))).toBe('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('E1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('E1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('E1'))).toBe('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('F1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('F1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('F1'))).toBe('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('G1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('G1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('G1'))).toBe('DD/MM/YYYY')
       expect(engine.getCellValueDetailedType(adr('H1'))).toEqual(NumberType.NUMBER_DATE)
-      expect(engine.getCellValueFormat(adr('H1'))).toEqual('DD/MM/YYYY')
+      expect(engine.getCellValueFormat(adr('H1'))).toBe('DD/MM/YYYY')
     })
   })
 
@@ -374,21 +382,27 @@ describe('Config', () => {
       const dateAsNumber = 0.564969131944444
 
       let engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss'] })
+
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.s'] })
+
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ss'] })
+
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sss'] })
+
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.ssss'] })
+
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
 
       engine = HyperFormula.buildFromArray([[dateAsString]], { timeFormats: ['hh:mm:ss.sssss'] })
+
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(dateAsNumber, 11)
     })
   })
@@ -397,6 +411,7 @@ describe('Config', () => {
 describe('getConfig', () => {
   it('should not be an instance of Config', () => {
     const engine = HyperFormula.buildEmpty()
+
     expect(engine.getConfig()).not.toBeInstanceOf(Config)
   })
 
@@ -404,6 +419,7 @@ describe('getConfig', () => {
     const arr = ['mm']
     const engine = HyperFormula.buildEmpty({dateFormats: arr})
     const arr2 = engine.getConfig().dateFormats
+
     expect(arr).toEqual(arr2)
     expect(arr).not.toBe(arr2)
   })
@@ -418,6 +434,7 @@ describe('getDefaultConfig', () => {
     const defaultConfig = HyperFormula.defaultConfig
     defaultConfig.dateFormats.push('mm')
     const defaultDateFormats = HyperFormula.defaultConfig.dateFormats
+
     expect(defaultDateFormats).toEqual(['DD/MM/YYYY', 'DD/MM/YY'])
   })
 })

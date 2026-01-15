@@ -23,6 +23,10 @@ import {ArrayFormulaVertex} from './'
 export class ArrayMapping {
   public readonly arrayMapping: Map<string, ArrayFormulaVertex> = new Map()
 
+  
+  /**
+   *
+   */
   public getArray(range: AbsoluteCellRange): Maybe<ArrayFormulaVertex> {
     const array = this.getArrayByCorner(range.start)
     if (array?.getRange().sameAs(range)) {
@@ -31,14 +35,26 @@ export class ArrayMapping {
     return
   }
 
+  
+  /**
+   *
+   */
   public getArrayByCorner(address: SimpleCellAddress): Maybe<ArrayFormulaVertex> {
     return this.arrayMapping.get(addressKey(address))
   }
 
+  
+  /**
+   *
+   */
   public setArray(range: AbsoluteCellRange, vertex: ArrayFormulaVertex) {
     this.arrayMapping.set(addressKey(range.start), vertex)
   }
 
+  
+  /**
+   *
+   */
   public removeArray(range: string | AbsoluteCellRange) {
     if (typeof range === 'string') {
       this.arrayMapping.delete(range)
@@ -47,10 +63,18 @@ export class ArrayMapping {
     }
   }
 
+  
+  /**
+   *
+   */
   public count(): number {
     return this.arrayMapping.size
   }
 
+  
+  /**
+   *
+   */
   public* arraysInRows(rowsSpan: RowsSpan): IterableIterator<[string, ArrayFormulaVertex]> {
     for (const [mtxKey, mtx] of this.arrayMapping.entries()) {
       if (mtx.spansThroughSheetRows(rowsSpan.sheet, rowsSpan.rowStart, rowsSpan.rowEnd)) {
@@ -59,6 +83,10 @@ export class ArrayMapping {
     }
   }
 
+  
+  /**
+   *
+   */
   public* arraysInCols(col: ColumnsSpan): IterableIterator<[string, ArrayFormulaVertex]> {
     for (const [mtxKey, mtx] of this.arrayMapping.entries()) {
       if (mtx.spansThroughSheetColumn(col.sheet, col.columnStart, col.columnEnd)) {
@@ -67,6 +95,10 @@ export class ArrayMapping {
     }
   }
 
+  
+  /**
+   *
+   */
   public isFormulaArrayInRow(sheet: number, row: number): boolean {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.spansThroughSheetRows(sheet, row)) {
@@ -76,6 +108,10 @@ export class ArrayMapping {
     return false
   }
 
+  
+  /**
+   *
+   */
   public isFormulaArrayInAllRows(span: RowsSpan): boolean {
     let result = true
     for (const row of span.rows()) {
@@ -86,6 +122,10 @@ export class ArrayMapping {
     return result
   }
 
+  
+  /**
+   *
+   */
   public isFormulaArrayInColumn(sheet: number, column: number): boolean {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.spansThroughSheetColumn(sheet, column)) {
@@ -95,6 +135,10 @@ export class ArrayMapping {
     return false
   }
 
+  
+  /**
+   *
+   */
   public isFormulaArrayInAllColumns(span: ColumnsSpan): boolean {
     let result = true
     for (const col of span.columns()) {
@@ -105,6 +149,10 @@ export class ArrayMapping {
     return result
   }
 
+  
+  /**
+   *
+   */
   public isFormulaArrayInRange(range: AbsoluteCellRange) {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.getRange().doesOverlap(range)) {
@@ -114,6 +162,10 @@ export class ArrayMapping {
     return false
   }
 
+  
+  /**
+   *
+   */
   public isFormulaArrayAtAddress(address: SimpleCellAddress) {
     for (const mtx of this.arrayMapping.values()) {
       if (mtx.getRange().addressInRange(address)) {
@@ -123,6 +175,10 @@ export class ArrayMapping {
     return false
   }
 
+  
+  /**
+   *
+   */
   public moveArrayVerticesAfterRowByRows(sheet: number, row: number, numberOfRows: number) {
     this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayFormulaVertex) => {
       const range = vertex.getRange()
@@ -130,6 +186,10 @@ export class ArrayMapping {
     })
   }
 
+  
+  /**
+   *
+   */
   public moveArrayVerticesAfterColumnByColumns(sheet: number, column: number, numberOfColumns: number) {
     this.updateArrayVerticesInSheet(sheet, (key: string, vertex: ArrayFormulaVertex) => {
       const range = vertex.getRange()
@@ -137,6 +197,10 @@ export class ArrayMapping {
     })
   }
 
+  
+  /**
+   *
+   */
   private updateArrayVerticesInSheet(sheet: number, fn: (key: string, vertex: ArrayFormulaVertex) => Maybe<[AbsoluteCellRange, ArrayFormulaVertex]>) {
     const updated = Array<[AbsoluteCellRange, ArrayFormulaVertex]>()
 

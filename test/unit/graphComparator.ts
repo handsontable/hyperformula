@@ -14,12 +14,18 @@ import {
 import {InterpreterValue} from '../../src/interpreter/InterpreterValue'
 import {simpleCellAddressToString} from '../../src/parser'
 
+/**
+ *
+ */
 export class EngineComparator {
 
   constructor(private expected: HyperFormula,
               private actual: HyperFormula) {
   }
 
+  /**
+   *
+   */
   public compare(): void {
     const expectedNumberOfSheets = this.expected.sheetMapping.numberOfSheets({includePlaceholders: true})
     const numberOfSheets = this.actual.sheetMapping.numberOfSheets({includePlaceholders: true})
@@ -36,6 +42,9 @@ export class EngineComparator {
     }
   }
 
+  /**
+   *
+   */
   private compareSheet(sheet: number): void {
     const expectedGraph = this.expected.graph
     const actualGraph = this.actual.graph
@@ -94,6 +103,9 @@ export class EngineComparator {
     }
   }
 
+  /**
+   *
+   */
   private normalizeCellValue(value: InterpreterValue): any {
     if (value instanceof CellError) {
       return {
@@ -105,6 +117,9 @@ export class EngineComparator {
     return value
   }
 
+  /**
+   *
+   */
   private compareMatrixMappings() {
     const actual = this.actual.arrayMapping.arrayMapping
     const expected = this.expected.arrayMapping.arrayMapping
@@ -119,6 +134,9 @@ export class EngineComparator {
     }
   }
 
+  /**
+   *
+   */
   private getAddressOfVertex(engine: HyperFormula, vertex: Vertex): SimpleCellAddress | AbsoluteCellRange {
     if (vertex instanceof RangeVertex) {
       return vertex.range

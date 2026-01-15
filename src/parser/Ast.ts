@@ -5,6 +5,7 @@
 
 import {IToken} from 'chevrotain'
 import {CellError} from '../Cell'
+import {Numeric, NumericProvider} from '../Numeric'
 import {AddressWithSheet} from './Address'
 import {CellAddress} from './CellAddress'
 import {ColumnAddress} from './ColumnAddress'
@@ -131,12 +132,12 @@ export const buildEmptyArgAst = (leadingWhitespace?: IToken): EmptyArgAst => ({
 
 export interface NumberAst extends AstWithWhitespace {
   type: AstNodeType.NUMBER,
-  value: number,
+  value: Numeric,
 }
 
-export const buildNumberAst = (value: number, leadingWhitespace?: IToken): NumberAst => ({
+export const buildNumberAst = (value: Numeric | number, leadingWhitespace?: IToken): NumberAst => ({
   type: AstNodeType.NUMBER,
-  value: value,
+  value: typeof value === 'number' ? NumericProvider.getGlobalFactory().create(value) : value,
   leadingWhitespace: leadingWhitespace?.image,
 })
 
@@ -466,6 +467,9 @@ export const buildParsingErrorAst = (): ErrorAst => ({
   error: CellError.parsingError()
 })
 
+/**
+ *
+ */
 function assertRangeConsistency(start: AddressWithSheet, end: AddressWithSheet, sheetReferenceType: RangeSheetReferenceType) {
   if ((start.sheet !== undefined && end.sheet === undefined) || (start.sheet === undefined && end.sheet !== undefined)) {
     throw new Error('Start address inconsistent with end address')
@@ -476,6 +480,9 @@ function assertRangeConsistency(start: AddressWithSheet, end: AddressWithSheet, 
   }
 }
 
+/**
+ *
+ */
 export function imageWithWhitespace(image: string, leadingWhitespace?: string) {
   return (leadingWhitespace ?? '') + image
 }

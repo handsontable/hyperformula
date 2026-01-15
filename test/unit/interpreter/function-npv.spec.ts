@@ -18,17 +18,19 @@ describe('Function NPV', () => {
       ['=NPV(1, B2:C2)', true, 1],
       ['=NPV(-1, 0)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0.5)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(0.5)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
   })
 
   it('should be compatible with product #2', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NPV(1, TRUE(), 1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.75) //product #1 returns 0.5
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0.75) //product #1 returns 0.5
   })
 
   it('order of arguments matters', () => {
@@ -37,7 +39,8 @@ describe('Function NPV', () => {
       [1, 2],
       [3, 4],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1.625)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1.625)
   })
 
   it('should return correct error value', () => {
@@ -46,6 +49,7 @@ describe('Function NPV', () => {
       ['=NPV(1, 1, "abcd")'],
       ['=NPV(-1,1)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
@@ -58,6 +62,7 @@ describe('Function NPV', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NPV(1,B1)', true]
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5) //Both products #1 and #2 return 0 here.
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5) //Both products #1 and #2 return 0 here.
   })
 })

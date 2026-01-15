@@ -19,9 +19,9 @@ describe('Function FVSCHEDULE', () => {
       ['=FVSCHEDULE(2, B2:D2)', 1, 1, null],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
-    expect(engine.getCellValue(adr('A2'))).toEqual(8)
+    expect(engine.getCellValue(adr('A2'))).toBe(8)
   })
 
   it('should return proper error', () => {

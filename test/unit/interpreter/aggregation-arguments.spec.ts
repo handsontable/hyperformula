@@ -7,7 +7,7 @@ describe('AVERAGE function', () => {
       ['=AVERAGE(1,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
   })
 
   it('should work for empty reference', () => {
@@ -16,7 +16,7 @@ describe('AVERAGE function', () => {
       [1, null]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('should work for range with empty val', () => {
@@ -25,7 +25,7 @@ describe('AVERAGE function', () => {
       [1, null]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('should work for empty reference + empty arg', () => {
@@ -34,7 +34,7 @@ describe('AVERAGE function', () => {
       [1, null]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
   })
 
   it('should work for range with empty val + empty arg', () => {
@@ -43,7 +43,7 @@ describe('AVERAGE function', () => {
       [1, null]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
   })
 
   it('should work for coercible arg', () => {
@@ -51,7 +51,7 @@ describe('AVERAGE function', () => {
       ['=AVERAGE(2,TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(1.5)
   })
 
   it('should work for coercible value in reference', () => {
@@ -60,7 +60,7 @@ describe('AVERAGE function', () => {
       [2, true]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   it('should work for coercible value in range', () => {
@@ -69,6 +69,6 @@ describe('AVERAGE function', () => {
       [2, true]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 })

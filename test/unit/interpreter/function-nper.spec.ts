@@ -30,7 +30,7 @@ describe('Function NPER', () => {
     expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
     expect(engine.getCellValue(adr('D2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
-    expect(engine.getCellValue(adr('A4'))).toEqual(8)
+    expect(engine.getCellValue(adr('A4'))).toBe(8)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('B5'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))

@@ -21,10 +21,10 @@ describe('Function TRIM', () => {
       ['=TRIM(" f    o  o   ")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A3'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A4'))).toEqual('f o o')
+    expect(engine.getCellValue(adr('A1'))).toBe('foo')
+    expect(engine.getCellValue(adr('A2'))).toBe('foo')
+    expect(engine.getCellValue(adr('A3'))).toBe('foo')
+    expect(engine.getCellValue(adr('A4'))).toBe('f o o')
   })
 
   it('should coerce other types to string', () => {
@@ -34,8 +34,8 @@ describe('Function TRIM', () => {
       ['=TRIM(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('10')
-    expect(engine.getCellValue(adr('A3'))).toEqual('TRUE')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('10')
+    expect(engine.getCellValue(adr('A3'))).toBe('TRUE')
   })
 })

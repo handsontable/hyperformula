@@ -16,17 +16,17 @@ describe('Function INTERVAL', () => {
   it('with numerical arguments', () => {
     const engine = HyperFormula.buildFromArray([['=INTERVAL(0)', '=INTERVAL(10000000)', '=INTERVAL(365.1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('PT')
-    expect(engine.getCellValue(adr('B1'))).toEqual('P3M25DT17H46M40S')
-    expect(engine.getCellValue(adr('C1'))).toEqual('PT6M5S')
+    expect(engine.getCellValue(adr('A1'))).toBe('PT')
+    expect(engine.getCellValue(adr('B1'))).toBe('P3M25DT17H46M40S')
+    expect(engine.getCellValue(adr('C1'))).toBe('PT6M5S')
   })
 
   it('with string arguments', () => {
     const engine = HyperFormula.buildFromArray([['=INTERVAL("31/12/1899")', '=INTERVAL("01/01/1900")', '=INTERVAL("31/12/2018")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('PT1S')
-    expect(engine.getCellValue(adr('B1'))).toEqual('PT2S')
-    expect(engine.getCellValue(adr('C1'))).toEqual('PT12H4M25S')
+    expect(engine.getCellValue(adr('A1'))).toBe('PT1S')
+    expect(engine.getCellValue(adr('B1'))).toBe('PT2S')
+    expect(engine.getCellValue(adr('C1'))).toBe('PT12H4M25S')
   })
 
   it('use datenumber coercion for 1st argument', () => {
@@ -35,8 +35,8 @@ describe('Function INTERVAL', () => {
       ['=INTERVAL("1")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('PT1S')
-    expect(engine.getCellValue(adr('A2'))).toEqual('PT1S')
+    expect(engine.getCellValue(adr('A1'))).toBe('PT1S')
+    expect(engine.getCellValue(adr('A2'))).toBe('PT1S')
   })
 
   it('propagate errors', () => {

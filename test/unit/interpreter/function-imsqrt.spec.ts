@@ -28,7 +28,7 @@ describe('Function IMSQRT', () => {
       ['=IMSQRT("-3+4i")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('0')
+    expect(engine.getCellValue(adr('A1'))).toBe('0')
     expectToBeCloseForComplex(engine, 'A2', '2i')
     expectToBeCloseForComplex(engine, 'A3', '1+2i')
   })

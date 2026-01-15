@@ -5,6 +5,9 @@ import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck} from '../
 import {ProcedureAst} from '../../src/parser'
 import {adr, detailedError} from './testUtils'
 
+/**
+ *
+ */
 class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlugin> {
   public static implementedFunctions = {
     'FOO': {
@@ -16,6 +19,9 @@ class FooPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FooPlu
     },
   }
 
+  /**
+   *
+   */
   public foo(ast: ProcedureAst, state: InterpreterState) {
     return this.runFunction(ast.args, state, this.metadata('FOO'),
       (arg1: string, arg2: string) => arg1 + '+' + arg2
@@ -60,9 +66,9 @@ describe('Nonexistent metadata', () => {
       ['=CONCATENATE(,"abcd")']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1901)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual('abcd')
+    expect(engine.getCellValue(adr('A1'))).toBe(1901)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
+    expect(engine.getCellValue(adr('A3'))).toBe('abcd')
   })
 
 })

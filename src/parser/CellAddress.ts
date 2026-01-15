@@ -34,6 +34,9 @@ export enum CellReferenceType {
   CELL_REFERENCE_ABSOLUTE_ROW = 'CELL_REFERENCE_ABSOLUTE_ROW',
 }
 
+/**
+ *
+ */
 export class CellAddress implements AddressWithColumn, AddressWithRow {
   constructor(
     public readonly col: number,
@@ -43,6 +46,10 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public static fromColAndRow(col: ColumnAddress, row: RowAddress, sheet: number | undefined): CellAddress {
     const factoryMethod: (col: number, row: number, sheet?: number) => CellAddress = col.isColumnAbsolute() && row.isRowAbsolute()
       ? CellAddress.absolute.bind(this)
@@ -55,18 +62,34 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return factoryMethod(col.col, row.row, sheet)
   }
 
+  
+  /**
+   *
+   */
   public static relative(col: number, row: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_RELATIVE, sheet)
   }
 
+  
+  /**
+   *
+   */
   public static absolute(col: number, row: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE, sheet)
   }
 
+  
+  /**
+   *
+   */
   public static absoluteCol(col: number, row: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL, sheet)
   }
 
+  
+  /**
+   *
+   */
   public static absoluteRow(col: number, row: number, sheet?: number) {
     return new CellAddress(col, row, CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW, sheet)
   }
@@ -89,16 +112,28 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     }
   }
 
+  
+  /**
+   *
+   */
   public toColumnAddress(): ColumnAddress {
     const refType = this.isColumnRelative() ? ReferenceType.RELATIVE : ReferenceType.ABSOLUTE
     return new ColumnAddress(refType, this.col, this.sheet)
   }
 
+  
+  /**
+   *
+   */
   public toRowAddress(): RowAddress {
     const refType = this.isRowRelative() ? ReferenceType.RELATIVE : ReferenceType.ABSOLUTE
     return new RowAddress(refType, this.row, this.sheet)
   }
 
+  
+  /**
+   *
+   */
   public toSimpleColumnAddress(baseAddress: SimpleCellAddress): SimpleColumnAddress {
     const sheet = absoluteSheetReference(this, baseAddress)
     let column = this.col
@@ -108,6 +143,10 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return simpleColumnAddress(sheet, column)
   }
 
+  
+  /**
+   *
+   */
   public toSimpleRowAddress(baseAddress: SimpleCellAddress): SimpleRowAddress {
     const sheet = absoluteSheetReference(this, baseAddress)
     let row = this.row
@@ -117,59 +156,111 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return simpleRowAddress(sheet, row)
   }
 
+  
+  /**
+   *
+   */
   public isRowAbsolute(): boolean {
     return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
 
+  
+  /**
+   *
+   */
   public isColumnAbsolute(): boolean {
     return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
+  
+  /**
+   *
+   */
   public isColumnRelative(): boolean {
     return (this.type === CellReferenceType.CELL_REFERENCE_RELATIVE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_ROW)
   }
 
+  
+  /**
+   *
+   */
   public isRowRelative(): boolean {
     return (this.type === CellReferenceType.CELL_REFERENCE_RELATIVE || this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE_COL)
   }
 
+  
+  /**
+   *
+   */
   public isAbsolute(): boolean {
     return (this.type === CellReferenceType.CELL_REFERENCE_ABSOLUTE && this.sheet !== undefined)
   }
 
+  
+  /**
+   *
+   */
   public shiftedByRows(numberOfRows: number): CellAddress {
     return new CellAddress(this.col, this.row + numberOfRows, this.type, this.sheet)
   }
 
+  
+  /**
+   *
+   */
   public shiftedByColumns(numberOfColumns: number): CellAddress {
     return new CellAddress(this.col + numberOfColumns, this.row, this.type, this.sheet)
   }
 
+  
+  /**
+   *
+   */
   public moved(toSheet: number, toRight: number, toBottom: number): CellAddress {
     const newSheet = this.sheet === undefined ? undefined : toSheet
     return new CellAddress(this.col + toRight, this.row + toBottom, this.type, newSheet)
   }
 
+  
+  /**
+   *
+   */
   public withSheet(sheet: number | undefined): CellAddress {
     return new CellAddress(this.col, this.row, this.type, sheet)
   }
 
+  
+  /**
+   *
+   */
   public isInvalid(baseAddress: SimpleCellAddress): boolean {
     return isColOrRowInvalid(this.toSimpleCellAddress(baseAddress))
   }
 
+  
+  /**
+   *
+   */
   public shiftRelativeDimensions(toRight: number, toBottom: number): CellAddress {
     const col = this.isColumnAbsolute() ? this.col : this.col + toRight
     const row = this.isRowAbsolute() ? this.row : this.row + toBottom
     return new CellAddress(col, row, this.type, this.sheet)
   }
 
+  
+  /**
+   *
+   */
   public shiftAbsoluteDimensions(toRight: number, toBottom: number): CellAddress {
     const col = this.isColumnRelative() ? this.col : this.col + toRight
     const row = this.isRowRelative() ? this.row : this.row + toBottom
     return new CellAddress(col, row, this.type, this.sheet)
   }
 
+  
+  /**
+   *
+   */
   public hash(withSheet: boolean): string {
     const sheetPart = withSheet && this.sheet !== undefined ? `#${this.sheet}` : ''
     switch (this.type) {
@@ -188,6 +279,10 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     }
   }
 
+  
+  /**
+   *
+   */
   public unparse(baseAddress: SimpleCellAddress): Maybe<string> {
     const simpleAddress = this.toSimpleCellAddress(baseAddress)
     if (isColOrRowInvalid(simpleAddress)) {
@@ -199,6 +294,10 @@ export class CellAddress implements AddressWithColumn, AddressWithRow {
     return `${colDollar}${column}${rowDollar}${simpleAddress.row + 1}`
   }
 
+  
+  /**
+   *
+   */
   public exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
     return this.row >= maxRows || this.col >= maxColumns
   }

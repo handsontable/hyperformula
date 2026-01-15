@@ -7,10 +7,13 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue, RawInterpreterValue} from '../InterpreterValue'
+import {InterpreterValue, RawInterpreterValue, toNativeNumerics, isExtendedNumber, toNativeNumeric, getRawPrecisionValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class MathPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MathPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'FACT': {
@@ -113,6 +116,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     },
   }
 
+  
+  /**
+   *
+   */
   public fact(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FACT'),
       (arg: number) => {
@@ -125,6 +132,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
       })
   }
 
+  
+  /**
+   *
+   */
   public factdouble(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FACTDOUBLE'),
       (arg: number) => {
@@ -138,6 +149,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public combin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COMBIN'),
       (n: number, m: number) => {
@@ -150,6 +165,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
       })
   }
 
+  
+  /**
+   *
+   */
   public combina(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COMBINA'),
       (n: number, m: number) => {
@@ -167,13 +186,18 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public gcd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('GCD'),
       (...args: RawInterpreterValue[]) => {
-        const processedArgs = this.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
-        if (processedArgs instanceof CellError) {
-          return processedArgs
+        const processedArgsPrecision = this.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
+        if (processedArgsPrecision instanceof CellError) {
+          return processedArgsPrecision
         }
+        const processedArgs = toNativeNumerics(processedArgsPrecision)
         let ret = 0
         for (const val of processedArgs) {
           if (val < 0) {
@@ -190,13 +214,18 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public lcm(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LCM'),
       (...args: RawInterpreterValue[]) => {
-        const processedArgs = this.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
-        if (processedArgs instanceof CellError) {
-          return processedArgs
+        const processedArgsPrecision = this.arithmeticHelper.coerceNumbersCoerceRangesDropNulls(args)
+        if (processedArgsPrecision instanceof CellError) {
+          return processedArgsPrecision
         }
+        const processedArgs = toNativeNumerics(processedArgsPrecision)
         let ret = 1
         for (const val of processedArgs) {
           if (val < 0) {
@@ -213,6 +242,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public mround(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MROUND'),
       (nom: number, denom: number) => {
@@ -227,6 +260,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public multinomial(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MULTINOMIAL'),
       (...args: number[]) => {
@@ -247,6 +284,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public quotient(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('QUOTIENT'),
       (nom: number, denom: number) => {
@@ -258,13 +299,18 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public seriessum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SERIESSUM'),
       (x: number, n: number, m: number, range: SimpleRangeValue) => {
-        const coefs = this.arithmeticHelper.manyToOnlyNumbersDropNulls(range.valuesFromTopLeftCorner())
-        if (coefs instanceof CellError) {
-          return coefs
+        const coefsPrecision = this.arithmeticHelper.manyToOnlyNumbersDropNulls(range.valuesFromTopLeftCorner())
+        if (coefsPrecision instanceof CellError) {
+          return coefsPrecision
         }
+        const coefs = toNativeNumerics(coefsPrecision)
         let ret = 0
         coefs.reverse()
         for (const coef of coefs) {
@@ -276,6 +322,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public sign(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SIGN'),
       (arg: number) => {
@@ -290,6 +340,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public sumx2my2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMX2MY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
@@ -309,8 +363,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
           if (valY instanceof CellError) {
             return valY
           }
-          if (typeof valX === 'number' && typeof valY === 'number') {
-            ret += Math.pow(valX, 2) - Math.pow(valY, 2)
+          if (isExtendedNumber(valX) && isExtendedNumber(valY)) {
+            const numX = toNativeNumeric(getRawPrecisionValue(valX))
+            const numY = toNativeNumeric(getRawPrecisionValue(valY))
+            ret += Math.pow(numX, 2) - Math.pow(numY, 2)
           }
         }
         return ret
@@ -318,6 +374,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public sumx2py2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMX2PY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
@@ -337,8 +397,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
           if (valY instanceof CellError) {
             return valY
           }
-          if (typeof valX === 'number' && typeof valY === 'number') {
-            ret += Math.pow(valX, 2) + Math.pow(valY, 2)
+          if (isExtendedNumber(valX) && isExtendedNumber(valY)) {
+            const numX = toNativeNumeric(getRawPrecisionValue(valX))
+            const numY = toNativeNumeric(getRawPrecisionValue(valY))
+            ret += Math.pow(numX, 2) + Math.pow(numY, 2)
           }
         }
         return ret
@@ -346,6 +408,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
     )
   }
 
+  
+  /**
+   *
+   */
   public sumxmy2(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMXMY2'),
       (rangeX: SimpleRangeValue, rangeY: SimpleRangeValue) => {
@@ -365,8 +431,10 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
           if (valY instanceof CellError) {
             return valY
           }
-          if (typeof valX === 'number' && typeof valY === 'number') {
-            ret += Math.pow(valX - valY, 2)
+          if (isExtendedNumber(valX) && isExtendedNumber(valY)) {
+            const numX = toNativeNumeric(getRawPrecisionValue(valX))
+            const numY = toNativeNumeric(getRawPrecisionValue(valY))
+            ret += Math.pow(numX - numY, 2)
           }
         }
         return ret
@@ -375,6 +443,9 @@ export class MathPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 }
 
+/**
+ *
+ */
 function combin(n: number, m: number): number {
   if (2 * m > n) {
     m = n - m
@@ -386,6 +457,9 @@ function combin(n: number, m: number): number {
   return Math.round(ret)
 }
 
+/**
+ *
+ */
 function binaryGCD(a: number, b: number): number {
   if (a < b) {
     [a, b] = [b, a]
@@ -396,6 +470,9 @@ function binaryGCD(a: number, b: number): number {
   return a
 }
 
+/**
+ *
+ */
 function binaryLCM(a: number, b: number): number {
   if (a === 0 || b === 0) {
     return 0

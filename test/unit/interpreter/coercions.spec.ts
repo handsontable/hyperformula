@@ -10,9 +10,17 @@ import {
   coerceToRangeNumbersOrError,
   coerceScalarToString
 } from '../../../src/interpreter/ArithmeticHelper'
-import {DateNumber, EmptyValue, TimeNumber} from '../../../src/interpreter/InterpreterValue'
+import {DateNumber, EmptyValue, TimeNumber, getRawPrecisionValue, isExtendedNumber, toNativeNumeric} from '../../../src/interpreter/InterpreterValue'
 import {NumberLiteralHelper} from '../../../src/NumberLiteralHelper'
 import {adr, detailedError} from '../testUtils'
+
+// Helper to convert Numeric to native number for comparison
+const toNum = (val: unknown): unknown => {
+  if (isExtendedNumber(val)) {
+    return toNativeNumeric(getRawPrecisionValue(val as any))
+  }
+  return val
+}
 
 describe('#coerceNonDateScalarToMaybeNumber', () => {
   const config = new Config()
@@ -20,19 +28,19 @@ describe('#coerceNonDateScalarToMaybeNumber', () => {
   const numberLiteralsHelper = new NumberLiteralHelper(config)
   const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
   it('works', () => {
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(42)).toBe(42)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('42')).toBe(42)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' 42')).toBe(42)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('42 ')).toBe(42)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('0000042')).toBe(42)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('42foo')).toEqual(undefined)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('foo42')).toEqual(undefined)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(true)).toBe(1)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(false)).toBe(0)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(EmptyValue)).toBe(0)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('')).toBe(0)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' ')).toEqual(undefined)
-    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(undefined)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber(42))).toBe(42)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber('42'))).toBe(42)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' 42'))).toBe(42)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber('42 '))).toBe(42)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber('0000042'))).toBe(42)
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('42foo')).toBeUndefined()
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber('foo42')).toBeUndefined()
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber(true))).toBe(1)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber(false))).toBe(0)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber(EmptyValue))).toBe(0)
+    expect(toNum(arithmeticHelper.coerceNonDateScalarToMaybeNumber(''))).toBe(0)
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(' ')).toBeUndefined()
+    expect(arithmeticHelper.coerceNonDateScalarToMaybeNumber(new CellError(ErrorType.DIV_BY_ZERO))).toBeUndefined()
   })
 })
 
@@ -71,11 +79,12 @@ describe('#coerceToRangeNumbersOrError', () => {
   it('works', () => {
     const simpleRangeValueOnlyNumbers = SimpleRangeValue.onlyNumbers([[1, 2]])
     const timeNumber = new TimeNumber(0, 'hh:mm:ss.ss')
+
     expect(coerceToRangeNumbersOrError(simpleRangeValueOnlyNumbers)).toEqual(simpleRangeValueOnlyNumbers)
     expect(coerceToRangeNumbersOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
     expect(coerceToRangeNumbersOrError(999)).toEqual(SimpleRangeValue.onlyValues([[999]]))
     expect(coerceToRangeNumbersOrError(timeNumber)).toEqual(SimpleRangeValue.onlyValues([[timeNumber]]))
-    expect(coerceToRangeNumbersOrError('foo')).toEqual(null)
+    expect(coerceToRangeNumbersOrError('foo')).toBeNull()
   })
 })
 
@@ -90,8 +99,9 @@ describe('#coerceBooleanToNumber', () => {
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
-    expect(coerceBooleanToNumber(true)).toBe(arithmeticHelper.coerceScalarToNumberOrError(true) as number)
-    expect(coerceBooleanToNumber(false)).toBe(arithmeticHelper.coerceScalarToNumberOrError(false) as number)
+
+    expect(coerceBooleanToNumber(true)).toBe(toNum(arithmeticHelper.coerceScalarToNumberOrError(true)))
+    expect(coerceBooleanToNumber(false)).toBe(toNum(arithmeticHelper.coerceScalarToNumberOrError(false)))
   })
 })
 
@@ -109,10 +119,10 @@ describe('#coerceScalarToBoolean', () => {
     expect(coerceScalarToBoolean('FALSE')).toBe(false)
     expect(coerceScalarToBoolean('true')).toBe(true)
     expect(coerceScalarToBoolean('TRUE')).toBe(true)
-    expect(coerceScalarToBoolean(' ')).toBe(undefined)
-    expect(coerceScalarToBoolean(' true')).toBe(undefined)
-    expect(coerceScalarToBoolean('true ')).toBe(undefined)
-    expect(coerceScalarToBoolean('prawda')).toBe(undefined)
+    expect(coerceScalarToBoolean(' ')).toBeUndefined()
+    expect(coerceScalarToBoolean(' true')).toBeUndefined()
+    expect(coerceScalarToBoolean('true ')).toBeUndefined()
+    expect(coerceScalarToBoolean('prawda')).toBeUndefined()
     expect(coerceScalarToBoolean('')).toBe(false)
 
     expect(coerceScalarToBoolean(EmptyValue)).toBe(false)
@@ -127,17 +137,27 @@ describe('#coerceScalarToNumberOrError', () => {
     const dateHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateHelper, numberLiteralsHelper)
-    expect(arithmeticHelper.coerceScalarToNumberOrError(1)).toEqual(1)
+
+    expect(toNum(arithmeticHelper.coerceScalarToNumberOrError(1))).toBe(1)
 
     expect(arithmeticHelper.coerceScalarToNumberOrError(new CellError(ErrorType.DIV_BY_ZERO))).toEqual(new CellError(ErrorType.DIV_BY_ZERO))
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')).toEqual(new DateNumber(1, 'DD/MM/YYYY'))
-    expect(arithmeticHelper.coerceScalarToNumberOrError('00:00:00')).toEqual(new TimeNumber(0, 'hh:mm:ss.sss'))
-    expect(arithmeticHelper.coerceScalarToNumberOrError(true)).toEqual(1)
+    // DateNumber and TimeNumber comparisons (value is now Numeric, compare the numeric value)
+    const dateResult = arithmeticHelper.coerceScalarToNumberOrError('31/12/1899')
+
+    expect(dateResult).toBeInstanceOf(DateNumber)
+    expect(toNum(dateResult)).toBe(1)
+    
+    const timeResult = arithmeticHelper.coerceScalarToNumberOrError('00:00:00')
+
+    expect(timeResult).toBeInstanceOf(TimeNumber)
+    expect(toNum(timeResult)).toBe(0)
+    
+    expect(toNum(arithmeticHelper.coerceScalarToNumberOrError(true))).toBe(1)
 
     expect(arithmeticHelper.coerceScalarToNumberOrError('foo42')).toEqual(new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
 
-    expect(arithmeticHelper.coerceScalarToNumberOrError('1')).toEqual(1)
+    expect(toNum(arithmeticHelper.coerceScalarToNumberOrError('1'))).toBe(1)
   })
 
 })
@@ -167,164 +187,183 @@ describe('check if type coercions are applied', () => {
     const engine = HyperFormula.buildFromArray([
       [true, null, '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=+A1', '=-A1', '=A1%']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(1) //ADD
-    expect(engine.getCellValue(adr('D1'))).toEqual(1) //SUB
-    expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
+
+    expect(engine.getCellValue(adr('C1'))).toBe(1) //ADD
+    expect(engine.getCellValue(adr('D1'))).toBe(1) //SUB
+    expect(engine.getCellValue(adr('E1'))).toBe(0) //MULT
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
-    expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
-    expect(engine.getCellValue(adr('H1'))).toEqual(true) // UNARY PLUS
-    expect(engine.getCellValue(adr('I1'))).toEqual(-1) // UNARY MINUS
-    expect(engine.getCellValue(adr('J1'))).toEqual(0.01) // PERCENTAGE
+    expect(engine.getCellValue(adr('G1'))).toBe(1) // EXP
+    expect(engine.getCellValue(adr('H1'))).toBe(true) // UNARY PLUS
+    expect(engine.getCellValue(adr('I1'))).toBe(-1) // UNARY MINUS
+    expect(engine.getCellValue(adr('J1'))).toBe(0.01) // PERCENTAGE
   })
 
   it('boolean to int, null vs true', () => {
     const engine = HyperFormula.buildFromArray([
       [null, true, '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=+A1', '=-A1', '=A1%']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(1) //ADD
-    expect(engine.getCellValue(adr('D1'))).toEqual(-1) //SUB
-    expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
-    expect(engine.getCellValue(adr('F1'))).toEqual(0) // DIV
-    expect(engine.getCellValue(adr('G1'))).toEqual(0) // EXP
-    expect(engine.getCellValue(adr('H1'))).toBe(null) // UNARY PLUS
-    expect(engine.getCellValue(adr('I1'))).toEqual(0) // UNARY MINUS
-    expect(engine.getCellValue(adr('J1'))).toEqual(0) // PERCENTAGE
+
+    expect(engine.getCellValue(adr('C1'))).toBe(1) //ADD
+    expect(engine.getCellValue(adr('D1'))).toBe(-1) //SUB
+    expect(engine.getCellValue(adr('E1'))).toBe(0) //MULT
+    expect(engine.getCellValue(adr('F1'))).toBe(0) // DIV
+    expect(engine.getCellValue(adr('G1'))).toBe(0) // EXP
+    expect(engine.getCellValue(adr('H1'))).toBeNull() // UNARY PLUS
+    expect(engine.getCellValue(adr('I1'))).toBe(0) // UNARY MINUS
+    expect(engine.getCellValue(adr('J1'))).toBe(0) // PERCENTAGE
   })
 
   it('boolean to int, true vs true', () => {
     const engine = HyperFormula.buildFromArray([
       [true, true, '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(2) //ADD
-    expect(engine.getCellValue(adr('D1'))).toEqual(0) //SUB
-    expect(engine.getCellValue(adr('E1'))).toEqual(1) //MULT
-    expect(engine.getCellValue(adr('F1'))).toEqual(1) // DIV
-    expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
+
+    expect(engine.getCellValue(adr('C1'))).toBe(2) //ADD
+    expect(engine.getCellValue(adr('D1'))).toBe(0) //SUB
+    expect(engine.getCellValue(adr('E1'))).toBe(1) //MULT
+    expect(engine.getCellValue(adr('F1'))).toBe(1) // DIV
+    expect(engine.getCellValue(adr('G1'))).toBe(1) // EXP
   })
 
   it('boolean to int, true vs false', () => {
     const engine = HyperFormula.buildFromArray([
       [true, false, '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(1) //ADD
-    expect(engine.getCellValue(adr('D1'))).toEqual(1) //SUB
-    expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
+
+    expect(engine.getCellValue(adr('C1'))).toBe(1) //ADD
+    expect(engine.getCellValue(adr('D1'))).toBe(1) //SUB
+    expect(engine.getCellValue(adr('E1'))).toBe(0) //MULT
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
-    expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
+    expect(engine.getCellValue(adr('G1'))).toBe(1) // EXP
   })
 
   it('boolean to int, false vs true', () => {
     const engine = HyperFormula.buildFromArray([
       [false, true, '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(1) //ADD
-    expect(engine.getCellValue(adr('D1'))).toEqual(-1) //SUB
-    expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
-    expect(engine.getCellValue(adr('F1'))).toEqual(0) // DIV
-    expect(engine.getCellValue(adr('G1'))).toEqual(0) // EXP
+
+    expect(engine.getCellValue(adr('C1'))).toBe(1) //ADD
+    expect(engine.getCellValue(adr('D1'))).toBe(-1) //SUB
+    expect(engine.getCellValue(adr('E1'))).toBe(0) //MULT
+    expect(engine.getCellValue(adr('F1'))).toBe(0) // DIV
+    expect(engine.getCellValue(adr('G1'))).toBe(0) // EXP
   })
 
   it('boolean to int, false vs false', () => {
     const engine = HyperFormula.buildFromArray([
       [false, false, '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1', '=+A1', '=-A1', '=A1%']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(0) //ADD
-    expect(engine.getCellValue(adr('D1'))).toEqual(0) //SUB
-    expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
+
+    expect(engine.getCellValue(adr('C1'))).toBe(0) //ADD
+    expect(engine.getCellValue(adr('D1'))).toBe(0) //SUB
+    expect(engine.getCellValue(adr('E1'))).toBe(0) //MULT
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
-    expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
-    expect(engine.getCellValue(adr('H1'))).toEqual(false) // UNARY PLUS
-    expect(engine.getCellValue(adr('I1'))).toEqual(0) // UNARY MINUS
-    expect(engine.getCellValue(adr('J1'))).toEqual(0) // PERCENTAGE
+    expect(engine.getCellValue(adr('G1'))).toBe(1) // EXP
+    expect(engine.getCellValue(adr('H1'))).toBe(false) // UNARY PLUS
+    expect(engine.getCellValue(adr('I1'))).toBe(0) // UNARY MINUS
+    expect(engine.getCellValue(adr('J1'))).toBe(0) // PERCENTAGE
   })
 
   it('boolean to int, null vs false', () => {
     const engine = HyperFormula.buildFromArray([
       [null, false, '=A1+B1', '=A1-B1', '=A1*B1', '=A1/B1', '=A1^B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(0) //ADD
-    expect(engine.getCellValue(adr('D1'))).toEqual(0) //SUB
-    expect(engine.getCellValue(adr('E1'))).toEqual(0) //MULT
+
+    expect(engine.getCellValue(adr('C1'))).toBe(0) //ADD
+    expect(engine.getCellValue(adr('D1'))).toBe(0) //SUB
+    expect(engine.getCellValue(adr('E1'))).toBe(0) //MULT
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO)) // DIV
-    expect(engine.getCellValue(adr('G1'))).toEqual(1) // EXP
+    expect(engine.getCellValue(adr('G1'))).toBe(1) // EXP
   })
+
   it('order operations, \'\' vs null', () => {
     const engine = HyperFormula.buildFromArray([
       ['', null, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(false)
-    expect(engine.getCellValue(adr('E1'))).toEqual(true)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
   })
+
   it('order operations, string vs boolean', () => {
     const engine = HyperFormula.buildFromArray([
       ['string', false, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(true)
-    expect(engine.getCellValue(adr('E1'))).toEqual(false)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
   })
+
   it('order operations, null vs false', () => {
     const engine = HyperFormula.buildFromArray([
       [null, false, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(false)
-    expect(engine.getCellValue(adr('E1'))).toEqual(true)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
   })
+
   it('order operations, null vs 1', () => {
     const engine = HyperFormula.buildFromArray([
       [null, 1, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(true)
-    expect(engine.getCellValue(adr('E1'))).toEqual(false)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
   })
 
   it('order operations, -1 vs null', () => {
     const engine = HyperFormula.buildFromArray([
       [-1, null, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(true)
-    expect(engine.getCellValue(adr('E1'))).toEqual(false)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
   })
 
   it('order operations, 0 vs null', () => {
     const engine = HyperFormula.buildFromArray([
       [0, null, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(false)
-    expect(engine.getCellValue(adr('E1'))).toEqual(true)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(true)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
   })
 
   it('order operations, 0 vs false', () => {
     const engine = HyperFormula.buildFromArray([
       [0, false, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(true)
-    expect(engine.getCellValue(adr('E1'))).toEqual(false)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
-    expect(engine.getCellValue(adr('G1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
+    expect(engine.getCellValue(adr('G1'))).toBe(false)
   })
 
   it('order operations, 1 vs true', () => {
     const engine = HyperFormula.buildFromArray([
       [1, true, '=A1>B1', '=A1<B1', '=A1>=B1', '=A1<=B1', '=A1=B1']
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(true)
-    expect(engine.getCellValue(adr('E1'))).toEqual(false)
-    expect(engine.getCellValue(adr('F1'))).toEqual(true)
-    expect(engine.getCellValue(adr('G1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(true)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
+    expect(engine.getCellValue(adr('F1'))).toBe(true)
+    expect(engine.getCellValue(adr('G1'))).toBe(false)
   })
 })
 
@@ -334,6 +373,7 @@ describe('#requiresRegex', () => {
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
+
     expect(arithmeticHelper.requiresRegex('')).toEqual(!config.matchWholeCell)
   })
 
@@ -342,12 +382,13 @@ describe('#requiresRegex', () => {
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
-    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
-    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+
+    expect(arithmeticHelper.requiresRegex('')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toBe(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toBe(true)
   })
 
   it('config.useRegularExpressions = true  && config.useWildcards = false)', () => {
@@ -355,12 +396,13 @@ describe('#requiresRegex', () => {
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
-    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
-    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(true)
-    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(true)
-    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+
+    expect(arithmeticHelper.requiresRegex('')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toBe(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toBe(true)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toBe(true)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toBe(true)
   })
 
   it('config.useRegularExpressions = true  && config.useWildcards = true)', () => {
@@ -368,11 +410,12 @@ describe('#requiresRegex', () => {
     const dateTimeHelper = new DateTimeHelper(config)
     const numberLiteralsHelper = new NumberLiteralHelper(config)
     const arithmeticHelper = new ArithmeticHelper(config, dateTimeHelper, numberLiteralsHelper)
-    expect(arithmeticHelper.requiresRegex('')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('foo')).toEqual(false)
-    expect(arithmeticHelper.requiresRegex('foo*bar')).toEqual(true)
-    expect(arithmeticHelper.requiresRegex('foo!bar')).toEqual(true)
-    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toEqual(true)
-    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toEqual(true)
+
+    expect(arithmeticHelper.requiresRegex('')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('foo')).toBe(false)
+    expect(arithmeticHelper.requiresRegex('foo*bar')).toBe(true)
+    expect(arithmeticHelper.requiresRegex('foo!bar')).toBe(true)
+    expect(arithmeticHelper.requiresRegex('[ab][0-9]')).toBe(true)
+    expect(arithmeticHelper.requiresRegex('[ab].*[0-9]')).toBe(true)
   })
 })

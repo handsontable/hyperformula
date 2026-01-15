@@ -26,6 +26,9 @@ interface ResultSuite {
   }
 })()
 
+/**
+ *
+ */
 function writeTableToFile(tableData: { [key: string]: string | number }[], filename: string): void {
   const tableRenderer = asTable.configure({ delimiter: ' | ', right: true })
   const renderedTable = `\n\n\`\`\`\n${tableRenderer(tableData)}\n\`\`\`\n`
@@ -38,6 +41,9 @@ function writeTableToFile(tableData: { [key: string]: string | number }[], filen
   }
 }
 
+/**
+ *
+ */
 function readResultSuiteFromFile(filename: string): ResultSuite {
   const suiteName = filenameWithNoExtension(filename)
   const resultsFromFile = readResultsFromFile(filename)
@@ -45,10 +51,16 @@ function readResultSuiteFromFile(filename: string): ResultSuite {
   return { suiteName, results }
 }
 
+/**
+ *
+ */
 function filenameWithNoExtension(filename: string): string {
   return filename.replace(/\.[^/.]+$/, '')
 }
 
+/**
+ *
+ */
 function readResultsFromFile(filename: string): { name: string, totalTime: number }[] {
   try {
     const rawFileContent = fs.readFileSync(filename)
@@ -58,11 +70,17 @@ function readResultsFromFile(filename: string): { name: string, totalTime: numbe
   }
 }
 
+/**
+ *
+ */
 function buildBenchmarkTable(resultSuites: ResultSuite[]): { [key: string]: string | number }[] {
   const testNames = resultSuites[0].results.map(bm => bm.testName)
   return testNames.map(testName => buildBenchmarkTableRow(testName, resultSuites))
 }
 
+/**
+ *
+ */
 function buildBenchmarkTableRow(testName: string, resultSuites: ResultSuite[]): { [key: string]: string | number } {
   const testResultsEntries = resultSuites.map(resultSuite => findTestResultInSuite(testName, resultSuite))
   const changeEntries = calculateChangeFromBase(testResultsEntries)
@@ -70,18 +88,27 @@ function buildBenchmarkTableRow(testName: string, resultSuites: ResultSuite[]): 
   return { testName, ...testResultsObj }
 }
 
+/**
+ *
+ */
 function calculateChangeFromBase(testResultsEntries: [string, number][]): [string, string][] {
   const [baseSuiteName, baseSuiteResult] = testResultsEntries[0]
   const resultsWithoutBase = testResultsEntries.filter(([currSuiteName, _]) => currSuiteName !== baseSuiteName)
   return resultsWithoutBase.map(currResultEntry => buildChangeEntry(currResultEntry, baseSuiteResult))
 }
 
+/**
+ *
+ */
 function buildChangeEntry([_, currSuiteResult]: [string, number], baseSuiteResult: number): [string, string] {
   const change = (currSuiteResult - baseSuiteResult) / baseSuiteResult * 100.0
   const formattedChange = `${change > 0.0 ? '+' : ''}${change.toFixed(2)}%`
   return ['change', formattedChange]
 }
 
+/**
+ *
+ */
 function findTestResultInSuite(testName: string, resultSuite: ResultSuite): [string, number] {
   const resultItem = resultSuite.results.find(res => res.testName === testName)
 

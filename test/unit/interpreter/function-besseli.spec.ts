@@ -37,13 +37,13 @@ describe('Function BESSELI', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.26606584803426, 6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(27.2398718943949, 6)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.565159097581944, 6)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A5'))).toBe(0)
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(24.3356418457055, 6)
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(-0.0221684244039833, 6)
-    expect(engine.getCellValue(adr('A8'))).toEqual(0)
+    expect(engine.getCellValue(adr('A8'))).toBe(0)
     expect(engine.getCellValue(adr('A9'))).toBeCloseTo(10.3311501959992, 6)
   })
 
@@ -64,7 +64,7 @@ describe('Function BESSELI', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.26606584803426, 6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(27.2398718943949, 6)
   })
 })

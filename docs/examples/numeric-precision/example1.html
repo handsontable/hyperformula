@@ -1,0 +1,48 @@
+<div class="example">
+  <h3>Numeric Precision Comparison</h3>
+  
+  <div class="comparison-section">
+    <h4>Invoice Calculation - Native Mode (IEEE-754)</h4>
+    <table id="invoice-native">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="comparison-section">
+    <h4>Invoice Calculation - Precise Mode (decimal.js)</h4>
+    <table id="invoice-precise">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="comparison-section">
+    <h4>IEEE-754 Floating Point Issues</h4>
+    <p>These calculations demonstrate common floating-point precision issues in JavaScript:</p>
+    <table id="precision-tests">
+      <thead>
+        <tr>
+          <th>Calculation</th>
+          <th>Native Result</th>
+          <th>Precise Result</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>

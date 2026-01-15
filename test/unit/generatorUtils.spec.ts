@@ -10,7 +10,7 @@ describe('split', () => {
   it('works for empty case', () => {
     const result = split(empty())
 
-    expect(result.value).toBe(undefined)
+    expect(result.value).toBeUndefined()
     expect(Array.from(result.rest)).toEqual([])
   })
 
@@ -35,18 +35,18 @@ describe('split', () => {
 
 describe('first', () => {
   it('works for empty case', () => {
-    expect(first(empty())).toBe(undefined)
+    expect(first(empty())).toBeUndefined()
   })
 
   it('works for one element case', () => {
     const arr = [42]
 
-    expect(first(arr[Symbol.iterator]())).toEqual(42)
+    expect(first(arr[Symbol.iterator]())).toBe(42)
   })
 
   it('works for more elements case', () => {
     const arr = [42, 43]
 
-    expect(first(arr[Symbol.iterator]())).toEqual(42)
+    expect(first(arr[Symbol.iterator]())).toBe(42)
   })
 })

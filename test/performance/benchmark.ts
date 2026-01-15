@@ -38,6 +38,9 @@ export interface BenchmarkResult {
   statistics: Stats,
 }
 
+/**
+ *
+ */
 export function benchmark(
   name: string,
   sheet: Sheet,
@@ -48,6 +51,9 @@ export function benchmark(
   return benchmarkBuild(name, runEngine, expectedValues, config)
 }
 
+/**
+ *
+ */
 export function benchmarkCruds(
   name: string,
   sheet: Sheet,
@@ -92,6 +98,9 @@ export function benchmarkCruds(
   }
 }
 
+/**
+ *
+ */
 export function batch(stats: BenchmarkResult[], ...benchmarks: (() => Maybe<BenchmarkResult>)[]): void {
   for (const benchmark of benchmarks) {
     const result = benchmark()
@@ -101,6 +110,9 @@ export function batch(stats: BenchmarkResult[], ...benchmarks: (() => Maybe<Benc
   }
 }
 
+/**
+ *
+ */
 function benchmarkBuild(
   name: string,
   runEngine: (engineConfig?: Partial<ConfigParams>) => HyperFormula,
@@ -144,6 +156,9 @@ function benchmarkBuild(
   }
 }
 
+/**
+ *
+ */
 function validate(engine: HyperFormula, expectedValues: ExpectedValue[]) {
   let valid = true
 

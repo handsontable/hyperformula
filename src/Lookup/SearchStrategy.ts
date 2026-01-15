@@ -53,6 +53,9 @@ export interface ColumnSearchStrategy extends SearchStrategy {
   removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void,
 }
 
+/**
+ *
+ */
 export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): ColumnSearchStrategy {
   if (config.useColumnIndex) {
     return new ColumnIndex(dependencyGraph, config, statistics)

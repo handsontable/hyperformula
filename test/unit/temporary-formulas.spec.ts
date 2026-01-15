@@ -7,7 +7,7 @@ describe('Temporary formulas - normalization', () => {
 
     const normalizedFormula = engine.normalizeFormula('=SHEET1!A1+10')
 
-    expect(normalizedFormula).toEqual('=Sheet1!A1+10')
+    expect(normalizedFormula).toBe('=Sheet1!A1+10')
   })
 
   it('fail with a typo', () => {
@@ -16,8 +16,8 @@ describe('Temporary formulas - normalization', () => {
     const normalizedFormula = engine.normalizeFormula('=SHET1!A1+10')
     const normalizedFormula2 = engine.normalizeFormula('=SUM(SHET1!A1:A100)')
 
-    expect(normalizedFormula).toEqual('=SHET1!A1+10')
-    expect(normalizedFormula2).toEqual('=SUM(SHET1!A1:A100)')
+    expect(normalizedFormula).toBe('=SHET1!A1+10')
+    expect(normalizedFormula2).toBe('=SUM(SHET1!A1:A100)')
   })
 
   it('works with absolute addressing', () => {
@@ -25,7 +25,7 @@ describe('Temporary formulas - normalization', () => {
 
     const normalizedFormula = engine.normalizeFormula('=3*$a$1')
 
-    expect(normalizedFormula).toEqual('=3*$A$1')
+    expect(normalizedFormula).toBe('=3*$A$1')
   })
 
   it('wont normalize sheet names of not existing sheets', () => {
@@ -90,7 +90,7 @@ describe('Temporary formulas - calculation', () => {
 
     const result = engine.calculateFormula('=Sheet1!A1+10', 0)
 
-    expect(result).toEqual(52)
+    expect(result).toBe(52)
   })
 
   it('formulas are executed in context of given sheet', () => {
@@ -99,8 +99,8 @@ describe('Temporary formulas - calculation', () => {
       Sheet2: [['58']],
     })
 
-    expect(engine.calculateFormula('=A1+10', 0)).toEqual(52)
-    expect(engine.calculateFormula('=A1+10', 1)).toEqual(68)
+    expect(engine.calculateFormula('=A1+10', 0)).toBe(52)
+    expect(engine.calculateFormula('=A1+10', 1)).toBe(68)
   })
 
   it('when sheet name does not exist', () => {
@@ -118,7 +118,8 @@ describe('Temporary formulas - calculation', () => {
       ['1', '2'],
       ['3', '4']
     ])
-    expect(engine.calculateFormula('=SUM(A1:B2)', 0)).toEqual(10)
+
+    expect(engine.calculateFormula('=SUM(A1:B2)', 0)).toBe(10)
   })
 
   it('non-scalars work', () => {
@@ -134,6 +135,7 @@ describe('Temporary formulas - calculation', () => {
 
   it('more non-scalars', () => {
     const engine = HyperFormula.buildFromArray([[0, 1]])
+
     expect(engine.calculateFormula('=ARRAYFORMULA(ISEVEN(A1:B2*3))', 0)).toEqual([[true, false], [true, true]])
   })
 

@@ -67,10 +67,10 @@ describe('Function INDEX', () => {
       ['=INDEX(B1:C2, 2, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(2)
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
-    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(4)
   })
 
   it('should propagate errors properly', () => {
@@ -102,8 +102,8 @@ describe('Function INDEX', () => {
       ['=INDEX(42, 1, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A3'))).toEqual(42)
+    expect(engine.getCellValue(adr('A2'))).toBe('foo')
+    expect(engine.getCellValue(adr('A3'))).toBe(42)
   })
 
   it('should assume first column if no last argument', () => {
@@ -113,6 +113,6 @@ describe('Function INDEX', () => {
       ['=INDEX(A1:B2, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 })

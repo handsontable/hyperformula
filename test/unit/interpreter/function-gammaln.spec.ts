@@ -30,7 +30,7 @@ describe('Function GAMMALN', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.25271265173425, 6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(12.801827480082, 6)
   })
 

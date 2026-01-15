@@ -8,8 +8,9 @@ describe('MatrixMapping', () => {
   it('should be empty', () => {
     const matrixMapping = new ArrayMapping()
 
-    expect(matrixMapping.count()).toEqual(0)
+    expect(matrixMapping.count()).toBe(0)
   })
+
   it('should set matrix', () => {
     const matrixMapping = new ArrayMapping()
 
@@ -17,7 +18,7 @@ describe('MatrixMapping', () => {
     const range = AbsoluteCellRange.spanFrom(adr('A1'), 2, 2)
     matrixMapping.setArray(range, vertex)
 
-    expect(matrixMapping.count()).toEqual(1)
+    expect(matrixMapping.count()).toBe(1)
     expect(matrixMapping.getArray(range)).toEqual(vertex)
   })
 
@@ -31,13 +32,13 @@ describe('MatrixMapping', () => {
     expect(matrixMapping.isFormulaArrayInRow(0, 1)).toBe(true)
     expect(matrixMapping.isFormulaArrayAtAddress(adr('A1'))).toBe(false)
     expect(matrixMapping.isFormulaArrayAtAddress(adr('B2'))).toBe(true)
-    expect(matrixMapping.isFormulaArrayInRange(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))).toEqual(false)
-    expect(matrixMapping.isFormulaArrayInRange(AbsoluteCellRange.spanFrom(adr('B1'), 1, 2))).toEqual(true)
-    expect(matrixMapping.isFormulaArrayInRange(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1))).toEqual(true)
-    expect(matrixMapping.isFormulaArrayInColumn(0, 0)).toEqual(false)
-    expect(matrixMapping.isFormulaArrayInColumn(0, 1)).toEqual(true)
-    expect(matrixMapping.isFormulaArrayInRow(0, 0)).toEqual(false)
-    expect(matrixMapping.isFormulaArrayInRow(0, 1)).toEqual(true)
+    expect(matrixMapping.isFormulaArrayInRange(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1))).toBe(false)
+    expect(matrixMapping.isFormulaArrayInRange(AbsoluteCellRange.spanFrom(adr('B1'), 1, 2))).toBe(true)
+    expect(matrixMapping.isFormulaArrayInRange(AbsoluteCellRange.spanFrom(adr('A2'), 2, 1))).toBe(true)
+    expect(matrixMapping.isFormulaArrayInColumn(0, 0)).toBe(false)
+    expect(matrixMapping.isFormulaArrayInColumn(0, 1)).toBe(true)
+    expect(matrixMapping.isFormulaArrayInRow(0, 0)).toBe(false)
+    expect(matrixMapping.isFormulaArrayInRow(0, 1)).toBe(true)
   })
 
   it('should move matrices below row', () => {

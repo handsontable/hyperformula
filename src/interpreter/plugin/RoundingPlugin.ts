@@ -10,16 +10,25 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export function findNextOddNumber(arg: number): number {
   const ceiled = Math.ceil(arg)
   return (ceiled % 2 === 1) ? ceiled : ceiled + 1
 }
 
+/**
+ *
+ */
 export function findNextEvenNumber(arg: number): number {
   const ceiled = Math.ceil(arg)
   return (ceiled % 2 === 0) ? ceiled : ceiled + 1
 }
 
+/**
+ *
+ */
 export class RoundingPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RoundingPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'ROUNDUP': {
@@ -112,6 +121,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     'TRUNC': 'ROUNDDOWN',
   }
 
+  
+  /**
+   *
+   */
   public roundup(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
@@ -123,6 +136,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public rounddown(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROUNDDOWN'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
@@ -134,6 +151,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public round(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROUND'), (numberToRound: number, places: number): number => {
       const placesMultiplier = Math.pow(10, places)
@@ -145,6 +166,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public intFunc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('INT'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
@@ -155,6 +180,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public even(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EVEN'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
@@ -165,6 +194,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public odd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ODD'), (coercedNumberToRound) => {
       if (coercedNumberToRound < 0) {
@@ -175,6 +208,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public ceilingmath(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING.MATH'),
       (value: number, significance: number, mode: number) => {
@@ -191,6 +228,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
+  
+  /**
+   *
+   */
   public ceiling(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING'),
       (value: number, significance: number) => {
@@ -209,6 +250,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
+  
+  /**
+   *
+   */
   public ceilingprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CEILING.PRECISE'),
       (value: number, significance: number) => {
@@ -220,6 +265,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
+  
+  /**
+   *
+   */
   public floormath(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FLOOR.MATH'),
       (value: number, significance: number, mode: number) => {
@@ -236,6 +285,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
+  
+  /**
+   *
+   */
   public floor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FLOOR'),
       (value: number, significance: number) => {
@@ -254,6 +307,10 @@ export class RoundingPlugin extends FunctionPlugin implements FunctionPluginType
       })
   }
 
+  
+  /**
+   *
+   */
   public floorprecise(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FLOOR.PRECISE'),
       (value: number, significance: number) => {

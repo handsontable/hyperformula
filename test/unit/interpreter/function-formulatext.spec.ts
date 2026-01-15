@@ -38,7 +38,7 @@ describe('Function FORMULATEXT', () => {
       ['=1/0', '=FORMULATEXT(A1)']
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('=1/0')
+    expect(engine.getCellValue(adr('B1'))).toBe('=1/0')
   })
 
   it('should work', () => {
@@ -46,7 +46,7 @@ describe('Function FORMULATEXT', () => {
       ['=SUM(1, 2)', '=FORMULATEXT(A1)']
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(1, 2)')
+    expect(engine.getCellValue(adr('B1'))).toBe('=SUM(1, 2)')
   })
 
   it('should return formula of a left corner cell', () => {
@@ -54,7 +54,7 @@ describe('Function FORMULATEXT', () => {
       ['=SUM(1, 2)', '=FORMULATEXT(A1:A2)']
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(1, 2)')
+    expect(engine.getCellValue(adr('B1'))).toBe('=SUM(1, 2)')
   })
 
   it('should return REF when', () => {
@@ -72,7 +72,7 @@ describe('Function FORMULATEXT', () => {
       ['=SUM(1,', '=FORMULATEXT(A1)']
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(1,')
+    expect(engine.getCellValue(adr('B1'))).toBe('=SUM(1,')
   })
 
   it('should return itself', () => {
@@ -80,7 +80,7 @@ describe('Function FORMULATEXT', () => {
       ['=FORMULATEXT(A1)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('=FORMULATEXT(A1)')
+    expect(engine.getCellValue(adr('A1'))).toBe('=FORMULATEXT(A1)')
   })
 
   it('should be dependent on sheet structure changes', () => {
@@ -91,7 +91,7 @@ describe('Function FORMULATEXT', () => {
 
     engine.addRows(0, [1, 1])
 
-    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(A3)')
-    expect(engine.getCellValue(adr('B1'))).toEqual('=SUM(A3)')
+    expect(engine.getCellFormula(adr('A1'))).toBe('=SUM(A3)')
+    expect(engine.getCellValue(adr('B1'))).toBe('=SUM(A3)')
   })
 })

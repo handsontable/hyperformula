@@ -54,10 +54,10 @@ describe('function BITAND', () => {
       ['=BITAND(256, 123)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(73)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(73)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 
   it('should return numeric type', () => {

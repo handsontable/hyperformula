@@ -9,10 +9,13 @@ import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {InternalScalarValue, InterpreterValue, toNativeNumeric, getRawPrecisionValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'ARRAYFORMULA': {
@@ -45,10 +48,18 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     }
   }
 
+  
+  /**
+   *
+   */
   public arrayformula(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARRAYFORMULA'), (value) => value)
   }
 
+  
+  /**
+   *
+   */
   public arrayformulaArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length !== 1) {
       return ArraySize.error()
@@ -60,6 +71,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return subChecks[0]
   }
 
+  
+  /**
+   *
+   */
   public arrayconstrain(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARRAY_CONSTRAIN'), (range: SimpleRangeValue, numRows: number, numCols: number) => {
       numRows = Math.min(numRows, range.height())
@@ -73,6 +88,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     })
   }
 
+  
+  /**
+   *
+   */
   public arrayconstrainArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length !== 3) {
       return ArraySize.error()
@@ -83,10 +102,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
     let {height, width} = subChecks[0]
     if (ast.args[1].type === AstNodeType.NUMBER) {
-      height = Math.min(height, ast.args[1].value)
+      height = Math.min(height, ast.args[1].value.toNumber())
     }
     if (ast.args[2].type === AstNodeType.NUMBER) {
-      width = Math.min(width, ast.args[2].value)
+      width = Math.min(width, ast.args[2].value.toNumber())
     }
     if (height < 1 || width < 1 || !Number.isInteger(height) || !Number.isInteger(width)) {
       return ArraySize.error()
@@ -94,6 +113,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return new ArraySize(width, height)
   }
 
+  
+  /**
+   *
+   */
   public filter(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FILTER'), (rangeVals: SimpleRangeValue, ...rangeFilters: SimpleRangeValue[]) => {
       for (const filter of rangeFilters) {
@@ -135,6 +158,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     })
   }
 
+  
+  /**
+   *
+   */
   public filterArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length <= 1) {
       return ArraySize.error()

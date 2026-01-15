@@ -17,6 +17,7 @@ describe('Function STDEVA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEVA(2, 3)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.707106781186548, 11)
   })
 
@@ -24,6 +25,7 @@ describe('Function STDEVA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEVA(2, 3, 4, TRUE(), FALSE(), "1",)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.51185789203691)
   })
 
@@ -31,6 +33,7 @@ describe('Function STDEVA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEVA(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.61834718742537)
   })
 
@@ -38,6 +41,7 @@ describe('Function STDEVA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEVA(B1:I1)', 2, 3, 4, '=NA()', false, 'a', '\'1', null],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

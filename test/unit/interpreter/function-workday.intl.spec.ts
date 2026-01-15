@@ -20,6 +20,7 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL(0, 1, -1)'],
       ['=WORKDAY.INTL(0, 1, "1111111")'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
@@ -37,13 +38,14 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL(1000, 0.9)'],
       ['=WORKDAY.INTL(1000, -0.9)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1003)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1003)
-    expect(engine.getCellValue(adr('A3'))).toEqual(999)
-    expect(engine.getCellValue(adr('A4'))).toEqual(999)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1000)
-    expect(engine.getCellValue(adr('A6'))).toEqual(1000)
-    expect(engine.getCellValue(adr('A7'))).toEqual(1000)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1003)
+    expect(engine.getCellValue(adr('A2'))).toBe(1003)
+    expect(engine.getCellValue(adr('A3'))).toBe(999)
+    expect(engine.getCellValue(adr('A4'))).toBe(999)
+    expect(engine.getCellValue(adr('A5'))).toBe(1000)
+    expect(engine.getCellValue(adr('A6'))).toBe(1000)
+    expect(engine.getCellValue(adr('A7'))).toBe(1000)
   })
 
   it('today plus 1', () => {
@@ -58,15 +60,16 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL("29/09/2020", 1, 15)'],
       ['=WORKDAY.INTL("29/09/2020", 1, "1011111")'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(44104)
-    expect(engine.getCellValue(adr('A2'))).toEqual(44104)
-    expect(engine.getCellValue(adr('A3'))).toEqual(44105)
-    expect(engine.getCellValue(adr('A4'))).toEqual(44106)
-    expect(engine.getCellValue(adr('A5'))).toEqual(44104)
-    expect(engine.getCellValue(adr('A6'))).toEqual(44104)
-    expect(engine.getCellValue(adr('A7'))).toEqual(44105)
-    expect(engine.getCellValue(adr('A8'))).toEqual(44104)
-    expect(engine.getCellValue(adr('A9'))).toEqual(44110)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(44104)
+    expect(engine.getCellValue(adr('A2'))).toBe(44104)
+    expect(engine.getCellValue(adr('A3'))).toBe(44105)
+    expect(engine.getCellValue(adr('A4'))).toBe(44106)
+    expect(engine.getCellValue(adr('A5'))).toBe(44104)
+    expect(engine.getCellValue(adr('A6'))).toBe(44104)
+    expect(engine.getCellValue(adr('A7'))).toBe(44105)
+    expect(engine.getCellValue(adr('A8'))).toBe(44104)
+    expect(engine.getCellValue(adr('A9'))).toBe(44110)
   })
 
   it('today minus 1', () => {
@@ -81,15 +84,16 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL("29/09/2020", -1, 14)'],
       ['=WORKDAY.INTL("29/09/2020", -1, "1011111")'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(44102)
-    expect(engine.getCellValue(adr('A2'))).toEqual(44100)
-    expect(engine.getCellValue(adr('A3'))).toEqual(44101)
-    expect(engine.getCellValue(adr('A4'))).toEqual(44102)
-    expect(engine.getCellValue(adr('A5'))).toEqual(44102)
-    expect(engine.getCellValue(adr('A6'))).toEqual(44101)
-    expect(engine.getCellValue(adr('A7'))).toEqual(44102)
-    expect(engine.getCellValue(adr('A8'))).toEqual(44102)
-    expect(engine.getCellValue(adr('A9'))).toEqual(44096)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(44102)
+    expect(engine.getCellValue(adr('A2'))).toBe(44100)
+    expect(engine.getCellValue(adr('A3'))).toBe(44101)
+    expect(engine.getCellValue(adr('A4'))).toBe(44102)
+    expect(engine.getCellValue(adr('A5'))).toBe(44102)
+    expect(engine.getCellValue(adr('A6'))).toBe(44101)
+    expect(engine.getCellValue(adr('A7'))).toBe(44102)
+    expect(engine.getCellValue(adr('A8'))).toBe(44102)
+    expect(engine.getCellValue(adr('A9'))).toBe(44096)
   })
 
   it('this year', () => {
@@ -101,11 +105,12 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL("01/01/2020", 262, 1, A1:D1)'],
       ['=WORKDAY.INTL("01/01/2020", 262, 1, A1:E1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(44197)
-    expect(engine.getCellValue(adr('A3'))).toEqual(44200)
-    expect(engine.getCellValue(adr('A4'))).toEqual(44200)
-    expect(engine.getCellValue(adr('A5'))).toEqual(44201)
-    expect(engine.getCellValue(adr('A6'))).toEqual(44201)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(44197)
+    expect(engine.getCellValue(adr('A3'))).toBe(44200)
+    expect(engine.getCellValue(adr('A4'))).toBe(44200)
+    expect(engine.getCellValue(adr('A5'))).toBe(44201)
+    expect(engine.getCellValue(adr('A6'))).toBe(44201)
   })
 
   it('should output correct values', () => {
@@ -117,11 +122,12 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL(A1+13, 34, "0000000", A1:J1)'],
       ['=WORKDAY.INTL(A1+50, 5, "0000000", A1:J1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(43931)
-    expect(engine.getCellValue(adr('A3'))).toEqual(43852)
-    expect(engine.getCellValue(adr('A4'))).toEqual(43932)
-    expect(engine.getCellValue(adr('A5'))).toEqual(43882)
-    expect(engine.getCellValue(adr('A6'))).toEqual(43888)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(43931)
+    expect(engine.getCellValue(adr('A3'))).toBe(43852)
+    expect(engine.getCellValue(adr('A4'))).toBe(43932)
+    expect(engine.getCellValue(adr('A5'))).toBe(43882)
+    expect(engine.getCellValue(adr('A6'))).toBe(43888)
   })
 
   it('checks types in last argument', () => {
@@ -132,9 +138,10 @@ describe('Function WORKDAY.INTL', () => {
       ['=WORKDAY.INTL(1000, 1, 1, C1:C1)'],
       ['=WORKDAY.INTL(1000, 1, 1, A1:D1)'],
     ])
+
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A4'))).toEqual(1003)
+    expect(engine.getCellValue(adr('A4'))).toBe(1003)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

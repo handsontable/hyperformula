@@ -35,8 +35,8 @@ describe('Function ACOSH', () => {
       ['=TRUE()', '=ACOSH(A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
-    expect(engine.getCellValue(adr('B2'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
+    expect(engine.getCellValue(adr('B2'))).toBe(0)
   })
 
   it('errors propagation', () => {

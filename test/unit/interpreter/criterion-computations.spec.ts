@@ -10,7 +10,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(A1:A3, ">1", B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(7)
+    expect(engine.getCellValue(adr('A4'))).toBe(7)
   })
 
   it('usage of greater than or equal operator', () => {
@@ -21,7 +21,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(A1:A3, ">=1", B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(12)
+    expect(engine.getCellValue(adr('A4'))).toBe(12)
   })
 
   it('usage of less than operator', () => {
@@ -32,7 +32,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(A1:A2, "<1", B1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(3)
   })
 
   it('usage of less than or equal operator', () => {
@@ -43,7 +43,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(A1:A3, "<=1", B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(8)
+    expect(engine.getCellValue(adr('A4'))).toBe(8)
   })
 
   it('usage of equal operator', () => {
@@ -54,7 +54,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(A1:A3, "=1", B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(5)
   })
 
   it('usage of not equal operator', () => {
@@ -65,7 +65,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(A1:A3, "<>1", B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(10)
+    expect(engine.getCellValue(adr('A4'))).toBe(10)
   })
 
   it('empty values #1', () => {
@@ -76,7 +76,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(B1:B3, "=", A1:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 
   it('empty values #2', () => {
@@ -87,7 +87,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(B1:B3, "<>", A1:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(6)
+    expect(engine.getCellValue(adr('A4'))).toBe(6)
   })
 
   it('empty values #3', () => {
@@ -98,7 +98,7 @@ describe('Criterions - operators computations', () => {
       ['=SUMIF(B1:B3, "=0", A1:A3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 
   it('empty values #4', () => {
@@ -109,7 +109,7 @@ describe('Criterions - operators computations', () => {
       ['=COUNTIF(A1:A3, "=")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 })
 
@@ -171,50 +171,50 @@ describe('big test', () => {
 
     const engine = HyperFormula.buildFromArray(formulas, {useRegularExpressions: true, precisionRounding: 13})
 
-    expect(engine.getCellValue(adr('B51'))).toEqual(304.5)
-    expect(engine.getCellValue(adr('G51'))).toEqual(304.5)
+    expect(engine.getCellValue(adr('B51'))).toBe(304.5)
+    expect(engine.getCellValue(adr('G51'))).toBe(304.5)
 
-    expect(engine.getCellValue(adr('F1'))).toEqual(14)
-    expect(engine.getCellValue(adr('F2'))).toEqual(2)
-    expect(engine.getCellValue(adr('F3'))).toEqual(11)
-    expect(engine.getCellValue(adr('F4'))).toEqual(0)
-    expect(engine.getCellValue(adr('F5'))).toEqual(5)
-    expect(engine.getCellValue(adr('F6'))).toEqual(0)
-    expect(engine.getCellValue(adr('F7'))).toEqual(7)
-    expect(engine.getCellValue(adr('F8'))).toEqual(5)
-    expect(engine.getCellValue(adr('F9'))).toEqual(0)
-    expect(engine.getCellValue(adr('F10'))).toEqual(0)
-    expect(engine.getCellValue(adr('F11'))).toEqual(0)
-    expect(engine.getCellValue(adr('F12'))).toEqual(0)
-    expect(engine.getCellValue(adr('F13'))).toEqual(0)
-    expect(engine.getCellValue(adr('F14'))).toEqual(0)
-    expect(engine.getCellValue(adr('F15'))).toEqual(0)
-    expect(engine.getCellValue(adr('F16'))).toEqual(0)
-    expect(engine.getCellValue(adr('F17'))).toEqual(0)
-    expect(engine.getCellValue(adr('F18'))).toEqual(0)
-    expect(engine.getCellValue(adr('F19'))).toEqual(0)
-    expect(engine.getCellValue(adr('F20'))).toEqual(5)
+    expect(engine.getCellValue(adr('F1'))).toBe(14)
+    expect(engine.getCellValue(adr('F2'))).toBe(2)
+    expect(engine.getCellValue(adr('F3'))).toBe(11)
+    expect(engine.getCellValue(adr('F4'))).toBe(0)
+    expect(engine.getCellValue(adr('F5'))).toBe(5)
+    expect(engine.getCellValue(adr('F6'))).toBe(0)
+    expect(engine.getCellValue(adr('F7'))).toBe(7)
+    expect(engine.getCellValue(adr('F8'))).toBe(5)
+    expect(engine.getCellValue(adr('F9'))).toBe(0)
+    expect(engine.getCellValue(adr('F10'))).toBe(0)
+    expect(engine.getCellValue(adr('F11'))).toBe(0)
+    expect(engine.getCellValue(adr('F12'))).toBe(0)
+    expect(engine.getCellValue(adr('F13'))).toBe(0)
+    expect(engine.getCellValue(adr('F14'))).toBe(0)
+    expect(engine.getCellValue(adr('F15'))).toBe(0)
+    expect(engine.getCellValue(adr('F16'))).toBe(0)
+    expect(engine.getCellValue(adr('F17'))).toBe(0)
+    expect(engine.getCellValue(adr('F18'))).toBe(0)
+    expect(engine.getCellValue(adr('F19'))).toBe(0)
+    expect(engine.getCellValue(adr('F20'))).toBe(5)
 
-    expect(engine.getCellValue(adr('G1'))).toEqual(36.39999999998)
-    expect(engine.getCellValue(adr('G2'))).toEqual(4.5000000000146)
-    expect(engine.getCellValue(adr('G3'))).toEqual(43.400000000009)
-    expect(engine.getCellValue(adr('G4'))).toEqual(0)
-    expect(engine.getCellValue(adr('G5'))).toEqual(31.100000000006)
-    expect(engine.getCellValue(adr('G6'))).toEqual(0)
-    expect(engine.getCellValue(adr('G7'))).toEqual(82.199999999997)
-    expect(engine.getCellValue(adr('G8'))).toEqual(57.800000000003)
-    expect(engine.getCellValue(adr('G9'))).toEqual(0)
-    expect(engine.getCellValue(adr('G10'))).toEqual(0)
-    expect(engine.getCellValue(adr('G11'))).toEqual(0)
-    expect(engine.getCellValue(adr('G12'))).toEqual(0)
-    expect(engine.getCellValue(adr('G13'))).toEqual(0)
-    expect(engine.getCellValue(adr('G14'))).toEqual(0)
-    expect(engine.getCellValue(adr('G15'))).toEqual(0)
-    expect(engine.getCellValue(adr('G16'))).toEqual(0)
-    expect(engine.getCellValue(adr('G17'))).toEqual(0)
-    expect(engine.getCellValue(adr('G18'))).toEqual(0)
-    expect(engine.getCellValue(adr('G19'))).toEqual(0)
-    expect(engine.getCellValue(adr('G20'))).toEqual(49.099999999991)
+    expect(engine.getCellValue(adr('G1'))).toBe(36.39999999998)
+    expect(engine.getCellValue(adr('G2'))).toBe(4.5000000000146)
+    expect(engine.getCellValue(adr('G3'))).toBe(43.400000000009)
+    expect(engine.getCellValue(adr('G4'))).toBe(0)
+    expect(engine.getCellValue(adr('G5'))).toBe(31.100000000006)
+    expect(engine.getCellValue(adr('G6'))).toBe(0)
+    expect(engine.getCellValue(adr('G7'))).toBe(82.199999999997)
+    expect(engine.getCellValue(adr('G8'))).toBe(57.800000000003)
+    expect(engine.getCellValue(adr('G9'))).toBe(0)
+    expect(engine.getCellValue(adr('G10'))).toBe(0)
+    expect(engine.getCellValue(adr('G11'))).toBe(0)
+    expect(engine.getCellValue(adr('G12'))).toBe(0)
+    expect(engine.getCellValue(adr('G13'))).toBe(0)
+    expect(engine.getCellValue(adr('G14'))).toBe(0)
+    expect(engine.getCellValue(adr('G15'))).toBe(0)
+    expect(engine.getCellValue(adr('G16'))).toBe(0)
+    expect(engine.getCellValue(adr('G17'))).toBe(0)
+    expect(engine.getCellValue(adr('G18'))).toBe(0)
+    expect(engine.getCellValue(adr('G19'))).toBe(0)
+    expect(engine.getCellValue(adr('G20'))).toBe(49.099999999991)
   })
 
   it('Gnumeric test file', () => {
@@ -273,46 +273,47 @@ describe('big test', () => {
     engine.addNamedExpression('TRUE', '=TRUE()', undefined)
     engine.addNamedExpression('FALSE', '=FALSE()', undefined)
     engine.setCellContents(adr('A1'), formulas)
-    expect(engine.getCellValue(adr('A10'))).toEqual(1)
-    expect(engine.getCellValue(adr('A11'))).toEqual(0)
-    expect(engine.getCellValue(adr('A12'))).toEqual(0)
-    expect(engine.getCellValue(adr('A13'))).toEqual(5)
-    expect(engine.getCellValue(adr('A14'))).toEqual(6)
-    expect(engine.getCellValue(adr('A15'))).toEqual(0)
-    expect(engine.getCellValue(adr('A16'))).toEqual(0)
-    expect(engine.getCellValue(adr('A17'))).toEqual(2)
-    expect(engine.getCellValue(adr('A18'))).toEqual(2)
-    expect(engine.getCellValue(adr('A19'))).toEqual(2)
-    expect(engine.getCellValue(adr('A20'))).toEqual(2)
-    expect(engine.getCellValue(adr('A21'))).toEqual(3)
-    expect(engine.getCellValue(adr('A22'))).toEqual(2)
-    expect(engine.getCellValue(adr('A23'))).toEqual(0)
-    expect(engine.getCellValue(adr('A24'))).toEqual(0)
-    expect(engine.getCellValue(adr('A25'))).toEqual(0)
-    expect(engine.getCellValue(adr('A26'))).toEqual(2)
-    expect(engine.getCellValue(adr('A27'))).toEqual(0)
-    expect(engine.getCellValue(adr('A28'))).toEqual(0)
-    expect(engine.getCellValue(adr('A29'))).toEqual(0)
-    expect(engine.getCellValue(adr('A30'))).toEqual(0)
-    expect(engine.getCellValue(adr('A31'))).toEqual(1)
-    expect(engine.getCellValue(adr('A32'))).toEqual(1)
-    expect(engine.getCellValue(adr('A33'))).toEqual(0)
-    expect(engine.getCellValue(adr('A34'))).toEqual(1)
+
+    expect(engine.getCellValue(adr('A10'))).toBe(1)
+    expect(engine.getCellValue(adr('A11'))).toBe(0)
+    expect(engine.getCellValue(adr('A12'))).toBe(0)
+    expect(engine.getCellValue(adr('A13'))).toBe(5)
+    expect(engine.getCellValue(adr('A14'))).toBe(6)
+    expect(engine.getCellValue(adr('A15'))).toBe(0)
+    expect(engine.getCellValue(adr('A16'))).toBe(0)
+    expect(engine.getCellValue(adr('A17'))).toBe(2)
+    expect(engine.getCellValue(adr('A18'))).toBe(2)
+    expect(engine.getCellValue(adr('A19'))).toBe(2)
+    expect(engine.getCellValue(adr('A20'))).toBe(2)
+    expect(engine.getCellValue(adr('A21'))).toBe(3)
+    expect(engine.getCellValue(adr('A22'))).toBe(2)
+    expect(engine.getCellValue(adr('A23'))).toBe(0)
+    expect(engine.getCellValue(adr('A24'))).toBe(0)
+    expect(engine.getCellValue(adr('A25'))).toBe(0)
+    expect(engine.getCellValue(adr('A26'))).toBe(2)
+    expect(engine.getCellValue(adr('A27'))).toBe(0)
+    expect(engine.getCellValue(adr('A28'))).toBe(0)
+    expect(engine.getCellValue(adr('A29'))).toBe(0)
+    expect(engine.getCellValue(adr('A30'))).toBe(0)
+    expect(engine.getCellValue(adr('A31'))).toBe(1)
+    expect(engine.getCellValue(adr('A32'))).toBe(1)
+    expect(engine.getCellValue(adr('A33'))).toBe(0)
+    expect(engine.getCellValue(adr('A34'))).toBe(1)
     // expect(engine.getCellValue(adr('A35'))).toEqual(1)
-    expect(engine.getCellValue(adr('A36'))).toEqual(0)
+    expect(engine.getCellValue(adr('A36'))).toBe(0)
     // expect(engine.getCellValue(adr('A37'))).toEqual(0)
-    expect(engine.getCellValue(adr('A38'))).toEqual(1)
-    expect(engine.getCellValue(adr('A39'))).toEqual(1)
+    expect(engine.getCellValue(adr('A38'))).toBe(1)
+    expect(engine.getCellValue(adr('A39'))).toBe(1)
     // expect(engine.getCellValue(adr('A40'))).toEqual(0)
     // expect(engine.getCellValue(adr('A41'))).toEqual(1)
-    expect(engine.getCellValue(adr('A42'))).toEqual(3)
-    expect(engine.getCellValue(adr('A43'))).toEqual(3)
+    expect(engine.getCellValue(adr('A42'))).toBe(3)
+    expect(engine.getCellValue(adr('A43'))).toBe(3)
     // expect(engine.getCellValue(adr('A44'))).toEqual(3)
-    expect(engine.getCellValue(adr('A45'))).toEqual(0)
-    expect(engine.getCellValue(adr('A46'))).toEqual(1)
-    expect(engine.getCellValue(adr('A47'))).toEqual(0)
-    expect(engine.getCellValue(adr('A48'))).toEqual(2)
-    expect(engine.getCellValue(adr('A49'))).toEqual(2)
+    expect(engine.getCellValue(adr('A45'))).toBe(0)
+    expect(engine.getCellValue(adr('A46'))).toBe(1)
+    expect(engine.getCellValue(adr('A47'))).toBe(0)
+    expect(engine.getCellValue(adr('A48'))).toBe(2)
+    expect(engine.getCellValue(adr('A49'))).toBe(2)
     // expect(engine.getCellValue(adr('C1'))).toEqual('All ok')
   })
 })

@@ -34,15 +34,15 @@ describe('Function UNICODE', () => {
       ['=UNICODE("􏿿")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(33)
-    expect(engine.getCellValue(adr('A3'))).toEqual(65)
-    expect(engine.getCellValue(adr('A4'))).toEqual(90)
-    expect(engine.getCellValue(adr('A5'))).toEqual(209)
-    expect(engine.getCellValue(adr('A6'))).toEqual(255)
-    expect(engine.getCellValue(adr('A7'))).toEqual(84)
-    expect(engine.getCellValue(adr('A8'))).toEqual(8364)
-    expect(engine.getCellValue(adr('A9'))).toEqual(1114111)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(33)
+    expect(engine.getCellValue(adr('A3'))).toBe(65)
+    expect(engine.getCellValue(adr('A4'))).toBe(90)
+    expect(engine.getCellValue(adr('A5'))).toBe(209)
+    expect(engine.getCellValue(adr('A6'))).toBe(255)
+    expect(engine.getCellValue(adr('A7'))).toBe(84)
+    expect(engine.getCellValue(adr('A8'))).toBe(8364)
+    expect(engine.getCellValue(adr('A9'))).toBe(1114111)
   })
 
   it('should return code of first character', () => {
@@ -51,8 +51,8 @@ describe('Function UNICODE', () => {
       ['=UNICODE("Ñbaz")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(65)
-    expect(engine.getCellValue(adr('A2'))).toEqual(209)
+    expect(engine.getCellValue(adr('A1'))).toBe(65)
+    expect(engine.getCellValue(adr('A2'))).toBe(209)
   })
 
   it('should return number', () => {
@@ -72,10 +72,10 @@ describe('Function UNICODE', () => {
       ['=UNICODE(UNICHAR(1114111))']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(128)
-    expect(engine.getCellValue(adr('A3'))).toEqual(256)
-    expect(engine.getCellValue(adr('A4'))).toEqual(8364)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1114111)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(128)
+    expect(engine.getCellValue(adr('A3'))).toBe(256)
+    expect(engine.getCellValue(adr('A4'))).toBe(8364)
+    expect(engine.getCellValue(adr('A5'))).toBe(1114111)
   })
 })

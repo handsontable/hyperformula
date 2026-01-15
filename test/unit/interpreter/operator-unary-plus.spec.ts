@@ -19,7 +19,7 @@ describe('Unary operator PLUS', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBe('3')
-    expect(engine.getCellValue(adr('A2'))).toEqual('foobar')
+    expect(engine.getCellValue(adr('A2'))).toBe('foobar')
   })
 
   it('pass error', () => {
@@ -49,13 +49,15 @@ describe('Unary operator PLUS', () => {
       ['Liz'],
       ['=+A1']
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual('Liz') // UNARY PLUS value
+
+    expect(engine.getCellValue(adr('A2'))).toBe('Liz') // UNARY PLUS value
   })
 
   it('double unary plus', () => {
     const engine = HyperFormula.buildFromArray([
       ['=++2'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 })

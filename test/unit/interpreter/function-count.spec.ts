@@ -12,19 +12,19 @@ describe('COUNT', () => {
   it('COUNT with args', () => {
     const engine = HyperFormula.buildFromArray([['=COUNT(1, B1)', '3.14']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   it('COUNT with range', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=COUNT(A1:A3)']])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(3)
   })
 
   it('COUNT ignores all nonnumeric arguments', () => {
     const engine = HyperFormula.buildFromArray([['foo'], [null], ['=TRUE()'], ['=COUNT(A1:A3)']])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 
   it('over a range value', () => {
@@ -34,7 +34,7 @@ describe('COUNT', () => {
       ['=COUNT(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(4)
+    expect(engine.getCellValue(adr('A3'))).toBe(4)
   })
 
   it('error in ranges', () => {
@@ -45,7 +45,7 @@ describe('COUNT', () => {
       ['=COUNT(MMULT(A1:B3, A1:B3))'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 
   it('doesnt propagate errors', () => {
@@ -55,14 +55,15 @@ describe('COUNT', () => {
       ['=COUNT(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A3'))).toBe(2)
   })
 
   it('should work with explicit error in arg', () => {
     const engine = HyperFormula.buildFromArray([
       ['=COUNT(NA())'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('should work for empty arg', () => {
@@ -70,6 +71,6 @@ describe('COUNT', () => {
       ['=COUNT(1,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 })

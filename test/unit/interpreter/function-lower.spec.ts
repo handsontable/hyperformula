@@ -22,11 +22,11 @@ describe('Function LOWER', () => {
       ['=LOWER("BaR")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('')
-    expect(engine.getCellValue(adr('A2'))).toEqual('')
-    expect(engine.getCellValue(adr('A3'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A4'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A5'))).toEqual('bar')
+    expect(engine.getCellValue(adr('A1'))).toBe('')
+    expect(engine.getCellValue(adr('A2'))).toBe('')
+    expect(engine.getCellValue(adr('A3'))).toBe('foo')
+    expect(engine.getCellValue(adr('A4'))).toBe('foo')
+    expect(engine.getCellValue(adr('A5'))).toBe('bar')
   })
 
   it('should coerce', () => {
@@ -35,7 +35,7 @@ describe('Function LOWER', () => {
       ['=LOWER(0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('true')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0')
+    expect(engine.getCellValue(adr('A1'))).toBe('true')
+    expect(engine.getCellValue(adr('A2'))).toBe('0')
   })
 })

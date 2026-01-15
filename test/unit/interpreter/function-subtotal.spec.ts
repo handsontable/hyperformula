@@ -12,8 +12,8 @@ describe('Function SUBTOTAL', () => {
       [5]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3.5)
-    expect(engine.getCellValue(adr('B1'))).toEqual(3.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(3.5)
+    expect(engine.getCellValue(adr('B1'))).toBe(3.5)
   })
 
   it('should calculate COUNT', () => {
@@ -25,8 +25,8 @@ describe('Function SUBTOTAL', () => {
       [5]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
+    expect(engine.getCellValue(adr('B1'))).toBe(3)
   })
 
   it('should calculate COUNTA', () => {
@@ -38,8 +38,8 @@ describe('Function SUBTOTAL', () => {
       [5]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(4)
-    expect(engine.getCellValue(adr('B1'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(4)
+    expect(engine.getCellValue(adr('B1'))).toBe(4)
   })
 
   it('should calcuate MAX', () => {
@@ -51,8 +51,8 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(5)
-    expect(engine.getCellValue(adr('B1'))).toEqual(5)
+    expect(engine.getCellValue(adr('A1'))).toBe(5)
+    expect(engine.getCellValue(adr('B1'))).toBe(5)
   })
 
   it('should calculate MIN', () => {
@@ -64,8 +64,8 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
   })
 
   it('should calculate PRODUCT', () => {
@@ -77,8 +77,8 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(120)
-    expect(engine.getCellValue(adr('B1'))).toEqual(120)
+    expect(engine.getCellValue(adr('A1'))).toBe(120)
+    expect(engine.getCellValue(adr('B1'))).toBe(120)
   })
 
   it('should calculate STDEV.S', () => {
@@ -116,8 +116,8 @@ describe('Function SUBTOTAL', () => {
       [4]
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(14)
-    expect(engine.getCellValue(adr('B1'))).toEqual(14)
+    expect(engine.getCellValue(adr('A1'))).toBe(14)
+    expect(engine.getCellValue(adr('B1'))).toBe(14)
   })
 
   it('should calculate VAR.S', () => {
@@ -168,6 +168,7 @@ describe('Function SUBTOTAL', () => {
       ['=SUBTOTAL(9, B3:C3)', 1, 1],
       ['=SUBTOTAL(9, B4:C4)', 1, 1],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(6)
   })
 })

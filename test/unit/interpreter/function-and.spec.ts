@@ -62,7 +62,7 @@ describe('Function AND', () => {
       ['=AND(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(true)
+    expect(engine.getCellValue(adr('A3'))).toBe(true)
   })
 
   it('takes at least one argument', () => {
@@ -89,7 +89,7 @@ describe('Function AND', () => {
       ['foo', '=FALSE()', '=AND(A2:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(true)
-    expect(engine.getCellValue(adr('C2'))).toEqual(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('C2'))).toBe(false)
   })
 })

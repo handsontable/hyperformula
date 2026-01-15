@@ -29,6 +29,7 @@ describe('Unparse', () => {
     const formula = '=1+SUM(1, 2, 3)*3'
     const ast = parser.parse(formula, adr('A1')).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
+
     expect(unparsed).toEqual(formula)
   })
 
@@ -117,7 +118,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, adr('A1')).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=#ERROR!')
+    expect(unparsed).toBe('=#ERROR!')
   })
 
   it('#unparse with known error', () => {
@@ -125,7 +126,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, adr('A1')).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=#REF!')
+    expect(unparsed).toBe('=#REF!')
   })
 
   it('#unparse error with data input', () => {
@@ -136,7 +137,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=A100')
+    expect(unparsed).toBe('=A100')
   })
 
   it('#unparse with known error with translation', () => {
@@ -147,7 +148,7 @@ describe('Unparse', () => {
     const ast = parser.parse(formula, adr('A1')).ast
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=#ADR!')
+    expect(unparsed).toBe('=#ADR!')
   })
 
   it('#unparse forgets about downcase', () => {
@@ -156,7 +157,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=SUM(1, 2, 3)')
+    expect(unparsed).toBe('=SUM(1, 2, 3)')
   })
 
   it('#unparse should not forget about spaces', () => {
@@ -165,7 +166,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('= 1 + SUM( 1,2,   3) +A1 / 2 + bar')
+    expect(unparsed).toBe('= 1 + SUM( 1,2,   3) +A1 / 2 + bar')
   })
 
   it('#unparse named expression', () => {
@@ -174,7 +175,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=true')
+    expect(unparsed).toBe('=true')
   })
 
   it('#unparse named expression returns original form', () => {
@@ -186,7 +187,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=SomeWEIRD_name')
+    expect(unparsed).toBe('=SomeWEIRD_name')
   })
 
   it('#unparse named expression use local version if available', () => {
@@ -199,7 +200,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=SomeWEIRD_NAME')
+    expect(unparsed).toBe('=SomeWEIRD_NAME')
   })
 
   it('#unparse nonexisting named expression returns original input', () => {
@@ -210,7 +211,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=someWeird_Name')
+    expect(unparsed).toBe('=someWeird_Name')
   })
 
   it('#unparse nonexisting named expression returns original input when global named expression is removed', () => {
@@ -223,7 +224,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=someWeird_Name')
+    expect(unparsed).toBe('=someWeird_Name')
   })
 
   it('#unparse forgets about OFFSET', () => {
@@ -232,7 +233,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=D4')
+    expect(unparsed).toBe('=D4')
   })
 
   it('#unparse doesnt forget about unnecessary parenthesis', () => {
@@ -241,7 +242,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=(1+2)')
+    expect(unparsed).toBe('=(1+2)')
   })
 
   it('#unparse do not forgets about sheet reference', () => {
@@ -250,7 +251,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=Sheet1!C3')
+    expect(unparsed).toBe('=Sheet1!C3')
   })
 
   it('#unparse necessary parenthesis from left subtree', () => {
@@ -259,7 +260,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=(1+2)*3')
+    expect(unparsed).toBe('=(1+2)*3')
   })
 
   it('#unparse necessary parenthesis from right subtree', () => {
@@ -268,7 +269,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=3*(1+2)')
+    expect(unparsed).toBe('=3*(1+2)')
   })
 
   it('#unparse doesnt use parenthesis for the same operations', () => {
@@ -277,7 +278,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=4*3*2')
+    expect(unparsed).toBe('=4*3*2')
   })
 
   it('#unparse doesnt use parenthesis for different operations of same precedece', () => {
@@ -355,8 +356,8 @@ describe('Unparse', () => {
 
     const ast = parser.parse(formula, adr('A1')).ast
 
-    expect(unparserPL.unparse(ast, adr('A1'))).toEqual('=SUMA(1, 2)')
-    expect(unparserEN.unparse(ast, adr('A1'))).toEqual('=SUM(1, 2)')
+    expect(unparserPL.unparse(ast, adr('A1'))).toBe('=SUMA(1, 2)')
+    expect(unparserEN.unparse(ast, adr('A1'))).toBe('=SUM(1, 2)')
   })
 
   it('unparsing sheet names in references sometimes have to wrap in quotes', () => {
@@ -389,7 +390,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1', 0))
 
-    expect(unparsed).toEqual('=Sheet2!A1:B1')
+    expect(unparsed).toBe('=Sheet2!A1:B1')
   })
 
   it('unparsing range with sheet name on both sides', () => {
@@ -398,7 +399,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1', 0))
 
-    expect(unparsed).toEqual('=Sheet1!A1:Sheet2!B1')
+    expect(unparsed).toBe('=Sheet1!A1:Sheet2!B1')
   })
 
   it('unparsing function without translation should unparse to canonical name', () => {
@@ -407,7 +408,7 @@ describe('Unparse', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=FOOBAR(1, 2, 3)')
+    expect(unparsed).toBe('=FOOBAR(1, 2, 3)')
   })
 
   it('unparsing numbers with decimal separator', () => {
@@ -540,7 +541,7 @@ describe('whitespaces', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=  A1:A2')
+    expect(unparsed).toBe('=  A1:A2')
   })
 
   it('should unparse formula with leading and internal whitespace', () => {
@@ -558,7 +559,7 @@ describe('whitespaces', () => {
 
     const unparsed = unparser.unparse(ast, adr('A1'))
 
-    expect(unparsed).toEqual('=  SUM( A1,   A2   )')
+    expect(unparsed).toBe('=  SUM( A1,   A2   )')
   })
 
   it('should unparse parenthesis with leading and internal whitespace', () => {

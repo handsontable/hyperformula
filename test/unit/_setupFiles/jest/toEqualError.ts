@@ -10,6 +10,9 @@ declare global {
 }
 
 export const toEqualError: ExpectExtendMap = {
+  /**
+   *
+   */
   toEqualError(received: any, expected: any): CustomMatcherResult {
     let result = false
 

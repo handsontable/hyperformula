@@ -14,6 +14,9 @@ const MAX_48BIT_INTEGER = 281474976710655
 const SHIFT_MIN_POSITIONS = -53
 const SHIFT_MAX_POSITIONS = 53
 
+/**
+ *
+ */
 export class BitShiftPlugin extends FunctionPlugin implements FunctionPluginTypecheck<BitShiftPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'BITLSHIFT': {
@@ -32,15 +35,26 @@ export class BitShiftPlugin extends FunctionPlugin implements FunctionPluginType
     },
   }
 
+  
+  /**
+   *
+   */
   public bitlshift(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITLSHIFT'), shiftLeft)
   }
 
+  
+  /**
+   *
+   */
   public bitrshift(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BITRSHIFT'), shiftRight)
   }
 }
 
+/**
+ *
+ */
 function shiftLeft(value: number, positions: number): number | CellError {
   if (positions < 0) {
     return shiftRight(value, -positions)
@@ -49,6 +63,9 @@ function shiftLeft(value: number, positions: number): number | CellError {
   }
 }
 
+/**
+ *
+ */
 function shiftRight(value: number, positions: number): number | CellError {
   if (positions < 0) {
     return shiftLeft(value, -positions)
@@ -57,6 +74,9 @@ function shiftRight(value: number, positions: number): number | CellError {
   }
 }
 
+/**
+ *
+ */
 function validate(result: number): number | CellError {
   if (result > MAX_48BIT_INTEGER) {
     return new CellError(ErrorType.NUM, ErrorMessage.BitshiftLong)

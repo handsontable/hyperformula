@@ -28,10 +28,10 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(-12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('10')
-    expect(engine.getCellValue(adr('A3'))).toEqual('1100010')
-    expect(engine.getCellValue(adr('A4'))).toEqual('1111110100')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('10')
+    expect(engine.getCellValue(adr('A3'))).toBe('1100010')
+    expect(engine.getCellValue(adr('A4'))).toBe('1111110100')
   })
 
   it('should work for numeric strings', () => {
@@ -40,8 +40,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN("-15")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1111011')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1111110001')
+    expect(engine.getCellValue(adr('A1'))).toBe('1111011')
+    expect(engine.getCellValue(adr('A2'))).toBe('1111110001')
   })
 
   it('should work for reference', () => {
@@ -50,7 +50,7 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('1100')
+    expect(engine.getCellValue(adr('A2'))).toBe('1100')
   })
 
   it('should return string value', () => {
@@ -70,8 +70,8 @@ describe('function DEC2BIN', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual('1000000000')
-    expect(engine.getCellValue(adr('A3'))).toEqual('111111111')
+    expect(engine.getCellValue(adr('A2'))).toBe('1000000000')
+    expect(engine.getCellValue(adr('A3'))).toBe('111111111')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
@@ -81,8 +81,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(5, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('00000010')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0101')
+    expect(engine.getCellValue(adr('A1'))).toBe('00000010')
+    expect(engine.getCellValue(adr('A2'))).toBe('0101')
   })
 
   it('should fail if the result is longer than the desired number of digits', () => {
@@ -101,8 +101,8 @@ describe('function DEC2BIN', () => {
       ['=DEC2BIN(-2, 10)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1111111110')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1111111110')
+    expect(engine.getCellValue(adr('A1'))).toBe('1111111110')
+    expect(engine.getCellValue(adr('A2'))).toBe('1111111110')
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {

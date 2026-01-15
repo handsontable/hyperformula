@@ -29,7 +29,7 @@ describe('COVARIANCE.P', () => {
       ['=COVARIANCE.P(A1:A2, B1:B2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(2.5)
+    expect(engine.getCellValue(adr('A3'))).toBe(2.5)
   })
 
   it('error when not enough data', () => {
@@ -53,7 +53,7 @@ describe('COVARIANCE.P', () => {
     ])
 
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(3.72)
-    expect(engine.getCellValue(adr('A7'))).toEqual(0)
+    expect(engine.getCellValue(adr('A7'))).toBe(0)
   })
 
   it('doesnt do coercions, nonnumeric values are skipped', () => {
@@ -64,7 +64,7 @@ describe('COVARIANCE.P', () => {
       ['=COVARIANCE.P(A1:A3, B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(10)
+    expect(engine.getCellValue(adr('A4'))).toBe(10)
   })
 
   it('over a range value', () => {
@@ -74,7 +74,7 @@ describe('COVARIANCE.P', () => {
       ['=COVARIANCE.P(MMULT(A1:B2, A1:B2), MMULT(B1:C2, B1:C2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(122.25)
+    expect(engine.getCellValue(adr('A3'))).toBe(122.25)
   })
 
   it('propagates errors', () => {

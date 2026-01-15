@@ -29,7 +29,7 @@ describe('SLOPE', () => {
       ['=SLOPE(A1:C1, A2:C2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(-0.5)
+    expect(engine.getCellValue(adr('A3'))).toBe(-0.5)
   })
 
   it('works', () => {
@@ -67,7 +67,7 @@ describe('SLOPE', () => {
       ['=SLOPE(A1:A4, B1:B4)'],
     ])
 
-    expect(engine.getCellValue(adr('A5'))).toEqual(-0.5)
+    expect(engine.getCellValue(adr('A5'))).toBe(-0.5)
   })
 
   it('over a range value', () => {

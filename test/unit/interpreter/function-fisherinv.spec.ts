@@ -29,7 +29,7 @@ describe('Function FISHERINV', () => {
       ['=FISHERINV(-5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.46211715726001, 6)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.999909204262595, 6)
   })

@@ -17,6 +17,7 @@ describe('Function VARA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARA(2, 3)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.5, 6)
   })
 
@@ -24,6 +25,7 @@ describe('Function VARA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARA(2, 3, 4, TRUE(), FALSE(), "1",)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.28571428571429)
   })
 
@@ -31,6 +33,7 @@ describe('Function VARA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARA(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2.61904761904762)
   })
 
@@ -38,6 +41,7 @@ describe('Function VARA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=VARA(B1:I1)', 2, 3, 4, '=NA()', false, 'a', '\'1', null],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

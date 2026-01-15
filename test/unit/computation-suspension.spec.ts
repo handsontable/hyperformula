@@ -24,15 +24,19 @@ describe('Evaluation suspension', () => {
     expect(() => {
       engine.getCellValue(adr('C1'))
     }).toThrow(new EvaluationSuspendedError())
+
     expect(() => {
       engine.getSheetValues(0)
     }).toThrow(new EvaluationSuspendedError())
+
     expect(() => {
       engine.getAllSheetsValues()
     }).toThrow(new EvaluationSuspendedError())
+
     expect(() => {
       engine.getRangeValues(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     }).toThrow(new EvaluationSuspendedError())
+
     expect(() => {
       engine.getNamedExpressionValue('FOO')
     }).toThrow(new EvaluationSuspendedError())
@@ -48,12 +52,15 @@ describe('Evaluation suspension', () => {
     expect(() => {
       engine.getCellSerialized(adr('C1'))
     }).toThrow(new EvaluationSuspendedError())
+
     expect(() => {
       engine.getSheetSerialized(0)
     }).toThrow(new EvaluationSuspendedError())
+
     expect(() => {
       engine.getAllSheetsSerialized()
     }).toThrow(new EvaluationSuspendedError())
+
     expect(() => {
       engine.getRangeSerialized(AbsoluteCellRange.spanFrom(adr('A1'), 1, 2))
     }).toThrow(new EvaluationSuspendedError())
@@ -93,7 +100,7 @@ describe('Evaluation suspension', () => {
     engine.suspendEvaluation()
     engine.setCellContents(adr('C1'), [['=A1+78']])
 
-    expect(engine.getCellFormula(adr('C1'))).toEqual('=A1+78')
+    expect(engine.getCellFormula(adr('C1'))).toBe('=A1+78')
     expect(engine.getSheetFormulas(0)).toEqual([[undefined, undefined, '=A1+78']])
     expect(engine.getAllSheetsFormulas()).toEqual({Sheet1: [[undefined, undefined, '=A1+78']]})
     expect(engine.getRangeFormulas(AbsoluteCellRange.spanFrom(adr('A1'), 3, 1))).toEqual([[undefined, undefined, '=A1+78']])
@@ -108,7 +115,7 @@ describe('Evaluation suspension', () => {
 
     engine.addRows(0, [1, 1])
 
-    expect(engine.getCellFormula(adr('C1'))).toEqual('=A3+42')
+    expect(engine.getCellFormula(adr('C1'))).toBe('=A3+42')
   })
 
   it('resuming evaluation', () => {
@@ -187,7 +194,7 @@ describe('Evaluation suspension', () => {
 
     engine.undo()
 
-    expect(engine.getCellFormula(adr('C1'))).toEqual('=A2+42')
+    expect(engine.getCellFormula(adr('C1'))).toBe('=A2+42')
   })
 
   it('#1291 - neighboring cell changes of an array formula should be emitted', () => {
@@ -199,7 +206,8 @@ describe('Evaluation suspension', () => {
     engine.setCellContents(adr('C1'), '5')
 
     const changes = engine.resumeEvaluation()
-    expect(changes.length).toEqual(5)
+
+    expect(changes.length).toBe(5)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A1'), 1))
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 2))
     expect(changes).toContainEqual(new ExportedCellChange(adr('A3'), 3))
@@ -222,6 +230,7 @@ describe('Evaluation suspension', () => {
     hf.setCellContents(adr('A1'), '=42')
     hf.setCellContents(adr('A1'), '=42')
     hf.resumeEvaluation()
+
     expect(hf.getCellValue(adr('A1'))).toBe(42)
   })
 })

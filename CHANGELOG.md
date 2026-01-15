@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added configurable numeric precision system for financial calculations. The new `numericImplementation` option allows choosing between `'precise'` (using decimal.js for exact decimal arithmetic) and `'native'` (standard JavaScript numbers). Default is `'precise'`.
+- Added `numericDigits` configuration option to set the number of significant digits (default: 34).
+- Added `numericRounding` configuration option with support for multiple rounding modes including banker's rounding (ROUND_HALF_EVEN).
+- Added `getCellValueWithPrecision` method to retrieve cell values as precise strings without floating-point conversion.
+- Added new exports: `Numeric`, `NumericFactory`, `NumericConfig`, `NumericImplementation`, `RoundingMode`, `NumericProvider`, `DecimalNumericFactory`, `NativeNumericFactory`, `isNumeric`.
+
+### Changed
+
+- Internal numeric calculations now use the configurable `Numeric` interface, allowing for pluggable numeric implementations.
+
 ## [3.1.1] - 2025-12-18
 
 ### Fixed

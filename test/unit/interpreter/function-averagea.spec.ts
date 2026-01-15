@@ -15,7 +15,7 @@ describe('AVERAGEA', () => {
       ['=AVERAGEA(1, B1)', '4']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(2.5)
   })
 
   it('AVERAGEA with range', () => {
@@ -36,9 +36,9 @@ describe('AVERAGEA', () => {
       ['39', null, '=AVERAGEA(A3:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(19.5)
-    expect(engine.getCellValue(adr('C2'))).toEqual(20)
-    expect(engine.getCellValue(adr('C3'))).toEqual(39)
+    expect(engine.getCellValue(adr('C1'))).toBe(19.5)
+    expect(engine.getCellValue(adr('C2'))).toBe(20)
+    expect(engine.getCellValue(adr('C3'))).toBe(39)
   })
 
   it('error when no meaningful arguments', () => {
@@ -49,7 +49,7 @@ describe('AVERAGEA', () => {
     ])
 
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('B3'))).toEqual(0)
+    expect(engine.getCellValue(adr('B3'))).toBe(0)
   })
 
   it('over a range value', () => {
@@ -59,7 +59,7 @@ describe('AVERAGEA', () => {
       ['=AVERAGEA(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(13.5)
+    expect(engine.getCellValue(adr('A3'))).toBe(13.5)
   })
 
   it('does propagate errors', () => {

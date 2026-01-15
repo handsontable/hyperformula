@@ -17,9 +17,9 @@ describe('Function ISPMT', () => {
       ['=ISPMT(1, 1, 10, 1)', '=ISPMT(1, 1, 0, 1)', '=ISPMT(1, -1, 1, 1)', '=ISPMT(-1, -1, 1, -1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-0.9)
+    expect(engine.getCellValue(adr('A1'))).toBe(-0.9)
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('C1'))).toEqual(-2)
-    expect(engine.getCellValue(adr('D1'))).toEqual(-2)
+    expect(engine.getCellValue(adr('C1'))).toBe(-2)
+    expect(engine.getCellValue(adr('D1'))).toBe(-2)
   })
 })

@@ -33,13 +33,13 @@ describe('function BASE', () => {
       ['=BASE(1234123412341230, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('001')
-    expect(engine.getCellValue(adr('A2'))).toEqual('2')
-    expect(engine.getCellValue(adr('A3'))).toEqual('23')
-    expect(engine.getCellValue(adr('A4'))).toEqual('00000011E')
-    expect(engine.getCellValue(adr('A5'))).toEqual('J7')
-    expect(engine.getCellValue(adr('A6'))).toEqual('LX')
-    expect(engine.getCellValue(adr('A7'))).toEqual('100011000100110110110111111100110100000000111101110')
+    expect(engine.getCellValue(adr('A1'))).toBe('001')
+    expect(engine.getCellValue(adr('A2'))).toBe('2')
+    expect(engine.getCellValue(adr('A3'))).toBe('23')
+    expect(engine.getCellValue(adr('A4'))).toBe('00000011E')
+    expect(engine.getCellValue(adr('A5'))).toBe('J7')
+    expect(engine.getCellValue(adr('A6'))).toBe('LX')
+    expect(engine.getCellValue(adr('A7'))).toBe('100011000100110110110111111100110100000000111101110')
   })
 
   it('should work for numeric strings', () => {
@@ -48,8 +48,8 @@ describe('function BASE', () => {
       ['=BASE("1234", 16)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1323')
-    expect(engine.getCellValue(adr('A2'))).toEqual('4D2')
+    expect(engine.getCellValue(adr('A1'))).toBe('1323')
+    expect(engine.getCellValue(adr('A2'))).toBe('4D2')
   })
 
   it('should return string value', () => {
@@ -66,8 +66,8 @@ describe('function BASE', () => {
       ['=BASE(94862, "33", 16)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('002')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0000000000002L3K')
+    expect(engine.getCellValue(adr('A1'))).toBe('002')
+    expect(engine.getCellValue(adr('A2'))).toBe('0000000000002L3K')
   })
 
   it('should return result as is if padding shorter than result', () => {
@@ -75,7 +75,7 @@ describe('function BASE', () => {
       ['=BASE(123, 2, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1111011')
+    expect(engine.getCellValue(adr('A1'))).toBe('1111011')
   })
 
   it('should return error for negative values', () => {
@@ -95,8 +95,8 @@ describe('function BASE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual('10')
-    expect(engine.getCellValue(adr('A3'))).toEqual('2')
+    expect(engine.getCellValue(adr('A2'))).toBe('10')
+    expect(engine.getCellValue(adr('A3'))).toBe('2')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })

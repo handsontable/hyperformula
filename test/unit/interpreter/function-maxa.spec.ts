@@ -19,7 +19,7 @@ describe('MAXA', () => {
   it('MAXA with range', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MAXA(A1:A3)']])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(3)
   })
 
   it('does only boolean coercions', () => {
@@ -30,20 +30,22 @@ describe('MAXA', () => {
       ['="TRUE"', '=MAXA(A4)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
-    expect(engine.getCellValue(adr('B2'))).toEqual(1)
-    expect(engine.getCellValue(adr('B3'))).toEqual(0)
-    expect(engine.getCellValue(adr('B4'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
+    expect(engine.getCellValue(adr('B2'))).toBe(1)
+    expect(engine.getCellValue(adr('B3'))).toBe(0)
+    expect(engine.getCellValue(adr('B4'))).toBe(0)
   })
 
   it('MAXA of strings and -1', () => {
     const engine = HyperFormula.buildFromArray([['foo'], ['bar'], ['-1'], ['=MAXA(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 
   it('MAXA of empty value', () => {
     const engine = HyperFormula.buildFromArray([['', '=MAXA(A1)']])
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
   it('MAXA of empty value and some negative number', () => {
@@ -51,8 +53,9 @@ describe('MAXA', () => {
       ['', '-1', '=MAXA(A1,B1)'],
       [null, '-1', '=MAXA(A2,B2)'],
     ])
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
-    expect(engine.getCellValue(adr('C2'))).toEqual(-1)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(0)
+    expect(engine.getCellValue(adr('C2'))).toBe(-1)
   })
 
   it('over a range value', () => {
@@ -62,7 +65,7 @@ describe('MAXA', () => {
       ['=MAXA(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(22)
+    expect(engine.getCellValue(adr('A3'))).toBe(22)
   })
 
   it('propagates errors', () => {

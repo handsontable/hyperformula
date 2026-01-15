@@ -22,9 +22,10 @@ describe('Function MIRR', () => {
       ['=MIRR(B4:D4, 0.2, 0.1)', -1, -1, 1],
       ['=MIRR(B5:D5, -2, 1)', 3, 4, -3]
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.257018945686308, 6)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.161201673643132, 6)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.261451054124004, 6) // different value without 0
     expect(engine.getCellValue(adr('A5'))).toBeCloseTo(1.58198889747161, 6)
@@ -35,6 +36,7 @@ describe('Function MIRR', () => {
       ['=MIRR(B1:E1,0.2,0.1)', -1, 0, -1, -1],
       ['=MIRR(B2:E2,0.2,0.1)', 1, 0, 1, 1],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
@@ -44,6 +46,7 @@ describe('Function MIRR', () => {
       ['=MIRR(B1:E1,-1,0.1)', -1, 1, -1, -1],
       ['=MIRR(B2:E2,0.2,-1)', 1, -1, 1, 1],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
@@ -61,6 +64,7 @@ describe('Function MIRR', () => {
       ['=MIRR(B1:E1,-1,0.1)', -1, 1, '=CONCATENATE(FOO)', -1],
       ['=MIRR(B2:E2,0.2,-1)', 1, '=FIND("h","bar")', 1, 1],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FOO')))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
   })

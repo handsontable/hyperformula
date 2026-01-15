@@ -12,6 +12,9 @@ export enum ExtStatType {
 export const EnrichedStatType = {...StatType, ...ExtStatType}
 export type EnrichedStatType = StatType | ExtStatType
 
+/**
+ *
+ */
 export function enrichStatistics(stats: Stats): Stats {
   const initDatastructures = (stats.get(EnrichedStatType.GRAPH_BUILD) || 0) - (stats.get(EnrichedStatType.PARSER) || 0)
   const preprocessing = (stats.get(EnrichedStatType.GRAPH_BUILD) || 0) + (stats.get(EnrichedStatType.TOP_SORT) || 0)
@@ -21,6 +24,9 @@ export function enrichStatistics(stats: Stats): Stats {
   return enriched
 }
 
+/**
+ *
+ */
 export function measureCruds(engine: HyperFormula, name: string, func: (engine: HyperFormula) => void): Stats {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
@@ -37,6 +43,9 @@ export function measureCruds(engine: HyperFormula, name: string, func: (engine: 
   return actualStats
 }
 
+/**
+ *
+ */
 export function statsTreePrint(stats: Stats): void {
   const str =
     `________________________________________________
@@ -53,6 +62,9 @@ ________________________________________________\n`
   console.log(str)
 }
 
+/**
+ *
+ */
 export function statsTreePrintCruds(stats: Stats): void {
   const str =
     `|CRUDS:                                     ${stats.get(EnrichedStatType.CRUDS_TOTAL) || 0}
@@ -68,6 +80,9 @@ ________________________________________________\n`
   console.log(str)
 }
 
+/**
+ *
+ */
 export function reduceStats(stats: Stats[], fn: (_: number[]) => number): Stats {
   const averages = new Map<EnrichedStatType, number>()
 
@@ -79,6 +94,9 @@ export function reduceStats(stats: Stats[], fn: (_: number[]) => number): Stats 
   return averages
 }
 
+/**
+ *
+ */
 export function average(values: number[]): number {
   const sum = values.reduce((sum, value) => {
     return sum + value

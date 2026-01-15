@@ -30,8 +30,8 @@ describe('Function IMSUB', () => {
       ['=IMSUB("-3+4i", "1+i")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('-1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('2i')
-    expect(engine.getCellValue(adr('A3'))).toEqual('-4+3i')
+    expect(engine.getCellValue(adr('A1'))).toBe('-1')
+    expect(engine.getCellValue(adr('A2'))).toBe('2i')
+    expect(engine.getCellValue(adr('A3'))).toBe('-4+3i')
   })
 })

@@ -7,7 +7,8 @@ describe('All functions', () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const metadata = engine._functionRegistry.getMetadata(functionId)
-      expect(metadata).not.toBe(undefined)
+
+      expect(metadata).toBeDefined()
     }
   })
 
@@ -17,7 +18,8 @@ describe('All functions', () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const params = engine._functionRegistry.getMetadata(functionId)?.parameters
-      expect(params).not.toBe(undefined)
+
+      expect(params).toBeDefined()
     }
   })
 })

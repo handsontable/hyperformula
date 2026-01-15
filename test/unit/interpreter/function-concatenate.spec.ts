@@ -13,7 +13,7 @@ describe('function CONCATENATE', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([['John', 'Smith', '=CONCATENATE(A1, B1)']])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual('JohnSmith')
+    expect(engine.getCellValue(adr('C1'))).toBe('JohnSmith')
   })
 
   it('propagate errors', () => {
@@ -38,7 +38,7 @@ describe('function CONCATENATE', () => {
       ['foo', '', 'bar', '=CONCATENATE(A1, B1, C1)'],
     ])
 
-    expect(engine.getCellValue(adr('D1'))).toEqual('foobar')
+    expect(engine.getCellValue(adr('D1'))).toBe('foobar')
   })
 
   it('supports range values', () => {
@@ -48,7 +48,7 @@ describe('function CONCATENATE', () => {
       ['=CONCATENATE(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual('TopleftToprightBottomleftBottomright')
+    expect(engine.getCellValue(adr('A3'))).toBe('TopleftToprightBottomleftBottomright')
   })
 
   it('coerce to strings', () => {
@@ -57,7 +57,7 @@ describe('function CONCATENATE', () => {
       ['=TRUE()', '=42%', '=CONCATENATE(A2:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual('TRUE42')
-    expect(engine.getCellValue(adr('C2'))).toEqual('TRUE0.42')
+    expect(engine.getCellValue(adr('C1'))).toBe('TRUE42')
+    expect(engine.getCellValue(adr('C2'))).toBe('TRUE0.42')
   })
 })

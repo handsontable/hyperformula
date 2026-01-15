@@ -87,6 +87,7 @@ describe('Function MULTINOMIAL', () => {
       ['=MULTINOMIAL(NA(),4)'],
       ['=MULTINOMIAL(B2:C2)', '=NA()', 4],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA))
   })

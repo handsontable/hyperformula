@@ -13,6 +13,9 @@ import {
 import {ConfigParamsList} from './ConfigParams'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ *
+ */
 export function configValueFromParam(inputValue: any, expectedType: string | string[], paramName: ConfigParamsList) {
   if (typeof inputValue === 'undefined') {
     return Config.defaultConfig[paramName]
@@ -31,12 +34,18 @@ export function configValueFromParam(inputValue: any, expectedType: string | str
   }
 }
 
+/**
+ *
+ */
 export function validateNumberToBeAtLeast(value: number, paramName: string, minimum: number) {
   if (value < minimum) {
     throw new ConfigValueTooSmallError(paramName, minimum)
   }
 }
 
+/**
+ *
+ */
 export function validateNumberToBeAtMost(value: number, paramName: string, maximum: number) {
   if (value > maximum) {
     throw new ConfigValueTooBigError(paramName, maximum)
@@ -44,6 +53,9 @@ export function validateNumberToBeAtMost(value: number, paramName: string, maxim
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ *
+ */
 export function configValueFromParamCheck(inputValue: any, typeCheck: (object: any) => boolean, expectedType: string, paramName: ConfigParamsList) {
   if (typeCheck(inputValue)) {
     return inputValue
@@ -54,6 +66,9 @@ export function configValueFromParamCheck(inputValue: any, typeCheck: (object: a
   }
 }
 
+/**
+ *
+ */
 export function configCheckIfParametersNotInConflict(...params: { value: number | string | boolean, name: string }[]) {
   const valuesMap: Map<number | string | boolean, string[]> = new Map()
 
@@ -78,6 +93,9 @@ export function configCheckIfParametersNotInConflict(...params: { value: number 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ *
+ */
 export function validateArgToType(inputValue: any, expectedType: string, paramName: string) {
   if (typeof inputValue !== expectedType) {
     throw new ExpectedValueOfTypeError(expectedType, paramName)

@@ -2,13 +2,25 @@ import {CellValueChange, ChangeExporter, ContentChanges} from '../../src/Content
 import {SimpleRangeValue} from '../../src/SimpleRangeValue'
 import {adr} from './testUtils'
 
+/**
+ *
+ */
 class SimpleChangeExporter implements ChangeExporter<CellValueChange> {
+  /**
+   *
+   */
   exportChange(change: CellValueChange): CellValueChange {
     return {address: change.address, value: change.value}
   }
 }
 
+/**
+ *
+ */
 class SpreadRangeExporter implements ChangeExporter<CellValueChange> {
+  /**
+   *
+   */
   exportChange(change: CellValueChange): CellValueChange | CellValueChange[] {
     const value = change.value
     const address = change.address
@@ -29,7 +41,7 @@ describe('ContentChanges', () => {
   it('should be empty', () => {
     const contentChanges = ContentChanges.empty()
 
-    expect(contentChanges.isEmpty()).toEqual(true)
+    expect(contentChanges.isEmpty()).toBe(true)
   })
 
   it('should replace simple value change', () => {
@@ -39,7 +51,8 @@ describe('ContentChanges', () => {
     contentChanges.addChange(2, adr('A1'))
 
     const exportedChanges = contentChanges.exportChanges(simpleChangeExporter)
-    expect(exportedChanges.length).toEqual(1)
+
+    expect(exportedChanges.length).toBe(1)
     expect(exportedChanges).toContainEqual({address: adr('A1'), value: 2})
   })
 
@@ -50,8 +63,8 @@ describe('ContentChanges', () => {
 
     const exportedChanges = contentChanges.exportChanges(simpleChangeExporter)
 
-    expect(contentChanges.isEmpty()).toEqual(false)
-    expect(exportedChanges.length).toEqual(1)
+    expect(contentChanges.isEmpty()).toBe(false)
+    expect(exportedChanges.length).toBe(1)
     expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
   })
 
@@ -62,7 +75,7 @@ describe('ContentChanges', () => {
 
     const exportedChanges = contentChanges.exportChanges(simpleChangeExporter)
 
-    expect(exportedChanges.length).toEqual(1)
+    expect(exportedChanges.length).toBe(1)
     expect(exportedChanges).toContainEqual({address: adr('A1'), value: SimpleRangeValue.onlyValues([['foo', 'bar']])})
   })
 
@@ -75,7 +88,8 @@ describe('ContentChanges', () => {
     contentChanges.addAll(otherChanges)
 
     const exportedChanges = contentChanges.exportChanges(simpleChangeExporter)
-    expect(exportedChanges.length).toEqual(2)
+
+    expect(exportedChanges.length).toBe(2)
     expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
     expect(exportedChanges).toContainEqual({address: adr('A2'), value: 2})
   })
@@ -86,7 +100,7 @@ describe('ContentChanges', () => {
 
     const exportedChanges = contentChanges.exportChanges(spreadRangeExporter)
 
-    expect(exportedChanges.length).toEqual(4)
+    expect(exportedChanges.length).toBe(4)
     expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
     expect(exportedChanges).toContainEqual({address: adr('B1'), value: 2})
     expect(exportedChanges).toContainEqual({address: adr('A2'), value: 'foo'})
@@ -103,7 +117,8 @@ describe('ContentChanges', () => {
     contentChanges.addAll(otherChanges)
 
     const exportedChanges = contentChanges.exportChanges(spreadRangeExporter)
-    expect(exportedChanges.length).toEqual(5)
+
+    expect(exportedChanges.length).toBe(5)
     expect(exportedChanges).toContainEqual({address: adr('A1'), value: 1})
     expect(exportedChanges).toContainEqual({address: adr('A2'), value: 2})
     expect(exportedChanges).toContainEqual({address: adr('A3'), value: 3})

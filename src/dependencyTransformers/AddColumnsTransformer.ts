@@ -12,6 +12,9 @@ import {RowAddress} from '../parser/RowAddress'
 import {ColumnsSpan} from '../Span'
 import {Transformer} from './Transformer'
 
+/**
+ *
+ */
 export class AddColumnsTransformer extends Transformer {
   constructor(
     public readonly columnsSpan: ColumnsSpan
@@ -19,30 +22,58 @@ export class AddColumnsTransformer extends Transformer {
     super()
   }
 
+  
+  /**
+   *
+   */
   public get sheet(): number {
     return this.columnsSpan.sheet
   }
 
+  
+  /**
+   *
+   */
   public isIrreversible() {
     return false
   }
 
+  
+  /**
+   *
+   */
   protected transformRowRangeAst(ast: RowRangeAst, _formulaAddress: SimpleCellAddress): Ast {
     return ast
   }
 
+  
+  /**
+   *
+   */
   protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
     return this.transformRange(start, end, formulaAddress)
   }
 
+  
+  /**
+   *
+   */
   protected transformRowRange(_start: RowAddress, _end: RowAddress, _formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
     throw Error('Not implemented')
   }
 
+  
+  /**
+   *
+   */
   protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
     return this.transformRange(start, end, formulaAddress)
   }
 
+  
+  /**
+   *
+   */
   protected transformCellAddress<T extends AddressWithColumn>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {
     const absoluteDependencySheet = absoluteSheetReference(dependencyAddress, formulaAddress)
     // Case 4 and 5
@@ -102,6 +133,10 @@ export class AddColumnsTransformer extends Transformer {
     }
   }
 
+  
+  /**
+   *
+   */
   protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
     if (this.columnsSpan.sheet === address.sheet && this.columnsSpan.columnStart <= address.col) {
       return {
@@ -113,6 +148,10 @@ export class AddColumnsTransformer extends Transformer {
     }
   }
 
+  
+  /**
+   *
+   */
   private transformRange<T extends AddressWithColumn>(start: T, end: T, formulaAddress: SimpleCellAddress): [T, T] | ErrorType.REF | false {
     const newStart = this.transformCellAddress(start, formulaAddress)
     const newEnd = this.transformCellAddress(end, formulaAddress)

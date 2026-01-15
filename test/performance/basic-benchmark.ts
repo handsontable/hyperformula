@@ -4,6 +4,9 @@ import {expectedValues as expectedValuesA, sheet as sheetAGenerator} from './she
 import {expectedValues as expectedValuesB, sheet as sheetBGenerator} from './sheets/10-sheet-b'
 import {sheet as columnRangesGenerator} from './sheets/column-ranges'
 
+/**
+ *
+ */
 export function runBasicBenchmark(): BenchmarkResult[] {
   const result: BenchmarkResult[] = []
   const sheetA = sheetAGenerator()

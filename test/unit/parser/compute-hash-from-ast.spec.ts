@@ -21,6 +21,9 @@ describe('Compute hash from ast', () => {
   const lexer = new FormulaLexer(buildLexerConfig(config))
   const parser = buildEmptyParserWithCaching(config, sheetMapping)
 
+  /**
+   *
+   */
   function expectHashFromAstMatchHashFromTokens(formula: string) {
     const baseAddress = adr('A1')
     const ast = parser.parse(formula, baseAddress).ast
@@ -186,7 +189,8 @@ describe('Compute hash from ast', () => {
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const hash = parser.computeHashFromAst(ast)
-    expect(hash).toEqual('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0R0, #0R0:#1R0 ) + #DIV/0!')
+
+    expect(hash).toBe('= - 1 + 2 / 3 - 4 % * (1 + 2 ) + SUM( #0R0, #0R0:#1R0 ) + #DIV/0!')
   })
 
   it('should skip whitespaces before function args separators', () => {
@@ -194,7 +198,8 @@ describe('Compute hash from ast', () => {
     const address = adr('A1')
     const ast = parser.parse(formula, address).ast
     const hash = parser.computeHashFromAst(ast)
-    expect(hash).toEqual('=SUM(#0R0, #1R0)')
+
+    expect(hash).toBe('=SUM(#0R0, #1R0)')
   })
 
   it('should not skip whitespaces when there is empty arg', () => {

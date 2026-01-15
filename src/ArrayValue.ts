@@ -20,28 +20,50 @@ export interface CellArray {
   simpleRangeValue(): SimpleRangeValue | CellError,
 }
 
+/**
+ *
+ */
 export class NotComputedArray implements CellArray {
   constructor(public readonly size: ArraySize) {
   }
 
+  
+  /**
+   *
+   */
   public width(): number {
     return this.size.width
   }
 
+  
+  /**
+   *
+   */
   public height(): number {
     return this.size.height
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
+  /**
+   *
+   */
   public get(col: number, row: number): number {
     throw Error('Array not computed yet.')
   }
 
+  
+  /**
+   *
+   */
   simpleRangeValue(): SimpleRangeValue {
     throw Error('Array not computed yet.')
   }
 }
 
+/**
+ *
+ */
 export class ArrayValue implements CellArray {
   public size: ArraySize
   private readonly array: InternalScalarValue[][]
@@ -55,6 +77,10 @@ export class ArrayValue implements CellArray {
     }
   }
 
+  
+  /**
+   *
+   */
   static fromInterpreterValue(value: InterpreterValue) {
     if (value instanceof SimpleRangeValue) {
       return new ArrayValue(value.data)
@@ -63,15 +89,27 @@ export class ArrayValue implements CellArray {
     }
   }
 
+  
+  /**
+   *
+   */
   simpleRangeValue(): SimpleRangeValue {
     return SimpleRangeValue.onlyValues(this.array)
   }
 
+  
+  /**
+   *
+   */
   public addRows(aboveRow: number, numberOfRows: number) {
     this.array.splice(aboveRow, 0, ...this.nullArrays(numberOfRows, this.width()))
     this.size.height += numberOfRows
   }
 
+  
+  /**
+   *
+   */
   public addColumns(aboveColumn: number, numberOfColumns: number) {
     for (let i = 0; i < this.height(); i++) {
       this.array[i].splice(aboveColumn, 0, ...new Array(numberOfColumns).fill(EmptyValue))
@@ -79,6 +117,10 @@ export class ArrayValue implements CellArray {
     this.size.width += numberOfColumns
   }
 
+  
+  /**
+   *
+   */
   public removeRows(startRow: number, endRow: number) {
     if (this.outOfBound(0, startRow) || this.outOfBound(0, endRow)) {
       throw Error('Array index out of bound')
@@ -88,6 +130,10 @@ export class ArrayValue implements CellArray {
     this.size.height -= numberOfRows
   }
 
+  
+  /**
+   *
+   */
   public removeColumns(leftmostColumn: number, rightmostColumn: number) {
     if (this.outOfBound(leftmostColumn, 0) || this.outOfBound(rightmostColumn, 0)) {
       throw Error('Array index out of bound')
@@ -99,6 +145,10 @@ export class ArrayValue implements CellArray {
     this.size.width -= numberOfColumns
   }
 
+  
+  /**
+   *
+   */
   public nullArrays(count: number, size: number) {
     const result = []
     for (let i = 0; i < count; ++i) {
@@ -107,6 +157,10 @@ export class ArrayValue implements CellArray {
     return result
   }
 
+  
+  /**
+   *
+   */
   public get(col: number, row: number): InternalScalarValue {
     if (this.outOfBound(col, row)) {
       throw Error('Array index out of bound')
@@ -114,6 +168,10 @@ export class ArrayValue implements CellArray {
     return this.array[row][col]
   }
 
+  
+  /**
+   *
+   */
   public set(col: number, row: number, value: number): void {
     if (this.outOfBound(col, row)) {
       throw Error('Array index out of bound')
@@ -121,18 +179,34 @@ export class ArrayValue implements CellArray {
     this.array[row][col] = value
   }
 
+  
+  /**
+   *
+   */
   public width(): number {
     return this.size.width
   }
 
+  
+  /**
+   *
+   */
   public height(): number {
     return this.size.height
   }
 
+  
+  /**
+   *
+   */
   public raw(): InternalScalarValue[][] {
     return this.array
   }
 
+  
+  /**
+   *
+   */
   public resize(newSize: ArraySize) {
     if (this.height() < newSize.height && isFinite(newSize.height)) {
       this.addRows(this.height(), newSize.height - this.height())
@@ -148,11 +222,18 @@ export class ArrayValue implements CellArray {
     }
   }
 
+  
+  /**
+   *
+   */
   private outOfBound(col: number, row: number): boolean {
     return col < 0 || row < 0 || row > this.size.height - 1 || col > this.size.width - 1
   }
 }
 
+/**
+ *
+ */
 export class ErroredArray implements CellArray {
   constructor(
     private readonly error: CellError,
@@ -161,18 +242,34 @@ export class ErroredArray implements CellArray {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  
+  /**
+   *
+   */
   public get(col: number, row: number): CellError {
     return this.error
   }
 
+  
+  /**
+   *
+   */
   public width(): number {
     return this.size.width
   }
 
+  
+  /**
+   *
+   */
   public height(): number {
     return this.size.height
   }
 
+  
+  /**
+   *
+   */
   simpleRangeValue(): CellError {
     return this.error
   }

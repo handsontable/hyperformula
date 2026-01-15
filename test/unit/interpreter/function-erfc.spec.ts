@@ -29,7 +29,7 @@ describe('Function ERFC', () => {
       ['=ERFC(0.5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.004677734981047288, 6)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.4795001221869535, 6)
   })

@@ -22,13 +22,14 @@ describe('Function WORKDAY', () => {
       ['=WORKDAY(1000, 0.9)'],
       ['=WORKDAY(1000, -0.9)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1003)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1003)
-    expect(engine.getCellValue(adr('A3'))).toEqual(999)
-    expect(engine.getCellValue(adr('A4'))).toEqual(999)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1000)
-    expect(engine.getCellValue(adr('A6'))).toEqual(1000)
-    expect(engine.getCellValue(adr('A7'))).toEqual(1000)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1003)
+    expect(engine.getCellValue(adr('A2'))).toBe(1003)
+    expect(engine.getCellValue(adr('A3'))).toBe(999)
+    expect(engine.getCellValue(adr('A4'))).toBe(999)
+    expect(engine.getCellValue(adr('A5'))).toBe(1000)
+    expect(engine.getCellValue(adr('A6'))).toBe(1000)
+    expect(engine.getCellValue(adr('A7'))).toBe(1000)
   })
 
   it('this year', () => {
@@ -40,11 +41,12 @@ describe('Function WORKDAY', () => {
       ['=WORKDAY("01/01/2020", 262, A1:D1)'],
       ['=WORKDAY("01/01/2020", 262, A1:E1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(44197)
-    expect(engine.getCellValue(adr('A3'))).toEqual(44200)
-    expect(engine.getCellValue(adr('A4'))).toEqual(44200)
-    expect(engine.getCellValue(adr('A5'))).toEqual(44201)
-    expect(engine.getCellValue(adr('A6'))).toEqual(44201)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(44197)
+    expect(engine.getCellValue(adr('A3'))).toBe(44200)
+    expect(engine.getCellValue(adr('A4'))).toBe(44200)
+    expect(engine.getCellValue(adr('A5'))).toBe(44201)
+    expect(engine.getCellValue(adr('A6'))).toBe(44201)
   })
 
   it('should output correct values', () => {
@@ -56,11 +58,12 @@ describe('Function WORKDAY', () => {
       ['=WORKDAY(A1+13, 26, A1:J1)'],
       ['=WORKDAY(A1+50, 3, A1:J1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(43931)
-    expect(engine.getCellValue(adr('A3'))).toEqual(43852)
-    expect(engine.getCellValue(adr('A4'))).toEqual(43934)
-    expect(engine.getCellValue(adr('A5'))).toEqual(43882)
-    expect(engine.getCellValue(adr('A6'))).toEqual(43888)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(43931)
+    expect(engine.getCellValue(adr('A3'))).toBe(43852)
+    expect(engine.getCellValue(adr('A4'))).toBe(43934)
+    expect(engine.getCellValue(adr('A5'))).toBe(43882)
+    expect(engine.getCellValue(adr('A6'))).toBe(43888)
   })
 
   it('checks types in last argument', () => {
@@ -71,9 +74,10 @@ describe('Function WORKDAY', () => {
       ['=WORKDAY(1000, 1, C1:C1)'],
       ['=WORKDAY(1000, 1, A1:D1)'],
     ])
+
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A4'))).toEqual(1003)
+    expect(engine.getCellValue(adr('A4'))).toBe(1003)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

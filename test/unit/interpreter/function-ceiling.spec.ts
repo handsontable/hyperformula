@@ -35,13 +35,13 @@ describe('Function CEILING', () => {
       ['=CEILING(0, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(4.5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(4.8)
-    expect(engine.getCellValue(adr('A3'))).toEqual(6)
-    expect(engine.getCellValue(adr('A4'))).toEqual(-3.6)
+    expect(engine.getCellValue(adr('A1'))).toBe(4.5)
+    expect(engine.getCellValue(adr('A2'))).toBe(4.8)
+    expect(engine.getCellValue(adr('A3'))).toBe(6)
+    expect(engine.getCellValue(adr('A4'))).toBe(-3.6)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A7'))).toEqual(0)
+    expect(engine.getCellValue(adr('A7'))).toBe(0)
   })
 
   /*Inconsistent with ODFF standard.*/
@@ -53,9 +53,9 @@ describe('Function CEILING', () => {
       ['=CEILING(-11, -2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(12)
-    expect(engine.getCellValue(adr('A2'))).toEqual(-10)
+    expect(engine.getCellValue(adr('A1'))).toBe(12)
+    expect(engine.getCellValue(adr('A2'))).toBe(-10)
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.DistinctSigns))
-    expect(engine.getCellValue(adr('A4'))).toEqual(-12)
+    expect(engine.getCellValue(adr('A4'))).toBe(-12)
   })
 })

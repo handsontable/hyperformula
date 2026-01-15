@@ -21,7 +21,7 @@ describe('Percent operator', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(0.03)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
-    expect(engine.getCellValue(adr('A3'))).toEqual(0.01)
+    expect(engine.getCellValue(adr('A3'))).toBe(0.01)
   })
 
   it('pass reference', () => {
@@ -30,7 +30,7 @@ describe('Percent operator', () => {
       ['=42'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.42)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.42)
   })
 
   it('pass error', () => {
@@ -45,7 +45,7 @@ describe('Percent operator', () => {
   it('works with other operator and coercion', () => {
     const engine = HyperFormula.buildFromArray([['=TRUE()%*1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.01)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.01)
   })
 
   it('range value results in VALUE error', () => {

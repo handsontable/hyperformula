@@ -7,6 +7,7 @@ describe('ParserWithCaching - volatile functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=RAND()', adr('A1'))
+
     expect(result.hasVolatileFunction).toBe(true)
   })
 
@@ -14,6 +15,7 @@ describe('ParserWithCaching - volatile functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=SUM(RAND())', adr('A1'))
+
     expect(result.hasVolatileFunction).toBe(true)
   })
 
@@ -21,6 +23,7 @@ describe('ParserWithCaching - volatile functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=-RAND()', adr('A1'))
+
     expect(result.hasVolatileFunction).toBe(true)
   })
 
@@ -28,6 +31,7 @@ describe('ParserWithCaching - volatile functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=42+RAND()', adr('A1'))
+
     expect(result.hasVolatileFunction).toBe(true)
   })
 
@@ -35,6 +39,7 @@ describe('ParserWithCaching - volatile functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=RAND()+42', adr('A1'))
+
     expect(result.hasVolatileFunction).toBe(true)
   })
 
@@ -42,6 +47,7 @@ describe('ParserWithCaching - volatile functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=SUM()', adr('A1'))
+
     expect(result.hasVolatileFunction).toBe(false)
   })
 })
@@ -51,6 +57,7 @@ describe('ParserWithCaching - structural change functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=COLUMNS()', adr('A1'))
+
     expect(result.hasStructuralChangeFunction).toBe(true)
   })
 
@@ -58,6 +65,7 @@ describe('ParserWithCaching - structural change functions detection', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const result = parser.parse('=SUM()', adr('A1'))
+
     expect(result.hasStructuralChangeFunction).toBe(false)
   })
 })

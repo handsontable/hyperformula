@@ -101,6 +101,7 @@
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
+    "decimal.js": "^10.4.3",
     "tiny-emitter": "^2.1.0"
   },
   "devDependencies": {

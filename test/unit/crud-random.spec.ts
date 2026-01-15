@@ -67,6 +67,9 @@ function randomRange(engine: HyperFormula, rect: Rectangle): string {
   return '=SUM(' + startAddress + ':' + endAddress + ')'
 }
 
+/**
+ *
+ */
 function undoRedo(engine: HyperFormula) {
   if (outputLog) {
     console.log('engine.undo()')
@@ -271,6 +274,7 @@ describe('large psuedo-random test', () => {
       verifyValues(engine)
     }
     randomCleanup(engine, rectangleFromCorner({x: 0, y: 0}, 2 * (n + 1) * sideX, 2 * sideY))
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })

@@ -43,9 +43,9 @@ describe('Function SEARCH', () => {
       ['=SEARCH("g", "foo")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(2)
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
   })
 
@@ -59,12 +59,12 @@ describe('Function SEARCH', () => {
       ['=SEARCH("?b~", "foobarb~az", 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(4)
-    expect(engine.getCellValue(adr('A3'))).toEqual(7)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(4)
+    expect(engine.getCellValue(adr('A3'))).toBe(7)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
-    expect(engine.getCellValue(adr('A5'))).toEqual(6)
-    expect(engine.getCellValue(adr('A6'))).toEqual(6)
+    expect(engine.getCellValue(adr('A5'))).toBe(6)
+    expect(engine.getCellValue(adr('A6'))).toBe(6)
   })
 
   it('should work with regular expressions', () => {
@@ -80,15 +80,15 @@ describe('Function SEARCH', () => {
       ['=SEARCH(".b", "fooBarBaz", 5)'],
     ], {useRegularExpressions: true})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(4)
-    expect(engine.getCellValue(adr('A3'))).toEqual(7)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(4)
+    expect(engine.getCellValue(adr('A3'))).toBe(7)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
-    expect(engine.getCellValue(adr('A5'))).toEqual(6)
-    expect(engine.getCellValue(adr('A6'))).toEqual(3)
-    expect(engine.getCellValue(adr('A7'))).toEqual(6)
-    expect(engine.getCellValue(adr('A8'))).toEqual(3)
-    expect(engine.getCellValue(adr('A9'))).toEqual(6)
+    expect(engine.getCellValue(adr('A5'))).toBe(6)
+    expect(engine.getCellValue(adr('A6'))).toBe(3)
+    expect(engine.getCellValue(adr('A7'))).toBe(6)
+    expect(engine.getCellValue(adr('A8'))).toBe(3)
+    expect(engine.getCellValue(adr('A9'))).toBe(6)
   })
 
   it('should work with regular expressions also when "caseSensitive: true" is set', () => {
@@ -104,15 +104,15 @@ describe('Function SEARCH', () => {
       ['=SEARCH(".b", "fooBarBaz", 5)'],
     ], { useRegularExpressions: true, caseSensitive: true })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(4)
-    expect(engine.getCellValue(adr('A3'))).toEqual(7)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(4)
+    expect(engine.getCellValue(adr('A3'))).toBe(7)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.PatternNotFound))
-    expect(engine.getCellValue(adr('A5'))).toEqual(6)
-    expect(engine.getCellValue(adr('A6'))).toEqual(3)
-    expect(engine.getCellValue(adr('A7'))).toEqual(6)
-    expect(engine.getCellValue(adr('A8'))).toEqual(3)
-    expect(engine.getCellValue(adr('A9'))).toEqual(6)
+    expect(engine.getCellValue(adr('A5'))).toBe(6)
+    expect(engine.getCellValue(adr('A6'))).toBe(3)
+    expect(engine.getCellValue(adr('A7'))).toBe(6)
+    expect(engine.getCellValue(adr('A8'))).toBe(3)
+    expect(engine.getCellValue(adr('A9'))).toBe(6)
   })
 
   it('should be case insensitive', () => {
@@ -123,10 +123,10 @@ describe('Function SEARCH', () => {
       ['=SEARCH("*r", "baR")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(2)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
   })
 
   it('should be case insensitive even when "caseSensitive: true" is set', () => {
@@ -137,10 +137,10 @@ describe('Function SEARCH', () => {
       ['=SEARCH("*r", "baR")'],
     ], { caseSensitive: true })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(2)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
   })
 
   it('should coerce other types to string', () => {
@@ -150,8 +150,8 @@ describe('Function SEARCH', () => {
       ['=SEARCH("U", TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(2)
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 })

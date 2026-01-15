@@ -19,10 +19,11 @@ describe('Function NETWORKDAYS', () => {
       ['=NETWORKDAYS(0, 6.9)'],
       ['=NETWORKDAYS(6.9,0.1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toEqual(5)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(-5)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(5)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(-5)
   })
 
   it('this year', () => {
@@ -34,11 +35,12 @@ describe('Function NETWORKDAYS', () => {
       ['=NETWORKDAYS("01/01/2020", "31/12/2020", A1:D1)'],
       ['=NETWORKDAYS("01/01/2020", "31/12/2020", A1:E1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(262)
-    expect(engine.getCellValue(adr('A3'))).toEqual(261)
-    expect(engine.getCellValue(adr('A4'))).toEqual(261)
-    expect(engine.getCellValue(adr('A5'))).toEqual(261)
-    expect(engine.getCellValue(adr('A6'))).toEqual(261)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(262)
+    expect(engine.getCellValue(adr('A3'))).toBe(261)
+    expect(engine.getCellValue(adr('A4'))).toBe(261)
+    expect(engine.getCellValue(adr('A5'))).toBe(261)
+    expect(engine.getCellValue(adr('A6'))).toBe(261)
   })
 
   it('should output correct values', () => {
@@ -50,11 +52,12 @@ describe('Function NETWORKDAYS', () => {
       ['=NETWORKDAYS(A1+13, A1+50, A1:J1)'],
       ['=NETWORKDAYS(A1+50, A1+56, A1:J1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(65)
-    expect(engine.getCellValue(adr('A3'))).toEqual(6)
-    expect(engine.getCellValue(adr('A4'))).toEqual(62)
-    expect(engine.getCellValue(adr('A5'))).toEqual(26)
-    expect(engine.getCellValue(adr('A6'))).toEqual(3)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(65)
+    expect(engine.getCellValue(adr('A3'))).toBe(6)
+    expect(engine.getCellValue(adr('A4'))).toBe(62)
+    expect(engine.getCellValue(adr('A5'))).toBe(26)
+    expect(engine.getCellValue(adr('A6'))).toBe(3)
   })
 
   it('checks types in last argument', () => {
@@ -65,9 +68,10 @@ describe('Function NETWORKDAYS', () => {
       ['=NETWORKDAYS(1000, 1, C1:C1)'],
       ['=NETWORKDAYS(1000, 1, A1:D1)'],
     ])
+
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A4'))).toEqual(-715)
+    expect(engine.getCellValue(adr('A4'))).toBe(-715)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

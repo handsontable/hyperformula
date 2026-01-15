@@ -28,10 +28,10 @@ describe('Function LARGE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('C1'))).toEqual(4)
-    expect(engine.getCellValue(adr('D1'))).toEqual(2)
-    expect(engine.getCellValue(adr('E1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(4)
+    expect(engine.getCellValue(adr('C1'))).toBe(4)
+    expect(engine.getCellValue(adr('D1'))).toBe(2)
+    expect(engine.getCellValue(adr('E1'))).toBe(1)
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
@@ -42,8 +42,8 @@ describe('Function LARGE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('C1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(4)
+    expect(engine.getCellValue(adr('C1'))).toBe(1)
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
@@ -66,10 +66,10 @@ describe('Function LARGE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('C1'))).toEqual(4)
-    expect(engine.getCellValue(adr('D1'))).toEqual(2)
-    expect(engine.getCellValue(adr('E1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(4)
+    expect(engine.getCellValue(adr('C1'))).toBe(4)
+    expect(engine.getCellValue(adr('D1'))).toBe(2)
+    expect(engine.getCellValue(adr('E1'))).toBe(1)
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 
@@ -79,7 +79,7 @@ describe('Function LARGE', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
     expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     //inconsistency with product #2
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))

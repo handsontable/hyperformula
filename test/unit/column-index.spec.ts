@@ -17,6 +17,9 @@ import {Statistics} from '../../src/statistics'
 import {adr, detailedError, expectColumnIndexToMatchSheet} from './testUtils'
 import { ErrorMessage } from '../../src/error-message'
 
+/**
+ *
+ */
 function buildEmptyIndex(transformingService: LazilyTransformingAstService, config: Config, statistics: Statistics): ColumnIndex {
   const functionRegistry = new FunctionRegistry(config)
   const namedExpression = new NamedExpressions()
@@ -74,6 +77,7 @@ describe('ColumnIndex#add', () => {
     index.add(error, adr('A1'))
 
     const columnMap = index.getColumnMap(0, 0)
+
     expect(columnMap.size).toBe(0)
     expect(columnMap.keys()).not.toContain(error)
   })
@@ -118,6 +122,7 @@ describe('ColumnIndex#add', () => {
   it('should ignore EmptyValue', () => {
     const index = buildEmptyIndex(transformingService, new Config(), statistics)
     index.add(EmptyValue, adr('A1'))
+
     expect(index.getColumnMap(0, 0).size).toBe(0)
   })
 })
@@ -136,6 +141,7 @@ describe('ColumnIndex change/remove', () => {
 
 
     const valueIndex = index.getColumnMap(0, 0).get(1)!
+
     expect(valueIndex.index.length).toBe(2)
     expect(valueIndex.index).toContain(0)
     expect(valueIndex.index).toContain(2)
@@ -151,6 +157,7 @@ describe('ColumnIndex change/remove', () => {
 
 
     const valueIndex = index.getColumnMap(0, 0).get(1)!
+
     expect(valueIndex.index.length).toBe(3)
     expect(valueIndex.index).toContain(0)
     expect(valueIndex.index).toContain(1)
@@ -166,6 +173,7 @@ describe('ColumnIndex change/remove', () => {
     expect(index.getColumnMap(0, 0).keys()).not.toContain(1)
 
     const valueIndex = index.getColumnMap(0, 0).get(2)!
+
     expect(valueIndex.index).toContain(0)
   })
 
@@ -368,8 +376,10 @@ describe('ColumnIndex#addRows', () => {
     transformingService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(1, 0, 1)))
 
     index.ensureRecentData(0, 0, 1)
+
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     index.ensureRecentData(0, 1, 2)
+
     expect(index.getValueIndex(0, 1, 2).index).toEqual([3])
   })
 
@@ -550,12 +560,14 @@ describe('ColumnIndex - lazy crud operations', () => {
     transformService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
 
     const rowA = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A2')), undefined!), { ordering: 'asc', ifNoMatch: 'returnNotFound' })
-    expect(rowA).toEqual(1)
+
+    expect(rowA).toBe(1)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 1, 1).index).toEqual([0])
 
     const rowB = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('B1'), adr('B2')), undefined!), { ordering: 'asc', ifNoMatch: 'returnNotFound' })
-    expect(rowB).toEqual(1)
+
+    expect(rowB).toBe(1)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 1, 1).index).toEqual([1])
   })
@@ -570,12 +582,14 @@ describe('ColumnIndex - lazy crud operations', () => {
     transformService.addTransformation(new AddRowsTransformer(RowsSpan.fromNumberOfRows(0, 0, 1)))
 
     const row1 = index.find(1, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A3')), undefined!), { ordering: 'asc', ifNoMatch: 'returnNotFound' })
-    expect(row1).toEqual(1)
+
+    expect(row1).toBe(1)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 0, 2).index).toEqual([1])
 
     const row2 = index.find(2, SimpleRangeValue.onlyRange(new AbsoluteCellRange(adr('A1'), adr('A3')), undefined!), { ordering: 'asc', ifNoMatch: 'returnNotFound' })
-    expect(row2).toEqual(2)
+
+    expect(row2).toBe(2)
     expect(index.getValueIndex(0, 0, 1).index).toEqual([1])
     expect(index.getValueIndex(0, 0, 2).index).toEqual([2])
   })

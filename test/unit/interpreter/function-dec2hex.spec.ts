@@ -28,10 +28,10 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(-154)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('32')
-    expect(engine.getCellValue(adr('A3'))).toEqual('7A')
-    expect(engine.getCellValue(adr('A4'))).toEqual('FFFFFFFF66')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('32')
+    expect(engine.getCellValue(adr('A3'))).toBe('7A')
+    expect(engine.getCellValue(adr('A4'))).toBe('FFFFFFFF66')
   })
 
   it('should work for numeric strings', () => {
@@ -40,8 +40,8 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX("-15")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('7B')
-    expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFFF1')
+    expect(engine.getCellValue(adr('A1'))).toBe('7B')
+    expect(engine.getCellValue(adr('A2'))).toBe('FFFFFFFFF1')
   })
 
   it('should work for reference', () => {
@@ -50,7 +50,7 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('C')
+    expect(engine.getCellValue(adr('A2'))).toBe('C')
   })
 
   it('should return string value', () => {
@@ -70,8 +70,8 @@ describe('function DEC2HEX', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual('8000000000')
-    expect(engine.getCellValue(adr('A3'))).toEqual('7FFFFFFFFF')
+    expect(engine.getCellValue(adr('A2'))).toBe('8000000000')
+    expect(engine.getCellValue(adr('A3'))).toBe('7FFFFFFFFF')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueBaseLarge))
   })
 
@@ -81,8 +81,8 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(20, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('00000002')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0014')
+    expect(engine.getCellValue(adr('A1'))).toBe('00000002')
+    expect(engine.getCellValue(adr('A2'))).toBe('0014')
   })
 
   it('should ignore second argument for negative numbers', () => {
@@ -91,8 +91,8 @@ describe('function DEC2HEX', () => {
       ['=DEC2HEX(-2, 10)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('FFFFFFFFFE')
-    expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFFFE')
+    expect(engine.getCellValue(adr('A1'))).toBe('FFFFFFFFFE')
+    expect(engine.getCellValue(adr('A2'))).toBe('FFFFFFFFFE')
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {

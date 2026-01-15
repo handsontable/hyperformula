@@ -9,15 +9,17 @@ import {DateTimeHelper, timeToNumber} from './DateTimeHelper'
 import {ErrorMessage} from './error-message'
 import {UnableToParseError} from './errors'
 import {fixNegativeZero, isNumberOverflow} from './interpreter/ArithmeticHelper'
+import {NumericProvider} from './Numeric'
 import {
   cloneNumber,
   CurrencyNumber,
   DateNumber,
   DateTimeNumber,
   ExtendedNumber,
-  getRawValue,
+  getRawPrecisionValue,
   PercentNumber,
-  TimeNumber
+  TimeNumber,
+  toNumeric
 } from './interpreter/InterpreterValue'
 import {Maybe} from './Maybe'
 import {NumberLiteralHelper} from './NumberLiteralHelper'
@@ -25,26 +27,46 @@ import {NumberLiteralHelper} from './NumberLiteralHelper'
 export type RawCellContent = Date | string | number | boolean | null | undefined
 
 export namespace CellContent {
+  
+  /**
+   *
+   */
   export class Number {
     constructor(public readonly value: ExtendedNumber) {
-      this.value = cloneNumber(this.value, fixNegativeZero(getRawValue(this.value)))
+      this.value = cloneNumber(this.value, fixNegativeZero(getRawPrecisionValue(this.value)))
     }
   }
 
+  
+  /**
+   *
+   */
   export class String {
     constructor(public readonly value: string) {
     }
   }
 
+  
+  /**
+   *
+   */
   export class Boolean {
     constructor(public readonly value: boolean) {
     }
   }
 
+  
+  /**
+   *
+   */
   export class Empty {
 
     private static instance: Empty
 
+    
+    /**
+     *
+     */
     public static getSingletonInstance() {
       if (!Empty.instance) {
         Empty.instance = new Empty()
@@ -53,11 +75,19 @@ export namespace CellContent {
     }
   }
 
+  
+  /**
+   *
+   */
   export class Formula {
     constructor(public readonly formula: string) {
     }
   }
 
+  
+  /**
+   *
+   */
   export class Error {
     public readonly value: CellError
 
@@ -78,17 +108,26 @@ export function isFormula(text: string): boolean {
   return text.startsWith('=')
 }
 
+/**
+ *
+ */
 export function isBoolean(text: string): boolean {
   const tl = text.toLowerCase()
   return tl === 'true' || tl === 'false'
 }
 
+/**
+ *
+ */
 export function isError(text: string, errorMapping: Record<string, ErrorType>): boolean {
   const upperCased = text.toUpperCase()
   const errorRegex = /#[A-Za-z0-9\/]+[?!]?/
   return errorRegex.test(upperCased) && Object.prototype.hasOwnProperty.call(errorMapping, upperCased)
 }
 
+/**
+ *
+ */
 export class CellContentParser {
   constructor(
     private readonly config: Config,
@@ -96,14 +135,19 @@ export class CellContentParser {
     private readonly numberLiteralsHelper: NumberLiteralHelper) {
   }
 
+  
+  /**
+   *
+   */
   public parse(content: RawCellContent): CellContent.Type {
     if (content === undefined || content === null) {
       return CellContent.Empty.getSingletonInstance()
     } else if (typeof content === 'number') {
-      if (isNumberOverflow(content)) {
+      const precisionNum = toNumeric(content)
+      if (isNumberOverflow(precisionNum)) {
         return new CellContent.Error(ErrorType.NUM, ErrorMessage.ValueLarge)
       } else {
-        return new CellContent.Number(content)
+        return new CellContent.Number(precisionNum)
       }
     } else if (typeof content === 'boolean') {
       return new CellContent.Boolean(content)
@@ -153,9 +197,9 @@ export class CellContentParser {
 
         const val = this.numberLiteralsHelper.numericStringToMaybeNumber(trimmedContent)
         if (val !== undefined) {
-          let parseAsNum
+          let parseAsNum: ExtendedNumber
           if (mode === 1) {
-            parseAsNum = new PercentNumber(val / 100)
+            parseAsNum = new PercentNumber(val.dividedBy(NumericProvider.getGlobalFactory().create(100)))
           } else if (mode === 2) {
             parseAsNum = new CurrencyNumber(val, currency as string)
           } else {
@@ -175,6 +219,10 @@ export class CellContentParser {
     }
   }
 
+  
+  /**
+   *
+   */
   private currencyMatcher(token: string): Maybe<[string, string]> {
     for (const currency of this.config.currencySymbol) {
       if (token.startsWith(currency)) {

@@ -19,12 +19,13 @@ describe('RemoveColumnsTransformer', () => {
       const astParen = ast as ParenthesisAst
       const astSum = astParen.expression as ProcedureAst
       const astSumArg = astSum.args[0] as CellRangeAst
+
       expect(astSumArg.start.sheet).toBeUndefined()
-      expect(astSumArg.start.col).toEqual(2)
-      expect(astSumArg.start.row).toEqual(1)
+      expect(astSumArg.start.col).toBe(2)
+      expect(astSumArg.start.row).toBe(1)
       expect(astSumArg.end.sheet).toBeUndefined()
-      expect(astSumArg.end.col).toEqual(5)
-      expect(astSumArg.end.row).toEqual(6)
+      expect(astSumArg.end.col).toBe(5)
+      expect(astSumArg.end.row).toBe(6)
     }
 
     expect(() => {

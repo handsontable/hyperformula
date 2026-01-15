@@ -14,9 +14,9 @@ describe('Set matrix empty', () => {
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toBe(null)
-    expect(engine.getCellValue(adr('A3'))).toBe(null)
-    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBeNull()
+    expect(engine.getCellValue(adr('A3'))).toBeNull()
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toBe(0)
   })
 
   it('should adjust edges between matrix cells and formula', () => {
@@ -30,18 +30,19 @@ describe('Set matrix empty', () => {
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toBe(null)
-    expect(engine.getCellValue(adr('A3'))).toBe(null)
-    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBeNull()
+    expect(engine.getCellValue(adr('A3'))).toBeNull()
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toBe(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
     const a1 = dependencyGraph.fetchCell(adr('A1'))
     const a2 = dependencyGraph.fetchCell(adr('A2'))
     const a3 = dependencyGraph.getCell(adr('A3'))
+
     expect(dependencyGraph.existsEdge(matrixVertex, formula)).toBe(false)
     expect(dependencyGraph.existsEdge(a1, formula)).toBe(true)
     expect(dependencyGraph.existsEdge(a2, formula)).toBe(true)
-    expect(a3).toBe(undefined)
+    expect(a3).toBeUndefined()
   })
 
   it('should adjust edges between matrix cells and formula matrix', () => {
@@ -55,12 +56,13 @@ describe('Set matrix empty', () => {
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
-    expect(engine.getCellValue(adr('A2'))).toBe(null)
-    expect(engine.getCellValue(adr('A3'))).toBe(null)
-    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toBeNull()
+    expect(engine.getCellValue(adr('A3'))).toBeNull()
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toBe(1)
 
     const formulaMatrix = dependencyGraph.fetchCell(adr('C1'))
     const a1 = dependencyGraph.fetchCell(adr('A1'))
+
     expect(dependencyGraph.existsEdge(matrixVertex, formulaMatrix)).toBe(false)
     expect(dependencyGraph.existsEdge(a1, formulaMatrix)).toBe(false)
   })
@@ -75,15 +77,17 @@ describe('Set matrix empty', () => {
     const matrixVertex = dependencyGraph.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     const rangeVertex = dependencyGraph.rangeMapping.getRangeVertex(adr('A2'), adr('A3'))!
+
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
-    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toBe(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
     const a2 = dependencyGraph.fetchCell(adr('A2'))
     const a3 = dependencyGraph.fetchCell(adr('A3'))
+
     expect(a2).not.toBe(a3)
     expect(dependencyGraph.existsEdge(rangeVertex, formula)).toBe(true)
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(false)
@@ -101,21 +105,23 @@ describe('Set matrix empty', () => {
     const matrixVertex = dependencyGraph.arrayMapping.getArray(AbsoluteCellRange.spanFrom(adr('A2'), 1, 2))!
 
     const rangeVertex = dependencyGraph.rangeMapping.getRangeVertex(adr('A1'), adr('A2'))!
+
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(true)
 
     dependencyGraph.setArrayEmpty(matrixVertex)
 
-    expect(dependencyGraph.arrayMapping.arrayMapping.size).toEqual(0)
+    expect(dependencyGraph.arrayMapping.arrayMapping.size).toBe(0)
 
     const formula = dependencyGraph.fetchCell(adr('C1'))
     const a1 = dependencyGraph.fetchCell(adr('A1'))
     const a2 = dependencyGraph.fetchCell(adr('A2'))
     const a3 = dependencyGraph.getCell(adr('A3'))
+
     expect(dependencyGraph.existsEdge(rangeVertex, formula)).toBe(true)
     expect(dependencyGraph.existsEdge(matrixVertex, rangeVertex)).toBe(false)
     expect(dependencyGraph.existsEdge(a1, rangeVertex)).toBe(true)
     expect(dependencyGraph.existsEdge(a2, rangeVertex)).toBe(true)
-    expect(a3).toBe(undefined)
+    expect(a3).toBeUndefined()
     expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 })

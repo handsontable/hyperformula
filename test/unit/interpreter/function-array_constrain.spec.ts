@@ -7,6 +7,7 @@ describe('Interpreter - function ARRAY_CONSTRAIN', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ARRAY_CONSTRAIN(1, 1, 1)'],
     ])
+
     expect(engine.getSheetValues(0)).toEqual([[1]])
   })
 
@@ -14,6 +15,7 @@ describe('Interpreter - function ARRAY_CONSTRAIN', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ARRAY_CONSTRAIN(1, 2, 2)'],
     ])
+
     expect(engine.getSheetValues(0)).toEqual([[1]])
   })
 
@@ -21,6 +23,7 @@ describe('Interpreter - function ARRAY_CONSTRAIN', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ARRAY_CONSTRAIN(1, 0, 1)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })
 
@@ -35,6 +38,7 @@ describe('Interpreter - function ARRAY_CONSTRAIN', () => {
         [7, 8, 9],
       ]
     })
+
     expect(engine.getSheetValues(0)).toEqual([[1, 2], [4, 5]])
   })
 
@@ -49,6 +53,7 @@ describe('Interpreter - function ARRAY_CONSTRAIN', () => {
         [7, 8, 9],
       ]
     })
+
     expect(engine.getSheetValues(0)).toEqual([[1, 2, 3], [4, 5, 6]])
   })
 

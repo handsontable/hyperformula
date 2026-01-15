@@ -7,9 +7,12 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {getRawPrecisionValue, InterpreterValue, RawScalarValue, toNativeNumeric, isExtendedNumber} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RomanPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'ROMAN': {
@@ -27,6 +30,10 @@ export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypeche
     },
   }
 
+  
+  /**
+   *
+   */
   public roman(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ROMAN'),
       (val: number, mode: RawScalarValue) => {
@@ -36,11 +43,11 @@ export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypeche
         } else if (mode === true) {
           mode = 0
         }
-        mode = getRawValue(this.coerceScalarToNumberOrError(mode))
-        if (mode instanceof CellError) {
-          return mode
+        const coercedMode = this.coerceScalarToNumberOrError(mode)
+        if (coercedMode instanceof CellError) {
+          return coercedMode
         }
-        mode = Math.trunc(mode)
+        mode = isExtendedNumber(coercedMode) ? Math.trunc(toNativeNumeric(getRawPrecisionValue(coercedMode))) : 0
         if (mode < 0) {
           return new CellError(ErrorType.VALUE, ErrorMessage.ValueSmall)
         }
@@ -52,6 +59,10 @@ export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypeche
     )
   }
 
+  
+  /**
+   *
+   */
   public arabic(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ARABIC'),
       (inputString: string) => {
@@ -126,6 +137,9 @@ export class RomanPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 }
 
+/**
+ *
+ */
 function eatToken(inputAcc: { input: string, acc: number }, ...tokens: { token: string, val: number }[]) {
   for (const token of tokens) {
     if (inputAcc.input.startsWith(token.token)) {
@@ -136,6 +150,9 @@ function eatToken(inputAcc: { input: string, acc: number }, ...tokens: { token: 
   }
 }
 
+/**
+ *
+ */
 function romanMode(input: number, mode: number): string {
   const work = {val: input % 1000, acc: 'M'.repeat(Math.floor(input / 1000))}
   if (mode === 4) {
@@ -179,6 +196,9 @@ function romanMode(input: number, mode: number): string {
   return work.acc
 }
 
+/**
+ *
+ */
 function absorb(valAcc: { val: number, acc: string }, token: string, lower: number, upper: number) {
   if (valAcc.val >= lower && valAcc.val < upper) {
     valAcc.val -= lower

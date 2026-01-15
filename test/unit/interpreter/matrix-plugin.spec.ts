@@ -67,10 +67,10 @@ describe('Matrix plugin', () => {
       ['=MMULT(A1:B2, MMULT(A1:B2,A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(37)
-    expect(engine.getCellValue(adr('B3'))).toEqual(54)
-    expect(engine.getCellValue(adr('A4'))).toEqual(81)
-    expect(engine.getCellValue(adr('B4'))).toEqual(118)
+    expect(engine.getCellValue(adr('A3'))).toBe(37)
+    expect(engine.getCellValue(adr('B3'))).toBe(54)
+    expect(engine.getCellValue(adr('A4'))).toBe(81)
+    expect(engine.getCellValue(adr('B4'))).toBe(118)
   })
 
   it('mmult of other mmult', () => {
@@ -80,10 +80,10 @@ describe('Matrix plugin', () => {
       ['=MMULT(A1:B2, C1:D2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(37)
-    expect(engine.getCellValue(adr('B3'))).toEqual(54)
-    expect(engine.getCellValue(adr('A4'))).toEqual(81)
-    expect(engine.getCellValue(adr('B4'))).toEqual(118)
+    expect(engine.getCellValue(adr('A3'))).toBe(37)
+    expect(engine.getCellValue(adr('B3'))).toBe(54)
+    expect(engine.getCellValue(adr('A4'))).toBe(81)
+    expect(engine.getCellValue(adr('B4'))).toBe(118)
   })
 
   it('mmult of a number', () => {
@@ -91,7 +91,7 @@ describe('Matrix plugin', () => {
       ['=MMULT(3, 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(12)
+    expect(engine.getCellValue(adr('A1'))).toBe(12)
   })
 
   it('mmult wrong number of arguments', () => {
@@ -292,10 +292,10 @@ describe('Function TRANSPOSE', () => {
     ])
 
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1)
-    expect(engine.getCellValue(adr('B4'))).toEqual('foo')
+    expect(engine.getCellValue(adr('B4'))).toBe('foo')
     expect(engine.getCellValue(adr('C4'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!A3'))
     expect(engine.getCellValue(adr('A5'))).toBeCloseTo(2)
-    expect(engine.getCellValue(adr('B5'))).toEqual('bar')
-    expect(engine.getCellValue(adr('C5'))).toEqual(true)
+    expect(engine.getCellValue(adr('B5'))).toBe('bar')
+    expect(engine.getCellValue(adr('C5'))).toBe(true)
   })
 })

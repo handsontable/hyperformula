@@ -17,7 +17,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('three numbers', () => {
@@ -27,9 +27,9 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(2, 1, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
-    expect(engine.getCellValue(adr('A2'))).toEqual(2)
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 
   it('theres no coercion', () => {
@@ -38,7 +38,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(A1:B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
   })
 
   it('errors in arguments are not propagated', () => {
@@ -46,7 +46,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=COUNTUNIQUE(5/0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('different errors are counted by type', () => {
@@ -57,7 +57,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=BARFOO()'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
   })
 
   it('empty string doesnt count', () => {
@@ -65,7 +65,7 @@ describe('Function COUNTUNIQUE', () => {
       ['=""', '=COUNTUNIQUE("", A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
   it('different strings are recognized are counted by type', () => {
@@ -76,7 +76,7 @@ describe('Function COUNTUNIQUE', () => {
       ['bar '],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('B1'))).toBe(3)
   })
 
   it('singular values are counted', () => {
@@ -89,6 +89,6 @@ describe('Function COUNTUNIQUE', () => {
       [null],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('B1'))).toBe(3)
   })
 })

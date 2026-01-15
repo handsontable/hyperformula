@@ -33,7 +33,7 @@ describe('Function NORM.INV', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(3.5631031310892, 6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
   })
 
   it('checks bounds', () => {
@@ -46,7 +46,7 @@ describe('Function NORM.INV', () => {
       ['=NORM.INV(1, -1, 0.01)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A1'))).toBe(-1)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-1.02326347874041, 6)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))

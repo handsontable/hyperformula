@@ -109,6 +109,10 @@ export class ParserWithCaching {
     return {ast: astWithNoReversedRanges, errors: [], hasVolatileFunction, hasStructuralChangeFunction, dependencies }
   }
 
+  
+  /**
+   *
+   */
   private convertReversedRangesToRegularRanges(ast: Ast): Ast {
     switch (ast.type) {
       case AstNodeType.EMPTY:
@@ -171,6 +175,10 @@ export class ParserWithCaching {
     }
   }
 
+  
+  /**
+   *
+   */
   private orderCellRangeEnds(endA: CellAddress, endB: CellAddress): { start: CellAddress, end: CellAddress } {
     const ends = [ endA, endB ]
     const [ startCol, endCol ] = ends.map(e => e.toColumnAddress()).sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress!))
@@ -183,6 +191,10 @@ export class ParserWithCaching {
     }
   }
 
+  
+  /**
+   *
+   */
   private orderColumnRangeEnds(endA: ColumnAddress, endB: ColumnAddress): { start: ColumnAddress, end: ColumnAddress } {
     const ends = [ endA, endB ]
     const [ startCol, endCol ] = ends.sort(ColumnAddress.compareByAbsoluteAddress(this.formulaAddress!))
@@ -194,6 +206,10 @@ export class ParserWithCaching {
     }
   }
 
+  
+  /**
+   *
+   */
   private orderRowRangeEnds(endA: RowAddress, endB: RowAddress): { start: RowAddress, end: RowAddress } {
     const ends = [ endA, endB ]
     const [ startRow, endRow ] = ends.sort(RowAddress.compareByAbsoluteAddress(this.formulaAddress!))
@@ -205,17 +221,29 @@ export class ParserWithCaching {
     }
   }
 
+  
+  /**
+   *
+   */
   private static compareSheetIds(sheetA: number | undefined, sheetB: number | undefined): number {
     sheetA = sheetA != null ? sheetA : Infinity
     sheetB = sheetB != null ? sheetB : Infinity
     return sheetA - sheetB
   }
 
+  
+  /**
+   *
+   */
   public fetchCachedResultForAst(ast: Ast): ParsingResult {
     const hash = this.computeHashFromAst(ast)
     return this.fetchCachedResult(hash)
   }
 
+  
+  /**
+   *
+   */
   public fetchCachedResult(hash: string): ParsingResult {
     const cacheResult = this.cache.get(hash)
     if (cacheResult === undefined) {
@@ -226,6 +254,10 @@ export class ParserWithCaching {
     }
   }
 
+  
+  /**
+   *
+   */
   public computeHashFromTokens(tokens: IToken[], baseAddress: SimpleCellAddress): string {
     let hash = ''
     let idx = 0
@@ -268,15 +300,27 @@ export class ParserWithCaching {
     return hash
   }
 
+  
+  /**
+   *
+   */
   public rememberNewAst(ast: Ast): Ast {
     const hash = this.computeHashFromAst(ast)
     return this.cache.maybeSetAndThenGet(hash, ast)
   }
 
+  
+  /**
+   *
+   */
   public computeHashFromAst(ast: Ast): string {
     return '=' + this.computeHashOfAstNode(ast)
   }
 
+  
+  /**
+   *
+   */
   private computeHashOfAstNode(ast: Ast): string {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
@@ -339,6 +383,10 @@ export class ParserWithCaching {
     }
   }
 
+  
+  /**
+   *
+   */
   public bindWhitespacesToTokens(tokens: IToken[]): ExtendedToken[] {
     const processedTokens: ExtendedToken[] = []
 
@@ -363,6 +411,10 @@ export class ParserWithCaching {
     return processedTokens
   }
 
+  
+  /**
+   *
+   */
   public tokenizeFormula(text: string): ILexingResult {
     return this.lexer.tokenizeFormula(text)
   }

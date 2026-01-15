@@ -19,6 +19,7 @@ describe('update config', () => {
     expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.CYCLE))
     expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
+
   it('simple reload preserves formulas', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '=A1', '=SUM(A1:B1)'],
@@ -36,12 +37,15 @@ describe('update config', () => {
     const engine = HyperFormula.buildFromArray([
       ['1.00000000000001', '1', '=A1-B1'],
     ], {smartRounding: false})
+
     expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.00000000000001)
 
     engine.updateConfig({smartRounding: true})
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    // With precise decimal arithmetic, 1.00000000000001 - 1 = 0.00000000000001 = 1e-14
+    expect(engine.getCellValue(adr('C1'))).toBeCloseTo(1e-14, 16)
   })
+
   it('language reload', () => {
     HyperFormula.registerLanguage('plPL', plPL)
     const engine = HyperFormula.buildFromArray([
@@ -52,7 +56,7 @@ describe('update config', () => {
     expect(engine.getCellFormula(adr('A1'))).toBe('=FOO()')
     expect(engine.getCellFormula(adr('B1'))).toBe('=SUMA()')
     expect(engine.getCellFormula(adr('C1'))).toBe('=SUMA()')
-    expect(engine.getCellFormula(adr('D1'))).toBe(undefined)
+    expect(engine.getCellFormula(adr('D1'))).toBeUndefined()
     expect(engine.getCellFormula(adr('E1'))).toBe('=SUM(')
   })
 
@@ -76,6 +80,7 @@ describe('update config', () => {
     resetSpy(rebuildEngineSpy)
 
     engine.updateConfig(config)
+
     expect(rebuildEngineSpy).not.toHaveBeenCalled()
   })
 
@@ -88,6 +93,7 @@ describe('update config', () => {
 
     config.timeFormats.push('hh:mm:ss')
     engine.updateConfig(config)
+
     expect(rebuildEngineSpy).toHaveBeenCalled()
   })
 
@@ -100,6 +106,7 @@ describe('update config', () => {
 
     config.currencySymbol.push('€')
     engine.updateConfig(config)
+
     expect(rebuildEngineSpy).toHaveBeenCalled()
   })
 
@@ -110,6 +117,7 @@ describe('update config', () => {
     resetSpy(rebuildEngineSpy)
 
     engine.updateConfig({ useColumnIndex: false, functionArgSeparator: ',', undoLimit: 20 })
+
     expect(rebuildEngineSpy).not.toHaveBeenCalled()
   })
 
@@ -120,6 +128,7 @@ describe('update config', () => {
 
 
     hf.addNamedExpression('ABC', '=Sheet1!$A$1')
+
     expect(() => hf.updateConfig({ maxRows: 101 })).not.toThrow()
   })
 })

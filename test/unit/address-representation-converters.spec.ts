@@ -44,12 +44,12 @@ describe('simpleCellRangeFromString', () => {
   }
 
   it('should not accept invalid ranges', () => {
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1', 0)).toEqual(undefined)
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1:B1:C1', 0)).toEqual(undefined)
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1', 0)).toBeUndefined()
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1:B1:C1', 0)).toBeUndefined()
   })
 
   it('should return undefined when the Sheet4 does not exist', () => {
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet4!A1:A2', 0)).toEqual(undefined)
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet4!A1:A2', 0)).toBeUndefined()
   })
 
   it('should return address with overridden sheet', () => {
@@ -69,8 +69,8 @@ describe('simpleCellRangeFromString', () => {
   })
 
   it('should not accept distinct sheets', () => {
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1:Sheet3!A2', 1)).toEqual(undefined)
-    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet2!A1:Sheet3!A2', 1)).toEqual(undefined)
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'A1:Sheet3!A2', 1)).toBeUndefined()
+    expect(simpleCellRangeFromString(sheetMappingFunction, 'Sheet2!A1:Sheet3!A2', 1)).toBeUndefined()
   })
 })
 
@@ -80,20 +80,20 @@ describe('simpleCellAddressToString', () => {
   }
 
   it('should return string representation', () => {
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1'), 0)).toEqual('A1')
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 50, 6), 0)).toEqual('AY7')
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1'), 0)).toBe('A1')
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, simpleCellAddress(0, 50, 6), 0)).toBe('AY7')
   })
 
   it('should return string representation with sheet name', () => {
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1'), 1)).toEqual('Sheet1!A1')
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1'), 1)).toBe('Sheet1!A1')
   })
 
   it('should quote sheet names with special characters', () => {
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1', 3), 1)).toEqual("'~`!@#$%^&*()_-+_=/|?{}[]\"'!A1")
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1', 3), 1)).toBe("'~`!@#$%^&*()_-+_=/|?{}[]\"'!A1")
   })
 
   it('should escape quote in quotes', () => {
-    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1', 4), 1)).toEqual("'Sheet''With''Quotes'!A1")
+    expect(simpleCellAddressToString(sheetIndexMappingFunction, adr('A1', 4), 1)).toBe("'Sheet''With''Quotes'!A1")
   })
 
   it('should return undefined', () => {
@@ -108,11 +108,11 @@ describe('simpleCellRangeToString', () => {
   }
 
   it('should return string representation', () => {
-    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'), adr('A2')), 0)).toEqual('A1:A2')
+    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'), adr('A2')), 0)).toBe('A1:A2')
   })
 
   it('should return string representation with sheet name', () => {
-    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'), adr('A2')), 1)).toEqual('Sheet1!A1:A2')
+    expect(simpleCellRangeToString(sheetIndexMappingFunction, simpleCellRange(adr('A1'), adr('A2')), 1)).toBe('Sheet1!A1:A2')
   })
 
   it('should return undefined when refering nonexistent sheet', () => {

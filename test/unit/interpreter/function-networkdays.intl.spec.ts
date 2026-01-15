@@ -20,6 +20,7 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL(0, 1, -1)'],
       ['=NETWORKDAYS.INTL(0, 1, "1111111")'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.WeekendString))
@@ -34,10 +35,11 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL(0, 6.9)'],
       ['=NETWORKDAYS.INTL(6.9,0.1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toEqual(5)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(-5)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(5)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(-5)
   })
 
   it('today', () => {
@@ -48,11 +50,12 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL("29/09/2020", "29/09/2020", 13)'],
       ['=NETWORKDAYS.INTL("29/09/2020", "29/09/2020", "1011111")'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
+    expect(engine.getCellValue(adr('A5'))).toBe(1)
   })
 
   it('this year', () => {
@@ -64,11 +67,12 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL("01/01/2020", "31/12/2020", 1, A1:D1)'],
       ['=NETWORKDAYS.INTL("01/01/2020", "31/12/2020", 1, A1:E1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(262)
-    expect(engine.getCellValue(adr('A3'))).toEqual(261)
-    expect(engine.getCellValue(adr('A4'))).toEqual(261)
-    expect(engine.getCellValue(adr('A5'))).toEqual(261)
-    expect(engine.getCellValue(adr('A6'))).toEqual(261)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(262)
+    expect(engine.getCellValue(adr('A3'))).toBe(261)
+    expect(engine.getCellValue(adr('A4'))).toBe(261)
+    expect(engine.getCellValue(adr('A5'))).toBe(261)
+    expect(engine.getCellValue(adr('A6'))).toBe(261)
   })
 
   it('should output correct values', () => {
@@ -80,11 +84,12 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL(A1+13, A1+50, "0000000", A1:J1)'],
       ['=NETWORKDAYS.INTL(A1+50, A1+56, "0000000", A1:J1)'],
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(91)
-    expect(engine.getCellValue(adr('A3'))).toEqual(9)
-    expect(engine.getCellValue(adr('A4'))).toEqual(86)
-    expect(engine.getCellValue(adr('A5'))).toEqual(34)
-    expect(engine.getCellValue(adr('A6'))).toEqual(5)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(91)
+    expect(engine.getCellValue(adr('A3'))).toBe(9)
+    expect(engine.getCellValue(adr('A4'))).toBe(86)
+    expect(engine.getCellValue(adr('A5'))).toBe(34)
+    expect(engine.getCellValue(adr('A6'))).toBe(5)
   })
 
   it('checks types in last argument', () => {
@@ -95,9 +100,10 @@ describe('Function NETWORKDAYS.INTL', () => {
       ['=NETWORKDAYS.INTL(1000, 1, 1, C1:C1)'],
       ['=NETWORKDAYS.INTL(1000, 1, 1, A1:D1)'],
     ])
+
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.WrongType))
-    expect(engine.getCellValue(adr('A4'))).toEqual(-715)
+    expect(engine.getCellValue(adr('A4'))).toBe(-715)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

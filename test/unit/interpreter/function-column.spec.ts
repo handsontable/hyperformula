@@ -40,9 +40,9 @@ describe('Function COLUMN', () => {
       ['=COLUMN($E5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(7)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(7)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
   })
 
   it('should work for itself', () => {
@@ -50,7 +50,7 @@ describe('Function COLUMN', () => {
       ['=COLUMN(A1)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('should return row of a cell in which formula is', () => {
@@ -59,8 +59,8 @@ describe('Function COLUMN', () => {
       ['=COLUMN()'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 
   it('should return row of range start', () => {
@@ -69,8 +69,8 @@ describe('Function COLUMN', () => {
       ['=COLUMN(A1:B1)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 
   it('should be dependent on sheet structure changes', () => {
@@ -78,11 +78,12 @@ describe('Function COLUMN', () => {
       ['1'],
       ['=COLUMN(A1)']
     ])
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
 
     engine.addColumns(0, [0, 1])
 
-    expect(engine.getCellValue(adr('B2'))).toEqual(2)
+    expect(engine.getCellValue(adr('B2'))).toBe(2)
   })
 
   it('should collect dependencies of inner function and return argument type error', () => {

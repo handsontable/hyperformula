@@ -32,12 +32,12 @@ describe('Function UNICHAR', () => {
       ['=UNICHAR(255)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('')
-    expect(engine.getCellValue(adr('A2'))).toEqual('!')
-    expect(engine.getCellValue(adr('A3'))).toEqual('A')
-    expect(engine.getCellValue(adr('A4'))).toEqual('Z')
-    expect(engine.getCellValue(adr('A5'))).toEqual('Ñ')
-    expect(engine.getCellValue(adr('A6'))).toEqual('ÿ')
+    expect(engine.getCellValue(adr('A1'))).toBe('')
+    expect(engine.getCellValue(adr('A2'))).toBe('!')
+    expect(engine.getCellValue(adr('A3'))).toBe('A')
+    expect(engine.getCellValue(adr('A4'))).toBe('Z')
+    expect(engine.getCellValue(adr('A5'))).toBe('Ñ')
+    expect(engine.getCellValue(adr('A6'))).toBe('ÿ')
   })
 
   it('should round down floats', () => {
@@ -47,9 +47,9 @@ describe('Function UNICHAR', () => {
       ['=UNICHAR(42.8)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('*')
-    expect(engine.getCellValue(adr('A2'))).toEqual('*')
-    expect(engine.getCellValue(adr('A3'))).toEqual('*')
+    expect(engine.getCellValue(adr('A1'))).toBe('*')
+    expect(engine.getCellValue(adr('A2'))).toBe('*')
+    expect(engine.getCellValue(adr('A3'))).toBe('*')
   })
 
   it('should work only for values from 1 to 1114111 truncating decimal part', () => {
@@ -65,10 +65,10 @@ describe('Function UNICHAR', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
-    expect(engine.getCellValue(adr('A3'))).toEqual('')
-    expect(engine.getCellValue(adr('A4'))).toEqual('Ā')
-    expect(engine.getCellValue(adr('A5'))).toEqual('􏿿')
-    expect(engine.getCellValue(adr('A6'))).toEqual('􏿿')
+    expect(engine.getCellValue(adr('A3'))).toBe('')
+    expect(engine.getCellValue(adr('A4'))).toBe('Ā')
+    expect(engine.getCellValue(adr('A5'))).toBe('􏿿')
+    expect(engine.getCellValue(adr('A6'))).toBe('􏿿')
     expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
   })
 })

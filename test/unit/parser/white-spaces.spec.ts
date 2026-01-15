@@ -15,11 +15,13 @@ describe('tokenizeFormula', () => {
 
   it('should not skip whitespaces', () => {
     const tokens = lexer.tokenizeFormula('= A1 + 2').tokens
+
     expect(tokens.length).toBe(7)
   })
 
   it('should forget about trailing whitespaces', () => {
     const tokens = lexer.tokenizeFormula('=SUM(A1:A2)   ').tokens
+
     expect(tokens.map(token => token.tokenType.name)).not.toContain('WhiteSpace')
   })
 
@@ -64,29 +66,34 @@ describe('tokenizeFormula', () => {
 
   it('should treat space as whitespace', () => {
     const tokens = lexer.tokenizeFormula('= 1').tokens
-    expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
+
+    expect(tokens[1].tokenType.name).toBe('WhiteSpace')
   })
 
   it('should treat tabulator (U+0009) as whitespace', () => {
     const tokens = lexer.tokenizeFormula('=\t1').tokens
-    expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
+
+    expect(tokens[1].tokenType.name).toBe('WhiteSpace')
   })
 
   it('should treat carriage return (U+000D) as whitespace', () => {
     const tokens = lexer.tokenizeFormula('=\r1').tokens
-    expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
+
+    expect(tokens[1].tokenType.name).toBe('WhiteSpace')
   })
 
   it('should treat line feed (U+000A) as whitespace', () => {
     const tokens = lexer.tokenizeFormula('=\n1').tokens
-    expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
+
+    expect(tokens[1].tokenType.name).toBe('WhiteSpace')
   })
 
   it('should treat multiple whitespaces as one token', () => {
     const tokens = lexer.tokenizeFormula('=\n\t\r 1').tokens
-    expect(tokens.length).toEqual(3)
-    expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
-    expect(tokens[1].image).toEqual('\n\t\r ')
+
+    expect(tokens.length).toBe(3)
+    expect(tokens[1].tokenType.name).toBe('WhiteSpace')
+    expect(tokens[1].image).toBe('\n\t\r ')
   })
 
   it('when set ignoreWhiteSpace = \'any\', should treat non-breaking space as a whitespace', () => {
@@ -94,7 +101,8 @@ describe('tokenizeFormula', () => {
     const lexer = new FormulaLexer(buildLexerConfig(config))
 
     const tokens = lexer.tokenizeFormula('=\u00A042').tokens
-    expect(tokens[1].tokenType.name).toEqual('WhiteSpace')
+
+    expect(tokens[1].tokenType.name).toBe('WhiteSpace')
   })
 })
 
@@ -107,6 +115,7 @@ describe('processWhitespaces', () => {
   it('should do nothing when no whitespaces', () => {
     const tokens = parser.tokenizeFormula('=SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
+
     expect(processed.length).toBe(6)
     expect(processed.map(processed => processed.leadingWhitespace).every(processed => processed === undefined)).toBe(true)
     expectArrayWithSameContent(
@@ -118,6 +127,7 @@ describe('processWhitespaces', () => {
   it('should add leading whitespace to token', () => {
     const tokens = parser.tokenizeFormula('= SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
+
     expect(processed.length).toBe(6)
 
     expect(processed[1].leadingWhitespace!.image).toBe(' ')
@@ -130,6 +140,7 @@ describe('processWhitespaces', () => {
   it('should work for multiple whitespaces', () => {
     const tokens = parser.tokenizeFormula('=    SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
+
     expect(processed.length).toBe(6)
 
     expect(processed[1].leadingWhitespace!.image).toBe('    ')
@@ -142,6 +153,7 @@ describe('processWhitespaces', () => {
   it('should work for whitespace at the beginning', () => {
     const tokens = parser.tokenizeFormula(' =SUM(A1:A2)').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
+
     expect(processed.length).toBe(6)
 
     expect(processed[0].leadingWhitespace!.image).toBe(' ')
@@ -154,6 +166,7 @@ describe('processWhitespaces', () => {
   it('should not include whitespaces directly on the list', () => {
     const tokens = parser.tokenizeFormula('=   SUM(   A1:A2)   ').tokens
     const processed = parser.bindWhitespacesToTokens(tokens)
+
     expect(processed.length).toBe(6)
     expectArrayWithSameContent(
       [EqualsOp, ProcedureName, CellReference, RangeSeparator, CellReference, RParen],

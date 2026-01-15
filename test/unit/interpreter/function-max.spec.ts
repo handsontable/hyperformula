@@ -6,22 +6,26 @@ import {adr, detailedError} from '../testUtils'
 describe('MAX', () => {
   it('MAX with empty args', () => {
     const engine = HyperFormula.buildFromArray([['=MAX()']])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
 
   it('MAX with args', () => {
     const engine = HyperFormula.buildFromArray([['=MAX(1, B1)', '3.14']])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(3.14)
   })
 
   it('MAX with range', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MAX(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+
+    expect(engine.getCellValue(adr('A4'))).toBe(3)
   })
 
   it('MAX with mixed arguments', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MAX(4,A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+
+    expect(engine.getCellValue(adr('A4'))).toBe(4)
   })
 
   it('doesnt do coercions', () => {
@@ -34,22 +38,25 @@ describe('MAX', () => {
       ['=MAX(A1:A5)'],
     ])
 
-    expect(engine.getCellValue(adr('A6'))).toEqual(2)
+    expect(engine.getCellValue(adr('A6'))).toBe(2)
   })
 
   it('MAX of strings and -1', () => {
     const engine = HyperFormula.buildFromArray([['foo'], ['bar'], ['-1'], ['=MAX(A1:A3)']])
-    expect(engine.getCellValue(adr('A4'))).toEqual(-1)
+
+    expect(engine.getCellValue(adr('A4'))).toBe(-1)
   })
 
   it('MAX of empty value', () => {
     const engine = HyperFormula.buildFromArray([['', '=MAX(A1)']])
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
   it('MAX of empty value and some negative number', () => {
     const engine = HyperFormula.buildFromArray([['', '-1', '=MAX(A1,B1)']])
-    expect(engine.getCellValue(adr('C1'))).toEqual(-1)
+
+    expect(engine.getCellValue(adr('C1'))).toBe(-1)
   })
 
   it('over a range value', () => {
@@ -59,7 +66,7 @@ describe('MAX', () => {
       ['=MAX(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(22)
+    expect(engine.getCellValue(adr('A3'))).toBe(22)
   })
 
   it('propagates errors', () => {

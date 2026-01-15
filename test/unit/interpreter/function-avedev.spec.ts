@@ -8,7 +8,7 @@ describe('Function AVEDEV', () => {
       ['=AVEDEV(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('two numbers', () => {
@@ -16,7 +16,7 @@ describe('Function AVEDEV', () => {
       ['=AVEDEV(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
   })
 
   it('more numbers', () => {
@@ -24,7 +24,7 @@ describe('Function AVEDEV', () => {
       ['=AVEDEV(3, 1, 2, 4, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1.2)
+    expect(engine.getCellValue(adr('A1'))).toBe(1.2)
   })
 
   it('works with ranges', () => {
@@ -33,7 +33,7 @@ describe('Function AVEDEV', () => {
       ['=AVEDEV(A1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(4)
+    expect(engine.getCellValue(adr('A2'))).toBe(4)
   })
 
   it('propagates error from regular argument', () => {
@@ -83,6 +83,6 @@ describe('Function AVEDEV', () => {
       [0, 1, false, null, '\'0']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
   })
 })

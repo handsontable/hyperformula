@@ -23,7 +23,7 @@ describe('CombinedTransformer', () => {
       [3, 4],
     ])
 
-    expect(transformer.isIrreversible()).toEqual(true)
+    expect(transformer.isIrreversible()).toBe(true)
   })
 
 })

@@ -44,10 +44,10 @@ describe('function BITLSHIFT', () => {
       ['=BITLSHIFT(123, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(8)
-    expect(engine.getCellValue(adr('A4'))).toEqual(984)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(8)
+    expect(engine.getCellValue(adr('A4'))).toBe(984)
   })
 
   it('should work for negative positions', () => {
@@ -58,10 +58,10 @@ describe('function BITLSHIFT', () => {
       ['=BITLSHIFT(4786, -3)', '=BITRSHIFT(4786, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(30)
-    expect(engine.getCellValue(adr('A4'))).toEqual(598)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(30)
+    expect(engine.getCellValue(adr('A4'))).toBe(598)
 
     expect(engine.getCellValue(adr('A1'))).toEqual(engine.getCellValue(adr('B1')))
     expect(engine.getCellValue(adr('A2'))).toEqual(engine.getCellValue(adr('B2')))
@@ -88,8 +88,8 @@ describe('function BITLSHIFT', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 })

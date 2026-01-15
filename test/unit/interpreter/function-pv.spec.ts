@@ -27,7 +27,7 @@ describe('Function PV', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(-1.01010101010099e+50, -39)
     expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('C2'))).toBeCloseTo(-400, 6)
-    expect(engine.getCellValue(adr('A3'))).toEqual(-2400)
+    expect(engine.getCellValue(adr('A3'))).toBe(-2400)
   })
 
   it('should return error when args are incorrect', () => {

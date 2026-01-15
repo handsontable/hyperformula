@@ -11,6 +11,9 @@ import {InterpreterState} from './interpreter/InterpreterState'
 import {FunctionArgumentType} from './interpreter'
 import {Ast, AstNodeType, ProcedureAst} from './parser'
 
+/**
+ *
+ */
 export class ArraySize {
   constructor(
     public width: number,
@@ -18,27 +21,48 @@ export class ArraySize {
     public isRef: boolean = false,
   ) {}
 
+  
+  /**
+   *
+   */
   public static error() {
     return new ArraySize(1, 1, true)
   }
 
+  
+  /**
+   *
+   */
   public static scalar() {
     return new ArraySize(1, 1, false)
   }
 
+  
+  /**
+   *
+   */
   isScalar(): boolean {
     return (this.width === 1 && this.height === 1) || this.isRef
   }
 }
 
+/**
+ *
+ */
 function arraySizeForBinaryOp(leftArraySize: ArraySize, rightArraySize: ArraySize): ArraySize {
   return new ArraySize(Math.max(leftArraySize.width, rightArraySize.width), Math.max(leftArraySize.height, rightArraySize.height))
 }
 
+/**
+ *
+ */
 function arraySizeForUnaryOp(arraySize: ArraySize): ArraySize {
   return new ArraySize(arraySize.width, arraySize.height)
 }
 
+/**
+ *
+ */
 export class ArraySizePredictor {
   constructor(
     private config: Config,
@@ -46,10 +70,18 @@ export class ArraySizePredictor {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public checkArraySize(ast: Ast, formulaAddress: SimpleCellAddress): ArraySize {
     return this.checkArraySizeForAst(ast, {formulaAddress, arraysFlag: this.config.useArrayArithmetic})
   }
 
+  
+  /**
+   *
+   */
   public checkArraySizeForAst(ast: Ast, state: InterpreterState): ArraySize {
     switch (ast.type) {
       case AstNodeType.FUNCTION_CALL: {
@@ -122,6 +154,10 @@ export class ArraySizePredictor {
     }
   }
 
+  
+  /**
+   *
+   */
   private checkArraySizeForFunction(ast: ProcedureAst, state: InterpreterState): ArraySize {
     const pluginArraySizeFunction = this.functionRegistry.getArraySizeFunction(ast.procedureName)
 

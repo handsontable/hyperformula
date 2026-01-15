@@ -5,13 +5,13 @@ describe('Clear sheet - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToClearSheet(1)).toEqual(false)
+    expect(engine.isItPossibleToClearSheet(1)).toBe(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToClearSheet(0)).toEqual(true)
+    expect(engine.isItPossibleToClearSheet(0)).toBe(true)
   })
 })
 
@@ -31,8 +31,8 @@ describe('Clear sheet content', () => {
 
     engine.clearSheet(0)
 
-    expect(engine.getCellValue(adr('A1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toBe(null)
+    expect(engine.getCellValue(adr('A1'))).toBeNull()
+    expect(engine.getCellValue(adr('B1'))).toBeNull()
   })
 
   it('should recalculate and return changes', () => {
@@ -48,10 +48,10 @@ describe('Clear sheet content', () => {
 
     const changes = engine.clearSheet(0)
 
-    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
-    expect(engine.getCellValue(adr('A2', 1))).toEqual(1)
+    expect(engine.getCellValue(adr('A1', 1))).toBeNull()
+    expect(engine.getCellValue(adr('A2', 1))).toBe(1)
 
-    expect(changes.length).toEqual(2)
+    expect(changes.length).toBe(2)
   })
 
   it('should clear sheet with matrix', () => {
@@ -68,10 +68,10 @@ describe('Clear sheet content', () => {
 
     const changes = engine.clearSheet(0)
 
-    expect(engine.getCellValue(adr('A1', 1))).toBe(null)
-    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
+    expect(engine.getCellValue(adr('A1', 1))).toBeNull()
+    expect(engine.getCellValue(adr('A2', 1))).toBeNull()
 
-    expect(changes.length).toEqual(2)
+    expect(changes.length).toBe(2)
   })
 
   it('should clear sheet and dont break edge between cells', () => {
@@ -87,7 +87,7 @@ describe('Clear sheet content', () => {
     engine.clearSheet(0)
     engine.setCellContents(adr('A1'), '2')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(2)
   })
 
   it('should clear sheet and dont break edge between cells, case with range', () => {
@@ -100,6 +100,6 @@ describe('Clear sheet content', () => {
     engine.setCellContents(adr('A1'), '2')
     engine.setCellContents(adr('B1'), '3')
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(5)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(5)
   })
 })

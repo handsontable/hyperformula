@@ -51,6 +51,6 @@ describe('Function DB', () => {
       ['=DB(10000, 10000, 10, 2, 12)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 })

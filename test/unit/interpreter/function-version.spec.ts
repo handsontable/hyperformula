@@ -13,7 +13,7 @@ describe('Function VERSION', () => {
         licenseKey: 'gpl-v3',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
+      expect(engine.getCellValue(adr('A1'))).toBe(`HyperFormula v${HyperFormula.version}, 1`)
     })
 
     it('missing license key', () => {
@@ -23,7 +23,7 @@ describe('Function VERSION', () => {
         licenseKey: '',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 2`)
+      expect(engine.getCellValue(adr('A1'))).toBe(`HyperFormula v${HyperFormula.version}, 2`)
     })
 
     it('invalid license key', () => {
@@ -33,7 +33,7 @@ describe('Function VERSION', () => {
         licenseKey: '11111-11111-11111-11111-11111',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 3`)
+      expect(engine.getCellValue(adr('A1'))).toBe(`HyperFormula v${HyperFormula.version}, 3`)
     })
 
     it('expired license key', () => {
@@ -43,7 +43,7 @@ describe('Function VERSION', () => {
         licenseKey: '80584-cc272-2e7c4-06f16-4db00',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 4`)
+      expect(engine.getCellValue(adr('A1'))).toBe(`HyperFormula v${HyperFormula.version}, 4`)
     })
 
     it('correct license key', () => {
@@ -53,11 +53,14 @@ describe('Function VERSION', () => {
         licenseKey: 'internal-use-in-handsontable',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, table`)
+      expect(engine.getCellValue(adr('A1'))).toBe(`HyperFormula v${HyperFormula.version}, table`)
     })
   })
 
   describe('registering', () => {
+    /**
+     *
+     */
     class VersionExtra extends FunctionPlugin implements FunctionPluginTypecheck<VersionExtra> {
       public static implementedFunctions = {
         'VERSION': {
@@ -65,6 +68,9 @@ describe('Function VERSION', () => {
         }
       }
 
+      /**
+       *
+       */
       public version(): InterpreterValue {
         return 'version'
       }
@@ -92,7 +98,7 @@ describe('Function VERSION', () => {
         licenseKey: 'gpl-v3',
       })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(`HyperFormula v${HyperFormula.version}, 1`)
+      expect(engine.getCellValue(adr('A1'))).toBe(`HyperFormula v${HyperFormula.version}, 1`)
     })
   })
 })

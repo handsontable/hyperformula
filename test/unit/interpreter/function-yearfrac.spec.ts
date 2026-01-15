@@ -36,11 +36,11 @@ describe('Function YEARFRAC', () => {
       ['=YEARFRAC("01/03/2021", "28/02/2021")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1 / 360, 9)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(1 / 360, 9)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(1 / 360, 9)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A5'))).toBe(0)
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(1 / 360, 9)
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(1 / 360, 9)
     expect(engine.getCellValue(adr('A8'))).toBeCloseTo(1 / 360, 9)
@@ -120,11 +120,11 @@ describe('Function YEARFRAC', () => {
       ['=YEARFRAC("01/03/2021", "28/02/2021", 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1 / 360, 9)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(2 / 360, 9)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(3 / 360, 9)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A5'))).toBe(0)
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(1 / 360, 9)
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(2 / 360, 9)
     expect(engine.getCellValue(adr('A8'))).toBeCloseTo(3 / 360, 9)

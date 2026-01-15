@@ -44,12 +44,12 @@ describe('Function WEEKNUM', () => {
       ['=WEEKNUM("02/08/2017", "21")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(32)
-    expect(engine.getCellValue(adr('A2'))).toEqual(32)
-    expect(engine.getCellValue(adr('A3'))).toEqual(31)
-    expect(engine.getCellValue(adr('A4'))).toEqual(31)
-    expect(engine.getCellValue(adr('A5'))).toEqual(32)
-    expect(engine.getCellValue(adr('A6'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(32)
+    expect(engine.getCellValue(adr('A2'))).toBe(32)
+    expect(engine.getCellValue(adr('A3'))).toBe(31)
+    expect(engine.getCellValue(adr('A4'))).toBe(31)
+    expect(engine.getCellValue(adr('A5'))).toBe(32)
+    expect(engine.getCellValue(adr('A6'))).toBe(31)
   })
 
   it('should work for numbers', () => {
@@ -59,9 +59,9 @@ describe('Function WEEKNUM', () => {
       ['=WEEKNUM(0, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(52)
-    expect(engine.getCellValue(adr('A2'))).toEqual(52)
-    expect(engine.getCellValue(adr('A3'))).toEqual(53)
+    expect(engine.getCellValue(adr('A1'))).toBe(52)
+    expect(engine.getCellValue(adr('A2'))).toBe(52)
+    expect(engine.getCellValue(adr('A3'))).toBe(53)
   })
 
   it('should work for strings with different nullDate', () => {
@@ -74,12 +74,12 @@ describe('Function WEEKNUM', () => {
       ['=WEEKNUM("02/08/2017", "21")'],
     ], {nullDate: {day: 20, month: 10, year: 1920}})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(32)
-    expect(engine.getCellValue(adr('A2'))).toEqual(32)
-    expect(engine.getCellValue(adr('A3'))).toEqual(31)
-    expect(engine.getCellValue(adr('A4'))).toEqual(31)
-    expect(engine.getCellValue(adr('A5'))).toEqual(32)
-    expect(engine.getCellValue(adr('A6'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(32)
+    expect(engine.getCellValue(adr('A2'))).toBe(32)
+    expect(engine.getCellValue(adr('A3'))).toBe(31)
+    expect(engine.getCellValue(adr('A4'))).toBe(31)
+    expect(engine.getCellValue(adr('A5'))).toBe(32)
+    expect(engine.getCellValue(adr('A6'))).toBe(31)
   })
 
   it('should work for strings with compatibility mode', () => {
@@ -92,13 +92,14 @@ describe('Function WEEKNUM', () => {
       ['=WEEKNUM("02/08/2017", "21")'],
     ], {leapYear1900: true})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(32)
-    expect(engine.getCellValue(adr('A2'))).toEqual(32)
-    expect(engine.getCellValue(adr('A3'))).toEqual(31)
-    expect(engine.getCellValue(adr('A4'))).toEqual(31)
-    expect(engine.getCellValue(adr('A5'))).toEqual(32)
-    expect(engine.getCellValue(adr('A6'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(32)
+    expect(engine.getCellValue(adr('A2'))).toBe(32)
+    expect(engine.getCellValue(adr('A3'))).toBe(31)
+    expect(engine.getCellValue(adr('A4'))).toBe(31)
+    expect(engine.getCellValue(adr('A5'))).toBe(32)
+    expect(engine.getCellValue(adr('A6'))).toBe(31)
   })
+
   it('should work for strings with compatibility mode and different nullDate', () => {
     const engine = HyperFormula.buildFromArray([
       ['=WEEKNUM("02/08/2020")'],
@@ -109,12 +110,12 @@ describe('Function WEEKNUM', () => {
       ['=WEEKNUM("02/08/2017", "21")'],
     ], {leapYear1900: true, nullDate: {day: 20, month: 10, year: 1920}})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(32)
-    expect(engine.getCellValue(adr('A2'))).toEqual(32)
-    expect(engine.getCellValue(adr('A3'))).toEqual(31)
-    expect(engine.getCellValue(adr('A4'))).toEqual(31)
-    expect(engine.getCellValue(adr('A5'))).toEqual(32)
-    expect(engine.getCellValue(adr('A6'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(32)
+    expect(engine.getCellValue(adr('A2'))).toBe(32)
+    expect(engine.getCellValue(adr('A3'))).toBe(31)
+    expect(engine.getCellValue(adr('A4'))).toBe(31)
+    expect(engine.getCellValue(adr('A5'))).toBe(32)
+    expect(engine.getCellValue(adr('A6'))).toBe(31)
   })
 
   it('big test', () => {
@@ -129,6 +130,7 @@ describe('Function WEEKNUM', () => {
       arrs.push(arr)
     }
     const engine = HyperFormula.buildFromArray(arrs)
+
     expect(engine.getSheetValues(0)).toEqual(
       [[33, 33, 33, 34, 34, 34, 34],
         [33, 33, 33, 33, 34, 34, 34],

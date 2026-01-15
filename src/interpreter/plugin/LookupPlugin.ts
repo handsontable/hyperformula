@@ -17,6 +17,9 @@ import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
 import { ArraySize } from '../../ArraySize'
 
+/**
+ *
+ */
 export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LookupPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'VLOOKUP': {
@@ -160,6 +163,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
+  
+  /**
+   *
+   */
   public xlookupArraySize(ast: ProcedureAst): ArraySize {
     const lookupRange = ast?.args?.[1] as CellRange
     const returnRange  = ast?.args?.[2] as CellRange
@@ -191,12 +198,20 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return new ArraySize(1, returnRangeHeight)
   }
 
+  
+  /**
+   *
+   */
   public match(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MATCH'), (key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number) => {
       return this.doMatch(zeroIfEmpty(key), rangeValue, type)
     })
   }
 
+  
+  /**
+   *
+   */
   protected searchInRange(key: RawNoErrorScalarValue, range: SimpleRangeValue, isWildcardMatchMode: boolean, searchOptions: SearchOptions, searchStrategy: SearchStrategy): number {
     if (isWildcardMatchMode && typeof key === 'string' && this.arithmeticHelper.requiresRegex(key)) {
       return searchStrategy.advancedFind(
@@ -209,6 +224,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return searchStrategy.find(key, range, searchOptions)
   }
 
+  
+  /**
+   *
+   */
   private doVlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
     this.dependencyGraph.stats.start(StatType.VLOOKUP)
     const range = rangeValue.range
@@ -240,6 +259,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
+  
+  /**
+   *
+   */
   private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
     const range = rangeValue.range
     let searchedRange
@@ -268,6 +291,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return value
   }
 
+  
+  /**
+   *
+   */
   private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, notFoundFlag: any, isWildcardMatchMode: boolean, searchOptions: SearchOptions): InterpreterValue {
     const isVerticalSearch = lookupRange.width() === 1 && returnRange.height() === lookupRange.height()
     const isHorizontalSearch = lookupRange.height() === 1 && returnRange.width() === lookupRange.width()
@@ -287,6 +314,10 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     return SimpleRangeValue.onlyValues(returnValues)
   }
 
+  
+  /**
+   *
+   */
   private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number): InternalScalarValue {
     if (![-1, 0, 1].includes(type)) {
       return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)

@@ -59,10 +59,18 @@ export class SparseStrategy implements AddressMappingStrategy {
     return this.width
   }
 
+  
+  /**
+   *
+   */
   public removeCell(address: SimpleCellAddress): void {
     this.mapping.get(address.col)?.delete(address.row)
   }
 
+  
+  /**
+   *
+   */
   public addRows(row: number, numberOfRows: number): void {
     this.mapping.forEach((rowMapping: Map<number, CellVertex>) => {
       const tmpMapping = new Map()
@@ -79,6 +87,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     this.height += numberOfRows
   }
 
+  
+  /**
+   *
+   */
   public addColumns(column: number, numberOfColumns: number): void {
     const tmpMapping = new Map()
     this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
@@ -93,6 +105,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     this.width += numberOfColumns
   }
 
+  
+  /**
+   *
+   */
   public removeRows(removedRows: RowsSpan): void {
     this.mapping.forEach((rowMapping: Map<number, CellVertex>) => {
       const tmpMapping = new Map()
@@ -113,6 +129,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     this.height = Math.max(0, this.height - numberOfRowsRemoved)
   }
 
+  
+  /**
+   *
+   */
   public removeColumns(removedColumns: ColumnsSpan): void {
     const tmpMapping = new Map()
     this.mapping.forEach((rowMapping: Map<number, CellVertex>, colNumber: number) => {
@@ -131,6 +151,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
+  
+  /**
+   *
+   */
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (const [colNumber, col] of this.mapping) {
       for (const [rowNumber, value] of col) {
@@ -139,6 +163,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromColumn(column: number): IterableIterator<CellVertex> {
     const colMapping = this.mapping.get(column)
     if (colMapping === undefined) {
@@ -149,6 +177,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromRow(row: number): IterableIterator<CellVertex> {
     for (const colMapping of this.mapping.values()) {
       const rowVertex = colMapping.get(row)
@@ -158,6 +190,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
     for (const column of columnsSpan.columns()) {
       const colMapping = this.mapping.get(column)
@@ -170,6 +206,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
     for (const colMapping of this.mapping.values()) {
       for (const row of rowsSpan.rows()) {
@@ -181,6 +221,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (const [col, colMapping] of this.mapping.entries()) {
       for (const row of rowsSpan.rows()) {
@@ -192,6 +236,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (const col of columnsSpan.columns()) {
       const colMapping = this.mapping.get(col)
@@ -203,6 +251,10 @@ export class SparseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* vertices(): IterableIterator<CellVertex> {
     for (const [_, col] of this.mapping) {
       for (const [_, value] of col) {

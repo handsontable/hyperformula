@@ -8,7 +8,10 @@ import {
   getRawValue,
   InternalScalarValue,
   RawInterpreterValue,
-  RawNoErrorScalarValue
+  RawNoErrorScalarValue,
+  isExtendedNumber,
+  getRawPrecisionValue,
+  toNativeNumeric
 } from '../interpreter/InterpreterValue'
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import {AdvancedFindOptions, SearchOptions} from './SearchStrategy'
@@ -17,12 +20,19 @@ import {compare, findLastOccurrenceInOrderedRange} from '../interpreter/binarySe
 
 const NOT_FOUND = -1
 
+/**
+ *
+ */
 export abstract class AdvancedFind {
   protected constructor(
     protected dependencyGraph: DependencyGraph
   ) {
   }
 
+  
+  /**
+   *
+   */
   public advancedFind(keyMatcher: (arg: RawInterpreterValue) => boolean, rangeValue: SimpleRangeValue, { returnOccurrence }: AdvancedFindOptions = { returnOccurrence: 'first' }): number {
     const range = rangeValue.range
     const values: InternalScalarValue[] = (range === undefined)
@@ -41,6 +51,10 @@ export abstract class AdvancedFind {
     return NOT_FOUND
   }
 
+  
+  /**
+   *
+   */
   protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, returnOccurrence }: SearchOptions): number {
     const normalizedSearchKey = typeof searchKey === 'string' ? forceNormalizeString(searchKey) : searchKey
     const range = rangeValue.range
@@ -61,13 +75,35 @@ export abstract class AdvancedFind {
     )
   }
 
+  
+  /**
+   *
+   */
   protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' = 'returnNotFound', returnOccurrence: 'first' | 'last' = 'first'): number {
     const normalizedArray = searchArray
       .map(getRawValue)
       .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)
 
     if (ifNoMatch === 'returnNotFound') {
-      return returnOccurrence === 'first' ? normalizedArray.indexOf(searchKey) : normalizedArray.lastIndexOf(searchKey)
+      // Custom comparison that handles Numeric
+      const isEqual = (a: RawInterpreterValue, b: RawNoErrorScalarValue): boolean => {
+        if (isExtendedNumber(a) && isExtendedNumber(b)) {
+          return toNativeNumeric(getRawPrecisionValue(a as any)) === toNativeNumeric(getRawPrecisionValue(b as any))
+        }
+        return a === b
+      }
+      
+      if (returnOccurrence === 'first') {
+        return normalizedArray.findIndex(val => isEqual(val, searchKey))
+      } else {
+        // Find last occurrence
+        for (let i = normalizedArray.length - 1; i >= 0; i--) {
+          if (isEqual(normalizedArray[i], searchKey)) {
+            return i
+          }
+        }
+        return -1
+      }
     }
 
     const compareFn = ifNoMatch === 'returnLowerBound'

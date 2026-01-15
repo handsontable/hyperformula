@@ -17,6 +17,7 @@ describe('Function STDEV.S', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.S(2, 3)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.707106781186548, 6)
   })
 
@@ -24,6 +25,7 @@ describe('Function STDEV.S', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.S(2, 3, 4, TRUE(), FALSE(), "1",)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(1.51185789203691, 6) //inconsistency with product #1
   })
 
@@ -31,13 +33,15 @@ describe('Function STDEV.S', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.S(B1:I1)', 2, 3, 4, true, false, 'a', '\'1', null],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('should propagate errors', () => {
     const engine = HyperFormula.buildFromArray([
       ['=STDEV.S(B1:I1)', 2, 3, 4, '=NA()', false, 'a', '\'1', null],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

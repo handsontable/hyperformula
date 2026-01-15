@@ -14,13 +14,13 @@ describe('Function ROWS', () => {
   it('works for range', () => {
     const engine = HyperFormula.buildFromArray([['=ROWS(A1:C2)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   it('works for row range', () => {
     const engine = HyperFormula.buildFromArray([['=ROWS(1:3)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
   })
 
   it('works for column range', () => {
@@ -32,13 +32,13 @@ describe('Function ROWS', () => {
   it('works for array', () => {
     const engine = HyperFormula.buildFromArray([['=ROWS({1;2;3})']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
   })
 
   it('works with cell reference', () => {
     const engine = HyperFormula.buildFromArray([['=ROWS(A1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('propagates only direct errors', () => {
@@ -49,7 +49,7 @@ describe('Function ROWS', () => {
     ])
 
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
   })
 
   // Inconsistency with Product 1
@@ -60,7 +60,7 @@ describe('Function ROWS', () => {
       ['=ROWS(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A3'))).toBe(2)
   })
 
   it('should work when adding column', () => {
@@ -71,6 +71,6 @@ describe('Function ROWS', () => {
 
     engine.addRows(0, [1, 1])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('B1'))).toBe(3)
   })
 })

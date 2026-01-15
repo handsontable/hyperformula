@@ -10,6 +10,7 @@ describe('Function IFS', () => {
       [20, '=IFS(A1>90)'],
       [30, '=IFS(A1>90, "A", A1>80)'],
     ])
+
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B3'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
@@ -33,9 +34,10 @@ describe('Function IFS', () => {
       [21, '=IFS(A2>30, "A", A2>20, "B", A2>10, "C")'],
       [31, '=IFS(A3>30, "A", A3>20, "B", A3>10, "C")'],
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual('C')
-    expect(engine.getCellValue(adr('B2'))).toEqual('B')
-    expect(engine.getCellValue(adr('B3'))).toEqual('A')
+
+    expect(engine.getCellValue(adr('B1'))).toBe('C')
+    expect(engine.getCellValue(adr('B2'))).toBe('B')
+    expect(engine.getCellValue(adr('B3'))).toBe('A')
   })
 
   it('Return first match', () => {
@@ -44,15 +46,17 @@ describe('Function IFS', () => {
       [21, '=IFS(A2>10, "A", A2>10, "B", A2>10, "C")'],
       [31, '=IFS(A3>10, "A", A3>10, "B", A3>10, "C")'],
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual('A')
-    expect(engine.getCellValue(adr('B2'))).toEqual('A')
-    expect(engine.getCellValue(adr('B3'))).toEqual('A')
+
+    expect(engine.getCellValue(adr('B1'))).toBe('A')
+    expect(engine.getCellValue(adr('B2'))).toBe('A')
+    expect(engine.getCellValue(adr('B3'))).toBe('A')
   })
 
   it('No match found', () => {
     const engine = HyperFormula.buildFromArray([
       [10, '=IFS(A1>90, "A", A1>80, "B", A1>70, "C")']
     ])
+
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.NoConditionMet))
   })
 })

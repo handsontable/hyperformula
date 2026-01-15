@@ -22,10 +22,18 @@ export class ValueCellVertex {
   constructor(private parsedValue: ValueCellVertexValue, private rawValue: RawCellContent) {
   }
 
+  
+  /**
+   *
+   */
   public getValues(): RawAndParsedValue {
     return {parsedValue: this.parsedValue, rawValue: this.rawValue}
   }
 
+  
+  /**
+   *
+   */
   public setValues(values: RawAndParsedValue) {
     this.parsedValue = values.parsedValue
     this.rawValue = values.rawValue

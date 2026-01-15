@@ -6,7 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {EmptyValueType, InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {EmptyValueType, getRawPrecisionValue, InterpreterValue, isExtendedNumber, RawScalarValue, toNativeNumeric} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 /**
@@ -41,7 +41,12 @@ export class CountUniquePlugin extends FunctionPlugin implements FunctionPluginT
         if (scalarValue instanceof CellError) {
           errorsSet.add(scalarValue.type)
         } else if (scalarValue !== '') {
-          valuesSet.add(scalarValue)
+          // Convert Numeric to native number for Set uniqueness comparison
+          if (isExtendedNumber(scalarValue)) {
+            valuesSet.add(toNativeNumeric(getRawPrecisionValue(scalarValue)))
+          } else {
+            valuesSet.add(scalarValue)
+          }
         }
       }
 

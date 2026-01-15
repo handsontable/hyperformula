@@ -35,13 +35,13 @@ describe('function OCT2BIN', () => {
       ['=OCT2BIN(7777777777)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1000')
-    expect(engine.getCellValue(adr('A3'))).toEqual('111001')
-    expect(engine.getCellValue(adr('A4'))).toEqual('111111111')
-    expect(engine.getCellValue(adr('A5'))).toEqual('1000000000')
-    expect(engine.getCellValue(adr('A6'))).toEqual('1000100010')
-    expect(engine.getCellValue(adr('A7'))).toEqual('1111111111')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('1000')
+    expect(engine.getCellValue(adr('A3'))).toBe('111001')
+    expect(engine.getCellValue(adr('A4'))).toBe('111111111')
+    expect(engine.getCellValue(adr('A5'))).toBe('1000000000')
+    expect(engine.getCellValue(adr('A6'))).toBe('1000100010')
+    expect(engine.getCellValue(adr('A7'))).toBe('1111111111')
   })
 
   it('should work for strings', () => {
@@ -49,7 +49,7 @@ describe('function OCT2BIN', () => {
       ['=OCT2BIN("456")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('100101110')
+    expect(engine.getCellValue(adr('A1'))).toBe('100101110')
   })
 
   it('should work for reference', () => {
@@ -58,7 +58,7 @@ describe('function OCT2BIN', () => {
       ['=OCT2BIN(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('1010011')
+    expect(engine.getCellValue(adr('A2'))).toBe('1010011')
   })
 
   it('should return string value', () => {
@@ -76,7 +76,7 @@ describe('function OCT2BIN', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotOctal))
-    expect(engine.getCellValue(adr('A2'))).toEqual('1000100010')
+    expect(engine.getCellValue(adr('A2'))).toBe('1000100010')
   })
 
   it('result cannot be longer than 10 digits', () => {
@@ -95,8 +95,8 @@ describe('function OCT2BIN', () => {
       ['=OCT2BIN(3, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('00001010')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0011')
+    expect(engine.getCellValue(adr('A1'))).toBe('00001010')
+    expect(engine.getCellValue(adr('A2'))).toBe('0011')
   })
 
   it('second argument should not affect negative results', () => {
@@ -105,8 +105,8 @@ describe('function OCT2BIN', () => {
       ['=OCT2BIN(7777777042, 10)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1000100010')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1000100010')
+    expect(engine.getCellValue(adr('A1'))).toBe('1000100010')
+    expect(engine.getCellValue(adr('A2'))).toBe('1000100010')
   })
 
   it('should fail if the result is longer than the desired length', () => {

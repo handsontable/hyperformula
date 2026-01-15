@@ -3,6 +3,9 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+/**
+ *
+ */
 export class ProcessableValue<Raw, Processed> {
   private processedValue: Processed | null = null
 
@@ -11,6 +14,10 @@ export class ProcessableValue<Raw, Processed> {
     private processFn: (r: Raw) => Processed
   ) {}
 
+  
+  /**
+   *
+   */
   getProcessedValue(): Processed {
     if (this.processedValue === null) {
       this.processedValue = this.processFn(this.rawValue)
@@ -19,6 +26,10 @@ export class ProcessableValue<Raw, Processed> {
     return this.processedValue
   }
 
+  
+  /**
+   *
+   */
   markAsModified() {
     this.processedValue = null
   }

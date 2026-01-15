@@ -19,12 +19,13 @@ describe('RemoveRowsTransformer', () => {
       const astParen = ast as ParenthesisAst
       const astSum = astParen.expression as ProcedureAst
       const astSumArg = astSum.args[0] as CellRangeAst
+
       expect(astSumArg.start.sheet).toBeUndefined()
-      expect(astSumArg.start.col).toEqual(2)
-      expect(astSumArg.start.row).toEqual(1)
+      expect(astSumArg.start.col).toBe(2)
+      expect(astSumArg.start.row).toBe(1)
       expect(astSumArg.end.sheet).toBeUndefined()
-      expect(astSumArg.end.col).toEqual(5)
-      expect(astSumArg.end.row).toEqual(6)
+      expect(astSumArg.end.col).toBe(5)
+      expect(astSumArg.end.row).toBe(6)
     }
 
     const [transformedAst, cellAddress] = transformer.transformSingleAst(ast, simpleCellAddress(0, 0, 0))
@@ -33,11 +34,12 @@ describe('RemoveRowsTransformer', () => {
       const astParen = transformedAst as ParenthesisAst
       const astSum = astParen.expression as ProcedureAst
       const astSumError = astSum.args[0] as ErrorAst
+
       expect(astSumError.type).toEqual(ErrorType.ERROR)
       expect(astSumError.error.type).toEqual(ErrorType.REF)
-      expect(cellAddress.sheet).toEqual(0)
-      expect(cellAddress.col).toEqual(0)
-      expect(cellAddress.row).toEqual(-3)
+      expect(cellAddress.sheet).toBe(0)
+      expect(cellAddress.col).toBe(0)
+      expect(cellAddress.row).toBe(-3)
     }
 
   })

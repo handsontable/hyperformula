@@ -34,7 +34,7 @@ describe('Function BINOM.DIST', () => {
       ['=BINOM.DIST(10, 20, 0.7, TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
 
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0479618973, 6)
   })
@@ -45,7 +45,7 @@ describe('Function BINOM.DIST', () => {
       ['=BINOM.DIST(10, 20, 0.7, FALSE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.1)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.1)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0308170809000851, 6)
   })
 
@@ -55,7 +55,7 @@ describe('Function BINOM.DIST', () => {
       ['=BINOM.DIST(10.5, 20.2, 0.7, FALSE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.1)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.1)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.0308170809000851, 6)
   })
 

@@ -10,23 +10,24 @@ describe('Function SPLIT', () => {
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
+
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 0)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('some')
+    expect(engine.getCellValue(adr('B1'))).toBe('some')
   })
 
   it('bigger index', () => {
     const engine = HyperFormula.buildFromArray([['some words', '=SPLIT(A1, 1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('words')
+    expect(engine.getCellValue(adr('B1'))).toBe('words')
   })
 
   it('when continuous delimeters', () => {
     const engine = HyperFormula.buildFromArray([['some  words', '=SPLIT(A1, 1)', '=SPLIT(A1, 2)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual('')
-    expect(engine.getCellValue(adr('C1'))).toEqual('words')
+    expect(engine.getCellValue(adr('B1'))).toBe('')
+    expect(engine.getCellValue(adr('C1'))).toBe('words')
   })
 
   it('coerce first argument to string', () => {

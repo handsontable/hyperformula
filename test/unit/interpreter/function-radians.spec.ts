@@ -9,7 +9,7 @@ describe('Function RADIANS', () => {
       ['=RADIANS(0)', '=RADIANS(180.0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(3.1415)
   })
 

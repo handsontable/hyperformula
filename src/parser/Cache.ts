@@ -22,6 +22,9 @@ const buildCacheEntry = (ast: Ast, relativeDependencies: RelativeDependency[], h
   hasStructuralChangeFunction
 })
 
+/**
+ *
+ */
 export class Cache {
   private cache: Map<string, CacheEntry> = new Map()
 
@@ -30,6 +33,10 @@ export class Cache {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public set(hash: string, ast: Ast): CacheEntry {
     const astRelativeDependencies = collectDependencies(ast, this.functionRegistry)
     const cacheEntry = buildCacheEntry(ast, astRelativeDependencies, doesContainFunctions(ast, this.functionRegistry.isFunctionVolatile), doesContainFunctions(ast, this.functionRegistry.isFunctionDependentOnSheetStructureChange))
@@ -37,10 +44,18 @@ export class Cache {
     return cacheEntry
   }
 
+  
+  /**
+   *
+   */
   public get(hash: string): Maybe<CacheEntry> {
     return this.cache.get(hash)
   }
 
+  
+  /**
+   *
+   */
   public maybeSetAndThenGet(hash: string, ast: Ast): Ast {
     const entryFromCache = this.cache.get(hash)
     if (entryFromCache !== undefined) {

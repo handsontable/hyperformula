@@ -8,7 +8,7 @@ describe('Function HARMEAN', () => {
       ['=HARMEAN(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('two numbers', () => {
@@ -16,7 +16,7 @@ describe('Function HARMEAN', () => {
       ['=HARMEAN(1, 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1.6)
+    expect(engine.getCellValue(adr('A1'))).toBe(1.6)
   })
 
   it('more numbers', () => {
@@ -80,7 +80,7 @@ describe('Function HARMEAN', () => {
       ['=HARMEAN(TRUE(),"4")']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1.6)
+    expect(engine.getCellValue(adr('A1'))).toBe(1.6)
   })
 
   it('ignores nonnumeric values in ranges', () => {
@@ -89,6 +89,6 @@ describe('Function HARMEAN', () => {
       [1, 1, false, null, '\'0']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 })

@@ -5,6 +5,7 @@ import { EmptyValue } from '../../src/interpreter/InterpreterValue'
 describe('Matrix', () => {
   it('fill', () => {
     const matrix = new ArrayValue([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
     expect(matrix.raw()).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
   })
 
@@ -27,6 +28,7 @@ describe('Matrix', () => {
       [7, 8, 9],
     ])
     matrix.addRows(1, 3)
+
     expect(matrix.raw()).toEqual([
       [1, 2, 3],
       [EmptyValue, EmptyValue, EmptyValue],
@@ -35,7 +37,8 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
-    expect(matrix.height()).toEqual(6)
+
+    expect(matrix.height()).toBe(6)
   })
 
   it('remove rows', () => {
@@ -46,7 +49,8 @@ describe('Matrix', () => {
       [7, 8],
     ])
     matrix.removeRows(1, 2)
-    expect(matrix.height()).toEqual(2)
+
+    expect(matrix.height()).toBe(2)
     expect(matrix.raw()).toEqual([
       [1, 2],
       [7, 8],
@@ -57,6 +61,7 @@ describe('Matrix', () => {
     const matrix = new ArrayValue([
       [1, 2],
     ])
+
     expect(() => {
       matrix.removeRows(1, 1)
     }).toThrowError('Array index out of bound')
@@ -69,7 +74,8 @@ describe('Matrix', () => {
       [7, 8, 9],
     ])
     matrix.addColumns(1, 2)
-    expect(matrix.width()).toEqual(5)
+
+    expect(matrix.width()).toBe(5)
     expect(matrix.raw()).toEqual([
       [1, EmptyValue, EmptyValue, 2, 3],
       [4, EmptyValue, EmptyValue, 5, 6],
@@ -84,7 +90,8 @@ describe('Matrix', () => {
       [7, 8, 9],
     ])
     matrix.removeColumns(1, 2)
-    expect(matrix.width()).toEqual(1)
+
+    expect(matrix.width()).toBe(1)
     expect(matrix.raw()).toEqual([
       [1],
       [4],
@@ -98,6 +105,7 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
+
     expect(() => {
       matrix.removeColumns(3, 2)
     }).toThrowError('Array index out of bound')
@@ -111,7 +119,8 @@ describe('Matrix', () => {
     ])
     const newSize = new ArraySize(3, 5)
     matrix.resize(newSize)
-    expect(matrix.height()).toEqual(5)
+
+    expect(matrix.height()).toBe(5)
     expect(matrix.raw()).toEqual([
       [1, 2, 3],
       [4, 5, 6],
@@ -127,6 +136,7 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
+
     expect(() => {
       const newSize = new ArraySize(3, 1)
       matrix.resize(newSize)
@@ -141,7 +151,8 @@ describe('Matrix', () => {
     ])
     const newSize = new ArraySize(5, 3)
     matrix.resize(newSize)
-    expect(matrix.width()).toEqual(5)
+
+    expect(matrix.width()).toBe(5)
     expect(matrix.raw()).toEqual([
       [1, 2, 3, EmptyValue, EmptyValue],
       [4, 5, 6, EmptyValue, EmptyValue],
@@ -155,6 +166,7 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
+
     expect(() => {
       const newSize = new ArraySize(1, 3)
       matrix.resize(newSize)
@@ -169,8 +181,9 @@ describe('Matrix', () => {
     ])
     const newSize = new ArraySize(5, 5)
     matrix.resize(newSize)
-    expect(matrix.width()).toEqual(5)
-    expect(matrix.height()).toEqual(5)
+
+    expect(matrix.width()).toBe(5)
+    expect(matrix.height()).toBe(5)
     expect(matrix.raw()).toEqual([
       [1, 2, 3, EmptyValue, EmptyValue],
       [4, 5, 6, EmptyValue, EmptyValue],
@@ -186,15 +199,16 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
-    expect(matrix.get(0, 0)).toEqual(1)
-    expect(matrix.get(1, 0)).toEqual(2)
-    expect(matrix.get(2, 0)).toEqual(3)
-    expect(matrix.get(0, 1)).toEqual(4)
-    expect(matrix.get(1, 1)).toEqual(5)
-    expect(matrix.get(2, 1)).toEqual(6)
-    expect(matrix.get(0, 2)).toEqual(7)
-    expect(matrix.get(1, 2)).toEqual(8)
-    expect(matrix.get(2, 2)).toEqual(9)
+
+    expect(matrix.get(0, 0)).toBe(1)
+    expect(matrix.get(1, 0)).toBe(2)
+    expect(matrix.get(2, 0)).toBe(3)
+    expect(matrix.get(0, 1)).toBe(4)
+    expect(matrix.get(1, 1)).toBe(5)
+    expect(matrix.get(2, 1)).toBe(6)
+    expect(matrix.get(0, 2)).toBe(7)
+    expect(matrix.get(1, 2)).toBe(8)
+    expect(matrix.get(2, 2)).toBe(9)
   })
 
   it('get value - out of bounds', () => {
@@ -203,21 +217,27 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
+
     expect(() => {
       matrix.get(3, 0)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.get(0, 3)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.get(3, 3)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.get(-1, 0)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.get(0, -1)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.get(-1, -1)
     }).toThrowError('Array index out of bound')
@@ -238,6 +258,7 @@ describe('Matrix', () => {
     matrix.set(0, 2, 17)
     matrix.set(1, 2, 18)
     matrix.set(2, 2, 19)
+
     expect(matrix.raw()).toEqual([
       [11, 12, 13],
       [14, 15, 16],
@@ -251,21 +272,27 @@ describe('Matrix', () => {
       [4, 5, 6],
       [7, 8, 9],
     ])
+
     expect(() => {
       matrix.set(3, 0, 99)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.set(0, 3, 99)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.set(3, 3, 99)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.set(-1, 0, 99)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.set(0, -1, 99)
     }).toThrowError('Array index out of bound')
+
     expect(() => {
       matrix.set(-1, -1, 99)
     }).toThrowError('Array index out of bound')
@@ -276,18 +303,21 @@ describe('NotComputedArray', () => {
   it('width', () => {
     const ncArraySize = new ArraySize(3, 2)
     const ncArray = new NotComputedArray(ncArraySize)
-    expect(ncArray.width()).toEqual(3)
+
+    expect(ncArray.width()).toBe(3)
   })
 
   it('height', () => {
     const ncArraySize = new ArraySize(3, 2)
     const ncArray = new NotComputedArray(ncArraySize)
-    expect(ncArray.height()).toEqual(2)
+
+    expect(ncArray.height()).toBe(2)
   })
 
   it('get', () => {
     const ncArraySize = new ArraySize(3, 2)
     const ncArray = new NotComputedArray(ncArraySize)
+
     expect(() => {
       ncArray.get(0, 0)
     }).toThrowError('Array not computed yet.')
@@ -296,6 +326,7 @@ describe('NotComputedArray', () => {
   it('simpleRangeValue', () => {
     const ncArraySize = new ArraySize(3, 2)
     const ncArray = new NotComputedArray(ncArraySize)
+
     expect(() => {
       ncArray.simpleRangeValue()
     }).toThrowError('Array not computed yet.')

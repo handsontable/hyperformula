@@ -73,15 +73,19 @@ describe('Operator POWER', () => {
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
-  it('NaN as a result', () => {
-
+  // Test overflow and NaN cases with decimal.js limits
+  // decimal.js maxE is 9e15, so exponents > 9e15 produce Infinity
+  // Negative base with non-integer exponent produces NaN
+  it('Infinity/NaN as a result', () => {
     const engine = HyperFormula.buildFromArray([
-      ['01/02/1999', '02/02/1999', '=A1^B1'],
-      ['3.1415', '36193.2', '=A2^B2'],
+      // Case 1: Overflow - exponent 10000000000000000 > maxE (9e15) → Infinity → #NUM!
+      ['=10^10000000000000000'],
+      // Case 2: NaN - negative base with non-integer exponent
+      ['=(-2)^1.5'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
-    expect(engine.getCellValue(adr('C2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+    expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
+    expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
   })
 
   it('negative base', () => {

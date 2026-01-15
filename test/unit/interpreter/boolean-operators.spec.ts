@@ -211,6 +211,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('B1'))).toBe(true)
     expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
+
   it('Less than or equal operator with coercions', () => {
     const engine = HyperFormula.buildFromArray([
       ['=FALSE()<="2"', '="1"<="2"', '=TRUE()<=FALSE()'],
@@ -287,6 +288,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
   it('Greater than propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)>2', '=2>(1/0)', '=(A1:B1)>(1/0)', '=(1/0)>(A1:B1)'],
@@ -297,6 +299,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
   it('Less than or equal propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)<=2', '=2<=(1/0)', '=(A1:B1)<=(1/0)', '=(1/0)<=(A1:B1)'],
@@ -307,6 +310,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
   it('Greater than or equal propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)>=2', '=2>=(1/0)', '=(A1:B1)>=(1/0)', '=(1/0)>=(A1:B1)'],
@@ -317,6 +321,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
   it('Equal propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)=2', '=2=(1/0)', '=(A1:B1)=(1/0)', '=(1/0)=(A1:B1)'],
@@ -327,6 +332,7 @@ describe('Interpreter - Boolean operators', () => {
     expect(engine.getCellValue(adr('E1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     expect(engine.getCellValue(adr('F1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
+
   it('Not equal propagates errors correctly', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '=(1/0)<>2', '=2<>(1/0)', '=(A1:B1)<>(1/0)', '=(1/0)<>(A1:B1)'],

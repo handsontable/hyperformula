@@ -7,7 +7,7 @@ describe('Function FALSE', () => {
   it('works', () => {
     const engine = HyperFormula.buildFromArray([['=FALSE()']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('is 0-arity', () => {

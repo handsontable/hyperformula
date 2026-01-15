@@ -19,13 +19,15 @@ describe('Function SUMX2PY2', () => {
       [1, 2, 3, 4],
       [5, 4, 2, 1],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(76)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(76)
   })
 
   it('should validate that ranges are of equal length', () => {
     const engine = HyperFormula.buildFromArray([
       ['=SUMX2PY2(A2:F2, A3:E3)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.EqualLength))
   })
 
@@ -35,6 +37,7 @@ describe('Function SUMX2PY2', () => {
       [1, 2, 3, '=NA()', 5, 6],
       [5, 4, 2, 1, 5, 10],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 
@@ -44,6 +47,7 @@ describe('Function SUMX2PY2', () => {
       [5, 4, 2, 1, 5, 10],
       [1, 2, 3, '=NA()', 5, 6],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 
@@ -53,6 +57,7 @@ describe('Function SUMX2PY2', () => {
       [null, 2, '\'1', 4],
       [5, '\'abcd', 2, true],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 })

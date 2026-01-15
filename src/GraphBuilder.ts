@@ -53,6 +53,10 @@ export class GraphBuilder {
     stats.measure(StatType.PROCESS_DEPENDENCIES, () => this.processDependencies(dependencies))
   }
 
+  
+  /**
+   *
+   */
   private processDependencies(dependencies: Dependencies) {
     dependencies.forEach((cellDependencies: CellDependency[], endVertex: Vertex) => {
       this.dependencyGraph.processCellDependencies(cellDependencies, endVertex)
@@ -64,6 +68,9 @@ export interface GraphBuilderStrategy {
   run(sheets: Sheets): Dependencies,
 }
 
+/**
+ *
+ */
 export class SimpleStrategy implements GraphBuilderStrategy {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
@@ -75,6 +82,10 @@ export class SimpleStrategy implements GraphBuilderStrategy {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public run(sheets: Sheets): Dependencies {
     const dependencies: Map<Vertex, CellDependency[]> = new Map()
 
@@ -129,6 +140,10 @@ export class SimpleStrategy implements GraphBuilderStrategy {
     return dependencies
   }
 
+  
+  /**
+   *
+   */
   private shrinkArrayIfNeeded(address: SimpleCellAddress) {
     const vertex = this.dependencyGraph.getCell(address)
     if (vertex instanceof ArrayFormulaVertex) {

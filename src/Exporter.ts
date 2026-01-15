@@ -4,11 +4,11 @@
  */
 
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
-import {CellValue, DetailedCellError} from './CellValue'
+import {CellValue, DetailedCellError, PrecisionCellValue} from './CellValue'
 import {Config} from './Config'
 import {CellValueChange, ChangeExporter} from './ContentChanges'
 import {ErrorMessage} from './error-message'
-import {EmptyValue, getRawValue, InterpreterValue, isExtendedNumber} from './interpreter/InterpreterValue'
+import {EmptyValue, getRawPrecisionValue, InterpreterValue, isExtendedNumber, toNativeNumeric} from './interpreter/InterpreterValue'
 import {SimpleRangeValue} from './SimpleRangeValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {NamedExpressions} from './NamedExpressions'
@@ -27,23 +27,42 @@ export class ExportedCellChange {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public get col() {
     return this.address.col
   }
 
+  
+  /**
+   *
+   */
   public get row() {
     return this.address.row
   }
 
+  
+  /**
+   *
+   */
   public get sheet() {
     return this.address.sheet
   }
 
+  
+  /**
+   *
+   */
   public get value() {
     return this.newValue
   }
 }
 
+/**
+ *
+ */
 export class ExportedNamedExpressionChange {
   constructor(
     public readonly name: string,
@@ -52,6 +71,9 @@ export class ExportedNamedExpressionChange {
   }
 }
 
+/**
+ *
+ */
 export class Exporter implements ChangeExporter<ExportedChange> {
   constructor(
     private readonly config: Config,
@@ -61,6 +83,10 @@ export class Exporter implements ChangeExporter<ExportedChange> {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public exportChange(change: CellValueChange): ExportedChange | ExportedChange[] {
     const value = change.value
     const address = change.address
@@ -91,20 +117,56 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     }
   }
 
+  
+  /**
+   *
+   */
   public exportValue(value: InterpreterValue): CellValue {
     if (value instanceof SimpleRangeValue) {
       return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
     } else if (this.config.smartRounding && isExtendedNumber(value)) {
-      return this.cellValueRounding(getRawValue(value))
+      return this.cellValueRounding(toNativeNumeric(getRawPrecisionValue(value)))
     } else if (value instanceof CellError) {
       return this.detailedError(value)
     } else if (value === EmptyValue) {
       return null
+    } else if (isExtendedNumber(value)) {
+      // Convert Numeric to native number for export
+      return toNativeNumeric(getRawPrecisionValue(value))
     } else {
-      return getRawValue(value)
+      return value
     }
   }
 
+  /**
+   * Exports value preserving full precision by returning numbers as strings.
+   * This avoids IEEE-754 floating-point precision loss.
+   * 
+   * @param {InterpreterValue} value - The interpreter value to export
+   * @returns {PrecisionCellValue} The value with numbers as strings for precision preservation
+   */
+  public exportValueWithPrecision(value: InterpreterValue): PrecisionCellValue {
+    if (value instanceof SimpleRangeValue) {
+      return this.detailedError(new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
+    } else if (value instanceof CellError) {
+      return this.detailedError(value)
+    } else if (value === EmptyValue) {
+      return null
+    } else if (isExtendedNumber(value)) {
+      // PRESERVE PRECISION: Return as string instead of number
+      const precisionValue = getRawPrecisionValue(value)
+      return precisionValue.toString()
+    } else if (typeof value === 'boolean') {
+      return value
+    } else {
+      return String(value)
+    }
+  }
+
+  
+  /**
+   *
+   */
   public exportScalarOrRange(value: InterpreterValue): CellValue | CellValue[][] {
     if (value instanceof SimpleRangeValue) {
       return value.rawData().map(row => row.map(v => this.exportValue(v)))
@@ -113,6 +175,10 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     }
   }
 
+  
+  /**
+   *
+   */
   private detailedError(error: CellError): DetailedCellError {
     let address = undefined
     const originAddress = error.root?.getAddress(this.lazilyTransformingService)
@@ -126,6 +192,10 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     return new DetailedCellError(error, this.config.translationPackage.getErrorTranslation(error.type), address)
   }
 
+  
+  /**
+   *
+   */
   private cellValueRounding(value: number): number {
     if (value === 0) {
       return value

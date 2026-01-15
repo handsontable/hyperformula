@@ -11,6 +11,7 @@ describe('address queries', () => {
         ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
         ['=A2+B2'],
       ])
+
       expect(engine.getCellDependents(adr('A1'))).toEqual([simpleCellRange(adr('A1'), adr('B1'))])
       expect(engine.getCellDependents(adr('D1'))).toEqual([])
       expect(engine.getCellDependents(adr('A2'))).toEqual([adr('A3')])
@@ -38,6 +39,7 @@ describe('address queries', () => {
         adr('B1', dependentSheetId),
         adr('C1', dependentSheetId)
       ])
+
       expect(engine.getCellDependents(adr('B1', dataSheetId))).toEqual([adr('C1', dependentSheetId)])
       expect(engine.getCellDependents(adr('C1', dataSheetId))).toEqual([])
       expect(engine.getCellDependents(adr('D1', dataSheetId))).toEqual([])
@@ -95,6 +97,7 @@ describe('address queries', () => {
         ['=SUM(A1:B1)', '=SUMSQ(A1:B1)'],
         ['=A2+B2'],
       ])
+
       expect(engine.getCellPrecedents(adr('A1'))).toEqual([])
       expect(engine.getCellPrecedents(adr('D1'))).toEqual([])
       expect(engine.getCellPrecedents(adr('A2'))).toEqual([simpleCellRange(adr('A1'), adr('B1'))])
@@ -134,6 +137,7 @@ describe('address queries', () => {
         ['=A2+B2'],
       ])
       const malformedAddress = {col: 0} as SimpleCellAddress
+
       expect(() => {
         engine.getCellPrecedents(malformedAddress)
       }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', malformedAddress.toString()))
@@ -163,6 +167,7 @@ describe('address queries', () => {
       expect(engine.getCellValue(adr('A2'))).toBe(84)
 
       engine.setCellContents(adr('A1'), 100)
+
       expect(engine.getCellValue(adr('A2'))).toBe(200)
     })
   })

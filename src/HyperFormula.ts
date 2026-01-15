@@ -18,7 +18,7 @@ import {
   SimpleCellAddress
 } from './Cell'
 import {CellContent, CellContentParser, RawCellContent} from './CellContentParser'
-import {CellValue} from './CellValue'
+import {CellValue, PrecisionCellValue, GetCellValueOptions} from './CellValue'
 import {Config, getDefaultConfig} from './Config'
 import {ColumnRowIndex, CrudOperations} from './CrudOperations'
 import {DateTime, numberToSimpleTime} from './DateTimeHelper'
@@ -692,16 +692,56 @@ export class HyperFormula implements TypedEmitter {
    *
    * // get value of B1 cell, should be '2'
    * const B1Value = hfInstance.getCellValue({ sheet: 0, col: 1, row: 0 });
+   *
+   * // get value with precision preserved (numbers as strings)
+   * const preciseValue = hfInstance.getCellValue({ sheet: 0, col: 0, row: 0 }, { preservePrecision: true });
    * ```
    *
    * @category Cells
    */
-  public getCellValue(cellAddress: SimpleCellAddress): CellValue {
+  public getCellValue(cellAddress: SimpleCellAddress, options?: GetCellValueOptions): CellValue | PrecisionCellValue {
     if (!isSimpleCellAddress(cellAddress)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
     }
     this.ensureEvaluationIsNotSuspended()
+    if (options?.preservePrecision) {
+      return this._serialization.getCellValueWithPrecision(cellAddress)
+    }
     return this._serialization.getCellValue(cellAddress)
+  }
+
+  /**
+   * Returns the value of the cell with full precision preserved.
+   * Numeric values are returned as strings to avoid IEEE-754 floating-point precision loss.
+   *
+   * This is useful for financial calculations where exact decimal precision is required.
+   *
+   * @param {SimpleCellAddress} cellAddress - cell coordinates
+   *
+   * @throws [[ExpectedValueOfTypeError]] when cellAddress is of incorrect type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=0.1+0.2'],  // Would be 0.30000000000000004 with native JS
+   * ], { smartRounding: false });
+   *
+   * // get value with precision: returns '0.3' as string
+   * const value = hfInstance.getCellValueWithPrecision({ sheet: 0, col: 0, row: 0 });
+   * console.log(value); // '0.3'
+   * console.log(value === '0.3'); // true (exact comparison)
+   * ```
+   *
+   * @category Cells
+   */
+  public getCellValueWithPrecision(cellAddress: SimpleCellAddress): PrecisionCellValue {
+    if (!isSimpleCellAddress(cellAddress)) {
+      throw new ExpectedValueOfTypeError('SimpleCellAddress', 'cellAddress')
+    }
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getCellValueWithPrecision(cellAddress)
   }
 
   /**
@@ -825,6 +865,36 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(sheetId, 'number', 'sheetId')
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getSheetValues(sheetId)
+  }
+
+  /**
+   * Returns a 2D array of values from [[Sheet]] with full precision preserved.
+   * Numeric values are returned as strings to avoid IEEE-754 floating-point precision loss.
+   *
+   * This is useful for financial applications where exact decimal precision is required.
+   *
+   * @param {number} sheetId - sheet ID number
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['=0.1+0.2', '=1/3'],
+   * ], { smartRounding: false });
+   *
+   * // returns [['0.3', '0.3333333333333333...']] with exact precision
+   * const sheetValues = hfInstance.getSheetValuesWithPrecision(0);
+   * ```
+   *
+   * @category Sheets
+   */
+  public getSheetValuesWithPrecision(sheetId: number): PrecisionCellValue[][] {
+    validateArgToType(sheetId, 'number', 'sheetId')
+    this.ensureEvaluationIsNotSuspended()
+    return this._serialization.getSheetValuesWithPrecision(sheetId)
   }
 
   /**

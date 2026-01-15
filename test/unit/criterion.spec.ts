@@ -60,7 +60,7 @@ describe('Criterion', () => {
   })
 
   it('null when unknown operator', () => {
-    expect(criterionBuilder.parseCriterion('><0', arithmeticHelper)).toEqual(undefined)
+    expect(criterionBuilder.parseCriterion('><0', arithmeticHelper)).toBeUndefined()
   })
 
   it('defaults to equal when unparsable string', () => {
@@ -73,7 +73,7 @@ describe('Criterion', () => {
   })
 
   it('null when criterion being error', () => {
-    expect(criterionBuilder.parseCriterion(new CellError(ErrorType.VALUE), arithmeticHelper)).toEqual(undefined)
+    expect(criterionBuilder.parseCriterion(new CellError(ErrorType.VALUE), arithmeticHelper)).toBeUndefined()
   })
 
   it('works with criterion being just value', () => {

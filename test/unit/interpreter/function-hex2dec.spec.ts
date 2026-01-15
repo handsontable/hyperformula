@@ -39,17 +39,17 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC("FFFFFFFFFF")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(16)
-    expect(engine.getCellValue(adr('A3'))).toEqual(173)
-    expect(engine.getCellValue(adr('A4'))).toEqual(43962)
-    expect(engine.getCellValue(adr('A5'))).toEqual(762027)
-    expect(engine.getCellValue(adr('A6'))).toEqual(11574629)
-    expect(engine.getCellValue(adr('A7'))).toEqual(253233380)
-    expect(engine.getCellValue(adr('A8'))).toEqual(185061383)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(16)
+    expect(engine.getCellValue(adr('A3'))).toBe(173)
+    expect(engine.getCellValue(adr('A4'))).toBe(43962)
+    expect(engine.getCellValue(adr('A5'))).toBe(762027)
+    expect(engine.getCellValue(adr('A6'))).toBe(11574629)
+    expect(engine.getCellValue(adr('A7'))).toBe(253233380)
+    expect(engine.getCellValue(adr('A8'))).toBe(185061383)
     expect(engine.getCellValue(adr('A9'))).toBeCloseTo(549755813887, -1)
-    expect(engine.getCellValue(adr('A10'))).toEqual(-54444247247)
-    expect(engine.getCellValue(adr('A11'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A10'))).toBe(-54444247247)
+    expect(engine.getCellValue(adr('A11'))).toBe(-1)
   })
 
   it('should work for numbers', () => {
@@ -57,7 +57,7 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC(456)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1110)
+    expect(engine.getCellValue(adr('A1'))).toBe(1110)
   })
 
   it('should work for reference', () => {
@@ -66,7 +66,7 @@ describe('function HEX2DEC', () => {
       ['=HEX2DEC(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(419)
+    expect(engine.getCellValue(adr('A2'))).toBe(419)
   })
 
   it('should return a number', () => {

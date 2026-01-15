@@ -153,13 +153,13 @@ describe('Function BINOM.INV', () => {
       ['=BINOM.INV(10, 0.5, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     //product #1 returns 0 for the following test
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     //both products #1 and #2 return NUM for '=BINOM.INV(10, 0, 0.5)', which is incorrect
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
     //both products #1 and #2 return NUM for '=BINOM.INV(10, 1, 0.5)', which is incorrect
-    expect(engine.getCellValue(adr('A4'))).toEqual(10)
+    expect(engine.getCellValue(adr('A4'))).toBe(10)
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A7'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))

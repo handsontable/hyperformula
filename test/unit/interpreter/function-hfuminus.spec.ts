@@ -19,9 +19,9 @@ describe('Function HF.UMINUS', () => {
       ['=HF.UMINUS(0)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-2)
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(-2)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
   })
 
   it('should coerce to correct types', () => {
@@ -31,9 +31,9 @@ describe('Function HF.UMINUS', () => {
       ['=HF.UMINUS("1")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A1'))).toBe(-1)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(-1)
   })
 
   it('should throw correct error', () => {

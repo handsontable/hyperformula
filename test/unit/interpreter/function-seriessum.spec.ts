@@ -56,6 +56,7 @@ describe('Function SERIESSUM', () => {
       ['=SERIESSUM(2,3,4,A2:D2)'],
       [1, '=NA()', 3, 4]
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

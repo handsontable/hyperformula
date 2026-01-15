@@ -50,13 +50,14 @@ describe('Interpreter', () => {
 
   it('ranges - VALUE error when evaluating without context', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['2'], ['=A1:A2']])
+
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.ScalarExpected))
   })
 
   it('procedures - SUM with bad args', () => {
     const engine = HyperFormula.buildFromArray([['=SUM(B1)', 'asdf']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('procedures - not known procedure', () => {
@@ -76,8 +77,8 @@ describe('Interpreter', () => {
   it('function OFFSET basic use', () => {
     const engine = HyperFormula.buildFromArray([['5', '=OFFSET(B1, 0, -1)', '=OFFSET(A1, 0, 0)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(5)
-    expect(engine.getCellValue(adr('C1'))).toEqual(5)
+    expect(engine.getCellValue(adr('B1'))).toBe(5)
+    expect(engine.getCellValue(adr('C1'))).toBe(5)
   })
 
   it('function OFFSET out of range', () => {
@@ -93,7 +94,7 @@ describe('Interpreter', () => {
       ['2', '3', '4'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(8)
+    expect(engine.getCellValue(adr('A1'))).toBe(8)
   })
 
   it('function OFFSET returns rectangular range and fails', () => {
@@ -110,7 +111,7 @@ describe('Interpreter', () => {
       ['2', '3', '4'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(16)
+    expect(engine.getCellValue(adr('C1'))).toBe(16)
   })
 
   it('function OFFSET as a reference inside SUM', () => {
@@ -119,7 +120,7 @@ describe('Interpreter', () => {
       ['5', '6', '=SUM(SUM(OFFSET(C2,-1,0),A2),-B2)'],
     ])
 
-    expect(engine.getCellValue(adr('C2'))).toEqual(9)
+    expect(engine.getCellValue(adr('C2'))).toBe(9)
   })
 
   it('initializing engine with multiple sheets', () => {
@@ -132,7 +133,8 @@ describe('Interpreter', () => {
         ['=SUM(Sheet1!A1:Sheet1!B2)'],
       ],
     })
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(6)
+
+    expect(engine.getCellValue(adr('A1', 1))).toBe(6)
   })
 
   it('using bad range reference', () => {
@@ -146,6 +148,7 @@ describe('Interpreter', () => {
         [''],
       ],
     })
+
     expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.REF, ErrorMessage.RangeManySheets))
   })
 
@@ -154,7 +157,7 @@ describe('Interpreter', () => {
       ['=(1+2)*3'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(9)
+    expect(engine.getCellValue(adr('A1'))).toBe(9)
   })
 
   it('should return #REF when range is pointing to multiple sheets', () => {

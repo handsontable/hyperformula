@@ -9,26 +9,28 @@ describe('Function ISERROR', () => {
       ['=ISERROR(1/0)', '=ISERROR(FOO())', '=ISERROR(TRUE(1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(true)
-    expect(engine.getCellValue(adr('B1'))).toEqual(true)
-    expect(engine.getCellValue(adr('C1'))).toEqual(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
   })
 
   it('should return false for valid formulas', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISERROR(1)', '=ISERROR(TRUE())', '=ISERROR("foo")', '=ISERROR(ISERROR(1/0))', '=ISERROR(A1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
-    expect(engine.getCellValue(adr('B1'))).toEqual(false)
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
-    expect(engine.getCellValue(adr('D1'))).toEqual(false)
-    expect(engine.getCellValue(adr('E1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
+    expect(engine.getCellValue(adr('E1'))).toBe(false)
   })
 
   it('takes exactly one argument', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ISERROR(1, 2)', '=ISERROR()'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })

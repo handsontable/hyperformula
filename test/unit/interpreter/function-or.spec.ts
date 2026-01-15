@@ -73,7 +73,7 @@ describe('Function OR', () => {
       ['=OR(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(true)
+    expect(engine.getCellValue(adr('A3'))).toBe(true)
   })
 
   it('is computed eagerly', () => {
@@ -92,7 +92,7 @@ describe('Function OR', () => {
       ['foo', '=FALSE()', '=OR(A2:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(true)
-    expect(engine.getCellValue(adr('C2'))).toEqual(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('C2'))).toBe(false)
   })
 })

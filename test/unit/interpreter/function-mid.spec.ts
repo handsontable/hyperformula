@@ -21,8 +21,8 @@ describe('Function MID', () => {
       ['=MID("bar", 2, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('fo')
-    expect(engine.getCellValue(adr('A2'))).toEqual('ar')
+    expect(engine.getCellValue(adr('A1'))).toBe('fo')
+    expect(engine.getCellValue(adr('A2'))).toBe('ar')
   })
 
   it('should return empty string if start is greater than text length', () => {
@@ -31,8 +31,8 @@ describe('Function MID', () => {
       ['=MID("foo", 5, 42)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('')
-    expect(engine.getCellValue(adr('A2'))).toEqual('')
+    expect(engine.getCellValue(adr('A1'))).toBe('')
+    expect(engine.getCellValue(adr('A2'))).toBe('')
   })
 
   it('should return chars up to string length if end start + number of chars exceeds string length', () => {
@@ -40,7 +40,7 @@ describe('Function MID', () => {
       ['=MID("foo", 2, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('oo')
+    expect(engine.getCellValue(adr('A1'))).toBe('oo')
   })
 
   it('should return #VALUE! if start num is less than 1', () => {
@@ -67,8 +67,8 @@ describe('Function MID', () => {
       ['=MID(0, 1, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('RU')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0')
+    expect(engine.getCellValue(adr('A1'))).toBe('RU')
+    expect(engine.getCellValue(adr('A2'))).toBe('0')
   })
 
   it('should return error for range', () => {

@@ -31,7 +31,7 @@ describe('Function MROUND', () => {
       ['=MROUND(42, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('should return error for args of different signs', () => {
@@ -54,12 +54,12 @@ describe('Function MROUND', () => {
       ['=MROUND(-10.5, -3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(39)
-    expect(engine.getCellValue(adr('A3'))).toEqual(12)
-    expect(engine.getCellValue(adr('A4'))).toEqual(-6)
-    expect(engine.getCellValue(adr('A5'))).toEqual(-39)
-    expect(engine.getCellValue(adr('A6'))).toEqual(-12)
+    expect(engine.getCellValue(adr('A1'))).toBe(6)
+    expect(engine.getCellValue(adr('A2'))).toBe(39)
+    expect(engine.getCellValue(adr('A3'))).toBe(12)
+    expect(engine.getCellValue(adr('A4'))).toBe(-6)
+    expect(engine.getCellValue(adr('A5'))).toBe(-39)
+    expect(engine.getCellValue(adr('A6'))).toBe(-12)
   })
 
   /**
@@ -72,7 +72,8 @@ describe('Function MROUND', () => {
       ['=MROUND(6.05, 0.1)'],
       ['=MROUND(7.05, 0.1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(7.1)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(6)
+    expect(engine.getCellValue(adr('A2'))).toBe(7.1)
   })
 })

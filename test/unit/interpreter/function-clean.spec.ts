@@ -19,8 +19,8 @@ describe('Function CLEAN', () => {
       ['=CLEAN("foo\u0020")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual('foo\u0020')
+    expect(engine.getCellValue(adr('A1'))).toBe('foo')
+    expect(engine.getCellValue(adr('A2'))).toBe('foo\u0020')
   })
 
   it('should clean all non-printable ASCII characters', () => {
@@ -30,8 +30,8 @@ describe('Function CLEAN', () => {
       [str, '=LEN(A1)', '=CLEAN(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(32)
-    expect(engine.getCellValue(adr('C1'))).toEqual('')
+    expect(engine.getCellValue(adr('B1'))).toBe(32)
+    expect(engine.getCellValue(adr('C1'))).toBe('')
   })
 
   it('should coerce other types to string', () => {
@@ -41,8 +41,8 @@ describe('Function CLEAN', () => {
       ['=CLEAN(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('10')
-    expect(engine.getCellValue(adr('A3'))).toEqual('TRUE')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('10')
+    expect(engine.getCellValue(adr('A3'))).toBe('TRUE')
   })
 })

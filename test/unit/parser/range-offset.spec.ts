@@ -14,6 +14,7 @@ describe('Parser - range offset', () => {
     const ast = parser.parse('=A1:OFFSET(A1, 1, 1, 1, 1)', adr('A1')).ast as CellRangeAst
     const ast2 = parser.parse('=OFFSET(A1, 1, 1, 1, 1):OFFSET(B2, 1, 1, 1, 1)', adr('A1')).ast as CellRangeAst
     const ast3 = parser.parse('=OFFSET(A1, 1, 1, 1, 1):B3', adr('A1')).ast as CellRangeAst
+
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast2.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast3.type).toBe(AstNodeType.CELL_RANGE)

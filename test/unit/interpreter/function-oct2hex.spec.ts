@@ -37,15 +37,15 @@ describe('function OCT2HEX', () => {
       ['=OCT2HEX(7777777777)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('8')
-    expect(engine.getCellValue(adr('A3'))).toEqual('39')
-    expect(engine.getCellValue(adr('A4'))).toEqual('14E5')
-    expect(engine.getCellValue(adr('A5'))).toEqual('114575')
-    expect(engine.getCellValue(adr('A6'))).toEqual('A72EFAC')
-    expect(engine.getCellValue(adr('A7'))).toEqual('FFFFFFFE00')
-    expect(engine.getCellValue(adr('A8'))).toEqual('FFFFFFFE22')
-    expect(engine.getCellValue(adr('A9'))).toEqual('FFFFFFFFFF')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('8')
+    expect(engine.getCellValue(adr('A3'))).toBe('39')
+    expect(engine.getCellValue(adr('A4'))).toBe('14E5')
+    expect(engine.getCellValue(adr('A5'))).toBe('114575')
+    expect(engine.getCellValue(adr('A6'))).toBe('A72EFAC')
+    expect(engine.getCellValue(adr('A7'))).toBe('FFFFFFFE00')
+    expect(engine.getCellValue(adr('A8'))).toBe('FFFFFFFE22')
+    expect(engine.getCellValue(adr('A9'))).toBe('FFFFFFFFFF')
   })
 
   it('should work for strings', () => {
@@ -53,7 +53,7 @@ describe('function OCT2HEX', () => {
       ['=OCT2HEX("456")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('12E')
+    expect(engine.getCellValue(adr('A1'))).toBe('12E')
   })
 
   it('should work for reference', () => {
@@ -62,7 +62,7 @@ describe('function OCT2HEX', () => {
       ['=OCT2HEX(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('53')
+    expect(engine.getCellValue(adr('A2'))).toBe('53')
   })
 
   it('should return string value', () => {
@@ -80,7 +80,7 @@ describe('function OCT2HEX', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotOctal))
-    expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFE22')
+    expect(engine.getCellValue(adr('A2'))).toBe('FFFFFFFE22')
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -89,8 +89,8 @@ describe('function OCT2HEX', () => {
       ['=OCT2HEX(3, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('0000000A')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0003')
+    expect(engine.getCellValue(adr('A1'))).toBe('0000000A')
+    expect(engine.getCellValue(adr('A2'))).toBe('0003')
   })
 
   it('should fail if the result is longer than the desired length', () => {
@@ -109,8 +109,8 @@ describe('function OCT2HEX', () => {
       ['=OCT2HEX(7777777022, 10)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('FFFFFFFE22')
-    expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFE12')
+    expect(engine.getCellValue(adr('A1'))).toBe('FFFFFFFE22')
+    expect(engine.getCellValue(adr('A2'))).toBe('FFFFFFFE12')
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {

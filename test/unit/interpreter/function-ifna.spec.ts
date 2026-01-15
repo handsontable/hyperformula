@@ -8,19 +8,21 @@ describe('Function IFNA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=IFNA(1)', '=IFNA(2, 3, 4)']
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
+
   it('when no error', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA("abcd", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('abcd')
+    expect(engine.getCellValue(adr('A1'))).toBe('abcd')
   })
 
   it('when left-error NA', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA(COS(1, 1), "yes")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('when left-error DIV0', () => {
@@ -32,7 +34,7 @@ describe('Function IFNA', () => {
   it('when right-error', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA("yes", 1/0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('when both-error', () => {
@@ -62,7 +64,7 @@ describe('Function IFNA', () => {
   it('when cycle 2', () => {
     const engine = HyperFormula.buildFromArray([['=IFNA(1, B1)', '=B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('preserves types of first arg', () => {

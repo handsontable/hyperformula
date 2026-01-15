@@ -35,13 +35,13 @@ describe('Function DECIMAL', () => {
       ['=DECIMAL("123XYZ", 36)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
-    expect(engine.getCellValue(adr('A2'))).toEqual(34359738366)
-    expect(engine.getCellValue(adr('A3'))).toEqual(27)
-    expect(engine.getCellValue(adr('A4'))).toEqual(12648430)
-    expect(engine.getCellValue(adr('A5'))).toEqual(117431614)
-    expect(engine.getCellValue(adr('A6'))).toEqual(9846500)
-    expect(engine.getCellValue(adr('A7'))).toEqual(64009403)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(34359738366)
+    expect(engine.getCellValue(adr('A3'))).toBe(27)
+    expect(engine.getCellValue(adr('A4'))).toBe(12648430)
+    expect(engine.getCellValue(adr('A5'))).toBe(117431614)
+    expect(engine.getCellValue(adr('A6'))).toBe(9846500)
+    expect(engine.getCellValue(adr('A7'))).toBe(64009403)
   })
 
   it('should work for of max length 255', () => {
@@ -65,8 +65,8 @@ describe('Function DECIMAL', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A2'))).toEqual(2)
-    expect(engine.getCellValue(adr('A3'))).toEqual(44027)
+    expect(engine.getCellValue(adr('A2'))).toBe(2)
+    expect(engine.getCellValue(adr('A3'))).toBe(44027)
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
   })
 

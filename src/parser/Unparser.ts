@@ -7,6 +7,7 @@ import {ErrorType, SimpleCellAddress} from '../Cell'
 import {SheetMapping} from '../DependencyGraph/SheetMapping'
 import {NoSheetWithIdError} from '../index'
 import {NamedExpressions} from '../NamedExpressions'
+import {Numeric, isNumeric} from '../Numeric'
 import {sheetIndexToString} from './addressRepresentationConverters'
 import {
   Ast,
@@ -20,6 +21,9 @@ import {
 import {binaryOpTokenMap} from './binaryOpTokenMap'
 import {ParserConfig} from './ParserConfig'
 
+/**
+ *
+ */
 export class Unparser {
   constructor(
     private readonly config: ParserConfig,
@@ -28,10 +32,18 @@ export class Unparser {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public unparse(ast: Ast, address: SimpleCellAddress): string {
     return '=' + this.unparseAst(ast, address)
   }
 
+  
+  /**
+   *
+   */
   private unparseAst(ast: Ast, address: SimpleCellAddress): string {
     switch (ast.type) {
       case AstNodeType.EMPTY: {
@@ -121,6 +133,10 @@ export class Unparser {
     return sheetName
   }
 
+  
+  /**
+   *
+   */
   private formatRange(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): string {
     let startSheeet = ''
     let endSheet = ''
@@ -142,7 +158,10 @@ export class Unparser {
   }
 }
 
-export function formatNumber(number: number, decimalSeparator: string): string {
-  const numericString = number.toString()
+/**
+ *
+ */
+export function formatNumber(number: number | Numeric, decimalSeparator: string): string {
+  const numericString = isNumeric(number) ? number.toString() : number.toString()
   return numericString.replace('.', decimalSeparator)
 }

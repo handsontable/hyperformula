@@ -49,6 +49,7 @@ describe('Z.TEST', () => {
       ['=Z.TEST(B1:E1, 1, 1)', null, 2, 3, 4],
       ['=Z.TEST(B2:E2, 1, 1)', true, 2, 3, 4],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.000266002752569605, 6)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.000266002752569605, 6)
   })
@@ -60,6 +61,7 @@ describe('Z.TEST', () => {
       ['3', '30'],
       ['=Z.TEST(A1:B3, 1, 1)'],
     ])
+
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

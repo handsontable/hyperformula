@@ -28,9 +28,16 @@ export interface FormulaTransformer {
   transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress],
 }
 
+/**
+ *
+ */
 export abstract class Transformer implements FormulaTransformer {
   public abstract get sheet(): number
 
+  
+  /**
+   *
+   */
   public performEagerTransformations(graph: DependencyGraph, parser: ParserWithCaching): void {
     for (const node of graph.arrayFormulaNodes()) {
       const [newAst, newAddress] = this.transformSingleAst(node.getFormula(graph.lazilyTransformingAstService), node.getAddress(graph.lazilyTransformingAstService))
@@ -40,6 +47,10 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
+  
+  /**
+   *
+   */
   public transformSingleAst(ast: Ast, address: SimpleCellAddress): [Ast, SimpleCellAddress] {
     const newAst = this.transformAst(ast, address)
     const newAddress = this.fixNodeAddress(address)
@@ -48,6 +59,10 @@ export abstract class Transformer implements FormulaTransformer {
 
   public abstract isIrreversible(): boolean
 
+  
+  /**
+   *
+   */
   protected transformAst(ast: Ast, address: SimpleCellAddress): Ast {
     switch (ast.type) {
       case AstNodeType.CELL_REFERENCE: {
@@ -107,6 +122,10 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
+  
+  /**
+   *
+   */
   protected transformCellReferenceAst(ast: CellReferenceAst, formulaAddress: SimpleCellAddress): Ast {
     const newCellAddress = this.transformCellAddress(ast.reference, formulaAddress)
     if (newCellAddress instanceof CellAddress) {
@@ -118,6 +137,10 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
+  
+  /**
+   *
+   */
   protected transformCellRangeAst(ast: CellRangeAst, formulaAddress: SimpleCellAddress): Ast {
     const newRange = this.transformCellRange(ast.start, ast.end, formulaAddress)
     if (Array.isArray(newRange)) {
@@ -129,6 +152,10 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
+  
+  /**
+   *
+   */
   protected transformColumnRangeAst(ast: ColumnRangeAst, formulaAddress: SimpleCellAddress): Ast {
     const newRange = this.transformColumnRange(ast.start, ast.end, formulaAddress)
     if (Array.isArray(newRange)) {
@@ -140,6 +167,10 @@ export abstract class Transformer implements FormulaTransformer {
     }
   }
 
+  
+  /**
+   *
+   */
   protected transformRowRangeAst(ast: RowRangeAst, formulaAddress: SimpleCellAddress): Ast {
     const newRange = this.transformRowRange(ast.start, ast.end, formulaAddress)
     if (Array.isArray(newRange)) {

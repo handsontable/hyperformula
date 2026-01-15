@@ -98,7 +98,7 @@ describe('Function XOR', () => {
       ['=XOR(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(true)
+    expect(engine.getCellValue(adr('A3'))).toBe(true)
   })
 
   it('is computed eagerly', () => {
@@ -117,7 +117,7 @@ describe('Function XOR', () => {
       ['foo', '=FALSE()', '=XOR(A2:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(true)
-    expect(engine.getCellValue(adr('C2'))).toEqual(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('C2'))).toBe(false)
   })
 })

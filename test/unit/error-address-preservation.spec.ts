@@ -7,6 +7,7 @@ describe('Address preservation.', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NA()', '=A1']
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
   })
@@ -16,6 +17,7 @@ describe('Address preservation.', () => {
       ['=NAMEDEXPRESSION', '=A1']
     ])
     engine.addNamedExpression('NAMEDEXPRESSION', '=NA()')
+
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'NAMEDEXPRESSION'))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'NAMEDEXPRESSION'))
   })
@@ -24,6 +26,7 @@ describe('Address preservation.', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NA()', '=NA()', '=A1+B1']
     ])
+
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
   })
 
@@ -32,6 +35,7 @@ describe('Address preservation.', () => {
       sheet1: [['=NA()']],
       sheet2: [['=sheet1!A1']]
     })
+
     expect(engine.getCellValue(adr('A1', 0))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'sheet1!A1'))
     expect(engine.getCellValue(adr('A1', 1))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'sheet1!A1'))
   })
@@ -40,6 +44,7 @@ describe('Address preservation.', () => {
     const engine = HyperFormula.buildFromArray([
       ['=NA()', '=DATE(1,1,A1)']
     ])
+
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!A1'))
   })
 
@@ -49,6 +54,7 @@ describe('Address preservation.', () => {
       ['=A1', '=B1'],
       ['=A1', '=B1']
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!B1'))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'))
@@ -63,6 +69,7 @@ describe('Address preservation.', () => {
       ['=A1'],
       ['=A1']
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'))
     expect(engine.getCellValue(adr('B1'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!B1'))
     expect(engine.getCellValue(adr('A2'))).toEqual(detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'))
@@ -75,12 +82,15 @@ describe('Address preservation.', () => {
     ])
 
     engine.addColumns(0, [0, 1])
+
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.NA, 'Sheet1!B1'))
 
     engine.setCellContents(adr('B1'), '=1/0')
+
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!B1'))
 
     engine.moveCells(simpleCellRange(adr('B1'), adr('B1')), adr('C5'))
+
     expect(engine.getCellValue(adr('C1'))).toEqual(detailedErrorWithOrigin(ErrorType.DIV_BY_ZERO, 'Sheet1!C5'))
   })
 })

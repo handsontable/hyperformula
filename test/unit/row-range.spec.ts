@@ -9,7 +9,7 @@ describe('Row ranges', () => {
       ['=SUM(1:2)']
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 
   it('should create correct edges for infinite range when building graph', () => {

@@ -33,6 +33,7 @@ describe('Interpreter - function RAND', () => {
     engine.setCellContents(adr('A1'), '=RAND()')
 
     const a1 = engine.addressMapping.getCell(adr('A1'))!
+
     expect(engine.dependencyGraph.verticesToRecompute()).toEqual([a1])
   })
 
@@ -54,6 +55,7 @@ describe('Interpreter - function RAND', () => {
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 1, 1), adr('A2'))
 
     const a2 = engine.addressMapping.getCell(adr('A2'))!
+
     expect(engine.dependencyGraph.verticesToRecompute()).toEqual([a2])
   })
 })

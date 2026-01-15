@@ -35,6 +35,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(A1:B3,C1:E2)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(3, 3))
   })
 
@@ -43,6 +44,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(A1:B3,C1:E3)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(3, 3))
   })
 
@@ -51,6 +53,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E2), A1:B3)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(2, 3))
   })
 
@@ -59,6 +62,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=mmult(mmult(A1:B3,C1:E3), A1:B3)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(2, 3))
   })
 
@@ -67,6 +71,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=maxpool(A1:I9,3)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(3, 3))
   })
 
@@ -75,6 +80,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=maxpool(A1:I9,B3)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(9, 9))
   })
 
@@ -83,6 +89,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=transpose(A2)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(1, 1))
   })
 
@@ -91,6 +98,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=1234', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(1, 1, false))
   })
 
@@ -99,6 +107,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=A1', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(1, 1, true))
   })
 
@@ -107,6 +116,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=A1:D3+A1:C4', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(ArraySize.error())
   })
 
@@ -115,6 +125,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=ARRAYFORMULA(A1:D3+A1:C4)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(4, 4))
   })
 
@@ -123,6 +134,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=-A1:B3', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(ArraySize.error())
   })
 
@@ -131,6 +143,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('=ARRAYFORMULA(-A1:B3)', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(2, 3))
   })
 
@@ -139,6 +152,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('={1,2,3;4,5,6}', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(3, 2))
   })
 
@@ -147,6 +161,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('={{1;2},{3;4}}', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(2, 2))
   })
 
@@ -155,6 +170,7 @@ describe('Matrix size check tests', () => {
     const ast = parser.parse('={1,{2,3},4;{5;6},{7,8;9,10},{11;12};13,{14,15},16}', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(4, 4))
   })
 })
@@ -182,6 +198,7 @@ describe('Matrix size check tests, with different config', () => {
     const ast = parser.parse('=A1:D3+A1:C4', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(4, 4))
   })
 
@@ -190,6 +207,7 @@ describe('Matrix size check tests, with different config', () => {
     const ast = parser.parse('=-A1:B3', adr('A1')).ast
 
     const size = arraySizePredictor.checkArraySize(ast, adr('A1'))
+
     expect(size).toEqual(new ArraySize(2, 3))
   })
 })

@@ -21,8 +21,8 @@ describe('Function HF.DIVIDE', () => {
       ['=HF.DIVIDE(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1.5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(1.5)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
@@ -34,9 +34,9 @@ describe('Function HF.DIVIDE', () => {
       ['=HF.DIVIDE("1",1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
   })
 
   it('should throw correct error', () => {
@@ -53,6 +53,7 @@ describe('Function HF.DIVIDE', () => {
 
   it('passes subtypes', () => {
     const engine = HyperFormula.buildFromArray([['=HF.DIVIDE(B1,C1)', '1$', 1]])
+
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
   })
 })

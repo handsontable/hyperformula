@@ -38,14 +38,14 @@ describe('Function CEILING.MATH', () => {
       ['=CEILING.MATH(3.14, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(4.5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(4.8)
-    expect(engine.getCellValue(adr('A3'))).toEqual(6)
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
-    expect(engine.getCellValue(adr('A5'))).toEqual(-4)
-    expect(engine.getCellValue(adr('A6'))).toEqual(-1.8)
-    expect(engine.getCellValue(adr('A7'))).toEqual(0)
-    expect(engine.getCellValue(adr('A8'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(4.5)
+    expect(engine.getCellValue(adr('A2'))).toBe(4.8)
+    expect(engine.getCellValue(adr('A3'))).toBe(6)
+    expect(engine.getCellValue(adr('A4'))).toBe(5)
+    expect(engine.getCellValue(adr('A5'))).toBe(-4)
+    expect(engine.getCellValue(adr('A6'))).toBe(-1.8)
+    expect(engine.getCellValue(adr('A7'))).toBe(0)
+    expect(engine.getCellValue(adr('A8'))).toBe(0)
   })
 
   it('should work with mode for negative numbers', () => {
@@ -57,11 +57,11 @@ describe('Function CEILING.MATH', () => {
       ['=CEILING.MATH(-11, 0, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-10)
-    expect(engine.getCellValue(adr('A2'))).toEqual(-10)
-    expect(engine.getCellValue(adr('A3'))).toEqual(-12)
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(-10)
+    expect(engine.getCellValue(adr('A2'))).toBe(-10)
+    expect(engine.getCellValue(adr('A3'))).toBe(-12)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
+    expect(engine.getCellValue(adr('A5'))).toBe(0)
   })
 
   it('negative values', () => {
@@ -76,13 +76,13 @@ describe('Function CEILING.MATH', () => {
       ['=CEILING.MATH(-11, -2, 1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(12)
-    expect(engine.getCellValue(adr('A2'))).toEqual(-10)
-    expect(engine.getCellValue(adr('A3'))).toEqual(12)
-    expect(engine.getCellValue(adr('A4'))).toEqual(-10)
-    expect(engine.getCellValue(adr('A5'))).toEqual(12)
-    expect(engine.getCellValue(adr('A6'))).toEqual(-12)
-    expect(engine.getCellValue(adr('A7'))).toEqual(12)
-    expect(engine.getCellValue(adr('A8'))).toEqual(-12)
+    expect(engine.getCellValue(adr('A1'))).toBe(12)
+    expect(engine.getCellValue(adr('A2'))).toBe(-10)
+    expect(engine.getCellValue(adr('A3'))).toBe(12)
+    expect(engine.getCellValue(adr('A4'))).toBe(-10)
+    expect(engine.getCellValue(adr('A5'))).toBe(12)
+    expect(engine.getCellValue(adr('A6'))).toBe(-12)
+    expect(engine.getCellValue(adr('A7'))).toBe(12)
+    expect(engine.getCellValue(adr('A8'))).toBe(-12)
   })
 })

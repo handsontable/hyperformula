@@ -19,7 +19,8 @@ describe('scoped named expressions', () => {
     engine.addNamedExpression('TRUE', true, 0)
     engine.removeSheet(0)
     engine.undo()
-    expect(engine.getCellValue(adr('A1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
   })
 
   it('removal should work with undo of named expression', () => {
@@ -27,6 +28,7 @@ describe('scoped named expressions', () => {
     engine.addNamedExpression('TRUE', true, 0)
     engine.removeNamedExpression('TRUE', 0)
     engine.undo()
-    expect(engine.getCellValue(adr('A1'))).toEqual(true)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
   })
 })

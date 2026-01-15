@@ -33,7 +33,7 @@ describe('Function XNPV', () => {
       ['=XNPV(1, B2:C2, D2:E2)', 1, 2, 3, 4],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(2.99620553730319, 6)
   })
 

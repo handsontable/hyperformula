@@ -66,7 +66,7 @@ describe('RSQ', () => {
       ['=RSQ(A1:A3, B1:B3)'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
   })
 
   it('over a range value', () => {

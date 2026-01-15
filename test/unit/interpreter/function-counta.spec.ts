@@ -13,19 +13,19 @@ describe('COUNTA', () => {
   it('COUNTA with args', () => {
     const engine = HyperFormula.buildFromArray([['=COUNTA(1, B1)', '3.14']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   it('COUNTA with range', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=COUNTA(A1:A3)']])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(3)
   })
 
   it('COUNTA doesnt count only empty values', () => {
     const engine = HyperFormula.buildFromArray([['foo'], ['=""'], [null], ['=TRUE()'], ['=COUNTA(A1:A4)']])
 
-    expect(engine.getCellValue(adr('A5'))).toEqual(3)
+    expect(engine.getCellValue(adr('A5'))).toBe(3)
   })
 
   it('over a range value', () => {
@@ -35,7 +35,7 @@ describe('COUNTA', () => {
       ['=COUNTA(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(4)
+    expect(engine.getCellValue(adr('A3'))).toBe(4)
   })
 
   it('error in ranges', () => {
@@ -46,7 +46,7 @@ describe('COUNTA', () => {
       ['=COUNTA(MMULT(A1:B3, A1:B3))'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
   })
 
   it('doesnt propagate errors', () => {
@@ -56,14 +56,15 @@ describe('COUNTA', () => {
       ['=COUNTA(A1:B2)'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(4)
+    expect(engine.getCellValue(adr('A3'))).toBe(4)
   })
 
   it('should work with explicit error in arg', () => {
     const engine = HyperFormula.buildFromArray([
       ['=COUNTA(NA())'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('should work for empty arg', () => {
@@ -71,6 +72,6 @@ describe('COUNTA', () => {
       ['=COUNTA(1,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2) //Compatible with product 2
+    expect(engine.getCellValue(adr('A1'))).toBe(2) //Compatible with product 2
   })
 })

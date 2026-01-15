@@ -2,7 +2,16 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {EmptyCellVertex, ValueCellVertex} from '../../src/DependencyGraph'
 import {SheetSizeLimitExceededError} from '../../src/errors'
+import {isExtendedNumber, getRawPrecisionValue, toNativeNumeric} from '../../src/interpreter/InterpreterValue'
 import {adr, colEnd, colStart, graphEdgesCount} from './testUtils'
+
+// Helper to convert value to number for comparison
+const toNum = (val: unknown): unknown => {
+  if (isExtendedNumber(val)) {
+    return toNativeNumeric(getRawPrecisionValue(val as any))
+  }
+  return val
+}
 
 describe('GraphBuilder', () => {
   it('build sheet with simple number cell', () => {
@@ -11,8 +20,9 @@ describe('GraphBuilder', () => {
     ])
 
     const vertex = engine.addressMapping.getCell(adr('A1'))
+
     expect(vertex).toBeInstanceOf(ValueCellVertex)
-    expect(vertex!.getCellValue()).toBe(42)
+    expect(toNum(vertex!.getCellValue())).toBe(42)
   })
 
   it('build sheet with simple string cell', () => {
@@ -21,6 +31,7 @@ describe('GraphBuilder', () => {
     ])
 
     const vertex = engine.addressMapping.getCell(adr('A1'))
+
     expect(vertex).toBeInstanceOf(ValueCellVertex)
     expect(vertex!.getCellValue()).toBe('foo')
   })
@@ -31,6 +42,7 @@ describe('GraphBuilder', () => {
     ])
 
     const vertex = engine.addressMapping.getCell(adr('A1'))
+
     expect(vertex).toBeInstanceOf(EmptyCellVertex)
   })
 
@@ -44,6 +56,7 @@ describe('GraphBuilder', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const a1b2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
     const a2 = engine.addressMapping.getCell(adr('A2'))
+
     expect(engine.graph.adjacentNodes(a1!)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(b1!)).toContain(a1b2)
     expect(engine.graph.adjacentNodes(a1b2)).toContain(a2)
@@ -58,6 +71,7 @@ describe('GraphBuilder', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const ab = engine.rangeMapping.getVertexOrThrow(colStart('A'), colEnd('B'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
+
     expect(engine.graph.adjacentNodes(a1!)).toContain(ab)
     expect(engine.graph.adjacentNodes(b1!)).toContain(ab)
     expect(engine.graph.adjacentNodes(ab)).toContain(c1)
@@ -116,6 +130,7 @@ describe('GraphBuilder', () => {
       1 + // for range vertex
       2,  // for 2 EmptyCellVertex instances
     )
+
     expect(graphEdgesCount(engine.graph)).toBe(
       2 + // from cells to range vertex
       2 + // from EmptyCellVertex instances to range vertices
@@ -133,6 +148,7 @@ describe('GraphBuilder', () => {
     const a1a2 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A2'))
     const a1a3 = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A3'))
     const a2 = engine.addressMapping.getCell(adr('A2'))
+
     expect(engine.graph.existsEdge(a2!, a1a3)).toBe(true)
     expect(engine.graph.existsEdge(a2!, a1a2)).toBe(true)
     expect(engine.graph.existsEdge(a1a2, a1a3)).toBe(false)

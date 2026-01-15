@@ -35,13 +35,13 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(111111111)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('2')
-    expect(engine.getCellValue(adr('A3'))).toEqual('2')
-    expect(engine.getCellValue(adr('A4'))).toEqual('56')
-    expect(engine.getCellValue(adr('A5'))).toEqual('7777777000')
-    expect(engine.getCellValue(adr('A6'))).toEqual('7777777777')
-    expect(engine.getCellValue(adr('A7'))).toEqual('777')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('2')
+    expect(engine.getCellValue(adr('A3'))).toBe('2')
+    expect(engine.getCellValue(adr('A4'))).toBe('56')
+    expect(engine.getCellValue(adr('A5'))).toBe('7777777000')
+    expect(engine.getCellValue(adr('A6'))).toBe('7777777777')
+    expect(engine.getCellValue(adr('A7'))).toBe('777')
   })
 
   it('should work for binary strings', () => {
@@ -49,7 +49,7 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT("1101")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('15')
+    expect(engine.getCellValue(adr('A1'))).toBe('15')
   })
 
   it('should work for reference', () => {
@@ -58,7 +58,7 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('13')
+    expect(engine.getCellValue(adr('A2'))).toBe('13')
   })
 
   it('should return string value', () => {
@@ -76,7 +76,7 @@ describe('function BIN2OCT', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
-    expect(engine.getCellValue(adr('A2'))).toEqual('7777777252')
+    expect(engine.getCellValue(adr('A2'))).toBe('7777777252')
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -85,8 +85,8 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(101, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('00000002')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0005')
+    expect(engine.getCellValue(adr('A1'))).toBe('00000002')
+    expect(engine.getCellValue(adr('A2'))).toBe('0005')
   })
 
   it('second argument should not affect negative results', () => {
@@ -95,8 +95,8 @@ describe('function BIN2OCT', () => {
       ['=BIN2OCT(1110110100, 10)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('7777777664')
-    expect(engine.getCellValue(adr('A2'))).toEqual('7777777664')
+    expect(engine.getCellValue(adr('A1'))).toBe('7777777664')
+    expect(engine.getCellValue(adr('A2'))).toBe('7777777664')
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {

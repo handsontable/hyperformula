@@ -9,15 +9,20 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
-  getRawValue,
+  getRawPrecisionValue,
   InterpreterValue,
   isExtendedNumber,
   NumberType,
-  RawInterpreterValue
+  RawInterpreterValue,
+  toNativeNumeric,
+  toNativeNumerics
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTypecheck<FinancialPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'PMT': {
@@ -283,22 +288,42 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     },
   }
 
+  
+  /**
+   *
+   */
   public pmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PMT'), pmtCore)
   }
 
+  
+  /**
+   *
+   */
   public ipmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IPMT'), ipmtCore)
   }
 
+  
+  /**
+   *
+   */
   public ppmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PPMT'), ppmtCore)
   }
 
+  
+  /**
+   *
+   */
   public fv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FV'), fvCore)
   }
 
+  
+  /**
+   *
+   */
   public cumipmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CUMIPMT'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
@@ -314,6 +339,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public cumprinc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CUMPRINC'),
       (rate: number, periods: number, value: number, start: number, end: number, type: number) => {
@@ -329,6 +358,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public db(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DB'),
       (cost: number, salvage: number, life: number, period: number, month: number) => {
@@ -361,6 +394,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public ddb(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DDB'),
       (cost: number, salvage: number, life: number, period: number, factor: number) => {
@@ -385,6 +422,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public dollarde(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARDE'),
       (dollar: number, fraction: number) => {
@@ -401,6 +442,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public dollarfr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DOLLARFR'),
       (dollar: number, fraction: number) => {
@@ -417,6 +462,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public effect(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EFFECT'),
       (rate: number, periods: number) => {
@@ -426,6 +475,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public ispmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISPMT'),
       (rate, period, periods, value) => {
@@ -437,6 +490,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public nominal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NOMINAL'),
       (rate: number, periods: number) => {
@@ -446,6 +503,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public nper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NPER'),
       (rate: number, payment: number, present: number, future: number, type: number) => {
@@ -463,6 +524,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public rate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     // Newton's method: https://en.wikipedia.org/wiki/Newton%27s_method
     return this.runFunction(ast.args, state, this.metadata('RATE'),
@@ -506,6 +571,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public pv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PV'),
       (rate: number, periods: number, payment: number, future: number, type: number) => {
@@ -526,6 +595,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public rri(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RRI'),
       (periods, present, future) => {
@@ -538,6 +611,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public sln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SLN'),
       (cost, salvage, life) => {
@@ -549,6 +626,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public syd(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SYD'),
       (cost: number, salvage: number, life: number, period: number) => {
@@ -560,6 +641,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public tbilleq(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLEQ'),
       (settlement: number, maturity: number, discount: number) => {
@@ -586,6 +671,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public tbillprice(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLPRICE'),
       (settlement: number, maturity: number, discount: number) => {
@@ -612,6 +701,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public tbillyield(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TBILLYIELD'),
       (settlement: number, maturity: number, price: number) => {
@@ -631,6 +724,10 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public fvschedule(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FVSCHEDULE'),
       (value: number, ratios: SimpleRangeValue) => {
@@ -642,7 +739,7 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         }
         for (const val of vals) {
           if (isExtendedNumber(val)) {
-            value *= 1 + getRawValue(val)
+            value *= 1 + toNativeNumeric(getRawPrecisionValue(val))
           } else if (val !== EmptyValue) {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
@@ -651,25 +748,34 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       })
   }
 
+  
+  /**
+   *
+   */
   public npv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NPV'),
       (rate: number, ...args: RawInterpreterValue[]) => {
-        const coerced = this.arithmeticHelper.coerceNumbersExactRanges(args)
-        if (coerced instanceof CellError) {
-          return coerced
+        const coercedPrecision = this.arithmeticHelper.coerceNumbersExactRanges(args)
+        if (coercedPrecision instanceof CellError) {
+          return coercedPrecision
         }
-        return npvCore(rate, coerced)
+        return npvCore(rate, toNativeNumerics(coercedPrecision))
       }
     )
   }
 
+  
+  /**
+   *
+   */
   public mirr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MIRR'),
       (range: SimpleRangeValue, frate: number, rrate: number) => {
-        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
-        if (vals instanceof CellError) {
-          return vals
+        const valsPrecision = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (valsPrecision instanceof CellError) {
+          return valsPrecision
         }
+        const vals = toNativeNumerics(valsPrecision)
         let posFlag = false
         let negFlag = false
         const posValues: number[] = []
@@ -708,29 +814,39 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     )
   }
 
+  
+  /**
+   *
+   */
   public pduration(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PDURATION'),
       (rate: number, pv: number, fv: number) => (Math.log(fv) - Math.log(pv)) / Math.log(1 + rate)
     )
   }
 
+  
+  /**
+   *
+   */
   public xnpv(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('XNPV'),
       (rate: number, values: SimpleRangeValue, dates: SimpleRangeValue) => {
         const valArr = values.valuesFromTopLeftCorner()
+        const valArrNum: number[] = []
         for (const val of valArr) {
-          if (typeof val !== 'number') {
+          if (!isExtendedNumber(val)) {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
+          valArrNum.push(toNativeNumeric(getRawPrecisionValue(val)))
         }
-        const valArrNum = valArr as number[]
         const dateArr = dates.valuesFromTopLeftCorner()
+        const dateArrNum: number[] = []
         for (const date of dateArr) {
-          if (typeof date !== 'number') {
+          if (!isExtendedNumber(date)) {
             return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
           }
+          dateArrNum.push(toNativeNumeric(getRawPrecisionValue(date)))
         }
-        const dateArrNum = dateArr as number[]
         if (dateArrNum.length !== valArrNum.length) {
           return new CellError(ErrorType.NUM, ErrorMessage.EqualLength)
         }
@@ -752,6 +868,9 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
   }
 }
 
+/**
+ *
+ */
 function pmtCore(rate: number, periods: number, present: number, future: number, type: number): number {
   if (rate === 0) {
     return (-present - future) / periods
@@ -761,6 +880,9 @@ function pmtCore(rate: number, periods: number, present: number, future: number,
   }
 }
 
+/**
+ *
+ */
 function ipmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
   const payment = pmtCore(rate, periods, present, future, type)
   if (period === 1) {
@@ -770,6 +892,9 @@ function ipmtCore(rate: number, period: number, periods: number, present: number
   }
 }
 
+/**
+ *
+ */
 function fvCore(rate: number, periods: number, payment: number, value: number, type: number): number {
   if (rate === 0) {
     return -value - payment * periods
@@ -779,10 +904,16 @@ function fvCore(rate: number, periods: number, payment: number, value: number, t
   }
 }
 
+/**
+ *
+ */
 function ppmtCore(rate: number, period: number, periods: number, present: number, future: number, type: number): number {
   return pmtCore(rate, periods, present, future, type) - ipmtCore(rate, period, periods, present, future, type)
 }
 
+/**
+ *
+ */
 function npvCore(rate: number, args: number[]): number | CellError {
   let acc = 0
   for (let i = args.length - 1; i >= 0; i--) {

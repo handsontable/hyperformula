@@ -9,7 +9,7 @@ describe('function BIN2DEC', () => {
       ['=BIN2DEC(101)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(5)
+    expect(engine.getCellValue(adr('A1'))).toBe(5)
   })
 
   it('should not work for non-binary arguments', () => {
@@ -31,7 +31,7 @@ describe('function BIN2DEC', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
-    expect(engine.getCellValue(adr('A2'))).toEqual(-342)
+    expect(engine.getCellValue(adr('A2'))).toBe(-342)
   })
 
   it('should work', () => {
@@ -43,11 +43,11 @@ describe('function BIN2DEC', () => {
       ['=BIN2DEC(000101)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(-512)
-    expect(engine.getCellValue(adr('A3'))).toEqual(511)
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
-    expect(engine.getCellValue(adr('A5'))).toEqual(5)
+    expect(engine.getCellValue(adr('A1'))).toBe(-1)
+    expect(engine.getCellValue(adr('A2'))).toBe(-512)
+    expect(engine.getCellValue(adr('A3'))).toBe(511)
+    expect(engine.getCellValue(adr('A4'))).toBe(5)
+    expect(engine.getCellValue(adr('A5'))).toBe(5)
 
   })
 
@@ -57,13 +57,14 @@ describe('function BIN2DEC', () => {
       ['=BIN2DEC(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(13)
+    expect(engine.getCellValue(adr('A2'))).toBe(13)
   })
 
   it('should return numeric type', () => {
     const engine = HyperFormula.buildFromArray([
       ['=BIN2DEC(101)'],
     ])
+
     expect(engine.getCellValueType(adr('A1'))).toBe(CellValueType.NUMBER)
   })
 })

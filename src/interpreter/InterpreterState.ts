@@ -6,6 +6,9 @@
 import {SimpleCellAddress} from '../Cell'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 
+/**
+ *
+ */
 export class InterpreterState {
   constructor(
     public formulaAddress: SimpleCellAddress,

@@ -5,12 +5,14 @@ import {adr} from './testUtils'
 describe('Building empty engine', () => {
   it('works', () => {
     const engine = HyperFormula.buildEmpty()
+
     expect(engine).toBeInstanceOf(HyperFormula)
   })
 
   it('accepts config params', () => {
     const config = {dateFormats: ['MM']}
     const engine = HyperFormula.buildEmpty(config)
+
     expect(engine.getConfig().dateFormats[0]).toBe('MM')
   })
 })
@@ -85,22 +87,26 @@ describe('named expressions', () => {
     const engine = HyperFormula.buildEmpty({}, [{name: 'FALSE', expression: false}])
     engine.addSheet('sheet')
     engine.setSheetContent(0, [['=FALSE']])
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('buildFromArray', () => {
     const engine = HyperFormula.buildFromArray([['=FALSE']], {}, [{name: 'FALSE', expression: false}])
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('buildFromSheets', () => {
     const engine = HyperFormula.buildFromSheets({sheet: [['=FALSE']]}, {}, [{name: 'FALSE', expression: false}])
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('buildFromArray + scope', () => {
     const engine = HyperFormula.buildFromArray([['=FALSE']], {}, [{name: 'FALSE', expression: false, scope: 0}])
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('buildFromSheets + scope', () => {
@@ -109,6 +115,7 @@ describe('named expressions', () => {
       expression: false,
       scope: 0
     }])
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 })

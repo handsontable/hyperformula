@@ -19,6 +19,9 @@ enum AbsStyle {
   FullyRelative = 4,
 }
 
+/**
+ *
+ */
 export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AddressPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'ADDRESS': {
@@ -33,6 +36,10 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
   }
 
+  
+  /**
+   *
+   */
   private verifyAddressArguments(row: number, col: number, abs: number, useA1Style: boolean): Maybe<CellError> {
     if (useA1Style) {
       if (row < 1 || col < 1) {
@@ -56,6 +63,10 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
     return undefined
   }
 
+  
+  /**
+   *
+   */
   public address(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ADDRESS'), (row: number, col: number, abs: number, useA1Style: boolean, sheetName: string): InterpreterValue => {
       const argumentError = this.verifyAddressArguments(row, col, abs, useA1Style)

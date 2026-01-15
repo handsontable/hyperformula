@@ -24,6 +24,10 @@ export class CountBlankPlugin extends FunctionPlugin implements FunctionPluginTy
     },
   }
 
+  
+  /**
+   *
+   */
   public countblank(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('COUNTBLANK'), (...args: RawScalarValue[]) => {
       let counter = 0

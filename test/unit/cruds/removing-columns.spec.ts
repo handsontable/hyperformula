@@ -21,42 +21,42 @@ describe('Removing columns - checking if its possible', () => {
   it('no if starting column is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, [-1, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [-1, 1])).toBe(false)
   })
 
   it('no if starting column is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, [1.5, 2])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [NaN, 2])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [Infinity, 2])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [-Infinity, 2])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [1.5, 2])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [NaN, 2])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [Infinity, 2])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [-Infinity, 2])).toBe(false)
   })
 
   it('no if number of columns is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, [0, -1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, -1])).toBe(false)
   })
 
   it('no if number of columns is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, [0, 1.5])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [0, NaN])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [0, Infinity])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(0, [0, -Infinity])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, 1.5])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, NaN])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, Infinity])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, -Infinity])).toBe(false)
   })
 
   it('no if sheet does not exist', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(1, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(1.5, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(-1, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(NaN, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(Infinity, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToRemoveColumns(-Infinity, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToRemoveColumns(1, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(1.5, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(-1, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(NaN, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(Infinity, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToRemoveColumns(-Infinity, [0, 1])).toBe(false)
   })
 
   it('yes if theres an array in place where we remove', () => {
@@ -65,19 +65,19 @@ describe('Removing columns - checking if its possible', () => {
       ['3', '4'],
     ])
 
-    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [2, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [3, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [4, 1])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toBe(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toBe(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [2, 1])).toBe(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [3, 1])).toBe(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [4, 1])).toBe(true)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToRemoveColumns(0, [0, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toEqual(true)
-    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toEqual(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [0, 1])).toBe(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 1])).toBe(true)
+    expect(engine.isItPossibleToRemoveColumns(0, [1, 2])).toBe(true)
   })
 })
 
@@ -424,11 +424,12 @@ describe('Removing columns - reevaluation', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MEDIAN(B1:D1)', '2', '4', '3'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
 
     engine.removeColumns(0, [2, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(2.5)
   })
 
   it('dont reevaluate everything', () => {
@@ -512,6 +513,7 @@ describe('Removing rows - arrays', () => {
     engine.removeColumns(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.getCell(adr('C1')) as ArrayFormulaVertex
+
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
 
@@ -649,6 +651,7 @@ describe('Removing columns - graph', function() {
     engine.removeColumns(0, [2, 1])
 
     const b1 = engine.addressMapping.getCell(adr('b1'))
+
     expect(engine.graph.adjacentNodes(b1!)).toEqual(new Set())
   })
 
@@ -657,8 +660,10 @@ describe('Removing columns - graph', function() {
       ['1', '2', '3', '4'],
       ['1', '2', '3', '4'],
     ])
+
     expect(engine.graph.getNodes().length).toBe(8)
     engine.removeColumns(0, [0, 2])
+
     expect(engine.graph.getNodes().length).toBe(4) // left two vertices in first column, two in last
   })
 
@@ -666,8 +671,10 @@ describe('Removing columns - graph', function() {
     const engine = HyperFormula.buildFromArray([
       ['1', null, '3'],
     ])
+
     expect(engine.graph.getNodes().length).toBe(2)
     engine.removeColumns(0, [1, 1])
+
     expect(engine.graph.getNodes().length).toBe(2)
   })
 })
@@ -687,6 +694,7 @@ describe('Removing columns - dependencies', () => {
 
     expect(extractReference(engine, adr('C1'))).toEqual(CellAddress.absoluteCol(0, 0, 1))
     engine.removeColumns(0, [0, 2])
+
     expect(extractReference(engine, adr('A1'))).toEqual(CellAddress.absoluteCol(0, 0, 1))
   })
 
@@ -704,6 +712,7 @@ describe('Removing columns - ranges', function() {
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('B1'))
     const a1 = engine.addressMapping.getCell(adr('A1'))
+
     expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
@@ -718,6 +727,7 @@ describe('Removing columns - ranges', function() {
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('A1'))
     const a1 = engine.addressMapping.getCell(adr('A1'))
+
     expect(engine.graph.existsEdge(a1!, range)).toBe(true)
   })
 
@@ -731,6 +741,7 @@ describe('Removing columns - ranges', function() {
     engine.removeColumns(0, [0, 3])
 
     const ranges = Array.from(engine.rangeMapping.rangesInSheet(0))
+
     expect(ranges.length).toBe(0)
     expect(engine.graph.hasNode(range)).toBe(false)
   })
@@ -884,6 +895,7 @@ describe('Removing columns - merge ranges', () => {
 
     verifyRangesInSheet(engine, 0, [])
     verifyValues(engine)
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })

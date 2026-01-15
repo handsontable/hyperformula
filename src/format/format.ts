@@ -10,6 +10,9 @@ import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
+/**
+ *
+ */
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): RawScalarValue {
   const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryDateTime !== undefined) {
@@ -26,6 +29,9 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   return formatArg
 }
 
+/**
+ *
+ */
 export function padLeft(number: number | string, size: number) {
   let result = `${number}`
   while (result.length < size) {
@@ -34,6 +40,9 @@ export function padLeft(number: number | string, size: number) {
   return result
 }
 
+/**
+ *
+ */
 export function padRight(number: number | string, size: number) {
   let result = `${number}`
   while (result.length < size) {
@@ -42,10 +51,16 @@ export function padRight(number: number | string, size: number) {
   return result
 }
 
+/**
+ *
+ */
 function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
+/**
+ *
+ */
 function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
   let result = ''
 
@@ -80,6 +95,9 @@ function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
   return result
 }
 
+/**
+ *
+ */
 export function defaultStringifyDuration(time: SimpleTime, formatArg: string): Maybe<string> {
   const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {
@@ -142,6 +160,9 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
   return result
 }
 
+/**
+ *
+ */
 export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: string): Maybe<string> {
   const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {

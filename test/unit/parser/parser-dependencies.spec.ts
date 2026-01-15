@@ -23,7 +23,7 @@ describe('Parsing collecting dependencies', () => {
     const parseResult = parser.parse('=$B$2', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
 
-    expect(dependencies.length).toEqual(1)
+    expect(dependencies.length).toBe(1)
     expect(dependencies[0]).toEqual(adr('B2'))
   })
 
@@ -93,6 +93,7 @@ describe('Parsing collecting dependencies', () => {
 
     const parseResult = parser.parse('=OFFSET(D4, 0, 0)', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
+
     expect(dependencies).toEqual([
       adr('D4'),
     ])
@@ -104,6 +105,7 @@ describe('Parsing collecting dependencies', () => {
 
     const parseResult = parser.parse('=COLUMNS(A1:B3)', formulaAddress)
     const dependencies = absolutizeDependencies(parseResult.dependencies, formulaAddress)
+
     expect(dependencies).toEqual([])
   })
 

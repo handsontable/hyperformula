@@ -6,7 +6,7 @@ describe('Function ATANH', () => {
   it('happy path', () => {
     const engine = HyperFormula.buildFromArray([['=ATANH(0)', '=ATANH(0.5)']], {smartRounding: false})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.5493061443340548)
   })
 
@@ -40,7 +40,7 @@ describe('Function ATANH', () => {
       ['="0"', '=ATANH(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
   it('errors propagation', () => {

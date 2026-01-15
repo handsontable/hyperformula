@@ -11,6 +11,7 @@ describe('Interpreter - function RANDBETWEEN', () => {
         ['=RANDBETWEEN(0,9)'],
       ])
       const val = engine.getCellValue(adr('A1')) as number
+
       expect(val).toBeGreaterThanOrEqual(0)
       expect(val).toBeLessThanOrEqual(9)
       expect(val).toEqual(Math.trunc(val))
@@ -28,6 +29,7 @@ describe('Interpreter - function RANDBETWEEN', () => {
         ['=RANDBETWEEN(-0.1,9.9)'],
       ])
       const val = engine.getCellValue(adr('A1')) as number
+
       expect(val).toBeGreaterThanOrEqual(0)
       expect(val).toBeLessThanOrEqual(9)
       expect(val).toEqual(Math.trunc(val))
@@ -44,7 +46,8 @@ describe('Interpreter - function RANDBETWEEN', () => {
         ['=RANDBETWEEN(0,0.5)'],
       ])
       const val = engine.getCellValue(adr('A1')) as number
-      expect(val).toEqual(0)
+
+      expect(val).toBe(0)
     }
   })
 
@@ -54,7 +57,8 @@ describe('Interpreter - function RANDBETWEEN', () => {
         ['=RANDBETWEEN(0.5,1)'],
       ])
       const val = engine.getCellValue(adr('A1')) as number
-      expect(val).toEqual(1)
+
+      expect(val).toBe(1)
     }
   })
 
@@ -64,7 +68,8 @@ describe('Interpreter - function RANDBETWEEN', () => {
         ['=RANDBETWEEN(0.5,0.6)'],
       ])
       const val = engine.getCellValue(adr('A1')) as number
-      expect(val).toEqual(1)
+
+      expect(val).toBe(1)
     }
   })
 

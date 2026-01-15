@@ -15,6 +15,9 @@ export interface RawTranslationPackage {
   ui: UITranslationSet,
 }
 
+/**
+ *
+ */
 export class TranslationPackage {
   private readonly _protectedTranslations: TranslationSet = {
     'VERSION': 'VERSION'
@@ -31,11 +34,19 @@ export class TranslationPackage {
     Object.assign(this.functions, this._protectedTranslations)
   }
 
+  
+  /**
+   *
+   */
   public extendFunctions(additionalFunctionTranslations: TranslationSet): void {
     this.checkFunctionTranslations(additionalFunctionTranslations)
     Object.assign(this.functions, additionalFunctionTranslations)
   }
 
+  
+  /**
+   *
+   */
   public buildFunctionMapping(): Record<string, string> {
     return Object.keys(this.functions).reduce((ret, key) => {
       ret[this.functions[key]] = key
@@ -43,6 +54,10 @@ export class TranslationPackage {
     }, {} as Record<string, string>)
   }
 
+  
+  /**
+   *
+   */
   public buildErrorMapping(): Record<string, TranslatableErrorType> {
     return Object.keys(this.errors).reduce((ret, key) => {
       ret[this.errors[key as TranslatableErrorType]] = key as TranslatableErrorType
@@ -50,10 +65,18 @@ export class TranslationPackage {
     }, {} as Record<string, TranslatableErrorType>)
   }
 
+  
+  /**
+   *
+   */
   public isFunctionTranslated(key: string): boolean {
     return this.functions[key] !== undefined
   }
 
+  
+  /**
+   *
+   */
   public getFunctionTranslations(functionIds: string[]): string[] {
     const translations: string[] = []
     for (const functionId of functionIds) {
@@ -64,6 +87,10 @@ export class TranslationPackage {
     return translations
   }
 
+  
+  /**
+   *
+   */
   public getFunctionTranslation(key: string): string {
     const val = this.functions[key]
     if (val === undefined) {
@@ -73,10 +100,18 @@ export class TranslationPackage {
     }
   }
 
+  
+  /**
+   *
+   */
   public getMaybeFunctionTranslation(key: string): Maybe<string> {
     return this.functions[key]
   }
 
+  
+  /**
+   *
+   */
   public getErrorTranslation(key: ErrorType): string {
     if (key === ErrorType.LIC) {
       return `#${ErrorType.LIC}!`
@@ -89,6 +124,10 @@ export class TranslationPackage {
     }
   }
 
+  
+  /**
+   *
+   */
   public getUITranslation(key: UIElement): string {
     const val = this.ui[key]
     if (val === undefined) {
@@ -98,6 +137,10 @@ export class TranslationPackage {
     }
   }
 
+  
+  /**
+   *
+   */
   private checkUI(): void {
     for (const key of Object.values(UIElement)) {
       if (!(key in this.ui)) {
@@ -106,6 +149,10 @@ export class TranslationPackage {
     }
   }
 
+  
+  /**
+   *
+   */
   private checkErrors(): void {
     for (const key of Object.values(ErrorType)) {
       if (!(key in this.errors) && (key !== ErrorType.LIC)) {
@@ -114,6 +161,10 @@ export class TranslationPackage {
     }
   }
 
+  
+  /**
+   *
+   */
   private checkFunctionTranslations(functions: TranslationSet) {
     const functionNames = new Set(Object.getOwnPropertyNames(functions))
     for (const protectedTranslation of Object.getOwnPropertyNames(this._protectedTranslations)) {
@@ -124,6 +175,9 @@ export class TranslationPackage {
   }
 }
 
+/**
+ *
+ */
 export function buildTranslationPackage(rawTranslationPackage: RawTranslationPackage): TranslationPackage {
   return new TranslationPackage(
     Object.assign({}, rawTranslationPackage.functions),

@@ -19,13 +19,24 @@ export interface ChangeExporter<T> {
 
 export type ChangeList = CellValueChange[]
 
+/**
+ *
+ */
 export class ContentChanges {
   private changes: Map<string, CellValueChange> = new Map()
 
+  
+  /**
+   *
+   */
   public static empty() {
     return new ContentChanges()
   }
 
+  
+  /**
+   *
+   */
   public addAll(other: ContentChanges): ContentChanges {
     for (const change of other.changes.values()) {
       this.add(change.address, change)
@@ -33,10 +44,18 @@ export class ContentChanges {
     return this
   }
 
+  
+  /**
+   *
+   */
   public addChange(newValue: InterpreterValue, address: SimpleCellAddress, oldValue?: InterpreterValue): void {
     this.addInterpreterValue(newValue, address, oldValue)
   }
 
+  
+  /**
+   *
+   */
   public exportChanges<T>(exporter: ChangeExporter<T>): T[] {
     let ret: T[] = []
     this.changes.forEach((e) => {
@@ -50,14 +69,26 @@ export class ContentChanges {
     return ret
   }
 
+  
+  /**
+   *
+   */
   public getChanges(): ChangeList {
     return Array.from(this.changes.values())
   }
 
+  
+  /**
+   *
+   */
   public isEmpty(): boolean {
     return this.changes.size === 0
   }
 
+  
+  /**
+   *
+   */
   private add(address: SimpleCellAddress, change: CellValueChange) {
     const value = change.value
     if (value instanceof SimpleRangeValue) {
@@ -68,6 +99,10 @@ export class ContentChanges {
     this.changes.set(addressKey(address), change)
   }
 
+  
+  /**
+   *
+   */
   private addInterpreterValue(value: InterpreterValue, address: SimpleCellAddress, oldValue?: InterpreterValue) {
     this.add(address, {
       address,

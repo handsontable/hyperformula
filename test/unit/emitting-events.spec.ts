@@ -99,6 +99,7 @@ describe('Events', () => {
     const handler = jasmine.createSpy()
 
     engine.on(Events.NamedExpressionRemoved, handler)
+
     expect(() => {
       engine.removeNamedExpression('myName')
     }).toThrow(new NamedExpressionDoesNotExistError('myName'))
@@ -173,16 +174,19 @@ describe('Events', () => {
     engine.on(Events.EvaluationResumed, handlerResumed)
 
     engine.suspendEvaluation()
+
     expect(handlerUpdated).not.toHaveBeenCalled()
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
     expect(handlerResumed).not.toHaveBeenCalled()
 
     engine.setCellContents(adr('A1'), [['13']])
+
     expect(handlerUpdated).not.toHaveBeenCalled()
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
     expect(handlerResumed).not.toHaveBeenCalled()
 
     engine.resumeEvaluation()
+
     expect(handlerUpdated).toHaveBeenCalledTimes(1)
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
     expect(handlerResumed).toHaveBeenCalledTimes(1)
@@ -202,6 +206,7 @@ describe('Events', () => {
     engine.on(Events.EvaluationResumed, handlerResumed)
 
     engine.batch(() => engine.setCellContents(adr('A1'), [['13']]))
+
     expect(handlerUpdated).toHaveBeenCalledTimes(1)
     expect(handlerSuspended).toHaveBeenCalledTimes(1)
     expect(handlerResumed).toHaveBeenCalledTimes(1)

@@ -5,6 +5,9 @@ import {sheet as sheetBGenerator} from './sheets/10-sheet-b'
 import {sheet as columnRangesGenerator} from './sheets/column-ranges'
 import {adr} from './utils/utils'
 
+/**
+ *
+ */
 export function runCrudsBenchmark(): BenchmarkResult[] {
   const result: BenchmarkResult[] = []
   const sheetA = sheetAGenerator(10000)

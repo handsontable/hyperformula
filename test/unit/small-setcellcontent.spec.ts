@@ -9,6 +9,7 @@ describe('should properly build', () => {
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
     ])
+
     expect(engine.getSheetValues(0)).toEqual(
       [
         [detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'), detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!B1')],
@@ -22,6 +23,7 @@ describe('should properly build', () => {
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
       ['=MAX(B1:B2)', '=MAX(A1:A2)'],
     ])
+
     expect(engine.getSheetValues(0)).toEqual(
       [
         [detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!A1'), detailedErrorWithOrigin(ErrorType.CYCLE, 'Sheet1!B1')],

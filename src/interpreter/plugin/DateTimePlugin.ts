@@ -22,13 +22,14 @@ import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
-  getRawValue,
+  getRawPrecisionValue,
   InternalNoErrorScalarValue,
   InterpreterValue,
   isExtendedNumber,
   NumberType,
   RawNoErrorScalarValue,
   RawScalarValue,
+  toNativeNumeric,
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
@@ -267,6 +268,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public time(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TIME'),
       (h, m, s) => {
@@ -294,12 +299,20 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     })
   }
 
+  
+  /**
+   *
+   */
   public day(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DAY'),
       (dateNumber) => this.dateTimeHelper.numberToSimpleDate(dateNumber).day
     )
   }
 
+  
+  /**
+   *
+   */
   public days(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DAYS'), (endDate, startDate) => Math.trunc(endDate) - Math.trunc(startDate))
   }
@@ -332,18 +345,30 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public hour(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HOUR'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber) % 1).hours
     )
   }
 
+  
+  /**
+   *
+   */
   public minute(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MINUTE'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber) % 1).minutes
     )
   }
 
+  
+  /**
+   *
+   */
   public second(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SECOND'),
       (timeNumber) => numberToSimpleTime(roundToNearestSecond(timeNumber) % 1).seconds
@@ -364,6 +389,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public weekday(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEEKDAY'),
       (day: number, type: number) => {
@@ -380,6 +409,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public weeknum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WEEKNUM'),
       (day: number, type: number) => {
@@ -399,10 +432,18 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public isoweeknum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ISOWEEKNUM'), this.isoweeknumCore)
   }
 
+  
+  /**
+   *
+   */
   public datevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DATEVALUE'),
       (date: string) => {
@@ -419,6 +460,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public timevalue(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TIMEVALUE'),
       (date: string) => {
@@ -426,11 +471,15 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         if (dateNumber === undefined) {
           return new CellError(ErrorType.VALUE, ErrorMessage.IncorrectDateTime)
         }
-        return getRawValue(dateNumber) % 1
+        return toNativeNumeric(getRawPrecisionValue(dateNumber)) % 1
       }
     )
   }
 
+  
+  /**
+   *
+   */
   public now(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NOW'),
       () => {
@@ -441,6 +490,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public today(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TODAY'),
       () => {
@@ -454,6 +507,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public edate(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EDATE'),
       (dateNumber: number, delta: number) => {
@@ -469,6 +526,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public datedif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DATEDIF'),
       (startDate: number, endDate: number, unit: string) => {
@@ -520,10 +581,18 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public days360(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DAYS360'), this.days360Core)
   }
 
+  
+  /**
+   *
+   */
   public yearfrac(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('YEARFRAC'),
       (startDate: number, endDate: number, mode: number) => {
@@ -552,6 +621,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public interval(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('INTERVAL'),
       (arg: number) => {
@@ -578,24 +651,40 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     )
   }
 
+  
+  /**
+   *
+   */
   public networkdays(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NETWORKDAYS'),
       (start, end, holidays) => this.networkdayscore(start, end, 1, holidays)
     )
   }
 
+  
+  /**
+   *
+   */
   public networkdaysintl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NETWORKDAYS.INTL'),
       (start, end, weekend, holidays) => this.networkdayscore(start, end, weekend, holidays)
     )
   }
 
+  
+  /**
+   *
+   */
   public workday(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WORKDAY'),
       (start, end, holidays) => this.workdaycore(start, end, 1, holidays)
     )
   }
 
+  
+  /**
+   *
+   */
   public workdayintl(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('WORKDAY.INTL'),
       (start, end, weekend, holidays) => this.workdaycore(start, end, weekend, holidays)
@@ -628,6 +717,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return 360 * (nEnd.year - nStart.year) + 30 * (nEnd.month - nStart.month) + nEnd.day - nStart.day
   }
 
+  
+  /**
+   *
+   */
   private networkdayscore(start: number, end: number, weekend: RawNoErrorScalarValue, holidays?: SimpleRangeValue): RawScalarValue {
     start = Math.trunc(start)
     end = Math.trunc(end)
@@ -649,6 +742,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return multiplier * this.countWorkdays(start, end, weekendPattern, filteredHolidays)
   }
 
+  
+  /**
+   *
+   */
   private workdaycore(start: number, delta: number, weekend: RawNoErrorScalarValue, holidays?: SimpleRangeValue): RawScalarValue {
     start = Math.trunc(start)
     delta = Math.trunc(delta)
@@ -699,6 +796,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     }
   }
 
+  
+  /**
+   *
+   */
   private countWorkdays(start: number, end: number, weekendPattern: string, sortedHolidays: number[]): number {
     const absoluteEnd = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(end))
     const absoluteStart = Math.floor(this.dateTimeHelper.relativeNumberToAbsoluteNumber(start))
@@ -715,6 +816,10 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
     return ans
   }
 
+  
+  /**
+   *
+   */
   private simpleRangeToFilteredHolidays(weekendPattern: string, holidays?: SimpleRangeValue): number[] | CellError {
     const holidaysArr = holidays?.valuesFromTopLeftCorner() ?? []
     for (const val of holidaysArr) {
@@ -728,7 +833,7 @@ export class DateTimePlugin extends FunctionPlugin implements FunctionPluginType
         continue
       }
       if (isExtendedNumber(val)) {
-        processedHolidays.push(Math.trunc(getRawValue(val)))
+        processedHolidays.push(Math.trunc(toNativeNumeric(getRawPrecisionValue(val))))
       } else {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
@@ -771,6 +876,9 @@ function lowerBound(val: number, sortedArray: number[]): number {
   return upper
 }
 
+/**
+ *
+ */
 function computeWeekendPattern(weekend: RawNoErrorScalarValue): string | CellError {
   if (typeof weekend !== 'number' && typeof weekend !== 'string') {
     return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)

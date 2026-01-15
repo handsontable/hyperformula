@@ -7,13 +7,15 @@ describe('Interpreter - function ARRAYFORMULA', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ARRAYFORMULA(1)'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('works #2', () => {
     const engine = HyperFormula.buildFromArray([
       ['=ARRAYFORMULA(1/0)'],
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
   })
 
@@ -22,7 +24,8 @@ describe('Interpreter - function ARRAYFORMULA', () => {
       ['=SUM(ARRAYFORMULA(A2:C2+A2:C2))'],
       [1, 2, 3]
     ], {useArrayArithmetic: false})
-    expect(engine.getCellValue(adr('A1'))).toEqual(12)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(12)
   })
 
   it('validates number of arguments', () => {

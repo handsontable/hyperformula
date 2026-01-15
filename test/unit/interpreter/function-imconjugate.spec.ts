@@ -28,8 +28,8 @@ describe('Function IMCONJUGATE', () => {
       ['=IMCONJUGATE("-3+4i")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('0')
-    expect(engine.getCellValue(adr('A2'))).toEqual('-i')
-    expect(engine.getCellValue(adr('A3'))).toEqual('-3-4i')
+    expect(engine.getCellValue(adr('A1'))).toBe('0')
+    expect(engine.getCellValue(adr('A2'))).toBe('-i')
+    expect(engine.getCellValue(adr('A3'))).toBe('-3-4i')
   })
 })

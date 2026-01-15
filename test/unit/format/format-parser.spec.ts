@@ -10,6 +10,7 @@ describe('FormatParser', () => {
       type: TokenType.FREE_TEXT,
       value: '\\d',
     })
+
     expect(parseResult.tokens[1]).toEqual({
       type: TokenType.FORMAT,
       value: 'dd',

@@ -14,6 +14,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 0, 0)', adr('B3', 1)).ast as CellReferenceAst
+
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(4, 13))
   })
@@ -22,6 +23,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 1, 0)', adr('B3', 1)).ast as CellReferenceAst
+
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(4, 14))
   })
@@ -30,6 +32,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(C3, -1, 0)', adr('B2')).ast as CellReferenceAst
+
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(1, 0))
   })
@@ -38,6 +41,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 0, 1)', adr('B3', 1)).ast as CellReferenceAst
+
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(5, 13))
   })
@@ -46,6 +50,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(C3, 0, -1)', adr('B2')).ast as CellReferenceAst
+
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(0, 1))
   })
@@ -54,6 +59,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 2, 0, 3)', adr('B3', 1)).ast as CellRangeAst
+
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.start).toEqual(CellAddress.relative(4, 15))
     expect(ast.end).toEqual(CellAddress.relative(4, 17))
@@ -63,6 +69,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=OFFSET(F16, 0, 2, 1, 3)', adr('B3', 1)).ast as CellRangeAst
+
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.start).toEqual(CellAddress.relative(6, 13))
     expect(ast.end).toEqual(CellAddress.relative(8, 13))
@@ -75,6 +82,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=OFFSET(Sheet2!F16, 0, 2, 1, 3)', adr('B3', 0)).ast as CellRangeAst
+
     expect(ast.type).toBe(AstNodeType.CELL_RANGE)
     expect(ast.start).toEqual(CellAddress.relative(6, 13, 1))
     expect(ast.end).toEqual(CellAddress.relative(8, 13, 1))
@@ -84,6 +92,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(42, 0, 0)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('First argument to OFFSET is not a reference')
   })
@@ -92,6 +101,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, C3, 0)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Second argument to OFFSET is not a static number')
   })
@@ -100,6 +110,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 1.3, 0)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Second argument to OFFSET is not a static number')
   })
@@ -108,6 +119,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, C3)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Third argument to OFFSET is not a static number')
   })
@@ -116,6 +128,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 1.3)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Third argument to OFFSET is not a static number')
   })
@@ -124,6 +137,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, B3)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Fourth argument to OFFSET is not a static number')
   })
@@ -132,6 +146,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 0)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Fourth argument to OFFSET is too small number')
   })
@@ -140,6 +155,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1.3)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Fourth argument to OFFSET is not integer')
   })
@@ -148,6 +164,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1, B3)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Fifth argument to OFFSET is not a static number')
   })
@@ -156,6 +173,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1, 0)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Fifth argument to OFFSET is too small number')
   })
@@ -164,6 +182,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {errors} = parser.parse('=OFFSET(A1, 0, 0, 1, 1.3)', adr('A1'))
+
     expect(errors[0].type).toBe('StaticOffsetError')
     expect(errors[0].message).toBe('Fifth argument to OFFSET is not integer')
   })
@@ -172,6 +191,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {ast, errors} = parser.parse('=OFFSET(A1, -1, 0)', adr('A1'))
+
     expect(errors.length).toBe(0)
     expect((ast as ErrorAst).error).toEqual(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
   })
@@ -180,6 +200,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const {ast, errors} = parser.parse('=OFFSET(A1, 0, -1)', adr('A1'))
+
     expect(errors.length).toBe(0)
     expect((ast as ErrorAst).error).toEqual(new CellError(ErrorType.REF, ErrorMessage.OutOfSheet))
   })
@@ -188,6 +209,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=oFfSeT(F16, 0, 0)', adr('B3', 1)).ast as CellReferenceAst
+
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(4, 13))
   })
@@ -199,6 +221,7 @@ describe('Parser - OFFSET to reference translation', () => {
     const parser = buildEmptyParserWithCaching(new Config(), sheetMapping)
 
     const ast = parser.parse('=OFFSET(Sheet2!A1, 0, 0)', adr('A1', 0)).ast as CellReferenceAst
+
     expect(ast.type).toBe(AstNodeType.CELL_REFERENCE)
     expect(ast.reference).toEqual(CellAddress.relative(0, 0, 1))
   })
@@ -209,6 +232,6 @@ describe('Parser - OFFSET to reference translation', () => {
       Sheet2: [['sheet2', '=OFFSET(Sheet1!A1, 0, 0)']],
     })
 
-    expect(engine.getCellValue(adr('B1', engine.getSheetId('Sheet2')))).toEqual('sheet1')
+    expect(engine.getCellValue(adr('B1', engine.getSheetId('Sheet2')))).toBe('sheet1')
   })
 })

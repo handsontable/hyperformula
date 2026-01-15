@@ -20,9 +20,9 @@ describe('batch cruds', () => {
     })
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
-    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toBe(null)
-    expect(engine.getCellValue(adr('A3'))).toEqual('bar')
+    expect(engine.getCellValue(adr('A1'))).toBe('foo')
+    expect(engine.getCellValue(adr('A2'))).toBeNull()
+    expect(engine.getCellValue(adr('A3'))).toBe('bar')
   })
 
   it('should run batch cruds unitl fail and call recompute only once', () => {
@@ -48,9 +48,9 @@ describe('batch cruds', () => {
     }
 
     expect(evaluatorSpy).toHaveBeenCalledTimes(1)
-    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toBe(null)
-    expect(engine.getCellValue(adr('A3'))).toEqual('bar')
+    expect(engine.getCellValue(adr('A1'))).toBe('foo')
+    expect(engine.getCellValue(adr('A2'))).toBeNull()
+    expect(engine.getCellValue(adr('A3'))).toBe('bar')
   })
 })
 

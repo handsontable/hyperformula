@@ -185,10 +185,18 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     )
   }
 
+  
+  /**
+   *
+   */
   public not(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('NOT'), (arg) => !arg)
   }
 
+  
+  /**
+   *
+   */
   public xor(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('XOR'), (...args: (boolean | undefined)[]) => {
       let cnt = 0
@@ -201,6 +209,10 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
+  
+  /**
+   *
+   */
   public switch(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SWITCH'), (selector, ...args) => {
       const n = args.length
@@ -221,6 +233,10 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
+  
+  /**
+   *
+   */
   public iferror(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IFERROR'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
       if (arg1 instanceof CellError) {
@@ -231,6 +247,10 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
+  
+  /**
+   *
+   */
   public ifna(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('IFNA'), (arg1: InternalScalarValue, arg2: InternalScalarValue) => {
       if (arg1 instanceof CellError && arg1.type === ErrorType.NA) {
@@ -241,6 +261,10 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
     })
   }
 
+  
+  /**
+   *
+   */
   public choose(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHOOSE'), (selector, ...args) => {
       if (selector > args.length) {

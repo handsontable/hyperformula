@@ -22,11 +22,11 @@ describe('Function UPPER', () => {
       ['=UPPER("bAr")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('')
-    expect(engine.getCellValue(adr('A2'))).toEqual('')
-    expect(engine.getCellValue(adr('A3'))).toEqual('FOO')
-    expect(engine.getCellValue(adr('A4'))).toEqual('FOO')
-    expect(engine.getCellValue(adr('A5'))).toEqual('BAR')
+    expect(engine.getCellValue(adr('A1'))).toBe('')
+    expect(engine.getCellValue(adr('A2'))).toBe('')
+    expect(engine.getCellValue(adr('A3'))).toBe('FOO')
+    expect(engine.getCellValue(adr('A4'))).toBe('FOO')
+    expect(engine.getCellValue(adr('A5'))).toBe('BAR')
   })
 
   it('should coerce', () => {
@@ -35,7 +35,7 @@ describe('Function UPPER', () => {
       ['=UPPER(0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('TRUE')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0')
+    expect(engine.getCellValue(adr('A1'))).toBe('TRUE')
+    expect(engine.getCellValue(adr('A2'))).toBe('0')
   })
 })

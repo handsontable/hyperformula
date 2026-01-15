@@ -32,12 +32,12 @@ describe('Function CHAR', () => {
       ['=CHAR(255)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('')
-    expect(engine.getCellValue(adr('A2'))).toEqual('!')
-    expect(engine.getCellValue(adr('A3'))).toEqual('A')
-    expect(engine.getCellValue(adr('A4'))).toEqual('Z')
-    expect(engine.getCellValue(adr('A5'))).toEqual('Ñ')
-    expect(engine.getCellValue(adr('A6'))).toEqual('ÿ')
+    expect(engine.getCellValue(adr('A1'))).toBe('')
+    expect(engine.getCellValue(adr('A2'))).toBe('!')
+    expect(engine.getCellValue(adr('A3'))).toBe('A')
+    expect(engine.getCellValue(adr('A4'))).toBe('Z')
+    expect(engine.getCellValue(adr('A5'))).toBe('Ñ')
+    expect(engine.getCellValue(adr('A6'))).toBe('ÿ')
   })
 
   it('should round down floats', () => {
@@ -47,9 +47,9 @@ describe('Function CHAR', () => {
       ['=CHAR(42.8)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('*')
-    expect(engine.getCellValue(adr('A2'))).toEqual('*')
-    expect(engine.getCellValue(adr('A3'))).toEqual('*')
+    expect(engine.getCellValue(adr('A1'))).toBe('*')
+    expect(engine.getCellValue(adr('A2'))).toBe('*')
+    expect(engine.getCellValue(adr('A3'))).toBe('*')
   })
 
   it('should work only for values from 1 to 255 truncating decimal part', () => {
@@ -63,10 +63,10 @@ describe('Function CHAR', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
-    expect(engine.getCellValue(adr('A2'))).toEqual('')
-    expect(engine.getCellValue(adr('A3'))).toEqual('ÿ')
+    expect(engine.getCellValue(adr('A2'))).toBe('')
+    expect(engine.getCellValue(adr('A3'))).toBe('ÿ')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.CharacterCodeBounds))
-    expect(engine.getCellValue(adr('A6'))).toEqual('ÿ')
+    expect(engine.getCellValue(adr('A6'))).toBe('ÿ')
   })
 })

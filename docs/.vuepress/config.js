@@ -259,6 +259,7 @@ module.exports = {
           children: [
             ['/guide/key-concepts', 'Key concepts'],
             ['/guide/dependency-graph', 'Dependency graph'],
+            ['/guide/numeric-precision', 'Numeric precision'],
             ['/guide/building', 'Building & testing'],
             ['/guide/custom-functions', 'Custom functions'],
             ['/guide/performance', 'Performance'],

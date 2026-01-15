@@ -31,7 +31,7 @@ describe('Function STANDARDIZE', () => {
       ['=STANDARDIZE(1, 2, 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-0.25)
+    expect(engine.getCellValue(adr('A1'))).toBe(-0.25)
   })
 
   it('should check bounds', () => {
@@ -41,7 +41,7 @@ describe('Function STANDARDIZE', () => {
       ['=STANDARDIZE(1, 2, -0.001)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-1000)
+    expect(engine.getCellValue(adr('A1'))).toBe(-1000)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
   })

@@ -41,9 +41,9 @@ describe('Function QUOTIENT', () => {
       ['=QUOTIENT(10.5, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
-    expect(engine.getCellValue(adr('A2'))).toEqual(5)
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(5)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 
   it('should work for negative numbers', () => {
@@ -53,8 +53,8 @@ describe('Function QUOTIENT', () => {
       ['=QUOTIENT(-5, -2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(-2)
-    expect(engine.getCellValue(adr('A2'))).toEqual(-2)
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(-2)
+    expect(engine.getCellValue(adr('A2'))).toBe(-2)
+    expect(engine.getCellValue(adr('A3'))).toBe(2)
   })
 })

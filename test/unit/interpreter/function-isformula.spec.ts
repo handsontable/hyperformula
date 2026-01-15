@@ -8,7 +8,7 @@ describe('Function ISFORMULA', () => {
       ['=A1', '=ISFORMULA(A1)']
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(true)
+    expect(engine.getCellValue(adr('B1'))).toBe(true)
   })
 
   it('should return false for cell without formula', () => {
@@ -16,8 +16,8 @@ describe('Function ISFORMULA', () => {
       ['foo', '=ISFORMULA(A1)', '=ISFORMULA(A2)']
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(false)
-    expect(engine.getCellValue(adr('C1'))).toEqual(false)
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(false)
   })
 
   it('should work with start of a range', () => {
@@ -25,8 +25,8 @@ describe('Function ISFORMULA', () => {
       ['=A1', 2, '=ISFORMULA(A1:A2)', '=ISFORMULA(B1:B2)']
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(true)
-    expect(engine.getCellValue(adr('D1'))).toEqual(false)
+    expect(engine.getCellValue(adr('C1'))).toBe(true)
+    expect(engine.getCellValue(adr('D1'))).toBe(false)
   })
 
   it('should propagate error', () => {
@@ -53,7 +53,7 @@ describe('Function ISFORMULA', () => {
       ['=ISFORMULA(A1)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(true)
   })
 
   it('should collect dependencies of inner function and return argument type error', () => {

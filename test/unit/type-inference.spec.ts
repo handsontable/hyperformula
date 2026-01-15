@@ -13,6 +13,7 @@ describe('arithmetic operations', () => {
       ['=E1+A1', '=E1+B1', '=E1+C1', '=E1+D1', '=E1+E1', '=E1+F1'],
       ['=F1+A1', '=F1+B1', '=F1+C1', '=F1+D1', '=F1+E1', '=F1+F1'],
     ])
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('B2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValueDetailedType(adr('C2'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
@@ -61,6 +62,7 @@ describe('arithmetic operations', () => {
       ['=E1-A1', '=E1-B1', '=E1-C1', '=E1-D1', '=E1-E1', '=E1-F1'],
       ['=F1-A1', '=F1-B1', '=F1-C1', '=F1-D1', '=F1-E1', '=F1-F1'],
     ])
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('B2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValueDetailedType(adr('C2'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
@@ -109,6 +111,7 @@ describe('arithmetic operations', () => {
       ['=E1*A1', '=E1*B1', '=E1*C1', '=E1*D1', '=E1*E1', '=E1*F1'],
       ['=F1*A1', '=F1*B1', '=F1*C1', '=F1*D1', '=F1*E1', '=F1*F1'],
     ])
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('B2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('C2'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
@@ -157,6 +160,7 @@ describe('arithmetic operations', () => {
       ['=E1/A1', '=E1/B1', '=E1/C1', '=E1/D1', '=E1/E1', '=E1/F1'],
       ['=F1/A1', '=F1/B1', '=F1/C1', '=F1/D1', '=F1/E1', '=F1/F1'],
     ])
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('B2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('C2'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
@@ -200,6 +204,7 @@ describe('arithmetic operations', () => {
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=A1%', '=B1%', '=C1%', '=D1%', '=E1%', '=F1%'],
     ])
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValueDetailedType(adr('B2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValueDetailedType(adr('C2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
@@ -213,6 +218,7 @@ describe('arithmetic operations', () => {
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=-A1', '=-B1', '=-C1', '=-D1', '=-E1', '=-F1'],
     ])
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('B2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValueDetailedType(adr('C2'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
@@ -226,6 +232,7 @@ describe('arithmetic operations', () => {
       ['1', '1%', '1$', '01/01/1900', '12:00', '01/01/1900 12:00'],
       ['=+A1', '=+B1', '=+C1', '=+D1', '=+E1', '=+F1'],
     ])
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_RAW)
     expect(engine.getCellValueDetailedType(adr('B2'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
     expect(engine.getCellValueDetailedType(adr('C2'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
@@ -241,8 +248,9 @@ describe('formatting info', () => {
       ['1$', '1', '1PLN'],
       ['=-A1', '=-B1', '=C1'],
     ], {currencySymbol: ['$', 'PLN']})
+
     expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('B2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('C2'))).toBe('PLN')
   })
 
@@ -251,8 +259,9 @@ describe('formatting info', () => {
       ['1$', '1', '1PLN'],
       ['=+A1', '=+B1', '=+C1'],
     ], {currencySymbol: ['$', 'PLN']})
+
     expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('B2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('C2'))).toBe('PLN')
   })
 
@@ -263,11 +272,12 @@ describe('formatting info', () => {
       ['=B1+A1', '=B1+B1', '=B1+C1'],
       ['=C1+A1', '=C1+B1', '=C1+C1'],
     ], {currencySymbol: ['$', 'PLN']})
+
     expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
     expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
     expect(engine.getCellValueFormat(adr('C2'))).toBe('$')
     expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B3'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
     expect(engine.getCellValueFormat(adr('A4'))).toBe('PLN')
     expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
@@ -281,11 +291,12 @@ describe('formatting info', () => {
       ['=B1-A1', '=B1-B1', '=B1-C1'],
       ['=C1-A1', '=C1-B1', '=C1-C1'],
     ], {currencySymbol: ['$', 'PLN']})
+
     expect(engine.getCellValueFormat(adr('A2'))).toBe('$')
     expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
     expect(engine.getCellValueFormat(adr('C2'))).toBe('$')
     expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B3'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
     expect(engine.getCellValueFormat(adr('A4'))).toBe('PLN')
     expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
@@ -299,15 +310,16 @@ describe('formatting info', () => {
       ['=B1*A1', '=B1*B1', '=B1*C1'],
       ['=C1*A1', '=C1*B1', '=C1*C1'],
     ], {currencySymbol: ['$', 'PLN']})
-    expect(engine.getCellValueFormat(adr('A2'))).toBe(undefined)
+
+    expect(engine.getCellValueFormat(adr('A2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('C2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B3'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
-    expect(engine.getCellValueFormat(adr('A4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('A4'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
-    expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C4'))).toBeUndefined()
   })
 
   it('should be preserved by division', () => {
@@ -317,15 +329,16 @@ describe('formatting info', () => {
       ['=B1/A1', '=B1/B1', '=B1/C1'],
       ['=C1/A1', '=C1/B1', '=C1/C1'],
     ], {currencySymbol: ['$', 'PLN']})
-    expect(engine.getCellValueFormat(adr('A2'))).toBe(undefined)
+
+    expect(engine.getCellValueFormat(adr('A2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('B2'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('C2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('A3'))).toBe('$')
-    expect(engine.getCellValueFormat(adr('B3'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('B3'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('C3'))).toBe('PLN')
-    expect(engine.getCellValueFormat(adr('A4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('A4'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('B4'))).toBe('PLN')
-    expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C4'))).toBeUndefined()
   })
 })
 
@@ -337,14 +350,15 @@ describe('Datetime formatting', () => {
       ['=B1+A1', '=B1+B1', '=B1+C1'],
       ['=C1+A1', '=C1+B1', '=C1+C1'],
     ])
-    expect(engine.getCellValueFormat(adr('A2'))).toBe(undefined)
+
+    expect(engine.getCellValueFormat(adr('A2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('B2'))).toBe('DD/MM/YYYY hh:mm')
-    expect(engine.getCellValueFormat(adr('C2'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C2'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('A3'))).toBe('DD/MM/YYYY hh:mm')
     expect(engine.getCellValueFormat(adr('B3'))).toBe('hh:mm')
     expect(engine.getCellValueFormat(adr('C3'))).toBe('DD/MM/YYYY hh:mm')
-    expect(engine.getCellValueFormat(adr('A4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('A4'))).toBeUndefined()
     expect(engine.getCellValueFormat(adr('B4'))).toBe('DD/MM/YYYY hh:mm')
-    expect(engine.getCellValueFormat(adr('C4'))).toBe(undefined)
+    expect(engine.getCellValueFormat(adr('C4'))).toBeUndefined()
   })
 })

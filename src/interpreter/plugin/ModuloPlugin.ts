@@ -9,6 +9,9 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ModuloPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'MOD': {
@@ -20,6 +23,10 @@ export class ModuloPlugin extends FunctionPlugin implements FunctionPluginTypech
     },
   }
 
+  
+  /**
+   *
+   */
   public mod(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MOD'), (dividend: number, divisor: number) => {
       if (divisor === 0) {

@@ -39,7 +39,7 @@ describe('RangeVertex with cache', () => {
     rangeVertex.setCriterionFunctionValues('SUMIF,1,1', criterionCache)
 
     expect(rangeVertex.getCriterionFunctionValues('SUMIF,1,1').size).toBe(2)
-    expect(rangeVertex.getCriterionFunctionValue('SUMIF,1,1', criterionString1)).toEqual(10)
-    expect(rangeVertex.getCriterionFunctionValue('SUMIF,1,1', criterionString2)).toEqual(20)
+    expect(rangeVertex.getCriterionFunctionValue('SUMIF,1,1', criterionString1)).toBe(10)
+    expect(rangeVertex.getCriterionFunctionValue('SUMIF,1,1', criterionString2)).toBe(20)
   })
 })

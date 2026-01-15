@@ -8,7 +8,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('two numbers', () => {
@@ -16,7 +16,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(1.5)
   })
 
   it('more numbers (odd)', () => {
@@ -24,7 +24,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(3, 1, 2, 5, 7)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
   })
 
   it('more numbers (even)', () => {
@@ -32,7 +32,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(3, 4, 1, 2, 5, 7)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(3.5)
   })
 
   it('works with ranges', () => {
@@ -41,7 +41,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(A1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
   })
 
   it('propagates error from regular argument', () => {
@@ -76,8 +76,8 @@ describe('Function MEDIAN', () => {
     ])
 
     expect(engine.getCellValue(adr('D1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.OneValue))
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(2)
   })
 
   it('ignores nonnumeric values as long as theres at least one numeric value', () => {
@@ -102,7 +102,7 @@ describe('Function MEDIAN', () => {
       ['=MEDIAN(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
   })
 })

@@ -19,9 +19,9 @@ describe('Function HF.POW', () => {
       ['=HF.POW(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(8)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(8)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
   })
 
   it('should coerce to correct types', () => {
@@ -30,8 +30,8 @@ describe('Function HF.POW', () => {
       ['=HF.POW("1",)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 
   it('should throw correct error', () => {

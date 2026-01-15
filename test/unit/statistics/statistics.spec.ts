@@ -22,16 +22,16 @@ describe('Statistics', () => {
 
     const resetSnapshot = statistics.snapshot()
 
-    expect(baseSnapshot.size).toEqual(2)
-    expect(baseSnapshot.get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(0)
-    expect(baseSnapshot.get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toEqual(0)
+    expect(baseSnapshot.size).toBe(2)
+    expect(baseSnapshot.get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toBe(0)
+    expect(baseSnapshot.get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toBe(0)
 
-    expect(modifiedSnapshot.size).toEqual(5)
-    expect(modifiedSnapshot.has(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(true)
-    expect(modifiedSnapshot.has(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toEqual(true)
-    expect(modifiedSnapshot.has(StatType.BUILD_ENGINE_TOTAL)).toEqual(true)
-    expect(modifiedSnapshot.has(StatType.VLOOKUP)).toEqual(true)
-    expect(modifiedSnapshot.has(StatType.PROCESS_DEPENDENCIES)).toEqual(true)
+    expect(modifiedSnapshot.size).toBe(5)
+    expect(modifiedSnapshot.has(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toBe(true)
+    expect(modifiedSnapshot.has(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toBe(true)
+    expect(modifiedSnapshot.has(StatType.BUILD_ENGINE_TOTAL)).toBe(true)
+    expect(modifiedSnapshot.has(StatType.VLOOKUP)).toBe(true)
+    expect(modifiedSnapshot.has(StatType.PROCESS_DEPENDENCIES)).toBe(true)
 
     expect(resetSnapshot).toEqual(baseSnapshot)
   })

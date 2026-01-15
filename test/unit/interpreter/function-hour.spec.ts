@@ -16,17 +16,17 @@ describe('Function HOUR', () => {
   it('with numerical arguments', () => {
     const engine = HyperFormula.buildFromArray([['=HOUR(0.5123456)', '=HOUR(0)', '=HOUR(0.999999)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(12)
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(12)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
+    expect(engine.getCellValue(adr('C1'))).toBe(0)
   })
 
   it('with string arguments', () => {
     const engine = HyperFormula.buildFromArray([['=HOUR("14:42:59")', '=HOUR("01/01/1900 03:01:02am")', '=HOUR("31/12/2018")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(14)
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(14)
+    expect(engine.getCellValue(adr('B1'))).toBe(3)
+    expect(engine.getCellValue(adr('C1'))).toBe(0)
   })
 
   it('use datenumber coercion for 1st argument', () => {
@@ -34,7 +34,7 @@ describe('Function HOUR', () => {
       ['=HOUR(TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('propagate errors', () => {

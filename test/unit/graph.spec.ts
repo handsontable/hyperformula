@@ -2,6 +2,9 @@ import {Graph} from '../../src/DependencyGraph'
 import {DependencyQuery} from '../../src/DependencyGraph/Graph'
 import {graphEdgesCount} from './testUtils'
 
+/**
+ *
+ */
 class IdentifiableString {
   constructor(
     public id: number,
@@ -39,9 +42,11 @@ describe('Graph class', () => {
       const node1 = new IdentifiableString(1, 'bar')
       graph.addNodeAndReturnId(node0)
       graph.addNodeAndReturnId(node1)
+
       expect(graph.adjacentNodes(node0)).toEqual(new Set([]))
 
       graph.addEdge(node0, node1)
+
       expect(graph.adjacentNodes(node0)).toEqual(new Set([node1]))
 
       graph.addNodeAndReturnId(node0)
@@ -175,14 +180,17 @@ describe('Graph class', () => {
 
       graph.addNodeAndReturnId(node0)
       graph.addNodeAndReturnId(node1)
-      expect(graphEdgesCount(graph)).toEqual(0)
+
+      expect(graphEdgesCount(graph)).toBe(0)
 
       graph.addEdge(node0, node1)
-      expect(graphEdgesCount(graph)).toEqual(1)
+
+      expect(graphEdgesCount(graph)).toBe(1)
       expect(graph.existsEdge(node0, node1)).toBe(true)
 
       graph.removeEdge(node0, node1)
-      expect(graphEdgesCount(graph)).toEqual(0)
+
+      expect(graphEdgesCount(graph)).toBe(0)
       expect(graph.existsEdge(node0, node1)).toBe(false)
     })
   })
@@ -252,7 +260,7 @@ describe('Graph class', () => {
       graph.addNodeAndReturnId(node1)
       graph.addEdge(node0, node1)
 
-      expect(graph.adjacentNodesCount(node0)).toEqual(1)
+      expect(graph.adjacentNodesCount(node0)).toBe(1)
     })
 
     it('throws error if the source node is not present in the graph', () => {
@@ -505,6 +513,7 @@ describe('Graph class', () => {
       const node = new IdentifiableString(0, 'foo')
 
       graph.markNodeAsVolatile(node)
+
       expect(graph.getDirtyAndVolatileNodes()).toEqual([])
     })
   })
@@ -548,6 +557,7 @@ describe('Graph class', () => {
       const node = new IdentifiableString(0, 'foo')
 
       graph.markNodeAsInfiniteRange(node)
+
       expect(graph.getInfiniteRanges()).toEqual([])
     })
   })

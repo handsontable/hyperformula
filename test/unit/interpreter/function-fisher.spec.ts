@@ -28,7 +28,7 @@ describe('Function FISHER', () => {
       ['=FISHER(0.5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(0.549306144334055, 6)
   })
 

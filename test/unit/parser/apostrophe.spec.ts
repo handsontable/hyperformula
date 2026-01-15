@@ -8,8 +8,8 @@ describe('When value is prepend with an apostrophe', () => {
       ['=A1']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('001572')
-    expect(engine.getCellValue(adr('A2'))).toEqual('001572')
+    expect(engine.getCellValue(adr('A1'))).toBe('001572')
+    expect(engine.getCellValue(adr('A2'))).toBe('001572')
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.STRING)
   })
 })

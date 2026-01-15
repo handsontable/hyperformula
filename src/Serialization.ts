@@ -5,7 +5,7 @@
 
 import {simpleCellAddress, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
-import {CellValue} from './CellValue'
+import {CellValue, PrecisionCellValue} from './CellValue'
 import {Config} from './Config'
 import {ArrayFormulaVertex, DependencyGraph, ScalarFormulaVertex, ParsingErrorVertex} from './DependencyGraph'
 import {Exporter} from './Exporter'
@@ -20,6 +20,9 @@ export interface SerializedNamedExpression {
   options?: NamedExpressionOptions,
 }
 
+/**
+ *
+ */
 export class Serialization {
   constructor(
     private readonly dependencyGraph: DependencyGraph,
@@ -28,6 +31,10 @@ export class Serialization {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public getCellHyperlink(address: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof ScalarFormulaVertex) {
@@ -39,6 +46,10 @@ export class Serialization {
     return undefined
   }
 
+  
+  /**
+   *
+   */
   public getCellFormula(address: SimpleCellAddress, targetAddress?: SimpleCellAddress): Maybe<string> {
     const formulaVertex = this.dependencyGraph.getCell(address)
     if (formulaVertex instanceof ScalarFormulaVertex) {
@@ -61,26 +72,72 @@ export class Serialization {
     return undefined
   }
 
+  
+  /**
+   *
+   */
   public getCellSerialized(address: SimpleCellAddress, targetAddress?: SimpleCellAddress): RawCellContent {
     return this.getCellFormula(address, targetAddress) ?? this.getRawValue(address)
   }
 
+  
+  /**
+   *
+   */
   public getCellValue(address: SimpleCellAddress): CellValue {
     return this.exporter.exportValue(this.dependencyGraph.getScalarValue(address))
   }
 
+  /**
+   * Returns the cell value with full precision preserved.
+   * Numbers are returned as strings to avoid IEEE-754 precision loss.
+   * 
+   * @param address - The cell address
+   * @returns The cell value with numbers as strings
+   */
+  public getCellValueWithPrecision(address: SimpleCellAddress): PrecisionCellValue {
+    return this.exporter.exportValueWithPrecision(this.dependencyGraph.getScalarValue(address))
+  }
+
+  
+  /**
+   *
+   */
   public getRawValue(address: SimpleCellAddress): RawCellContent {
     return this.dependencyGraph.getRawValue(address)
   }
 
+  
+  /**
+   *
+   */
   public getSheetValues(sheet: number): CellValue[][] {
     return this.genericSheetGetter(sheet, (arg) => this.getCellValue(arg))
   }
 
+  /**
+   * Returns all sheet values with full precision preserved.
+   * Numbers are returned as strings to avoid IEEE-754 precision loss.
+   * 
+   * @param sheet - The sheet ID
+   * @returns 2D array of cell values with numbers as strings
+   */
+  public getSheetValuesWithPrecision(sheet: number): PrecisionCellValue[][] {
+    return this.genericSheetGetter(sheet, (arg) => this.getCellValueWithPrecision(arg))
+  }
+
+  
+  /**
+   *
+   */
   public getSheetFormulas(sheet: number): Maybe<string>[][] {
     return this.genericSheetGetter(sheet, (arg) => this.getCellFormula(arg))
   }
 
+  
+  /**
+   *
+   */
   public genericSheetGetter<T>(sheet: number, getter: (address: SimpleCellAddress) => T): T[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
@@ -112,6 +169,10 @@ export class Serialization {
     return arr
   }
 
+  
+  /**
+   *
+   */
   public genericAllSheetsGetter<T>(sheetGetter: (sheet: number) => T): Record<string, T> {
     const result: Record<string, T> = {}
     for (const sheetName of this.dependencyGraph.sheetMapping.iterateSheetNames()) {
@@ -121,22 +182,42 @@ export class Serialization {
     return result
   }
 
+  
+  /**
+   *
+   */
   public getSheetSerialized(sheet: number): RawCellContent[][] {
     return this.genericSheetGetter(sheet, (arg) => this.getCellSerialized(arg))
   }
 
+  
+  /**
+   *
+   */
   public getAllSheetsValues(): Record<string, CellValue[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetValues(arg))
   }
 
+  
+  /**
+   *
+   */
   public getAllSheetsFormulas(): Record<string, Maybe<string>[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetFormulas(arg))
   }
 
+  
+  /**
+   *
+   */
   public getAllSheetsSerialized(): Record<string, RawCellContent[][]> {
     return this.genericAllSheetsGetter((arg) => this.getSheetSerialized(arg))
   }
 
+  
+  /**
+   *
+   */
   public getAllNamedExpressionsSerialized(): SerializedNamedExpression[] {
     const idMap: number[] = []
     let id = 0
@@ -155,6 +236,10 @@ export class Serialization {
     })
   }
 
+  
+  /**
+   *
+   */
   public withNewConfig(newConfig: Config, namedExpressions: NamedExpressions): Serialization {
     const newUnparser = new Unparser(newConfig, this.dependencyGraph.sheetMapping, namedExpressions)
     return new Serialization(this.dependencyGraph, newUnparser, this.exporter)

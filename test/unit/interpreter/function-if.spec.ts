@@ -14,18 +14,19 @@ describe('Function IF', () => {
   it('when value is true', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('when value is false', () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(), "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('no')
+    expect(engine.getCellValue(adr('A1'))).toBe('no')
   })
 
   it('coercing empty string', () => {
     const engine = HyperFormula.buildFromArray([['', '=IF(A1, "yes", "no")']])
-    expect(engine.getCellValue(adr('B1'))).toEqual('no')
+
+    expect(engine.getCellValue(adr('B1'))).toBe('no')
   })
 
   it('when condition is weird type', () => {
@@ -37,7 +38,7 @@ describe('Function IF', () => {
   it('use coercion', () => {
     const engine = HyperFormula.buildFromArray([['=IF("TRUE", "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('returns error if condition is an error', () => {
@@ -54,42 +55,44 @@ describe('Function IF', () => {
 
   it('passes subtypes of second arg', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(),B1,C1)', '1%', '1']])
+
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('passes subtypes of third arg', () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(),B1,C1)', '1', '1%']])
+
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
   })
 
   it('passes correct value when other arg is an error', () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(), 4/0, "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('no')
+    expect(engine.getCellValue(adr('A1'))).toBe('no')
   })
 
   it('when condition is number', () => {
     const engine = HyperFormula.buildFromArray([['=IF(1, "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('when condition is logic function', () => {
     const engine = HyperFormula.buildFromArray([['=IF(OR(1, FALSE()), "yes", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('works when only first part is given', () => {
     const engine = HyperFormula.buildFromArray([['=IF(TRUE(), "yes")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('works when only first part is given and condition is false', () => {
     const engine = HyperFormula.buildFromArray([['=IF(FALSE(), "yes")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('range value results in VALUE error', () => {
@@ -110,20 +113,23 @@ describe('Function IF', () => {
       ['=TRUE()', '=IF(A1, "yes", "no")'],
       ['=FALSE()', '=IF(A2, "yes", "no")']
     ])
-    expect(engine.getCellValue(adr('B1'))).toEqual('yes')
-    expect(engine.getCellValue(adr('B2'))).toEqual('no')
+
+    expect(engine.getCellValue(adr('B1'))).toBe('yes')
+    expect(engine.getCellValue(adr('B2'))).toBe('no')
   })
 
   it('works when condition is an expression', () => {
     const engine = HyperFormula.buildFromArray([['=IF(1<100, "yes", "no")', '=IF(1000<100, "yes", "no")']])
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
-    expect(engine.getCellValue(adr('B1'))).toEqual('no')
+
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
+    expect(engine.getCellValue(adr('B1'))).toBe('no')
   })
 
   it('works when condition is an expression with cell references', () => {
     const engine = HyperFormula.buildFromArray([['10', '=IF(A1<100, "yes", "no")', '=IF(A1<1, "yes", "no")']])
-    expect(engine.getCellValue(adr('B1'))).toEqual('yes')
-    expect(engine.getCellValue(adr('C1'))).toEqual('no')
+
+    expect(engine.getCellValue(adr('B1'))).toBe('yes')
+    expect(engine.getCellValue(adr('C1'))).toBe('no')
   })
 
   it('works when condition references a cell with formula inside', () => {
@@ -133,7 +139,8 @@ describe('Function IF', () => {
       ['=AVERAGE(A1,A2)'],
       ['=IF(A3<100,"True","False")']
     ])
-    expect(engine.getCellValue(adr('A3'))).toEqual(200)
-    expect(engine.getCellValue(adr('A4'))).toEqual('False')
+
+    expect(engine.getCellValue(adr('A3'))).toBe(200)
+    expect(engine.getCellValue(adr('A4'))).toBe('False')
   })
 })

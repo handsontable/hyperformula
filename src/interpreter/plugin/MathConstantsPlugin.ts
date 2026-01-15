@@ -10,6 +10,9 @@ import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, Implement
 
 export const PI = parseFloat(Math.PI.toFixed(14))
 
+/**
+ *
+ */
 export class MathConstantsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MathConstantsPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'PI': {
@@ -24,12 +27,20 @@ export class MathConstantsPlugin extends FunctionPlugin implements FunctionPlugi
     },
   }
 
+  
+  /**
+   *
+   */
   public pi(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PI'),
       () => PI
     )
   }
 
+  
+  /**
+   *
+   */
   public sqrtpi(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SQRTPI'),
       (arg: number) => Math.sqrt(PI * arg)

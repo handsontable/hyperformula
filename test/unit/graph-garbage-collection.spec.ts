@@ -8,8 +8,10 @@ describe('vertex counting', () => {
       ['1', '2'],
       ['3', '4']
     ])
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
     engine.calculateFormula('=SUM(A1:B2)', 0)
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
   })
 
@@ -18,10 +20,13 @@ describe('vertex counting', () => {
       ['1', '2'],
       ['3', '4']
     ])
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
     engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(5)
     engine.setCellContents(adr('A1'), 1)
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(4)
   })
 })
@@ -32,8 +37,10 @@ describe('range mapping', () => {
       ['1', '2'],
       ['3', '4']
     ])
+
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
     engine.calculateFormula('=SUM(A1:B2)', 0)
+
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 
@@ -42,14 +49,20 @@ describe('range mapping', () => {
       ['1', '2'],
       ['3', '4']
     ])
+
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
     engine.setCellContents(adr('A1'), '=SUM(A2:B2)')
+
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(1)
     engine.setCellContents(adr('A1'), 1)
+
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
 })
 
+/**
+ *
+ */
 function randomInteger(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -75,6 +88,7 @@ describe('larger tests', () => {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
@@ -92,6 +106,7 @@ describe('larger tests', () => {
     engine.setCellContents({sheet: 0, col: 1, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 2, row: 0}, null)
     engine.setCellContents({sheet: 0, col: 3, row: 0}, null)
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
@@ -156,6 +171,7 @@ describe('larger tests', () => {
         engine.setCellContents({sheet: 0, col: x, row: y}, null)
       }
     }
+
     expect(engine.dependencyGraph.graph.getNodes().length).toBe(0)
     expect(engine.dependencyGraph.rangeMapping.getNumberOfRangesInSheet(0)).toBe(0)
   })
@@ -306,6 +322,7 @@ describe('cruds', () => {
     ])
     engine.addColumns(0, [1, 1])
     engine.setCellContents(adr('B3'), 1)
+
     expect(engine.getCellSerialized(adr('A4'))).toBe('=SUM(A1:C2)')
     expect(engine.getCellSerialized(adr('A5'))).toBe('=SUM(A1:C3)')
     expect(engine.getCellValue(adr('A4'))).toBe(0)
@@ -344,7 +361,7 @@ describe('cruds', () => {
     engine.addColumns(0, [0, 1])
     engine.removeColumns(0, [0, 1])
 
-    expect(engine.getCellValue(adr('B3'))).toEqual(1)
-    expect(engine.getCellValue(adr('B4'))).toEqual(3)
+    expect(engine.getCellValue(adr('B3'))).toBe(1)
+    expect(engine.getCellValue(adr('B4'))).toBe(3)
   })
 })

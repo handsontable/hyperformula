@@ -72,12 +72,20 @@ export class DenseStrategy implements AddressMappingStrategy {
     return this.width
   }
 
+  
+  /**
+   *
+   */
   public removeCell(address: SimpleCellAddress): void {
     if (this.mapping[address.row] !== undefined) {
       delete this.mapping[address.row][address.col]
     }
   }
 
+  
+  /**
+   *
+   */
   public addRows(row: number, numberOfRows: number): void {
     const newRows = []
     for (let i = 0; i < numberOfRows; i++) {
@@ -87,6 +95,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     this.height += numberOfRows
   }
 
+  
+  /**
+   *
+   */
   public addColumns(column: number, numberOfColumns: number): void {
     for (let i = 0; i < this.height; i++) {
       if (this.mapping[i] !== undefined) {
@@ -96,6 +108,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     this.width += numberOfColumns
   }
 
+  
+  /**
+   *
+   */
   public removeRows(removedRows: RowsSpan): void {
     this.mapping.splice(removedRows.rowStart, removedRows.numberOfRows)
     const rightmostRowRemoved = Math.min(this.height - 1, removedRows.rowEnd)
@@ -103,6 +119,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     this.height = Math.max(0, this.height - numberOfRowsRemoved)
   }
 
+  
+  /**
+   *
+   */
   public removeColumns(removedColumns: ColumnsSpan): void {
     for (let i = 0; i < this.height; i++) {
       if (this.mapping[i] !== undefined) {
@@ -114,6 +134,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     this.width = Math.max(0, this.width - numberOfColumnsRemoved)
   }
 
+  
+  /**
+   *
+   */
   public* getEntries(sheet: number): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (let y = 0; y < this.height; ++y) {
       for (let x = 0; x < this.width; ++x) {
@@ -125,6 +149,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromColumn(column: number): IterableIterator<CellVertex> {
     for (let y = 0; y < this.height; ++y) {
       const vertex = this.getCellVertex(column, y)
@@ -134,6 +162,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromRow(row: number): IterableIterator<CellVertex> {
     for (let x = 0; x < this.width; ++x) {
       const vertex = this.getCellVertex(x, row)
@@ -143,6 +175,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<CellVertex> {
     for (let x = columnsSpan.columnStart; x <= columnsSpan.columnEnd; ++x) {
       for (let y = 0; y < this.height; ++y) {
@@ -154,6 +190,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* verticesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<CellVertex> {
     for (let x = 0; x < this.width; ++x) {
       for (let y = rowsSpan.rowStart; y <= rowsSpan.rowEnd; ++y) {
@@ -165,6 +205,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* entriesFromRowsSpan(rowsSpan: RowsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (let x = 0; x < this.width; ++x) {
       for (let y = rowsSpan.rowStart; y <= rowsSpan.rowEnd; ++y) {
@@ -176,6 +220,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* entriesFromColumnsSpan(columnsSpan: ColumnsSpan): IterableIterator<[SimpleCellAddress, CellVertex]> {
     for (let x = columnsSpan.columnStart; x <= columnsSpan.columnEnd; ++x) {
       for (let y = 0; y < this.height; ++y) {
@@ -187,6 +235,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   public* vertices(): IterableIterator<CellVertex> {
     for (let y = 0; y < this.height; ++y) {
       for (let x = 0; x < this.width; ++x) {
@@ -198,6 +250,10 @@ export class DenseStrategy implements AddressMappingStrategy {
     }
   }
 
+  
+  /**
+   *
+   */
   private getCellVertex(x: number, y: number): Maybe<CellVertex> {
     return this.mapping[y]?.[x]
   }

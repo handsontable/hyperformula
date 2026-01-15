@@ -8,6 +8,9 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTypecheck<LogarithmPlugin> {
 
   public static implementedFunctions: ImplementedFunctions = {
@@ -32,16 +35,28 @@ export class LogarithmPlugin extends FunctionPlugin implements FunctionPluginTyp
     },
   }
 
+  
+  /**
+   *
+   */
   public log10(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOG10'), Math.log10)
   }
 
+  
+  /**
+   *
+   */
   public log(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOG'),
       (arg: number, base: number) => Math.log(arg) / Math.log(base)
     )
   }
 
+  
+  /**
+   *
+   */
   public ln(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LN'), Math.log)
   }

@@ -8,7 +8,7 @@ import {ArraySize} from './ArraySize'
 import {CellError, ErrorType, simpleCellAddress, SimpleCellAddress} from './Cell'
 import {DependencyGraph} from './DependencyGraph'
 import {ErrorMessage} from './error-message'
-import {InternalScalarValue, isExtendedNumber} from './interpreter/InterpreterValue'
+import {getRawPrecisionValue, InternalScalarValue, isExtendedNumber, toNativeNumeric} from './interpreter/InterpreterValue'
 
 /**
  * A class that represents a range of data.
@@ -167,7 +167,8 @@ export class SimpleRangeValue {
       this._hasOnlyNumbers = true
       for (const row of this.data) {
         for (const v of row) {
-          if (typeof v !== 'number') {
+          // Check for both native numbers and Numeric
+          if (!isExtendedNumber(v)) {
             this._hasOnlyNumbers = false
             return false
           }
@@ -180,11 +181,18 @@ export class SimpleRangeValue {
 
   /**
    * Returns the range data as a 2D array of numbers.
+   * Converts Numeric to native numbers.
    *
    * Internal use only.
    */
   public rawNumbers(): number[][] {
-    return this._data as number[][]
+    return this.data.map(row => row.map(v => {
+      if (isExtendedNumber(v)) {
+        return toNativeNumeric(getRawPrecisionValue(v))
+      }
+      // This should only be reached if hasOnlyNumbers() was not called first
+      return 0
+    }))
   }
 
 

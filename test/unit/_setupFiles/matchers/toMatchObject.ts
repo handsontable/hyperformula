@@ -12,8 +12,14 @@ declare global {
 }
 
 export const toMatchObjectMatcher: CustomMatcherFactories = {
+  /**
+   *
+   */
   toMatchObject: function(util: MatchersUtil): CustomMatcher {
     return {
+      /**
+       *
+       */
       compare: function(actual: never, expected: never): CustomMatcherResult {
         return {
           pass: util.equals(actual, jasmine.objectContaining(expected)),

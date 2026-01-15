@@ -324,7 +324,14 @@ export interface TypedEmitter {
   once<Event extends keyof Listeners>(s: Event, listener: Listeners[Event]): void,
 }
 
+/**
+ *
+ */
 export class Emitter extends TinyEmitter implements TypedEmitter {
+  
+  /**
+   *
+   */
   public emit<Event extends keyof Listeners>(event: Event, ...args: Parameters<Listeners[Event]>): this {
     super.emit(event, ...args)
     return this

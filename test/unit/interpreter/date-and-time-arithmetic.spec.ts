@@ -296,7 +296,7 @@ describe('Time arithmetic', () => {
       ["'13:13"],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('13:13')
+    expect(engine.getCellValue(adr('A1'))).toBe('13:13')
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.STRING)
   })
 
@@ -305,7 +305,7 @@ describe('Time arithmetic', () => {
       ['1:80'],
     ], { timeFormats: [] })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1:80')
+    expect(engine.getCellValue(adr('A1'))).toBe('1:80')
     expect(engine.getCellValueDetailedType(adr('A1'))).toEqual(CellValueDetailedType.STRING)
   })
 })

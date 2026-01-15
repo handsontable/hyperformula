@@ -6,7 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
-import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
+import {EmptyValue, getRawPrecisionValue, getRawValue, isExtendedNumber, RawInterpreterValue, RawNoErrorScalarValue, toNativeNumeric} from './InterpreterValue'
 
 const NOT_FOUND = -1
 
@@ -21,6 +21,9 @@ const NOT_FOUND = -1
  * If the search range contains duplicates, returns the last matching value. If no value found in the range satisfies the above, returns -1.
  *
  * Note: this function does not normalize input strings.
+ */
+/**
+ *
  */
 export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
@@ -42,7 +45,8 @@ export function findLastOccurrenceInOrderedRange(
   const foundIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
   const foundValue = getValueFromIndexFn(foundIndex)
 
-  if (foundValue === searchKey) {
+  // Use compare function for equality check to handle Numeric correctly
+  if (compare(searchKey, foundValue) === 0) {
     return foundIndex - start
   }
 
@@ -51,7 +55,10 @@ export function findLastOccurrenceInOrderedRange(
       return orderingDirection === 'asc' ? NOT_FOUND : 0
     }
 
-    if (typeof foundValue !== typeof searchKey) {
+    // Check if both are the same "type" (both numbers, both strings, etc.)
+    const bothNumbers = isExtendedNumber(foundValue) && isExtendedNumber(searchKey)
+    const sameType = bothNumbers || typeof foundValue === typeof searchKey
+    if (!sameType) {
       return NOT_FOUND
     }
 
@@ -70,7 +77,10 @@ export function findLastOccurrenceInOrderedRange(
       return orderingDirection === 'asc' ? 0 : NOT_FOUND
     }
 
-    if (typeof foundValue !== typeof searchKey) {
+    // Check if both are the same "type" (both numbers, both strings, etc.)
+    const bothNumbers = isExtendedNumber(foundValue) && isExtendedNumber(searchKey)
+    const sameType = bothNumbers || typeof foundValue === typeof searchKey
+    if (!sameType) {
       return NOT_FOUND
     }
 
@@ -98,6 +108,9 @@ export function findLastOccurrenceInOrderedRange(
  * - If the array contains duplicates, returns the last matching value.
  * - If no value in the range satisfies the above, returns -1.
  */
+/**
+ *
+ */
 export function findLastOccurrenceInOrderedArray(searchKey: RawNoErrorScalarValue, array: RawInterpreterValue[], orderingDirection: 'asc' | 'desc' = 'asc'): number {
   const predicate = orderingDirection === 'asc'
     ? (index: number) => compare(searchKey, array[index]) >= 0
@@ -110,6 +123,9 @@ export function findLastOccurrenceInOrderedArray(searchKey: RawNoErrorScalarValu
  *   - the last element in the range for which predicate === true or,
  *   - value -1 if predicate === false for all elements.
  * Assumption: All elements for which predicate === true are before the elements for which predicate === false.
+ */
+/**
+ *
  */
 export function findLastMatchingIndex(predicate: (index: number) => boolean, startRange: number, endRange: number): number {
   let start = startRange
@@ -135,12 +151,24 @@ export function findLastMatchingIndex(predicate: (index: number) => boolean, sta
 /*
  * numbers < strings < false < true
  */
+/**
+ *
+ */
 export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue): number {
-  if (typeof left === typeof right) {
-    if (left === EmptyValue) {
-      return 0
-    }
-    return (left < (right as string | number | boolean) ? -1 : (left > (right as string | number | boolean) ? 1 : 0))
+  // Convert Numeric to native number for comparison
+  const leftIsNumber = isExtendedNumber(left)
+  const rightIsNumber = isExtendedNumber(right)
+  
+  // Both are numbers (native or Numeric)
+  if (leftIsNumber && rightIsNumber) {
+    const leftNum = toNativeNumeric(getRawPrecisionValue(left as any))
+    const rightNum = toNativeNumeric(getRawPrecisionValue(right as any))
+    return leftNum < rightNum ? -1 : (leftNum > rightNum ? 1 : 0)
+  }
+  
+  // Handle EmptyValue
+  if (left === EmptyValue && right === EmptyValue) {
+    return 0
   }
   if (left === EmptyValue) {
     return -1
@@ -148,16 +176,25 @@ export function compare(left: RawNoErrorScalarValue, right: RawInterpreterValue)
   if (right === EmptyValue) {
     return 1
   }
+  
+  // Handle CellError
   if (right instanceof CellError) {
     return -1
   }
-  if (typeof left === 'number' && typeof right === 'string') {
+  
+  // Handle same non-numeric types
+  if (typeof left === typeof right && !leftIsNumber && !rightIsNumber) {
+    return (left < (right as string | boolean) ? -1 : (left > (right as string | boolean) ? 1 : 0))
+  }
+  
+  // numbers < strings < booleans
+  if (leftIsNumber && typeof right === 'string') {
     return -1
   }
-  if (typeof left === 'number' && typeof right === 'boolean') {
+  if (leftIsNumber && typeof right === 'boolean') {
     return -1
   }
-  if (typeof left === 'string' && typeof right === 'number') {
+  if (typeof left === 'string' && rightIsNumber) {
     return 1
   }
   if (typeof left === 'string' && typeof right === 'boolean') {

@@ -56,7 +56,7 @@ describe('Function T.INV.2T', () => {
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(63.656741162866, 6)
     //product #2 returns different error
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
     //product #2 returns value
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueLarge))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.ValueSmall))

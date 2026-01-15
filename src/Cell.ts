@@ -146,6 +146,9 @@ export const getCellValueFormat = (cellValue: InterpreterValue): string | undefi
   }
 }
 
+/**
+ *
+ */
 export class CellError {
   constructor(
     public readonly type: ErrorType,
@@ -162,6 +165,10 @@ export class CellError {
     return new CellError(ErrorType.ERROR, `${ErrorMessage.ParseError}${detailedMessage ? ' ' + detailedMessage : ''}`)
   }
 
+  
+  /**
+   *
+   */
   public attachRootVertex(vertex: FormulaVertex): CellError {
     if (this.root === undefined) {
       return new CellError(this.type, this.message, vertex)

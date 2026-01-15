@@ -9,7 +9,7 @@ describe('Function EXP', () => {
       ['=EXP(0)', '=EXP(2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(7.38905609893065)
   })
 
@@ -28,7 +28,7 @@ describe('Function EXP', () => {
     ])
 
     expect(engine.getCellValue(adr('B1'))).toBeCloseTo(7.38905609893065)
-    expect(engine.getCellValue(adr('B2'))).toEqual(1)
+    expect(engine.getCellValue(adr('B2'))).toBe(1)
   })
 
   it('given wrong number of arguments', () => {

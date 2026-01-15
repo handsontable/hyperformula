@@ -8,6 +8,9 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {ProcedureAst} from '../../parser'
 
+/**
+ *
+ */
 export class HyperlinkPlugin extends FunctionPlugin implements FunctionPluginTypecheck<HyperlinkPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'HYPERLINK': {
@@ -19,6 +22,10 @@ export class HyperlinkPlugin extends FunctionPlugin implements FunctionPluginTyp
     },
   }
 
+  
+  /**
+   *
+   */
   public hyperlink(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HYPERLINK'), (url, linkLabel) => {
       ast.hyperlink = url

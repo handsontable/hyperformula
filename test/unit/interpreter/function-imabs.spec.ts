@@ -28,8 +28,8 @@ describe('Function IMABS', () => {
       ['=IMABS("-3+4i")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
   })
 })

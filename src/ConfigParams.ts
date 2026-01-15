@@ -6,6 +6,21 @@
 import {ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {DateTime, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {Maybe} from './Maybe'
+import {RoundingMode} from './Numeric'
+
+/**
+ * Available precision number implementations.
+ * 
+ * - `'precise'`: High precision arbitrary decimal arithmetic (default).
+ *   Best for financial calculations requiring exact decimal arithmetic.
+ *   Avoids IEEE-754 floating-point precision issues (e.g., 0.1 + 0.2 = 0.3 exactly).
+ *   Precision: up to 1e+9 significant digits.
+ * 
+ * - `'native'`: Standard JavaScript IEEE-754 float64 numbers.
+ *   Fastest but has precision issues (e.g., 0.1 + 0.2 !== 0.3).
+ *   Use only for backward compatibility or non-financial calculations.
+ */
+export type NumericImplementation = 'precise' | 'native'
 
 export interface ConfigParams {
   /**
@@ -290,6 +305,56 @@ export interface ConfigParams {
    * @category Number
    */
   precisionRounding: number,
+  /**
+   * Selects the numeric implementation for internal calculations.
+   *
+   * Available implementations:
+   * - `'precise'`: High precision arbitrary decimal arithmetic (default, recommended for finance).
+   *   Avoids IEEE-754 precision issues like 0.1 + 0.2 !== 0.3.
+   * - `'native'`: Standard JavaScript numbers (fastest, but has IEEE-754 precision issues).
+   *   Use for backward compatibility or non-financial calculations.
+   *
+   * For financial applications, use `'precise'` (default) to avoid precision loss.
+   *
+   * @default 'precise'
+   * @category Number
+   */
+  numericImplementation: NumericImplementation,
+  /**
+   * Sets the number of significant digits for numeric calculations.
+   *
+   * Only applies when `numericImplementation` is `'precise'`.
+   * Has no effect when using `'native'` implementation.
+   *
+   * Default is 34 significant digits, maximum is 1e+9.
+   *
+   * @default 34
+   * @category Number
+   */
+  numericDigits: number,
+  /**
+   * Sets the default rounding mode for numeric calculations.
+   *
+   * Only applies when `numericImplementation` is `'precise'`.
+   *
+   * Available modes (from RoundingMode enum):
+   * - `ROUND_UP` (0): Round away from zero
+   * - `ROUND_DOWN` (1): Round towards zero (truncate)
+   * - `ROUND_CEIL` (2): Round towards positive infinity
+   * - `ROUND_FLOOR` (3): Round towards negative infinity
+   * - `ROUND_HALF_UP` (4): Round to nearest, ties away from zero (default, standard rounding)
+   * - `ROUND_HALF_DOWN` (5): Round to nearest, ties towards zero
+   * - `ROUND_HALF_EVEN` (6): Round to nearest, ties to even (banker's rounding, recommended for finance)
+   * - `ROUND_HALF_CEIL` (7): Round to nearest, ties towards positive infinity
+   * - `ROUND_HALF_FLOOR` (8): Round to nearest, ties towards negative infinity
+   *
+   * For financial applications, consider using `ROUND_HALF_EVEN` (banker's rounding)
+   * to minimize cumulative rounding errors.
+   *
+   * @default RoundingMode.ROUND_HALF_UP (4)
+   * @category Number
+   */
+  numericRounding: RoundingMode,
   /**
    * Sets a function that converts date-time values into strings.
    *

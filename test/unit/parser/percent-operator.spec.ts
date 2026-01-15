@@ -9,6 +9,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=1%', adr('A1')).ast as PercentOpAst
+
     expect(ast.type).toBe(AstNodeType.PERCENT_OP)
     expect(ast.value.type).toBe(AstNodeType.NUMBER)
   })
@@ -17,6 +18,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=-1%', adr('A1')).ast as MinusUnaryOpAst
+
     expect(ast.type).toBe(AstNodeType.MINUS_UNARY_OP)
     expect(ast.value.type).toBe(AstNodeType.PERCENT_OP)
   })
@@ -25,6 +27,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=+1%', adr('A1')).ast as PlusUnaryOpAst
+
     expect(ast.type).toBe(AstNodeType.PLUS_UNARY_OP)
     expect(ast.value.type).toBe(AstNodeType.PERCENT_OP)
   })
@@ -33,6 +36,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=42+1%', adr('A1')).ast as PlusOpAst
+
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.right.type).toBe(AstNodeType.PERCENT_OP)
   })
@@ -41,6 +45,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=42*1%', adr('A1')).ast as TimesOpAst
+
     expect(ast.type).toBe(AstNodeType.TIMES_OP)
     expect(ast.right.type).toBe(AstNodeType.PERCENT_OP)
   })
@@ -49,6 +54,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=1%+42', adr('A1')).ast as PlusOpAst
+
     expect(ast.type).toBe(AstNodeType.PLUS_OP)
     expect(ast.left.type).toBe(AstNodeType.PERCENT_OP)
   })
@@ -57,6 +63,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=SUM(1,2)%', adr('A1')).ast as PercentOpAst
+
     expect(ast.type).toBe(AstNodeType.PERCENT_OP)
     expect(ast.value.type).toBe(AstNodeType.FUNCTION_CALL)
   })
@@ -65,6 +72,7 @@ describe('percent', () => {
     const parser = buildEmptyParserWithCaching(new Config())
 
     const ast = parser.parse('=100%%', adr('A1')).ast as PercentOpAst
+
     expect(ast.type).toBe(AstNodeType.ERROR)
   })
 })

@@ -10,6 +10,9 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class CharPlugin extends FunctionPlugin implements FunctionPluginTypecheck<CharPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'CHAR': {
@@ -26,6 +29,10 @@ export class CharPlugin extends FunctionPlugin implements FunctionPluginTypechec
     },
   }
 
+  
+  /**
+   *
+   */
   public char(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHAR'), (value: number) => {
       if (value < 1 || value >= 256) {
@@ -36,6 +43,10 @@ export class CharPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public unichar(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHAR'), (value: number) => {
       if (value < 1 || value >= 1114112) {

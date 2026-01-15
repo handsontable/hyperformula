@@ -48,6 +48,9 @@ export interface ClipboardCellParsingError {
   errors: ParsingError[],
 }
 
+/**
+ *
+ */
 class Clipboard {
   constructor(
     public readonly sourceLeftCorner: SimpleCellAddress,
@@ -58,6 +61,10 @@ class Clipboard {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public* getContent(leftCorner: SimpleCellAddress): IterableIterator<[SimpleCellAddress, ClipboardCell]> {
     if (this.content === undefined) {
       return
@@ -71,6 +78,9 @@ class Clipboard {
   }
 }
 
+/**
+ *
+ */
 export class ClipboardOperations {
   public clipboard?: Clipboard
   private maxRows: number
@@ -85,10 +95,18 @@ export class ClipboardOperations {
     this.maxColumns = config.maxColumns
   }
 
+  
+  /**
+   *
+   */
   public cut(leftCorner: SimpleCellAddress, width: number, height: number): void {
     this.clipboard = new Clipboard(leftCorner, width, height, ClipboardOperationType.CUT)
   }
 
+  
+  /**
+   *
+   */
   public copy(leftCorner: SimpleCellAddress, width: number, height: number): void {
     const content: ClipboardCell[][] = []
 
@@ -104,16 +122,28 @@ export class ClipboardOperations {
     this.clipboard = new Clipboard(leftCorner, width, height, ClipboardOperationType.COPY, content)
   }
 
+  
+  /**
+   *
+   */
   public abortCut(): void {
     if (this.clipboard && this.clipboard.type === ClipboardOperationType.CUT) {
       this.clear()
     }
   }
 
+  
+  /**
+   *
+   */
   public clear(): void {
     this.clipboard = undefined
   }
 
+  
+  /**
+   *
+   */
   public ensureItIsPossibleToCopyPaste(destinationLeftCorner: SimpleCellAddress): void {
     if (this.clipboard === undefined) {
       return
@@ -134,10 +164,18 @@ export class ClipboardOperations {
     }
   }
 
+  
+  /**
+   *
+   */
   public isCutClipboard(): boolean {
     return this.clipboard !== undefined && this.clipboard.type === ClipboardOperationType.CUT
   }
 
+  
+  /**
+   *
+   */
   public isCopyClipboard(): boolean {
     return this.clipboard !== undefined && this.clipboard.type === ClipboardOperationType.COPY
   }

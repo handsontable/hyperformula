@@ -9,16 +9,16 @@ describe('Function SHEETS', () => {
       'Sheet2': [],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   it('should return 1 for a valid reference', () => {
     const engine = HyperFormula.buildFromArray([['=SHEETS(B1)', '=SHEETS(A1:A2)', '=SHEETS(A:B)', '=SHEETS(1:2)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('C1'))).toEqual(1)
-    expect(engine.getCellValue(adr('D1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
+    expect(engine.getCellValue(adr('C1'))).toBe(1)
+    expect(engine.getCellValue(adr('D1'))).toBe(1)
   })
 
   it('should return VALUE for non-reference parameter', () => {
@@ -38,6 +38,6 @@ describe('Function SHEETS', () => {
   it('should work for itself', () => {
     const engine = HyperFormula.buildFromArray([['=SHEETS(A1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 })

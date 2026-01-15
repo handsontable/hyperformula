@@ -211,6 +211,9 @@ export function columnIndexToLabel(column: number) {
   return result.toUpperCase()
 }
 
+/**
+ *
+ */
 export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMappingFn): Maybe<string> {
   let sheetName = sheetMappingFn(sheetId)
   if (sheetName === undefined) {
@@ -225,6 +228,9 @@ export function sheetIndexToString(sheetId: number, sheetMappingFn: SheetIndexMa
   }
 }
 
+/**
+ *
+ */
 function extractSheetName(regexResult: RegExpExecArray): string | null {
   const maybeSheetName = regexResult[3] ?? regexResult[2]
 

@@ -57,6 +57,9 @@ import { ParsingResult } from './parser/ParserWithCaching'
 import { ColumnsSpan, RowsSpan } from './Span'
 import { Statistics, StatType } from './statistics'
 
+/**
+ *
+ */
 export class RemoveRowsCommand {
   constructor(
     public readonly sheet: number,
@@ -64,10 +67,18 @@ export class RemoveRowsCommand {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeRemovedIndexes(this.indexes)
   }
 
+  
+  /**
+   *
+   */
   public rowsSpans(): RowsSpan[] {
     return this.normalizedIndexes().map(normalizedIndex =>
       RowsSpan.fromNumberOfRows(this.sheet, normalizedIndex[0], normalizedIndex[1])
@@ -75,6 +86,9 @@ export class RemoveRowsCommand {
   }
 }
 
+/**
+ *
+ */
 export class AddRowsCommand {
   constructor(
     public readonly sheet: number,
@@ -82,10 +96,18 @@ export class AddRowsCommand {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeAddedIndexes(this.indexes)
   }
 
+  
+  /**
+   *
+   */
   public rowsSpans(): RowsSpan[] {
     return this.normalizedIndexes().map(normalizedIndex =>
       RowsSpan.fromNumberOfRows(this.sheet, normalizedIndex[0], normalizedIndex[1])
@@ -93,6 +115,9 @@ export class AddRowsCommand {
   }
 }
 
+/**
+ *
+ */
 export class AddColumnsCommand {
   constructor(
     public readonly sheet: number,
@@ -100,10 +125,18 @@ export class AddColumnsCommand {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeAddedIndexes(this.indexes)
   }
 
+  
+  /**
+   *
+   */
   public columnsSpans(): ColumnsSpan[] {
     return this.normalizedIndexes().map(normalizedIndex =>
       ColumnsSpan.fromNumberOfColumns(this.sheet, normalizedIndex[0], normalizedIndex[1])
@@ -111,6 +144,9 @@ export class AddColumnsCommand {
   }
 }
 
+/**
+ *
+ */
 export class RemoveColumnsCommand {
   constructor(
     public readonly sheet: number,
@@ -118,10 +154,18 @@ export class RemoveColumnsCommand {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public normalizedIndexes(): ColumnRowIndex[] {
     return normalizeRemovedIndexes(this.indexes)
   }
 
+  
+  /**
+   *
+   */
   public columnsSpans(): ColumnsSpan[] {
     return this.normalizedIndexes().map(normalizedIndex =>
       ColumnsSpan.fromNumberOfColumns(this.sheet, normalizedIndex[0], normalizedIndex[1])
@@ -154,6 +198,9 @@ export interface MoveCellsResult {
   addedGlobalNamedExpressions: string[],
 }
 
+/**
+ *
+ */
 export class Operations {
   private changes: ContentChanges = ContentChanges.empty()
   private readonly maxRows: number
@@ -175,14 +222,26 @@ export class Operations {
     this.maxRows = config.maxRows
   }
 
+  
+  /**
+   *
+   */
   private get sheetMapping(): SheetMapping {
     return this.dependencyGraph.sheetMapping
   }
 
+  
+  /**
+   *
+   */
   private get addressMapping(): AddressMapping {
     return this.dependencyGraph.addressMapping
   }
 
+  
+  /**
+   *
+   */
   public removeRows(cmd: RemoveRowsCommand): RowsRemoval[] {
     const rowsRemovals: RowsRemoval[] = []
     for (const rowsToRemove of cmd.rowsSpans()) {
@@ -194,18 +253,30 @@ export class Operations {
     return rowsRemovals
   }
 
+  
+  /**
+   *
+   */
   public addRows(cmd: AddRowsCommand) {
     for (const addedRows of cmd.rowsSpans()) {
       this.doAddRows(addedRows)
     }
   }
 
+  
+  /**
+   *
+   */
   public addColumns(cmd: AddColumnsCommand) {
     for (const addedColumns of cmd.columnsSpans()) {
       this.doAddColumns(addedColumns)
     }
   }
 
+  
+  /**
+   *
+   */
   public removeColumns(cmd: RemoveColumnsCommand): ColumnsRemoval[] {
     const columnsRemovals: ColumnsRemoval[] = []
     for (const columnsToRemove of cmd.columnsSpans()) {
@@ -302,6 +373,10 @@ export class Operations {
     }
   }
 
+  
+  /**
+   *
+   */
   public moveRows(sheet: number, startRow: number, numberOfRows: number, targetRow: number): number {
     const rowsToAdd = RowsSpan.fromNumberOfRows(sheet, targetRow, numberOfRows)
     this.lazilyTransformingAstService.beginCombinedMode(sheet)
@@ -321,6 +396,10 @@ export class Operations {
     return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
+  
+  /**
+   *
+   */
   public moveColumns(sheet: number, startColumn: number, numberOfColumns: number, targetColumn: number): number {
     const columnsToAdd = ColumnsSpan.fromNumberOfColumns(sheet, targetColumn, numberOfColumns)
     this.lazilyTransformingAstService.beginCombinedMode(sheet)
@@ -340,6 +419,10 @@ export class Operations {
     return this.lazilyTransformingAstService.commitCombinedMode()
   }
 
+  
+  /**
+   *
+   */
   public moveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): MoveCellsResult {
     this.ensureItIsPossibleToMoveCells(sourceLeftCorner, width, height, destinationLeftCorner)
 
@@ -375,6 +458,10 @@ export class Operations {
     }
   }
 
+  
+  /**
+   *
+   */
   public setRowOrder(sheetId: number, rowMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][] {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
     let oldContent: [SimpleCellAddress, ClipboardCell][] = []
@@ -396,6 +483,10 @@ export class Operations {
     return oldContent
   }
 
+  
+  /**
+   *
+   */
   public setColumnOrder(sheetId: number, columnMapping: [number, number][]): [SimpleCellAddress, ClipboardCell][] {
     const buffer: [SimpleCellAddress, ClipboardCell][][] = []
     let oldContent: [SimpleCellAddress, ClipboardCell][] = []
@@ -417,12 +508,20 @@ export class Operations {
     return oldContent
   }
 
+  
+  /**
+   *
+   */
   public addNamedExpression(expressionName: string, expression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions) {
     const namedExpression = this.namedExpressions.addNamedExpression(expressionName, sheetId, options)
     this.storeNamedExpressionInCell(namedExpression.address, expression)
     this.adjustNamedExpressionEdges(namedExpression, expressionName, sheetId)
   }
 
+  
+  /**
+   *
+   */
   public restoreNamedExpression(namedExpression: InternalNamedExpression, content: ClipboardCell, sheetId?: number) {
     const expressionName = namedExpression.displayName
     this.restoreCell(namedExpression.address, content)
@@ -430,6 +529,10 @@ export class Operations {
     this.adjustNamedExpressionEdges(restoredNamedExpression, expressionName, sheetId)
   }
 
+  
+  /**
+   *
+   */
   public changeNamedExpressionExpression(expressionName: string, newExpression: RawCellContent, sheetId?: number, options?: NamedExpressionOptions): [InternalNamedExpression, ClipboardCell] {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
@@ -444,6 +547,10 @@ export class Operations {
     return [oldNamedExpression, content]
   }
 
+  
+  /**
+   *
+   */
   public removeNamedExpression(expressionName: string, sheetId?: number): [InternalNamedExpression, ClipboardCell] {
     const namedExpression = this.namedExpressions.namedExpressionForScope(expressionName, sheetId)
     if (!namedExpression) {
@@ -463,6 +570,10 @@ export class Operations {
     ]
   }
 
+  
+  /**
+   *
+   */
   public ensureItIsPossibleToMoveCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): void {
     if (
       isColOrRowInvalid(sourceLeftCorner) ||
@@ -490,6 +601,10 @@ export class Operations {
     }
   }
 
+  
+  /**
+   *
+   */
   public restoreClipboardCells(sourceSheetId: number, cells: IterableIterator<[SimpleCellAddress, ClipboardCell]>): string[] {
     const addedNamedExpressions: string[] = []
     for (const [address, clipboardCell] of cells) {
@@ -527,6 +642,10 @@ export class Operations {
     }
   }
 
+  
+  /**
+   *
+   */
   public getOldContent(address: SimpleCellAddress): [SimpleCellAddress, ClipboardCell] {
     const vertex = this.dependencyGraph.getCell(address)
 
@@ -546,6 +665,10 @@ export class Operations {
     throw Error('Trying to copy unsupported type')
   }
 
+  
+  /**
+   *
+   */
   public getClipboardCell(address: SimpleCellAddress): ClipboardCell {
     const vertex = this.dependencyGraph.getCell(address)
 
@@ -571,6 +694,10 @@ export class Operations {
     throw Error('Trying to copy unsupported type')
   }
 
+  
+  /**
+   *
+   */
   public getSheetClipboardCells(sheet: number): ClipboardCell[][] {
     const sheetHeight = this.dependencyGraph.getSheetHeight(sheet)
     const sheetWidth = this.dependencyGraph.getSheetWidth(sheet)
@@ -587,6 +714,10 @@ export class Operations {
     return arr
   }
 
+  
+  /**
+   *
+   */
   public getRangeClipboardCells(range: AbsoluteCellRange): [SimpleCellAddress, ClipboardCell][] {
     const result: [SimpleCellAddress, ClipboardCell][] = []
     for (const address of range.addresses(this.dependencyGraph)) {
@@ -595,6 +726,10 @@ export class Operations {
     return result
   }
 
+  
+  /**
+   *
+   */
   public setCellContent(address: SimpleCellAddress, newCellContent: RawCellContent): [SimpleCellAddress, ClipboardCell] {
     const parsedCellContent = this.cellContentParser.parse(newCellContent)
     const oldContent = this.getOldContent(address)
@@ -631,6 +766,10 @@ export class Operations {
     return oldContent
   }
 
+  
+  /**
+   *
+   */
   public setSheetContent(sheetId: number, newSheetContent: RawCellContent[][]) {
     this.clearSheet(sheetId)
     for (let i = 0; i < newSheetContent.length; i++) {
@@ -706,6 +845,10 @@ export class Operations {
     this.changes.addChange(EmptyValue, address)
   }
 
+  
+  /**
+   *
+   */
   public setFormulaToCellFromCache(formulaHash: string, address: SimpleCellAddress) {
     const {
       ast,
@@ -731,12 +874,20 @@ export class Operations {
     return row >= height
   }
 
+  
+  /**
+   *
+   */
   public getAndClearContentChanges(): ContentChanges {
     const changes = this.changes
     this.changes = ContentChanges.empty()
     return changes
   }
 
+  
+  /**
+   *
+   */
   public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
   }
@@ -829,6 +980,10 @@ export class Operations {
     this.rewriteAffectedArrays(affectedArrays)
   }
 
+  
+  /**
+   *
+   */
   private rewriteAffectedArrays(affectedArrays: Set<ArrayFormulaVertex>) {
     for (const arrayVertex of affectedArrays.values()) {
       if (arrayVertex.array.size.isRef) {
@@ -874,6 +1029,10 @@ export class Operations {
     return column >= width
   }
 
+  
+  /**
+   *
+   */
   private adjustNamedExpressionEdges(namedExpression: InternalNamedExpression, expressionName: string, sheetId?: number) {
     if (sheetId === undefined) {
       return
@@ -900,6 +1059,10 @@ export class Operations {
     }
   }
 
+  
+  /**
+   *
+   */
   private storeNamedExpressionInCell(address: SimpleCellAddress, expression: RawCellContent) {
     const parsedCellContent = this.cellContentParser.parse(expression)
     if (parsedCellContent instanceof CellContent.Formula) {
@@ -916,6 +1079,10 @@ export class Operations {
     }
   }
 
+  
+  /**
+   *
+   */
   private updateNamedExpressionsForMovedCells(sourceLeftCorner: SimpleCellAddress, width: number, height: number, destinationLeftCorner: SimpleCellAddress): string[] {
     if (sourceLeftCorner.sheet === destinationLeftCorner.sheet) {
       return []
@@ -936,6 +1103,10 @@ export class Operations {
     return addedGlobalNamedExpressions
   }
 
+  
+  /**
+   *
+   */
   private updateNamedExpressionsForTargetAddress(sourceSheet: number, targetAddress: SimpleCellAddress, dependencies: RelativeDependency[]): string[] {
     if (sourceSheet === targetAddress.sheet) {
       return []
@@ -966,10 +1137,18 @@ export class Operations {
     return addedGlobalNamedExpressions
   }
 
+  
+  /**
+   *
+   */
   private allocateNamedExpressionAddressSpace() {
     this.dependencyGraph.addressMapping.addSheetWithStrategy(NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS, new SparseStrategy(0, 0))
   }
 
+  
+  /**
+   *
+   */
   private copyOrFetchGlobalNamedExpressionVertex(expressionName: string, sourceVertex: CellVertex, addedNamedExpressions: string[]): CellVertex {
     let expression = this.namedExpressions.namedExpressionForScope(expressionName)
     if (expression === undefined) {
@@ -1028,6 +1207,9 @@ export class Operations {
   }
 }
 
+/**
+ *
+ */
 export function normalizeRemovedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex[] {
   if (indexes.length <= 1) {
     return indexes
@@ -1059,6 +1241,9 @@ export function normalizeRemovedIndexes(indexes: ColumnRowIndex[]): ColumnRowInd
   return merged
 }
 
+/**
+ *
+ */
 export function normalizeAddedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex[] {
   if (indexes.length <= 1) {
     return indexes
@@ -1087,10 +1272,16 @@ export function normalizeAddedIndexes(indexes: ColumnRowIndex[]): ColumnRowIndex
   return merged
 }
 
+/**
+ *
+ */
 function isPositiveInteger(n: number): boolean {
   return Number.isInteger(n) && n > 0
 }
 
+/**
+ *
+ */
 function isRowOrColumnRange(leftCorner: SimpleCellAddress, width: number, height: number): boolean {
   return (leftCorner.row === 0 && isPositiveInteger(width) && height === Number.POSITIVE_INFINITY)
     || (leftCorner.col === 0 && isPositiveInteger(height) && width === Number.POSITIVE_INFINITY)

@@ -33,7 +33,7 @@ describe('Function ERF', () => {
       ['=ERF(-2.56)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(0.9999910304344467, 6)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.999705836979508, 6)
   })

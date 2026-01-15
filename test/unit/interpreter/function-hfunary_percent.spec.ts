@@ -17,7 +17,7 @@ describe('Function HF.UNARY_PERCENT', () => {
       ['=HF.UNARY_PERCENT(2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.02)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.02)
   })
 
   it('should coerce to correct types', () => {
@@ -27,9 +27,9 @@ describe('Function HF.UNARY_PERCENT', () => {
       ['=HF.UNARY_PERCENT("1")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.01)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(0.01)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.01)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0.01)
   })
 
   it('should throw correct error', () => {

@@ -8,7 +8,7 @@ describe('Function GEOMEAN', () => {
       ['=GEOMEAN(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('two numbers', () => {
@@ -16,7 +16,7 @@ describe('Function GEOMEAN', () => {
       ['=GEOMEAN(1, 4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   it('more numbers', () => {
@@ -24,7 +24,7 @@ describe('Function GEOMEAN', () => {
       ['=GEOMEAN(8, 1, 2, 4, 16)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(4)
   })
 
   it('validates input', () => {
@@ -43,7 +43,7 @@ describe('Function GEOMEAN', () => {
       ['=GEOMEAN(A1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
   })
 
   it('propagates error from regular argument', () => {
@@ -80,7 +80,7 @@ describe('Function GEOMEAN', () => {
       ['=GEOMEAN(TRUE(),"4")']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
   })
 
   it('ignores nonnumeric values in ranges', () => {
@@ -89,6 +89,6 @@ describe('Function GEOMEAN', () => {
       [1, 1, false, null, '\'0']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 })

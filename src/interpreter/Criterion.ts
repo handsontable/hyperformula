@@ -6,7 +6,7 @@
 import {Config} from '../Config'
 import {Maybe} from '../Maybe'
 import {ArithmeticHelper} from './ArithmeticHelper'
-import {EmptyValue, getRawValue, RawScalarValue} from './InterpreterValue'
+import {EmptyValue, getRawPrecisionValue, isExtendedNumber, RawScalarValue, toNativeNumeric} from './InterpreterValue'
 
 export enum CriterionType {
   GREATER_THAN = 'GREATER_THAN',
@@ -24,6 +24,9 @@ export interface Criterion {
 
 export const buildCriterion = (operator: CriterionType, value: number | string | boolean | null) => ({operator, value})
 
+/**
+ *
+ */
 export class CriterionBuilder {
   private trueString: string
   private falseString: string
@@ -33,6 +36,10 @@ export class CriterionBuilder {
     this.falseString = config.translationPackage.getMaybeFunctionTranslation('FALSE')?.toLowerCase() ?? 'false'
   }
 
+  
+  /**
+   *
+   */
   public fromCellValue(raw: RawScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<CriterionPackage> {
     if (typeof raw !== 'string' && typeof raw !== 'boolean' && typeof raw !== 'number') {
       return undefined
@@ -46,6 +53,10 @@ export class CriterionBuilder {
     return {raw, lambda: buildCriterionLambda(criterion, arithmeticHelper)}
   }
 
+  
+  /**
+   *
+   */
   public parseCriterion(criterion: RawScalarValue, arithmeticHelper: ArithmeticHelper): Maybe<Criterion> {
     if (typeof criterion === 'number' || typeof criterion === 'boolean') {
       return buildCriterion(CriterionType.EQUAL, criterion)
@@ -74,7 +85,8 @@ export class CriterionBuilder {
           return buildCriterion(criterionType, boolvalue ?? criterionValue)
         }
       } else {
-        return buildCriterion(criterionType, getRawValue(value))
+        // Convert Numeric to native number for criterion comparison
+        return buildCriterion(criterionType, toNativeNumeric(getRawPrecisionValue(value)))
       }
     }
     return undefined
@@ -85,6 +97,9 @@ export type CriterionPackage = { raw: string | number | boolean, lambda: Criteri
 
 const ANY_CRITERION_REGEX = /([<>=]+)(.*)/
 
+/**
+ *
+ */
 function StrToCriterionType(str: string): Maybe<CriterionType> {
   switch (str) {
     case '>':
@@ -110,7 +125,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
     case CriterionType.GREATER_THAN: {
       if (typeof criterion.value === 'number') {
         return (cellValue) =>
-          (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) > 0)
+          (isExtendedNumber(cellValue) && arithmeticHelper.floatCmp(cellValue, criterion.value as number) > 0)
       } else {
         return (_cellValue) => false
       }
@@ -118,7 +133,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
     case CriterionType.GREATER_THAN_OR_EQUAL: {
       if (typeof criterion.value === 'number') {
         return (cellValue) =>
-          (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) >= 0)
+          (isExtendedNumber(cellValue) && arithmeticHelper.floatCmp(cellValue, criterion.value as number) >= 0)
       } else {
         return (_cellValue) => false
       }
@@ -126,7 +141,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
     case CriterionType.LESS_THAN: {
       if (typeof criterion.value === 'number') {
         return (cellValue) =>
-          (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) < 0)
+          (isExtendedNumber(cellValue) && arithmeticHelper.floatCmp(cellValue, criterion.value as number) < 0)
       } else {
         return (_cellValue) => false
       }
@@ -134,7 +149,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
     case CriterionType.LESS_THAN_OR_EQUAL: {
       if (typeof criterion.value === 'number') {
         return (cellValue) =>
-          (typeof cellValue === 'number' && arithmeticHelper.floatCmp(cellValue, criterion.value as number) <= 0)
+          (isExtendedNumber(cellValue) && arithmeticHelper.floatCmp(cellValue, criterion.value as number) <= 0)
       } else {
         return (_cellValue) => false
       }
@@ -142,7 +157,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
     case CriterionType.EQUAL: {
       if (typeof criterion.value === 'number') {
         return (cellValue) => {
-          if (typeof cellValue === 'number') {
+          if (isExtendedNumber(cellValue)) {
             return arithmeticHelper.floatCmp(cellValue, criterion.value as number) === 0
           } else if (typeof cellValue === 'string') {
             if (cellValue === '') {
@@ -168,7 +183,7 @@ export const buildCriterionLambda = (criterion: Criterion, arithmeticHelper: Ari
     case CriterionType.NOT_EQUAL: {
       if (typeof criterion.value === 'number') {
         return (cellValue) => {
-          if (typeof cellValue === 'number') {
+          if (isExtendedNumber(cellValue)) {
             return arithmeticHelper.floatCmp(cellValue, criterion.value as number) !== 0
           } else if (typeof cellValue === 'string') {
             if (cellValue === '') {

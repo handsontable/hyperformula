@@ -15,12 +15,20 @@ export class Statistics {
   ])
   protected readonly startTimes: Map<StatType, number> = new Map<StatType, number>()
 
+  
+  /**
+   *
+   */
   public incrementCriterionFunctionFullCacheUsed() {
     const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED) ?? 0) + 1
 
     this.stats.set(StatType.CRITERION_FUNCTION_FULL_CACHE_USED, newValue)
   }
 
+  
+  /**
+   *
+   */
   public incrementCriterionFunctionPartialCacheUsed() {
     const newValue = (this.stats.get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED) ?? 0) + 1
 

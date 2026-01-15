@@ -18,6 +18,9 @@ const MIN_BASE = 2
 const MAX_BASE = 36
 const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+/**
+ *
+ */
 export class RadixConversionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<RadixConversionPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'DEC2BIN': {
@@ -118,24 +121,40 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     },
   }
 
+  
+  /**
+   *
+   */
   public dec2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEC2BIN'),
       (value, places) => decimalToBaseWithExactPadding(value, 2, places)
     )
   }
 
+  
+  /**
+   *
+   */
   public dec2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEC2OCT'),
       (value, places) => decimalToBaseWithExactPadding(value, 8, places)
     )
   }
 
+  
+  /**
+   *
+   */
   public dec2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DEC2HEX'),
       (value, places) => decimalToBaseWithExactPadding(value, 16, places)
     )
   }
 
+  
+  /**
+   *
+   */
   public bin2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BIN2DEC'), (binary) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
@@ -146,6 +165,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public bin2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BIN2OCT'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
@@ -156,6 +179,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public bin2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BIN2HEX'), (binary, places) => {
       const binaryWithSign = coerceStringToBase(binary, 2, MAX_LENGTH)
@@ -166,6 +193,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public oct2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OCT2DEC'), (octal) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
@@ -176,6 +207,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public oct2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OCT2BIN'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
@@ -186,6 +221,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public oct2hex(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('OCT2HEX'), (octal, places) => {
       const octalWithSign = coerceStringToBase(octal, 8, MAX_LENGTH)
@@ -196,6 +235,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public hex2dec(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HEX2DEC'), (hexadecimal) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
@@ -206,6 +249,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public hex2bin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HEX2BIN'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
@@ -216,6 +263,10 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public hex2oct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('HEX2OCT'), (hexadecimal, places) => {
       const hexadecimalWithSign = coerceStringToBase(hexadecimal, 16, MAX_LENGTH)
@@ -226,10 +277,18 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
     })
   }
 
+  
+  /**
+   *
+   */
   public base(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('BASE'), decimalToBaseWithMinimumPadding)
   }
 
+  
+  /**
+   *
+   */
   public decimal(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('DECIMAL'), (arg, base) => {
       const input = coerceStringToBase(arg, base, DECIMAL_NUMBER_OF_BITS)
@@ -241,6 +300,9 @@ export class RadixConversionPlugin extends FunctionPlugin implements FunctionPlu
   }
 }
 
+/**
+ *
+ */
 function coerceStringToBase(value: string, base: number, maxLength: number): Maybe<string> {
   const baseAlphabet = ALPHABET.substr(0, base)
   const regex = new RegExp(`^[${baseAlphabet}]+$`)
@@ -250,6 +312,9 @@ function coerceStringToBase(value: string, base: number, maxLength: number): May
   return value
 }
 
+/**
+ *
+ */
 function decimalToBaseWithExactPadding(value: number, base: number, places?: number): string | CellError {
   if (value > maxValFromBase(base)) {
     return new CellError(ErrorType.NUM, ErrorMessage.ValueBaseLarge)
@@ -267,14 +332,23 @@ function decimalToBaseWithExactPadding(value: number, base: number, places?: num
   }
 }
 
+/**
+ *
+ */
 function minValFromBase(base: number) {
   return -Math.pow(base, MAX_LENGTH) / 2
 }
 
+/**
+ *
+ */
 function maxValFromBase(base: number) {
   return -minValFromBase(base) - 1
 }
 
+/**
+ *
+ */
 function decimalToBaseWithMinimumPadding(value: number, base: number, places?: number): string {
   const result = decimalToRadixComplement(value, base)
   if (places !== undefined && places > result.length) {
@@ -284,11 +358,17 @@ function decimalToBaseWithMinimumPadding(value: number, base: number, places?: n
   }
 }
 
+/**
+ *
+ */
 function decimalToRadixComplement(value: number, base: number): string {
   const offset = value < 0 ? Math.pow(base, MAX_LENGTH) : 0
   return (value + offset).toString(base).toUpperCase()
 }
 
+/**
+ *
+ */
 function twoComplementToDecimal(value: string, base: number): number {
   const parsed = parseInt(value, base)
   const offset = Math.pow(base, MAX_LENGTH)

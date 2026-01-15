@@ -19,6 +19,9 @@ import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Ast, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
 
+/**
+ *
+ */
 export class Evaluator {
 
   constructor(
@@ -31,6 +34,10 @@ export class Evaluator {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public run(): void {
     this.stats.start(StatType.TOP_SORT)
     const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
@@ -41,6 +48,10 @@ export class Evaluator {
     })
   }
 
+  
+  /**
+   *
+   */
   public partialRun(vertices: Vertex[]): ContentChanges {
     const changes = ContentChanges.empty()
 
@@ -53,6 +64,10 @@ export class Evaluator {
     return changes
   }
 
+  
+  /**
+   *
+   */
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
@@ -131,6 +146,10 @@ export class Evaluator {
     })
   }
 
+  
+  /**
+   *
+   */
   private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
     if (vertex instanceof ArrayFormulaVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
@@ -142,6 +161,10 @@ export class Evaluator {
     }
   }
 
+  
+  /**
+   *
+   */
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
     const interpreterValue = this.interpreter.evaluateAst(ast, state)
     if (interpreterValue instanceof SimpleRangeValue) {

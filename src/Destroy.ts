@@ -3,6 +3,9 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+/**
+ *
+ */
 export function objectDestroy(object: any) {
   for (const [key, value] of Object.entries(object)) {
     if (value instanceof Function) {
@@ -13,6 +16,9 @@ export function objectDestroy(object: any) {
   }
 }
 
+/**
+ *
+ */
 function postMortem(method: any) {
   return () => {
     throw new Error(`The "${method}" method cannot be called because this HyperFormula instance has been destroyed`)

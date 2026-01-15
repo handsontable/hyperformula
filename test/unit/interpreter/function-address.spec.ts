@@ -11,10 +11,10 @@ describe('ADDRESS', () => {
       ['=ADDRESS(45,COLUMN())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('$A$1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('$KN$77')
-    expect(engine.getCellValue(adr('A3'))).toEqual('$KN$3')
-    expect(engine.getCellValue(adr('A4'))).toEqual('$A$45')
+    expect(engine.getCellValue(adr('A1'))).toBe('$A$1')
+    expect(engine.getCellValue(adr('A2'))).toBe('$KN$77')
+    expect(engine.getCellValue(adr('A3'))).toBe('$KN$3')
+    expect(engine.getCellValue(adr('A4'))).toBe('$A$45')
   })
 
   it('with row, col, and abs (A1 Notation)', () => {
@@ -25,10 +25,10 @@ describe('ADDRESS', () => {
       ['=ADDRESS(1,1,4)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('$A$1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('A$1')
-    expect(engine.getCellValue(adr('A3'))).toEqual('$A1')
-    expect(engine.getCellValue(adr('A4'))).toEqual('A1')
+    expect(engine.getCellValue(adr('A1'))).toBe('$A$1')
+    expect(engine.getCellValue(adr('A2'))).toBe('A$1')
+    expect(engine.getCellValue(adr('A3'))).toBe('$A1')
+    expect(engine.getCellValue(adr('A4'))).toBe('A1')
   })
 
   it('with row, col, and abs (R1C1 Notation)', () => {
@@ -39,10 +39,10 @@ describe('ADDRESS', () => {
       ['=ADDRESS(1,1,4,FALSE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('R1C1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('R1C[1]')
-    expect(engine.getCellValue(adr('A3'))).toEqual('R[1]C1')
-    expect(engine.getCellValue(adr('A4'))).toEqual('R[1]C[1]')
+    expect(engine.getCellValue(adr('A1'))).toBe('R1C1')
+    expect(engine.getCellValue(adr('A2'))).toBe('R1C[1]')
+    expect(engine.getCellValue(adr('A3'))).toBe('R[1]C1')
+    expect(engine.getCellValue(adr('A4'))).toBe('R[1]C[1]')
   })
 
   it('with row, col, abs, and sheetName (A1 Notation)', () => {
@@ -54,11 +54,11 @@ describe('ADDRESS', () => {
       ['=ADDRESS(1,1,4, TRUE(), "")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('Sheet1!$A$1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('Sheet2!A$1')
-    expect(engine.getCellValue(adr('A3'))).toEqual('Sheet3!$A1')
-    expect(engine.getCellValue(adr('A4'))).toEqual('Sheet4!A1')
-    expect(engine.getCellValue(adr('A5'))).toEqual('!A1')
+    expect(engine.getCellValue(adr('A1'))).toBe('Sheet1!$A$1')
+    expect(engine.getCellValue(adr('A2'))).toBe('Sheet2!A$1')
+    expect(engine.getCellValue(adr('A3'))).toBe('Sheet3!$A1')
+    expect(engine.getCellValue(adr('A4'))).toBe('Sheet4!A1')
+    expect(engine.getCellValue(adr('A5'))).toBe('!A1')
   })
 
   it('with row, col, abs, and sheetName (R1C1 Notation)', () => {
@@ -70,11 +70,11 @@ describe('ADDRESS', () => {
       ['=ADDRESS(1,1,4, FALSE(), "")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('Sheet1!R1C1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('Sheet2!R1C[1]')
-    expect(engine.getCellValue(adr('A3'))).toEqual('Sheet3!R[1]C1')
-    expect(engine.getCellValue(adr('A4'))).toEqual('Sheet4!R[1]C[1]')
-    expect(engine.getCellValue(adr('A5'))).toEqual('!R[1]C[1]')
+    expect(engine.getCellValue(adr('A1'))).toBe('Sheet1!R1C1')
+    expect(engine.getCellValue(adr('A2'))).toBe('Sheet2!R1C[1]')
+    expect(engine.getCellValue(adr('A3'))).toBe('Sheet3!R[1]C1')
+    expect(engine.getCellValue(adr('A4'))).toBe('Sheet4!R[1]C[1]')
+    expect(engine.getCellValue(adr('A5'))).toBe('!R[1]C[1]')
   })
 
   it('invalid arguments', () => {
@@ -117,7 +117,7 @@ describe('ADDRESS - Compatability Checks', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('R[-1]C[-1]')
+    expect(engine.getCellValue(adr('A7'))).toBe('R[-1]C[-1]')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -139,7 +139,7 @@ describe('ADDRESS - Compatability Checks', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('R[-1]C')
+    expect(engine.getCellValue(adr('A7'))).toBe('R[-1]C')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -159,9 +159,9 @@ describe('ADDRESS - Compatability Checks', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A5'))).toEqual('R[-1]C1')
+    expect(engine.getCellValue(adr('A5'))).toBe('R[-1]C1')
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('R[-1]C[1]')
+    expect(engine.getCellValue(adr('A7'))).toBe('R[-1]C[1]')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -183,7 +183,7 @@ describe('ADDRESS - Compatability Checks', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('RC[-1]')
+    expect(engine.getCellValue(adr('A7'))).toBe('RC[-1]')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -205,7 +205,7 @@ describe('ADDRESS - Compatability Checks', () => {
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('RC')
+    expect(engine.getCellValue(adr('A7'))).toBe('RC')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -225,9 +225,9 @@ describe('ADDRESS - Compatability Checks', () => {
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A3'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A5'))).toEqual('RC1')
+    expect(engine.getCellValue(adr('A5'))).toBe('RC1')
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('RC[1]')
+    expect(engine.getCellValue(adr('A7'))).toBe('RC[1]')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -245,11 +245,11 @@ describe('ADDRESS - Compatability Checks', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A3'))).toEqual('R1C[-1]')
+    expect(engine.getCellValue(adr('A3'))).toBe('R1C[-1]')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('R[1]C[-1]')
+    expect(engine.getCellValue(adr('A7'))).toBe('R[1]C[-1]')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -267,11 +267,11 @@ describe('ADDRESS - Compatability Checks', () => {
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A3'))).toEqual('R1C')
+    expect(engine.getCellValue(adr('A3'))).toBe('R1C')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
     expect(engine.getCellValue(adr('A6'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
-    expect(engine.getCellValue(adr('A7'))).toEqual('R[1]C')
+    expect(engine.getCellValue(adr('A7'))).toBe('R[1]C')
     expect(engine.getCellValue(adr('A8'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.LessThanOne))
   })
 
@@ -287,13 +287,13 @@ describe('ADDRESS - Compatability Checks', () => {
       ['=ADDRESS(1, 1, 4, TRUE())'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('R1C1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('$A$1')
-    expect(engine.getCellValue(adr('A3'))).toEqual('R1C[1]')
-    expect(engine.getCellValue(adr('A4'))).toEqual('A$1')
-    expect(engine.getCellValue(adr('A5'))).toEqual('R[1]C1')
-    expect(engine.getCellValue(adr('A6'))).toEqual('$A1')
-    expect(engine.getCellValue(adr('A7'))).toEqual('R[1]C[1]')
-    expect(engine.getCellValue(adr('A8'))).toEqual('A1')
+    expect(engine.getCellValue(adr('A1'))).toBe('R1C1')
+    expect(engine.getCellValue(adr('A2'))).toBe('$A$1')
+    expect(engine.getCellValue(adr('A3'))).toBe('R1C[1]')
+    expect(engine.getCellValue(adr('A4'))).toBe('A$1')
+    expect(engine.getCellValue(adr('A5'))).toBe('R[1]C1')
+    expect(engine.getCellValue(adr('A6'))).toBe('$A1')
+    expect(engine.getCellValue(adr('A7'))).toBe('R[1]C[1]')
+    expect(engine.getCellValue(adr('A8'))).toBe('A1')
   })
 })

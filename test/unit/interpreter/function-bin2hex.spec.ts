@@ -35,13 +35,13 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(111111111)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('2')
-    expect(engine.getCellValue(adr('A3'))).toEqual('2')
-    expect(engine.getCellValue(adr('A4'))).toEqual('2E')
-    expect(engine.getCellValue(adr('A5'))).toEqual('FFFFFFFE00')
-    expect(engine.getCellValue(adr('A6'))).toEqual('FFFFFFFFFF')
-    expect(engine.getCellValue(adr('A7'))).toEqual('1FF')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('2')
+    expect(engine.getCellValue(adr('A3'))).toBe('2')
+    expect(engine.getCellValue(adr('A4'))).toBe('2E')
+    expect(engine.getCellValue(adr('A5'))).toBe('FFFFFFFE00')
+    expect(engine.getCellValue(adr('A6'))).toBe('FFFFFFFFFF')
+    expect(engine.getCellValue(adr('A7'))).toBe('1FF')
   })
 
   it('should work for binary strings', () => {
@@ -49,7 +49,7 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX("1101")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('D')
+    expect(engine.getCellValue(adr('A1'))).toBe('D')
   })
 
   it('should work for reference', () => {
@@ -58,7 +58,7 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('B')
+    expect(engine.getCellValue(adr('A2'))).toBe('B')
   })
 
   it('should return string value', () => {
@@ -76,7 +76,7 @@ describe('function BIN2HEX', () => {
     ])
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NotBinary))
-    expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFEAA')
+    expect(engine.getCellValue(adr('A2'))).toBe('FFFFFFFEAA')
   })
 
   it('should respect second argument and fill with zeros for positive arguments', () => {
@@ -85,8 +85,8 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(101, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('00000002')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0005')
+    expect(engine.getCellValue(adr('A1'))).toBe('00000002')
+    expect(engine.getCellValue(adr('A2'))).toBe('0005')
   })
 
   it('second argument should not affect negative results', () => {
@@ -95,8 +95,8 @@ describe('function BIN2HEX', () => {
       ['=BIN2HEX(1110110100, 10)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('FFFFFFFFB4')
-    expect(engine.getCellValue(adr('A2'))).toEqual('FFFFFFFFB4')
+    expect(engine.getCellValue(adr('A1'))).toBe('FFFFFFFFB4')
+    expect(engine.getCellValue(adr('A2'))).toBe('FFFFFFFFB4')
   })
 
   it('should allow for numbers from 1 to 10 as second argument', () => {

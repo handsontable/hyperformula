@@ -19,10 +19,10 @@ describe('Function IMSUM', () => {
       ['=IMSUM("i",)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('0')
-    expect(engine.getCellValue(adr('A2'))).toEqual('-1.5+i')
-    expect(engine.getCellValue(adr('A3'))).toEqual('4+5i')
-    expect(engine.getCellValue(adr('A4'))).toEqual('i')
+    expect(engine.getCellValue(adr('A1'))).toBe('0')
+    expect(engine.getCellValue(adr('A2'))).toBe('-1.5+i')
+    expect(engine.getCellValue(adr('A3'))).toBe('4+5i')
+    expect(engine.getCellValue(adr('A4'))).toBe('i')
   })
 
   it('should fail for non-coercible explicit arguments', () => {
@@ -43,9 +43,9 @@ describe('Function IMSUM', () => {
       ['=IMSUM(B4:D4,)', 'i', '=NA()', 1],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('3+i')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1')
-    expect(engine.getCellValue(adr('A3'))).toEqual('i')
+    expect(engine.getCellValue(adr('A1'))).toBe('3+i')
+    expect(engine.getCellValue(adr('A2'))).toBe('1')
+    expect(engine.getCellValue(adr('A3'))).toBe('i')
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NA))
   })
 })

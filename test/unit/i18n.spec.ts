@@ -75,7 +75,8 @@ describe('i18n', () => {
   it('all translation packages should not include protected function definition', () => {
     allLanguages.forEach(lang => {
       const translatedFunctionsInLang = new Set(Object.keys(lang.functions))
-      expect(translatedFunctionsInLang.has('VERSION')).toEqual(false)
+
+      expect(translatedFunctionsInLang.has('VERSION')).toBe(false)
     })
   })
 
@@ -84,7 +85,8 @@ describe('i18n', () => {
 
     allLanguages.forEach(lang => {
       const translatedFunctionsInLang = new Set(Object.keys(lang.functions))
-      translatedFunctionsInLang.add('VERSION') /* missing protected function */
+      translatedFunctionsInLang.add('VERSION')
+
       expect(translatedFunctionsInLang).toEqual(implementedFunctions)
     })
   })
@@ -118,6 +120,7 @@ describe('i18n', () => {
       errorsMap[key] = ErrorType[key]
     }
     delete errorsMap[unknownErrorType]
+
     expect(() =>
       new TranslationPackage(plPL.functions, errorsMap as ErrorTranslationSet, plPL.ui)
     ).toThrow(new MissingTranslationError(`errors.${unknownErrorType}`))
@@ -125,6 +128,7 @@ describe('i18n', () => {
 
   it('should not be possible to extend TranslationPackage with protected translation', () => {
     const translationPackage = HyperFormula.getLanguage('plPL')
+
     expect(() =>
       translationPackage.extendFunctions({'VERSION': 'FOO'})
     ).toThrow(new ProtectedFunctionTranslationError('VERSION'))
@@ -172,7 +176,7 @@ describe('i18n', () => {
     })
 
     it('should langCode = "enUS"', () => {
-      expect(enUS.langCode).toEqual('enUS')
+      expect(enUS.langCode).toBe('enUS')
     })
 
     it('should have the same translations as "enGB"', () => {

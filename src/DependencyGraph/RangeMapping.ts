@@ -95,6 +95,10 @@ export class RangeMapping {
     return maybeRange
   }
 
+  
+  /**
+   *
+   */
   public truncateRanges(span: Span, coordinate: (address: SimpleCellAddress) => number): TruncateRangesResult {
     const verticesToRemove = Array<RangeVertex>()
     const updated = Array<[string, RangeVertex]>()
@@ -139,6 +143,10 @@ export class RangeMapping {
     }
   }
 
+  
+  /**
+   *
+   */
   public moveAllRangesInSheetAfterAddingRows(sheet: number, row: number, numberOfRows: number): AdjustRangesResult {
     return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex) => {
       if (row <= vertex.start.row) {
@@ -159,6 +167,10 @@ export class RangeMapping {
     })
   }
 
+  
+  /**
+   *
+   */
   public moveAllRangesInSheetAfterAddingColumns(sheet: number, column: number, numberOfColumns: number): AdjustRangesResult {
     return this.updateVerticesFromSheet(sheet, (key: string, vertex: RangeVertex) => {
       if (column <= vertex.start.col) {
@@ -179,6 +191,10 @@ export class RangeMapping {
     })
   }
 
+  
+  /**
+   *
+   */
   public moveRangesInsideSourceRange(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
     this.updateVerticesFromSheet(sourceRange.sheet, (key: string, vertex: RangeVertex) => {
       if (sourceRange.containsRange(vertex.range)) {
@@ -195,6 +211,10 @@ export class RangeMapping {
     })
   }
 
+  
+  /**
+   *
+   */
   public* rangesInSheet(sheet: number): IterableIterator<RangeVertex> {
     const sheetMap = this.rangeMapping.get(sheet)
     if (!sheetMap) {
@@ -203,6 +223,10 @@ export class RangeMapping {
     yield* sheetMap.values()
   }
 
+  
+  /**
+   *
+   */
   public* rangeVerticesContainedInRange(sourceRange: AbsoluteCellRange): IterableIterator<RangeVertex> {
     for (const rangeVertex of this.rangesInSheet(sourceRange.sheet)) {
       if (sourceRange.containsRange(rangeVertex.range)) {
@@ -253,6 +277,10 @@ export class RangeMapping {
     }
   }
 
+  
+  /**
+   *
+   */
   private* entriesFromSheet(sheet: number): IterableIterator<[string, RangeVertex]> {
     const sheetMap = this.rangeMapping.get(sheet)
     if (!sheetMap) {
@@ -261,6 +289,10 @@ export class RangeMapping {
     yield* sheetMap.entries()
   }
 
+  
+  /**
+   *
+   */
   private removeByKey(sheet: number, key: string): void {
     const sheetMap = this.rangeMapping.get(sheet)
 
@@ -270,10 +302,18 @@ export class RangeMapping {
     sheetMap.delete(key)
   }
 
+  
+  /**
+   *
+   */
   private getByKey(sheet: number, key: string): RangeVertex | undefined {
     return this.rangeMapping.get(sheet)?.get(key)
   }
 
+  
+  /**
+   *
+   */
   private updateVerticesFromSheet(sheet: number, fn: AdjustVerticesOperation): AdjustRangesResult {
     const updated = Array<AdjustVerticesOperationResult>()
 

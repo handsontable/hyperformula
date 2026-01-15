@@ -23,7 +23,8 @@ describe('SUMSQ', () => {
       ['1', '2', '5'],
       ['3', '4', '=SUMSQ(A1:B2)'],
     ])
-    expect(engine.getCellValue(adr('C2'))).toEqual(30)
+
+    expect(engine.getCellValue(adr('C2'))).toBe(30)
   })
 
   it('SUMSQ with using previously cached value', () => {
@@ -31,7 +32,8 @@ describe('SUMSQ', () => {
       ['3', '=SUMSQ(A1:A1)'],
       ['4', '=SUMSQ(A1:A2)'],
     ])
-    expect(engine.getCellValue(adr('B2'))).toEqual(25)
+
+    expect(engine.getCellValue(adr('B2'))).toBe(25)
   })
 
   it('doesnt do coercions', () => {
@@ -44,7 +46,7 @@ describe('SUMSQ', () => {
       ['=SUMSQ(A1:A5)'],
     ])
 
-    expect(engine.getCellValue(adr('A6'))).toEqual(5)
+    expect(engine.getCellValue(adr('A6'))).toBe(5)
   })
 
   it('range only with empty value', () => {
@@ -52,7 +54,7 @@ describe('SUMSQ', () => {
       ['', '=SUMSQ(A1:A1)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
   it('range only with some empty values', () => {
@@ -60,7 +62,7 @@ describe('SUMSQ', () => {
       ['42', '', '13', '=SUMSQ(A1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('D1'))).toEqual(1933)
+    expect(engine.getCellValue(adr('D1'))).toBe(1933)
   })
 
   it('over a range value', () => {
@@ -70,7 +72,7 @@ describe('SUMSQ', () => {
       ['=SUMSQ(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(858)
+    expect(engine.getCellValue(adr('A3'))).toBe(858)
   })
 
   it('propagates errors', () => {

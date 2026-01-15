@@ -17,26 +17,47 @@ describe('Transformer', () => {
     constructor() {
       super()
     }
+    /**
+     *
+     */
     public get sheet(): number {
       return 0
     }
+    /**
+     *
+     */
     public isIrreversible(): boolean {
       return false
     }
+    /**
+     *
+     */
     protected transformCellAddress<T extends CellAddress>(dependencyAddress: T, formulaAddress: SimpleCellAddress): T | ErrorType.REF | false {
       return ErrorType.REF
     }
+    /**
+     *
+     */
     protected transformCellRange(start: CellAddress, end: CellAddress, formulaAddress: SimpleCellAddress): [CellAddress, CellAddress] | ErrorType.REF | false {
       const newStart = new CellAddress(15, 10, start.type, 19)
       const newEnd = new CellAddress(20, 30, start.type, 19)
       return [newStart, newEnd]
     }
+    /**
+     *
+     */
     protected transformRowRange(start: RowAddress, end: RowAddress, formulaAddress: SimpleCellAddress): [RowAddress, RowAddress] | ErrorType.REF | false {
       return ErrorType.REF
     }
+    /**
+     *
+     */
     protected transformColumnRange(start: ColumnAddress, end: ColumnAddress, formulaAddress: SimpleCellAddress): [ColumnAddress, ColumnAddress] | ErrorType.REF | false {
       return ErrorType.REF
     }
+    /**
+     *
+     */
     protected fixNodeAddress(address: SimpleCellAddress): SimpleCellAddress {
       return simpleCellAddress(19, 12, 50)
     }
@@ -52,12 +73,13 @@ describe('Transformer', () => {
       const astParen = ast as ParenthesisAst
       const astSum = astParen.expression as ProcedureAst
       const astSumArg = astSum.args[0] as CellRangeAst
+
       expect(astSumArg.start.sheet).toBeUndefined()
-      expect(astSumArg.start.col).toEqual(2)
-      expect(astSumArg.start.row).toEqual(1)
+      expect(astSumArg.start.col).toBe(2)
+      expect(astSumArg.start.row).toBe(1)
       expect(astSumArg.end.sheet).toBeUndefined()
-      expect(astSumArg.end.col).toEqual(5)
-      expect(astSumArg.end.row).toEqual(6)
+      expect(astSumArg.end.col).toBe(5)
+      expect(astSumArg.end.row).toBe(6)
     }
 
     const [transformedAst, cellAddress] = transformer.transformSingleAst(ast, simpleCellAddress(0, 2, 2))
@@ -66,15 +88,16 @@ describe('Transformer', () => {
       const astParen = transformedAst as ParenthesisAst
       const astSum = astParen.expression as ProcedureAst
       const astSumArg = astSum.args[0] as CellRangeAst
-      expect(astSumArg.start.sheet).toEqual(19)
-      expect(astSumArg.start.col).toEqual(15)
-      expect(astSumArg.start.row).toEqual(10)
-      expect(astSumArg.end.sheet).toEqual(19)
-      expect(astSumArg.end.col).toEqual(20)
-      expect(astSumArg.end.row).toEqual(30)
-      expect(cellAddress.sheet).toEqual(19)
-      expect(cellAddress.col).toEqual(12)
-      expect(cellAddress.row).toEqual(50)
+
+      expect(astSumArg.start.sheet).toBe(19)
+      expect(astSumArg.start.col).toBe(15)
+      expect(astSumArg.start.row).toBe(10)
+      expect(astSumArg.end.sheet).toBe(19)
+      expect(astSumArg.end.col).toBe(20)
+      expect(astSumArg.end.row).toBe(30)
+      expect(cellAddress.sheet).toBe(19)
+      expect(cellAddress.col).toBe(12)
+      expect(cellAddress.row).toBe(50)
     }
 
   })
@@ -89,12 +112,13 @@ describe('Transformer', () => {
       const astArray = ast as ArrayAst
       const astSum = astArray.args[0][0] as ProcedureAst
       const astSumArg = astSum.args[0] as CellRangeAst
+
       expect(astSumArg.start.sheet).toBeUndefined()
-      expect(astSumArg.start.col).toEqual(2)
-      expect(astSumArg.start.row).toEqual(1)
+      expect(astSumArg.start.col).toBe(2)
+      expect(astSumArg.start.row).toBe(1)
       expect(astSumArg.end.sheet).toBeUndefined()
-      expect(astSumArg.end.col).toEqual(5)
-      expect(astSumArg.end.row).toEqual(6)
+      expect(astSumArg.end.col).toBe(5)
+      expect(astSumArg.end.row).toBe(6)
     }
 
     const [transformedAst, cellAddress] = transformer.transformSingleAst(ast, simpleCellAddress(0, 2, 2))
@@ -103,15 +127,16 @@ describe('Transformer', () => {
       const astArray = transformedAst as ArrayAst
       const astSum = astArray.args[0][0] as ProcedureAst
       const astSumArg = astSum.args[0] as CellRangeAst
-      expect(astSumArg.start.sheet).toEqual(19)
-      expect(astSumArg.start.col).toEqual(15)
-      expect(astSumArg.start.row).toEqual(10)
-      expect(astSumArg.end.sheet).toEqual(19)
-      expect(astSumArg.end.col).toEqual(20)
-      expect(astSumArg.end.row).toEqual(30)
-      expect(cellAddress.sheet).toEqual(19)
-      expect(cellAddress.col).toEqual(12)
-      expect(cellAddress.row).toEqual(50)
+
+      expect(astSumArg.start.sheet).toBe(19)
+      expect(astSumArg.start.col).toBe(15)
+      expect(astSumArg.start.row).toBe(10)
+      expect(astSumArg.end.sheet).toBe(19)
+      expect(astSumArg.end.col).toBe(20)
+      expect(astSumArg.end.row).toBe(30)
+      expect(cellAddress.sheet).toBe(19)
+      expect(cellAddress.col).toBe(12)
+      expect(cellAddress.row).toBe(50)
     }
 
   })

@@ -10,16 +10,20 @@ import {ProcedureAst} from '../../parser'
 import {Condition, CriterionFunctionCompute} from '../CriterionFunctionCompute'
 import {InterpreterState} from '../InterpreterState'
 import {
-  getRawValue,
+  getRawPrecisionValue,
   InternalScalarValue,
   InterpreterValue,
   isExtendedNumber,
   RawInterpreterValue,
-  RawScalarValue
+  RawScalarValue,
+  toNativeNumeric
 } from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 class AverageResult {
   public static empty = new AverageResult(0, 0)
 
@@ -28,14 +32,26 @@ class AverageResult {
     public readonly count: number,
   ) {}
 
+  
+  /**
+   *
+   */
   public static single(arg: number): AverageResult {
     return new AverageResult(arg, 1)
   }
 
+  
+  /**
+   *
+   */
   public compose(other: AverageResult) {
     return new AverageResult(this.sum + other.sum, this.count + other.count)
   }
 
+  
+  /**
+   *
+   */
   public averageValue(): Maybe<number> {
     if (this.count > 0) {
       return this.sum / this.count
@@ -54,26 +70,35 @@ function conditionalAggregationFunctionCacheKey(functionName: string): (conditio
   }
 }
 
+/**
+ *
+ */
 function zeroForInfinite(value: InternalScalarValue) {
-  if (isExtendedNumber(value) && !Number.isFinite(getRawValue(value))) {
+  if (isExtendedNumber(value) && !Number.isFinite(toNativeNumeric(getRawPrecisionValue(value)))) {
     return 0
   } else {
     return value
   }
 }
 
+/**
+ *
+ */
 function mapToRawScalarValue(arg: InternalScalarValue): Maybe<CellError | RawScalarValue> {
   if (arg instanceof CellError) {
     return arg
   }
 
   if (isExtendedNumber(arg)) {
-    return getRawValue(arg)
+    return toNativeNumeric(getRawPrecisionValue(arg))
   }
 
   return undefined
 }
 
+/**
+ *
+ */
 export class ConditionalAggregationPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ConditionalAggregationPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     SUMIF: {
@@ -165,6 +190,10 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
+  
+  /**
+   *
+   */
   public sumifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'SUMIFS'
 
@@ -180,6 +209,10 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
+  
+  /**
+   *
+   */
   public averageif(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'AVERAGEIF'
 
@@ -194,7 +227,7 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
         functionName,
         AverageResult.empty,
         (left, right) => left.compose(right),
-        (arg) => isExtendedNumber(arg) ? AverageResult.single(getRawValue(arg)) : AverageResult.empty,
+        (arg) => isExtendedNumber(arg) ? AverageResult.single(toNativeNumeric(getRawPrecisionValue(arg))) : AverageResult.empty,
         )
 
       if (averageResult instanceof CellError) {
@@ -233,6 +266,10 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
+  
+  /**
+   *
+   */
   public countifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'COUNTIFS'
 
@@ -248,6 +285,10 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
+  
+  /**
+   *
+   */
   public minifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'MINIFS'
 
@@ -275,6 +316,10 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
+  
+  /**
+   *
+   */
   public maxifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const functionName = 'MAXIFS'
 
@@ -302,6 +347,10 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
     return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
   }
 
+  
+  /**
+   *
+   */
   private computeConditionalAggregationFunction<T>(
     valuesRange: SimpleRangeValue,
     conditionArgs: RawInterpreterValue[],

@@ -7,7 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InterpreterValue, RawScalarValue} from '../InterpreterValue'
+import {InterpreterValue, RawScalarValue, toNativeNumerics} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
@@ -51,13 +51,14 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
   public median(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MEDIAN'),
       (...args: RawScalarValue[]) => {
-        const values = this.arithmeticHelper.coerceNumbersExactRanges(args)
-        if (values instanceof CellError) {
-          return values
+        const valuesPrecision = this.arithmeticHelper.coerceNumbersExactRanges(args)
+        if (valuesPrecision instanceof CellError) {
+          return valuesPrecision
         }
-        if (values.length === 0) {
+        if (valuesPrecision.length === 0) {
           return new CellError(ErrorType.NUM, ErrorMessage.OneValue)
         }
+        const values = toNativeNumerics(valuesPrecision)
         values.sort((a, b) => (a - b))
         if (values.length % 2 === 0) {
           return (values[(values.length / 2) - 1] + values[values.length / 2]) / 2
@@ -67,13 +68,18 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
       })
   }
 
+  
+  /**
+   *
+   */
   public large(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LARGE'),
       (range: SimpleRangeValue, n: number) => {
-        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
-        if (vals instanceof CellError) {
-          return vals
+        const valsPrecision = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (valsPrecision instanceof CellError) {
+          return valsPrecision
         }
+        const vals = toNativeNumerics(valsPrecision)
         vals.sort((a, b) => a - b)
         n = Math.trunc(n)
         if (n > vals.length) {
@@ -84,13 +90,18 @@ export class MedianPlugin extends FunctionPlugin implements FunctionPluginTypech
     )
   }
 
+  
+  /**
+   *
+   */
   public small(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SMALL'),
       (range: SimpleRangeValue, n: number) => {
-        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
-        if (vals instanceof CellError) {
-          return vals
+        const valsPrecision = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (valsPrecision instanceof CellError) {
+          return valsPrecision
         }
+        const vals = toNativeNumerics(valsPrecision)
         vals.sort((a, b) => a - b)
         n = Math.trunc(n)
         if (n > vals.length) {

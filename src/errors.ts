@@ -131,6 +131,9 @@ export class NothingToPasteError extends Error {
   }
 }
 
+/**
+ *
+ */
 function replacer(key: string, val: any): any {
   switch (typeof val) {
     case 'function':
@@ -314,10 +317,18 @@ export class LanguageAlreadyRegisteredError extends Error {
  * @see [[buildFromSheets]]
  */
 export class FunctionPluginValidationError extends Error {
+  
+  /**
+   *
+   */
   public static functionNotDeclaredInPlugin(functionId: string, pluginName: string): FunctionPluginValidationError {
     return new FunctionPluginValidationError(`Function with id ${functionId} not declared in plugin ${pluginName}`)
   }
 
+  
+  /**
+   *
+   */
   public static functionMethodNotFound(functionName: string, pluginName: string): FunctionPluginValidationError {
     return new FunctionPluginValidationError(`Function method ${functionName} not found in plugin ${pluginName}`)
   }
@@ -331,14 +342,26 @@ export class FunctionPluginValidationError extends Error {
  * @see [[unregisterFunction]]
  */
 export class ProtectedFunctionError extends Error {
+  
+  /**
+   *
+   */
   public static cannotRegisterFunctionWithId(functionId: string): ProtectedFunctionError {
     return new ProtectedFunctionError(`Cannot register function with id ${functionId}`)
   }
 
+  
+  /**
+   *
+   */
   public static cannotUnregisterFunctionWithId(functionId: string): ProtectedFunctionError {
     return new ProtectedFunctionError(`Cannot unregister function with id ${functionId}`)
   }
 
+  
+  /**
+   *
+   */
   public static cannotUnregisterProtectedPlugin(): ProtectedFunctionError {
     return new ProtectedFunctionError('Cannot unregister protected plugin')
   }

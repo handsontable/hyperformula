@@ -7,10 +7,13 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {getRawValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
+import {getRawPrecisionValue, InterpreterValue, isExtendedNumber, toNativeNumeric} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypecheck<SumprodPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'SUMPRODUCT': {
@@ -22,6 +25,10 @@ export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
   }
 
+  
+  /**
+   *
+   */
   public sumproduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUMPRODUCT'), (...args: SimpleRangeValue[]) => {
       const width = args[0].width()
@@ -43,7 +50,7 @@ export class SumprodPlugin extends FunctionPlugin implements FunctionPluginTypec
           }
           const coercedVal = this.coerceScalarToNumberOrError(val)
           if (isExtendedNumber(coercedVal)) {
-            acc *= getRawValue(coercedVal)
+            acc *= toNativeNumeric(getRawPrecisionValue(coercedVal))
           } else {
             acc = 0
           }

@@ -42,10 +42,10 @@ describe('Function WEEKDAY', () => {
       ['=WEEKDAY("31/07/2020", "3")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(6)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(6)
+    expect(engine.getCellValue(adr('A2'))).toBe(6)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(4)
   })
 
   it('should work for numbers', () => {
@@ -56,10 +56,10 @@ describe('Function WEEKDAY', () => {
       ['=WEEKDAY(0, 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(7)
-    expect(engine.getCellValue(adr('A2'))).toEqual(7)
-    expect(engine.getCellValue(adr('A3'))).toEqual(6)
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
+    expect(engine.getCellValue(adr('A1'))).toBe(7)
+    expect(engine.getCellValue(adr('A2'))).toBe(7)
+    expect(engine.getCellValue(adr('A3'))).toBe(6)
+    expect(engine.getCellValue(adr('A4'))).toBe(5)
   })
 
   it('should work for strings with different nullDate', () => {
@@ -70,10 +70,10 @@ describe('Function WEEKDAY', () => {
       ['=WEEKDAY("31/07/2020", "3")'],
     ], {nullDate: {day: 20, month: 10, year: 1920}})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(6)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(6)
+    expect(engine.getCellValue(adr('A2'))).toBe(6)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(4)
   })
 
   it('should work for strings with compatibility mode', () => {
@@ -84,10 +84,10 @@ describe('Function WEEKDAY', () => {
       ['=WEEKDAY("31/07/2020", "3")'],
     ], {leapYear1900: true})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(6)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(6)
+    expect(engine.getCellValue(adr('A2'))).toBe(6)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(4)
   })
 
   it('should work for strings with compatibility mode and different nullDate', () => {
@@ -98,10 +98,10 @@ describe('Function WEEKDAY', () => {
       ['=WEEKDAY("31/07/2020", "3")'],
     ], {leapYear1900: true, nullDate: {day: 20, month: 10, year: 1920}})
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(6)
-    expect(engine.getCellValue(adr('A2'))).toEqual(6)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(4)
+    expect(engine.getCellValue(adr('A1'))).toBe(6)
+    expect(engine.getCellValue(adr('A2'))).toBe(6)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(4)
   })
 
   it('big test', () => {
@@ -116,6 +116,7 @@ describe('Function WEEKDAY', () => {
       arrs.push(arr)
     }
     const engine = HyperFormula.buildFromArray(arrs)
+
     expect(engine.getSheetValues(0)).toEqual(
       [[5, 6, 7, 1, 2, 3, 4],
         [4, 5, 6, 7, 1, 2, 3],

@@ -7,7 +7,7 @@ import {SimpleCellRange} from './AbsoluteCellRange'
 import {ArraySize} from './ArraySize'
 import {CellError, CellType, CellValueDetailedType, CellValueType, ErrorType, SimpleCellAddress} from './Cell'
 import {RawCellContent} from './CellContentParser'
-import {CellValue, DetailedCellError, NoErrorCellValue} from './CellValue'
+import {CellValue, DetailedCellError, NoErrorCellValue, PrecisionCellValue, GetCellValueOptions} from './CellValue'
 import {Config} from './Config'
 import {ColumnRowIndex} from './CrudOperations'
 import {
@@ -55,7 +55,17 @@ import {SimpleRangeValue} from './SimpleRangeValue'
 import {NamedExpression, NamedExpressionOptions} from './NamedExpressions'
 import {SerializedNamedExpression} from './Serialization'
 import {Sheet, SheetDimensions, Sheets} from './Sheet'
-import {ConfigParams} from './ConfigParams'
+import {ConfigParams, NumericImplementation} from './ConfigParams'
+import {
+  RoundingMode,
+  NumericConfig,
+  Numeric,
+  NumericFactory,
+  NumericProvider,
+  DecimalNumericFactory,
+  NativeNumericFactory,
+  isNumeric
+} from './Numeric'
 
 /**
  * Aggregate class for default export
@@ -125,6 +135,8 @@ export {
   DenseSparseChooseBasedOnThreshold,
   CellValue,
   NoErrorCellValue,
+  PrecisionCellValue,
+  GetCellValueOptions,
   ConfigParams,
   ExportedChange,
   RawCellContent,
@@ -184,4 +196,14 @@ export {
   TargetLocationHasArrayError,
   UnableToParseError,
   SerializedNamedExpression,
+  // Precision Number System
+  RoundingMode,
+  NumericConfig,
+  NumericImplementation,
+  Numeric,
+  NumericFactory,
+  NumericProvider,
+  DecimalNumericFactory,
+  NativeNumericFactory,
+  isNumeric,
 }

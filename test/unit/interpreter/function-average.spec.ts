@@ -15,7 +15,7 @@ describe('AVERAGE', () => {
       ['=AVERAGE(1, B1)', '4']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(2.5)
   })
 
   it('AVERAGE with range', () => {
@@ -38,7 +38,7 @@ describe('AVERAGE', () => {
       ['=AVERAGE(A1:A4)']
     ])
 
-    expect(engine.getCellValue(adr('A5'))).toEqual(42)
+    expect(engine.getCellValue(adr('A5'))).toBe(42)
   })
 
   it('error when no meaningful arguments', () => {
@@ -58,7 +58,7 @@ describe('AVERAGE', () => {
       ['=AVERAGE(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(13.5)
+    expect(engine.getCellValue(adr('A3'))).toBe(13.5)
   })
 
   it('does propagate errors', () => {

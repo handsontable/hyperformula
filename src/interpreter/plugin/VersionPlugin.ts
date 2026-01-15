@@ -17,6 +17,9 @@ const LICENSE_STATUS_MAP = new Map([
   [LicenseKeyValidityState.EXPIRED, 4],
 ])
 
+/**
+ *
+ */
 export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypecheck<VersionPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'VERSION': {
@@ -25,6 +28,10 @@ export class VersionPlugin extends FunctionPlugin implements FunctionPluginTypec
     },
   }
 
+  
+  /**
+   *
+   */
   public version(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('VERSION'), () => {
       const {

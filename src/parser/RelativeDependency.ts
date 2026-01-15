@@ -12,17 +12,27 @@ import {RowAddress} from './RowAddress'
 export type RangeDependency = CellRangeDependency | ColumnRangeDependency | RowRangeDependency
 export type RelativeDependency = AddressDependency | RangeDependency | NamedExpressionDependency
 
+/**
+ *
+ */
 export class AddressDependency {
   constructor(
     public readonly dependency: CellAddress
   ) {
   }
 
+  
+  /**
+   *
+   */
   public absolutize(baseAddress: SimpleCellAddress) {
     return this.dependency.toSimpleCellAddress(baseAddress)
   }
 }
 
+/**
+ *
+ */
 export class CellRangeDependency {
   constructor(
     public readonly start: CellAddress,
@@ -30,6 +40,10 @@ export class CellRangeDependency {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public absolutize(baseAddress: SimpleCellAddress) {
     return new AbsoluteCellRange(
       this.start.toSimpleCellAddress(baseAddress),
@@ -38,6 +52,9 @@ export class CellRangeDependency {
   }
 }
 
+/**
+ *
+ */
 export class ColumnRangeDependency {
   constructor(
     public readonly start: ColumnAddress,
@@ -45,6 +62,10 @@ export class ColumnRangeDependency {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public absolutize(baseAddress: SimpleCellAddress) {
     const start = this.start.toSimpleColumnAddress(baseAddress)
     const end = this.end.toSimpleColumnAddress(baseAddress)
@@ -52,6 +73,9 @@ export class ColumnRangeDependency {
   }
 }
 
+/**
+ *
+ */
 export class RowRangeDependency {
   constructor(
     public readonly start: RowAddress,
@@ -59,6 +83,10 @@ export class RowRangeDependency {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public absolutize(baseAddress: SimpleCellAddress) {
     const start = this.start.toSimpleRowAddress(baseAddress)
     const end = this.end.toSimpleRowAddress(baseAddress)
@@ -66,12 +94,19 @@ export class RowRangeDependency {
   }
 }
 
+/**
+ *
+ */
 export class NamedExpressionDependency {
   constructor(
     public readonly name: string
   ) {
   }
 
+  
+  /**
+   *
+   */
   public absolutize(_baseAddress: SimpleCellAddress) {
     return this
   }

@@ -40,10 +40,10 @@ describe('Function BESSELJ', () => {
     expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1.00000000283141, 9)
     expect(engine.getCellValue(adr('A3'))).toBeCloseTo(-0.177596774112343, 6)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(-0.44005058567713, 6)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A5'))).toBe(0)
     expect(engine.getCellValue(adr('A6'))).toBeCloseTo(-0.327579138566363, 6)
     expect(engine.getCellValue(adr('A7'))).toBeCloseTo(-0.019563353982688, 6)
-    expect(engine.getCellValue(adr('A8'))).toEqual(0)
+    expect(engine.getCellValue(adr('A8'))).toBe(0)
     expect(engine.getCellValue(adr('A9'))).toBeCloseTo(0.364831233515002, 6)
   })
 

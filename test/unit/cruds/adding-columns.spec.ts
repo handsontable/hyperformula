@@ -23,52 +23,52 @@ describe('Adding column - checking if its possible', () => {
   it('no if starting column is negative', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, [-1, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [-1, 1])).toBe(false)
   })
 
   it('no if starting column is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, [1.5, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [1.5, 1])).toBe(false)
   })
 
   it('no if starting column is NaN/Infinity', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, [NaN, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, [Infinity, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, [-Infinity, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [NaN, 1])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(0, [Infinity, 1])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(0, [-Infinity, 1])).toBe(false)
   })
 
   it('no if number of columns is not positive', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, [0, 0])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 0])).toBe(false)
   })
 
   it('no if number of columns is not an integer', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, [0, 1.5])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1.5])).toBe(false)
   })
 
   it('no if number of columns is NaN/Infinity', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, [0, NaN])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, [0, Infinity])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, [0, -Infinity])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, NaN])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, Infinity])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, -Infinity])).toBe(false)
   })
 
   it('no if sheet does not exist', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(1, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(1.5, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(-1, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(NaN, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(Infinity, [0, 1])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(-Infinity, [0, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(1, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(1.5, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(-1, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(NaN, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(Infinity, [0, 1])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(-Infinity, [0, 1])).toBe(false)
   })
 
   it('no if adding column would exceed sheet size limit', () => {
@@ -76,14 +76,14 @@ describe('Adding column - checking if its possible', () => {
       Array(Config.defaultConfig.maxColumns - 1).fill('')
     ])
 
-    expect(engine.isItPossibleToAddColumns(0, [0, 2])).toEqual(false)
-    expect(engine.isItPossibleToAddColumns(0, [0, 1], [5, 1])).toEqual(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 2])).toBe(false)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1], [5, 1])).toBe(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToAddColumns(0, [0, 1])).toEqual(true)
+    expect(engine.isItPossibleToAddColumns(0, [0, 1])).toBe(true)
   })
 })
 
@@ -132,7 +132,7 @@ describe('Adding column - matrix check', () => {
     expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     expect(engine.getCellValue(adr('C1'))).toBe('foo')
-    expect(engine.getCellValue(adr('D1'))).toBe(null)
+    expect(engine.getCellValue(adr('D1'))).toBeNull()
     expect(engine.getCellValue(adr('E1'))).toBe('bar')
 
     expect(engine.getCellValue(adr('A2'))).toBe(3)
@@ -156,10 +156,10 @@ describe('Adding column - matrix check', () => {
 
     engine.addColumns(0, [0, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toBe(null)
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('C1'))).toEqual(3)
-    expect(engine.getCellValue(adr('D1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBeNull()
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
+    expect(engine.getCellValue(adr('C1'))).toBe(3)
+    expect(engine.getCellValue(adr('D1'))).toBe(1)
   })
 
   it('should be possible to add row right after matrix', () => {
@@ -170,10 +170,10 @@ describe('Adding column - matrix check', () => {
 
     engine.addColumns(0, [2, 1])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
-    expect(engine.getCellValue(adr('C1'))).toBe(null)
-    expect(engine.getCellValue(adr('D1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(3)
+    expect(engine.getCellValue(adr('C1'))).toBeNull()
+    expect(engine.getCellValue(adr('D1'))).toBe(1)
   })
 })
 
@@ -183,9 +183,10 @@ describe('Adding column - reevaluation', () => {
       ['1', /* new col */ '2', '=COUNTBLANK(A1:B1)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
+    expect(engine.getCellValue(adr('C1'))).toBe(0)
     engine.addColumns(0, [1, 1])
-    expect(engine.getCellValue(adr('D1'))).toEqual(1)
+
+    expect(engine.getCellValue(adr('D1'))).toBe(1)
   })
 
   it('dont reevaluate everything', () => {
@@ -242,6 +243,7 @@ describe('Adding column - ScalarFormulaVertex#address update', () => {
     engine.addColumns(0, [1, 1])
 
     const c1 = engine.addressMapping.getCell(adr('C1')) as ScalarFormulaVertex
+
     expect(c1).toBeInstanceOf(ScalarFormulaVertex)
     expect(c1.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('C1'))
   })
@@ -278,7 +280,8 @@ describe('different sheet', () => {
     const formulaVertex = engine.addressMapping.getCell(adr('A1', 1)) as ScalarFormulaVertex
 
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
-    formulaVertex.getFormula(engine.lazilyTransformingAstService) // force transformations to be applied
+    formulaVertex.getFormula(engine.lazilyTransformingAstService)
+
     expect(formulaVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('A1', 1))
   })
 })
@@ -424,6 +427,7 @@ describe('Adding column - arrays', () => {
     engine.addColumns(0, [1, 1])
 
     const matrixVertex = engine.addressMapping.getCell(adr('D1')) as ArrayFormulaVertex
+
     expect(matrixVertex.getAddress(engine.lazilyTransformingAstService)).toEqual(adr('D1'))
   })
 })

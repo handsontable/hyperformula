@@ -251,12 +251,12 @@ describe('Adding column, fixing ranges', () => {
       ['=SUM(A1:C1)'],
     ])
 
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeDefined()
 
     engine.addColumns(0, [1, 1])
 
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBe(undefined)
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('D1'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeUndefined()
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('D1'))).toBeDefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [null, null, null, null],
@@ -270,12 +270,12 @@ describe('Adding column, fixing ranges', () => {
       ['=SUM(A1:C1)'],
     ])
 
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeDefined()
 
     engine.addColumns(0, [1, 1])
 
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBe(undefined)
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('D1'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeUndefined()
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('D1'))).toBeDefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3'],
@@ -289,10 +289,11 @@ describe('Adding column, fixing ranges', () => {
       ['=SUM(A1:C1)'],
     ])
 
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeDefined()
     engine.addColumns(0, [0, 1])
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBe(undefined)
-    expect(engine.rangeMapping.getRangeVertex(adr('B1'), adr('D1'))).not.toBe(undefined)
+
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeUndefined()
+    expect(engine.rangeMapping.getRangeVertex(adr('B1'), adr('D1'))).toBeDefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [null, '1', '2', '3'],
@@ -306,9 +307,10 @@ describe('Adding column, fixing ranges', () => {
       ['=SUM(A1:C1)'],
     ])
 
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeDefined()
     engine.addColumns(0, [3, 1])
-    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).not.toBe(undefined)
+
+    expect(engine.rangeMapping.getRangeVertex(adr('A1'), adr('C1'))).toBeDefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2', '3', null],
@@ -342,7 +344,8 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(undefined)
+
+    expect(b1).toBeUndefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -360,6 +363,7 @@ describe('Adding column, fixing ranges', () => {
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('E1'))
+
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1!, range)).toBe(true)
 
@@ -378,7 +382,8 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(undefined)
+
+    expect(b1).toBeUndefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -395,7 +400,8 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(undefined)
+
+    expect(b1).toBeUndefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -414,6 +420,7 @@ describe('Adding column, fixing ranges', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('C1'))
+
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1!, range)).toBe(true)
 
@@ -434,6 +441,7 @@ describe('Adding column, fixing ranges', () => {
     const b1 = engine.addressMapping.getCell(adr('B1'))
 
     const range = engine.rangeMapping.getVertexOrThrow(adr('A1'), adr('D1'))
+
     expect(b1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(b1!, range)).toBe(true)
 
@@ -452,7 +460,8 @@ describe('Adding column, fixing ranges', () => {
     engine.addColumns(0, [1, 1])
 
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(b1).toBe(undefined)
+
+    expect(b1).toBeUndefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '4'],
@@ -467,12 +476,12 @@ describe('Adding column, fixing column ranges', () => {
       ['1', /* new col */ '2', '3', '=SUM(A:C)'],
     ])
 
-    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBeDefined()
 
     engine.addColumns(0, [1, 1])
 
-    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBe(undefined)
-    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('D'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBeUndefined()
+    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('D'))).toBeDefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', null, '2', '3', '=SUM(A:D)'],
@@ -484,10 +493,11 @@ describe('Adding column, fixing column ranges', () => {
       [/* new col */ '1', '2', '3', '=SUM(A:C)'],
     ])
 
-    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBeDefined()
     engine.addColumns(0, [0, 1])
-    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBe(undefined)
-    expect(engine.rangeMapping.getRangeVertex(colStart('B'), colEnd('D'))).not.toBe(undefined)
+
+    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBeUndefined()
+    expect(engine.rangeMapping.getRangeVertex(colStart('B'), colEnd('D'))).toBeDefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       [null, '1', '2', '3', '=SUM(B:D)'],
@@ -499,9 +509,10 @@ describe('Adding column, fixing column ranges', () => {
       ['1', '2', '3' /* new col */, '=SUM(A:C)'],
     ])
 
-    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBeDefined()
     engine.addColumns(0, [3, 1])
-    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).not.toBe(undefined)
+
+    expect(engine.rangeMapping.getRangeVertex(colStart('A'), colEnd('C'))).toBeDefined()
 
     expectEngineToBeTheSameAs(engine, HyperFormula.buildFromArray([
       ['1', '2', '3', null, '=SUM(A:C)'],
@@ -519,8 +530,9 @@ describe('Adding column, row range', () => {
 
     engine.addColumns(0, [1, 1])
 
-    expect(engine.rangeMapping.getRangeVertex(rowStart(1), rowEnd(2))).not.toBe(undefined)
+    expect(engine.rangeMapping.getRangeVertex(rowStart(1), rowEnd(2))).toBeDefined()
     const rowRange = extractRowRange(engine, adr('D3'))
+
     expect(rowRange.start).toEqual(rowStart(1))
     expect(rowRange.end).toEqual(rowEnd(2))
 

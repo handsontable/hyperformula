@@ -33,11 +33,12 @@ describe('Function IMPOWER', () => {
       ['=IMPOWER("i", 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('0')
+    expect(engine.getCellValue(adr('A1'))).toBe('0')
     expectToBeCloseForComplex(engine, 'A2', '1.09247705577745+0.35496731310463i')
     expectToBeCloseForComplex(engine, 'A3', '-0.12-0.16i')
+
     expect(engine.getCellValue(adr('A4'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
     expect(engine.getCellValue(adr('A5'))).toEqualError(detailedError(ErrorType.NUM, ErrorMessage.NaN))
-    expect(engine.getCellValue(adr('A6'))).toEqual('1')
+    expect(engine.getCellValue(adr('A6'))).toBe('1')
   })
 })

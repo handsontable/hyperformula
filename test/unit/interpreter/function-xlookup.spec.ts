@@ -98,7 +98,7 @@ describe('Function XLOOKUP', () => {
         ['=XLOOKUP(2, B1:D1, B1:D1)', 1, 2, 3],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('finds value in an unsorted row', () => {
@@ -106,7 +106,7 @@ describe('Function XLOOKUP', () => {
         ['=XLOOKUP(2, B1:D1, B1:D1)', 4, 2, 3],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('finds value in a sorted column', () => {
@@ -116,7 +116,7 @@ describe('Function XLOOKUP', () => {
         ['', 3],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('finds value in an unsorted column', () => {
@@ -126,7 +126,7 @@ describe('Function XLOOKUP', () => {
         ['', 3],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('when key is not found, returns ifNotFound value or NA error', () => {
@@ -139,8 +139,8 @@ describe('Function XLOOKUP', () => {
 
       expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
       expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
-      expect(engine.getCellValue(adr('A3'))).toEqual('not found')
-      expect(engine.getCellValue(adr('A4'))).toEqual('not found')
+      expect(engine.getCellValue(adr('A3'))).toBe('not found')
+      expect(engine.getCellValue(adr('A4'))).toBe('not found')
     })
 
     it('works when returnArray is shifted (vertical search)', () => {
@@ -160,7 +160,7 @@ describe('Function XLOOKUP', () => {
         ['', '', 'c'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('b')
+      expect(engine.getCellValue(adr('A1'))).toBe('b')
     })
 
     it('works when returnArray is shifted (horizontal search)', () => {
@@ -169,7 +169,7 @@ describe('Function XLOOKUP', () => {
         ['', '', 'a', 'b', 'c'],
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('b')
+      expect(engine.getCellValue(adr('A1'))).toBe('b')
     })
 
     it('should not perform the wildcard match unless matchMode=2', () => {
@@ -196,7 +196,7 @@ describe('Function XLOOKUP', () => {
           ['=XLOOKUP(1, B1:B1, C1:C1)', 1, 'a'],
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual('a')
+        expect(engine.getCellValue(adr('A1'))).toBe('a')
       })
 
       it('returns a vertical range, when returnArray is a vertical range', () => {
@@ -207,8 +207,8 @@ describe('Function XLOOKUP', () => {
           ['c']
         ])
 
-        expect(engine.getCellValue(adr('A1'))).toEqual('b')
-        expect(engine.getCellValue(adr('A2'))).toEqual('c')
+        expect(engine.getCellValue(adr('A1'))).toBe('b')
+        expect(engine.getCellValue(adr('A2'))).toBe('c')
       })
 
       it('returns a horizontal range, when returnArray is a horizontal range', () => {
@@ -217,8 +217,8 @@ describe('Function XLOOKUP', () => {
           ['=XLOOKUP(1, A1:A1, B1:C1)'],
         ])
 
-        expect(engine.getCellValue(adr('A2'))).toEqual('b')
-        expect(engine.getCellValue(adr('B2'))).toEqual('c')
+        expect(engine.getCellValue(adr('A2'))).toBe('b')
+        expect(engine.getCellValue(adr('B2'))).toBe('c')
       })
     })
 
@@ -228,7 +228,7 @@ describe('Function XLOOKUP', () => {
         ['', 'a', 'b', 'c']
       ])
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('c')
+      expect(engine.getCellValue(adr('A1'))).toBe('c')
     })
   })
 
@@ -240,7 +240,7 @@ describe('Function XLOOKUP', () => {
         [1, 2, 3, 4, 5],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('1, finds the first match in unsorted vertical range', () => {
@@ -253,7 +253,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('1, returns "NotFound" if there is no match', () => {
@@ -266,7 +266,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
 
     it('-1, finds the last match in unsorted horizontal range', () => {
@@ -276,7 +276,7 @@ describe('Function XLOOKUP', () => {
         [1, 2, 3, 4, 5],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(4)
+      expect(engine.getCellValue(adr('A1'))).toBe(4)
     })
 
     it('-1, finds the last match in unsorted vertical range', () => {
@@ -289,7 +289,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(4)
+      expect(engine.getCellValue(adr('A1'))).toBe(4)
     })
 
     it('-1, returns "NotFound" if there is no match', () => {
@@ -302,7 +302,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
 
     it('2, finds the value in horizontal range sorted ascending', () => {
@@ -311,7 +311,7 @@ describe('Function XLOOKUP', () => {
         [1, 2, 2, 5, 5],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('2, finds the value in vertical range sorted ascending', () => {
@@ -324,7 +324,7 @@ describe('Function XLOOKUP', () => {
         [5],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('2, returns "NotFound" if there is no match in a range sorted ascending', () => {
@@ -337,7 +337,7 @@ describe('Function XLOOKUP', () => {
         [5],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
 
     it('-2, finds the value in horizontal range sorted descending', () => {
@@ -346,7 +346,7 @@ describe('Function XLOOKUP', () => {
         [5, 2, 2, 1, 1],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('-2, finds the value in vertical range sorted descending', () => {
@@ -359,7 +359,7 @@ describe('Function XLOOKUP', () => {
         [1],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('-2, returns "NotFound" if there is no match in a range sorted descending', () => {
@@ -372,7 +372,7 @@ describe('Function XLOOKUP', () => {
         [1],
       ], { useColumnIndex: false })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
   })
 
@@ -384,7 +384,7 @@ describe('Function XLOOKUP', () => {
         [1, 2, 3, 4, 5],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('1, finds the first match in unsorted vertical range', () => {
@@ -397,7 +397,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('1, returns "NotFound" if there is no match', () => {
@@ -410,7 +410,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
 
     it('-1, finds the last match in unsorted horizontal range', () => {
@@ -420,7 +420,7 @@ describe('Function XLOOKUP', () => {
         [1, 2, 3, 4, 5],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(4)
+      expect(engine.getCellValue(adr('A1'))).toBe(4)
     })
 
     it('-1, finds the last match in unsorted vertical range', () => {
@@ -433,7 +433,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(4)
+      expect(engine.getCellValue(adr('A1'))).toBe(4)
     })
 
     it('-1, returns "NotFound" if there is no match', () => {
@@ -446,7 +446,7 @@ describe('Function XLOOKUP', () => {
         [4, 5]
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
 
     it('2, finds the value in horizontal range sorted ascending', () => {
@@ -455,7 +455,7 @@ describe('Function XLOOKUP', () => {
         [1, 2, 2, 5, 5],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('2, finds the value in vertical range sorted ascending', () => {
@@ -468,7 +468,7 @@ describe('Function XLOOKUP', () => {
         [5],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('2, returns "NotFound" if there is no match in a range sorted ascending', () => {
@@ -481,7 +481,7 @@ describe('Function XLOOKUP', () => {
         [5],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
 
     it('-2, finds the value in horizontal range sorted descending', () => {
@@ -490,7 +490,7 @@ describe('Function XLOOKUP', () => {
         [5, 2, 2, 1, 1],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('-2, finds the value in vertical range sorted descending', () => {
@@ -503,7 +503,7 @@ describe('Function XLOOKUP', () => {
         [1],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+      expect(engine.getCellValue(adr('A1'))).toBe(2)
     })
 
     it('-2, returns "NotFound" if there is no match in a range sorted descending', () => {
@@ -516,7 +516,7 @@ describe('Function XLOOKUP', () => {
         [1],
       ], { useColumnIndex: true })
 
-      expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+      expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
     })
   })
 
@@ -529,7 +529,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns a lower bound when there is no exact match', () => {
@@ -538,7 +538,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 40, 50, 51],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(40)
+          expect(engine.getCellValue(adr('A1'))).toBe(40)
         })
 
         it('returns a lower bound when all elements are smaller than the key', () => {
@@ -547,7 +547,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(5)
+          expect(engine.getCellValue(adr('A1'))).toBe(5)
         })
 
         it('returns NotFound when all elements are greater than the key', () => {
@@ -556,7 +556,7 @@ describe('Function XLOOKUP', () => {
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
       })
 
@@ -567,7 +567,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns a lower bound when there is no exact match', () => {
@@ -576,7 +576,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 40, 2, 1],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(40)
+          expect(engine.getCellValue(adr('A1'))).toBe(40)
         })
 
         it('returns a lower bound when all elements are smaller than the key', () => {
@@ -585,7 +585,7 @@ describe('Function XLOOKUP', () => {
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(5)
+          expect(engine.getCellValue(adr('A1'))).toBe(5)
         })
 
         it('returns NotFound when all elements are greater than the key', () => {
@@ -594,7 +594,7 @@ describe('Function XLOOKUP', () => {
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
       })
 
@@ -605,7 +605,7 @@ describe('Function XLOOKUP', () => {
           [1, 2, 3, 4, 5],
         ], { useColumnIndex: false })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        expect(engine.getCellValue(adr('A1'))).toBe(1)
       })
 
       it('returns a lower bound if there is no match in unsorted vertical range', () => {
@@ -618,7 +618,7 @@ describe('Function XLOOKUP', () => {
           [5, 5]
         ], { useColumnIndex: false })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        expect(engine.getCellValue(adr('A1'))).toBe(1)
       })
     })
 
@@ -630,7 +630,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns an upper bound when there is no exact match', () => {
@@ -639,7 +639,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 44, 50, 51],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(44)
+          expect(engine.getCellValue(adr('A1'))).toBe(44)
         })
 
         it('returns NotFound when all elements are smaller than the key', () => {
@@ -648,7 +648,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
 
         it('returns an upper bound when all elements are greater than the key', () => {
@@ -657,7 +657,7 @@ describe('Function XLOOKUP', () => {
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(43)
+          expect(engine.getCellValue(adr('A1'))).toBe(43)
         })
       })
 
@@ -668,7 +668,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns an upper bound when there is no exact match', () => {
@@ -677,7 +677,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 44, 2, 1],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(44)
+          expect(engine.getCellValue(adr('A1'))).toBe(44)
         })
 
         it('returns NotFound when all elements are smaller than the key', () => {
@@ -686,7 +686,7 @@ describe('Function XLOOKUP', () => {
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
 
         it('returns an upper bound when all elements are greater than the key', () => {
@@ -695,7 +695,7 @@ describe('Function XLOOKUP', () => {
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(60)
+          expect(engine.getCellValue(adr('A1'))).toBe(60)
         })
       })
 
@@ -706,7 +706,7 @@ describe('Function XLOOKUP', () => {
           [1, 2, 3, 4, 5],
         ], { useColumnIndex: false })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
 
       it('returns an upper bound if there is no match in unsorted vertical range', () => {
@@ -719,7 +719,7 @@ describe('Function XLOOKUP', () => {
           [5, 5]
         ], { useColumnIndex: false })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
     })
 
@@ -731,7 +731,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = 2, returns the first matching item', () => {
@@ -740,7 +740,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -2, returns the first matching item', () => {
@@ -749,7 +749,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -1, returns the last matching item', () => {
@@ -758,7 +758,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
+          expect(engine.getCellValue(adr('A1'))).toBe('a2b222')
         })
 
         it('when there are no matching items, returns NotFound (all searchModes)', () => {
@@ -770,10 +770,10 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A4'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A2'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A3'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A4'))).toBe('NotFound')
         })
       })
 
@@ -788,7 +788,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = 2, returns the first matching item', () => {
@@ -801,7 +801,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -2, returns the first matching item', () => {
@@ -814,7 +814,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -1, returns the last matching item', () => {
@@ -827,7 +827,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
+          expect(engine.getCellValue(adr('A1'))).toBe('a2b222')
         })
 
         it('when there are no matching items, returns NotFound (all searchModes)', () => {
@@ -843,10 +843,10 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: false })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A4'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A2'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A3'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A4'))).toBe('NotFound')
         })
       })
     })
@@ -861,7 +861,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns a lower bound when there is no exact match', () => {
@@ -870,7 +870,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 40, 50, 51],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(40)
+          expect(engine.getCellValue(adr('A1'))).toBe(40)
         })
 
         it('returns a lower bound when all elements are smaller than the key', () => {
@@ -879,7 +879,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(5)
+          expect(engine.getCellValue(adr('A1'))).toBe(5)
         })
 
         it('returns NotFound when all elements are greater than the key', () => {
@@ -888,7 +888,7 @@ describe('Function XLOOKUP', () => {
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
       })
 
@@ -899,7 +899,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns a lower bound when there is no exact match', () => {
@@ -908,7 +908,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 40, 2, 1],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(40)
+          expect(engine.getCellValue(adr('A1'))).toBe(40)
         })
 
         it('returns a lower bound when all elements are smaller than the key', () => {
@@ -917,7 +917,7 @@ describe('Function XLOOKUP', () => {
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(5)
+          expect(engine.getCellValue(adr('A1'))).toBe(5)
         })
 
         it('returns NotFound when all elements are greater than the key', () => {
@@ -926,7 +926,7 @@ describe('Function XLOOKUP', () => {
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
       })
 
@@ -937,7 +937,7 @@ describe('Function XLOOKUP', () => {
           [1, 2, 3, 4, 5],
         ], { useColumnIndex: true })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        expect(engine.getCellValue(adr('A1'))).toBe(1)
       })
 
       it('returns a lower bound if there is no match in unsorted vertical range', () => {
@@ -950,7 +950,7 @@ describe('Function XLOOKUP', () => {
           [5, 5]
         ], { useColumnIndex: true })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(1)
+        expect(engine.getCellValue(adr('A1'))).toBe(1)
       })
     })
 
@@ -962,7 +962,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 42, 50, 51],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns an upper bound when there is no exact match', () => {
@@ -971,7 +971,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 44, 50, 51],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(44)
+          expect(engine.getCellValue(adr('A1'))).toBe(44)
         })
 
         it('returns NotFound when all elements are smaller than the key', () => {
@@ -980,7 +980,7 @@ describe('Function XLOOKUP', () => {
             [1, 2, 3, 4, 5],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
 
         it('returns an upper bound when all elements are greater than the key', () => {
@@ -989,7 +989,7 @@ describe('Function XLOOKUP', () => {
             [43, 44, 45, 46, 47],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(43)
+          expect(engine.getCellValue(adr('A1'))).toBe(43)
         })
       })
 
@@ -1000,7 +1000,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 42, 2, 1],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(42)
+          expect(engine.getCellValue(adr('A1'))).toBe(42)
         })
 
         it('returns an upper bound when there is no exact match', () => {
@@ -1009,7 +1009,7 @@ describe('Function XLOOKUP', () => {
             [55, 54, 44, 2, 1],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(44)
+          expect(engine.getCellValue(adr('A1'))).toBe(44)
         })
 
         it('returns NotFound when all elements are smaller than the key', () => {
@@ -1018,7 +1018,7 @@ describe('Function XLOOKUP', () => {
             [5, 4, 3, 2, 1],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
         })
 
         it('returns an upper bound when all elements are greater than the key', () => {
@@ -1027,7 +1027,7 @@ describe('Function XLOOKUP', () => {
             [100, 90, 80, 70, 60],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual(60)
+          expect(engine.getCellValue(adr('A1'))).toBe(60)
         })
       })
 
@@ -1038,7 +1038,7 @@ describe('Function XLOOKUP', () => {
           [1, 2, 3, 4, 5],
         ], { useColumnIndex: true })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
 
       it('returns an upper bound if there is no match in unsorted vertical range', () => {
@@ -1051,7 +1051,7 @@ describe('Function XLOOKUP', () => {
           [5, 5]
         ], { useColumnIndex: true })
 
-        expect(engine.getCellValue(adr('A1'))).toEqual(3)
+        expect(engine.getCellValue(adr('A1'))).toBe(3)
       })
     })
 
@@ -1063,7 +1063,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = 2, returns the first matching item', () => {
@@ -1072,7 +1072,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -2, returns the first matching item', () => {
@@ -1081,7 +1081,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -1, returns the last matching item', () => {
@@ -1090,7 +1090,7 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
+          expect(engine.getCellValue(adr('A1'))).toBe('a2b222')
         })
 
         it('when there are no matching items, returns NotFound (all searchModes)', () => {
@@ -1102,10 +1102,10 @@ describe('Function XLOOKUP', () => {
             ['a', 'axxb', 'a1b111', 'a2b222', 'x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A4'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A2'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A3'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A4'))).toBe('NotFound')
         })
       })
 
@@ -1120,7 +1120,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = 2, returns the first matching item', () => {
@@ -1133,7 +1133,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -2, returns the first matching item', () => {
@@ -1146,7 +1146,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a1b111')
+          expect(engine.getCellValue(adr('A1'))).toBe('a1b111')
         })
 
         it('when searchMode = -1, returns the last matching item', () => {
@@ -1159,7 +1159,7 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('a2b222')
+          expect(engine.getCellValue(adr('A1'))).toBe('a2b222')
         })
 
         it('when there are no matching items, returns NotFound (all searchModes)', () => {
@@ -1175,10 +1175,10 @@ describe('Function XLOOKUP', () => {
             ['x'],
           ], { useColumnIndex: true })
 
-          expect(engine.getCellValue(adr('A1'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A2'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A3'))).toEqual('NotFound')
-          expect(engine.getCellValue(adr('A4'))).toEqual('NotFound')
+          expect(engine.getCellValue(adr('A1'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A2'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A3'))).toBe('NotFound')
+          expect(engine.getCellValue(adr('A4'))).toBe('NotFound')
         })
       })
     })
@@ -1200,7 +1200,7 @@ describe('Function XLOOKUP', () => {
         ['=XLOOKUP("Indonesia", A1:A5, B1:B5)'],
       ])
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('ID')
+      expect(engine.getCellValue(adr('A6'))).toBe('ID')
     })
 
     it('should find row range in table (official example 2)', () => {
@@ -1238,7 +1238,7 @@ describe('Function XLOOKUP', () => {
         ['=XLOOKUP(A1, A2:A5, B2:B5, "ID not found")'],
       ])
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('ID not found')
+      expect(engine.getCellValue(adr('A6'))).toBe('ID not found')
     })
 
     it('example 4', () => {
@@ -1251,7 +1251,7 @@ describe('Function XLOOKUP', () => {
         ['=XLOOKUP(25, A1:A5, B1:B5, 0, 1, 1)'],
       ])
 
-      expect(engine.getCellValue(adr('A6'))).toEqual('c')
+      expect(engine.getCellValue(adr('A6'))).toBe('c')
     })
 
     it('nested xlookup function to perform both a vertical and horizontal match (official example 5)', () => {
@@ -1270,7 +1270,7 @@ describe('Function XLOOKUP', () => {
         ['Profit %', '29.3', '27.8', '23.4', '27.6', '26.9'],
       ])
 
-      expect(engine.getCellValue(adr('B2'))).toEqual(25000)
+      expect(engine.getCellValue(adr('B2'))).toBe(25000)
     })
   })
 })

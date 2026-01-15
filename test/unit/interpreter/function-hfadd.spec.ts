@@ -21,10 +21,11 @@ describe('Function HF.ADD', () => {
       ['=HF.ADD(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('A4'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(5)
+    // With precise decimal arithmetic: 1.0000000000001 + (-1) = 0.0000000000001 = 1e-13
+    expect(engine.getCellValue(adr('A2'))).toBeCloseTo(1e-13, 15)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(0)
   })
 
   it('should coerce to correct types', () => {
@@ -33,8 +34,8 @@ describe('Function HF.ADD', () => {
       ['=HF.ADD("1",)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
   })
 
   it('should throw correct error', () => {
@@ -51,6 +52,7 @@ describe('Function HF.ADD', () => {
 
   it('passes subtypes', () => {
     const engine = HyperFormula.buildFromArray([['=HF.ADD(B1,C1)', '1$', 1]])
+
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_CURRENCY)
   })
 })

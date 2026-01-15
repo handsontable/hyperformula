@@ -20,9 +20,9 @@ describe('Function REPLACE', () => {
       ['=REPLACE("foobar", 3, 2, "uuuu")', ],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('fuubar')
-    expect(engine.getCellValue(adr('A2'))).toEqual('fuu')
-    expect(engine.getCellValue(adr('A3'))).toEqual('fouuuuar')
+    expect(engine.getCellValue(adr('A1'))).toBe('fuubar')
+    expect(engine.getCellValue(adr('A2'))).toBe('fuu')
+    expect(engine.getCellValue(adr('A3'))).toBe('fouuuuar')
   })
 
   it('should insert text before position if number of chars is 0', () => {
@@ -30,7 +30,7 @@ describe('Function REPLACE', () => {
       ['=REPLACE("foobar", 4, 0, "uu")', ],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('foouubar')
+    expect(engine.getCellValue(adr('A1'))).toBe('foouubar')
   })
 
   it('should append new text if start position is greater than text length', () => {
@@ -39,8 +39,8 @@ describe('Function REPLACE', () => {
       ['=REPLACE("foobar", 28, 0, "uu")', ],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('foobaruu')
-    expect(engine.getCellValue(adr('A2'))).toEqual('foobaruu')
+    expect(engine.getCellValue(adr('A1'))).toBe('foobaruu')
+    expect(engine.getCellValue(adr('A2'))).toBe('foobaruu')
   })
 
   it('should coerce', () => {
@@ -49,8 +49,8 @@ describe('Function REPLACE', () => {
       ['=REPLACE(12345, 3, 2, 123)', ],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('TRUEbar')
-    expect(engine.getCellValue(adr('A2'))).toEqual('121235')
+    expect(engine.getCellValue(adr('A1'))).toBe('TRUEbar')
+    expect(engine.getCellValue(adr('A2'))).toBe('121235')
   })
 
   it('should return #VALUE! if parameters out of range', () => {

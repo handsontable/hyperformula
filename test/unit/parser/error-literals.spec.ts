@@ -12,6 +12,7 @@ describe('Parsing error literals', () => {
   it('should parse error literals', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=#VALUE!', adr('A1')).ast as ErrorAst
+
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.VALUE)
   })
@@ -19,6 +20,7 @@ describe('Parsing error literals', () => {
   it('should not parse #LIC! as license error', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=#LIC!', adr('A1')).ast as ErrorAst
+
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.ERROR)
   })
@@ -26,6 +28,7 @@ describe('Parsing error literals', () => {
   it('should parse error literals with ?', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=#NAME?', adr('A1')).ast as ErrorAst
+
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.NAME)
   })
@@ -33,6 +36,7 @@ describe('Parsing error literals', () => {
   it('should parse error literals with slashes', () => {
     const parser = buildEmptyParserWithCaching(new Config())
     const ast = parser.parse('=#N/A', adr('A1')).ast as ErrorAst
+
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.NA)
   })
@@ -41,6 +45,7 @@ describe('Parsing error literals', () => {
     HyperFormula.registerLanguage('plPL', plPL)
     const parser = buildEmptyParserWithCaching(new Config({language: 'plPL'}), new SheetMapping(buildTranslationPackage(plPL)))
     const ast = parser.parse('=#ARG!', adr('A1')).ast as ErrorAst
+
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.VALUE)
   })
@@ -48,6 +53,7 @@ describe('Parsing error literals', () => {
   it('should parse #DIV/0!', () => {
     const parser = buildEmptyParserWithCaching(new Config({language: 'enGB'}), new SheetMapping(buildTranslationPackage(enGB)))
     const ast = parser.parse('=#DIV/0!', adr('A1')).ast as ErrorAst
+
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(ast.error.type).toEqual(ErrorType.DIV_BY_ZERO)
   })
@@ -55,6 +61,7 @@ describe('Parsing error literals', () => {
   it('should return parser error', () => {
     const parser = buildEmptyParserWithCaching(new Config({language: 'enGB'}), new SheetMapping(buildTranslationPackage(enGB)))
     const {ast, errors} = parser.parse('=#UNKNOWN!', adr('A1'))
+
     expect(ast.type).toBe(AstNodeType.ERROR)
     expect(errors[0].type).toBe(ParsingErrorType.ParserError)
     expect(errors[0].message).toBe('Unknown error literal')

@@ -8,7 +8,8 @@ describe('Rebuilding engine', () => {
     const engine = HyperFormula.buildFromArray([['=FALSE']])
     engine.addNamedExpression('FALSE', '=FALSE()')
     engine.rebuildAndRecalculate()
-    expect(engine.getCellValue(adr('A1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(false)
   })
 
   it('should preserve local named expression', () => {
@@ -18,7 +19,8 @@ describe('Rebuilding engine', () => {
     })
     engine.addNamedExpression('FALSE', '=FALSE()', 0)
     engine.rebuildAndRecalculate()
-    expect(engine.getCellValue(adr('A1', 0))).toEqual(false)
+
+    expect(engine.getCellValue(adr('A1', 0))).toBe(false)
     expect(engine.getCellValue(adr('A1', 1))).toEqualError(detailedError(ErrorType.NAME, ErrorMessage.NamedExpressionName('FALSE')))
   })
 
@@ -29,7 +31,7 @@ describe('Rebuilding engine', () => {
     engine.addNamedExpression('FOO', '=Sheet1!$A$1')
     engine.rebuildAndRecalculate()
 
-    expect(engine.getCellValue(adr('B1', 0))).toEqual(42)
+    expect(engine.getCellValue(adr('B1', 0))).toBe(42)
   })
 
   it('scopes are properly handled', () => {
@@ -40,7 +42,8 @@ describe('Rebuilding engine', () => {
 
     engine.removeSheet(0)
     engine.rebuildAndRecalculate()
-    expect(engine.getCellValue(adr('B1'))).toEqual(false)
+
+    expect(engine.getCellValue(adr('B1'))).toBe(false)
   })
 
   it('rebuildAndRecalculate rebuilds the engine if the config is empty', () => {
@@ -61,6 +64,7 @@ describe('Rebuilding engine', () => {
 
 
     hf.addNamedExpression('ABC', '=Sheet1!$A$1')
+
     expect(() => hf.rebuildAndRecalculate()).not.toThrow()
   })
 })

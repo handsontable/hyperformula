@@ -5,6 +5,28 @@ HyperFormula. In some cases, turning them on or off might increase
 the performance of your app. Below we provide a number of tips on
 how to speed it up.
 
+## Numeric implementation choice
+
+HyperFormula provides two numeric implementations with different performance characteristics:
+
+| Implementation | Performance | Description |
+|:---------------|:------------|:------------|
+| `'native'` | Fastest | Uses standard JavaScript IEEE-754 numbers |
+| `'precise'` | ~3-5x slower | Uses decimal.js for exact decimal arithmetic |
+
+By default, HyperFormula uses `'precise'` mode for accurate financial calculations.
+If precision is not critical for your use case and you need maximum performance,
+consider switching to `'native'` mode:
+
+```javascript
+const hf = HyperFormula.buildFromArray(data, {
+    licenseKey: 'gpl-v3',
+    numericImplementation: 'native',  // faster but less precise
+});
+```
+
+See the [Numeric precision guide](numeric-precision.md) for more information.
+
 ## VLOOKUP/MATCH
 
 If you are planning to use VLOOKUP or MATCH heavily in your app,

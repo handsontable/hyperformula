@@ -13,13 +13,13 @@ describe('MINA', () => {
   it('MINA with args', () => {
     const engine = HyperFormula.buildFromArray([['=MINA(1, B1)', '3.14']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('MINA with range', () => {
     const engine = HyperFormula.buildFromArray([['1'], ['3'], ['2'], ['=MINA(A1:A3)']])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
   })
 
   it('does only boolean coercions', () => {
@@ -30,16 +30,16 @@ describe('MINA', () => {
       ['="TRUE"', '=MINA(A4)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
-    expect(engine.getCellValue(adr('B2'))).toEqual(1)
-    expect(engine.getCellValue(adr('B3'))).toEqual(0)
-    expect(engine.getCellValue(adr('B4'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
+    expect(engine.getCellValue(adr('B2'))).toBe(1)
+    expect(engine.getCellValue(adr('B3'))).toBe(0)
+    expect(engine.getCellValue(adr('B4'))).toBe(0)
   })
 
   it('MINA of empty value', () => {
     const engine = HyperFormula.buildFromArray([['', '=MINA(A1)']])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(0)
   })
 
   it('MINA of empty value and some positive number', () => {
@@ -48,8 +48,8 @@ describe('MINA', () => {
       [null, '1', '=MINA(A2,B2)'],
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(0)
-    expect(engine.getCellValue(adr('C2'))).toEqual(1)
+    expect(engine.getCellValue(adr('C1'))).toBe(0)
+    expect(engine.getCellValue(adr('C2'))).toBe(1)
   })
 
   it('over a range value', () => {
@@ -59,7 +59,7 @@ describe('MINA', () => {
       ['=MINA(MMULT(A1:B2, A1:B2))'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(7)
+    expect(engine.getCellValue(adr('A3'))).toBe(7)
   })
 
   it('propagates errors', () => {

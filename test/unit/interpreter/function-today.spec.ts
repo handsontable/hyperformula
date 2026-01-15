@@ -19,7 +19,8 @@ describe('Interpreter - function TODAY', () => {
     const engine = HyperFormula.buildFromArray([
       ['=TODAY()'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(31275)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(31275)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 
@@ -27,21 +28,24 @@ describe('Interpreter - function TODAY', () => {
     const engine = HyperFormula.buildFromArray([
       ['=YEAR(TODAY())'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(1985)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(1985)
   })
 
   it('works #3', () => {
     const engine = HyperFormula.buildFromArray([
       ['=MONTH(TODAY())'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(8)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(8)
   })
 
   it('works #4', () => {
     const engine = HyperFormula.buildFromArray([
       ['=DAY(TODAY())'],
     ])
-    expect(engine.getCellValue(adr('A1'))).toEqual(16)
+
+    expect(engine.getCellValue(adr('A1'))).toBe(16)
   })
 
   it('validates number of arguments', () => {

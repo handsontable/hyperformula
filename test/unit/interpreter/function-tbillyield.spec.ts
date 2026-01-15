@@ -25,10 +25,10 @@ describe('Function TBILLYIELD', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBeCloseTo(32.4, 6)
     expect(engine.getCellValueDetailedType(adr('A1'))).toBe(CellValueDetailedType.NUMBER_PERCENT)
-    expect(engine.getCellValue(adr('A2'))).toEqual(9)
+    expect(engine.getCellValue(adr('A2'))).toBe(9)
     expect(engine.getCellValue(adr('B2'))).toBeCloseTo(17.7049180327869, 6)
-    expect(engine.getCellValue(adr('A3'))).toEqual(18)
-    expect(engine.getCellValue(adr('B3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(18)
+    expect(engine.getCellValue(adr('B3'))).toBe(0)
     expect(engine.getCellValue(adr('C3'))).toBeCloseTo(-0.181818181818182, 6)
     expect(engine.getCellValue(adr('A4'))).toBeCloseTo(8.87671232876712, 6)
     expect(engine.getCellValue(adr('B4'))).toBeCloseTo(8.87671232876712, 6)

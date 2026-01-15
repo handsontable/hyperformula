@@ -20,6 +20,9 @@ import {VersionPlugin} from './plugin/VersionPlugin'
 
 export type FunctionTranslationsPackage = Record<string, TranslationSet>
 
+/**
+ *
+ */
 function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionPluginDefinition): FunctionMetadata {
   let entry = plugin.implementedFunctions[functionId]
   const key = plugin.aliases?.[functionId]
@@ -36,6 +39,9 @@ function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionP
   return entry
 }
 
+/**
+ *
+ */
 export class FunctionRegistry {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
 
@@ -71,6 +77,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public static registerFunctionPlugin(plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     this.loadPluginFunctions(plugin, this.plugins)
     if (translations !== undefined) {
@@ -78,6 +88,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     this.loadPluginFunction(plugin, functionId, this.plugins)
     if (translations !== undefined) {
@@ -85,6 +99,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public static unregisterFunction(functionId: string): void {
     if (this.functionIsProtected(functionId)) {
       throw ProtectedFunctionError.cannotUnregisterFunctionWithId(functionId)
@@ -92,6 +110,10 @@ export class FunctionRegistry {
     this.plugins.delete(functionId)
   }
 
+  
+  /**
+   *
+   */
   public static unregisterFunctionPlugin(plugin: FunctionPluginDefinition): void {
     for (const protectedPlugin of this.protectedPlugins()) {
       if (protectedPlugin === plugin) {
@@ -105,10 +127,18 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public static unregisterAll(): void {
     this.plugins.clear()
   }
 
+  
+  /**
+   *
+   */
   public static getRegisteredFunctionIds(): string[] {
     return [
       ...Array.from(this.plugins.keys()),
@@ -116,10 +146,18 @@ export class FunctionRegistry {
     ]
   }
 
+  
+  /**
+   *
+   */
   public static getPlugins(): FunctionPluginDefinition[] {
     return Array.from(new Set(this.plugins.values()).values())
   }
 
+  
+  /**
+   *
+   */
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     if (this.functionIsProtected(functionId)) {
       return undefined
@@ -128,10 +166,18 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public static functionIsProtected(functionId: string) {
     return this._protectedPlugins.has(functionId)
   }
 
+  
+  /**
+   *
+   */
   private static loadTranslations(translations: FunctionTranslationsPackage) {
     const registeredLanguages = new Set(HyperFormula.getRegisteredLanguagesCodes())
     Object.keys(translations).forEach(code => {
@@ -141,6 +187,10 @@ export class FunctionRegistry {
     })
   }
 
+  
+  /**
+   *
+   */
   private static loadPluginFunctions(plugin: FunctionPluginDefinition, registry: Map<string, FunctionPluginDefinition>): void {
     Object.keys(plugin.implementedFunctions).forEach((functionName) => {
       this.loadPluginFunction(plugin, functionName, registry)
@@ -152,6 +202,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   private static loadPluginFunction(plugin: FunctionPluginDefinition, functionId: string, registry: Map<string, FunctionPluginDefinition>): void {
     if (this.functionIsProtected(functionId)) {
       throw ProtectedFunctionError.cannotRegisterFunctionWithId(functionId)
@@ -191,6 +245,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   private static* protectedFunctions(): IterableIterator<[string, FunctionPluginDefinition]> {
     for (const [functionId, plugin] of this._protectedPlugins) {
       if (plugin !== undefined) {
@@ -199,6 +257,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   private static* protectedPlugins(): IterableIterator<FunctionPluginDefinition> {
     for (const [, plugin] of this._protectedPlugins) {
       if (plugin !== undefined) {
@@ -207,6 +269,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public initializePlugins(interpreter: Interpreter): void {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instances: any[] = []
@@ -226,6 +292,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     if (FunctionRegistry.functionIsProtected(functionId)) {
       return undefined
@@ -233,6 +303,10 @@ export class FunctionRegistry {
     return this.instancePlugins.get(functionId)
   }
 
+  
+  /**
+   *
+   */
   public getFunction(functionId: string): Maybe<PluginFunctionType> {
     const pluginEntry = this.functions.get(functionId)
     if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
@@ -243,6 +317,10 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public getArraySizeFunction(functionId: string): Maybe<PluginArraySizeFunctionType> {
     const pluginEntry = this.arraySizeFunctions.get(functionId)
     if (pluginEntry !== undefined && this.config.translationPackage.isFunctionTranslated(functionId)) {
@@ -253,10 +331,18 @@ export class FunctionRegistry {
     }
   }
 
+  
+  /**
+   *
+   */
   public getMetadata(functionId: string): Maybe<FunctionMetadata> {
     return this.functionsMetadata.get(functionId)
   }
 
+  
+  /**
+   *
+   */
   public getPlugins(): FunctionPluginDefinition[] {
     const plugins: Set<FunctionPluginDefinition> = new Set()
     for (const [functionId, plugin] of this.instancePlugins) {
@@ -267,6 +353,10 @@ export class FunctionRegistry {
     return Array.from(plugins)
   }
 
+  
+  /**
+   *
+   */
   public getRegisteredFunctionIds(): string[] {
     return Array.from(this.functions.keys())
   }
@@ -279,6 +369,10 @@ export class FunctionRegistry {
 
   public isFunctionDependentOnSheetStructureChange = (functionId: string): boolean => this.structuralChangeFunctions.has(functionId)
 
+  
+  /**
+   *
+   */
   private categorizeFunction(functionId: string, functionMetadata: FunctionMetadata): void {
     if (functionMetadata.isVolatile) {
       this.volatileFunctions.add(functionId)

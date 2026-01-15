@@ -5,13 +5,13 @@ describe('Replace sheet content - checking if its possible', () => {
   it('no if theres no such sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent(1, [])).toEqual(false)
+    expect(engine.isItPossibleToReplaceSheetContent(1, [])).toBe(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToReplaceSheetContent(0, [])).toEqual(true)
+    expect(engine.isItPossibleToReplaceSheetContent(0, [])).toBe(true)
   })
 })
 
@@ -36,10 +36,10 @@ describe('Replace sheet content', () => {
 
     engine.setSheetContent(0, [['3', '4']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
-    expect(engine.getCellValue(adr('B1'))).toEqual(4)
-    expect(engine.getCellValue(adr('A2'))).toBe(null)
-    expect(engine.getCellValue(adr('B2'))).toBe(null)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
+    expect(engine.getCellValue(adr('B1'))).toBe(4)
+    expect(engine.getCellValue(adr('A2'))).toBeNull()
+    expect(engine.getCellValue(adr('B2'))).toBeNull()
   })
 
   /* for now return only new values */
@@ -66,7 +66,7 @@ describe('Replace sheet content', () => {
 
     const changes = engine.setSheetContent(0, [['3', '4']])
 
-    expect(changes.length).toEqual(4)
+    expect(changes.length).toBe(4)
 
     expectArrayWithSameContent(changes, [
       new ExportedCellChange(adr('A1'), 3),
@@ -93,8 +93,8 @@ describe('Replace sheet content', () => {
       ['foo', '5'],
     ])
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2', 1))).toBe(null)
+    expect(engine.getCellValue(adr('A1', 1))).toBe('foo')
+    expect(engine.getCellValue(adr('A2', 1))).toBeNull()
   })
 
   it('should replace content of a sheet with formula matrix and recalculate range formula', () => {
@@ -113,6 +113,6 @@ describe('Replace sheet content', () => {
       [null, '5'],
     ])
 
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(3)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(3)
   })
 })

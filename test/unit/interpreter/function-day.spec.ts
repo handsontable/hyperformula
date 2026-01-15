@@ -15,17 +15,17 @@ describe('Function DAY', () => {
   it('with numerical arguments', () => {
     const engine = HyperFormula.buildFromArray([['=DAY(0)', '=DAY(2)', '=DAY(43465)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(30)
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('C1'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(30)
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
+    expect(engine.getCellValue(adr('C1'))).toBe(31)
   })
 
   it('with string arguments', () => {
     const engine = HyperFormula.buildFromArray([['=DAY("31/12/1899")', '=DAY("01/01/1900")', '=DAY("31/12/2018")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(31)
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('C1'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(31)
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
+    expect(engine.getCellValue(adr('C1'))).toBe(31)
   })
 
   it('use datenumber coercion for 1st argument', () => {
@@ -34,8 +34,8 @@ describe('Function DAY', () => {
       ['=DAY(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(31)
-    expect(engine.getCellValue(adr('A2'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(31)
+    expect(engine.getCellValue(adr('A2'))).toBe(31)
   })
 
   it('propagate errors', () => {
@@ -62,18 +62,18 @@ describe('Function DAY', () => {
       ['=DAY(DATE(2021, 12, 1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1)
-    expect(engine.getCellValue(adr('A6'))).toEqual(1)
-    expect(engine.getCellValue(adr('A7'))).toEqual(1)
-    expect(engine.getCellValue(adr('A8'))).toEqual(1)
-    expect(engine.getCellValue(adr('A9'))).toEqual(1)
-    expect(engine.getCellValue(adr('A10'))).toEqual(1)
-    expect(engine.getCellValue(adr('A11'))).toEqual(1)
-    expect(engine.getCellValue(adr('A12'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
+    expect(engine.getCellValue(adr('A5'))).toBe(1)
+    expect(engine.getCellValue(adr('A6'))).toBe(1)
+    expect(engine.getCellValue(adr('A7'))).toBe(1)
+    expect(engine.getCellValue(adr('A8'))).toBe(1)
+    expect(engine.getCellValue(adr('A9'))).toBe(1)
+    expect(engine.getCellValue(adr('A10'))).toBe(1)
+    expect(engine.getCellValue(adr('A11'))).toBe(1)
+    expect(engine.getCellValue(adr('A12'))).toBe(1)
   })
 
   it('test for days in month, end of month', () => {
@@ -92,18 +92,18 @@ describe('Function DAY', () => {
       ['=DAY(DATE(2021, 12, 31))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(31)
-    expect(engine.getCellValue(adr('A2'))).toEqual(28)
-    expect(engine.getCellValue(adr('A3'))).toEqual(31)
-    expect(engine.getCellValue(adr('A4'))).toEqual(30)
-    expect(engine.getCellValue(adr('A5'))).toEqual(31)
-    expect(engine.getCellValue(adr('A6'))).toEqual(30)
-    expect(engine.getCellValue(adr('A7'))).toEqual(31)
-    expect(engine.getCellValue(adr('A8'))).toEqual(31)
-    expect(engine.getCellValue(adr('A9'))).toEqual(30)
-    expect(engine.getCellValue(adr('A10'))).toEqual(31)
-    expect(engine.getCellValue(adr('A11'))).toEqual(30)
-    expect(engine.getCellValue(adr('A12'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(31)
+    expect(engine.getCellValue(adr('A2'))).toBe(28)
+    expect(engine.getCellValue(adr('A3'))).toBe(31)
+    expect(engine.getCellValue(adr('A4'))).toBe(30)
+    expect(engine.getCellValue(adr('A5'))).toBe(31)
+    expect(engine.getCellValue(adr('A6'))).toBe(30)
+    expect(engine.getCellValue(adr('A7'))).toBe(31)
+    expect(engine.getCellValue(adr('A8'))).toBe(31)
+    expect(engine.getCellValue(adr('A9'))).toBe(30)
+    expect(engine.getCellValue(adr('A10'))).toBe(31)
+    expect(engine.getCellValue(adr('A11'))).toBe(30)
+    expect(engine.getCellValue(adr('A12'))).toBe(31)
   })
 
   it('test for days in month, end of month+1', () => {
@@ -122,18 +122,18 @@ describe('Function DAY', () => {
       ['=DAY(DATE(2021, 12, 31)+1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1)
-    expect(engine.getCellValue(adr('A6'))).toEqual(1)
-    expect(engine.getCellValue(adr('A7'))).toEqual(1)
-    expect(engine.getCellValue(adr('A8'))).toEqual(1)
-    expect(engine.getCellValue(adr('A9'))).toEqual(1)
-    expect(engine.getCellValue(adr('A10'))).toEqual(1)
-    expect(engine.getCellValue(adr('A11'))).toEqual(1)
-    expect(engine.getCellValue(adr('A12'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
+    expect(engine.getCellValue(adr('A5'))).toBe(1)
+    expect(engine.getCellValue(adr('A6'))).toBe(1)
+    expect(engine.getCellValue(adr('A7'))).toBe(1)
+    expect(engine.getCellValue(adr('A8'))).toBe(1)
+    expect(engine.getCellValue(adr('A9'))).toBe(1)
+    expect(engine.getCellValue(adr('A10'))).toBe(1)
+    expect(engine.getCellValue(adr('A11'))).toBe(1)
+    expect(engine.getCellValue(adr('A12'))).toBe(1)
   })
 
   it('test for days in month, start of month, leap year', () => {
@@ -152,18 +152,18 @@ describe('Function DAY', () => {
       ['=DAY(DATE(2020, 12, 1))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1)
-    expect(engine.getCellValue(adr('A6'))).toEqual(1)
-    expect(engine.getCellValue(adr('A7'))).toEqual(1)
-    expect(engine.getCellValue(adr('A8'))).toEqual(1)
-    expect(engine.getCellValue(adr('A9'))).toEqual(1)
-    expect(engine.getCellValue(adr('A10'))).toEqual(1)
-    expect(engine.getCellValue(adr('A11'))).toEqual(1)
-    expect(engine.getCellValue(adr('A12'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
+    expect(engine.getCellValue(adr('A5'))).toBe(1)
+    expect(engine.getCellValue(adr('A6'))).toBe(1)
+    expect(engine.getCellValue(adr('A7'))).toBe(1)
+    expect(engine.getCellValue(adr('A8'))).toBe(1)
+    expect(engine.getCellValue(adr('A9'))).toBe(1)
+    expect(engine.getCellValue(adr('A10'))).toBe(1)
+    expect(engine.getCellValue(adr('A11'))).toBe(1)
+    expect(engine.getCellValue(adr('A12'))).toBe(1)
   })
 
   it('test for days in month, end of month, leap year', () => {
@@ -182,18 +182,18 @@ describe('Function DAY', () => {
       ['=DAY(DATE(2020, 12, 31))'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(31)
-    expect(engine.getCellValue(adr('A2'))).toEqual(29)
-    expect(engine.getCellValue(adr('A3'))).toEqual(31)
-    expect(engine.getCellValue(adr('A4'))).toEqual(30)
-    expect(engine.getCellValue(adr('A5'))).toEqual(31)
-    expect(engine.getCellValue(adr('A6'))).toEqual(30)
-    expect(engine.getCellValue(adr('A7'))).toEqual(31)
-    expect(engine.getCellValue(adr('A8'))).toEqual(31)
-    expect(engine.getCellValue(adr('A9'))).toEqual(30)
-    expect(engine.getCellValue(adr('A10'))).toEqual(31)
-    expect(engine.getCellValue(adr('A11'))).toEqual(30)
-    expect(engine.getCellValue(adr('A12'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(31)
+    expect(engine.getCellValue(adr('A2'))).toBe(29)
+    expect(engine.getCellValue(adr('A3'))).toBe(31)
+    expect(engine.getCellValue(adr('A4'))).toBe(30)
+    expect(engine.getCellValue(adr('A5'))).toBe(31)
+    expect(engine.getCellValue(adr('A6'))).toBe(30)
+    expect(engine.getCellValue(adr('A7'))).toBe(31)
+    expect(engine.getCellValue(adr('A8'))).toBe(31)
+    expect(engine.getCellValue(adr('A9'))).toBe(30)
+    expect(engine.getCellValue(adr('A10'))).toBe(31)
+    expect(engine.getCellValue(adr('A11'))).toBe(30)
+    expect(engine.getCellValue(adr('A12'))).toBe(31)
   })
 
   it('test for days in month, end of month+1, leap year', () => {
@@ -212,18 +212,18 @@ describe('Function DAY', () => {
       ['=DAY(DATE(2020, 12, 31)+1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(1)
-    expect(engine.getCellValue(adr('A3'))).toEqual(1)
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
-    expect(engine.getCellValue(adr('A5'))).toEqual(1)
-    expect(engine.getCellValue(adr('A6'))).toEqual(1)
-    expect(engine.getCellValue(adr('A7'))).toEqual(1)
-    expect(engine.getCellValue(adr('A8'))).toEqual(1)
-    expect(engine.getCellValue(adr('A9'))).toEqual(1)
-    expect(engine.getCellValue(adr('A10'))).toEqual(1)
-    expect(engine.getCellValue(adr('A11'))).toEqual(1)
-    expect(engine.getCellValue(adr('A12'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(1)
+    expect(engine.getCellValue(adr('A3'))).toBe(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
+    expect(engine.getCellValue(adr('A5'))).toBe(1)
+    expect(engine.getCellValue(adr('A6'))).toBe(1)
+    expect(engine.getCellValue(adr('A7'))).toBe(1)
+    expect(engine.getCellValue(adr('A8'))).toBe(1)
+    expect(engine.getCellValue(adr('A9'))).toBe(1)
+    expect(engine.getCellValue(adr('A10'))).toBe(1)
+    expect(engine.getCellValue(adr('A11'))).toBe(1)
+    expect(engine.getCellValue(adr('A12'))).toBe(1)
   })
 
   it('returns 30 when its argument is a reference to an empty cell', () => {
@@ -231,7 +231,7 @@ describe('Function DAY', () => {
       ['=DAY(B1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(30)
+    expect(engine.getCellValue(adr('A1'))).toBe(30)
   })
 
   it('returns 31 when its argument is a reference to an empty cell and the engine is configured to use 1899-12-31 as a null year', () => {
@@ -242,6 +242,6 @@ describe('Function DAY', () => {
       nullDate: { year: 1899, month: 12, day: 31 },
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(31)
+    expect(engine.getCellValue(adr('A1'))).toBe(31)
   })
 })

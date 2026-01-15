@@ -53,13 +53,13 @@ describe('Function MAXIFS - argument validations and combinations', () => {
   it('scalars are treated like singular arrays', () => {
     const engine = HyperFormula.buildFromArray([['=MAXIFS(42, 10, ">1")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(42)
+    expect(engine.getCellValue(adr('A1'))).toBe(42)
   })
 
   it('should return 0 as max from an empty range', () => {
     const engine = HyperFormula.buildFromArray([['=MAXIFS(42, -1, ">1")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('error propagation', () => {
@@ -81,7 +81,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
   it('works when arguments are just references', () => {
     const engine = HyperFormula.buildFromArray([['2', '3'], ['=MAXIFS(B1, A1, ">1")']])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
   })
 
   it('works with numbers', () => {
@@ -91,7 +91,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 
   it('works with percents', () => {
@@ -101,7 +101,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(.03)
+    expect(engine.getCellValue(adr('A3'))).toBe(.03)
   })
 
   it('works with currencies', () => {
@@ -111,7 +111,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
   })
 
   it('works with dates', () => {
@@ -133,7 +133,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A3'))).toBe(-1)
   })
 
   it('empty cells are ignored', () => {
@@ -143,7 +143,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A3'))).toBe(-1)
   })
 
   it('booleans are ignored', () => {
@@ -153,7 +153,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(-1)
+    expect(engine.getCellValue(adr('A3'))).toBe(-1)
   })
 
   it('max of empty cells is zero', () => {
@@ -163,7 +163,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
   })
 
   it('max of strings is zero', () => {
@@ -173,7 +173,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
   })
 
   it('max of booleans is zero', () => {
@@ -183,7 +183,7 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(A1:A2, B1:B2, "a")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(0)
+    expect(engine.getCellValue(adr('A3'))).toBe(0)
   })
 
   it('works with range values', () => {
@@ -195,9 +195,9 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(C1:D2, MMULT(A1:B2, A1:B2), "=2")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(116)
-    expect(engine.getCellValue(adr('A4'))).toEqual(116)
-    expect(engine.getCellValue(adr('A5'))).toEqual(9)
+    expect(engine.getCellValue(adr('A3'))).toBe(116)
+    expect(engine.getCellValue(adr('A4'))).toBe(116)
+    expect(engine.getCellValue(adr('A5'))).toBe(9)
   })
 
   it('works for mixed reference/range arguments', () => {
@@ -208,8 +208,8 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       ['=MAXIFS(B3:B3, A3, ">1")'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(3)
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
+    expect(engine.getCellValue(adr('A2'))).toBe(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(5)
   })
 
   it('works when criterion arg is an inline array', () => {
@@ -217,8 +217,8 @@ describe('Function MAXIFS - argument validations and combinations', () => {
       useArrayArithmetic: true,
     })
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(2)
-    expect(engine.getCellValue(adr('B3'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(2)
+    expect(engine.getCellValue(adr('B3'))).toBe(3)
   })
 })
 
@@ -231,7 +231,7 @@ describe('Function MAXIFS - calcultions on more than one criteria', () => {
       ['=MAXIFS(C1:C3, A1:A3, ">=1", B1:B3, "<102")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(5)
   })
 })
 
@@ -243,17 +243,18 @@ describe('Function MAXIFS - cache recalculation after cruds', () => {
     const changes = engine.setCellContents(adr('A1'), [['1', '3']])
     const newValues = changes.map(c => c.newValue)
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(3)
     expectArrayWithSameContent(newValues, [1, 3, 3])
   })
 
   it('recalculates MAXIFS if changes in one of the tested range', () => {
     const sheet = [['20', '10'], ['5', '6'], ['7', '8'], ['=MAXIFS(A1:B1, A2:B2, ">=5", A3:B3, ">=7")']]
     const engine = HyperFormula.buildFromArray(sheet)
-    expect(engine.getCellValue(adr('A4'))).toEqual(20)
+
+    expect(engine.getCellValue(adr('A4'))).toBe(20)
 
     engine.setCellContents(adr('A3'), [['1', '7']])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(10)
+    expect(engine.getCellValue(adr('A4'))).toBe(10)
   })
 })

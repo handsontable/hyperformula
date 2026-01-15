@@ -9,8 +9,8 @@ describe('Function SHEET', () => {
       'Sheet2': [['=SHEET()']],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(2)
   })
 
   it('should return reference sheet number for self sheet reference', () => {
@@ -19,8 +19,8 @@ describe('Function SHEET', () => {
       'Sheet2': [['=SHEET(B1)', '=1/0']],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(2)
   })
 
   it('should return reference sheet number for absolute sheet reference', () => {
@@ -29,10 +29,10 @@ describe('Function SHEET', () => {
       'Sheet2': [['=SHEET(Sheet1!B1)', '=SHEET(Sheet2!B2)']],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(1)
-    expect(engine.getCellValue(adr('B1', 1))).toEqual(2)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(1)
+    expect(engine.getCellValue(adr('B1', 1))).toBe(2)
   })
 
   it('should return range sheet number', () => {
@@ -41,10 +41,10 @@ describe('Function SHEET', () => {
       'Sheet2': [['=SHEET(B1:B2)', '=SHEET(Sheet1!A1:B1)']],
     })
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
-    expect(engine.getCellValue(adr('A1', 1))).toEqual(2)
-    expect(engine.getCellValue(adr('B1', 1))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
+    expect(engine.getCellValue(adr('A1', 1))).toBe(2)
+    expect(engine.getCellValue(adr('B1', 1))).toBe(1)
   })
 
   it('should return VALUE for non existing sheet', () => {
@@ -64,8 +64,8 @@ describe('Function SHEET', () => {
     engine.setCellContents(adr('A1'), [['=SHEET(1=1)']])
     engine.setCellContents(adr('B1'), [['=SHEET(1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(2)
-    expect(engine.getCellValue(adr('B1'))).toEqual(3)
+    expect(engine.getCellValue(adr('A1'))).toBe(2)
+    expect(engine.getCellValue(adr('B1'))).toBe(3)
   })
 
   it('should propagate errors', () => {
@@ -77,7 +77,7 @@ describe('Function SHEET', () => {
   it('should work for itself', () => {
     const engine = HyperFormula.buildFromArray([['=SHEET(A1)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('should make cycle for non-refs', () => {

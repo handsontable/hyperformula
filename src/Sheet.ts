@@ -30,6 +30,9 @@ export interface SheetBoundaries {
   fill: number,
 }
 
+/**
+ *
+ */
 export function validateAsSheet(sheet: Sheet): void {
   if (!Array.isArray(sheet)) {
     throw new InvalidArgumentsError('an array of arrays.')

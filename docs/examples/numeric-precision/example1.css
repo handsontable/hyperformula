@@ -1,0 +1,76 @@
+.example {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  padding: 20px;
+}
+
+.example h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.example h4 {
+  color: #34495e;
+  margin: 15px 0 10px;
+}
+
+.comparison-section {
+  margin-bottom: 30px;
+}
+
+.example table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.example th,
+.example td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.example th {
+  background-color: #3498db;
+  color: white;
+  font-weight: 600;
+}
+
+.example tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.example tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Highlight precision differences */
+.example .native {
+  color: #e74c3c;
+  font-family: monospace;
+}
+
+.example .precise {
+  color: #27ae60;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.example .precise.correct {
+  background-color: #d4edda;
+}
+
+/* Invoice styling */
+#invoice-native td:nth-child(3),
+#invoice-native td:nth-child(4),
+#invoice-precise td:nth-child(3),
+#invoice-precise td:nth-child(4) {
+  text-align: right;
+  font-family: monospace;
+}
+
+.example p {
+  color: #666;
+  margin-bottom: 10px;
+}

@@ -26,6 +26,7 @@ describe('Function EDATE', () => {
     ])
 
     expectCellValueToEqualDate(engine, adr('A2'), '10/03/2019')
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 

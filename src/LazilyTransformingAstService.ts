@@ -11,6 +11,9 @@ import {StatType} from './statistics'
 import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
+/**
+ *
+ */
 export class LazilyTransformingAstService {
 
   public parser?: ParserWithCaching
@@ -24,10 +27,18 @@ export class LazilyTransformingAstService {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public version(): number {
     return this.transformations.length
   }
 
+  
+  /**
+   *
+   */
   public addTransformation(transformation: FormulaTransformer): number {
     if (this.combinedTransformer !== undefined) {
       this.combinedTransformer.add(transformation)
@@ -37,10 +48,18 @@ export class LazilyTransformingAstService {
     return this.version()
   }
 
+  
+  /**
+   *
+   */
   public beginCombinedMode(sheet: number) {
     this.combinedTransformer = new CombinedTransformer(sheet)
   }
 
+  
+  /**
+   *
+   */
   public commitCombinedMode(): number {
     if (this.combinedTransformer === undefined) {
       throw Error('Combined mode wasn\'t started')
@@ -50,6 +69,10 @@ export class LazilyTransformingAstService {
     return this.version()
   }
 
+  
+  /**
+   *
+   */
   public applyTransformations(ast: Ast, address: SimpleCellAddress, version: number): [Ast, SimpleCellAddress, number] {
     this.stats.start(StatType.TRANSFORM_ASTS_POSTPONED)
 
@@ -70,6 +93,10 @@ export class LazilyTransformingAstService {
     return [cachedAst, address, this.transformations.length]
   }
 
+  
+  /**
+   *
+   */
   public* getTransformationsFrom(version: number, filter?: (transformation: FormulaTransformer) => boolean): IterableIterator<FormulaTransformer> {
     for (let v = version; v < this.transformations.length; v++) {
       const transformation = this.transformations[v]

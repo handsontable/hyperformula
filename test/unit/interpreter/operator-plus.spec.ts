@@ -22,7 +22,7 @@ describe('Operator PLUS', () => {
 
     expect(engine.getCellValue(adr('A1'))).toBe(5)
     expect(engine.getCellValue(adr('A2'))).toEqualError(detailedError(ErrorType.VALUE, ErrorMessage.NumberCoercion))
-    expect(engine.getCellValue(adr('A4'))).toEqual(6)
+    expect(engine.getCellValue(adr('A4'))).toBe(6)
   })
 
   it('pass error from left operand', () => {

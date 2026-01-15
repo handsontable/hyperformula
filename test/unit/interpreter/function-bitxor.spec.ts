@@ -55,11 +55,11 @@ describe('function BITXOR', () => {
       ['=BITXOR(0, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(4)
-    expect(engine.getCellValue(adr('A2'))).toEqual(422)
-    expect(engine.getCellValue(adr('A3'))).toEqual(4)
-    expect(engine.getCellValue(adr('A4'))).toEqual(379)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(4)
+    expect(engine.getCellValue(adr('A2'))).toBe(422)
+    expect(engine.getCellValue(adr('A3'))).toBe(4)
+    expect(engine.getCellValue(adr('A4'))).toBe(379)
+    expect(engine.getCellValue(adr('A5'))).toBe(0)
   })
 
   it('should return numeric type', () => {

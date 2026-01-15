@@ -178,18 +178,30 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public len(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LEN'), (arg: string) => {
       return arg.length
     })
   }
 
+  
+  /**
+   *
+   */
   public lower(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LOWER'), (arg: string) => {
       return arg.toLowerCase()
     })
   }
 
+  
+  /**
+   *
+   */
   public trim(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TRIM'), (arg: string) => {
       return arg
@@ -199,12 +211,20 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public proper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PROPER'), (arg: string) => {
       return arg.replace(/\p{L}+/gu, word => word.charAt(0).toUpperCase() + word.substring(1).toLowerCase())
     })
   }
 
+  
+  /**
+   *
+   */
   public clean(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CLEAN'), (arg: string) => {
       // eslint-disable-next-line no-control-regex
@@ -212,12 +232,20 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public exact(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('EXACT'), (left: string, right: string) => {
       return left === right
     })
   }
 
+  
+  /**
+   *
+   */
   public rept(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('REPT'), (text: string, count: number) => {
       if (count < 0) {
@@ -227,6 +255,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public right(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('RIGHT'), (text: string, length: number) => {
       if (length < 0) {
@@ -238,6 +270,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public left(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('LEFT'), (text: string, length: number) => {
       if (length < 0) {
@@ -247,6 +283,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public mid(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MID'), (text: string, startPosition: number, numberOfChars: number) => {
       if (startPosition < 1) {
@@ -259,6 +299,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public replace(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('REPLACE'), (text: string, startPosition: number, numberOfChars: number, newText: string) => {
       if (startPosition < 1) {
@@ -271,6 +315,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public search(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SEARCH'), (pattern: string, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
@@ -288,6 +336,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public substitute(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SUBSTITUTE'), (text: string, searchString: string, replacementString: string, occurrenceNum: number | undefined) => {
       const escapedSearchString = this.escapeRegExpSpecialCharacters(searchString)
@@ -313,6 +365,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public find(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('FIND'), (pattern, text: string, startIndex: number) => {
       if (startIndex < 1 || startIndex > text.length) {
@@ -326,6 +382,10 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public t(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('T'), (arg: RawScalarValue) => {
       if (arg instanceof CellError) {
@@ -335,12 +395,20 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     })
   }
 
+  
+  /**
+   *
+   */
   public upper(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('UPPER'), (arg: string) => {
       return arg.toUpperCase()
     })
   }
 
+  
+  /**
+   *
+   */
   private escapeRegExpSpecialCharacters(text: string): string {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }

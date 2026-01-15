@@ -9,7 +9,7 @@ describe('Column ranges', () => {
       ['1', '2', '=SUM(A:B)']
     ])
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(3)
+    expect(engine.getCellValue(adr('C1'))).toBe(3)
   })
 
   it('should create correct edges for infinite range when building graph', () => {
@@ -72,12 +72,14 @@ describe('Column ranges', () => {
     const engine = HyperFormula.buildFromArray([
       ['1', '2', '', '', '=SUM(A:B)']
     ])
-    expect(engine.getCellValue(adr('E1'))).toEqual(3)
+
+    expect(engine.getCellValue(adr('E1'))).toBe(3)
 
     engine.moveCells(AbsoluteCellRange.spanFrom(adr('A1'), 2, 1), adr('C1'))
 
-    expect(engine.getCellValue(adr('E1'))).toEqual(0)
+    expect(engine.getCellValue(adr('E1'))).toBe(0)
     const range = extractColumnRange(engine, adr('E1'))
+
     expect(range.start).toEqual(colStart('A'))
     expect(range.end).toEqual(colEnd('B'))
   })

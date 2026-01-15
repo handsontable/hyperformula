@@ -9,8 +9,8 @@ describe('Function ABS', () => {
       ['=ABS(-1)', '=ABS(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
   })
 
   it('given wrong argument type', () => {
@@ -27,8 +27,8 @@ describe('Function ABS', () => {
       ['=TRUE()', '=ABS(A2)'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
-    expect(engine.getCellValue(adr('B2'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
+    expect(engine.getCellValue(adr('B2'))).toBe(1)
   })
 
   it('given wrong number of arguments', () => {

@@ -19,8 +19,8 @@ describe('Function T', () => {
       ['=T(B2)', 'bar'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('foo')
-    expect(engine.getCellValue(adr('A2'))).toEqual('bar')
+    expect(engine.getCellValue(adr('A1'))).toBe('foo')
+    expect(engine.getCellValue(adr('A2'))).toBe('bar')
   })
 
   it('should return empty string if given value is not a text', () => {
@@ -30,9 +30,9 @@ describe('Function T', () => {
       ['=T(B3)', null],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('')
-    expect(engine.getCellValue(adr('A2'))).toEqual('')
-    expect(engine.getCellValue(adr('A3'))).toEqual('')
+    expect(engine.getCellValue(adr('A1'))).toBe('')
+    expect(engine.getCellValue(adr('A2'))).toBe('')
+    expect(engine.getCellValue(adr('A3'))).toBe('')
   })
 
   it('should propagate errors', () => {

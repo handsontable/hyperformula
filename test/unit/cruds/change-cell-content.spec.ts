@@ -33,13 +33,13 @@ describe('Changing cell content - checking if its possible', () => {
   it('address should have valid coordinates', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToSetCellContents(simpleCellAddress(0, -1, 0))).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(simpleCellAddress(0, -1, 0))).toBe(false)
   })
 
   it('address should be in existing sheet', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToSetCellContents(adr('A1', 1))).toEqual(false)
+    expect(engine.isItPossibleToSetCellContents(adr('A1', 1))).toBe(false)
   })
 
   it('yes if there is an array', () => {
@@ -61,20 +61,22 @@ describe('Changing cell content - checking if its possible', () => {
     const engine = HyperFormula.buildFromArray([])
     const cellInLastColumn = simpleCellAddress(0, Config.defaultConfig.maxColumns - 1, 0)
     const cellInLastRow = simpleCellAddress(0, 0, Config.defaultConfig.maxRows - 1)
-    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastColumn, 1, 1))).toEqual(true)
-    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastColumn, 2, 1))).toEqual(false)
-    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastRow, 1, 1))).toEqual(true)
-    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastRow, 1, 2))).toEqual(false)
+
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastColumn, 1, 1))).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastColumn, 2, 1))).toBe(false)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastRow, 1, 1))).toBe(true)
+    expect(engine.isItPossibleToSetCellContents(AbsoluteCellRange.spanFrom(cellInLastRow, 1, 2))).toBe(false)
   })
 
   it('yes otherwise', () => {
     const engine = HyperFormula.buildFromArray([[]])
 
-    expect(engine.isItPossibleToSetCellContents(adr('A1'))).toEqual(true)
+    expect(engine.isItPossibleToSetCellContents(adr('A1'))).toBe(true)
   })
 
   it('should throw error if testing with a malformed address', () => {
     const engine = HyperFormula.buildEmpty()
+
     expect(() => {
       engine.isItPossibleToSetCellContents({} as SimpleCellAddress)
     }).toThrow(new ExpectedValueOfTypeError('SimpleCellAddress | SimpleCellRange', 'address'))
@@ -97,6 +99,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('C1'), [['=B1']])
 
     c1 = engine.addressMapping.getCell(adr('C1'))
+
     expect(engine.graph.existsEdge(a1!, c1!)).toBe(false)
     expect(engine.graph.existsEdge(b1!, c1!)).toBe(true)
 
@@ -114,6 +117,7 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [['7']])
+
     expect(engine.getCellValue(adr('B1'))).toBe(7)
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
   })
@@ -129,6 +133,7 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [['foo']])
+
     expect(engine.getCellValue(adr('B1'))).toBe('foo')
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
   })
@@ -142,9 +147,10 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const a2 = engine.addressMapping.getCell(adr('B1'))
+
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1!, a2!)).toBe(true)
-    expect(engine.getCellValue(adr('A1'))).toBe(null)
+    expect(engine.getCellValue(adr('A1'))).toBeNull()
   })
 
   it('update formula to empty cell', () => {
@@ -158,7 +164,8 @@ describe('changing cell content', () => {
     expect(engine.graph.existsEdge(a1, b1)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
     engine.setCellContents(adr('B1'), [[null]])
-    expect(engine.getCellValue(adr('B1'))).toBe(null)
+
+    expect(engine.getCellValue(adr('B1'))).toBeNull()
     expect([ ...engine.graph.getNodes() ]).not.toContain(b1)
     expect(engine.graph.existsEdge(a1, b1)).toBe(false)
   })
@@ -176,6 +183,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('B1'), [['=A1']])
 
     b1 = engine.addressMapping.getCell(adr('B1'))
+
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(1)
   })
@@ -188,6 +196,7 @@ describe('changing cell content', () => {
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), [['3']])
+
     expect(engine.getCellValue(adr('B1'))).toBe(3)
   })
 
@@ -213,8 +222,9 @@ describe('changing cell content', () => {
 
     expect(engine.getCellValue(adr('B1'))).toBe(2)
     engine.setCellContents(adr('B1'), null)
-    expect(engine.addressMapping.getCell(adr('B1'))).toBe(undefined)
-    expect(engine.getCellValue(adr('B1'))).toBe(null)
+
+    expect(engine.addressMapping.getCell(adr('B1'))).toBeUndefined()
+    expect(engine.getCellValue(adr('B1'))).toBeNull()
   })
 
   it('update value cell to error literal', () => {
@@ -234,7 +244,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), '#FOO!')
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('#FOO!')
+    expect(engine.getCellValue(adr('A1'))).toBe('#FOO!')
   })
 
   it('update value cell to invalid formula', () => {
@@ -243,7 +253,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), '=SUM(')
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
-    expect(engine.getCellFormula(adr('A1'))).toEqual('=SUM(')
+    expect(engine.getCellFormula(adr('A1'))).toBe('=SUM(')
   })
 
   it('changing value inside range', () => {
@@ -252,10 +262,12 @@ describe('changing cell content', () => {
       ['2', '0'],
       ['3', '=SUM(A1:A3)'],
     ])
-    expect(engine.getCellValue(adr('B3'))).toEqual(6)
+
+    expect(engine.getCellValue(adr('B3'))).toBe(6)
 
     engine.setCellContents({sheet: 0, col: 0, row: 0}, '3')
-    expect(engine.getCellValue(adr('B3'))).toEqual(8)
+
+    expect(engine.getCellValue(adr('B3'))).toBe(8)
   })
 
   it('changing value inside column range', () => {
@@ -264,10 +276,12 @@ describe('changing cell content', () => {
       ['2', '0'],
       ['3', '0', '=SUM(A:B)'],
     ])
-    expect(engine.getCellValue(adr('C3'))).toEqual(6)
+
+    expect(engine.getCellValue(adr('C3'))).toBe(6)
 
     engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
-    expect(engine.getCellValue(adr('C3'))).toEqual(9)
+
+    expect(engine.getCellValue(adr('C3'))).toBe(9)
   })
 
   it('changing value inside row range', () => {
@@ -276,10 +290,12 @@ describe('changing cell content', () => {
       ['2', '0'],
       ['=SUM(1:2)'],
     ])
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
+
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
 
     engine.setCellContents({sheet: 0, col: 1, row: 0}, '3')
-    expect(engine.getCellValue(adr('A3'))).toEqual(6)
+
+    expect(engine.getCellValue(adr('A3'))).toBe(6)
   })
 
   it('set formula for the first time', () => {
@@ -292,6 +308,7 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
+
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(42)
   })
@@ -304,8 +321,9 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('A1'), null)
     const a1 = engine.addressMapping.getCell(adr('A1'))
-    expect(a1).toBe(undefined)
-    expect(engine.getCellValue(adr('A1'))).toBe(null)
+
+    expect(a1).toBeUndefined()
+    expect(engine.getCellValue(adr('A1'))).toBeNull()
   })
 
   it('set number for the first time', () => {
@@ -341,6 +359,7 @@ describe('changing cell content', () => {
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
+
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.graph.existsEdge(b1!, c1!)).toBe(true)
     expect(engine.getCellValue(adr('B1'))).toBe(42)
@@ -357,6 +376,7 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
+
     expect(a1).toBeInstanceOf(EmptyCellVertex)
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
   })
@@ -371,6 +391,7 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
+
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toBe(7)
   })
@@ -385,6 +406,7 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
+
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toBe('foo')
   })
@@ -403,6 +425,7 @@ describe('changing cell content', () => {
     const b2setCellValueSpy = spyOn(b2 as any, 'setCellValue')
 
     engine.setCellContents(adr('A1'), '3')
+
     expect(a2setCellValueSpy).toHaveBeenCalled()
     expect(b2setCellValueSpy).not.toHaveBeenCalled()
   })
@@ -425,6 +448,7 @@ describe('changing cell content', () => {
     const engine = HyperFormula.buildFromArray(sheet)
 
     const address = {row: -1, col: 0, sheet: 0}
+
     expect(() => {
       engine.setCellContents(address, '3')
     }).toThrow(new InvalidAddressError(address))
@@ -504,6 +528,7 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
+
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(true)
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
@@ -519,9 +544,10 @@ describe('changing cell content', () => {
 
     const a1 = engine.addressMapping.getCell(adr('A1'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
+
     expect(engine.graph.existsEdge(a1!, b1!)).toBe(false)
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
   })
 
@@ -533,7 +559,7 @@ describe('changing cell content', () => {
 
     engine.setCellContents(adr('B1'), '=SUM(A1)')
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
   })
 
   it('update empty cell to unparsable matrix formula', () => {
@@ -542,7 +568,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A1'), '=TRANSPOSE(')
 
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.ERROR, ErrorMessage.ParseError))
-    expect(engine.getCellFormula(adr('A1'))).toEqual('=TRANSPOSE(')
+    expect(engine.getCellFormula(adr('A1'))).toBe('=TRANSPOSE(')
   })
 
   it('should throw when trying to set cell content outside sheet limits', () => {
@@ -594,7 +620,7 @@ describe('changing cell content', () => {
     engine.setCellContents(adr('A3'), [['=SUM(A1:C2)']])
     engine.setCellContents(adr('B1'), [[null]])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(4)
+    expect(engine.getCellValue(adr('A3'))).toBe(4)
   })
 })
 
@@ -606,6 +632,7 @@ describe('change multiple cells contents', () => {
     const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('B1'), [['3']])
+
     expect(engine.getCellValue(adr('B1'))).toBe(3)
   })
 
@@ -621,6 +648,7 @@ describe('change multiple cells contents', () => {
       ['15', '16'],
       ['18', '19'],
     ])
+
     expect(engine.getCellValue(adr('B1'))).toBe(12)
     expect(engine.getCellValue(adr('C1'))).toBe(13)
     expect(engine.getCellValue(adr('B2'))).toBe(15)
@@ -654,6 +682,7 @@ describe('change multiple cells contents', () => {
     const engine = HyperFormula.buildFromArray(sheet)
 
     engine.setCellContents(adr('A1'), [['42', '18', '=MMULT(A1:B1,TRANSPOSE(A1:B1))']])
+
     expect(engine.getCellValue(adr('A1'))).toBe(42)
     expect(engine.getCellValue(adr('B1'))).toBe(18)
     expect(engine.getCellValue(adr('C1'))).toBe(2088)
@@ -669,7 +698,7 @@ describe('change multiple cells contents', () => {
 
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
-    expect(changes.length).toEqual(4)
+    expect(changes.length).toBe(4)
     expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10])
   })
 
@@ -684,7 +713,7 @@ describe('change multiple cells contents', () => {
 
     const changes = engine.setCellContents(adr('A1'), [['7', '8'], ['9', '10']])
 
-    expect(changes.length).toEqual(6)
+    expect(changes.length).toBe(6)
     expectArrayWithSameContent(changes.map((change) => change.newValue), [7, 8, 9, 10, 15, 18])
   })
 
@@ -751,7 +780,7 @@ describe('column ranges', () => {
 
     engine.setCellContents(adr('A1'), '3')
 
-    expect(engine.getCellValue(adr('C1'))).toEqual(5)
+    expect(engine.getCellValue(adr('C1'))).toBe(5)
   })
 
   it('works when new content is added beyond previous sheet size', () => {
@@ -763,8 +792,9 @@ describe('column ranges', () => {
 
     const range = engine.rangeMapping.getVertexOrThrow(colStart('A'), colEnd('B'))
     const a2 = engine.addressMapping.getCell(adr('A2'))
-    expect(engine.graph.existsEdge(a2!, range)).toEqual(true)
-    expect(engine.getCellValue(adr('C1'))).toEqual(6)
+
+    expect(engine.graph.existsEdge(a2!, range)).toBe(true)
+    expect(engine.getCellValue(adr('C1'))).toBe(6)
   })
 
   it('works when adding matrix', () => {
@@ -779,9 +809,10 @@ describe('column ranges', () => {
     const range = engine.rangeMapping.getVertexOrThrow(colStart('B'), colEnd('C'))
     const b1 = engine.addressMapping.getCell(adr('B1'))
     const c1 = engine.addressMapping.getCell(adr('C1'))
-    expect(engine.graph.existsEdge(b1!, range)).toEqual(true)
-    expect(engine.graph.existsEdge(c1!, range)).toEqual(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+
+    expect(engine.graph.existsEdge(b1!, range)).toBe(true)
+    expect(engine.graph.existsEdge(c1!, range)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
   })
 })
 
@@ -795,7 +826,7 @@ describe('row ranges', () => {
 
     engine.setCellContents(adr('A1'), '3')
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
   })
 
   it('works when new content is added beyond previous sheet size', () => {
@@ -809,8 +840,9 @@ describe('row ranges', () => {
 
     const range = engine.rangeMapping.getVertexOrThrow(rowStart(1), rowEnd(2))
     const b1 = engine.addressMapping.getCell(adr('B1'))
-    expect(engine.graph.existsEdge(b1!, range)).toEqual(true)
-    expect(engine.getCellValue(adr('A3'))).toEqual(6)
+
+    expect(engine.graph.existsEdge(b1!, range)).toBe(true)
+    expect(engine.getCellValue(adr('A3'))).toBe(6)
   })
 
   it('works when adding matrix', () => {
@@ -823,9 +855,10 @@ describe('row ranges', () => {
     const range = engine.rangeMapping.getVertexOrThrow(rowStart(2), rowEnd(3))
     const a2 = engine.addressMapping.getCell(adr('A2'))
     const a3 = engine.addressMapping.getCell(adr('A3'))
-    expect(engine.graph.existsEdge(a2!, range)).toEqual(true)
-    expect(engine.graph.existsEdge(a3!, range)).toEqual(true)
-    expect(engine.getCellValue(adr('A1'))).toEqual(3)
+
+    expect(engine.graph.existsEdge(a2!, range)).toBe(true)
+    expect(engine.graph.existsEdge(a3!, range)).toBe(true)
+    expect(engine.getCellValue(adr('A1'))).toBe(3)
   })
 })
 
@@ -906,7 +939,8 @@ describe('arrays', () => {
       [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
       [undefined, ArrayFormulaVertex, ArrayFormulaVertex],
     ])
-    expect(engine.arrayMapping.arrayMapping.size).toEqual(4)
+
+    expect(engine.arrayMapping.arrayMapping.size).toBe(4)
   })
 
   it('should REF last array', () => {
@@ -925,11 +959,13 @@ describe('arrays', () => {
       [ArrayFormulaVertex, ArrayFormulaVertex, ArrayFormulaVertex],
       [undefined, undefined],
     ])
+
     expect(engine.getSheetValues(0)).toEqual([
       [noSpace(), 1, 1, 1, 2],
       [noSpace(), 2, 2, 1, 2],
     ])
-    expect(engine.arrayMapping.arrayMapping.size).toEqual(3)
+
+    expect(engine.arrayMapping.arrayMapping.size).toBe(3)
   })
 
   it('should make existing array REF and change cell content to simple value', () => {
@@ -981,6 +1017,7 @@ describe('arrays', () => {
       ['=-A1:B2'],
       [undefined, '=SUM(A1:B2)']
     ], {useArrayArithmetic: true}))
+
     expect(engine.getSheetValues(0)).toEqual([
       [1, 2],
       [3, 4, 10],
@@ -1090,7 +1127,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
 
-    expect(changes.length).toEqual(2)
+    expect(changes.length).toBe(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), -1))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), -2))
   })
@@ -1103,7 +1140,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('A2'), [['foo']])
 
-    expect(changes.length).toEqual(2)
+    expect(changes.length).toBe(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 'foo'))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
   })
@@ -1116,7 +1153,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('B2'), [['foo']])
 
-    expect(changes.length).toEqual(3)
+    expect(changes.length).toBe(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), 'foo'))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
@@ -1130,7 +1167,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('B2'), [['=SUM(']])
 
-    expect(changes.length).toEqual(3)
+    expect(changes.length).toBe(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), noSpace()))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), detailedError(ErrorType.ERROR, "Parsing error. Expecting token of type --> RParen <-- but found --> '' <--")))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
@@ -1144,7 +1181,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('A2'), null)
 
-    expect(changes.length).toEqual(2)
+    expect(changes.length).toBe(2)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), null))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), null))
   })
@@ -1157,7 +1194,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('B2'), null)
 
-    expect(changes.length).toEqual(0)
+    expect(changes.length).toBe(0)
   })
 
   it('should return changed content when replacing array to another smaller one', () => {
@@ -1168,7 +1205,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('A2'), [['=+A1:B1']])
 
-    expect(changes.length).toEqual(3)
+    expect(changes.length).toBe(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), 1))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), 2))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
@@ -1182,7 +1219,7 @@ describe('arrays', () => {
 
     const changes = engine.setCellContents(adr('A2'), [['=-A1:B1']])
 
-    expect(changes.length).toEqual(3)
+    expect(changes.length).toBe(3)
     expect(changes).toContainEqual(new ExportedCellChange(adr('A2'), -1))
     expect(changes).toContainEqual(new ExportedCellChange(adr('B2'), -2))
     expect(changes).toContainEqual(new ExportedCellChange(adr('C2'), null))
@@ -1216,10 +1253,10 @@ describe('arrays', () => {
       ['=D1', '=E1', '=SUM(F1:F1)', '=SUM(F1:G1)'],
     ], {useArrayArithmetic: true}))
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(-1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(-2)
-    expect(engine.getCellValue(adr('C2'))).toEqual(-3)
-    expect(engine.getCellValue(adr('D2'))).toEqual(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(-1)
+    expect(engine.getCellValue(adr('B2'))).toBe(-2)
+    expect(engine.getCellValue(adr('C2'))).toBe(-3)
+    expect(engine.getCellValue(adr('D2'))).toBe(1)
   })
 
   it('should redo REF', () => {
@@ -1242,6 +1279,7 @@ describe('arrays', () => {
     const engine = HyperFormula.buildFromArray([
       ['=+C1:D1', 'foo', 1, 2]
     ], {useArrayArithmetic: true})
+
     expect(engine.getCellValue(adr('A1'))).toEqual(noSpace())
 
     engine.setCellContents(adr('B1'), null)

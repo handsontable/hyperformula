@@ -25,7 +25,7 @@ describe('Function COUNTIFS', () => {
       ['=COUNTIFS(A1:A3, ">=1")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toBe(2)
   })
 
   it('works for more criteria pairs', () => {
@@ -36,7 +36,7 @@ describe('Function COUNTIFS', () => {
       ['=COUNTIFS(A1:A3, ">=2", B1:B3, "<=20")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(1)
+    expect(engine.getCellValue(adr('A4'))).toBe(1)
   })
 
   it('use partial cache', () => {
@@ -47,9 +47,9 @@ describe('Function COUNTIFS', () => {
       ['3', '=COUNTIFS(A1:A4, ">=1")'],
     ])
 
-    expect(engine.getCellValue(adr('B3'))).toEqual(2)
-    expect(engine.getCellValue(adr('B4'))).toEqual(3)
-    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toEqual(1)
+    expect(engine.getCellValue(adr('B3'))).toBe(2)
+    expect(engine.getCellValue(adr('B4'))).toBe(3)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_PARTIAL_CACHE_USED)).toBe(1)
   })
 
   it('use full cache', () => {
@@ -59,9 +59,9 @@ describe('Function COUNTIFS', () => {
       ['2'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(2)
-    expect(engine.getCellValue(adr('B2'))).toEqual(2)
-    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toEqual(1)
+    expect(engine.getCellValue(adr('B1'))).toBe(2)
+    expect(engine.getCellValue(adr('B2'))).toBe(2)
+    expect(engine.getStats().get(StatType.CRITERION_FUNCTION_FULL_CACHE_USED)).toBe(1)
   })
 
   it('works for only one cell', () => {
@@ -70,8 +70,8 @@ describe('Function COUNTIFS', () => {
       ['0', '=COUNTIFS(A2, ">=1")'],
     ])
 
-    expect(engine.getCellValue(adr('B1'))).toEqual(1)
-    expect(engine.getCellValue(adr('B2'))).toEqual(0)
+    expect(engine.getCellValue(adr('B1'))).toBe(1)
+    expect(engine.getCellValue(adr('B2'))).toBe(0)
   })
 
   it('error when criterion unparsable', () => {
@@ -88,8 +88,8 @@ describe('Function COUNTIFS', () => {
       ['=COUNTIFS(0, ">1")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
-    expect(engine.getCellValue(adr('A2'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
+    expect(engine.getCellValue(adr('A2'))).toBe(0)
   })
 
   it('error propagation', () => {
@@ -112,8 +112,8 @@ describe('Function COUNTIFS', () => {
       ['=COUNTIFS(MMULT(A1:B2, A1:B2), ">50")'],
     ])
 
-    expect(engine.getCellValue(adr('A3'))).toEqual(3)
-    expect(engine.getCellValue(adr('A4'))).toEqual(3)
+    expect(engine.getCellValue(adr('A3'))).toBe(3)
+    expect(engine.getCellValue(adr('A4'))).toBe(3)
   })
 
   it('works for matrices', () => {
@@ -124,7 +124,7 @@ describe('Function COUNTIFS', () => {
       ['=COUNTIFS(A2:A3, ">0")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toBe(2)
   })
 
   it('ignore errors', () => {
@@ -135,6 +135,6 @@ describe('Function COUNTIFS', () => {
       ['=COUNTIFS(A1:A3, "=1")'],
     ])
 
-    expect(engine.getCellValue(adr('A4'))).toEqual(2)
+    expect(engine.getCellValue(adr('A4'))).toBe(2)
   })
 })

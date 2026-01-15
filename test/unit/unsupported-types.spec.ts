@@ -17,18 +17,21 @@ describe('unsupported types should result in error', () => {
     expect(() => HyperFormula.buildFromArray([[[]]])
     ).toThrowError('Unable to parse value: []')
   })
+
   it('should give parsing error #2', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => HyperFormula.buildFromArray([[{}]])
     ).toThrowError('Unable to parse value: {}')
   })
+
   it('should give parsing error #3', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => HyperFormula.buildFromArray([[() => {}]]))
       .toThrowError(/^Unable to parse value\: "(\(\) => \{\s*\}|function \(\) \{\s*\})"$/)
   })
+
   it('should give parsing error #4', () => {
     expect(() => HyperFormula.buildFromSheets({
       // eslint-disable-next-line
@@ -40,18 +43,21 @@ describe('unsupported types should result in error', () => {
     }))
       .toThrowError(/^Unable to parse value\: "(\(\) \=\> \{\s*\}|function \(\) \{\s*\})"$/)
   })
+
   it('should give parsing error #5', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => HyperFormula.buildFromArray([[Symbol()]])
     ).toThrowError('Unable to parse value: \"Symbol()\"')
   })
+
   it('should give parsing error #6', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => HyperFormula.buildFromArray([[/abcd/]])
     ).toThrowError('Unable to parse value: \"RegExp(/abcd/)\"')
   })
+
   it('should give parsing error #7', () => {
     // eslint-disable-next-line
     // @ts-ignore
@@ -60,12 +66,14 @@ describe('unsupported types should result in error', () => {
       '    \"sym\": \"Symbol()\"\n' +
       '}')
   })
+
   it('should give parsing error #9', () => {
     // eslint-disable-next-line
     // @ts-ignore
     expect(() => HyperFormula.buildFromArray([[Symbol('a')]])
     ).toThrowError('Unable to parse value: \"Symbol(a)\"')
   })
+
   it('should give parsing error #10', () => {
     // eslint-disable-next-line
     // @ts-ignore
@@ -74,6 +82,7 @@ describe('unsupported types should result in error', () => {
       '    \"Symbol(/abcd/)\"\n' +
       ']')
   })
+
   it('should give parsing error #11', () => {
     if (BigIntSupported) {
       // eslint-disable-next-line
@@ -82,6 +91,7 @@ describe('unsupported types should result in error', () => {
       ).toThrowError('Unable to parse value: \"BigInt(9007199254740991)\"')
     }
   })
+
   it('should give parsing error for setCellContents', () => {
     const sheet = [
       [],

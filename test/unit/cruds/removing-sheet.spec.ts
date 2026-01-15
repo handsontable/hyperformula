@@ -826,6 +826,7 @@ describe('remove sheet - placeholder sheet behavior', () => {
     engine.removeSheet(sheet1Id)
 
     const result = engine.getCellSerialized(adr('A1', sheet1Id))
+
     expect(result).toBeNull()
   })
 

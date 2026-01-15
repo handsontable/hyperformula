@@ -55,11 +55,11 @@ describe('function BITOR', () => {
       ['=BITOR(0, 0)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(5)
-    expect(engine.getCellValue(adr('A2'))).toEqual(495)
-    expect(engine.getCellValue(adr('A3'))).toEqual(5)
-    expect(engine.getCellValue(adr('A4'))).toEqual(379)
-    expect(engine.getCellValue(adr('A5'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(5)
+    expect(engine.getCellValue(adr('A2'))).toBe(495)
+    expect(engine.getCellValue(adr('A3'))).toBe(5)
+    expect(engine.getCellValue(adr('A4'))).toBe(379)
+    expect(engine.getCellValue(adr('A5'))).toBe(0)
   })
 
   it('should return numeric type', () => {

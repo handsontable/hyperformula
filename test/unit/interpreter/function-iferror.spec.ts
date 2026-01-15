@@ -8,13 +8,15 @@ describe('Function IFERROR', () => {
     const engine = HyperFormula.buildFromArray([
       ['=IFERROR(1)', '=IFERROR(2,3,4)']
     ])
+
     expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
     expect(engine.getCellValue(adr('B1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.WrongArgNumber))
   })
+
   it('when no error', () => {
     const engine = HyperFormula.buildFromArray([['=IFERROR("abcd", "no")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('abcd')
+    expect(engine.getCellValue(adr('A1'))).toBe('abcd')
   })
 
   it('preserves types of first arg', () => {
@@ -32,13 +34,13 @@ describe('Function IFERROR', () => {
   it('when left-error', () => {
     const engine = HyperFormula.buildFromArray([['=IFERROR(1/0, "yes")']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('when right-error', () => {
     const engine = HyperFormula.buildFromArray([['=IFERROR("yes", 1/0)']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('yes')
+    expect(engine.getCellValue(adr('A1'))).toBe('yes')
   })
 
   it('when both-error', () => {
@@ -56,7 +58,7 @@ describe('Function IFERROR', () => {
   it('when cycle', () => {
     const engine = HyperFormula.buildFromArray([['=IFERROR(B1, 1)', '=B1']])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(1)
+    expect(engine.getCellValue(adr('A1'))).toBe(1)
   })
 
   it('when left-parsing error', () => {

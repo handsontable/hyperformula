@@ -35,6 +35,7 @@ describe('Function EOMONTH', () => {
     ])
 
     expectCellValueToEqualDate(engine, adr('A2'), '31/03/2019')
+
     expect(engine.getCellValueDetailedType(adr('A2'))).toBe(CellValueDetailedType.NUMBER_DATE)
   })
 

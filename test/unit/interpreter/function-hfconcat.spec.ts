@@ -19,9 +19,9 @@ describe('Function HF.CONCAT', () => {
       ['=HF.CONCAT(,)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('hokuspokusczarymary')
-    expect(engine.getCellValue(adr('A2'))).toEqual('a')
-    expect(engine.getCellValue(adr('A3'))).toEqual('')
+    expect(engine.getCellValue(adr('A1'))).toBe('hokuspokusczarymary')
+    expect(engine.getCellValue(adr('A2'))).toBe('a')
+    expect(engine.getCellValue(adr('A3'))).toBe('')
   })
 
   it('should coerce to correct types', () => {
@@ -30,8 +30,8 @@ describe('Function HF.CONCAT', () => {
       ['=HF.CONCAT(1,)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('TRUE')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1')
+    expect(engine.getCellValue(adr('A1'))).toBe('TRUE')
+    expect(engine.getCellValue(adr('A2'))).toBe('1')
   })
 
   it('should throw correct error', () => {

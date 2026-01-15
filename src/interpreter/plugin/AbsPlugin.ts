@@ -8,6 +8,9 @@ import {InterpreterState} from '../InterpreterState'
 import {InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+/**
+ *
+ */
 export class AbsPlugin extends FunctionPlugin implements FunctionPluginTypecheck<AbsPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'ABS': {
@@ -18,6 +21,10 @@ export class AbsPlugin extends FunctionPlugin implements FunctionPluginTypecheck
     },
   }
 
+  
+  /**
+   *
+   */
   public abs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('ABS'), Math.abs)
   }

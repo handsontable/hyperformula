@@ -34,7 +34,7 @@ import {InterpreterState} from './InterpreterState'
 import {
   cloneNumber,
   EmptyValue,
-  getRawValue,
+  getRawPrecisionValue,
   InternalScalarValue,
   InterpreterValue,
   isExtendedNumber,
@@ -42,6 +42,9 @@ import {
 import {SimpleRangeValue} from '../SimpleRangeValue'
 import { AddressWithSheet } from '../parser/Address'
 
+/**
+ *
+ */
 export class Interpreter {
   public readonly criterionBuilder: CriterionBuilder
 
@@ -61,13 +64,18 @@ export class Interpreter {
     this.criterionBuilder = new CriterionBuilder(config)
   }
 
+  
+  /**
+   *
+   */
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
     let val = this.evaluateAstWithoutPostprocessing(ast, state)
     if (isExtendedNumber(val)) {
-      if (isNumberOverflow(getRawValue(val))) {
+      const precisionVal = getRawPrecisionValue(val)
+      if (isNumberOverflow(precisionVal)) {
         return new CellError(ErrorType.NUM, ErrorMessage.NaN)
       } else {
-        val = cloneNumber(val, fixNegativeZero(getRawValue(val)))
+        val = cloneNumber(val, fixNegativeZero(precisionVal))
       }
     }
     if (val instanceof SimpleRangeValue && val.height() === 1 && val.width() === 1) {
@@ -297,6 +305,10 @@ export class Interpreter {
     return address.sheet === undefined || address.sheet === NamedExpressions.SHEET_FOR_WORKBOOK_EXPRESSIONS || this.dependencyGraph.sheetMapping.hasSheetWithId(address.sheet, { includePlaceholders: false })
   }
 
+  
+  /**
+   *
+   */
   private rangeSpansOneSheet(ast: CellRangeAst | ColumnRangeAst | RowRangeAst): boolean {
     return ast.start.sheet === ast.end.sheet
   }
@@ -368,6 +380,10 @@ export class Interpreter {
 
   private unaryPlusOp = (arg: InternalScalarValue): InternalScalarValue => this.arithmeticHelper.unaryPlus(arg)
 
+  
+  /**
+   *
+   */
   private unaryRangeWrapper(op: (arg: InternalScalarValue) => InternalScalarValue, arg: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg instanceof SimpleRangeValue && !state.arraysFlag) {
       arg = coerceRangeToScalar(arg, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
@@ -385,6 +401,10 @@ export class Interpreter {
     return op(arg)
   }
 
+  
+  /**
+   *
+   */
   private binaryRangeWrapper(op: (arg1: InternalScalarValue, arg2: InternalScalarValue) => InternalScalarValue, arg1: InterpreterValue, arg2: InterpreterValue, state: InterpreterState): InterpreterValue {
     if (arg1 instanceof SimpleRangeValue && !state.arraysFlag) {
       arg1 = coerceRangeToScalar(arg1, state) ?? new CellError(ErrorType.VALUE, ErrorMessage.ScalarExpected)
@@ -473,6 +493,9 @@ export class Interpreter {
   }
 }
 
+/**
+ *
+ */
 function unaryErrorWrapper<T extends InterpreterValue>(op: (arg: T) => InternalScalarValue, arg: T | CellError): InternalScalarValue {
   if (arg instanceof CellError) {
     return arg
@@ -481,6 +504,9 @@ function unaryErrorWrapper<T extends InterpreterValue>(op: (arg: T) => InternalS
   }
 }
 
+/**
+ *
+ */
 function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) => InternalScalarValue, arg1: T | CellError, arg2: T | CellError): InternalScalarValue {
   if (arg1 instanceof CellError) {
     return arg1
@@ -491,6 +517,9 @@ function binaryErrorWrapper<T extends InterpreterValue>(op: (arg1: T, arg2: T) =
   }
 }
 
+/**
+ *
+ */
 function wrapperForRootVertex(val: InterpreterValue, vertex?: FormulaVertex): InterpreterValue {
   if (val instanceof CellError && vertex !== undefined) {
     return val.attachRootVertex(vertex)

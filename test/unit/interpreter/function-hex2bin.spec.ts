@@ -35,13 +35,13 @@ describe('function HEX2BIN', () => {
       ['=HEX2BIN("FFFFFFFE00")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1111')
-    expect(engine.getCellValue(adr('A3'))).toEqual('101010')
-    expect(engine.getCellValue(adr('A4'))).toEqual('111111111')
-    expect(engine.getCellValue(adr('A5'))).toEqual('1111110110')
-    expect(engine.getCellValue(adr('A6'))).toEqual('1110011100')
-    expect(engine.getCellValue(adr('A7'))).toEqual('1000000000')
+    expect(engine.getCellValue(adr('A1'))).toBe('1')
+    expect(engine.getCellValue(adr('A2'))).toBe('1111')
+    expect(engine.getCellValue(adr('A3'))).toBe('101010')
+    expect(engine.getCellValue(adr('A4'))).toBe('111111111')
+    expect(engine.getCellValue(adr('A5'))).toBe('1111110110')
+    expect(engine.getCellValue(adr('A6'))).toBe('1110011100')
+    expect(engine.getCellValue(adr('A7'))).toBe('1000000000')
   })
 
   it('should work for numbers', () => {
@@ -49,7 +49,7 @@ describe('function HEX2BIN', () => {
       ['=HEX2BIN(156)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('101010110')
+    expect(engine.getCellValue(adr('A1'))).toBe('101010110')
   })
 
   it('should work for reference', () => {
@@ -58,7 +58,7 @@ describe('function HEX2BIN', () => {
       ['=HEX2BIN(A1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual('100101010')
+    expect(engine.getCellValue(adr('A2'))).toBe('100101010')
   })
 
   it('should return string value', () => {
@@ -85,8 +85,8 @@ describe('function HEX2BIN', () => {
       ['=HEX2BIN(3, "4")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('00010010')
-    expect(engine.getCellValue(adr('A2'))).toEqual('0011')
+    expect(engine.getCellValue(adr('A1'))).toBe('00010010')
+    expect(engine.getCellValue(adr('A2'))).toBe('0011')
   })
 
   it('second argument should not affect negative results', () => {
@@ -95,8 +95,8 @@ describe('function HEX2BIN', () => {
       ['=HEX2BIN("FFFFFFFFF6", 10)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('1110011100')
-    expect(engine.getCellValue(adr('A2'))).toEqual('1111110110')
+    expect(engine.getCellValue(adr('A1'))).toBe('1110011100')
+    expect(engine.getCellValue(adr('A2'))).toBe('1111110110')
   })
 
   it('should fail if the result is longer than the desired length', () => {

@@ -9,12 +9,15 @@ import {ArrayValue, ErroredArray, CellArray, NotComputedArray} from '../ArrayVal
 import {CellError, equalSimpleCellAddress, ErrorType, SimpleCellAddress} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ErrorMessage} from '../error-message'
-import {EmptyValue, getRawValue, InternalScalarValue, InterpreterValue} from '../interpreter/InterpreterValue'
+import {EmptyValue, getRawPrecisionValue, InternalScalarValue, InterpreterValue, isExtendedNumber, toNativeNumeric} from '../interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from '../LazilyTransformingAstService'
 import {Maybe} from '../Maybe'
 import {Ast} from '../parser'
 import {ColumnsSpan, RowsSpan} from '../Span'
 
+/**
+ *
+ */
 export abstract class FormulaVertex {
   protected constructor(
     protected formula: Ast,
@@ -23,14 +26,26 @@ export abstract class FormulaVertex {
   ) {
   }
 
+  
+  /**
+   *
+   */
   public get width(): number {
     return 1
   }
 
+  
+  /**
+   *
+   */
   public get height(): number {
     return 1
   }
 
+  
+  /**
+   *
+   */
   static fromAst(formula: Ast, address: SimpleCellAddress, size: ArraySize, version: number) {
     if (size.isScalar()) {
       return new ScalarFormulaVertex(formula, address, version)
@@ -47,6 +62,10 @@ export abstract class FormulaVertex {
     return this.formula
   }
 
+  
+  /**
+   *
+   */
   public ensureRecentData(updatingService: LazilyTransformingAstService) {
     if (this.version != updatingService.version()) {
       const [newAst, newAddress, newVersion] = updatingService.applyTransformations(this.formula, this.cellAddress, this.version)
@@ -79,6 +98,9 @@ export abstract class FormulaVertex {
   public abstract isComputed(): boolean
 }
 
+/**
+ *
+ */
 export class ArrayFormulaVertex extends FormulaVertex {
   array: CellArray
 
@@ -91,22 +113,42 @@ export class ArrayFormulaVertex extends FormulaVertex {
     }
   }
 
+  
+  /**
+   *
+   */
   get width(): number {
     return this.array.width()
   }
 
+  
+  /**
+   *
+   */
   get height(): number {
     return this.array.height()
   }
 
+  
+  /**
+   *
+   */
   get sheet(): number {
     return this.cellAddress.sheet
   }
 
+  
+  /**
+   *
+   */
   get leftCorner(): SimpleCellAddress {
     return this.cellAddress
   }
 
+  
+  /**
+   *
+   */
   setCellValue(value: InterpreterValue): InterpreterValue {
     if (value instanceof CellError) {
       this.setErrorValue(value)
@@ -118,6 +160,10 @@ export class ArrayFormulaVertex extends FormulaVertex {
     return value
   }
 
+  
+  /**
+   *
+   */
   getCellValue(): InterpreterValue {
     if (this.array instanceof NotComputedArray) {
       throw Error('Array not computed yet.')
@@ -125,6 +171,10 @@ export class ArrayFormulaVertex extends FormulaVertex {
     return this.array.simpleRangeValue()
   }
 
+  
+  /**
+   *
+   */
   public valueOrUndef(): Maybe<InterpreterValue> {
     if (this.array instanceof NotComputedArray) {
       return undefined
@@ -132,6 +182,10 @@ export class ArrayFormulaVertex extends FormulaVertex {
     return this.array.simpleRangeValue()
   }
 
+  
+  /**
+   *
+   */
   getArrayCellValue(address: SimpleCellAddress): InternalScalarValue {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
@@ -143,15 +197,26 @@ export class ArrayFormulaVertex extends FormulaVertex {
     }
   }
 
+  
+  /**
+   *
+   */
   getArrayCellRawValue(address: SimpleCellAddress): Maybe<RawCellContent> {
     const val = this.getArrayCellValue(address)
     if (val instanceof CellError || val === EmptyValue) {
       return undefined
+    } else if (isExtendedNumber(val)) {
+      // Convert Numeric to native number for raw cell content
+      return toNativeNumeric(getRawPrecisionValue(val))
     } else {
-      return getRawValue(val)
+      return val
     }
   }
 
+  
+  /**
+   *
+   */
   setArrayCellValue(address: SimpleCellAddress, value: number): void {
     const col = address.col - this.cellAddress.col
     const row = address.row - this.cellAddress.row
@@ -160,47 +225,87 @@ export class ArrayFormulaVertex extends FormulaVertex {
     }
   }
 
+  
+  /**
+   *
+   */
   setNoSpace(): InterpreterValue {
     this.array = new ErroredArray(new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult), ArraySize.error())
     return this.getCellValue()
   }
 
+  
+  /**
+   *
+   */
   getRange(): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(this.cellAddress, this.width, this.height)
   }
 
+  
+  /**
+   *
+   */
   getRangeOrUndef(): Maybe<AbsoluteCellRange> {
     return AbsoluteCellRange.spanFromOrUndef(this.cellAddress, this.width, this.height)
   }
 
+  
+  /**
+   *
+   */
   setAddress(address: SimpleCellAddress) {
     this.cellAddress = address
   }
 
+  
+  /**
+   *
+   */
   setFormula(newFormula: Ast) {
     this.formula = newFormula
   }
 
+  
+  /**
+   *
+   */
   spansThroughSheetRows(sheet: number, startRow: number, endRow: number = startRow): boolean {
     return (this.cellAddress.sheet === sheet) &&
       (this.cellAddress.row <= endRow) &&
       (startRow < this.cellAddress.row + this.height)
   }
 
+  
+  /**
+   *
+   */
   spansThroughSheetColumn(sheet: number, col: number, columnEnd: number = col): boolean {
     return (this.cellAddress.sheet === sheet) &&
       (this.cellAddress.col <= columnEnd) &&
       (col < this.cellAddress.col + this.width)
   }
 
+  
+  /**
+   *
+   */
   isComputed() {
     return (!(this.array instanceof NotComputedArray))
   }
 
+  
+  /**
+   *
+   */
   columnsFromArray() {
     return ColumnsSpan.fromNumberOfColumns(this.cellAddress.sheet, this.cellAddress.col, this.width)
   }
 
+  
+  /**
+   *
+   */
   rowsFromArray() {
     return RowsSpan.fromNumberOfRows(this.cellAddress.sheet, this.cellAddress.row, this.height)
   }
@@ -211,10 +316,18 @@ export class ArrayFormulaVertex extends FormulaVertex {
   ensureRecentData(_updatingService: LazilyTransformingAstService) {
   }
 
+  
+  /**
+   *
+   */
   isLeftCorner(address: SimpleCellAddress): boolean {
     return equalSimpleCellAddress(this.cellAddress, address)
   }
 
+  
+  /**
+   *
+   */
   private setErrorValue(error: CellError) {
     this.array = new ErroredArray(error, this.array.size)
   }
@@ -237,6 +350,10 @@ export class ScalarFormulaVertex extends FormulaVertex {
     super(formula, address, version)
   }
 
+  
+  /**
+   *
+   */
   public valueOrUndef(): Maybe<InterpreterValue> {
     return this.cachedCellValue
   }
@@ -260,6 +377,10 @@ export class ScalarFormulaVertex extends FormulaVertex {
     }
   }
 
+  
+  /**
+   *
+   */
   public isComputed() {
     return (this.cachedCellValue !== undefined)
   }

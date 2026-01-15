@@ -8,7 +8,7 @@ describe('Function DEVSQ', () => {
       ['=DEVSQ(1)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   it('two numbers', () => {
@@ -16,7 +16,7 @@ describe('Function DEVSQ', () => {
       ['=DEVSQ(1, 2)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
   })
 
   it('more numbers', () => {
@@ -24,7 +24,7 @@ describe('Function DEVSQ', () => {
       ['=DEVSQ(3, 1, 2, 4, 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(10)
+    expect(engine.getCellValue(adr('A1'))).toBe(10)
   })
 
   it('works with ranges', () => {
@@ -33,7 +33,7 @@ describe('Function DEVSQ', () => {
       ['=DEVSQ(A1:C1)'],
     ])
 
-    expect(engine.getCellValue(adr('A2'))).toEqual(54)
+    expect(engine.getCellValue(adr('A2'))).toBe(54)
   })
 
   it('propagates error from regular argument', () => {
@@ -60,7 +60,7 @@ describe('Function DEVSQ', () => {
       [null],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0)
+    expect(engine.getCellValue(adr('A1'))).toBe(0)
   })
 
   /**
@@ -80,6 +80,6 @@ describe('Function DEVSQ', () => {
       [0, 1, false, null, '\'0']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual(0.5)
+    expect(engine.getCellValue(adr('A1'))).toBe(0.5)
   })
 })

@@ -42,6 +42,9 @@ export function isSimpleCellRange(val: unknown): val is SimpleCellRange {
 
 export const simpleCellRange = (start: SimpleCellAddress, end: SimpleCellAddress) => ({start, end})
 
+/**
+ *
+ */
 export class AbsoluteCellRange implements SimpleCellRange {
   public readonly start: SimpleCellAddress
   public readonly end: SimpleCellAddress
@@ -57,10 +60,18 @@ export class AbsoluteCellRange implements SimpleCellRange {
     this.end = simpleCellAddress(end.sheet, end.col, end.row)
   }
 
+  
+  /**
+   *
+   */
   public get sheet() {
     return this.start.sheet
   }
 
+  
+  /**
+   *
+   */
   public static fromSimpleCellAddresses(start: SimpleCellAddress, end: SimpleCellAddress): AbsoluteCellRange {
     if (start.sheet !== end.sheet) {
       throw new SheetsNotEqual(start.sheet, end.sheet)
@@ -80,6 +91,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return new AbsoluteColumnRange(start.sheet, start.col, end.col)
   }
 
+  
+  /**
+   *
+   */
   public static fromAst(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     if (ast.type === AstNodeType.CELL_RANGE) {
       return AbsoluteCellRange.fromCellRange(ast, baseAddress)
@@ -90,6 +105,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     }
   }
 
+  
+  /**
+   *
+   */
   public static fromAstOrUndef(ast: CellRangeAst | ColumnRangeAst | RowRangeAst, baseAddress: SimpleCellAddress): Maybe<AbsoluteCellRange> {
     try {
       return AbsoluteCellRange.fromAst(ast, baseAddress)
@@ -98,6 +117,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     }
   }
 
+  
+  /**
+   *
+   */
   public static fromCellRange(x: CellRange, baseAddress: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(
       x.start.toSimpleCellAddress(baseAddress),
@@ -105,6 +128,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     )
   }
 
+  
+  /**
+   *
+   */
   public static spanFrom(topLeftCorner: SimpleCellAddress, width: number, height: number): AbsoluteCellRange {
     const ret = AbsoluteCellRange.spanFromOrUndef(topLeftCorner, width, height)
     if (ret === undefined) {
@@ -113,6 +140,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return ret
   }
 
+  
+  /**
+   *
+   */
   public static spanFromOrUndef(topLeftCorner: SimpleCellAddress, width: number, height: number): Maybe<AbsoluteCellRange> {
     if (!Number.isFinite(width) && Number.isFinite(height)) {
       if (topLeftCorner.col !== 0) {
@@ -133,14 +164,26 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return undefined
   }
 
+  
+  /**
+   *
+   */
   public static fromCoordinates(sheet: number, x1: number, y1: number, x2: number, y2: number): AbsoluteCellRange {
     return new AbsoluteCellRange(simpleCellAddress(sheet, x1, y1), simpleCellAddress(sheet, x2, y2))
   }
 
+  
+  /**
+   *
+   */
   public isFinite(): boolean {
     return Number.isFinite(this.size())
   }
 
+  
+  /**
+   *
+   */
   public doesOverlap(other: AbsoluteCellRange): boolean {
     if (this.start.sheet != other.start.sheet) {
       return false
@@ -154,6 +197,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return true
   }
 
+  
+  /**
+   *
+   */
   public addressInRange(address: SimpleCellAddress): boolean {
     if (this.sheet !== address.sheet) {
       return false
@@ -165,6 +212,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
       && this.end.col >= address.col
   }
 
+  
+  /**
+   *
+   */
   public columnInRange(address: SimpleColumnAddress): boolean {
     if (this.sheet !== address.sheet) {
       return false
@@ -172,6 +223,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return this.start.col <= address.col && this.end.col >= address.col
   }
 
+  
+  /**
+   *
+   */
   public rowInRange(address: SimpleRowAddress): boolean {
     if (this.sheet !== address.sheet) {
       return false
@@ -179,10 +234,18 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return this.start.row <= address.row && this.end.row >= address.row
   }
 
+  
+  /**
+   *
+   */
   public containsRange(range: AbsoluteCellRange): boolean {
     return this.addressInRange(range.start) && this.addressInRange(range.end)
   }
 
+  
+  /**
+   *
+   */
   public intersectionWith(other: AbsoluteCellRange): Maybe<AbsoluteCellRange> {
     if (this.sheet !== other.start.sheet) {
       return undefined
@@ -201,41 +264,77 @@ export class AbsoluteCellRange implements SimpleCellRange {
     )
   }
 
+  
+  /**
+   *
+   */
   public includesRow(row: number): boolean {
     return this.start.row < row && this.end.row >= row
   }
 
+  
+  /**
+   *
+   */
   public includesColumn(column: number): boolean {
     return this.start.col < column && this.end.col >= column
   }
 
+  
+  /**
+   *
+   */
   public shiftByRows(numberOfRows: number) {
     this.start.row += numberOfRows
     this.end.row += numberOfRows
   }
 
+  
+  /**
+   *
+   */
   public expandByRows(numberOfRows: number) {
     this.end.row += numberOfRows
   }
 
+  
+  /**
+   *
+   */
   public shiftByColumns(numberOfColumns: number) {
     this.start.col += numberOfColumns
     this.end.col += numberOfColumns
   }
 
+  
+  /**
+   *
+   */
   public shifted(byCols: number, byRows: number): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col + byCols, this.start.row + byRows), this.width(), this.height())
   }
 
+  
+  /**
+   *
+   */
   public expandByColumns(numberOfColumns: number) {
     this.end.col += numberOfColumns
   }
 
+  
+  /**
+   *
+   */
   public moveToSheet(toSheet: number) {
     this.start.sheet = toSheet
     this.end.sheet = toSheet
   }
 
+  
+  /**
+   *
+   */
   public removeSpan(span: Span) {
     if (span instanceof RowsSpan) {
       this.removeRows(span.start, span.end)
@@ -244,34 +343,66 @@ export class AbsoluteCellRange implements SimpleCellRange {
     }
   }
 
+  
+  /**
+   *
+   */
   public shouldBeRemoved(): boolean {
     return this.width() <= 0 || this.height() <= 0
   }
 
+  
+  /**
+   *
+   */
   public rangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, this.start.col, startRow), this.width(), numberOfRows)
   }
 
+  
+  /**
+   *
+   */
   public rangeWithSameHeight(startColumn: number, numberOfColumns: number): AbsoluteCellRange {
     return AbsoluteCellRange.spanFrom(simpleCellAddress(this.sheet, startColumn, this.start.row), numberOfColumns, this.height())
   }
 
+  
+  /**
+   *
+   */
   public toString(): string {
     return `${this.start.sheet},${this.start.col},${this.start.row},${this.end.col},${this.end.row}`
   }
 
+  
+  /**
+   *
+   */
   public width(): number {
     return this.end.col - this.start.col + 1
   }
 
+  
+  /**
+   *
+   */
   public height(): number {
     return this.end.row - this.start.row + 1
   }
 
+  
+  /**
+   *
+   */
   public size(): number {
     return this.height() * this.width()
   }
 
+  
+  /**
+   *
+   */
   public arrayOfAddressesInRange(): SimpleCellAddress[][] {
     const result: SimpleCellAddress[][] = []
     for (let y = 0; y < this.height(); ++y) {
@@ -284,18 +415,34 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return result
   }
 
+  
+  /**
+   *
+   */
   public withStart(newStart: SimpleCellAddress): AbsoluteCellRange {
     return new AbsoluteCellRange(newStart, this.end)
   }
 
+  
+  /**
+   *
+   */
   public sameDimensionsAs(other: AbsoluteCellRange) {
     return this.width() === other.width() && this.height() === other.height()
   }
 
+  
+  /**
+   *
+   */
   public sameAs(other: AbsoluteCellRange) {
     return equalSimpleCellAddress(this.start, other.start) && equalSimpleCellAddress(this.end, other.end)
   }
 
+  
+  /**
+   *
+   */
   public addressesArrayMap<T>(dependencyGraph: DependencyGraph, op: (arg: SimpleCellAddress) => T): T[][] {
     const ret = []
     let currentRow = this.start.row
@@ -312,6 +459,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return ret
   }
 
+  
+  /**
+   *
+   */
   public addresses(dependencyGraph: DependencyGraph): SimpleCellAddress[] {
     const ret = []
     let currentRow = this.start.row
@@ -328,6 +479,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return ret
   }
 
+  
+  /**
+   *
+   */
   public* addressesWithDirection(right: number, bottom: number, dependencyGraph: DependencyGraph): IterableIterator<SimpleCellAddress> {
     if (right > 0) {
       if (bottom > 0) {
@@ -376,6 +531,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     }
   }
 
+  
+  /**
+   *
+   */
   public getAddress(col: number, row: number): SimpleCellAddress {
     if (col < 0 || row < 0 || row > this.height() - 1 || col > this.width() - 1) {
       throw Error('Index out of bound')
@@ -383,26 +542,50 @@ export class AbsoluteCellRange implements SimpleCellRange {
     return simpleCellAddress(this.start.sheet, this.start.col + col, this.start.row + row)
   }
 
+  
+  /**
+   *
+   */
   public exceedsSheetSizeLimits(maxColumns: number, maxRows: number): boolean {
     return this.end.col >= maxColumns || this.end.row >= maxRows
   }
 
+  
+  /**
+   *
+   */
   public effectiveEndColumn(_dependencyGraph: DependencyGraph): number {
     return this.end.col
   }
 
+  
+  /**
+   *
+   */
   public effectiveEndRow(_dependencyGraph: DependencyGraph): number {
     return this.end.row
   }
 
+  
+  /**
+   *
+   */
   public effectiveWidth(_dependencyGraph: DependencyGraph): number {
     return this.width()
   }
 
+  
+  /**
+   *
+   */
   public effectiveHeight(_dependencyGraph: DependencyGraph): number {
     return this.height()
   }
 
+  
+  /**
+   *
+   */
   protected removeRows(rowStart: number, rowEnd: number) {
     if (rowStart > this.end.row) {
       return
@@ -420,6 +603,10 @@ export class AbsoluteCellRange implements SimpleCellRange {
     this.end.row -= Math.min(rowEnd, this.end.row) - rowStart + 1
   }
 
+  
+  /**
+   *
+   */
   protected removeColumns(columnStart: number, columnEnd: number) {
     if (columnStart > this.end.col) {
       return
@@ -438,6 +625,9 @@ export class AbsoluteCellRange implements SimpleCellRange {
   }
 }
 
+/**
+ *
+ */
 export class AbsoluteColumnRange extends AbsoluteCellRange {
   constructor(sheet: number, columnStart: number, columnEnd: number) {
     super(
@@ -446,6 +636,10 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     )
   }
 
+  
+  /**
+   *
+   */
   public static fromColumnRange(x: ColumnRangeAst, baseAddress: SimpleCellAddress): AbsoluteColumnRange {
     const start = x.start.toSimpleColumnAddress(baseAddress)
     const end = x.end.toSimpleColumnAddress(baseAddress)
@@ -455,43 +649,82 @@ export class AbsoluteColumnRange extends AbsoluteCellRange {
     return new AbsoluteColumnRange(start.sheet, start.col, end.col)
   }
 
+  
+  /**
+   *
+   */
   public shouldBeRemoved() {
     return this.width() <= 0
   }
 
+  
+  /**
+   *
+   */
   public shiftByRows(_numberOfRows: number) {
     return
   }
 
+  
+  /**
+   *
+   */
   public expandByRows(_numberOfRows: number) {
     return
   }
 
+  
+  /**
+   *
+   */
   public shifted(byCols: number, _byRows: number): AbsoluteCellRange {
     return new AbsoluteColumnRange(this.sheet, this.start.col + byCols, this.end.col + byCols)
   }
 
+  
+  /**
+   *
+   */
   public rangeWithSameHeight(startColumn: number, numberOfColumns: number): AbsoluteCellRange {
     return new AbsoluteColumnRange(this.sheet, startColumn, startColumn + numberOfColumns - 1)
   }
 
+  
+  /**
+   *
+   */
   public exceedsSheetSizeLimits(maxColumns: number, _maxRows: number): boolean {
     return this.end.col >= maxColumns
   }
 
+  
+  /**
+   *
+   */
   public effectiveEndRow(dependencyGraph: DependencyGraph): number {
     return this.effectiveHeight(dependencyGraph) - 1
   }
 
+  
+  /**
+   *
+   */
   public effectiveHeight(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetHeight(this.sheet)
   }
 
+  
+  /**
+   *
+   */
   protected removeRows(_rowStart: number, _rowEnd: number) {
     return
   }
 }
 
+/**
+ *
+ */
 export class AbsoluteRowRange extends AbsoluteCellRange {
   constructor(sheet: number, rowStart: number, rowEnd: number) {
     super(
@@ -500,6 +733,10 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
     )
   }
 
+  
+  /**
+   *
+   */
   public static fromRowRangeAst(x: RowRangeAst, baseAddress: SimpleCellAddress): AbsoluteRowRange {
     const start = x.start.toSimpleRowAddress(baseAddress)
     const end = x.end.toSimpleRowAddress(baseAddress)
@@ -509,38 +746,74 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
     return new AbsoluteRowRange(start.sheet, start.row, end.row)
   }
 
+  
+  /**
+   *
+   */
   public shouldBeRemoved() {
     return this.height() <= 0
   }
 
+  
+  /**
+   *
+   */
   public shiftByColumns(_numberOfColumns: number) {
     return
   }
 
+  
+  /**
+   *
+   */
   public expandByColumns(_numberOfColumns: number) {
     return
   }
 
+  
+  /**
+   *
+   */
   public shifted(byCols: number, byRows: number): AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, this.start.row + byRows, this.end.row + byRows)
   }
 
+  
+  /**
+   *
+   */
   public rangeWithSameWidth(startRow: number, numberOfRows: number): AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, startRow, startRow + numberOfRows - 1)
   }
 
+  
+  /**
+   *
+   */
   public exceedsSheetSizeLimits(_maxColumns: number, maxRows: number): boolean {
     return this.end.row >= maxRows
   }
 
+  
+  /**
+   *
+   */
   public effectiveEndColumn(dependencyGraph: DependencyGraph): number {
     return this.effectiveWidth(dependencyGraph) - 1
   }
 
+  
+  /**
+   *
+   */
   public effectiveWidth(dependencyGraph: DependencyGraph): number {
     return dependencyGraph.getSheetWidth(this.sheet)
   }
 
+  
+  /**
+   *
+   */
   protected removeColumns(_columnStart: number, _columnEnd: number) {
     return
   }

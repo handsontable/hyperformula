@@ -20,9 +20,9 @@ describe('Function SUBSTITUTE', () => {
       ['=SUBSTITUTE("fooobar", "oo", "x")']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('bboo')
-    expect(engine.getCellValue(adr('A2'))).toEqual('fuuuubar')
-    expect(engine.getCellValue(adr('A3'))).toEqual('fxobar')
+    expect(engine.getCellValue(adr('A1'))).toBe('bboo')
+    expect(engine.getCellValue(adr('A2'))).toBe('fuuuubar')
+    expect(engine.getCellValue(adr('A3'))).toBe('fxobar')
   })
 
   it('should substitute new text for nth occurrence of a string', () => {
@@ -33,10 +33,10 @@ describe('Function SUBSTITUTE', () => {
       ['=SUBSTITUTE("fofofofofo", "o", "u", 4)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('ffobar')
-    expect(engine.getCellValue(adr('A2'))).toEqual('foOObar')
-    expect(engine.getCellValue(adr('A3'))).toEqual('foobar')
-    expect(engine.getCellValue(adr('A4'))).toEqual('fofofofufo')
+    expect(engine.getCellValue(adr('A1'))).toBe('ffobar')
+    expect(engine.getCellValue(adr('A2'))).toBe('foOObar')
+    expect(engine.getCellValue(adr('A3'))).toBe('foobar')
+    expect(engine.getCellValue(adr('A4'))).toBe('fofofofufo')
   })
 
   it('should return the original text if there are not enough occurrences of the search string', () => {
@@ -44,7 +44,7 @@ describe('Function SUBSTITUTE', () => {
       ['=SUBSTITUTE("foobar", "o", "BAZ", 3)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('foobar')
+    expect(engine.getCellValue(adr('A1'))).toBe('foobar')
   })
 
   it('should accept "." character in the search string', () => {
@@ -59,14 +59,14 @@ describe('Function SUBSTITUTE', () => {
       ['=SUBSTITUTE("foo.foo.foo.bar.", ".", "BAZ", 5)'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A2'))).toEqual('BAZbar')
-    expect(engine.getCellValue(adr('A3'))).toEqual('fooBAZ')
-    expect(engine.getCellValue(adr('A4'))).toEqual('fooBAZfoo.foo.bar.')
-    expect(engine.getCellValue(adr('A5'))).toEqual('foo.fooBAZfoo.bar.')
-    expect(engine.getCellValue(adr('A6'))).toEqual('foo.foo.fooBAZbar.')
-    expect(engine.getCellValue(adr('A7'))).toEqual('foo.foo.foo.barBAZ')
-    expect(engine.getCellValue(adr('A8'))).toEqual('foo.foo.foo.bar.')
+    expect(engine.getCellValue(adr('A1'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A2'))).toBe('BAZbar')
+    expect(engine.getCellValue(adr('A3'))).toBe('fooBAZ')
+    expect(engine.getCellValue(adr('A4'))).toBe('fooBAZfoo.foo.bar.')
+    expect(engine.getCellValue(adr('A5'))).toBe('foo.fooBAZfoo.bar.')
+    expect(engine.getCellValue(adr('A6'))).toBe('foo.foo.fooBAZbar.')
+    expect(engine.getCellValue(adr('A7'))).toBe('foo.foo.foo.barBAZ')
+    expect(engine.getCellValue(adr('A8'))).toBe('foo.foo.foo.bar.')
   })
 
   it('should accept regexp special characters in the search string', () => {
@@ -81,14 +81,14 @@ describe('Function SUBSTITUTE', () => {
       ['=SUBSTITUTE("foo$bar", "$", "BAZ")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A2'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A3'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A4'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A5'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A6'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A7'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A8'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A1'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A2'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A3'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A4'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A5'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A6'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A7'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A8'))).toBe('fooBAZbar')
   })
 
   it('should work with search strings that look like regular expressions', () => {
@@ -101,12 +101,12 @@ describe('Function SUBSTITUTE', () => {
       ['=SUBSTITUTE("foo\\sbar", "\\s", "BAZ")'],
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A2'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A3'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A4'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A5'))).toEqual('fooBAZbar')
-    expect(engine.getCellValue(adr('A6'))).toEqual('fooBAZbar')
+    expect(engine.getCellValue(adr('A1'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A2'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A3'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A4'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A5'))).toBe('fooBAZbar')
+    expect(engine.getCellValue(adr('A6'))).toBe('fooBAZbar')
   })
 
   it('should coerce', () => {
@@ -115,8 +115,8 @@ describe('Function SUBSTITUTE', () => {
       ['=SUBSTITUTE("fooTRUE", TRUE(), 5, 1)']
     ])
 
-    expect(engine.getCellValue(adr('A1'))).toEqual('fTRUEobar')
-    expect(engine.getCellValue(adr('A2'))).toEqual('foo5')
+    expect(engine.getCellValue(adr('A1'))).toBe('fTRUEobar')
+    expect(engine.getCellValue(adr('A2'))).toBe('foo5')
   })
 
   it('should return value when last argument is less than one', () => {

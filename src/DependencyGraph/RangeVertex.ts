@@ -30,14 +30,26 @@ export class RangeVertex {
     this.bruteForce = false
   }
 
+  
+  /**
+   *
+   */
   public get start(): SimpleCellAddress {
     return this.range.start
   }
 
+  
+  /**
+   *
+   */
   public get end(): SimpleCellAddress {
     return this.range.end
   }
 
+  
+  /**
+   *
+   */
   public get sheet(): number {
     return this.range.start.sheet
   }
@@ -90,6 +102,10 @@ export class RangeVertex {
     this.criterionFunctionCache.set(cacheKey, values)
   }
 
+  
+  /**
+   *
+   */
   public addDependentCacheRange(dependentRange: RangeVertex) {
     if (dependentRange !== this) {
       this.dependentCacheRanges.add(dependentRange)

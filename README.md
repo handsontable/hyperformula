@@ -44,6 +44,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 - High-speed parsing and evaluation of spreadsheet formulas
 - [A library of ~400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
 - [Support for custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
+- [High-precision arithmetic for financial calculations](https://hyperformula.handsontable.com/guide/numeric-precision.html) (avoids IEEE-754 floating-point issues)
 - [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)
 - [Support for undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
 - [Support for CRUD operations](https://hyperformula.handsontable.com/guide/basic-operations.html)
