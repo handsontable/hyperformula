@@ -297,6 +297,34 @@ describe('Iterative Calculation', () => {
       expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0, 5)
       expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0, 5)
     })
+
+    it('should handle multiple independent cycles', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=B1+1', '=A1+1', '', '=E1+2', '=D1+2'],
+      ], {
+        iterativeCalculationEnable: true,
+        iterativeCalculationMaxIterations: 10,
+      })
+
+      // Cycle 1: A1 <-> B1 (each adds 1)
+      // Cycle 2: D1 <-> E1 (each adds 2)
+      expect(engine.getCellValue(adr('A1'))).toBe(19)
+      expect(engine.getCellValue(adr('B1'))).toBe(20)
+      expect(engine.getCellValue(adr('D1'))).toBe(38)
+      expect(engine.getCellValue(adr('E1'))).toBe(40)
+    })
+
+    it('should handle cycle with SUM function', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=SUM(B1:D1)', '=A1/4', '=A1/3', 0.1],
+      ], {
+        iterativeCalculationEnable: true,
+      })
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(0.1)
+      expect(engine.getCellValue(adr('B1'))).toBeCloseTo(0.025)
+      expect(engine.getCellValue(adr('C1'))).toBeCloseTo(0.03333333333333333)
+    })
   })
 
   describe('Mixed Dependencies', () => {
@@ -334,6 +362,20 @@ describe('Iterative Calculation', () => {
 
       expect(engine.getCellValue(adr('A1'))).toBe(10)
       expect(engine.getCellValue(adr('B1'))).toBe(20)
+    })
+
+    it('should propagate changes to dependent cells after cycle resolution', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=A1+1', '=A1*2', '=B1+5'],  // A1 is cycle, B1 and C1 depend on it
+      ], {
+        iterativeCalculationEnable: true,
+        iterativeCalculationMaxIterations: 10,
+      })
+
+      // A1 resolves to 10, B1 = 10*2 = 20, C1 = 20+5 = 25
+      expect(engine.getCellValue(adr('A1'))).toBe(10)
+      expect(engine.getCellValue(adr('B1'))).toBe(20)
+      expect(engine.getCellValue(adr('C1'))).toBe(25)
     })
   })
 
