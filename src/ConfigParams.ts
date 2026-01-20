@@ -6,6 +6,7 @@
 import {ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {DateTime, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {Maybe} from './Maybe'
+import { RawCellContent } from '.'
 
 export interface ConfigParams {
   /**
@@ -18,12 +19,6 @@ export interface ConfigParams {
    * @category String
    */
   accentSensitive: boolean,
-  /**
-   * When set to `true`, allows circular references in formulas (up to a fixed iteration limit).
-   * @default false
-   * @category Engine
-   */
-  allowCircularReferences: boolean,
   /**
    * When set to `true`, makes string comparison case-sensitive.
    *
@@ -420,6 +415,45 @@ export interface ConfigParams {
    * @category String
    */
   useWildcards: boolean,
+  /**
+   * When set to `true`, enables iterative calculation for circular references.
+   *
+   * When disabled, circular references result in a #CYCLE! error.
+   *
+   * For more information, see the Excel and Google Sheets documentation on iterative calculations.
+   * @default false
+   * @category Engine
+   */
+  iterativeCalculationEnable: boolean,
+  /**
+   * Sets the maximum number of iterations for iterative calculation.
+   *
+   * Must be a positive integer (>= 1).
+   *
+   * @default 100
+   * @category Engine
+   */
+  iterativeCalculationMaxIterations: number,
+  /**
+   * Sets the convergence threshold for iterative calculation.
+   *
+   * Iteration stops when the change between successive values is strictly less than this threshold.
+   *
+   * Must be >= 0.
+   *
+   * @default 0.001
+   * @category Engine
+   */
+  iterativeCalculationConvergenceThreshold: number,
+  /**
+   * Sets the initial value used for cells in circular references during iterative calculation.
+   *
+   * Can be a number, string, boolean or date/time value.
+   *
+   * @default 0
+   * @category Engine
+   */
+  iterativeCalculationInitialValue: RawCellContent,
 }
 
 export type ConfigParamsList = keyof ConfigParams
