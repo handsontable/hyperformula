@@ -3,6 +3,48 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+/**
+ * # Evaluator - Formula Evaluation Engine
+ *
+ * Responsible for computing cell values based on their formulas and dependencies.
+ *
+ * ## Evaluation Workflow
+ *
+ * 1. **Topological Sort with SCC Detection**
+ *    - Sorts vertices (cells/ranges) by dependency order
+ *    - Identifies Strongly Connected Components (SCCs) as cycles
+ *
+ * 2. **Pre-cycle Evaluation**
+ *    - Computes all vertices that don't depend on cycles
+ *    - These provide stable inputs for cycle resolution
+ *
+ * 3. **Cycle Resolution** (if cycles exist)
+ *    - If iterative calculation disabled: sets #CYCLE! error on all cycle members
+ *    - If enabled: uses Gauss-Seidel iteration until convergence or max iterations
+ *
+ * 4. **Post-cycle Evaluation**
+ *    - Recomputes vertices that depend on cycle results
+ *    - Uses subgraph traversal for efficiency
+ *
+ * ## Iterative Calculation Algorithm
+ *
+ * When circular references exist and `iterativeCalculationEnable` is true:
+ *
+ * 1. Initialize all cycle cells to `iterativeCalculationInitialValue`
+ * 2. Repeat up to `iterativeCalculationMaxIterations` times:
+ *    a. Clear caches for ranges containing cycle cells
+ *    b. Store current values
+ *    c. Recompute all cycle cells in address order (Gauss-Seidel style)
+ *    d. Check convergence: |new - old| < `iterativeCalculationConvergenceThreshold`
+ * 3. If all cells converge, stop early; otherwise continue to max iterations
+ *
+ * ## Entry Points
+ *
+ * - `run()`: Full evaluation from scratch (initial load or major changes)
+ * - `partialRun()`: Incremental evaluation starting from changed vertices
+ * - `runAndForget()`: One-off formula evaluation without side effects
+ */
+
 import {AbsoluteCellRange} from './AbsoluteCellRange'
 import {absolutizeDependencies} from './absolutizeDependencies'
 import {CellError, ErrorType, SimpleCellAddress} from './Cell'
@@ -19,7 +61,21 @@ import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
 import {Ast, RelativeDependency} from './parser'
 import {Statistics, StatType} from './statistics'
 
+/**
+ * Evaluates formulas in the dependency graph, handling both acyclic and cyclic dependencies.
+ *
+ * Uses topological sorting for acyclic portions and iterative calculation for cycles.
+ * Maintains integration with column search index for VLOOKUP/MATCH optimization.
+ */
 export class Evaluator {
+  /**
+   * @param config - Configuration including iterative calculation settings
+   * @param stats - Statistics collector for performance measurement
+   * @param interpreter - AST interpreter for formula evaluation
+   * @param lazilyTransformingAstService - Service for lazy AST transformations (address updates)
+   * @param dependencyGraph - Graph of cell/range dependencies
+   * @param columnSearch - Search index for efficient column lookups
+   */
   constructor(
     private readonly config: Config,
     private readonly stats: Statistics,
@@ -30,6 +86,15 @@ export class Evaluator {
   ) {
   }
 
+  /**
+   * Performs full evaluation of all formulas in the dependency graph.
+   *
+   * Used for initial spreadsheet load or when dependencies have changed significantly.
+   * Performs topological sort to determine evaluation order and handles any cycles.
+   *
+   * Complexity: O(V + E) for topological sort + O(I × C) for cycles where
+   * V=vertices, E=edges, I=iterations, C=cycle size
+   */
   public run(): void {
     this.stats.start(StatType.TOP_SORT)
     const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
@@ -40,86 +105,76 @@ export class Evaluator {
     })
   }
 
+  /**
+   * Performs incremental evaluation starting from a set of changed vertices.
+   *
+   * More efficient than `run()` when only a subset of cells have changed.
+   * Traverses only the subgraph reachable from the changed vertices.
+   *
+   * Algorithm:
+   * 1. Traverse subgraph from starting vertices in topological order
+   * 2. Collect any cycles encountered during traversal
+   * 3. Mark vertices that depend on cycles for deferred processing
+   * 4. Process cycles via iterative calculation
+   * 5. Cycle dependents are handled inside iterateCircularDependencies
+   *
+   * @param vertices - Starting vertices (typically cells that were directly modified)
+   * @returns Content changes describing all value updates
+   */
   public partialRun(vertices: Vertex[]): ContentChanges {
     const changes = ContentChanges.empty()
     const cycled: Vertex[] = []
-    const postCycleVertices: Vertex[] = []
-    const cycledSet = new Set<Vertex>()
-    const dependsOnCycleCache = new Set<Vertex>()
+
+    // Tracks vertices depending on cycles (direct or transitive)
+    // These are deferred to updateNonCyclicDependents after cycle resolution
+    const cycleDependentVertices = new Set<Vertex>()
 
     this.stats.measure(StatType.EVALUATION, () => {
       this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
+        // onVertex callback: process each vertex in topological order
         (vertex: Vertex) => {
-          // Check if this vertex depends on any cycled vertex (directly or transitively)
-          if (cycledSet.size > 0 && this.dependsOnCycle(vertex, cycledSet, dependsOnCycleCache)) { // TODO: performance!
-            // Defer computation until after cycles are processed
-            postCycleVertices.push(vertex)
-            return true // Signal that changes may occur
+          if (cycleDependentVertices.has(vertex)) {
+            // Propagate cycle dependency to all dependents
+            this.dependencyGraph.graph.adjacentNodes(vertex).forEach(dependent => {
+              cycleDependentVertices.add(dependent)
+            })
+            return true // Signal potential changes for dependent propagation
           }
           return this.recomputeVertex(vertex, changes)
         },
+        // onCycle callback: handle vertices discovered as part of a cycle
         (vertex: Vertex) => {
           if (vertex instanceof RangeVertex) {
             vertex.clearCache()
-            // RangeVertices in an SCC are part of the cycle dependency chain
-            cycledSet.add(vertex)
           } else if (vertex instanceof FormulaVertex) {
             cycled.push(vertex)
-            cycledSet.add(vertex)
           }
+          // Mark all direct dependents as cycle-dependent
+          this.dependencyGraph.graph.adjacentNodes(vertex).forEach(dependent => {
+            cycleDependentVertices.add(dependent)
+          })
         },
       )
     })
 
-    // Process circular dependencies
+    // Resolve cycles and update their dependents
     const cycledChanges = this.iterateCircularDependencies(cycled)
     changes.addAll(cycledChanges)
-
-    // Process vertices that depend on cycles
-    postCycleVertices.forEach((vertex: Vertex) => {
-      this.recomputeVertex(vertex, changes)
-    })
 
     return changes
   }
 
   /**
-   * Checks if a vertex depends (directly or transitively) on any vertex in the cycled set.
-   * Uses caching to avoid recomputation for vertices already known to depend on cycles.
+   * Evaluates a formula without persisting the result or modifying the graph.
    *
-   * @param vertex - The vertex to check
-   * @param cycledSet - Set of vertices known to be part of a cycle
-   * @param dependsOnCycleCache - Cache of vertices known to depend on cycles
-   * @returns True if the vertex depends on any cycled vertex
+   * Used for one-off calculations like conditional formatting or data validation.
+   * Temporarily creates range vertices if needed, then cleans them up.
+   *
+   * @param ast - Parsed formula AST to evaluate
+   * @param address - Cell address context for relative references
+   * @param dependencies - Relative dependencies extracted from the formula
+   * @returns Computed value (number, string, boolean, error, or array)
    */
-  private dependsOnCycle(vertex: Vertex, cycledSet: Set<Vertex>, dependsOnCycleCache: Set<Vertex>): boolean {
-    // Already known to depend on cycle
-    if (dependsOnCycleCache.has(vertex)) {
-      return true
-    }
-
-    // Check if any cycled vertex has a path to this vertex
-    // A vertex depends on a cycle if:
-    // 1. A cycled vertex directly points to this vertex, OR
-    // 2. A cycled vertex points to an intermediate vertex that points to this vertex
-    for (const cycledVertex of cycledSet) {
-      if (this.dependencyGraph.graph.adjacentNodes(cycledVertex).has(vertex)) {
-        dependsOnCycleCache.add(vertex)
-        return true
-      }
-    }
-
-    // Check if any known cycle-dependent vertex points to this vertex
-    for (const depVertex of dependsOnCycleCache) {
-      if (this.dependencyGraph.graph.adjacentNodes(depVertex).has(vertex)) {
-        dependsOnCycleCache.add(vertex)
-        return true
-      }
-    }
-
-    return false
-  }
-
   public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
@@ -142,11 +197,16 @@ export class Evaluator {
   }
 
   /**
-   * Recalculates the value of a single vertex, assuming its dependencies have already been recalculated.
+   * Recomputes a single vertex and records any value changes.
    *
-   * @param vertex - The vertex to recompute
-   * @param changes - Content changes tracker to record value changes
-   * @returns True if the value changed, false otherwise
+   * Handles different vertex types:
+   * - FormulaVertex: evaluates formula, updates column search index if changed
+   * - RangeVertex: clears cached aggregate values
+   * - Other (ValueVertex): no computation needed, always signals change
+   *
+   * @param vertex - The vertex to recompute (dependencies must be current)
+   * @param changes - Accumulator for tracking all value changes
+   * @returns True if value changed (used by graph traversal to propagate to dependents)
    */
   private recomputeVertex(vertex: Vertex, changes: ContentChanges): boolean {
     if (vertex instanceof FormulaVertex) {
@@ -168,29 +228,39 @@ export class Evaluator {
   }
 
   /**
-   * Recalculates formulas in the topological sort order
-   * First computes non-cyclic dependencies, then iterates cycles, then computes dependents
+   * Evaluates all formulas in dependency order, handling cycles appropriately.
+   *
+   * Algorithm:
+   * 1. Build set of vertices that depend on cycles (BFS from cycle members)
+   * 2. Evaluate all non-cycle-dependent vertices in topological order
+   * 3. Delegate cycle resolution and dependent updates to iterateCircularDependencies
+   *
+   * This separation ensures cycle cells have stable inputs before iteration begins.
+   *
+   * @param cycled - Vertices identified as part of cycles (from topological sort)
+   * @param sorted - All vertices in topological order (excludes cycle members)
    */
   private recomputeFormulas(cycled: Vertex[], sorted: Vertex[]): void {
     const cyclicSet = new Set(cycled)
 
-    // Build set of vertices that depend on cycles (directly or transitively)
+    // BFS to find all vertices transitively depending on cycles
     const dependsOnCycleSet = new Set<Vertex>()
-
-    // Start with direct dependents of cycled vertices
     const queue: Vertex[] = []
-    cycled.forEach(cycledVertex => {
-      this.dependencyGraph.graph.adjacentNodes(cycledVertex).forEach(dependent => {
+
+    // Seed with direct dependents of cycle members
+    for (let i = 0; i < cycled.length; i++) {
+      this.dependencyGraph.graph.adjacentNodes(cycled[i]).forEach(dependent => {
         if (!cyclicSet.has(dependent) && !dependsOnCycleSet.has(dependent)) {
           dependsOnCycleSet.add(dependent)
           queue.push(dependent)
         }
       })
-    })
+    }
 
-    // Propagate transitively: if X depends on cycle, and Y depends on X, then Y depends on cycle
-    while (queue.length > 0) {
-      const vertex = queue.shift()!
+    // Propagate: if X depends on cycle, all dependents of X also depend on cycle
+    let queueIndex = 0
+    while (queueIndex < queue.length) {
+      const vertex = queue[queueIndex++]
       this.dependencyGraph.graph.adjacentNodes(vertex).forEach(dependent => {
         if (!cyclicSet.has(dependent) && !dependsOnCycleSet.has(dependent)) {
           dependsOnCycleSet.add(dependent)
@@ -199,20 +269,13 @@ export class Evaluator {
       })
     }
 
-    // Split sorted into: vertices that don't depend on cycles vs those that do
-    const preCycleVertices: Vertex[] = []
-    const postCycleVertices: Vertex[] = []
-
-    sorted.forEach(vertex => {
+    // Evaluate vertices that don't depend on cycles
+    // (cycle-dependent vertices handled by updateNonCyclicDependents)
+    for (let i = 0; i < sorted.length; i++) {
+      const vertex = sorted[i]
       if (dependsOnCycleSet.has(vertex)) {
-        postCycleVertices.push(vertex)
-      } else {
-        preCycleVertices.push(vertex)
+        continue
       }
-    })
-
-    // First: compute non-cyclic vertices that cycles may depend on
-    preCycleVertices.forEach((vertex: Vertex) => {
       if (vertex instanceof FormulaVertex) {
         const newCellValue = this.recomputeFormulaVertexValue(vertex)
         const address = vertex.getAddress(this.lazilyTransformingAstService)
@@ -220,34 +283,23 @@ export class Evaluator {
       } else if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       }
-    })
+    }
 
-    // Then iterate the circular dependencies
+    // Resolve cycles and evaluate their dependents
     this.iterateCircularDependencies(cycled)
-
-    // Finally: compute vertices that depend on cycle results
-    postCycleVertices.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaVertex) {
-        const newCellValue = this.recomputeFormulaVertexValue(vertex)
-        const address = vertex.getAddress(this.lazilyTransformingAstService)
-        this.columnSearch.add(getRawValue(newCellValue), address)
-      } else if (vertex instanceof RangeVertex) {
-        vertex.clearCache()
-      }
-    })
   }
 
   /**
-   * Blocks circular dependencies by setting #CYCLE! error on all cycled formula vertices.
-   * Used when iterative calculation is disabled.
+   * Sets #CYCLE! error on all cycle members when iterative calculation is disabled.
    *
-   * @param cycled - Array of vertices involved in circular dependencies
-   * @returns Content changes from setting errors on cycled cells
+   * Also removes old values from column search index to maintain consistency.
+   * RangeVertices in cycles have their caches cleared.
+   *
+   * @param cycled - Vertices identified as part of circular dependencies
    */
-  private blockCircularDependencies(cycled: Vertex[]): ContentChanges {
-    const changes = ContentChanges.empty()
-
-    cycled.forEach((vertex: Vertex) => {
+  private blockCircularDependencies(cycled: Vertex[]): void {
+    for (let i = 0; i < cycled.length; i++) {
+      const vertex = cycled[i]
       if (vertex instanceof RangeVertex) {
         vertex.clearCache()
       } else if (vertex instanceof FormulaVertex) {
@@ -255,84 +307,139 @@ export class Evaluator {
         this.columnSearch.remove(getRawValue(vertex.valueOrUndef()), address)
         const error = new CellError(ErrorType.CYCLE, undefined, vertex)
         vertex.setCellValue(error)
-        changes.addChange(error, address)
       }
-    })
-
-    return changes
+    }
   }
 
   /**
-   * Iterates over all circular dependencies (cycled vertices) until convergence or max iterations.
-   * Uses Gauss-Seidel style iteration where each cell immediately sees updated values from
-   * earlier cells in the same iteration.
+   * Resolves circular dependencies using iterative calculation (Gauss-Seidel method).
    *
-   * Iteration stops when:
-   * - All cell value changes are strictly less than the convergence threshold, OR
-   * - Maximum iterations are reached
+   * When iterative calculation is disabled, sets #CYCLE! error on all cycle members.
+   * When enabled, iterates until convergence or max iterations reached.
    *
-   * @param cycled - Array of vertices involved in circular dependencies
-   * @returns Content changes from the iterative calculation
+   * ## Gauss-Seidel Iteration
+   * Each cell immediately uses updated values from cells earlier in the evaluation order
+   * (within the same iteration). This typically converges faster than Jacobi iteration.
+   *
+   * ## Convergence Criteria
+   * - Numeric values: |new - old| < threshold
+   * - Non-numeric values: strict equality
+   * - All cells must satisfy the criteria to stop early
+   *
+   * ## Performance Optimizations
+   * - Addresses cached to avoid repeated getAddress() calls
+   * - Affected ranges pre-computed once before iteration loop
+   * - Previous values stored in pre-allocated array
+   *
+   * @param cycled - Vertices forming circular dependencies
+   * @returns Content changes for all cycle members and their dependents
    */
   private iterateCircularDependencies(cycled: Vertex[]): ContentChanges {
-    if (!this.config.iterativeCalculationEnable) {
-      return this.blockCircularDependencies(cycled)
+    const changes = ContentChanges.empty()
+
+    // Early return for empty cycles
+    if (cycled.length === 0) {
+      return changes
     }
 
-    const changes = ContentChanges.empty()
+    if (!this.config.iterativeCalculationEnable) {
+      this.blockCircularDependencies(cycled)
+      // Still need to update dependents (they'll see #CYCLE! errors)
+      const dependentChanges = this.updateNonCyclicDependents(cycled)
+      changes.addAll(dependentChanges)
+      return changes
+    }
     const maxIterations = this.config.iterativeCalculationMaxIterations
     const threshold = this.config.iterativeCalculationConvergenceThreshold
     const initialValue = this.config.iterativeCalculationInitialValue
 
-    // Extract and sort formula vertices by address for consistent evaluation order
-    const formulaVertices = cycled
-      .filter((vertex): vertex is FormulaVertex => vertex instanceof FormulaVertex)
-      .sort((a, b) => {
-        const addrA = a.getAddress(this.lazilyTransformingAstService)
-        const addrB = b.getAddress(this.lazilyTransformingAstService)
-        if (addrA.sheet !== addrB.sheet) return addrA.sheet - addrB.sheet
-        if (addrA.row !== addrB.row) return addrA.row - addrB.row
-        return addrA.col - addrB.col
-      })
+    // Extract formula vertices and cache their addresses to avoid repeated getAddress() calls
+    const formulaVerticesWithAddresses: {vertex: FormulaVertex, address: SimpleCellAddress}[] = []
+    for (let i = 0; i < cycled.length; i++) {
+      const vertex = cycled[i]
+      if (vertex instanceof FormulaVertex) {
+        formulaVerticesWithAddresses.push({
+          vertex,
+          address: vertex.getAddress(this.lazilyTransformingAstService)
+        })
+      }
+    }
 
-    // Always initialize cycle vertices to initialValue (restart on recalculation)
-    formulaVertices.forEach(vertex => {
-      vertex.setCellValue(initialValue)
+    // Sort by address for consistent evaluation order
+    formulaVerticesWithAddresses.sort((a, b) => {
+      if (a.address.sheet !== b.address.sheet) return a.address.sheet - b.address.sheet
+      if (a.address.row !== b.address.row) return a.address.row - b.address.row
+      return a.address.col - b.address.col
     })
 
+    // Extract vertices and addresses in single pass
+    const count = formulaVerticesWithAddresses.length
+    const formulaVertices: FormulaVertex[] = new Array(count)
+    const cachedAddresses: SimpleCellAddress[] = new Array(count)
+    for (let i = 0; i < count; i++) {
+      formulaVertices[i] = formulaVerticesWithAddresses[i].vertex
+      cachedAddresses[i] = formulaVerticesWithAddresses[i].address
+    }
+
+    // Pre-compute affected ranges ONCE before iteration loop (performance optimization)
+    const affectedRanges = this.findAffectedRanges(cachedAddresses)
+
+    // Always initialize cycle vertices to initialValue (restart on recalculation)
+    // Config validation ensures initialValue is never undefined/null
+    // Date objects are converted to their numeric representation (days since epoch)
+    let safeInitialValue: InterpreterValue
+    if (initialValue instanceof Date) {
+      safeInitialValue = initialValue.getTime() / 86400000 + 25569 // Convert to Excel serial date
+    } else {
+      safeInitialValue = initialValue ?? 0
+    }
+    for (let i = 0; i < formulaVertices.length; i++) {
+      formulaVertices[i].setCellValue(safeInitialValue)
+    }
+
+    // Pre-allocate array for previous values to avoid Map overhead
+    const previousValues: InterpreterValue[] = new Array(formulaVertices.length)
+
+    // Convert Set to Array for faster iteration in the loop
+    const affectedRangesArray = Array.from(affectedRanges)
+
     for (let iteration = 0; iteration < maxIterations; iteration++) {
-      this.clearCachesForCyclicRanges(cycled)
+      // Clear affected range caches - O(affectedRanges) instead of O(ranges * cells)
+      for (let i = 0; i < affectedRangesArray.length; i++) {
+        affectedRangesArray[i].clearCache()
+      }
 
       // Store previous values for convergence check
-      const previousValues = new Map<FormulaVertex, InterpreterValue>()
-      formulaVertices.forEach(vertex => {
-        previousValues.set(vertex, vertex.getCellValue())
-      })
+      for (let i = 0; i < formulaVertices.length; i++) {
+        previousValues[i] = formulaVertices[i].getCellValue()
+      }
 
       // Recompute all formula vertices in order (Gauss-Seidel style)
-      formulaVertices.forEach(vertex => {
-        this.recomputeFormulaVertexValue(vertex)
-      })
+      for (let i = 0; i < formulaVertices.length; i++) {
+        this.recomputeFormulaVertexValue(formulaVertices[i])
+      }
 
       // Check for convergence: all changes must be strictly less than threshold
-      const converged = formulaVertices.every(vertex => {
-        const oldValue = previousValues.get(vertex)
-        const newValue = vertex.getCellValue()
-        return this.isConverged(oldValue, newValue, threshold)
-      })
+      let converged = true
+      for (let i = 0; i < formulaVertices.length; i++) {
+        if (!this.isConverged(previousValues[i], formulaVertices[i].getCellValue(), threshold)) {
+          converged = false
+          break
+        }
+      }
 
       if (converged) {
         break
       }
     }
 
-    // Record final values in changes and column search
-    formulaVertices.forEach(vertex => {
-      const address = vertex.getAddress(this.lazilyTransformingAstService)
-      const finalValue = vertex.getCellValue()
+    // Record final values in changes and column search (using cached addresses)
+    for (let i = 0; i < formulaVertices.length; i++) {
+      const finalValue = formulaVertices[i].getCellValue()
+      const address = cachedAddresses[i]
       this.columnSearch.add(getRawValue(finalValue), address)
       changes.addChange(finalValue, address)
-    })
+    }
 
     const dependentChanges = this.updateNonCyclicDependents(cycled)
     changes.addAll(dependentChanges)
@@ -341,13 +448,62 @@ export class Evaluator {
   }
 
   /**
-   * Checks if the change between old and new values is below the convergence threshold.
-   * For numeric values, uses absolute difference; for non-numeric, checks strict equality.
+   * Identifies range vertices whose cached values may be affected by cycle cells.
    *
-   * @param oldValue - The previous value (undefined if not yet computed)
-   * @param newValue - The new computed value
-   * @param threshold - The convergence threshold (change must be strictly less than)
-   * @returns True if converged (change < threshold for numbers, or values are equal)
+   * A range is affected if it contains any cell involved in the cycle.
+   * These ranges need their caches cleared on each iteration since their
+   * aggregate values (SUM, AVERAGE, etc.) depend on the changing cycle values.
+   *
+   * Computed once before the iteration loop to avoid O(ranges × cells) work per iteration.
+   *
+   * @param cyclicAddresses - Addresses of formula vertices in the cycle
+   * @returns Set of RangeVertices requiring cache invalidation each iteration
+   */
+  private findAffectedRanges(cyclicAddresses: SimpleCellAddress[]): Set<RangeVertex> {
+    const affectedRanges = new Set<RangeVertex>()
+
+    // Group addresses by sheet for efficient lookup
+    const addressesBySheet = new Map<number, SimpleCellAddress[]>()
+
+    for (let i = 0; i < cyclicAddresses.length; i++) {
+      const address = cyclicAddresses[i]
+      let cells = addressesBySheet.get(address.sheet)
+      if (cells === undefined) {
+        cells = []
+        addressesBySheet.set(address.sheet, cells)
+      }
+      cells.push(address)
+    }
+
+    // Check each range in affected sheets
+    addressesBySheet.forEach((cellsInSheet, sheet) => {
+      for (const rangeVertex of this.dependencyGraph.rangeMapping.rangesInSheet(sheet)) {
+        const range = rangeVertex.range
+        // Check if range contains any cyclic cell
+        for (let i = 0; i < cellsInSheet.length; i++) {
+          if (range.addressInRange(cellsInSheet[i])) {
+            affectedRanges.add(rangeVertex)
+            break
+          }
+        }
+      }
+    })
+
+    return affectedRanges
+  }
+
+  /**
+   * Determines if a cell value has converged between iterations.
+   *
+   * Convergence rules:
+   * - Numbers: |new - old| < threshold (strict inequality)
+   * - Strings, booleans, errors: exact equality
+   * - Undefined old value: not converged (first iteration)
+   *
+   * @param oldValue - Value from previous iteration (undefined if first iteration)
+   * @param newValue - Value from current iteration
+   * @param threshold - Maximum allowed change for numeric convergence
+   * @returns True if the cell has stabilized
    */
   private isConverged(oldValue: InterpreterValue | undefined, newValue: InterpreterValue, threshold: number): boolean {
     if (oldValue === undefined) {
@@ -364,83 +520,73 @@ export class Evaluator {
   }
 
   /**
-   * Updates all non-cyclic cells that depend on the given cycled vertices.
-   * Uses topological sorting to ensure correct dependency order.
+   * Recomputes all vertices that depend on cycle results.
    *
-   * @param cycled - Array of vertices involved in circular dependencies
-   * @returns Content changes from updating dependent cells
+   * After cycle values stabilize, their dependents need to be updated.
+   * Uses subgraph traversal starting from direct dependents of cycle members,
+   * avoiding a full graph topological sort.
+   *
+   * Complexity: O(V' + E') where V' and E' are vertices/edges in the dependent subgraph
+   *
+   * @param cycled - Cycle member vertices (used to find their dependents)
+   * @returns Content changes from all dependent updates
    */
   private updateNonCyclicDependents(cycled: Vertex[]): ContentChanges {
     const changes = ContentChanges.empty()
     const cyclicSet = new Set(cycled)
 
-    const dependents = new Set<Vertex>()
-    cycled.forEach(vertex => {
-      this.dependencyGraph.graph.adjacentNodes(vertex).forEach(dependent => {
-        if (!cyclicSet.has(dependent) && dependent instanceof FormulaVertex) {
-          dependents.add(dependent)
+    // Collect unique direct dependents of cycled vertices (use Set to avoid duplicates)
+    const directDependentsSet = new Set<Vertex>()
+    for (let i = 0; i < cycled.length; i++) {
+      this.dependencyGraph.graph.adjacentNodes(cycled[i]).forEach(dependent => {
+        if (!cyclicSet.has(dependent)) {
+          directDependentsSet.add(dependent)
         }
       })
-    })
+    }
 
-    if (dependents.size === 0) {
+    if (directDependentsSet.size === 0) {
       return changes
     }
 
-    const {sorted} = this.dependencyGraph.topSortWithScc()
-    const orderedDependents = sorted.filter(vertex => dependents.has(vertex))
+    const directDependents = Array.from(directDependentsSet)
 
-    orderedDependents.forEach(vertex => {
-      if (vertex instanceof FormulaVertex) {
-        const newCellValue = this.recomputeFormulaVertexValue(vertex)
-        const address = vertex.getAddress(this.lazilyTransformingAstService)
-        this.columnSearch.add(getRawValue(newCellValue), address)
-        changes.addChange(newCellValue, address)
-      }
-    })
+    // Use subgraph traversal starting from direct dependents
+    // This avoids full graph traversal - only visits reachable vertices
+    this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(
+      directDependents,
+      (vertex: Vertex) => {
+        if (vertex instanceof FormulaVertex) {
+          const newCellValue = this.recomputeFormulaVertexValue(vertex)
+          const address = vertex.getAddress(this.lazilyTransformingAstService)
+          this.columnSearch.add(getRawValue(newCellValue), address)
+          changes.addChange(newCellValue, address)
+        } else if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+        }
+        return true
+      },
+      (vertex: Vertex) => {
+        // Handle any cycles in dependents (shouldn't normally happen)
+        if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+        }
+      },
+    )
 
     return changes
   }
 
   /**
-   * Clears function caches for ranges that contain any of the given cyclic vertices.
-   * This ensures fresh computation during circular dependency iteration.
+   * Evaluates a formula vertex and stores the result.
    *
-   * @param cycled - Array of vertices involved in circular dependencies
+   * Handles special cases:
+   * - ArrayFormulaVertex: checks for available space, returns #SPILL! if blocked
+   * - ScalarFormulaVertex: standard formula evaluation
+   *
+   * @param vertex - Formula vertex to evaluate
+   * @returns The computed value (also stored in the vertex)
    */
-  private clearCachesForCyclicRanges(cycled: Vertex[]): void {
-    const cyclicAddresses = new Set<string>()
-    const sheetsWithCycles = new Set<number>()
-
-    // Collect cyclic addresses and sheets in a single pass
-    cycled.forEach((vertex: Vertex) => {
-      if (vertex instanceof FormulaVertex) {
-        const address = vertex.getAddress(this.lazilyTransformingAstService)
-        cyclicAddresses.add(`${address.sheet}:${address.col}:${address.row}`)
-        sheetsWithCycles.add(address.sheet)
-      }
-    })
-
-    sheetsWithCycles.forEach(sheet => {
-      for (const rangeVertex of this.dependencyGraph.rangeMapping.rangesInSheet(sheet)) {
-        const range = rangeVertex.range
-        let containsCyclicCell = false
-
-        for (const address of range.addresses(this.dependencyGraph)) {
-          const addressKey = `${address.sheet}:${address.col}:${address.row}`
-          if (cyclicAddresses.has(addressKey)) {
-            containsCyclicCell = true
-            break
-          }
-        }
-
-        if (containsCyclicCell) {
-          rangeVertex.clearCache()
-        }
-      }
-    })
-  }
-
   private recomputeFormulaVertexValue(vertex: FormulaVertex): InterpreterValue {
     const address = vertex.getAddress(this.lazilyTransformingAstService)
     if (vertex instanceof ArrayFormulaVertex && (vertex.array.size.isRef || !this.dependencyGraph.isThereSpaceForArray(vertex))) {
@@ -452,6 +598,17 @@ export class Evaluator {
     }
   }
 
+  /**
+   * Evaluates an AST and normalizes the result.
+   *
+   * Handles special cases:
+   * - SimpleRangeValue: returned as-is (for array formulas)
+   * - EmptyValue: converted to 0 if evaluateNullToZero config is set
+   *
+   * @param ast - Parsed formula AST
+   * @param state - Interpreter state with address context and array mode
+   * @returns Normalized cell value
+   */
   private evaluateAstToCellValue(ast: Ast, state: InterpreterState): InterpreterValue {
     const interpreterValue = this.interpreter.evaluateAst(ast, state)
     if (interpreterValue instanceof SimpleRangeValue) {
