@@ -387,7 +387,7 @@ export interface ConfigParams {
    * @category Engine
    */
   useColumnIndex: boolean,
-  /**1
+  /**
    * When set to `true`, enables gathering engine statistics and timings.
    *
    * Useful for testing and benchmarking.
