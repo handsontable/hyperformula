@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'HELTAL',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'RBETALNING',
+    IRR: 'IR',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ÄRTOM',
     ISERR: 'ÄRF',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MMULT',
     MOD: 'REST',
     MONTH: 'MÅNAD',
+    N: 'N',
     NA: 'SAKNAS',
     NETWORKDAYS: 'NETTOARBETSDAGAR',
     'NETWORKDAYS.INTL': 'NETTOARBETSDAGAR.INT',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICHAR',
     UNICODE: 'UNICODE',
     UPPER: 'VERSALER',
+    VALUE: 'TEXTNUM',
     VARA: 'VARA',
     'VAR.P': 'VARIANS.P',
     VARPA: 'VARPA',

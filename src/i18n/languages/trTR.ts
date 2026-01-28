@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'TAMSAYI',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'FAİZTUTARI',
+    IRR: 'İÇ_VERİM_ORANI',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'EBOŞSA',
     ISERR: 'EHATA',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'DÇARP',
     MOD: 'MOD',
     MONTH: 'AY',
+    N: 'S',
     NA: 'YOKSAY',
     NETWORKDAYS: 'TAMİŞGÜNÜ',
     'NETWORKDAYS.INTL': 'TAMİŞGÜNÜ.ULUSL',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICODEKARAKTERİ',
     UNICODE: 'UNICODE',
     UPPER: 'BÜYÜKHARF',
+    VALUE: 'DEĞER',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARSA',

@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'KOKONAISLUKU',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'IPMT',
+    IRR: 'SISÄINEN.KORKO',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ONTYHJÄ',
     ISERR: 'ONVIRH',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MKERRO',
     MOD: 'JAKOJ',
     MONTH: 'KUUKAUSI',
+    N: 'N',
     NA: 'PUUTTUU',
     NETWORKDAYS: 'TYÖPÄIVÄT',
     'NETWORKDAYS.INTL': 'TYÖPÄIVÄT.KANSVÄL',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICODEMERKKI',
     UNICODE: 'UNICODE',
     UPPER: 'ISOT',
+    VALUE: 'ARVO',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARPA',

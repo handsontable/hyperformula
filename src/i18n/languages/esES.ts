@@ -111,6 +111,7 @@ export const dictionary: RawTranslationPackage = {
     INT: 'ENTERO',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'PAGOINT',
+    IRR: 'TIR',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ESBLANCO',
     ISERR: 'ESERR',
@@ -148,6 +149,7 @@ export const dictionary: RawTranslationPackage = {
     MMULT: 'MMULT',
     MOD: 'RESIDUO',
     MONTH: 'MES',
+    N: 'N',
     NA: 'NOD',
     NETWORKDAYS: 'DIAS.LAB',
     'NETWORKDAYS.INTL': 'DIAS.LAB.INTL',
@@ -223,6 +225,7 @@ export const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICHAR',
     UNICODE: 'UNICODE',
     UPPER: 'MAYUSC',
+    VALUE: 'VALOR',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARPA',
