@@ -9,20 +9,15 @@ src/interpreter/plugin/3rdparty
 
 # Configurations
 *.config.js
-karma.*
 doc
-test/unit/_setupFiles/*.js
 
 # Auto-generated directories
 commonjs
-coverage
 dist
 doc
 es
 languages
 lib
 script
-test-jasmine
-test-jest
 typedoc
 typings
