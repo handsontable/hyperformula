@@ -1,7 +1,6 @@
 .idea/
 .vscode
 /commonjs/
-/coverage/
 /dist/
 /doc/
 /docs/api/
@@ -13,8 +12,6 @@
 /es/
 /languages/
 /lib/
-/test-jasmine/
-/test-jest/
 node_modules/
 /typings/
 /storage/
