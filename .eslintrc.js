@@ -6,12 +6,16 @@ module.exports = {
     '@typescript-eslint',
     'license-header',
     'jsdoc',
+    'jasmine',
+    'jest',
   ],
   env: {
+    jasmine: true,
+    'jest/globals': true,
   },
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: './tsconfig.json',
+    project: './tsconfig.test.json',
     createDefaultProgram: true,
   },
   extends: [
@@ -19,6 +23,9 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:jasmine/recommended',
+    'plugin:jest/recommended',
+    'plugin:jest/style',
   ],
   rules: {
     // Automatic fixers
@@ -115,6 +122,13 @@ module.exports = {
         MethodDefinition: true,
       }
     }],
+    'jest/no-jasmine-globals': 'off',
+    'jest/no-alias-methods': 'off',
+    'jest/no-conditional-expect': 'warn',
+    'jest/no-standalone-expect': 'warn',
+    'jest/no-test-prefixes': 'off',
+    'jest/prefer-to-be': 'warn',
+    'jest/prefer-to-have-length': 'off',
   },
   overrides: [
     {
@@ -129,5 +143,11 @@ module.exports = {
         'sort-keys': ['error', 'asc'],
       }
     },
+    {
+      files: ['**/*.spec.ts'],
+      rules: {
+        '@typescript-eslint/no-non-null-assertion': 'off',
+      }
+    }
   ],
 }

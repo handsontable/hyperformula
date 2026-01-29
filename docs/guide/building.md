@@ -60,6 +60,21 @@ Most likely, you will want to document the code. You can use the following comma
 * `npm run docs:build` - builds the docs
 * `npm run docs:dev` - serves the development version of the docs locally
 
+## Run the tests
+
+The tests are done with Jest and Karma. The same test suite should
+pass in both of them because the library might be used
+[server-side](server-side-installation) or in a browser, so you have
+to be sure that both environments are fine.
+
+* `npm run test` - runs the linter and all tests
+* `npm run test:jest` - runs unit tests
+  * To run a test suite that matches a word, add a Jest `-t` flag. For example: `npm run test:jest -- -t 'SUMIF'` runs only the tests that match the word `SUMIF` within `describe()` or `it()`.
+  * To run a specific test suite, pass the file name. For example: `npm run test:jest 'function-sumif.spec.ts'` runs only the unit tests from the file `function-sumif.spec.ts`.
+* `npm run test:browser` - runs tests in **karma** once and closes all open browsers
+  * To run a specific `spec` file or a test suite you can add a Karma `--spec` flag. For example: `npm run test:browser.debug -- --spec=matrix.spec.ts` runs `matrix.spec.ts` browser tests only
+* `npm run test:browser.debug` - runs test in **karma** only in Chrome until you exit the process. It watches changes in `src` and `test` directories and rebuilds them automatically.
+
 ## Run the linter
 
 You can use the following commands to lint the code, so it meets the required standards. ESLint is used as the tool of choice in this case.

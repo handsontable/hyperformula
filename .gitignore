@@ -12,6 +12,8 @@
 /es/
 /languages/
 /lib/
+/test-jasmine/
+/test-jest/
 node_modules/
 /typings/
 /storage/

@@ -1,0 +1,62 @@
+name: Test
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize # the head branch is updated from the base branch, new commits are pushed to the head branch, or the base branch is changed
+  push:
+    branches:
+      - 'master'
+      - 'develop'
+      - 'release/**'
+
+jobs:
+  unit-tests:
+    strategy:
+      matrix:
+        node-version: [ '22' ]
+        os: [ 'ubuntu-latest' ]
+    name: unit-tests
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run tests
+        run: |
+          npm run test:ci
+
+  browser-tests:
+    strategy:
+      matrix:
+        node-version: [ '22' ]
+        os: [ 'ubuntu-latest' ]
+    name: browser-tests
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run tests
+        run: |
+          npm run test:browser

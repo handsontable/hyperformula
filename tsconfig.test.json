@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "./test-jasmine",
+    /* Make sure proper types are used */
+    "types": ["jasmine", "node", "webpack-env"],
+    "sourceMap": true
+  },
+  "extends": "./tsconfig",
+  "include": ["src", "test"],
+  /* Exclude files that are specific for jest setup */
+  "exclude": ["test/_setupFiles/jest"]
+}
