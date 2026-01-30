@@ -8,17 +8,19 @@ docs/examples/
 src/interpreter/plugin/3rdparty
 
 # Configurations
-*.config.js
+.config.js
+karma.*
 doc
-test/_setupFiles/*.js
+test/unit/_setupFiles/*.js
 
 # Auto-generated directories
 commonjs
+coverage
 dist
 doc
 es
 languages
 lib
 script
-typedoc
-typings
+test-jasmine
+test-jest
