@@ -8,7 +8,7 @@ docs/examples/
 src/interpreter/plugin/3rdparty
 
 # Configurations
-.config.js
+*.config.js
 karma.*
 doc
 test/unit/_setupFiles/*.js
@@ -24,3 +24,5 @@ lib
 script
 test-jasmine
 test-jest
+typedoc
+typings
