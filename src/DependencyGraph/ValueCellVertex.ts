@@ -6,6 +6,7 @@
 import {CellError} from '../Cell'
 import {RawCellContent} from '../CellContentParser'
 import {ExtendedNumber} from '../interpreter/InterpreterValue'
+import {CellVertex} from './CellVertex'
 
 export type ValueCellVertexValue = ExtendedNumber | boolean | string | CellError
 
@@ -17,9 +18,10 @@ export interface RawAndParsedValue {
 /**
  * Represents vertex which keeps static cell value
  */
-export class ValueCellVertex {
+export class ValueCellVertex extends CellVertex {
   /** Static cell value. */
   constructor(private parsedValue: ValueCellVertexValue, private rawValue: RawCellContent) {
+    super()
   }
 
   public getValues(): RawAndParsedValue {

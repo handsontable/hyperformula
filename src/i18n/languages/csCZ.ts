@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'CELÁ.ČÁST',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'PLATBA.ÚROK',
+    IRR: 'MÍRA.VÝNOSNOSTI',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'JE.PRÁZDNÉ',
     ISERR: 'JE.CHYBA',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'SOUČIN.MATIC',
     MOD: 'MOD',
     MONTH: 'MĚSÍC',
+    N: 'N',
     NA: 'NEDEF',
     NETWORKDAYS: 'NETWORKDAYS',
     'NETWORKDAYS.INTL': 'NETWORKDAYS.INTL',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICHAR',
     UNICODE: 'UNICODE',
     UPPER: 'VELKÁ',
+    VALUE: 'HODNOTA',
     VARA: 'VARA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARPA',

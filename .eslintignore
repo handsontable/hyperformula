@@ -9,7 +9,6 @@ src/interpreter/plugin/3rdparty
 
 # Configurations
 *.config.js
-karma.*
 doc
 test/_setupFiles/*.js
 
@@ -21,7 +20,5 @@ es
 languages
 lib
 script
-test-jasmine
-test-jest
 typedoc
 typings

@@ -281,6 +281,14 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
         {argumentType: FunctionArgumentType.RANGE},
       ],
     },
+    'IRR': {
+      method: 'irr',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0.1},
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
+    },
   }
 
   public pmt(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -750,6 +758,36 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       }
     )
   }
+
+  /**
+   * Calculates the internal rate of return for a series of cash flows.
+   * @param {ProcedureAst} ast - The AST node representing the function call.
+   * @param {InterpreterState} state - The interpreter state.
+   * @returns {InterpreterValue} The internal rate of return.
+   */
+  public irr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('IRR'),
+      (range: SimpleRangeValue, guess: number) => {
+        if (guess <= -1) {
+          return new CellError(ErrorType.VALUE)
+        }
+
+        const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
+        if (vals instanceof CellError) {
+          return vals
+        }
+
+        // Check for at least one positive and one negative value
+        const hasPositive = vals.some(val => val > 0)
+        const hasNegative = vals.some(val => val < 0)
+        if (!hasPositive || !hasNegative) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        return irrCore(vals, guess)
+      }
+    )
+  }
 }
 
 function pmtCore(rate: number, periods: number, present: number, future: number, type: number): number {
@@ -797,4 +835,61 @@ function npvCore(rate: number, args: number[]): number | CellError {
     acc /= 1 + rate
   }
   return acc
+}
+
+/**
+ * Calculates IRR using Newton-Raphson method.
+ * IRR is the rate r where: CF0 + CF1/(1+r) + CF2/(1+r)^2 + ... + CFn/(1+r)^n = 0
+ */
+function irrCore(values: number[], guess: number): number | CellError {
+  const epsMax = 1e-10
+  const iterMax = 50
+
+  let rate = guess
+
+  for (let iter = 0; iter < iterMax; iter++) {
+    // Calculate NPV and its derivative at current rate
+    // NPV = sum of values[i] / (1+rate)^i for i = 0 to n-1
+    // dNPV/dr = sum of -i * values[i] / (1+rate)^(i+1) for i = 0 to n-1
+    let npv = 0
+    let dnpv = 0
+
+    for (let i = 0; i < values.length; i++) {
+      const factor = Math.pow(1 + rate, i)
+      if (!isFinite(factor) || factor === 0) {
+        return new CellError(ErrorType.NUM)
+      }
+      npv += values[i] / factor
+      if (i > 0) {
+        dnpv -= i * values[i] / (factor * (1 + rate))
+      }
+    }
+
+    // Check for convergence
+    if (Math.abs(npv) < epsMax) {
+      return rate
+    }
+
+    // Check if derivative is too small (avoid division by zero)
+    if (Math.abs(dnpv) < epsMax) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    // Newton-Raphson step
+    const newRate = rate - npv / dnpv
+
+    // Check for convergence based on rate change
+    if (Math.abs(newRate - rate) < epsMax) {
+      return newRate
+    }
+
+    rate = newRate
+
+    // Check for invalid rate
+    if (!isFinite(rate) || rate <= -1) {
+      return new CellError(ErrorType.NUM)
+    }
+  }
+
+  return new CellError(ErrorType.NUM)
 }

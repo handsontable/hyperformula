@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'ЦЕЛОЕ',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'ПРПЛТ',
+    IRR: 'ВСД',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ЕПУСТО',
     ISERR: 'ЕОШ',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'МУМНОЖ',
     MOD: 'ОСТАТ',
     MONTH: 'МЕСЯЦ',
+    N: 'Ч',
     NA: 'НД',
     NETWORKDAYS: 'ЧИСТРАБДНИ',
     'NETWORKDAYS.INTL': 'ЧИСТРАБДНИ.МЕЖД',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'ЮНИСИМВ',
     UNICODE: 'UNICODE',
     UPPER: 'ПРОПИСН',
+    VALUE: 'ЗНАЧ',
     VARA: 'ДИСПА',
     'VAR.P': 'ДИСП.Г',
     VARPA: 'ДИСПРА',

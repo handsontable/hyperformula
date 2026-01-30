@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'INT',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'RRÉSZLET',
+    IRR: 'BMR',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ÜRES',
     ISERR: 'HIBA.E',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MSZORZAT',
     MOD: 'MARADÉK',
     MONTH: 'HÓNAP',
+    N: 'S',
     NA: 'HIÁNYZIK',
     NETWORKDAYS: 'ÖSSZ.MUNKANAP',
     'NETWORKDAYS.INTL': 'ÖSSZ.MUNKANAP.INTL',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNIKARAKTER',
     UNICODE: 'UNICODE',
     UPPER: 'NAGYBETŰS',
+    VALUE: 'ÉRTÉK',
     VARA: 'VARA',
     'VAR.P': 'VAR.S',
     VARPA: 'VARPA',

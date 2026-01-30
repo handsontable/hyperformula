@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'ENT',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'INTPER',
+    IRR: 'TRI',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ESTVIDE',
     ISERR: 'ESTERR',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'PRODUITMAT',
     MOD: 'MOD',
     MONTH: 'MOIS',
+    N: 'N',
     NA: 'NA',
     NETWORKDAYS: 'NB.JOURS.OUVRES',
     'NETWORKDAYS.INTL': 'NB.JOURS.OUVRES.INTL',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNICAR',
     UNICODE: 'UNICODE',
     UPPER: 'MAJUSCULE',
+    VALUE: 'CNUM',
     VARA: 'VARA',
     'VAR.P': 'VAR.P.N',
     VARPA: 'VARPA',

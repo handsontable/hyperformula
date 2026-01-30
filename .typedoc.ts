@@ -1,6 +1,5 @@
 module.exports = {
   "exclude": [
-    "./test/**",
     "./src/interpreter/**",
     "./src/i18n/**",
     "./src/parser/**",

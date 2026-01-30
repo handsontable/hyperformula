@@ -111,6 +111,7 @@ const dictionary: RawTranslationPackage = {
     INT: 'GANZZAHL',
     INTERVAL: 'INTERVAL', //FIXME
     IPMT: 'ZINSZ',
+    IRR: 'IKV',
     ISBINARY: 'ISBINARY',
     ISBLANK: 'ISTLEER',
     ISERR: 'ISTFEHL',
@@ -148,6 +149,7 @@ const dictionary: RawTranslationPackage = {
     MMULT: 'MMULT',
     MOD: 'REST',
     MONTH: 'MONAT',
+    N: 'N',
     NA: 'NV',
     NETWORKDAYS: 'NETTOARBEITSTAGE',
     'NETWORKDAYS.INTL': 'NETTOARBEITSTAGE.INTL',
@@ -223,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     UNICHAR: 'UNIZEICHEN',
     UNICODE: 'UNICODE',
     UPPER: 'GROSS',
+    VALUE: 'WERT',
     VARA: 'VARIANZA',
     'VAR.P': 'VAR.P',
     VARPA: 'VARIANZENA',

@@ -7,8 +7,7 @@ setup: ## Setup project
 compile: ## Compile to javascript
 	@npm run compile
 
-test: ## Run tests
-	@npm run test
+check: typecheck lint ## Check whether code is working correctly (types + lint)
 
 test-ci: ## Separate test configuration for CI environment
 	@npm run test

@@ -11,7 +11,7 @@ import {Maybe} from '../../Maybe'
 import {SheetBoundaries} from '../../Sheet'
 import {ColumnsSpan, RowsSpan} from '../../Span'
 import {ArrayFormulaVertex, DenseStrategy, ValueCellVertex} from '../index'
-import {CellVertex} from '../Vertex'
+import {CellVertex} from '../CellVertex'
 import {ChooseAddressMapping} from './ChooseAddressMappingPolicy'
 import {AddressMappingStrategy} from './AddressMappingStrategy'
 
