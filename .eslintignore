@@ -15,7 +15,6 @@ test/_setupFiles/*.js
 
 # Auto-generated directories
 commonjs
-coverage
 dist
 doc
 es
