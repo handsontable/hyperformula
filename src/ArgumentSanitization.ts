@@ -99,6 +99,7 @@ export function validateInitialComputedValues(
             Array.isArray(row) &&
             row.every(
               (cell) =>
+                cell === null ||
                 typeof cell === 'string' ||
                 typeof cell === 'number' ||
                 typeof cell === 'undefined'

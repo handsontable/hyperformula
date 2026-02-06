@@ -71,3 +71,26 @@ describe('detailed error', () => {
     expect(`${detailedError(ErrorType.REF, ErrorMessage.DateBounds)}`).toEqual('#REF!')
   })
 })
+
+describe('evaluateNullToZero', () => {
+  it('should export EmptyValue as null when evaluateNullToZero is false', () => {
+    const config = new Config({evaluateNullToZero: false})
+    const cellValueExporter = new Exporter(config, namedExpressionsMock, sheetIndexMock, lazilyTransforminService)
+    expect(cellValueExporter.exportValue(EmptyValue)).toBe(null)
+  })
+
+  it('should export EmptyValue as 0 when evaluateNullToZero is true', () => {
+    const config = new Config({evaluateNullToZero: true})
+    const cellValueExporter = new Exporter(config, namedExpressionsMock, sheetIndexMock, lazilyTransforminService)
+    expect(cellValueExporter.exportValue(EmptyValue)).toBe(0)
+  })
+
+  it('should not affect non-empty values when evaluateNullToZero is true', () => {
+    const config = new Config({evaluateNullToZero: true})
+    const cellValueExporter = new Exporter(config, namedExpressionsMock, sheetIndexMock, lazilyTransforminService)
+    expect(cellValueExporter.exportValue(1)).toBe(1)
+    expect(cellValueExporter.exportValue('abcd')).toBe('abcd')
+    expect(cellValueExporter.exportValue(true)).toBe(true)
+    expect(cellValueExporter.exportValue(false)).toBe(false)
+  })
+})

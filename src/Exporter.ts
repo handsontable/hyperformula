@@ -98,7 +98,7 @@ export class Exporter implements ChangeExporter<ExportedChange> {
     } else if (value instanceof CellError) {
       return this.detailedError(value)
     } else if (value === EmptyValue) {
-      return null
+      return this.config.evaluateNullToZero ? 0 : null
     } else {
       return getRawValue(value)
     }
