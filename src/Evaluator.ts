@@ -3,10 +3,27 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from './AbsoluteCellRange'
+import {absolutizeDependencies} from './absolutizeDependencies'
+import {CellError, ErrorType, SimpleCellAddress} from './Cell'
+import {Config} from './Config'
+import {ContentChanges} from './ContentChanges'
+import {ArrayFormulaVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
+import {FormulaVertex} from './DependencyGraph/FormulaVertex'
+import {Interpreter} from './interpreter/Interpreter'
+import {InterpreterState} from './interpreter/InterpreterState'
+import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
+import {SimpleRangeValue} from './SimpleRangeValue'
+import {LazilyTransformingAstService} from './LazilyTransformingAstService'
+import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {Ast, RelativeDependency} from './parser'
+import {Statistics, StatType} from './statistics'
+
 /**
- * # Evaluator - Formula Evaluation Engine
- *
  * Responsible for computing cell values based on their formulas and dependencies.
+ *
+ * Uses topological sorting for acyclic portions and iterative calculation for cycles.
+ * Maintains integration with column search index for VLOOKUP/MATCH optimization
  *
  * ## Evaluation Workflow
  *
@@ -20,7 +37,7 @@
  *
  * 3. **Cycle Resolution** (if cycles exist)
  *    - If iterative calculation disabled: sets #CYCLE! error on all cycle members
- *    - If enabled: uses Gauss-Seidel iteration until convergence or max iterations
+ *    - If enabled: iteratates the cycle calculation until convergence or max iterations
  *
  * 4. **Post-cycle Evaluation**
  *    - Recomputes vertices that depend on cycle results
@@ -43,29 +60,6 @@
  * - `run()`: Full evaluation from scratch (initial load or major changes)
  * - `partialRun()`: Incremental evaluation starting from changed vertices
  * - `runAndForget()`: One-off formula evaluation without side effects
- */
-
-import {AbsoluteCellRange} from './AbsoluteCellRange'
-import {absolutizeDependencies} from './absolutizeDependencies'
-import {CellError, ErrorType, SimpleCellAddress} from './Cell'
-import {Config} from './Config'
-import {ContentChanges} from './ContentChanges'
-import {ArrayFormulaVertex, DependencyGraph, RangeVertex, Vertex} from './DependencyGraph'
-import {FormulaVertex} from './DependencyGraph/FormulaVertex'
-import {Interpreter} from './interpreter/Interpreter'
-import {InterpreterState} from './interpreter/InterpreterState'
-import {EmptyValue, getRawValue, InterpreterValue} from './interpreter/InterpreterValue'
-import {SimpleRangeValue} from './SimpleRangeValue'
-import {LazilyTransformingAstService} from './LazilyTransformingAstService'
-import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
-import {Ast, RelativeDependency} from './parser'
-import {Statistics, StatType} from './statistics'
-
-/**
- * Evaluates formulas in the dependency graph, handling both acyclic and cyclic dependencies.
- *
- * Uses topological sorting for acyclic portions and iterative calculation for cycles.
- * Maintains integration with column search index for VLOOKUP/MATCH optimization.
  */
 export class Evaluator {
   /**
@@ -95,9 +89,9 @@ export class Evaluator {
    * Complexity: O(V + E) for topological sort + O(I × C) for cycles where
    * V=vertices, E=edges, I=iterations, C=cycle size
    */
-  public run(): void {
+  public recomputeWholeGraph(): void {
     this.stats.start(StatType.TOP_SORT)
-    const {sorted, cycled} = this.dependencyGraph.topSortWithScc()
+    const {sorted, cycled} = this.dependencyGraph.topSortWithScc() // TODO: can it also find vertices that depend on the cycles?
     this.stats.end(StatType.TOP_SORT)
 
     this.stats.measure(StatType.EVALUATION, () => {
@@ -108,7 +102,7 @@ export class Evaluator {
   /**
    * Performs incremental evaluation starting from a set of changed vertices.
    *
-   * More efficient than `run()` when only a subset of cells have changed.
+   * More efficient than `recomputeWholeGraph()` when only a subset of cells have changed.
    * Traverses only the subgraph reachable from the changed vertices.
    *
    * Algorithm:
@@ -118,10 +112,10 @@ export class Evaluator {
    * 4. Process cycles via iterative calculation
    * 5. Cycle dependents are handled inside iterateCircularDependencies
    *
-   * @param vertices - Starting vertices (typically cells that were directly modified)
+   * @param changedVertices - Starting vertices (typically cells that were directly modified)
    * @returns Content changes describing all value updates
    */
-  public partialRun(vertices: Vertex[]): ContentChanges {
+  public recomputeSubgraph(changedVertices: Vertex[]): ContentChanges {
     const changes = ContentChanges.empty()
     const cycled: Vertex[] = []
 
@@ -130,7 +124,7 @@ export class Evaluator {
     const cycleDependentVertices = new Set<Vertex>()
 
     this.stats.measure(StatType.EVALUATION, () => {
-      this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(vertices,
+      this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(changedVertices, // TODO: is this callback-providing the best way?
         // onVertex callback: process each vertex in topological order
         (vertex: Vertex) => {
           if (cycleDependentVertices.has(vertex)) {
@@ -175,7 +169,7 @@ export class Evaluator {
    * @param dependencies - Relative dependencies extracted from the formula
    * @returns Computed value (number, string, boolean, error, or array)
    */
-  public runAndForget(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
+  public evaluateSingleFormula(ast: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[]): InterpreterValue {
     const tmpRanges: RangeVertex[] = []
     for (const dep of absolutizeDependencies(dependencies, address)) {
       if (dep instanceof AbsoluteCellRange) {
@@ -531,7 +525,7 @@ export class Evaluator {
    * @param cycled - Cycle member vertices (used to find their dependents)
    * @returns Content changes from all dependent updates
    */
-  private updateNonCyclicDependents(cycled: Vertex[]): ContentChanges {
+  private updateNonCyclicDependents(cycled: Vertex[]): ContentChanges { // TODO: can we use evaluateSubgraph for this?
     const changes = ContentChanges.empty()
     const cyclicSet = new Set(cycled)
 
