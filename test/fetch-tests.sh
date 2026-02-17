@@ -28,10 +28,12 @@ fi
 
 echo "Checking out branch $CURRENT_BRANCH in hyperformula-tests..."
 
-# 3. Checkout matching branch in hyperformula-tests or fall back to main
+# 3. Checkout matching branch in hyperformula-tests or fall back to master
 cd "$HYPERFORMULA_TESTS_DIR"
+git fetch origin
 
-if git show-ref --verify --quiet "refs/heads/$CURRENT_BRANCH"; then
+if git show-ref --verify --quiet "refs/heads/$CURRENT_BRANCH" || \
+   git show-ref --verify --quiet "refs/remotes/origin/$CURRENT_BRANCH"; then
   git checkout "$CURRENT_BRANCH"
 else
   git checkout master
