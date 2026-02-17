@@ -19,6 +19,8 @@ fi
 cd "$REPO_ROOT"
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
+git rev-parse --abbrev-ref HEAD
+
 echo "Checking out branch $CURRENT_BRANCH in hyperformula-tests..."
 
 # 3. Checkout matching branch in hyperformula-tests or fall back to main
