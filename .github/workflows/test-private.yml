@@ -53,9 +53,22 @@ jobs:
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
-      - name: Fetch hyperformula-tests
+      - name: Setup SSH agent
         env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_TOKEN" > ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          chmod 0600 .github/workflows/secrets/id_rsa
+          ssh-add .github/workflows/secrets/id_rsa
+          
+      - name: Fetch hyperformula-tests
+        # env:
+        #   DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: ./test/fetch-tests.sh
 
       - name: Setup Node.js ${{ matrix.node-version }}
