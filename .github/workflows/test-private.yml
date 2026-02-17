@@ -53,12 +53,11 @@ jobs:
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
-      - name: Clone private submodule
-        uses: pietrobolcato/action-clone-private-submodule@537ff87af8e3e989dd02f491708ab6d1912c915c
+      - uses: actions/checkout@v2
         with:
-          ssh_private_key: ${{ secrets.DEPLOY_TOKEN }}
-          module_link: handsontable/hyperformula-tests
-          module_path: test/hyperformula-tests
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: test/hyperformula-tests
 
       - name: Fetch hyperformula-tests
         # env:
