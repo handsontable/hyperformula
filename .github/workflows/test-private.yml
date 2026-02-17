@@ -55,16 +55,11 @@ jobs:
 
       - name: Setup SSH agent
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          echo "$DEPLOY_TOKEN" > .github/workflows/secrets/id_rsa
-          chmod 0600 .github/workflows/secrets/id_rsa
-          ssh-add .github/workflows/secrets/id_rsa
+            eval $(ssh-agent -s)
+            ssh-add .github/workflows/secrets/id_rsa <<< ${{secrets.DEPLOY_TOKEN}}
+            git clone git@github.com:handsontable/hyperformula-tests.git
           
       - name: Fetch hyperformula-tests
         # env:
