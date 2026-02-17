@@ -15,11 +15,16 @@ if [ ! -d "$HYPERFORMULA_TESTS_DIR" ]; then
   fi
 fi
 
-# 2. Get current branch from root repo
+# 2. Get current branch from root repo (GitHub Actions uses detached HEAD, so use env vars in CI)
 cd "$REPO_ROOT"
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
-git rev-parse --abbrev-ref HEAD
+if [ -n "$GITHUB_HEAD_REF" ]; then
+  CURRENT_BRANCH="$GITHUB_HEAD_REF"
+elif [ -n "$GITHUB_REF_NAME" ] && [[ "$GITHUB_REF_NAME" != *"/merge" ]]; then
+  CURRENT_BRANCH="$GITHUB_REF_NAME"
+else
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  [ "$CURRENT_BRANCH" = "HEAD" ] && CURRENT_BRANCH="master"
+fi
 
 echo "Checking out branch $CURRENT_BRANCH in hyperformula-tests..."
 
