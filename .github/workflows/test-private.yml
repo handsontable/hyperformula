@@ -25,9 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
-      - name: Fetch hyperformula-tests
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: test/hyperformula-tests
+
+      - name: Fetch hyperformula-tests and sync branches
         run: ./test/fetch-tests.sh
 
       - name: Setup Node.js ${{ matrix.node-version }}
@@ -53,15 +57,13 @@ jobs:
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
           path: test/hyperformula-tests
 
-      - name: Fetch hyperformula-tests
-        # env:
-        #   DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+      - name: Fetch hyperformula-tests and sync branches
         run: ./test/fetch-tests.sh
 
       - name: Setup Node.js ${{ matrix.node-version }}
