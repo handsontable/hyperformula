@@ -23,7 +23,7 @@ jobs:
     name: unit-tests-extended
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # https://github.com/actions/checkout/releases/tag/v2.0.0
 
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -32,7 +32,7 @@ jobs:
           path: test/hyperformula-tests
 
       - name: Fetch hyperformula-tests and sync branches
-        run: ./test/fetch-tests.sh
+        run: cd test && ./fetch-tests.sh
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
@@ -64,7 +64,7 @@ jobs:
           path: test/hyperformula-tests
 
       - name: Fetch hyperformula-tests and sync branches
-        run: ./test/fetch-tests.sh
+        run: cd test && ./fetch-tests.sh
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
