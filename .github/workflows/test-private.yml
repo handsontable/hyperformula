@@ -53,14 +53,13 @@ jobs:
     steps:
       - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
-      - name: Setup SSH agent
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-        run: |
-            eval $(ssh-agent -s)
-            ssh-add .github/workflows/secrets/id_rsa <<< ${{secrets.DEPLOY_TOKEN}}
-            git clone git@github.com:handsontable/hyperformula-tests.git
-          
+      - name: Clone private submodule
+        uses: pietrobolcato/action-clone-private-submodule@537ff87af8e3e989dd02f491708ab6d1912c915c
+        with:
+          ssh_private_key: ${{ secrets.DEPLOY_TOKEN }}
+          module_link: handsontable/hyperformula-tests
+          module_path: test/hyperformula-tests
+
       - name: Fetch hyperformula-tests
         # env:
         #   DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
