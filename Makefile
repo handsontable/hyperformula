@@ -12,6 +12,10 @@ check: typecheck lint ## Check whether code is working correctly (types + lint)
 test-ci: ## Separate test configuration for CI environment
 	@npm run test
 
+test-private: ## Run tests with private submodule
+	@./test/fetch-tests.sh
+	@npm run test
+
 check: typecheck test ## Check whether code is working correctly (types + specs)
 
 full: check lint-fix ## Check whether code is ready to commit (types + specs + lint)
