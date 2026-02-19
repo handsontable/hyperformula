@@ -6,6 +6,20 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 3.2.0
+
+**Release date: February 19, 2026**
+
+### Added
+
+- Added a new function: IRR. [#1591](https://github.com/handsontable/hyperformula/issues/1591)
+- Added a new function: N. [#1585](https://github.com/handsontable/hyperformula/issues/1585)
+- Added a new function: VALUE. [#1592](https://github.com/handsontable/hyperformula/issues/1592)
+
+### Fixed
+
+- Fixed `Error Map maximum size exceeded` error when loading big spreadsheets. [#1602](https://github.com/handsontable/hyperformula/issues/1602)
+
 ## 3.1.1
 
 **Release date: December 18, 2025**

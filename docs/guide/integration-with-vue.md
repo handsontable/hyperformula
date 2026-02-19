@@ -36,7 +36,7 @@ This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking 
 :::
 
 <iframe
-  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/3.1.x/vue-3-demo?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
+  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/3.2.x/vue-3-demo?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
   style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
   title="handsontable/hyperformula-demos: react-demo"
   allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
