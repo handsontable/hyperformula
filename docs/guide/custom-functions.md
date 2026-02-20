@@ -358,17 +358,11 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
+Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/custom-functions?v=${$page.buildDateURIEncoded}).
+
 This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
-
-<iframe
-  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/3.2.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
-  title="handsontable/hyperformula-demos: react-demo"
-  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
-</iframe>
 
 ## Function options
 
