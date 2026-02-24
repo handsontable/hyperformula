@@ -7,6 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
@@ -158,12 +159,11 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     },
     'TEXTJOIN': {
       method: 'textjoin',
-      expandRanges: true,
       repeatLastArgs: 1,
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.ANY},
         {argumentType: FunctionArgumentType.BOOLEAN},
-        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.ANY},
       ],
     },
   }
@@ -438,6 +438,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * Corresponds to TEXTJOIN(delimiter, ignore_empty, text1, [text2], …)
    *
    * Joins text from multiple strings/ranges with a configurable delimiter.
+   * Supports array/range delimiters that cycle through gaps between text values.
    * When ignore_empty is TRUE, empty strings are skipped.
    * Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
    *
@@ -446,11 +447,52 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    */
   public textjoin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TEXTJOIN'),
-      (delimiter: string, ignoreEmpty: boolean, ...texts: string[]) => {
-        const parts = ignoreEmpty
-          ? texts.filter((t) => t !== '')
-          : texts
-        const result = parts.join(delimiter)
+      (delimiterArg: InternalScalarValue | SimpleRangeValue,
+       ignoreEmpty: boolean,
+       ...textArgs: (InternalScalarValue | SimpleRangeValue)[]) => {
+
+        const delimiters: string[] = []
+        const delimiterValues = delimiterArg instanceof SimpleRangeValue
+          ? delimiterArg.valuesFromTopLeftCorner()
+          : [delimiterArg]
+        for (const val of delimiterValues) {
+          if (val instanceof CellError) {
+            return val
+          }
+          const coerced = coerceScalarToString(val as InternalScalarValue)
+          if (coerced instanceof CellError) {
+            return coerced
+          }
+          delimiters.push(coerced)
+        }
+
+        const texts: string[] = []
+        for (const arg of textArgs) {
+          const values = arg instanceof SimpleRangeValue
+            ? arg.valuesFromTopLeftCorner()
+            : [arg]
+          for (const val of values) {
+            if (val instanceof CellError) {
+              return val
+            }
+            const coerced = coerceScalarToString(val as InternalScalarValue)
+            if (coerced instanceof CellError) {
+              return coerced
+            }
+            texts.push(coerced)
+          }
+        }
+
+        const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
+
+        if (parts.length === 0) {
+          return ''
+        }
+        let result = parts[0]
+        for (let i = 1; i < parts.length; i++) {
+          result += delimiters[(i - 1) % delimiters.length] + parts[i]
+        }
+
         if (result.length > 32767) {
           return new CellError(ErrorType.VALUE, ErrorMessage.TextJoinResultTooLong)
         }

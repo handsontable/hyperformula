@@ -147,6 +147,18 @@ describe('HyperFormula', () => {
     hf.destroy()
   })
 
+  it('should evaluate TEXTJOIN with array delimiter (cycling)', () => {
+    const data = [
+      ['-', '/', '=TEXTJOIN(A1:B1, TRUE(), "a", "b", "c", "d")'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('C1'))).toBe('a-b/c-d')
+
+    hf.destroy()
+  })
+
   it('should add and remove rows with formula updates', () => {
     const data = [
       [1],
