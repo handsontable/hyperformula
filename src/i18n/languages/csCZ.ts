@@ -215,6 +215,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'TBILLPRICE',
     TBILLYIELD: 'TBILLYIELD',
     TEXT: 'HODNOTA.NA.TEXT',
+    TEXTJOIN: 'TEXTJOIN',
     TIME: 'ČAS',
     TIMEVALUE: 'ČASHODN',
     TODAY: 'DNES',

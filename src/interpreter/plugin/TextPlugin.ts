@@ -156,6 +156,16 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         {argumentType: FunctionArgumentType.SCALAR}
       ]
     },
+    'TEXTJOIN': {
+      method: 'textjoin',
+      expandRanges: true,
+      repeatLastArgs: 1,
+      parameters: [
+        {argumentType: FunctionArgumentType.STRING},
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.STRING},
+      ],
+    },
   }
 
   /**
@@ -422,6 +432,31 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
       return new CellError(ErrorType.VALUE, ErrorMessage.NumberCoercion)
     })
+  }
+
+  /**
+   * Corresponds to TEXTJOIN(delimiter, ignore_empty, text1, [text2], …)
+   *
+   * Joins text from multiple strings/ranges with a configurable delimiter.
+   * When ignore_empty is TRUE, empty strings are skipped.
+   * Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
+   *
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
+   */
+  public textjoin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TEXTJOIN'),
+      (delimiter: string, ignoreEmpty: boolean, ...texts: string[]) => {
+        const parts = ignoreEmpty
+          ? texts.filter((t) => t !== '')
+          : texts
+        const result = parts.join(delimiter)
+        if (result.length > 32767) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.TextJoinResultTooLong)
+        }
+        return result
+      }
+    )
   }
 
   /**

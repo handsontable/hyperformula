@@ -63,6 +63,90 @@ describe('HyperFormula', () => {
     hf.destroy()
   })
 
+  it('should evaluate TEXTJOIN with ignore_empty=TRUE', () => {
+    const data = [
+      ['Hello', 'World', '', '=TEXTJOIN(", ", TRUE(), A1:C1)'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('D1'))).toBe('Hello, World')
+
+    hf.destroy()
+  })
+
+  it('should evaluate TEXTJOIN with ignore_empty=FALSE', () => {
+    const data = [
+      ['Hello', 'World', '', '=TEXTJOIN(", ", FALSE(), A1:C1)'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('D1'))).toBe('Hello, World, ')
+
+    hf.destroy()
+  })
+
+  it('should evaluate TEXTJOIN with individual cell references', () => {
+    const data = [
+      ['a', 'b', 'c', '=TEXTJOIN("-", TRUE(), A1, B1, C1)'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('D1'))).toBe('a-b-c')
+
+    hf.destroy()
+  })
+
+  it('should evaluate TEXTJOIN with single argument', () => {
+    const data = [
+      ['only', '=TEXTJOIN(",", TRUE(), A1)'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('B1'))).toBe('only')
+
+    hf.destroy()
+  })
+
+  it('should evaluate TEXTJOIN with empty delimiter', () => {
+    const data = [
+      ['x', 'y', 'z', '=TEXTJOIN("", TRUE(), A1:C1)'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('D1'))).toBe('xyz')
+
+    hf.destroy()
+  })
+
+  it('should evaluate TEXTJOIN with all-empty range and ignore_empty=TRUE', () => {
+    const data = [
+      ['', '', '', '=TEXTJOIN(",", TRUE(), A1:C1)'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('D1'))).toBe('')
+
+    hf.destroy()
+  })
+
+  it('should evaluate TEXTJOIN with all-empty range and ignore_empty=FALSE', () => {
+    const data = [
+      ['', '', '', '=TEXTJOIN(",", FALSE(), A1:C1)'],
+    ]
+
+    const hf = HyperFormula.buildFromArray(data, {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('D1'))).toBe(',,')
+
+    hf.destroy()
+  })
+
   it('should add and remove rows with formula updates', () => {
     const data = [
       [1],

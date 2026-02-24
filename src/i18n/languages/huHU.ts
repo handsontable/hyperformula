@@ -215,6 +215,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'KJEGY.ÁR',
     TBILLYIELD: 'KJEGY.HOZAM',
     TEXT: 'SZÖVEG',
+    TEXTJOIN: 'SZÖVEGÖSSZEFŰZÉS',
     TIME: 'IDŐ',
     TIMEVALUE: 'IDŐÉRTÉK',
     TODAY: 'MA',
