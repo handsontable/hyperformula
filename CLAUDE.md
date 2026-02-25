@@ -93,3 +93,23 @@ The build produces multiple output formats:
 - When generating code, prefer functional approach whenever possible (in JS/TS use filter, map and reduce functions).
 - Make the code self-documenting. Use meaningfull names for classes, functions, valiables etc. Add code comments only when necessary.
 - Add jsdocs to all classes and functions.
+
+## Built-in Function Implementation
+
+When implementing a new built-in Excel function, follow the 8-phase workflow defined in [`built-in_function_implementation_workflow.md`](./built-in_function_implementation_workflow.md). The phases are:
+
+1. **Spec Research** — Excel docs, Google Sheets divergences, existing codebase check
+2. **Excel Validation Workbook** — Python/openpyxl script generating test matrix .xlsx
+3. **Excel Validation** — user runs in real Excel, reports results
+4. **Smoke Tests** — 3-5 tests in `test/smoke.spec.ts`
+5. **Comprehensive Unit Tests** — dedicated `test/{function_name}.spec.ts`
+6. **Implementation** — plugin metadata, method, i18n (17 langs), error messages
+7. **Verify** — lint, test, compile
+8. **Commit & Push**
+
+Key conventions:
+- Branch: `feature/built-in/{FUNCTION_NAME}`, base: `develop`
+- Every Excel validation row maps 1:1 to a Jest test
+- Use `FunctionArgumentType` enum for parameter types (`STRING`, `NUMBER`, `BOOLEAN`, `ANY`, `INTEGER`, `RANGE`, `SCALAR`)
+- Use `repeatLastArgs: N` for variadic params, `expandRanges: true` only when ALL args can be flattened
+- Auto-registration: export plugin from `src/interpreter/plugin/index.ts` → picked up by `src/index.ts`
