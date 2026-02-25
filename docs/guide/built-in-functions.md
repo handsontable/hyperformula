@@ -58,6 +58,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | ARRAYFORMULA    | Enables the array arithmetic mode for a single formula.          | ARRAYFORMULA(Formula)                                      |
 | FILTER          | Filters an array, based on multiple conditions (boolean arrays). | FILTER(SourceArray, BoolArray1, BoolArray2, ...BoolArrayN) |
 | ARRAY_CONSTRAIN | Truncates an array to given dimensions.                          | ARRAY_CONSTRAIN(Array, Height, Width)                      |
+| SEQUENCE        | Returns an array of sequential numbers.                          | SEQUENCE(Rows, [Cols], [Start], [Step])                    |
 
 ### Date and time
 
