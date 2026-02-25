@@ -99,22 +99,27 @@ describe('SEQUENCE — GROUP 2: Optional Parameter Omission', () => {
     hf.destroy()
   })
 
-  it('#9 empty start arg coerces to 0 in HyperFormula SEQUENCE(3,2,,)', () => {
-    // Excel treats empty arg as default (1); HyperFormula's NUMBER type coerces empty to 0
+  it('#9 start omitted → defaults to 1 SEQUENCE(3,2,,)', () => {
+    // Empty arg (,,) treated as default value, matching Excel behaviour
     const hf = HyperFormula.buildFromArray([['=SEQUENCE(3,2,,)']], LICENSE)
-    expect(hf.getCellValue(adr('A1'))).toBe(0) // start=0, step=0 → constant 0
-    expect(hf.getCellValue(adr('B1'))).toBe(0)
-    expect(hf.getCellValue(adr('A2'))).toBe(0)
-    expect(hf.getCellValue(adr('B3'))).toBe(0)
+    expect(hf.getCellValue(adr('A1'))).toBe(1)
+    expect(hf.getCellValue(adr('B1'))).toBe(2)
+    expect(hf.getCellValue(adr('A2'))).toBe(3)
+    expect(hf.getCellValue(adr('B2'))).toBe(4)
+    expect(hf.getCellValue(adr('A3'))).toBe(5)
+    expect(hf.getCellValue(adr('B3'))).toBe(6)
     hf.destroy()
   })
 
-  it('#10 empty step arg coerces to 0 in HyperFormula SEQUENCE(3,2,5,)', () => {
-    // Excel treats empty arg as default (1); HyperFormula's NUMBER type coerces empty to 0
+  it('#10 step omitted → defaults to 1 SEQUENCE(3,2,5,)', () => {
+    // Empty arg (,,) treated as default value, matching Excel behaviour
     const hf = HyperFormula.buildFromArray([['=SEQUENCE(3,2,5,)']], LICENSE)
-    expect(hf.getCellValue(adr('A1'))).toBe(5) // start=5, step=0 → constant 5
-    expect(hf.getCellValue(adr('B1'))).toBe(5)
-    expect(hf.getCellValue(adr('A3'))).toBe(5)
+    expect(hf.getCellValue(adr('A1'))).toBe(5)
+    expect(hf.getCellValue(adr('B1'))).toBe(6)
+    expect(hf.getCellValue(adr('A2'))).toBe(7)
+    expect(hf.getCellValue(adr('B2'))).toBe(8)
+    expect(hf.getCellValue(adr('A3'))).toBe(9)
+    expect(hf.getCellValue(adr('B3'))).toBe(10)
     hf.destroy()
   })
 
