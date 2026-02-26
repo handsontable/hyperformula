@@ -7,6 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
@@ -155,6 +156,15 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       parameters: [
         {argumentType: FunctionArgumentType.SCALAR}
       ]
+    },
+    'TEXTJOIN': {
+      method: 'textjoin',
+      repeatLastArgs: 1,
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY},
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.ANY},
+      ],
     },
   }
 
@@ -442,5 +452,77 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
   private escapeRegExpSpecialCharacters(text: string): string {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  }
+
+  /**
+   * Corresponds to TEXTJOIN(delimiter, ignore_empty, text1, [text2], …)
+   *
+   * Joins text from multiple strings/ranges with a configurable delimiter.
+   * Supports array/range delimiters that cycle through gaps between text values.
+   * When ignore_empty is TRUE, empty strings are skipped.
+   * Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
+   *
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
+   */
+  public textjoin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TEXTJOIN'),
+      (delimiterArg: InternalScalarValue | SimpleRangeValue,
+        ignoreEmpty: boolean,
+        ...textArgs: (InternalScalarValue | SimpleRangeValue)[]) => {
+
+        const delimiters = this.flattenArgToStrings(delimiterArg)
+        if (delimiters instanceof CellError) {
+          return delimiters
+        }
+
+        const texts: string[] = []
+        for (const arg of textArgs) {
+          const coerced = this.flattenArgToStrings(arg)
+          if (coerced instanceof CellError) {
+            return coerced
+          }
+          texts.push(...coerced)
+        }
+
+        const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
+
+        if (parts.length === 0) {
+          return ''
+        }
+        let result = parts[0]
+        for (let i = 1; i < parts.length; i++) {
+          result += delimiters[(i - 1) % delimiters.length] + parts[i]
+        }
+
+        if (result.length > 32767) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.TextJoinResultTooLong)
+        }
+        return result
+      }
+    )
+  }
+
+  /**
+   * Flattens a scalar or range argument into an array of coerced strings.
+   * Returns a CellError immediately if any value in the argument is an error or cannot be coerced.
+   *
+   * @param {InternalScalarValue | SimpleRangeValue} arg - Scalar or range to flatten
+   * @returns {string[] | CellError} - Array of string values, or the first error encountered
+   */
+  private flattenArgToStrings(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
+    const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+    const result: string[] = []
+    for (const val of values) {
+      if (val instanceof CellError) {
+        return val
+      }
+      const coerced = coerceScalarToString(val as InternalScalarValue)
+      if (coerced instanceof CellError) {
+        return coerced
+      }
+      result.push(coerced)
+    }
+    return result
   }
 }

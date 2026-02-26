@@ -215,6 +215,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'ЦЕНАКЧЕК',
     TBILLYIELD: 'ДОХОДКЧЕК',
     TEXT: 'ТЕКСТ',
+    TEXTJOIN: 'ОБЪЕДИНИТЬ',
     TIME: 'ВРЕМЯ',
     TIMEVALUE: 'ВРЕМЗНАЧ',
     TODAY: 'СЕГОДНЯ',

@@ -215,6 +215,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'SSVXPRIS',
     TBILLYIELD: 'SSVXRÄNTA',
     TEXT: 'TEXT',
+    TEXTJOIN: 'TEXTJOIN',
     TIME: 'KLOCKSLAG',
     TIMEVALUE: 'TIDVÄRDE',
     TODAY: 'IDAG',

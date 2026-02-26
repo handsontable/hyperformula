@@ -215,6 +215,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'HTAHDEĞER',
     TBILLYIELD: 'HTAHÖDEME',
     TEXT: 'METNEÇEVİR',
+    TEXTJOIN: 'METİNBİRLEŞTİR',
     TIME: 'ZAMAN',
     TIMEVALUE: 'ZAMANSAYISI',
     TODAY: 'BUGÜN',
