@@ -589,11 +589,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       if (val instanceof CellError) {
         return val
       }
-      const coerced = coerceScalarToString(val as InternalScalarValue)
-      if (coerced instanceof CellError) {
-        return coerced
-      }
-      result.push(coerced)
+      result.push(coerceScalarToString(val as InternalScalarValue) as string)
     }
     return result
   }

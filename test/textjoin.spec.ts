@@ -10,10 +10,6 @@ describe('TEXTJOIN', () => {
     return {hf, val: (ref: string) => hf.getCellValue(adr(ref))}
   }
 
-  afterEach(() => {
-    // HyperFormula instances are destroyed in each test
-  })
-
   describe('basic functionality', () => {
     it('should join literal strings with a scalar delimiter', () => {
       const {hf, val} = evaluate([['=TEXTJOIN(", ", TRUE(), "Hello", "World")']])
