@@ -3,15 +3,15 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {CellError, ErrorType} from '../../Cell'
-import {ErrorMessage} from '../../error-message'
-import {Maybe} from '../../Maybe'
-import {ProcedureAst} from '../../parser'
-import {coerceScalarToString} from '../ArithmeticHelper'
-import {InterpreterState} from '../InterpreterState'
-import {SimpleRangeValue} from '../../SimpleRangeValue'
-import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
-import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+import { CellError, ErrorType } from '../../Cell'
+import { ErrorMessage } from '../../error-message'
+import { Maybe } from '../../Maybe'
+import { ProcedureAst } from '../../parser'
+import { coerceScalarToString } from '../ArithmeticHelper'
+import { InterpreterState } from '../InterpreterState'
+import { SimpleRangeValue } from '../../SimpleRangeValue'
+import { ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue } from '../InterpreterValue'
+import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
 
 /**
  * Interpreter plugin containing text-specific functions
@@ -21,7 +21,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'CONCATENATE': {
       method: 'concatenate',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -29,141 +29,141 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'EXACT': {
       method: 'exact',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'SPLIT': {
       method: 'split',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
       ]
     },
     'LEN': {
       method: 'len',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'LOWER': {
       method: 'lower',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'MID': {
       method: 'mid',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.NUMBER },
       ]
     },
     'TRIM': {
       method: 'trim',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'T': {
       method: 't',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR}
+        { argumentType: FunctionArgumentType.SCALAR }
       ]
     },
     'N': {
       method: 'n',
       parameters: [
-        {argumentType: FunctionArgumentType.ANY}
+        { argumentType: FunctionArgumentType.ANY }
       ]
     },
     'PROPER': {
       method: 'proper',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'CLEAN': {
       method: 'clean',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'REPT': {
       method: 'rept',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
       ]
     },
     'RIGHT': {
       method: 'right',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'LEFT': {
       method: 'left',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'REPLACE': {
       method: 'replace',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'SEARCH': {
       method: 'search',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'SUBSTITUTE': {
       method: 'substitute',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true}
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true }
       ]
     },
     'FIND': {
       method: 'find',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'UPPER': {
       method: 'upper',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'VALUE': {
       method: 'value',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR}
+        { argumentType: FunctionArgumentType.SCALAR }
       ]
     },
     'TEXTJOIN': {
       method: 'textjoin',
       repeatLastArgs: 1,
       parameters: [
-        {argumentType: FunctionArgumentType.ANY},
-        {argumentType: FunctionArgumentType.BOOLEAN},
-        {argumentType: FunctionArgumentType.ANY},
+        { argumentType: FunctionArgumentType.ANY },
+        { argumentType: FunctionArgumentType.BOOLEAN },
+        { argumentType: FunctionArgumentType.ANY },
       ],
     },
   }
@@ -448,39 +448,21 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   public textjoin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('TEXTJOIN'),
       (delimiterArg: InternalScalarValue | SimpleRangeValue,
-       ignoreEmpty: boolean,
-       ...textArgs: (InternalScalarValue | SimpleRangeValue)[]) => {
+        ignoreEmpty: boolean,
+        ...textArgs: (InternalScalarValue | SimpleRangeValue)[]) => {
 
-        const delimiters: string[] = []
-        const delimiterValues = delimiterArg instanceof SimpleRangeValue
-          ? delimiterArg.valuesFromTopLeftCorner()
-          : [delimiterArg]
-        for (const val of delimiterValues) {
-          if (val instanceof CellError) {
-            return val
-          }
-          const coerced = coerceScalarToString(val as InternalScalarValue)
-          if (coerced instanceof CellError) {
-            return coerced
-          }
-          delimiters.push(coerced)
+        const delimiters = this.flattenArgToStrings(delimiterArg)
+        if (delimiters instanceof CellError) {
+          return delimiters
         }
 
         const texts: string[] = []
         for (const arg of textArgs) {
-          const values = arg instanceof SimpleRangeValue
-            ? arg.valuesFromTopLeftCorner()
-            : [arg]
-          for (const val of values) {
-            if (val instanceof CellError) {
-              return val
-            }
-            const coerced = coerceScalarToString(val as InternalScalarValue)
-            if (coerced instanceof CellError) {
-              return coerced
-            }
-            texts.push(coerced)
+          const coerced = this.flattenArgToStrings(arg)
+          if (coerced instanceof CellError) {
+            return coerced
           }
+          texts.push(...coerced)
         }
 
         const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
@@ -499,6 +481,29 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
         return result
       }
     )
+  }
+
+  /**
+   * Flattens a scalar or range argument into an array of coerced strings.
+   * Returns a CellError immediately if any value in the argument is an error or cannot be coerced.
+   *
+   * @param {InternalScalarValue | SimpleRangeValue} arg - Scalar or range to flatten
+   * @returns {string[] | CellError} - Array of string values, or the first error encountered
+   */
+  private flattenArgToStrings(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
+    const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+    const result: string[] = []
+    for (const val of values) {
+      if (val instanceof CellError) {
+        return val
+      }
+      const coerced = coerceScalarToString(val as InternalScalarValue)
+      if (coerced instanceof CellError) {
+        return coerced
+      }
+      result.push(coerced)
+    }
+    return result
   }
 
   /**
