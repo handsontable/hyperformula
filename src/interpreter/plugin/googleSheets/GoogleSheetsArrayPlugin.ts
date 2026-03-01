@@ -717,11 +717,14 @@ export class GoogleSheetsArrayPlugin extends FunctionPlugin implements FunctionP
   }
 
   /** Predicts the size of the SEQUENCE result array. */
-  public sequenceArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+  public sequenceArraySize(ast: ProcedureAst, _state: InterpreterState): ArraySize {
     if (ast.args.length < 1) return ArraySize.error()
     const rowsArg = ast.args[0]
     const colsArg = ast.args[1]
-    const rows = rowsArg.type === AstNodeType.NUMBER ? Math.max(1, rowsArg.value) : this.config.maxRows
+    // When arguments are cell references (not literals), use a minimal
+    // non-scalar fallback. ArrayValue.resize() will grow to the actual
+    // computed size and tolerates actual > predicted.
+    const rows = rowsArg.type === AstNodeType.NUMBER ? Math.max(1, rowsArg.value) : 2
     const cols = colsArg !== undefined && colsArg.type === AstNodeType.NUMBER ? Math.max(1, colsArg.value) : 1
     return new ArraySize(cols, rows)
   }
@@ -888,10 +891,10 @@ export class GoogleSheetsArrayPlugin extends FunctionPlugin implements FunctionP
   }
 
   /** Predicts the size of the MUNIT result array. */
-  public munitArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+  public munitArraySize(ast: ProcedureAst, _state: InterpreterState): ArraySize {
     if (ast.args.length < 1) return ArraySize.error()
     const dimArg = ast.args[0]
-    const dim = dimArg.type === AstNodeType.NUMBER ? Math.max(1, dimArg.value) : this.config.maxRows
+    const dim = dimArg.type === AstNodeType.NUMBER ? Math.max(1, dimArg.value) : 2
     return new ArraySize(dim, dim)
   }
 

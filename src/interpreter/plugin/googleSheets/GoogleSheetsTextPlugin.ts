@@ -84,9 +84,12 @@ export class GoogleSheetsTextPlugin extends FunctionPlugin implements FunctionPl
     }
 
     const textArg = ast.args[0]
+    // When the text argument is a cell reference (not a literal), use a
+    // minimal non-scalar fallback. ArrayValue.resize() will grow to the
+    // actual computed size and tolerates actual > predicted.
     const width = (textArg.type === AstNodeType.STRING)
       ? textArg.value.length + 1
-      : this.config.maxColumns
+      : 2
 
     return new ArraySize(width, 1)
   }

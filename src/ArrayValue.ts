@@ -68,13 +68,30 @@ export class ArrayValue implements CellArray {
   }
 
   public addRows(aboveRow: number, numberOfRows: number) {
-    this.array.splice(aboveRow, 0, ...this.nullArrays(numberOfRows, this.width()))
+    const newRows = this.nullArrays(numberOfRows, this.width())
+    // Use a loop instead of splice(...spread) to avoid stack overflow
+    // when inserting a large number of rows.
+    const tail = this.array.splice(aboveRow)
+    for (const row of newRows) {
+      this.array.push(row)
+    }
+    for (const row of tail) {
+      this.array.push(row)
+    }
     this.size.height += numberOfRows
   }
 
   public addColumns(aboveColumn: number, numberOfColumns: number) {
     for (let i = 0; i < this.height(); i++) {
-      this.array[i].splice(aboveColumn, 0, ...new Array(numberOfColumns).fill(EmptyValue))
+      // Use a loop instead of splice(...spread) to avoid stack overflow
+      // when inserting a large number of columns.
+      const tail = this.array[i].splice(aboveColumn)
+      for (let j = 0; j < numberOfColumns; j++) {
+        this.array[i].push(EmptyValue)
+      }
+      for (const val of tail) {
+        this.array[i].push(val)
+      }
     }
     this.size.width += numberOfColumns
   }
@@ -137,15 +154,13 @@ export class ArrayValue implements CellArray {
     if (this.height() < newSize.height && isFinite(newSize.height)) {
       this.addRows(this.height(), newSize.height - this.height())
     }
-    if (this.height() > newSize.height) {
-      throw Error('Resizing to smaller array')
-    }
     if (this.width() < newSize.width && isFinite(newSize.width)) {
       this.addColumns(this.width(), newSize.width - this.width())
     }
-    if (this.width() > newSize.width) {
-      throw Error('Resizing to smaller array')
-    }
+    // When the actual result is larger than the predicted size (e.g.
+    // because the size predictor couldn't inspect cell-reference
+    // arguments), keep the actual computed dimensions. Discarding
+    // computed values would be incorrect.
   }
 
   private outOfBound(col: number, row: number): boolean {
