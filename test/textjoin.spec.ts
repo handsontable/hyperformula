@@ -49,6 +49,18 @@ describe('TEXTJOIN', () => {
       expect(val('A2')).toBe('start-a-b-c-end')
       hf.destroy()
     })
+
+    it('should join individual cell references', () => {
+      const {hf, val} = evaluate([['a', 'b', 'c', '=TEXTJOIN("-", TRUE(), A1, B1, C1)']])
+      expect(val('D1')).toBe('a-b-c')
+      hf.destroy()
+    })
+
+    it('should return single cell reference value without delimiter', () => {
+      const {hf, val} = evaluate([['only', '=TEXTJOIN(",", TRUE(), A1)']])
+      expect(val('B1')).toBe('only')
+      hf.destroy()
+    })
   })
 
   describe('ignore_empty behavior', () => {
@@ -84,6 +96,22 @@ describe('TEXTJOIN', () => {
       hf.destroy()
     })
 
+    it('should skip empty string cells when ignore_empty=TRUE', () => {
+      const {hf, val} = evaluate([
+        ['Hello', 'World', '', '=TEXTJOIN(", ", TRUE(), A1:C1)'],
+      ])
+      expect(val('D1')).toBe('Hello, World')
+      hf.destroy()
+    })
+
+    it('should include empty string cells when ignore_empty=FALSE', () => {
+      const {hf, val} = evaluate([
+        ['Hello', 'World', '', '=TEXTJOIN(", ", FALSE(), A1:C1)'],
+      ])
+      expect(val('D1')).toBe('Hello, World, ')
+      hf.destroy()
+    })
+
     it('should return empty string for all-empty range with ignore_empty=TRUE', () => {
       const {hf, val} = evaluate([
         [null, null, null, '=TEXTJOIN(",", TRUE(), A1:C1)'],
@@ -92,9 +120,25 @@ describe('TEXTJOIN', () => {
       hf.destroy()
     })
 
+    it('should return delimiters for all-empty string range with ignore_empty=TRUE', () => {
+      const {hf, val} = evaluate([
+        ['', '', '', '=TEXTJOIN(",", TRUE(), A1:C1)'],
+      ])
+      expect(val('D1')).toBe('')
+      hf.destroy()
+    })
+
     it('should return delimiters for all-empty range with ignore_empty=FALSE', () => {
       const {hf, val} = evaluate([
         [null, null, null, '=TEXTJOIN(",", FALSE(), A1:C1)'],
+      ])
+      expect(val('D1')).toBe(',,')
+      hf.destroy()
+    })
+
+    it('should return delimiters for all-empty string range with ignore_empty=FALSE', () => {
+      const {hf, val} = evaluate([
+        ['', '', '', '=TEXTJOIN(",", FALSE(), A1:C1)'],
       ])
       expect(val('D1')).toBe(',,')
       hf.destroy()
