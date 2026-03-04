@@ -23,6 +23,11 @@ jobs:
     name: unit-tests
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - name: Checkout main repository
         uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
@@ -32,11 +37,6 @@ jobs:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
           path: test/hyperformula-tests
-
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
-        with:
-          node-version: ${{ matrix.node-version }}
 
       - name: Fetch hyperformula-tests and sync branches
         run: cd test && ./fetch-tests.sh
@@ -55,6 +55,11 @@ jobs:
     name: browser-tests
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
+        with:
+          node-version: ${{ matrix.node-version }}
+
       - name: Checkout main repository
         uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
 
@@ -64,11 +69,6 @@ jobs:
           ssh-key: ${{ secrets.DEPLOY_TOKEN }}
           repository: handsontable/hyperformula-tests
           path: test/hyperformula-tests
-
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
-        with:
-          node-version: ${{ matrix.node-version }}
 
       - name: Fetch hyperformula-tests and sync branches
         run: cd test && ./fetch-tests.sh
