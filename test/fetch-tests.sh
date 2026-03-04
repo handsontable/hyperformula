@@ -23,12 +23,12 @@ elif [ -n "$GITHUB_REF_NAME" ] && [[ "$GITHUB_REF_NAME" != *"/merge" ]]; then
   CURRENT_BRANCH="$GITHUB_REF_NAME"
 else
   CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-  [ "$CURRENT_BRANCH" = "HEAD" ] && CURRENT_BRANCH="master"
+  [ "$CURRENT_BRANCH" = "HEAD" ] && CURRENT_BRANCH="develop"
 fi
 
 echo "Checking out branch $CURRENT_BRANCH in hyperformula-tests..."
 
-# 3. Checkout matching branch in hyperformula-tests or fall back to master
+# 3. Checkout matching branch in hyperformula-tests or fall back to develop
 cd "$HYPERFORMULA_TESTS_DIR"
 git fetch origin
 
@@ -36,7 +36,7 @@ if git show-ref --verify --quiet "refs/heads/$CURRENT_BRANCH" || \
    git show-ref --verify --quiet "refs/remotes/origin/$CURRENT_BRANCH"; then
   git checkout "$CURRENT_BRANCH"
 else
-  git checkout master
+  git checkout develop
 fi
 
 # 4. Pull changes from origin
