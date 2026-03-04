@@ -79,7 +79,7 @@
     "test:fetch-private": "bash test/fetch-tests.sh",
     "test:jest": "cross-env NODE_ICU_DATA=node_modules/full-icu jest",
     "test:watch": "npm run test:jest -- --watch",
-    "test:tdd": "npm run test:jest -- --watch function-value",
+    "test:tdd": "npm run test:jest -- --watch function-irr",
     "test:coverage": "npm run test:jest -- --coverage",
     "test:logMemory": "npm run test:jest -- --runInBand --logHeapUsage",
     "test:performance": "npm run benchmark:basic && npm run benchmark:cruds",
