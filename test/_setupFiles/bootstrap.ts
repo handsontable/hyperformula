@@ -6,8 +6,13 @@ import {HyperFormula} from '../../src'
 import {Config} from '../../src/Config'
 import {enGB} from '../../src/i18n/languages'
 import * as plugins from '../../src/interpreter/plugin'
-import {unregisterAllLanguages} from '../testUtils'
 import {toContainEqualMatcher, toEqualErrorMatcher, toMatchObjectMatcher} from './matchers'
+
+function unregisterAllLanguages() {
+  for (const langCode of HyperFormula.getRegisteredLanguagesCodes()) {
+    HyperFormula.unregisterLanguage(langCode)
+  }
+}
 
 Config.defaultConfig = Object.assign({}, Config.defaultConfig, {
   functionPlugins: [],
