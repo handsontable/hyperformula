@@ -45,7 +45,7 @@ This file is located in the `test` directory.
 3. **Checkout matching branch** – In `hyperformula-tests`:
    - Fetches from `origin`
    - Checks out the branch if it exists locally or on `origin`
-   - Otherwise checks out `develop`
+   - If the branch doesn't exist, creates it from `develop`
 
 4. **Pull latest** – Runs `git pull origin` on the checked-out branch.
 

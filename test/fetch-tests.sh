@@ -28,7 +28,7 @@ fi
 
 echo "Checking out branch $CURRENT_BRANCH in hyperformula-tests..."
 
-# 3. Checkout matching branch in hyperformula-tests or fall back to develop
+# 3. Checkout matching branch in hyperformula-tests or create it if it doesn't exist
 cd "$HYPERFORMULA_TESTS_DIR"
 git fetch origin
 
@@ -36,7 +36,10 @@ if git show-ref --verify --quiet "refs/heads/$CURRENT_BRANCH" || \
    git show-ref --verify --quiet "refs/remotes/origin/$CURRENT_BRANCH"; then
   git checkout "$CURRENT_BRANCH"
 else
+  echo "Branch $CURRENT_BRANCH not found in hyperformula-tests, creating from develop..."
   git checkout develop
+  git pull origin develop
+  git checkout -b "$CURRENT_BRANCH"
 fi
 
 # 4. Pull changes from origin
