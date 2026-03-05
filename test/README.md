@@ -12,7 +12,7 @@ The private test suite is kept in the `hyperformula-tests` repository. Once you 
 
 Whenenever you switch branch in the main repository, you need to fetch the private test suite to the `test/hyperformula-tests` directory by running:
 ```
-npm run test:fetch-private
+npm run test:setup-private
 
 ```
 
