@@ -25,6 +25,7 @@ import {
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {
+  EmptyValue,
   ExtendedNumber,
   FormatInfo,
   getRawValue,
@@ -451,7 +452,12 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
     for (let i = 0; i < argumentsMetadata.length; i++) {
       const argumentMetadata = argumentsMetadata[i]
-      const argumentValue = vectorizedArguments[i] !== undefined ? vectorizedArguments[i] : argumentMetadata?.defaultValue
+      const rawArg = vectorizedArguments[i]
+      const argumentValue = (rawArg === undefined)
+        ? argumentMetadata?.defaultValue
+        : (rawArg === EmptyValue && argumentMetadata?.defaultValue !== undefined)
+          ? argumentMetadata.defaultValue
+          : rawArg
 
       if (argumentValue === undefined) {
         coercedArguments.push(undefined)
