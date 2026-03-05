@@ -876,7 +876,16 @@ function irrCore(values: number[], guess: number): number | CellError {
     }
 
     // Newton-Raphson step
-    const newRate = rate - npv / dnpv
+    let newRate = rate - npv / dnpv
+
+    if (!isFinite(newRate)) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    // Clamp: when Newton overshoots past -1, bisect between current rate and -1
+    if (newRate <= -1) {
+      newRate = (rate - 1) / 2
+    }
 
     // Check for convergence based on rate change
     if (Math.abs(newRate - rate) < epsMax) {
@@ -884,11 +893,6 @@ function irrCore(values: number[], guess: number): number | CellError {
     }
 
     rate = newRate
-
-    // Check for invalid rate
-    if (!isFinite(rate) || rate <= -1) {
-      return new CellError(ErrorType.NUM)
-    }
   }
 
   return new CellError(ErrorType.NUM)
