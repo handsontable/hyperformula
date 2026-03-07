@@ -17,6 +17,7 @@ export class LazilyTransformingAstService {
   public undoRedo?: UndoRedo
 
   private transformations: FormulaTransformer[] = []
+  private versionOffset: number = 0
   private combinedTransformer?: CombinedTransformer
 
   constructor(
@@ -25,7 +26,7 @@ export class LazilyTransformingAstService {
   }
 
   public version(): number {
-    return this.transformations.length
+    return this.versionOffset + this.transformations.length
   }
 
   public addTransformation(transformation: FormulaTransformer): number {
@@ -53,8 +54,9 @@ export class LazilyTransformingAstService {
   public applyTransformations(ast: Ast, address: SimpleCellAddress, version: number): [Ast, SimpleCellAddress, number] {
     this.stats.start(StatType.TRANSFORM_ASTS_POSTPONED)
 
-    for (let v = version; v < this.transformations.length; v++) {
-      const transformation = this.transformations[v]
+    const currentVersion = this.version()
+    for (let v = Math.max(version, this.versionOffset); v < currentVersion; v++) {
+      const transformation = this.transformations[v - this.versionOffset]
       if (transformation.isIrreversible()) {
         this.undoRedo!.storeDataForVersion(v, address, this.parser!.computeHashFromAst(ast))
         this.parser!.rememberNewAst(ast)
@@ -67,15 +69,33 @@ export class LazilyTransformingAstService {
     const cachedAst = this.parser!.rememberNewAst(ast)
 
     this.stats.end(StatType.TRANSFORM_ASTS_POSTPONED)
-    return [cachedAst, address, this.transformations.length]
+    return [cachedAst, address, currentVersion]
   }
 
   public* getTransformationsFrom(version: number, filter?: (transformation: FormulaTransformer) => boolean): IterableIterator<FormulaTransformer> {
-    for (let v = version; v < this.transformations.length; v++) {
-      const transformation = this.transformations[v]
+    const currentVersion = this.version()
+    for (let v = Math.max(version, this.versionOffset); v < currentVersion; v++) {
+      const transformation = this.transformations[v - this.versionOffset]
       if (!filter || filter(transformation)) {
         yield transformation
       }
     }
+  }
+
+  /**
+   * Returns true if there are pending transformations that can be compacted.
+   */
+  public needsCompaction(): boolean {
+    return this.transformations.length > 0
+  }
+
+  /**
+   * Compacts the transformations array by discarding all entries that have already
+   * been applied by every consumer. Safe to call only after all FormulaVertex and
+   * ColumnIndex consumers have been brought up to the current version.
+   */
+  public compact(): void {
+    this.versionOffset += this.transformations.length
+    this.transformations = []
   }
 }

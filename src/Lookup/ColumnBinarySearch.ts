@@ -53,6 +53,9 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {
   }
 
+  public forceApplyPostponedTransformations(): void {
+  }
+
   /*
    * WARNING: Finding lower/upper bounds in unordered ranges is not supported. When ordering === 'none', assumes matchExactly === true
    */
