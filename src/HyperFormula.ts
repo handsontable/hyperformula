@@ -4610,6 +4610,12 @@ export class HyperFormula implements TypedEmitter {
       const verticesToRecomputeFrom = this.dependencyGraph.verticesToRecompute()
       this.dependencyGraph.clearDirtyVertices()
 
+      if (this._lazilyTransformingAstService.needsCompaction()) {
+        this._dependencyGraph.forceApplyPostponedTransformations()
+        this._columnSearch.forceApplyPostponedTransformations()
+        this._lazilyTransformingAstService.compact()
+      }
+
       if (verticesToRecomputeFrom.length > 0) {
         changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))
       }

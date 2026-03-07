@@ -458,6 +458,9 @@ export class UndoRedo {
   }
 
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
+    if (this.undoLimit === 0) {
+      return
+    }
     if (!this.oldData.has(version)) {
       this.oldData.set(version, [])
     }
@@ -771,6 +774,15 @@ export class UndoRedo {
     this.operations.setColumnOrder(operation.sheetId, operation.columnMapping)
   }
 
+  /**
+   * Adds an entry to the undo stack, evicting the oldest entry when undoLimit is exceeded.
+   *
+   * Known limitation (follow-up for issue #1629): when an entry is evicted by the splice
+   * below, its corresponding `oldData` keys are never removed from the map. Fixing this
+   * properly requires each UndoEntry to record which LTAS version keys it references so
+   * they can be deleted on eviction. Until then, `oldData` has a minor leak when
+   * `undoLimit > 0` and many structural operations are performed.
+   */
   private addUndoEntry(operation: UndoEntry) {
     this.undoStack.push(operation)
     this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))

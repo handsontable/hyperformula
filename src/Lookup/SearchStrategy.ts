@@ -51,6 +51,13 @@ export interface ColumnSearchStrategy extends SearchStrategy {
   moveValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>, toRight: number, toBottom: number, toSheet: number): void,
 
   removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void,
+
+  /**
+   * Forces all lazily-tracked ValueIndex entries to apply any pending transformations,
+   * bringing every entry's version up to the current LTAS version.
+   * Must be called before compacting LazilyTransformingAstService.
+   */
+  forceApplyPostponedTransformations(): void,
 }
 
 export function buildColumnSearchStrategy(dependencyGraph: DependencyGraph, config: Config, statistics: Statistics): ColumnSearchStrategy {

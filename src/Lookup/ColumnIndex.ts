@@ -184,6 +184,24 @@ export class ColumnIndex implements ColumnSearchStrategy {
     this.index.delete(sheetId)
   }
 
+  /**
+   * Forces all ValueIndex entries to apply any pending lazy transformations,
+   * bringing every entry up to the current LTAS version.
+   * Must be called before compacting LazilyTransformingAstService.
+   */
+  public forceApplyPostponedTransformations(): void {
+    for (const [sheet, sheetIndex] of this.index) {
+      sheetIndex.forEach((columnMap, col) => {
+        if (!columnMap) {
+          return
+        }
+        for (const value of columnMap.keys()) {
+          this.ensureRecentData(sheet, col, value)
+        }
+      })
+    }
+  }
+
   public getColumnMap(sheet: number, col: number): ColumnMap {
     if (!this.index.has(sheet)) {
       this.index.set(sheet, [])
