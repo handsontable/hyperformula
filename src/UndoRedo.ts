@@ -22,12 +22,22 @@ export interface UndoEntry {
   doUndo(undoRedo: UndoRedo): void,
 
   doRedo(undoRedo: UndoRedo): void,
+
+  /**
+   * Returns the LTAS version keys referenced by this entry's oldData storage.
+   * Used to clean up oldData when the entry is permanently evicted from the undo/redo stack.
+   */
+  getReferencedOldDataVersions(): number[],
 }
 
 export abstract class BaseUndoEntry implements UndoEntry {
   abstract doUndo(undoRedo: UndoRedo): void
 
   abstract doRedo(undoRedo: UndoRedo): void
+
+  public getReferencedOldDataVersions(): number[] {
+    return []
+  }
 }
 
 export class RemoveRowsUndoEntry extends BaseUndoEntry {
@@ -44,6 +54,10 @@ export class RemoveRowsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoRemoveRows(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.rowsRemovals.map(r => r.version - 1)
   }
 }
 
@@ -66,6 +80,10 @@ export class MoveCellsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoMoveCells(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return [this.version - 1]
   }
 }
 
@@ -162,6 +180,10 @@ export class MoveRowsUndoEntry extends BaseUndoEntry {
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoMoveRows(this)
   }
+
+  public getReferencedOldDataVersions(): number[] {
+    return [this.version - 1]
+  }
 }
 
 export class MoveColumnsUndoEntry extends BaseUndoEntry {
@@ -186,6 +208,10 @@ export class MoveColumnsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoMoveColumns(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return [this.version - 1]
   }
 }
 
@@ -219,6 +245,10 @@ export class RemoveColumnsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoRemoveColumns(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.columnsRemovals.map(r => r.version - 1)
   }
 }
 
@@ -285,6 +315,10 @@ export class RenameSheetUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoRenameSheet(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.version !== undefined ? [this.version - 1] : []
   }
 }
 
@@ -421,6 +455,10 @@ export class BatchUndoEntry extends BaseUndoEntry {
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoBatch(this)
   }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.operations.flatMap(op => op.getReferencedOldDataVersions())
+  }
 }
 
 export class UndoRedo {
@@ -469,10 +507,12 @@ export class UndoRedo {
   }
 
   public clearRedoStack() {
+    this.cleanupOldDataForEntries(this.redoStack)
     this.redoStack = []
   }
 
   public clearUndoStack() {
+    this.cleanupOldDataForEntries(this.undoStack)
     this.undoStack = []
   }
 
@@ -775,17 +815,27 @@ export class UndoRedo {
   }
 
   /**
-   * Adds an entry to the undo stack, evicting the oldest entry when undoLimit is exceeded.
-   *
-   * Known limitation (follow-up for issue #1629): when an entry is evicted by the splice
-   * below, its corresponding `oldData` keys are never removed from the map. Fixing this
-   * properly requires each UndoEntry to record which LTAS version keys it references so
-   * they can be deleted on eviction. Until then, `oldData` has a minor leak when
-   * `undoLimit > 0` and many structural operations are performed.
+   * Adds an entry to the undo stack, evicting the oldest entries when undoLimit is exceeded.
+   * Evicted entries have their oldData keys cleaned up to prevent memory leaks.
    */
   private addUndoEntry(operation: UndoEntry) {
     this.undoStack.push(operation)
-    this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
+    const evictCount = Math.max(0, this.undoStack.length - this.undoLimit)
+    if (evictCount > 0) {
+      const evicted = this.undoStack.splice(0, evictCount)
+      this.cleanupOldDataForEntries(evicted)
+    }
+  }
+
+  /**
+   * Removes oldData entries referenced by permanently discarded undo/redo entries.
+   */
+  private cleanupOldDataForEntries(entries: UndoEntry[]) {
+    for (const entry of entries) {
+      for (const version of entry.getReferencedOldDataVersions()) {
+        this.oldData.delete(version)
+      }
+    }
   }
 
   private undoEntry(operation: UndoEntry) {
