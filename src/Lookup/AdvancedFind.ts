@@ -67,7 +67,16 @@ export abstract class AdvancedFind {
       .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)
 
     if (ifNoMatch === 'returnNotFound') {
-      return returnOccurrence === 'first' ? normalizedArray.indexOf(searchKey) : normalizedArray.lastIndexOf(searchKey)
+      const index = returnOccurrence === 'first' ? normalizedArray.indexOf(searchKey) : normalizedArray.lastIndexOf(searchKey)
+      if (index !== NOT_FOUND) {
+        return index
+      }
+      const coercedKey = typeof searchKey === 'number' ? searchKey.toString() : typeof searchKey === 'string' ? Number(searchKey) : searchKey
+      console.log(`[MATCH COERCE] key: ${searchKey} (${typeof searchKey}) -> coercedKey: ${coercedKey} (${typeof coercedKey})`)
+      if (coercedKey !== searchKey && !Number.isNaN(coercedKey)) {
+        return returnOccurrence === 'first' ? normalizedArray.indexOf(coercedKey) : normalizedArray.lastIndexOf(coercedKey)
+      }
+      return NOT_FOUND
     }
 
     const compareFn = ifNoMatch === 'returnLowerBound'
