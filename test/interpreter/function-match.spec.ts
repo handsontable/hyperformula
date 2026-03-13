@@ -760,24 +760,13 @@ describe('Function MATCH', () => {
     it('should match a number key against a string value', () => {
       const engine = HyperFormula.buildFromArray([
         ['=MATCH(100, A2:A5, 0)'],
-        ['"100"'],
-        ['"200"'],
-        ['"300"'],
-        ['"400"'],
+        ["'100"],
+        ["'200"],
+        ["'300"],
+        ["'400"],
       ])
 
-      const engine2 = HyperFormula.buildFromSheets({
-        Sheet1: [
-          ['=MATCH(100, B1:B4, 0)'],
-        ],
-      })
-      const sheetId = engine2.getSheetId('Sheet1')!
-      engine2.setCellContents({sheet: sheetId, row: 0, col: 1}, [['100']])
-      engine2.setCellContents({sheet: sheetId, row: 1, col: 1}, [['200']])
-      engine2.setCellContents({sheet: sheetId, row: 2, col: 1}, [['300']])
-      engine2.setCellContents({sheet: sheetId, row: 3, col: 1}, [['400']])
-
-      expect(engine2.getCellValue(adr('A1'))).toEqual(1)
+      expect(engine.getCellValue(adr('A1'))).toEqual(1)
     })
 
     it('should match a string key against a number value', () => {
