@@ -766,8 +766,6 @@ describe('Function MATCH', () => {
         ['"400"'],
       ])
 
-      // "100" stored as text won't match number 100 without coercion
-      // Using direct string values instead:
       const engine2 = HyperFormula.buildFromSheets({
         Sheet1: [
           ['=MATCH(100, B1:B4, 0)'],
@@ -779,8 +777,6 @@ describe('Function MATCH', () => {
       engine2.setCellContents({sheet: sheetId, row: 2, col: 1}, [['300']])
       engine2.setCellContents({sheet: sheetId, row: 3, col: 1}, [['400']])
 
-      // The MATCH formula searches for number 100 in a range of strings
-      // With coercion, number 100 should match string "100"
       expect(engine2.getCellValue(adr('A1'))).toEqual(1)
     })
 
@@ -816,7 +812,6 @@ describe('Function MATCH', () => {
         [400],
       ])
 
-      // Direct match should still work — coercion is only a fallback
       expect(engine.getCellValue(adr('A1'))).toEqual(2)
     })
 
