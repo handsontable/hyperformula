@@ -755,4 +755,89 @@ describe('Function MATCH', () => {
       expect(hf.calculateFormula('=MATCH(0, A:A)', 0)).toEqualError(detailedError(ErrorType.NA))
     })
   })
+
+  describe('type coercion for exact match (MatchType = 0)', () => {
+    it('should match a number key against a string value', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MATCH(100, A2:A5, 0)'],
+        ['"100"'],
+        ['"200"'],
+        ['"300"'],
+        ['"400"'],
+      ])
+
+      // "100" stored as text won't match number 100 without coercion
+      // Using direct string values instead:
+      const engine2 = HyperFormula.buildFromSheets({
+        Sheet1: [
+          ['=MATCH(100, B1:B4, 0)'],
+        ],
+      })
+      const sheetId = engine2.getSheetId('Sheet1')!
+      engine2.setCellContents({sheet: sheetId, row: 0, col: 1}, [['100']])
+      engine2.setCellContents({sheet: sheetId, row: 1, col: 1}, [['200']])
+      engine2.setCellContents({sheet: sheetId, row: 2, col: 1}, [['300']])
+      engine2.setCellContents({sheet: sheetId, row: 3, col: 1}, [['400']])
+
+      // The MATCH formula searches for number 100 in a range of strings
+      // With coercion, number 100 should match string "100"
+      expect(engine2.getCellValue(adr('A1'))).toEqual(1)
+    })
+
+    it('should match a string key against a number value', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MATCH("200", A2:A5, 0)'],
+        [100],
+        [200],
+        [300],
+        [400],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+
+    it('should not coerce non-numeric strings', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MATCH("abc", A2:A4, 0)'],
+        [100],
+        [200],
+        [300],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqualError(detailedError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    })
+
+    it('should prefer exact type match over coerced match', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MATCH(200, A2:A5, 0)'],
+        [100],
+        [200],
+        [300],
+        [400],
+      ])
+
+      // Direct match should still work — coercion is only a fallback
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+
+    it('should match string key against string value in horizontal range', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MATCH("300", A2:D2, 0)'],
+        [100, 200, 300, 400],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(3)
+    })
+
+    it('should match number key against string values with decimal', () => {
+      const engine = HyperFormula.buildFromArray([
+        ['=MATCH(2032.2, A2:A4, 0)'],
+        ['2032.1'],
+        ['2032.2'],
+        ['2032.3'],
+      ])
+
+      expect(engine.getCellValue(adr('A1'))).toEqual(2)
+    })
+  })
 })

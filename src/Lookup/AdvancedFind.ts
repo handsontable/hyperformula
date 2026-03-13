@@ -72,7 +72,7 @@ export abstract class AdvancedFind {
         return index
       }
       const coercedKey = typeof searchKey === 'number' ? searchKey.toString() : typeof searchKey === 'string' ? Number(searchKey) : searchKey
-      console.log(`[MATCH COERCE] key: ${searchKey} (${typeof searchKey}) -> coercedKey: ${coercedKey} (${typeof coercedKey})`)
+      console.log(`[MATCH COERCE] key: ${String(searchKey)} (${typeof searchKey}) -> coercedKey: ${String(coercedKey)} (${typeof coercedKey})`)
       if (coercedKey !== searchKey && !Number.isNaN(coercedKey)) {
         return returnOccurrence === 'first' ? normalizedArray.indexOf(coercedKey) : normalizedArray.lastIndexOf(coercedKey)
       }
