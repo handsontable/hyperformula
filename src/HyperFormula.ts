@@ -4614,6 +4614,7 @@ export class HyperFormula implements TypedEmitter {
         this._dependencyGraph.forceApplyPostponedTransformations()
         this._columnSearch.forceApplyPostponedTransformations()
         this._lazilyTransformingAstService.compact()
+        this._lazilyTransformingAstService.undoRedo?.cleanupOrphanedOldData()
       }
 
       if (verticesToRecomputeFrom.length > 0) {
