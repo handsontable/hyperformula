@@ -7,6 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
@@ -155,6 +156,15 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       parameters: [
         {argumentType: FunctionArgumentType.SCALAR}
       ]
+    },
+    'TEXTJOIN': {
+      method: 'textjoin',
+      repeatLastArgs: 1,
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY},
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.ANY},
+      ],
     },
   }
 
@@ -384,6 +394,54 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   /**
+   * Corresponds to TEXTJOIN(delimiter, ignore_empty, text1, [text2], ...)
+   */
+  public textjoin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(
+      ast.args,
+      state,
+      this.metadata('TEXTJOIN'),
+      (delimiterArg: InternalScalarValue | SimpleRangeValue, ignoreEmpty: boolean, ...textArgs: (InternalScalarValue | SimpleRangeValue)[]) => {
+        const delimiters = this.flattenArgToStrings(delimiterArg)
+        if (delimiters instanceof CellError) {
+          return delimiters
+        }
+
+        const delimiterPool = delimiters.length > 0 ? delimiters : ['']
+        const texts: string[] = []
+
+        for (const arg of textArgs) {
+          const coerced = this.flattenArgToStrings(arg)
+          if (coerced instanceof CellError) {
+            return coerced
+          }
+          texts.push(...coerced)
+        }
+
+        const parts = ignoreEmpty ? texts.filter((textPart) => textPart !== '') : texts
+        if (parts.length === 0) {
+          return ''
+        }
+
+        const maxResultLength = 32767
+        let result = parts[0]
+        if (result.length > maxResultLength) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.TextJoinResultTooLong)
+        }
+
+        for (let i = 1; i < parts.length; i++) {
+          result += delimiterPool[(i - 1) % delimiterPool.length] + parts[i]
+          if (result.length > maxResultLength) {
+            return new CellError(ErrorType.VALUE, ErrorMessage.TextJoinResultTooLong)
+          }
+        }
+
+        return result
+      }
+    )
+  }
+
+  /**
    * Corresponds to VALUE(text)
    *
    * Converts a text string that represents a number to a number.
@@ -438,6 +496,24 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     }
 
     return this.arithmeticHelper.coerceToMaybeNumber(trimmedInput)
+  }
+
+  /**
+   * Flattens a scalar or range argument into coerced strings.
+   */
+  private flattenArgToStrings(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
+    const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+    const result: string[] = []
+
+    for (const value of values) {
+      const coercedValue = coerceScalarToString(value)
+      if (coercedValue instanceof CellError) {
+        return coercedValue
+      }
+      result.push(coercedValue)
+    }
+
+    return result
   }
 
   private escapeRegExpSpecialCharacters(text: string): string {
