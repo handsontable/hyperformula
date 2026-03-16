@@ -740,7 +740,6 @@ export class Operations {
   public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
     this.columnSearch.forceApplyPostponedTransformations()
-    this.dependencyGraph.lazilyTransformingAstService.compact()
   }
 
   /**
