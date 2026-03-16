@@ -16,6 +16,8 @@ export class LazilyTransformingAstService {
   public parser?: ParserWithCaching
   public undoRedo?: UndoRedo
 
+  private static readonly COMPACTION_THRESHOLD = 50
+
   private transformations: FormulaTransformer[] = []
   private versionOffset: number = 0
   private combinedTransformer?: CombinedTransformer
@@ -83,10 +85,11 @@ export class LazilyTransformingAstService {
   }
 
   /**
-   * Returns true if there are pending transformations that can be compacted.
+   * Returns true when enough transformations have accumulated to justify the cost
+   * of forcing all consumers (FormulaVertex, ColumnIndex) to apply pending changes.
    */
   public needsCompaction(): boolean {
-    return this.transformations.length > 0
+    return this.transformations.length >= LazilyTransformingAstService.COMPACTION_THRESHOLD
   }
 
   /**
