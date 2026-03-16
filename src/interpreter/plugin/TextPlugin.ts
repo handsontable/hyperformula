@@ -502,7 +502,9 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    * Flattens a scalar or range argument into coerced strings.
    */
   private flattenArgToStrings(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
-    const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+    const values: InternalScalarValue[] = arg instanceof SimpleRangeValue
+      ? arg.valuesFromTopLeftCorner()
+      : [arg]
     const result: string[] = []
 
     for (const value of values) {
