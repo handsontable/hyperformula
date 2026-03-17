@@ -96,6 +96,9 @@ export class LazilyTransformingAstService {
    * Compacts the transformations array by discarding all entries that have already
    * been applied by every consumer. Safe to call only after all FormulaVertex and
    * ColumnIndex consumers have been brought up to the current version.
+   * After calling, UndoRedo.cleanupOrphanedOldData() must be invoked to remove
+   * oldData entries written during forceApplyPostponedTransformations for
+   * already-evicted undo entries.
    */
   public compact(): void {
     this.versionOffset += this.transformations.length
