@@ -83,7 +83,7 @@ export class MoveCellsUndoEntry extends BaseUndoEntry {
   }
 
   public getReferencedOldDataVersions(): number[] {
-    return [this.version - 1]
+    return this.version > 0 ? [this.version - 1] : []
   }
 }
 
@@ -182,7 +182,7 @@ export class MoveRowsUndoEntry extends BaseUndoEntry {
   }
 
   public getReferencedOldDataVersions(): number[] {
-    return [this.version - 1]
+    return this.version > 0 ? [this.version - 1] : []
   }
 }
 
@@ -211,7 +211,7 @@ export class MoveColumnsUndoEntry extends BaseUndoEntry {
   }
 
   public getReferencedOldDataVersions(): number[] {
-    return [this.version - 1]
+    return this.version > 0 ? [this.version - 1] : []
   }
 }
 
@@ -608,12 +608,14 @@ export class UndoRedo {
   }
 
   public undoMoveRows(operation: MoveRowsUndoEntry) {
+    this.operations.forceApplyPostponedTransformations()
     const {sheet} = operation
     this.operations.moveRows(sheet, operation.undoStart, operation.numberOfRows, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   public undoMoveColumns(operation: MoveColumnsUndoEntry) {
+    this.operations.forceApplyPostponedTransformations()
     const {sheet} = operation
     this.operations.moveColumns(sheet, operation.undoStart, operation.numberOfColumns, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
