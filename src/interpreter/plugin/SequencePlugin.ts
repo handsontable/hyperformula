@@ -20,6 +20,7 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
    */
   private static readonly MIN_DIMENSION = 1
 
+  /** Returns true when `n` is at least {@link MIN_DIMENSION}. */
   private static isValidDimension(n: number): boolean {
     return n >= SequencePlugin.MIN_DIMENSION
   }
@@ -46,9 +47,9 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
       sizeOfResultArrayMethod: 'sequenceArraySize',
       parameters: [
         { argumentType: FunctionArgumentType.NUMBER },
-        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
-        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
-        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true },
       ],
       vectorizationForbidden: true,
     },

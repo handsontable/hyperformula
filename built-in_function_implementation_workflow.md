@@ -4,13 +4,13 @@
 
 This is a reusable prompt template for implementing any new built-in Excel-compatible function in HyperFormula. It codifies the full lifecycle we developed during the TEXTJOIN implementation: spec research → Excel behavior validation → test-first development → implementation → verification.
 
-The workflow is designed to be copy-pasted as a user prompt to Claude Code, with placeholders (`{FUNCTION_NAME}`, etc.) filled in for each new function.
+The workflow is designed to be copy-pasted as a prompt, with placeholders (`{FUNCTION_NAME}`, etc.) filled in for each new function.
 
 ---
 
 ## The Prompt Template
 
-Copy everything below the line and fill in the `{PLACEHOLDERS}` before pasting to Claude Code:
+Copy everything below the line and fill in the `{PLACEHOLDERS}` before pasting:
 
 ---
 
