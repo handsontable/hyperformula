@@ -74,6 +74,9 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
         const numRows = Math.trunc(rows)
         const numCols = Math.trunc(cols)
 
+        if (numRows < 0 || numCols < 0) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+        }
         if (!SequencePlugin.isValidDimension(numRows) || !SequencePlugin.isValidDimension(numCols)) {
           return new CellError(ErrorType.NUM, ErrorMessage.LessThanOne)
         }
