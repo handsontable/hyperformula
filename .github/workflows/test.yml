@@ -23,20 +23,35 @@ jobs:
     name: unit-tests
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Checkout main repository
+        uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Checkout hyperformula-tests repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: test/hyperformula-tests
+
+      - name: Fetch hyperformula-tests and sync branches
+        run: cd test && ./fetch-tests.sh
+
       - name: Install dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Run tests
-        run: |
-          npm run test:ci
+        run: npm run test:ci -- --coverage
+
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@6004246f47ab62d32be025ce173b241cd84ac58e # https://github.com/codecov/codecov-action/releases/tag/v1.0.13
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   browser-tests:
     strategy:
@@ -46,17 +61,26 @@ jobs:
     name: browser-tests
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
-
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@56899e050abffc08c2b3b61f3ec6a79a9dc3223d # https://github.com/actions/setup-node/releases/tag/v1.4.4
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Checkout main repository
+        uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Checkout hyperformula-tests repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: test/hyperformula-tests
+
+      - name: Fetch hyperformula-tests and sync branches
+        run: cd test && ./fetch-tests.sh
+
       - name: Install dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Run tests
-        run: |
-          npm run test:browser
+        run: npm run test:browser
