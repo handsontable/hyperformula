@@ -19,9 +19,9 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
       sizeOfResultArrayMethod: 'sequenceArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
       ],
       vectorizationForbidden: true,
     },
@@ -39,15 +39,8 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
   public sequence(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SEQUENCE'),
       (rows: number, cols: number, start: number, step: number) => {
-        // runFunction coerces AstNodeType.EMPTY args to 0 for NUMBER params.
-        // Re-apply defaults for any position that was an empty arg in the formula,
-        // matching Excel's behavior where =SEQUENCE(3,2,,) treats ,, as default (1).
-        const effectiveCols  = ast.args[1]?.type === AstNodeType.EMPTY ? 1 : cols
-        const effectiveStart = ast.args[2]?.type === AstNodeType.EMPTY ? 1 : start
-        const effectiveStep  = ast.args[3]?.type === AstNodeType.EMPTY ? 1 : step
-
         const numRows = Math.trunc(rows)
-        const numCols = Math.trunc(effectiveCols)
+        const numCols = Math.trunc(cols)
 
         if (numRows < 1 || numCols < 1) {
           return new CellError(ErrorType.NUM, ErrorMessage.LessThanOne)
@@ -57,7 +50,7 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
         for (let r = 0; r < numRows; r++) {
           const row: number[] = []
           for (let c = 0; c < numCols; c++) {
-            row.push(effectiveStart + (r * numCols + c) * effectiveStep)
+            row.push(start + (r * numCols + c) * step)
           }
           result.push(row)
         }
