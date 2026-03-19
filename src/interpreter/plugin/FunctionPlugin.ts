@@ -25,6 +25,7 @@ import {
 import {Interpreter} from '../Interpreter'
 import {InterpreterState} from '../InterpreterState'
 import {
+  EmptyValue,
   ExtendedNumber,
   FormatInfo,
   getRawValue,
@@ -231,6 +232,14 @@ export interface FunctionArgument {
    * If set, numerical arguments need to be greater than `greaterThan`.
    */
   greaterThan?: number,
+
+  /**
+   * If set to `true`, an empty argument (EmptyValue) is treated as if the argument
+   * was omitted — i.e., replaced by `defaultValue`. This matches Excel behavior for
+   * functions like ADDRESS where empty args use declared defaults instead of the
+   * zero-value for the type.
+   */
+  emptyAsDefault?: boolean,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
@@ -451,7 +460,12 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
     for (let i = 0; i < argumentsMetadata.length; i++) {
       const argumentMetadata = argumentsMetadata[i]
-      const argumentValue = vectorizedArguments[i] !== undefined ? vectorizedArguments[i] : argumentMetadata?.defaultValue
+      const rawArg = vectorizedArguments[i]
+      const argumentValue = rawArg === undefined
+        ? argumentMetadata?.defaultValue
+        : (rawArg === EmptyValue && argumentMetadata?.emptyAsDefault && argumentMetadata?.defaultValue !== undefined)
+          ? argumentMetadata.defaultValue
+          : rawArg
 
       if (argumentValue === undefined) {
         coercedArguments.push(undefined)
