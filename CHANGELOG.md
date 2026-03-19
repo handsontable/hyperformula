@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 
 - Fixed the IRR function returning `#NUM!` error when the initial investment significantly exceeds the sum of returns. [#1628](https://github.com/handsontable/hyperformula/issues/1628)
+- Fixed the ADDRESS function ignoring `defaultValue` when arguments are syntactically empty (e.g., `=ADDRESS(2,3,,FALSE())`). [#1632](https://github.com/handsontable/hyperformula/issues/1632)
 
 ## [3.2.0] - 2026-02-19
 
