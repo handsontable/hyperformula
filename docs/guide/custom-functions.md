@@ -423,6 +423,7 @@ You can set the following argument validation options:
 | `maxValue`                | Number                                    | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                                           |
 | `lessThan`                | Number                                    | If set: numerical argument needs to be less than `lessThan`.                                                                                                                                                                                       |
 | `greaterThan`             | Number                                    | If set: numerical argument needs to be greater than `greaterThan`.                                                                                                                                                                                 |
+| `emptyAsDefault`          | Boolean                                   | `true`: an empty argument (e.g., `=FUNC(1,,3)`) is treated as missing and falls back to `defaultValue`. By default (`false`), empty arguments are coerced to the zero-value for their type (`0`, `FALSE`, or `""`). Requires `defaultValue` to be set. |
 
 In your function plugin, in the static `implementedFunctions` property, add an
 array called `parameters`:

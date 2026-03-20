@@ -234,10 +234,18 @@ export interface FunctionArgument {
   greaterThan?: number,
 
   /**
-   * If set to `true`, an empty argument (EmptyValue) is treated as if the argument
-   * was omitted — i.e., replaced by `defaultValue`. This matches Excel behavior for
-   * functions like ADDRESS where empty args use declared defaults instead of the
-   * zero-value for the type.
+   * If set to `true`, an empty argument is treated as if the argument was not
+   * provided at all — that is, it falls back to `defaultValue`.
+   *
+   * By default (`false`), an empty argument is coerced to the zero-value for its
+   * type (`0` for numbers, `FALSE` for booleans, `""` for strings).
+   *
+   * | Formula          | `emptyAsDefault: false` (default) | `emptyAsDefault: true`        |
+   * |------------------|-----------------------------------|-------------------------------|
+   * | `ADDRESS(2,3)`   | uses `defaultValue` for 3rd arg   | uses `defaultValue` for 3rd arg |
+   * | `ADDRESS(2,3,)`  | uses `0` for 3rd arg              | uses `defaultValue` for 3rd arg |
+   *
+   * Requires `defaultValue` to be set.
    */
   emptyAsDefault?: boolean,
 }
