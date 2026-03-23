@@ -403,6 +403,18 @@ export interface ConfigParams {
    */
   undoLimit: number,
   /**
+   * Sets the number of accumulated formula transformations that triggers compaction
+   * of the LazilyTransformingAstService. When the number of pending transformations
+   * reaches this threshold, all formula vertices and column indexes are forced to
+   * apply their postponed transformations, and the transformation history is cleared.
+   *
+   * Lower values cause more frequent compaction (useful for testing), while higher
+   * values reduce overhead at the cost of more memory usage.
+   * @default 50
+   * @category Engine
+   */
+  compactionThreshold: number,
+  /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false
    * @category String
