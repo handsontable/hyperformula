@@ -551,4 +551,41 @@ describe('Graph class', () => {
       expect(graph.getInfiniteRanges()).toEqual([])
     })
   })
+
+  describe('performance', () => {
+    it('topSortWithScc completes in under 200ms for 10K+ node graph', () => {
+      const graph = new Graph<string>(dummyDependencyQuery)
+      const nodeCount = 12000
+      const nodes: string[] = []
+
+      // Create nodes
+      for (let i = 0; i < nodeCount; i++) {
+        const node = `node_${i}`
+        nodes.push(node)
+        graph.addNodeAndReturnId(node)
+      }
+
+      // Create ~3 edges per node (typical spreadsheet dependency density)
+      for (let i = 0; i < nodeCount; i++) {
+        for (let j = 1; j <= 3; j++) {
+          const target = (i + j) % nodeCount
+          if (target !== i) {
+            graph.addEdge(nodes[i], nodes[target])
+          }
+        }
+      }
+
+      // Warmup run to trigger JIT optimization
+      graph.topSortWithScc()
+
+      const start = Date.now()
+      graph.topSortWithScc()
+      const elapsed = Date.now() - start
+
+      // 200ms threshold is generous for CI variability.
+      // With Set-based edges this should complete in <50ms.
+      // O(n^2) regression would take multiple seconds for 12K nodes.
+      expect(elapsed).toBeLessThan(200)
+    })
+  })
 })

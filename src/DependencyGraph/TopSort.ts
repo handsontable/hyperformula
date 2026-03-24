@@ -30,7 +30,7 @@ export class TopSort<T> {
 
   constructor(
     private nodesSparseArray: T[] = [],
-    private edgesSparseArray: number[][] = [],
+    private edgesSparseArray: Set<number>[] = [],
   ) {
   }
 
@@ -56,7 +56,7 @@ export class TopSort<T> {
    * Returns adjacent nodes of a given node.
    */
   private getAdjacentNodeIds(id: number): number[] {
-    return this.edgesSparseArray[id].filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
+    return [...this.edgesSparseArray[id]].filter(adjacentId => this.nodesSparseArray[adjacentId])
   }
 
   /**
@@ -169,10 +169,7 @@ export class TopSort<T> {
     this.order.forEach((t: number) => {
       const adjacentNodes = this.getAdjacentNodeIds(t)
 
-      // The following line is a potential performance bottleneck.
-      // Array.includes() is O(n) operation, which makes the whole algorithm O(n^2).
-      // Idea for improvement: use Set<T>[] instead of number[][] for edgesSparseArray.
-      if (this.sccNonSingletons[t] || adjacentNodes.includes(t)) {
+      if (this.sccNonSingletons[t] || this.edgesSparseArray[t].has(t)) {
         cycled.push(this.nodesSparseArray[t])
         onCycle(this.nodesSparseArray[t])
         adjacentNodes.forEach((s: number) => shouldBeUpdatedMapping[s] = true)

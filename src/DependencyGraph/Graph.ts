@@ -14,9 +14,6 @@ export type DependencyQuery<Node> = (vertex: Node) => [(SimpleCellAddress | Simp
 
 /**
  * Provides directed graph structure.
- *
- * Idea for performance improvement:
- * - use Set<Node>[] instead of NodeId[][] for edgesSparseArray
  */
 export class Graph<Node> {
   /**
@@ -27,10 +24,10 @@ export class Graph<Node> {
 
   /**
    * A sparse array. The value edgesSparseArray[n] exists if and only if node n is in the graph.
-   * The edgesSparseArray[n] is also a sparse array. It may contain removed nodes. To make sure check nodesSparseArray.
+   * The edgesSparseArray[n] is a Set of adjacent node IDs. It may reference removed nodes. To make sure check nodesSparseArray.
    * @private
    */
-  private edgesSparseArray: NodeId[][] = []
+  private edgesSparseArray: Set<NodeId>[] = []
 
   /**
    * A mapping from node to its id. The value nodesIds.get(node) exists if and only if node is in the graph.
@@ -95,7 +92,7 @@ export class Graph<Node> {
       return false
     }
 
-    return this.edgesSparseArray[fromId].includes(toId)
+    return this.edgesSparseArray[fromId].has(toId)
   }
 
   /**
@@ -113,7 +110,7 @@ export class Graph<Node> {
       throw this.missingNodeError(node)
     }
 
-    return new Set(this.edgesSparseArray[id].filter(id => id !== undefined).map(id => this.nodesSparseArray[id]))
+    return new Set([...this.edgesSparseArray[id]].map(id => this.nodesSparseArray[id]))
   }
 
   /**
@@ -128,7 +125,7 @@ export class Graph<Node> {
       throw this.missingNodeError(node)
     }
 
-    return this.fixEdgesArrayForNode(id).length
+    return this.fixEdgesArrayForNode(id).size
   }
 
   /**
@@ -147,7 +144,7 @@ export class Graph<Node> {
     this.nextId++
 
     this.nodesSparseArray[newId] = node
-    this.edgesSparseArray[newId] = []
+    this.edgesSparseArray[newId] = new Set()
     this.nodesIds.set(node, newId)
     return newId
   }
@@ -172,11 +169,7 @@ export class Graph<Node> {
       throw this.missingNodeError(toNode as Node)
     }
 
-    if (this.edgesSparseArray[fromId].includes(toId)) {
-      return
-    }
-
-    this.edgesSparseArray[fromId].push(toId)
+    this.edgesSparseArray[fromId].add(toId)
   }
 
   /**
@@ -189,7 +182,7 @@ export class Graph<Node> {
       throw this.missingNodeError(node)
     }
 
-    if (this.edgesSparseArray[id].length > 0) {
+    if (this.edgesSparseArray[id].size > 0) {
       this.edgesSparseArray[id].forEach(adjacentId => this.dirtyAndVolatileNodeIds.rawValue.dirty.push(adjacentId))
       this.dirtyAndVolatileNodeIds.markAsModified()
     }
@@ -219,13 +212,9 @@ export class Graph<Node> {
       throw this.missingNodeError(toNode as Node)
     }
 
-    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
-
-    if (indexOfToId === -1) {
+    if (!this.edgesSparseArray[fromId].delete(toId)) {
       throw new Error('Edge does not exist')
     }
-
-    delete this.edgesSparseArray[fromId][indexOfToId]
   }
 
   /**
@@ -243,13 +232,7 @@ export class Graph<Node> {
       return
     }
 
-    const indexOfToId = this.edgesSparseArray[fromId].indexOf(toId)
-
-    if (indexOfToId === -1) {
-      return
-    }
-
-    delete this.edgesSparseArray[fromId][indexOfToId]
+    this.edgesSparseArray[fromId].delete(toId)
   }
 
   /**
@@ -381,10 +364,14 @@ export class Graph<Node> {
   /**
    * Removes invalid neighbors of a given node from the edges array and returns adjacent nodes for the input node.
    */
-  private fixEdgesArrayForNode(id: NodeId): NodeId[] {
+  private fixEdgesArrayForNode(id: NodeId): Set<NodeId> {
     const adjacentNodeIds = this.edgesSparseArray[id]
-    this.edgesSparseArray[id] = adjacentNodeIds.filter(adjacentId => adjacentId !== undefined && this.nodesSparseArray[adjacentId])
-    return this.edgesSparseArray[id]
+    for (const adjacentId of adjacentNodeIds) {
+      if (!this.nodesSparseArray[adjacentId]) {
+        adjacentNodeIds.delete(adjacentId)
+      }
+    }
+    return adjacentNodeIds
   }
 
   /**
