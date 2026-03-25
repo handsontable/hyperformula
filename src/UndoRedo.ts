@@ -61,7 +61,7 @@ export class RemoveRowsUndoEntry extends BaseUndoEntry {
   }
 
   public getReferencedOldDataVersions(): number[] {
-    return this.rowsRemovals.map(r => r.version - 1)
+    return this.rowsRemovals.filter(r => r.version > 0).map(r => r.version - 1)
   }
 }
 
@@ -252,7 +252,7 @@ export class RemoveColumnsUndoEntry extends BaseUndoEntry {
   }
 
   public getReferencedOldDataVersions(): number[] {
-    return this.columnsRemovals.map(r => r.version - 1)
+    return this.columnsRemovals.filter(r => r.version > 0).map(r => r.version - 1)
   }
 }
 
@@ -322,7 +322,7 @@ export class RenameSheetUndoEntry extends BaseUndoEntry {
   }
 
   public getReferencedOldDataVersions(): number[] {
-    return this.version !== undefined ? [this.version - 1] : []
+    return (this.version !== undefined && this.version > 0) ? [this.version - 1] : []
   }
 }
 
