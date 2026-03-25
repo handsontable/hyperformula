@@ -4596,15 +4596,6 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Runs a recomputation starting from recently changed vertices.
-   *
-   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
-   *
-   * Note that this method may trigger dependency graph recalculation.
-   *
-   * @fires [[valuesUpdated]] if recalculation was triggered by this change
-   */
-  /**
    * When enough transformations have accumulated, forces all formula vertices and
    * column index entries to apply pending lazy transformations, then compacts the
    * transformation history and cleans up orphaned undo oldData entries.
@@ -4618,6 +4609,15 @@ export class HyperFormula implements TypedEmitter {
     }
   }
 
+  /**
+   * Runs a recomputation starting from recently changed vertices.
+   *
+   * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
+   *
+   * Note that this method may trigger dependency graph recalculation.
+   *
+   * @fires [[valuesUpdated]] if recalculation was triggered by this change
+   */
   private recomputeIfDependencyGraphNeedsIt(): ExportedChange[] {
     if (!this._evaluationSuspended) {
       const changes = this._crudOperations.getAndClearContentChanges()
