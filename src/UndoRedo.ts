@@ -527,6 +527,10 @@ export class UndoRedo {
     this.batchUndoEntry = undefined
   }
 
+  /**
+   * Stores a formula AST hash snapshot for the given LazilyTransformingAstService version.
+   * Skipped when `undoLimit` is 0 (undo disabled) to avoid storing data that would never be used.
+   */
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
     if (this.undoLimit === 0) {
       return
@@ -538,11 +542,13 @@ export class UndoRedo {
     currentOldData.push([address, astHash])
   }
 
+  /** Clears the redo stack and removes oldData entries no longer referenced by any remaining entry. */
   public clearRedoStack() {
     this.cleanupOldDataForEntries(this.redoStack, this.undoStack)
     this.redoStack = []
   }
 
+  /** Clears the undo stack and removes oldData entries no longer referenced by any remaining entry. */
   public clearUndoStack() {
     this.cleanupOldDataForEntries(this.undoStack, this.redoStack)
     this.undoStack = []
