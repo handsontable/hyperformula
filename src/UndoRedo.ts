@@ -483,15 +483,19 @@ export class BatchUndoEntry extends BaseUndoEntry {
  *
  * ### Memory Management
  *
- * Without cleanup, `oldData` grows indefinitely because:
- * 1. When undo entries are evicted (due to `undoLimit`), their referenced oldData
- *    keys are deleted via `cleanupOldDataForEntries()`.
- * 2. When compaction forces lazy formula evaluation, it may write new oldData entries
- *    for versions that belong to already-evicted undo entries. These orphaned entries
- *    are cleaned up by `cleanupOrphanedOldData()`, which retains only versions
- *    still referenced by entries on the undo or redo stack.
- * 3. When `undoLimit` is 0 (undo disabled), `storeDataForVersion()` short-circuits
- *    to avoid storing data that would never be used.
+ * Without cleanup, `oldData` grows indefinitely as undo entries are evicted but
+ * their oldData keys remain. Three mechanisms prevent this:
+ *
+ * 1. **Eviction cleanup**: When undo entries are evicted (due to `undoLimit`),
+ *    `cleanupOldDataForEntries()` deletes their referenced oldData keys
+ *    (unless still needed by entries on the other stack).
+ * 2. **Orphan cleanup**: Compaction may force lazy formula evaluation, which
+ *    writes new oldData entries for already-evicted undo entries. After compaction,
+ *    `cleanupOrphanedOldData()` removes any keys not referenced by entries on
+ *    either stack or the in-progress batch.
+ * 3. **Short-circuit**: When `undoLimit` is 0 (undo disabled),
+ *    `storeDataForVersion()` returns immediately to avoid storing data that
+ *    would never be used.
  */
 export class UndoRedo {
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
