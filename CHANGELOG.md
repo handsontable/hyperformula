@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added `compactionThreshold` configuration option to control how often the engine compacts accumulated formula transformations. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
+
 ### Fixed
 
 - Fixed a memory leak in `LazilyTransformingAstService` where the transformations array grew unboundedly, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)

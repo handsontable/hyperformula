@@ -35,6 +35,10 @@ export abstract class BaseUndoEntry implements UndoEntry {
 
   abstract doRedo(undoRedo: UndoRedo): void
 
+  /**
+   * Returns LazilyTransformingAstService version keys referenced by this entry's oldData.
+   * Default implementation returns empty — override in entries that store oldData.
+   */
   public getReferencedOldDataVersions(): number[] {
     return []
   }
