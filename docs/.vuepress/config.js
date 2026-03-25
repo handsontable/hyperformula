@@ -233,6 +233,7 @@ module.exports = {
             ['/guide/volatile-functions', 'Volatile functions'],
             ['/guide/named-expressions', 'Named expressions'],
             ['/guide/arrays', 'Array formulas'],
+            ['/guide/iterative-calculation', 'Iterative calculation'],
           ]
         },
         {

@@ -23,6 +23,7 @@ import {FunctionPluginDefinition} from './interpreter'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {ConfigParams, ConfigParamsList} from './ConfigParams'
+import { RawCellContent } from '.'
 
 const privatePool: WeakMap<Config, { licenseKeyValidityState: LicenseKeyValidityState }> = new WeakMap()
 
@@ -67,6 +68,10 @@ export class Config implements ConfigParams, ParserConfig {
     useColumnIndex: false,
     useStats: false,
     useArrayArithmetic: false,
+    iterativeCalculationEnable: false,
+    iterativeCalculationMaxIterations: 100,
+    iterativeCalculationConvergenceThreshold: 0.001,
+    iterativeCalculationInitialValue: 0,
   }
 
   /** @inheritDoc */
@@ -160,6 +165,14 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useWildcards: boolean
   /** @inheritDoc */
   public readonly matchWholeCell: boolean
+  /** @inheritDoc */
+  public readonly iterativeCalculationEnable: boolean
+  /** @inheritDoc */
+  public readonly iterativeCalculationMaxIterations: number
+  /** @inheritDoc */
+  public readonly iterativeCalculationConvergenceThreshold: number
+  /** @inheritDoc */
+  public readonly iterativeCalculationInitialValue: RawCellContent
 
   constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
     const {
@@ -201,6 +214,10 @@ export class Config implements ConfigParams, ParserConfig {
       useColumnIndex,
       useRegularExpressions,
       useWildcards,
+      iterativeCalculationEnable,
+      iterativeCalculationMaxIterations,
+      iterativeCalculationConvergenceThreshold,
+      iterativeCalculationInitialValue,
     } = options
 
     if (showDeprecatedWarns) {
@@ -255,6 +272,14 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.context = context
 
+    // Iterative calculation config
+    this.iterativeCalculationEnable = configValueFromParam(iterativeCalculationEnable, 'boolean', 'iterativeCalculationEnable')
+    this.iterativeCalculationMaxIterations = configValueFromParam(iterativeCalculationMaxIterations, 'number', 'iterativeCalculationMaxIterations')
+    this.validateIterativeCalculationMaxIterations(this.iterativeCalculationMaxIterations)
+    this.iterativeCalculationConvergenceThreshold = configValueFromParam(iterativeCalculationConvergenceThreshold, 'number', 'iterativeCalculationConvergenceThreshold')
+    validateNumberToBeAtLeast(this.iterativeCalculationConvergenceThreshold, 'iterativeCalculationConvergenceThreshold', 0)
+    this.iterativeCalculationInitialValue = this.validateIterativeCalculationInitialValue(iterativeCalculationInitialValue)
+
     privatePool.set(this, {
       licenseKeyValidityState: checkLicenseKeyValidity(this.licenseKey)
     })
@@ -285,6 +310,23 @@ export class Config implements ConfigParams, ParserConfig {
     })
 
     return valueAfterCheck as string[]
+  }
+
+  private validateIterativeCalculationMaxIterations(value: number): void {
+    if (!Number.isInteger(value) || value < 1) {
+      throw new ExpectedValueOfTypeError('positive integer', 'iterativeCalculationMaxIterations')
+    }
+  }
+
+  private validateIterativeCalculationInitialValue(value: unknown): RawCellContent {
+    if (value === undefined) {
+      return Config.defaultConfig.iterativeCalculationInitialValue
+    }
+    if (typeof value === 'number' || typeof value === 'string' || typeof value === 'boolean' || value instanceof Date) {
+      return value as RawCellContent
+    }
+
+    throw new ExpectedValueOfTypeError('number, string, boolean or Date object', 'iterativeCalculationInitialValue')
   }
 
   /**
