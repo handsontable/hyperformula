@@ -54,7 +54,7 @@ export interface ColumnSearchStrategy extends SearchStrategy {
 
   /**
    * Forces all lazily-tracked ValueIndex entries to apply any pending transformations,
-   * bringing every entry's version up to the current LTAS version.
+   * bringing every entry's version up to the current LazilyTransformingAstService version.
    * Must be called before compacting LazilyTransformingAstService.
    */
   forceApplyPostponedTransformations(): void,

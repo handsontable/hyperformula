@@ -53,6 +53,13 @@ export class ColumnBinarySearch extends AdvancedFind implements ColumnSearchStra
   public removeValues(range: IterableIterator<[RawScalarValue, SimpleCellAddress]>): void {
   }
 
+  /**
+   * No-op: ColumnBinarySearch reads cell values directly from the dependency graph
+   * on every lookup, so it has no cached data that could become stale.
+   * Unlike ColumnIndex, which maintains a separate value-to-address index that
+   * must be kept in sync with lazy transformations, binary search always operates
+   * on the current graph state.
+   */
   public forceApplyPostponedTransformations(): void {
   }
 

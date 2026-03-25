@@ -24,7 +24,7 @@ export interface UndoEntry {
   doRedo(undoRedo: UndoRedo): void,
 
   /**
-   * Returns the LTAS version keys referenced by this entry's oldData storage.
+   * Returns the LazilyTransformingAstService version keys referenced by this entry's oldData storage.
    * Used to clean up oldData when the entry is permanently evicted from the undo/redo stack.
    */
   getReferencedOldDataVersions(): number[],
@@ -461,6 +461,34 @@ export class BatchUndoEntry extends BaseUndoEntry {
   }
 }
 
+/**
+ * Manages undo/redo stacks for all spreadsheet operations.
+ *
+ * ## oldData: Preserving Formula ASTs Across Irreversible Transformations
+ *
+ * Some structural operations (e.g., removing rows/columns, moving cells) destroy
+ * formula information that cannot be reconstructed from the transformation alone.
+ * For example, when a row is removed, formulas referencing that row are rewritten
+ * to `#REF!` — an irreversible change.
+ *
+ * To support undo of such operations, `oldData` stores snapshots of formula AST
+ * hashes keyed by the LazilyTransformingAstService version at which the irreversible
+ * transformation was applied. Each entry maps a version number to an array of
+ * `[cellAddress, astHash]` pairs that can be used to restore the original formula
+ * from the parser cache.
+ *
+ * ### Memory Management
+ *
+ * Without cleanup, `oldData` grows indefinitely because:
+ * 1. When undo entries are evicted (due to `undoLimit`), their referenced oldData
+ *    keys are deleted via `cleanupOldDataForEntries()`.
+ * 2. When compaction forces lazy formula evaluation, it may write new oldData entries
+ *    for versions that belong to already-evicted undo entries. These orphaned entries
+ *    are cleaned up by `cleanupOrphanedOldData()`, which retains only versions
+ *    still referenced by entries on the undo or redo stack.
+ * 3. When `undoLimit` is 0 (undo disabled), `storeDataForVersion()` short-circuits
+ *    to avoid storing data that would never be used.
+ */
 export class UndoRedo {
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
   private undoStack: UndoEntry[] = []

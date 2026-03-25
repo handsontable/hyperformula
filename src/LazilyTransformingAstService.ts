@@ -11,12 +11,43 @@ import {StatType} from './statistics'
 import {Statistics} from './statistics/Statistics'
 import {UndoRedo} from './UndoRedo'
 
+/**
+ * Manages lazy application of formula AST transformations.
+ *
+ * ## Problem
+ * Structural operations (adding/removing rows/columns, moving cells, renaming sheets)
+ * require updating every formula that references the affected area. Applying these
+ * transformations eagerly to all formulas after every operation is expensive, especially
+ * for large spreadsheets with many formulas.
+ *
+ * ## Solution: Lazy Transformation
+ * Instead of transforming all formulas immediately, this service stores transformations
+ * in a queue. Each formula vertex (FormulaVertex) and column index entry (ValueIndex)
+ * tracks its own version number. When a consumer needs up-to-date data, it calls
+ * `applyTransformations()` with its current version and receives all transformations
+ * accumulated since that version.
+ *
+ * ## Compaction
+ * Over time, the transformations array grows unboundedly. To prevent this memory leak,
+ * the engine periodically triggers compaction when the number of accumulated
+ * transformations reaches the configurable `compactionThreshold`:
+ *
+ * 1. All FormulaVertex instances are forced to apply pending transformations
+ *    (via `DependencyGraph.forceApplyPostponedTransformations()`).
+ * 2. All ColumnIndex entries are forced to apply pending transformations
+ *    (via `ColumnSearchStrategy.forceApplyPostponedTransformations()`).
+ * 3. `compact()` is called, which advances `versionOffset` and clears the
+ *    transformations array.
+ * 4. `UndoRedo.cleanupOrphanedOldData()` removes any oldData entries that were
+ *    written during forced application but belong to already-evicted undo entries.
+ *
+ * The `versionOffset` ensures that version numbers remain globally consistent
+ * after compaction: `version() = versionOffset + transformations.length`.
+ */
 export class LazilyTransformingAstService {
 
   public parser?: ParserWithCaching
   public undoRedo?: UndoRedo
-
-  private static readonly COMPACTION_THRESHOLD = 50
 
   private transformations: FormulaTransformer[] = []
   private versionOffset: number = 0
@@ -24,6 +55,7 @@ export class LazilyTransformingAstService {
 
   constructor(
     private readonly stats: Statistics,
+    private readonly compactionThreshold: number,
   ) {
   }
 
@@ -89,7 +121,7 @@ export class LazilyTransformingAstService {
    * of forcing all consumers (FormulaVertex, ColumnIndex) to apply pending changes.
    */
   public needsCompaction(): boolean {
-    return this.transformations.length >= LazilyTransformingAstService.COMPACTION_THRESHOLD
+    return this.transformations.length >= this.compactionThreshold
   }
 
   /**

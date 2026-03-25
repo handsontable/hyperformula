@@ -186,7 +186,7 @@ export class ColumnIndex implements ColumnSearchStrategy {
 
   /**
    * Forces all ValueIndex entries to apply any pending lazy transformations,
-   * bringing every entry up to the current LTAS version.
+   * bringing every entry up to the current LazilyTransformingAstService version.
    * Must be called before compacting LazilyTransformingAstService.
    */
   public forceApplyPostponedTransformations(): void {
