@@ -539,12 +539,12 @@ export class UndoRedo {
   }
 
   public clearRedoStack() {
-    this.cleanupOldDataForEntries(this.redoStack)
+    this.cleanupOldDataForEntries(this.redoStack, this.undoStack)
     this.redoStack = []
   }
 
   public clearUndoStack() {
-    this.cleanupOldDataForEntries(this.undoStack)
+    this.cleanupOldDataForEntries(this.undoStack, this.redoStack)
     this.undoStack = []
   }
 
@@ -857,7 +857,7 @@ export class UndoRedo {
     const evictCount = Math.max(0, this.undoStack.length - this.undoLimit)
     if (evictCount > 0) {
       const evicted = this.undoStack.splice(0, evictCount)
-      this.cleanupOldDataForEntries(evicted)
+      this.cleanupOldDataForEntries(evicted, [...this.undoStack, ...this.redoStack])
     }
   }
 
@@ -881,12 +881,20 @@ export class UndoRedo {
   }
 
   /**
-   * Removes oldData entries referenced by permanently discarded undo/redo entries.
+   * Removes oldData entries referenced by permanently discarded undo/redo entries,
+   * but only if not still referenced by entries remaining on the other stack or
+   * in-progress batch.
    */
-  private cleanupOldDataForEntries(entries: UndoEntry[]) {
-    for (const entry of entries) {
+  private cleanupOldDataForEntries(discardedEntries: UndoEntry[], retainedEntries: UndoEntry[]) {
+    const retainedVersions = new Set<number>([
+      ...retainedEntries.flatMap(e => e.getReferencedOldDataVersions()),
+      ...(this.batchUndoEntry?.getReferencedOldDataVersions() ?? []),
+    ])
+    for (const entry of discardedEntries) {
       for (const version of entry.getReferencedOldDataVersions()) {
-        this.oldData.delete(version)
+        if (!retainedVersions.has(version)) {
+          this.oldData.delete(version)
+        }
       }
     }
   }
