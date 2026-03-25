@@ -868,11 +868,7 @@ export class UndoRedo {
    * already-evicted entries.
    */
   public cleanupOrphanedOldData() {
-    const referencedVersions = new Set<number>([
-      ...this.undoStack.flatMap(e => e.getReferencedOldDataVersions()),
-      ...this.redoStack.flatMap(e => e.getReferencedOldDataVersions()),
-      ...(this.batchUndoEntry?.getReferencedOldDataVersions() ?? []),
-    ])
+    const referencedVersions = this.collectReferencedOldDataVersions(this.undoStack, this.redoStack)
     for (const version of this.oldData.keys()) {
       if (!referencedVersions.has(version)) {
         this.oldData.delete(version)
@@ -886,10 +882,7 @@ export class UndoRedo {
    * in-progress batch.
    */
   private cleanupOldDataForEntries(discardedEntries: UndoEntry[], retainedEntries: UndoEntry[]) {
-    const retainedVersions = new Set<number>([
-      ...retainedEntries.flatMap(e => e.getReferencedOldDataVersions()),
-      ...(this.batchUndoEntry?.getReferencedOldDataVersions() ?? []),
-    ])
+    const retainedVersions = this.collectReferencedOldDataVersions(retainedEntries)
     for (const entry of discardedEntries) {
       for (const version of entry.getReferencedOldDataVersions()) {
         if (!retainedVersions.has(version)) {
@@ -897,6 +890,14 @@ export class UndoRedo {
         }
       }
     }
+  }
+
+  /** Collects all oldData version keys referenced by the given entry lists and in-progress batch. */
+  private collectReferencedOldDataVersions(...entryLists: UndoEntry[][]): Set<number> {
+    return new Set<number>([
+      ...entryLists.flatMap(list => list.flatMap(e => e.getReferencedOldDataVersions())),
+      ...(this.batchUndoEntry?.getReferencedOldDataVersions() ?? []),
+    ])
   }
 
   private undoEntry(operation: UndoEntry) {
