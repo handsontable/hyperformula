@@ -863,13 +863,15 @@ export class UndoRedo {
 
   /**
    * Removes oldData entries whose version keys are not referenced by any
-   * entry on the undo or redo stack. Called after compaction forces lazy
-   * formula evaluation, which may insert oldData for already-evicted entries.
+   * entry on the undo stack, redo stack, or in-progress batch. Called after
+   * compaction forces lazy formula evaluation, which may insert oldData for
+   * already-evicted entries.
    */
   public cleanupOrphanedOldData() {
     const referencedVersions = new Set<number>([
       ...this.undoStack.flatMap(e => e.getReferencedOldDataVersions()),
       ...this.redoStack.flatMap(e => e.getReferencedOldDataVersions()),
+      ...(this.batchUndoEntry?.getReferencedOldDataVersions() ?? []),
     ])
     for (const version of this.oldData.keys()) {
       if (!referencedVersions.has(version)) {
