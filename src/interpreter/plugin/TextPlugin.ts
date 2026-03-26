@@ -456,27 +456,30 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
           return delimiters
         }
 
-        const texts: string[] = []
-        for (const arg of textArgs) {
-          const coerced = this.flattenArgToStrings(arg)
-          if (coerced instanceof CellError) {
-            return coerced
+        const textsOrError = textArgs.reduce<string[] | CellError>((acc, arg) => {
+          if (acc instanceof CellError) {
+            return acc
           }
-          texts.push(...coerced)
+          const coerced = this.flattenArgToStrings(arg)
+          return coerced instanceof CellError ? coerced : [...acc, ...coerced]
+        }, [])
+
+        if (textsOrError instanceof CellError) {
+          return textsOrError
         }
 
-        const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
+        const parts = ignoreEmpty ? textsOrError.filter((t) => t !== '') : textsOrError
 
         if (parts.length === 0) {
           return ''
         }
-        let result = parts[0]
-        for (let i = 1; i < parts.length; i++) {
-          result += delimiters[(i - 1) % delimiters.length] + parts[i]
-        }
+
+        const result = parts.reduce((acc, part, i) =>
+          i === 0 ? part : acc + delimiters[(i - 1) % delimiters.length] + part
+        , '')
 
         if (result.length > 32767) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.TextJoinResultTooLong)
+          return new CellError(ErrorType.VALUE, ErrorMessage.ResultTooLong)
         }
         return result
       }
@@ -492,18 +495,16 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    */
   private flattenArgToStrings(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
     const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
-    const result: string[] = []
-    for (const val of values) {
+    return values.reduce<string[] | CellError>((acc, val) => {
+      if (acc instanceof CellError) {
+        return acc
+      }
       if (val instanceof CellError) {
         return val
       }
       const coerced = coerceScalarToString(val as InternalScalarValue)
-      if (coerced instanceof CellError) {
-        return coerced
-      }
-      result.push(coerced)
-    }
-    return result
+      return coerced instanceof CellError ? coerced : [...acc, coerced]
+    }, [])
   }
 
   /**
