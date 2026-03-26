@@ -215,6 +215,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'OBLIG.HINTA',
     TBILLYIELD: 'OBLIG.TUOTTO',
     TEXT: 'TEKSTI',
+    TEXTJOIN: 'TEKSTI.YHDISTÄ',
     TIME: 'AIKA',
     TIMEVALUE: 'AIKA_ARVO',
     TODAY: 'TÄMÄ.PÄIVÄ',
