@@ -502,8 +502,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
       if (val instanceof CellError) {
         return val
       }
-      const coerced = coerceScalarToString(val as InternalScalarValue)
-      return coerced instanceof CellError ? coerced : [...acc, coerced]
+      return [...acc, coerceScalarToString(val as InternalScalarValue) as string]
     }, [])
   }
 
