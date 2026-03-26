@@ -71,6 +71,8 @@ export class Config implements ConfigParams, ParserConfig {
     useColumnIndex: false,
     useStats: false,
     useArrayArithmetic: false,
+    maxIterations: 100,
+    convergenceThreshold: 1e-10,
   }
 
   /** @inheritDoc */
@@ -168,6 +170,10 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly useWildcards: boolean
   /** @inheritDoc */
   public readonly matchWholeCell: boolean
+  /** @inheritDoc */
+  public readonly maxIterations: number
+  /** @inheritDoc */
+  public readonly convergenceThreshold: number
 
   constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
     const {
@@ -210,6 +216,8 @@ export class Config implements ConfigParams, ParserConfig {
       useColumnIndex,
       useRegularExpressions,
       useWildcards,
+      maxIterations,
+      convergenceThreshold,
     } = options
 
     if (showDeprecatedWarns) {
@@ -264,6 +272,10 @@ export class Config implements ConfigParams, ParserConfig {
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
     this.currencySymbol = this.setupCurrencySymbol(currencySymbol)
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
+    this.maxIterations = configValueFromParam(maxIterations, 'number', 'maxIterations')
+    validateNumberToBeAtLeast(this.maxIterations, 'maxIterations', 1)
+    this.convergenceThreshold = configValueFromParam(convergenceThreshold, 'number', 'convergenceThreshold')
+    validateNumberToBeAtLeast(this.convergenceThreshold, 'convergenceThreshold', 0)
     this.context = context
 
     privatePool.set(this, {

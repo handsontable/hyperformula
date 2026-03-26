@@ -403,6 +403,23 @@ export interface ConfigParams {
    * @category Engine
    */
   initialComputedValues: InitialComputedValues,
+  /**
+   * Sets the maximum number of iterations for circular dependency resolution.
+   *
+   * Only used when [[allowCircularReferences]] is set to `true`.
+   * @default 100
+   * @category Engine
+   */
+  maxIterations: number,
+  /**
+   * Sets the convergence threshold for early termination of circular dependency iteration.
+   *
+   * When all cell value changes between iterations are within this threshold, iteration stops early.
+   * Only used when [[allowCircularReferences]] is set to `true`.
+   * @default 1e-10
+   * @category Engine
+   */
+  convergenceThreshold: number,
 }
 
 export type ConfigParamsList = keyof ConfigParams

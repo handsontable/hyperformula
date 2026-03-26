@@ -331,4 +331,138 @@ describe('Circular Dependencies', () => {
       expect(hfInstance).toBeDefined()
     })
   })
+
+  describe('convergence detection', () => {
+    it('damped system converges early', () => {
+      // A=0.5*B+1, B=0.5*A+1 → converges to 2
+      const engine = HyperFormula.buildFromArray([['=0.5*B1+1', '1']], {
+        allowCircularReferences: true,
+        maxIterations: 1000,
+      })
+
+      // Introduce cycle via setCellContents (triggers partialRun with iteration)
+      engine.setCellContents(adr('B1'), [['=0.5*A1+1']])
+
+      const valueA = engine.getCellValue(adr('A1'))
+      const valueB = engine.getCellValue(adr('B1'))
+
+      expect(valueA).toBeCloseTo(2, 8)
+      expect(valueB).toBeCloseTo(2, 8)
+    })
+
+    it('config defaults are correct', () => {
+      const config = new Config()
+      expect(config.maxIterations).toBe(100)
+      expect(config.convergenceThreshold).toBe(1e-10)
+    })
+
+    it('config validation rejects invalid maxIterations', () => {
+      expect(() => new Config({maxIterations: 0}))
+        .toThrowError('Config parameter maxIterations should be at least 1')
+
+      // eslint-disable-next-line
+      // @ts-ignore
+      expect(() => new Config({maxIterations: 'abc'}))
+        .toThrowError('Expected value of type: number for config parameter: maxIterations')
+    })
+
+    it('config validation rejects invalid convergenceThreshold', () => {
+      expect(() => new Config({convergenceThreshold: -1}))
+        .toThrowError('Config parameter convergenceThreshold should be at least 0')
+
+      // eslint-disable-next-line
+      // @ts-ignore
+      expect(() => new Config({convergenceThreshold: 'abc'}))
+        .toThrowError('Expected value of type: number for config parameter: convergenceThreshold')
+    })
+
+    it('non-converging system runs all iterations', () => {
+      // A=B+1, B=A+1 diverges — values grow each iteration
+      const engine = HyperFormula.buildFromArray([['=B1+1', '1']], {
+        allowCircularReferences: true,
+        maxIterations: 50,
+      })
+
+      // Introduce cycle via setCellContents (triggers partialRun with iteration)
+      engine.setCellContents(adr('B1'), [['=A1+1']])
+
+      const valueA = engine.getCellValue(adr('A1'))
+      const valueB = engine.getCellValue(adr('B1'))
+
+      expect(typeof valueA).toBe('number')
+      expect(typeof valueB).toBe('number')
+      // With 50 iterations starting from 0, values grow substantially
+      expect(valueA as number).toBeGreaterThan(10)
+    })
+
+    it('threshold 0 requires exact match', () => {
+      // A=B, B=A — trivially converges from 0 on first iteration
+      const engine = HyperFormula.buildFromArray([['=B1', '1']], {
+        allowCircularReferences: true,
+        convergenceThreshold: 0,
+        maxIterations: 1000,
+      })
+
+      engine.setCellContents(adr('B1'), [['=A1']])
+
+      const valueA = engine.getCellValue(adr('A1'))
+      const valueB = engine.getCellValue(adr('B1'))
+
+      // After cycle introduction, both stabilize to same value
+      expect(valueA).toBe(valueB)
+    })
+
+    it('error values converge', () => {
+      // Both cells produce DIV_BY_ZERO — stable error should converge
+      const engine = HyperFormula.buildFromArray([['=B1/0', '1']], {
+        allowCircularReferences: true,
+        maxIterations: 1000,
+      })
+
+      // Introduce cycle via setCellContents (triggers partialRun with iteration)
+      engine.setCellContents(adr('B1'), [['=A1/0']])
+
+      const valueA = engine.getCellValue(adr('A1'))
+      const valueB = engine.getCellValue(adr('B1'))
+
+      expect(valueA).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+      expect(valueB).toEqualError(detailedError(ErrorType.DIV_BY_ZERO))
+    })
+
+    it('partialRun convergence via setCellContents', () => {
+      // A=0.5*B+1, B=0.5*A+1 → converges to 2
+      const engine = HyperFormula.buildFromArray([['=0.5*B1+1', '10']], {
+        allowCircularReferences: true,
+        maxIterations: 1000,
+      })
+
+      // Introduce a cycle via setCellContents (triggers partialRun)
+      engine.setCellContents(adr('B1'), [['=0.5*A1+1']])
+
+      const valueA = engine.getCellValue(adr('A1'))
+      const valueB = engine.getCellValue(adr('B1'))
+
+      expect(valueA).toBeCloseTo(2, 8)
+      expect(valueB).toBeCloseTo(2, 8)
+    })
+
+    it('converging model with low maxIterations produces same result as higher count', () => {
+      // A=0.5*B+1, B=0.5*A+1 → converges to 2
+      // With contraction factor 0.5, 20 iterations is more than enough
+      const engineLow = HyperFormula.buildFromArray([['=0.5*B1+1', '1']], {
+        allowCircularReferences: true,
+        maxIterations: 20,
+      })
+      engineLow.setCellContents(adr('B1'), [['=0.5*A1+1']])
+
+      const engineHigh = HyperFormula.buildFromArray([['=0.5*B1+1', '1']], {
+        allowCircularReferences: true,
+        maxIterations: 1000,
+      })
+      engineHigh.setCellContents(adr('B1'), [['=0.5*A1+1']])
+
+      expect(engineLow.getCellValue(adr('A1'))).toBeCloseTo(engineHigh.getCellValue(adr('A1')) as number, 8)
+      expect(engineLow.getCellValue(adr('B1'))).toBeCloseTo(engineHigh.getCellValue(adr('B1')) as number, 8)
+    })
+  })
 })
