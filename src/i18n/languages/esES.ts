@@ -215,6 +215,7 @@ export const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'LETRA.DE.TES.PRECIO',
     TBILLYIELD: 'LETRA.DE.TES.RENDTO',
     TEXT: 'TEXTO',
+    TEXTJOIN: 'UNIRCADENAS',
     TIME: 'NSHORA',
     TIMEVALUE: 'HORANUMERO',
     TODAY: 'HOY',

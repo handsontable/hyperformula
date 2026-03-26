@@ -215,6 +215,7 @@ const dictionary: RawTranslationPackage = {
     TBILLPRICE: 'SCHATK.PRIJS',
     TBILLYIELD: 'SCHATK.REND',
     TEXT: 'TEKST',
+    TEXTJOIN: 'TEKST.KOPPELEN',
     TIME: 'TIJD',
     TIMEVALUE: 'TIJDWAARDE',
     TODAY: 'VANDAAG',
