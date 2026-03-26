@@ -176,17 +176,6 @@ module.exports = {
           ]
         },
         {
-          title: 'Overview',
-          collapsable: false,
-          children: [
-            ['/guide/quality', 'Quality'],
-            ['/guide/supported-browsers', 'Supported browsers'],
-            ['/guide/dependencies', 'Dependencies'],
-            ['/guide/licensing', 'Licensing'],
-            ['/guide/support', 'Support'],
-          ]
-        },
-        {
           title: 'Getting started',
           collapsable: false,
           children: [
@@ -206,6 +195,9 @@ module.exports = {
             ['/guide/integration-with-vue', 'Integration with Vue'],
             ['/guide/integration-with-angular', 'Integration with Angular'],
             ['/guide/integration-with-svelte', 'Integration with Svelte'],
+            ['/guide/ai-sdk', 'HyperFormula AI SDK'],
+            ['/guide/integration-with-langchain', 'Integration with LangChain'],
+            ['/guide/mcp-server', 'HyperFormula MCP Server'],
           ]
         },
         {
@@ -274,6 +266,17 @@ module.exports = {
             ['/guide/migration-from-0.6-to-1.0', 'Migrating from 0.6 to 1.0'],
             ['/guide/migration-from-1.x-to-2.0', 'Migrating from 1.x to 2.0'],
             ['/guide/migration-from-2.x-to-3.0', 'Migrating from 2.x to 3.0'],
+          ]
+        },
+        {
+          title: 'About',
+          collapsable: false,
+          children: [
+            ['/guide/quality', 'Quality'],
+            ['/guide/supported-browsers', 'Supported browsers'],
+            ['/guide/dependencies', 'Dependencies'],
+            ['/guide/licensing', 'Licensing'],
+            ['/guide/support', 'Support'],
           ]
         },
         {
