@@ -456,19 +456,16 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
           return delimiters
         }
 
-        const textsOrError = textArgs.reduce<string[] | CellError>((acc, arg) => {
-          if (acc instanceof CellError) {
-            return acc
-          }
+        const texts: string[] = []
+        for (const arg of textArgs) {
           const coerced = this.flattenArgToStrings(arg)
-          return coerced instanceof CellError ? coerced : [...acc, ...coerced]
-        }, [])
-
-        if (textsOrError instanceof CellError) {
-          return textsOrError
+          if (coerced instanceof CellError) {
+            return coerced
+          }
+          texts.push(...coerced)
         }
 
-        const parts = ignoreEmpty ? textsOrError.filter((t) => t !== '') : textsOrError
+        const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
 
         if (parts.length === 0) {
           return ''
@@ -495,15 +492,18 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
    */
   private flattenArgToStrings(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
     const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
-    return values.reduce<string[] | CellError>((acc, val) => {
-      if (acc instanceof CellError) {
-        return acc
-      }
+    const result: string[] = []
+    for (const val of values) {
       if (val instanceof CellError) {
         return val
       }
-      return [...acc, coerceScalarToString(val as InternalScalarValue) as string]
-    }, [])
+      const coerced = coerceScalarToString(val as InternalScalarValue)
+      if (coerced instanceof CellError) {
+        return coerced
+      }
+      result.push(coerced)
+    }
+    return result
   }
 
   /**
