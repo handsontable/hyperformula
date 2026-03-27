@@ -33,8 +33,9 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
 
   /**
    * Parses a literal dimension from an AST node at parse time.
-   * Handles NUMBER nodes directly and STRING nodes via numeric coercion.
-   * Returns undefined for non-literal nodes (cell refs, formulas, unary/binary ops).
+   * Handles NUMBER nodes directly, STRING nodes via numeric coercion,
+   * and PLUS/MINUS_UNARY_OP wrapping a NUMBER (e.g. `+3`, `-2`).
+   * Returns undefined for non-literal nodes (cell refs, formulas, binary ops).
    */
   private static parseLiteralDimension(node: Ast): number | undefined {
     if (node.type === AstNodeType.NUMBER) {
@@ -43,6 +44,12 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
     if (node.type === AstNodeType.STRING) {
       const parsed = Number(node.value)
       return Number.isFinite(parsed) ? Math.trunc(parsed) : undefined
+    }
+    if (node.type === AstNodeType.PLUS_UNARY_OP && node.value.type === AstNodeType.NUMBER) {
+      return Math.trunc(node.value.value)
+    }
+    if (node.type === AstNodeType.MINUS_UNARY_OP && node.value.type === AstNodeType.NUMBER) {
+      return Math.trunc(-node.value.value)
     }
     return undefined
   }
@@ -77,12 +84,13 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
   public sequence(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SEQUENCE'),
       (rows: number, cols: number, start: number, step: number) => {
+        if (rows < 0 || cols < 0) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+        }
+
         const numRows = Math.trunc(rows)
         const numCols = Math.trunc(cols)
 
-        if (numRows < 0 || numCols < 0) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
-        }
         if (!SequencePlugin.isValidDimension(numRows) || !SequencePlugin.isValidDimension(numCols)) {
           return new CellError(ErrorType.NUM, ErrorMessage.LessThanOne)
         }
