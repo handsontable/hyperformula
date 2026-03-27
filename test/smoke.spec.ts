@@ -1,5 +1,5 @@
 import {HyperFormula} from '../src'
-import {SimpleCellAddress, simpleCellAddress} from '../src/Cell'
+import {ErrorType, SimpleCellAddress, simpleCellAddress} from '../src/Cell'
 
 const adr = (stringAddress: string, sheet: number = 0): SimpleCellAddress => {
 
@@ -76,6 +76,44 @@ describe('HyperFormula', () => {
     expect(hf.getCellValue(adr('C3'))).toBe('HELLO')
     expect(hf.getCellValue(adr('D3'))).toBe('hello')
     expect(hf.getCellValue(adr('E3'))).toBe(5)
+
+    hf.destroy()
+  })
+
+  it('SEQUENCE: returns a column vector spilling downward', () => {
+    const hf = HyperFormula.buildFromArray([['=SEQUENCE(4)']], {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('A1'))).toBe(1)
+    expect(hf.getCellValue(adr('A2'))).toBe(2)
+    expect(hf.getCellValue(adr('A3'))).toBe(3)
+    expect(hf.getCellValue(adr('A4'))).toBe(4)
+
+    hf.destroy()
+  })
+
+  it('SEQUENCE: fills a 2D array row-major with custom start and step', () => {
+    const hf = HyperFormula.buildFromArray([['=SEQUENCE(2,3,0,2)']], {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('A1'))).toBe(0)
+    expect(hf.getCellValue(adr('B1'))).toBe(2)
+    expect(hf.getCellValue(adr('C1'))).toBe(4)
+    expect(hf.getCellValue(adr('A2'))).toBe(6)
+    expect(hf.getCellValue(adr('B2'))).toBe(8)
+    expect(hf.getCellValue(adr('C2'))).toBe(10)
+
+    hf.destroy()
+  })
+
+  it('SEQUENCE: returns error for zero or negative rows/cols', () => {
+    const hf = HyperFormula.buildFromArray([
+      ['=SEQUENCE(0)'],
+      ['=SEQUENCE(-1)'],
+      ['=SEQUENCE(1,0)'],
+    ], {licenseKey: 'gpl-v3'})
+
+    expect(hf.getCellValue(adr('A1'))).toMatchObject({type: ErrorType.NUM})
+    expect(hf.getCellValue(adr('A2'))).toMatchObject({type: ErrorType.VALUE})
+    expect(hf.getCellValue(adr('A3'))).toMatchObject({type: ErrorType.NUM})
 
     hf.destroy()
   })

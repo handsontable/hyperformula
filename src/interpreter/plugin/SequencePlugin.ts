@@ -12,6 +12,12 @@ import { InterpreterValue } from '../InterpreterValue'
 import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
 
+/**
+ * Plugin implementing the SEQUENCE spreadsheet function.
+ *
+ * SEQUENCE(rows, [cols], [start], [step]) returns a rows×cols array of
+ * sequential numbers starting at `start` and incrementing by `step`.
+ */
 export class SequencePlugin extends FunctionPlugin implements FunctionPluginTypecheck<SequencePlugin> {
   /**
    * Minimum valid value for the `rows` and `cols` arguments.
@@ -65,8 +71,8 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
    * cause a size mismatch between parse-time prediction and runtime result,
    * which results in a #VALUE! error. Use literal numbers for rows and cols.
    *
-   * @param ast
-   * @param state
+   * @param {ProcedureAst} ast - The parsed function call AST node.
+   * @param {InterpreterState} state - Current interpreter evaluation state.
    */
   public sequence(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SEQUENCE'),
@@ -102,8 +108,8 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
    * Non-literal args (cell refs, formulas, unary/binary ops) fall back to 1,
    * which will cause a size mismatch at eval time when the actual result is larger.
    *
-   * @param ast
-   * @param _state
+   * @param {ProcedureAst} ast - The parsed function call AST node.
+   * @param {InterpreterState} _state - Current interpreter evaluation state (unused).
    */
   public sequenceArraySize(ast: ProcedureAst, _state: InterpreterState): ArraySize {
     if (ast.args.length < 1 || ast.args.length > 4) {
