@@ -26,9 +26,9 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
    */
   private static readonly MIN_DIMENSION = 1
 
-  /** Returns true when `n` is at least {@link MIN_DIMENSION}. */
+  /** Returns true when `n` is a finite number at least {@link MIN_DIMENSION}. */
   private static isValidDimension(n: number): boolean {
-    return n >= SequencePlugin.MIN_DIMENSION
+    return Number.isFinite(n) && n >= SequencePlugin.MIN_DIMENSION
   }
 
   /**
@@ -42,7 +42,7 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
     }
     if (node.type === AstNodeType.STRING) {
       const parsed = Number(node.value)
-      return isNaN(parsed) ? undefined : Math.trunc(parsed)
+      return Number.isFinite(parsed) ? Math.trunc(parsed) : undefined
     }
     return undefined
   }
