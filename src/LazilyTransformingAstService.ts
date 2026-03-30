@@ -30,7 +30,7 @@ import {UndoRedo} from './UndoRedo'
  * ## Compaction
  * Over time, the transformations array grows unboundedly. To prevent this memory leak,
  * the engine periodically triggers compaction when the number of accumulated
- * transformations reaches the configurable `compactionThreshold`:
+ * transformations reaches the configurable `maxPendingLazyTransformations`:
  *
  * 1. All FormulaVertex instances are forced to apply pending transformations
  *    (via `DependencyGraph.forceApplyPostponedTransformations()`).
@@ -55,7 +55,7 @@ export class LazilyTransformingAstService {
 
   constructor(
     private readonly stats: Statistics,
-    private readonly compactionThreshold: number,
+    private readonly maxPendingLazyTransformations: number,
   ) {
   }
 
@@ -121,7 +121,7 @@ export class LazilyTransformingAstService {
    * of forcing all consumers (FormulaVertex, ColumnIndex) to apply pending changes.
    */
   public needsCompaction(): boolean {
-    return this.transformations.length >= this.compactionThreshold
+    return this.transformations.length >= this.maxPendingLazyTransformations
   }
 
   /**

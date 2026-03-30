@@ -403,17 +403,20 @@ export interface ConfigParams {
    */
   undoLimit: number,
   /**
-   * Sets the number of accumulated formula transformations that triggers compaction
-   * of the LazilyTransformingAstService. When the number of pending transformations
-   * reaches this threshold, all formula vertices and column indexes are forced to
-   * apply their postponed transformations, and the transformation history is cleared.
+   * Controls memory usage for long-running instances by limiting the number of
+   * pending lazy transformations before cleanup occurs.
    *
-   * Lower values cause more frequent compaction (useful for testing), while higher
-   * values reduce overhead at the cost of more memory usage.
+   * Structural operations (adding/removing rows/columns, moving cells) create
+   * transformations that are applied lazily to formulas. This setting determines
+   * how many can accumulate before they are flushed and memory is reclaimed.
+   *
+   * Lower values reduce peak memory usage but may slightly increase CPU overhead.
+   * Higher values reduce overhead but allow more memory accumulation.
+   *
    * @default 50
    * @category Engine
    */
-  compactionThreshold: number,
+  maxPendingLazyTransformations: number,
   /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false

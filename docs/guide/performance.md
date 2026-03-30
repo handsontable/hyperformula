@@ -37,6 +37,29 @@ cells filled, but located very far from each other.
 the fill ratio of the sheet. Let the engine choose the best strategy
 for you.
 
+## Lazy transformation cleanup
+
+Structural operations (adding/removing rows/columns, moving cells) create
+transformations that are applied lazily to formulas. Over time, these
+transformations accumulate in memory. HyperFormula automatically flushes
+them when their count reaches the `maxPendingLazyTransformations` threshold
+(default: 50).
+
+You can tune this setting to balance memory usage and CPU overhead:
+
+* **Lower values** (e.g., 10) reduce peak memory usage but trigger
+  cleanup more frequently, adding slight CPU overhead per flush.
+* **Higher values** (e.g., 200) reduce the frequency of cleanup but
+  allow more memory to accumulate between flushes.
+* The default of **50** works well for most use cases.
+
+```javascript
+const hf = HyperFormula.buildEmpty({
+  licenseKey: 'gpl-v3',
+  maxPendingLazyTransformations: 100,
+})
+```
+
 ## Suspending automatic recalculations
 
 By default, HyperFormula recalculates formulas after every change.

@@ -62,7 +62,7 @@ export class Config implements ConfigParams, ParserConfig {
     timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
     thousandSeparator: '',
     undoLimit: 20,
-    compactionThreshold: 50,
+    maxPendingLazyTransformations: 50,
     useRegularExpressions: false,
     useWildcards: true,
     useColumnIndex: false,
@@ -136,7 +136,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly undoLimit: number
   /** @inheritDoc */
-  public readonly compactionThreshold: number
+  public readonly maxPendingLazyTransformations: number
   /** @inheritDoc */
   public readonly context: unknown
 
@@ -201,7 +201,7 @@ export class Config implements ConfigParams, ParserConfig {
       useArrayArithmetic,
       useStats,
       undoLimit,
-      compactionThreshold,
+      maxPendingLazyTransformations,
       useColumnIndex,
       useRegularExpressions,
       useWildcards,
@@ -248,12 +248,12 @@ export class Config implements ConfigParams, ParserConfig {
     this.nullDate = configValueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
     this.leapYear1900 = configValueFromParam(leapYear1900, 'boolean', 'leapYear1900')
     this.undoLimit = configValueFromParam(undoLimit, 'number', 'undoLimit')
-    this.compactionThreshold = configValueFromParam(compactionThreshold, 'number', 'compactionThreshold')
+    this.maxPendingLazyTransformations = configValueFromParam(maxPendingLazyTransformations, 'number', 'maxPendingLazyTransformations')
     this.useRegularExpressions = configValueFromParam(useRegularExpressions, 'boolean', 'useRegularExpressions')
     this.useWildcards = configValueFromParam(useWildcards, 'boolean', 'useWildcards')
     this.matchWholeCell = configValueFromParam(matchWholeCell, 'boolean', 'matchWholeCell')
     validateNumberToBeAtLeast(this.undoLimit, 'undoLimit', 0)
-    validateNumberToBeAtLeast(this.compactionThreshold, 'compactionThreshold', 1)
+    validateNumberToBeAtLeast(this.maxPendingLazyTransformations, 'maxPendingLazyTransformations', 1)
     this.maxRows = configValueFromParam(maxRows, 'number', 'maxRows')
     validateNumberToBeAtLeast(this.maxRows, 'maxRows', 1)
     this.maxColumns = configValueFromParam(maxColumns, 'number', 'maxColumns')
