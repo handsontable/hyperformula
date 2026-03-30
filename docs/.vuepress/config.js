@@ -188,7 +188,7 @@ module.exports = {
           ]
         },
         {
-          title: 'Framework integration',
+          title: 'Integrations',
           collapsable: false,
           children: [
             ['/guide/integration-with-react', 'Integration with React'],
