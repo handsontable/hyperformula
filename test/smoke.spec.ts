@@ -111,9 +111,9 @@ describe('HyperFormula', () => {
       ['=SEQUENCE(1,0)'],
     ], {licenseKey: 'gpl-v3'})
 
-    expect(hf.getCellValue(adr('A1'))).toMatchObject({type: ErrorType.NUM})
+    expect(hf.getCellValue(adr('A1'))).toMatchObject({type: ErrorType.VALUE})
     expect(hf.getCellValue(adr('A2'))).toMatchObject({type: ErrorType.VALUE})
-    expect(hf.getCellValue(adr('A3'))).toMatchObject({type: ErrorType.NUM})
+    expect(hf.getCellValue(adr('A3'))).toMatchObject({type: ErrorType.VALUE})
 
     hf.destroy()
   })
