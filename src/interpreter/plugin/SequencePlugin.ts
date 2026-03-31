@@ -34,7 +34,8 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
   /**
    * Parses a literal dimension from an AST node at parse time.
    * Handles NUMBER nodes directly, STRING nodes via numeric coercion,
-   * and PLUS/MINUS_UNARY_OP wrapping a NUMBER (e.g. `+3`, `-2`).
+   * PLUS/MINUS_UNARY_OP wrapping a NUMBER (e.g. `+3`, `-2`),
+   * and TRUE()/FALSE() function calls (returning 1/0).
    * Returns undefined for non-literal nodes (cell refs, formulas, binary ops).
    */
   private static parseLiteralDimension(node: Ast): number | undefined {
@@ -50,6 +51,14 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
     }
     if (node.type === AstNodeType.MINUS_UNARY_OP && node.value.type === AstNodeType.NUMBER) {
       return Math.trunc(-node.value.value)
+    }
+    if (node.type === AstNodeType.FUNCTION_CALL) {
+      if (node.procedureName === 'TRUE' && node.args.length === 0) {
+        return 1
+      }
+      if (node.procedureName === 'FALSE' && node.args.length === 0) {
+        return 0
+      }
     }
     return undefined
   }
