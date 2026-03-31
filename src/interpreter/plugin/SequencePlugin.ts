@@ -84,6 +84,10 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
   public sequence(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('SEQUENCE'),
       (rows: number, cols: number, start: number, step: number) => {
+        if (!Number.isFinite(rows) || !Number.isFinite(cols)) {
+          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+        }
+
         if (rows < 0 || cols < 0) {
           return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
         }
@@ -92,7 +96,7 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
         const numCols = Math.trunc(cols)
 
         if (!SequencePlugin.isValidDimension(numRows) || !SequencePlugin.isValidDimension(numCols)) {
-          return new CellError(ErrorType.NUM, ErrorMessage.LessThanOne)
+          return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
         }
 
         const result: number[][] = []
