@@ -108,6 +108,10 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
           return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
         }
 
+        if (numRows > this.config.maxRows || numCols > this.config.maxColumns) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+        }
+
         const result: number[][] = []
         for (let r = 0; r < numRows; r++) {
           const row: number[] = []
@@ -160,6 +164,10 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
     }
 
     if (!SequencePlugin.isValidDimension(rows) || !SequencePlugin.isValidDimension(cols)) {
+      return ArraySize.error()
+    }
+
+    if (rows > this.config.maxRows || cols > this.config.maxColumns) {
       return ArraySize.error()
     }
 
