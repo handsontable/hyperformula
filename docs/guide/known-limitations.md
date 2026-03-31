@@ -23,6 +23,13 @@ you can't compare the arguments in a formula like this:
   * 3D references
   * Constant arrays
   * Dynamic arrays
+  * Array-producing functions (e.g., SEQUENCE, FILTER) require their output
+    dimensions to be known at parse time, not at evaluation time. This means
+    that passing cell references or formulas as dimension arguments (e.g.,
+    `=SEQUENCE(A1)`) results in a `#VALUE!` error, even if the referenced
+    cell contains a valid number. This is an architectural limitation —
+    Microsoft Excel resolves dimensions at runtime and handles such cases
+    correctly.
   * Asynchronous functions
   * Structured references ("Tables")
   * Relative named expressions
