@@ -446,6 +446,49 @@ describe('Circular Dependencies', () => {
       expect(valueB).toBeCloseTo(2, 8)
     })
 
+    it('updates non-cyclic dependents after cycle convergence', () => {
+      const engine = HyperFormula.buildFromArray([['=0.5*B1+1', '1', '=A1+B1', '=C1*2']], {
+        allowCircularReferences: true,
+        maxIterations: 1000,
+      })
+
+      engine.setCellContents(adr('B1'), [['=0.5*A1+1']])
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2, 8)
+      expect(engine.getCellValue(adr('B1'))).toBeCloseTo(2, 8)
+      expect(engine.getCellValue(adr('C1'))).toBeCloseTo(4, 8)
+      expect(engine.getCellValue(adr('D1'))).toBeCloseTo(8, 8)
+    })
+
+    it('updates cascading non-cyclic dependents after cycle convergence', () => {
+      const engine = HyperFormula.buildFromArray([['=0.5*B1+1', '1', '=A1+B1', '=C1*2', '=D1+3']], {
+        allowCircularReferences: true,
+        maxIterations: 1000,
+      })
+
+      engine.setCellContents(adr('B1'), [['=0.5*A1+1']])
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2, 8)
+      expect(engine.getCellValue(adr('B1'))).toBeCloseTo(2, 8)
+      expect(engine.getCellValue(adr('C1'))).toBeCloseTo(4, 8)
+      expect(engine.getCellValue(adr('D1'))).toBeCloseTo(8, 8)
+      expect(engine.getCellValue(adr('E1'))).toBeCloseTo(11, 8)
+    })
+
+    it('updates range dependents after cycle convergence', () => {
+      const engine = HyperFormula.buildFromArray([['=0.5*B1+1', '1', '=SUM(A1:B1)', '=C1*2']], {
+        allowCircularReferences: true,
+        maxIterations: 1000,
+      })
+
+      engine.setCellContents(adr('B1'), [['=0.5*A1+1']])
+
+      expect(engine.getCellValue(adr('A1'))).toBeCloseTo(2, 8)
+      expect(engine.getCellValue(adr('B1'))).toBeCloseTo(2, 8)
+      expect(engine.getCellValue(adr('C1'))).toBeCloseTo(4, 8)
+      expect(engine.getCellValue(adr('D1'))).toBeCloseTo(8, 8)
+    })
+
     it('converging model with low maxIterations produces same result as higher count', () => {
       // A=0.5*B+1, B=0.5*A+1 → converges to 2
       // With contraction factor 0.5, 20 iterations is more than enough

@@ -245,29 +245,45 @@ export class Evaluator {
     const changes = ContentChanges.empty()
     const cyclicSet = new Set(cycled)
 
-    const dependents = new Set<FormulaVertex>()
+    const dependents: Vertex[] = []
     for (const vertex of cycled) {
       for (const dependent of this.dependencyGraph.graph.adjacentNodes(vertex)) {
-        if (!cyclicSet.has(dependent) && dependent instanceof FormulaVertex) {
-          dependents.add(dependent)
+        if (!cyclicSet.has(dependent)) {
+          dependents.push(dependent)
         }
       }
     }
 
-    if (dependents.size === 0) {
+    if (dependents.length === 0) {
       return changes
     }
 
-    const {sorted} = this.dependencyGraph.topSortWithScc()
-    for (const vertex of sorted) {
-      if (dependents.has(vertex as FormulaVertex)) {
-        const formulaVertex = vertex as FormulaVertex
-        const newCellValue = this.recomputeFormulaVertexValue(formulaVertex)
-        const address = formulaVertex.getAddress(this.lazilyTransformingAstService)
-        this.columnSearch.add(getRawValue(newCellValue), address)
-        changes.addChange(newCellValue, address)
+    this.dependencyGraph.graph.getTopSortedWithSccSubgraphFrom(
+      dependents,
+      (vertex: Vertex) => {
+        if (vertex instanceof FormulaVertex) {
+          const currentValue = vertex.isComputed() ? vertex.getCellValue() : undefined
+          const newCellValue = this.recomputeFormulaVertexValue(vertex)
+          if (newCellValue !== currentValue) {
+            const address = vertex.getAddress(this.lazilyTransformingAstService)
+            changes.addChange(newCellValue, address)
+            this.columnSearch.change(getRawValue(currentValue), getRawValue(newCellValue), address)
+            return true
+          }
+          return false
+        } else if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+          return true
+        } else {
+          return true
+        }
+      },
+      (vertex: Vertex) => {
+        if (vertex instanceof RangeVertex) {
+          vertex.clearCache()
+        }
       }
-    }
+    )
 
     return changes
   }
