@@ -109,7 +109,7 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
         }
 
         if (numRows > this.config.maxRows || numCols > this.config.maxColumns) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
         }
 
         const result: number[][] = []
