@@ -94,7 +94,7 @@ export class SequencePlugin extends FunctionPlugin implements FunctionPluginType
     return this.runFunction(ast.args, state, this.metadata('SEQUENCE'),
       (rows: number, cols: number, start: number, step: number) => {
         if (!Number.isFinite(rows) || !Number.isFinite(cols)) {
-          return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
         }
 
         if (rows < 0 || cols < 0) {
