@@ -6,12 +6,6 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
-
-- Added a new function: SEQUENCE.
-
 ## 3.2.0
 
 **Release date: February 19, 2026**

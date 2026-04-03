@@ -23,13 +23,6 @@ you can't compare the arguments in a formula like this:
   * 3D references
   * Constant arrays
   * Dynamic arrays
-  * Array-producing functions (e.g., SEQUENCE, FILTER) require their output
-    dimensions to be known at parse time, not at evaluation time. This means
-    that passing cell references or formulas as dimension arguments (e.g.,
-    `=SEQUENCE(A1)`) results in a `#VALUE!` error, even if the referenced
-    cell contains a valid number. This is an architectural limitation —
-    Microsoft Excel resolves dimensions at runtime and handles such cases
-    correctly.
   * Asynchronous functions
   * Structured references ("Tables")
   * Relative named expressions
@@ -44,3 +37,4 @@ you can't compare the arguments in a formula like this:
 * For certain inputs, the RATE function might have no solutions, or have multiple solutions. Our implementation uses an iterative algorithm (Newton's method) to find an approximation for one of the solutions to within 1e-7. If the approximation is not found after 50 iterations, the RATE function returns the `#NUM!` error.
 * The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
+* Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
