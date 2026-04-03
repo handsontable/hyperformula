@@ -35,7 +35,7 @@ git fetch origin
 if git show-ref --verify --quiet "refs/heads/$CURRENT_BRANCH" || \
    git show-ref --verify --quiet "refs/remotes/origin/$CURRENT_BRANCH"; then
   git checkout "$CURRENT_BRANCH"
-  git pull # pull latest changes
+  git pull origin "$CURRENT_BRANCH" # pull latest changes
 else
   echo "Branch $CURRENT_BRANCH not found in hyperformula-tests, creating from develop..."
   git checkout develop

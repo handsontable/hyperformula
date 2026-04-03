@@ -99,3 +99,4 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | DEVSQ         | =DEVSQ(A2, A3)                                                 |       0.0000 |        0.0000 |             NUM |
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
+| SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |

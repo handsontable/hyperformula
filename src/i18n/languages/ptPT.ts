@@ -188,6 +188,7 @@ const dictionary: RawTranslationPackage = {
     SEC: 'SEC',
     SECH: 'SECH',
     SECOND: 'SEGUNDO',
+    SEQUENCE: 'SEQUÊNCIA',
     SHEET: 'PLANILHA',
     SHEETS: 'PLANILHAS',
     SIN: 'SEN',
