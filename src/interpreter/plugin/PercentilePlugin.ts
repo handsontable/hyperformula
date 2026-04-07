@@ -64,13 +64,6 @@ function percentileExclusive(sortedVals: number[], k: number): number | CellErro
 export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTypecheck<PercentilePlugin> {
 
   public static implementedFunctions: ImplementedFunctions = {
-    'PERCENTILE': {
-      method: 'percentile',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER, minValue: 0, maxValue: 1},
-      ],
-    },
     'PERCENTILE.INC': {
       method: 'percentile',
       parameters: [
@@ -83,13 +76,6 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER, greaterThan: 0, lessThan: 1},
-      ],
-    },
-    'QUARTILE': {
-      method: 'quartile',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER},
       ],
     },
     'QUARTILE.INC': {
@@ -108,6 +94,11 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
     },
   }
 
+  public static aliases = {
+    PERCENTILE: 'PERCENTILE.INC',
+    QUARTILE: 'QUARTILE.INC',
+  }
+
   /**
    * Corresponds to PERCENTILE(array, k) and PERCENTILE.INC(array, k).
    *
@@ -118,7 +109,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * @returns interpolated percentile value, or CellError on invalid input
    */
   public percentile(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata(ast.procedureName),
+    return this.runFunction(ast.args, state, this.metadata('PERCENTILE.INC'),
       (range: SimpleRangeValue, k: number) => {
         const vals = this.getSortedValues(range)
         if (vals instanceof CellError) {
@@ -161,7 +152,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * @returns quartile value, or CellError on invalid input
    */
   public quartile(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata(ast.procedureName),
+    return this.runFunction(ast.args, state, this.metadata('QUARTILE.INC'),
       (range: SimpleRangeValue, quart: number) => {
         quart = Math.trunc(quart)
         if (quart < 0) {
