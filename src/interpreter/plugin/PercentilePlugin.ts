@@ -102,7 +102,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * Returns the k-th percentile of values in a range using inclusive interpolation.
    */
   public percentile(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('PERCENTILE'),
+    return this.runFunction(ast.args, state, this.metadata(ast.procedureName),
       (range: SimpleRangeValue, k: number) => {
         const vals = this.getSortedValues(range)
         if (vals instanceof CellError) {
@@ -137,7 +137,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * quart is truncated to an integer and validated in [0, 4].
    */
   public quartile(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('QUARTILE'),
+    return this.runFunction(ast.args, state, this.metadata(ast.procedureName),
       (range: SimpleRangeValue, quart: number) => {
         quart = Math.trunc(quart)
         if (quart < 0) {
