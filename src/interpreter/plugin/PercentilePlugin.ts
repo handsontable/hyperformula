@@ -14,40 +14,52 @@ import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, Implement
 /**
  * Computes the inclusive percentile using linear interpolation: rank = k * (n - 1).
  * Assumes sortedVals is non-empty and k is in [0, 1].
+ *
+ * @param sortedVals - pre-sorted array of numeric values (ascending)
+ * @param k - percentile fraction in [0, 1]
+ * @returns interpolated percentile value
  */
 function percentileInclusive(sortedVals: number[], k: number): number {
   const n = sortedVals.length
   const rank = k * (n - 1)
-  const intPart = Math.floor(rank)
-  const fraction = rank - intPart
-  if (intPart + 1 < n) {
-    return sortedVals[intPart] + fraction * (sortedVals[intPart + 1] - sortedVals[intPart])
+  const lowerIndex = Math.floor(rank)
+  const fraction = rank - lowerIndex
+  if (lowerIndex + 1 < n) {
+    return sortedVals[lowerIndex] + fraction * (sortedVals[lowerIndex + 1] - sortedVals[lowerIndex])
   }
-  return sortedVals[intPart]
+  return sortedVals[lowerIndex]
 }
 
 /**
  * Computes the exclusive percentile using linear interpolation: rank = k * (n + 1).
  * Assumes sortedVals is non-empty and k is in (0, 1).
  * Returns CellError if the resulting rank falls outside [1, n].
+ *
+ * @param sortedVals - pre-sorted array of numeric values (ascending)
+ * @param k - percentile fraction in (0, 1)
+ * @returns interpolated percentile value, or CellError if rank is out of bounds
  */
 function percentileExclusive(sortedVals: number[], k: number): number | CellError {
   const n = sortedVals.length
   const rank = k * (n + 1)
+  // Exclusive method requires rank in [1, n]; values outside mean k is too extreme for this dataset size
   if (rank < 1 || rank > n) {
     return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
   }
-  const intPart = Math.floor(rank)
-  const fraction = rank - intPart
-  if (intPart < n) {
-    return sortedVals[intPart - 1] + fraction * (sortedVals[intPart] - sortedVals[intPart - 1])
+  const lowerIndex = Math.floor(rank)
+  const fraction = rank - lowerIndex
+  if (lowerIndex < n) {
+    return sortedVals[lowerIndex - 1] + fraction * (sortedVals[lowerIndex] - sortedVals[lowerIndex - 1])
   }
-  return sortedVals[intPart - 1]
+  return sortedVals[lowerIndex - 1]
 }
 
 /**
- * Interpreter plugin containing PERCENTILE, PERCENTILE.INC, PERCENTILE.EXC,
- * QUARTILE, QUARTILE.INC, and QUARTILE.EXC functions.
+ * Interpreter plugin for percentile and quartile statistical functions.
+ *
+ * Implements inclusive (INC) and exclusive (EXC) interpolation variants.
+ * QUARTILE functions delegate to PERCENTILE by converting quart index to
+ * a percentile fraction (quart / 4) after truncating to integer.
  */
 export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTypecheck<PercentilePlugin> {
 
@@ -100,6 +112,10 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * Corresponds to PERCENTILE(array, k) and PERCENTILE.INC(array, k).
    *
    * Returns the k-th percentile of values in a range using inclusive interpolation.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   * @returns interpolated percentile value, or CellError on invalid input
    */
   public percentile(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata(ast.procedureName),
@@ -117,6 +133,10 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    * Corresponds to PERCENTILE.EXC(array, k).
    *
    * Returns the k-th percentile of values in a range using exclusive interpolation.
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   * @returns interpolated percentile value, or CellError on invalid input
    */
   public percentileExc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('PERCENTILE.EXC'),
@@ -135,6 +155,10 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * Returns the quartile of a data set using inclusive interpolation.
    * quart is truncated to an integer and validated in [0, 4].
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   * @returns quartile value, or CellError on invalid input
    */
   public quartile(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata(ast.procedureName),
@@ -150,6 +174,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
         if (vals instanceof CellError) {
           return vals
         }
+        // Convert quartile index to percentile fraction: 0→0%, 1→25%, 2→50%, 3→75%, 4→100%
         return percentileInclusive(vals, quart / 4)
       }
     )
@@ -160,6 +185,10 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
    *
    * Returns the quartile of a data set using exclusive interpolation.
    * quart is truncated to an integer and validated in [1, 3].
+   *
+   * @param ast - procedure AST node
+   * @param state - interpreter state
+   * @returns quartile value, or CellError on invalid input
    */
   public quartileExc(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('QUARTILE.EXC'),
@@ -175,6 +204,7 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
         if (vals instanceof CellError) {
           return vals
         }
+        // Convert quartile index to percentile fraction: 1→25%, 2→50%, 3→75%
         return percentileExclusive(vals, quart / 4)
       }
     )
@@ -183,6 +213,9 @@ export class PercentilePlugin extends FunctionPlugin implements FunctionPluginTy
   /**
    * Extracts numeric values from a range, filters non-numbers, and returns them sorted.
    * Returns CellError if the range contains an error, or if no numeric values exist.
+   *
+   * @param range - input range from the spreadsheet
+   * @returns sorted numeric values (ascending), or CellError
    */
   private getSortedValues(range: SimpleRangeValue): number[] | CellError {
     const vals = this.arithmeticHelper.manyToExactNumbers(range.valuesFromTopLeftCorner())
