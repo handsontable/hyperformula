@@ -43,8 +43,11 @@ function percentileExclusive(sortedVals: number[], k: number): number | CellErro
   const n = sortedVals.length
   const rank = k * (n + 1)
   // Exclusive method requires rank in [1, n]; values outside mean k is too extreme for this dataset size
-  if (rank < 1 || rank > n) {
+  if (rank < 1) {
     return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+  }
+  if (rank > n) {
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
   }
   const lowerIndex = Math.floor(rank)
   const fraction = rank - lowerIndex
