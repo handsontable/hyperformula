@@ -4,6 +4,48 @@ Installing HyperFormula in a Vue application works the same as with vanilla Java
 
 For more details, see the [client-side installation](client-side-installation.md) section.
 
+## Basic usage
+
+### Step 1. Initialize HyperFormula
+
+Wrap the HyperFormula instance in `markRaw` to prevent Vue's reactivity system from converting it into a proxy (see [Troubleshooting](#vue-reactivity-issues) below). Use `ref` for the data you want to display.
+
+```javascript
+<script setup>
+import { ref, markRaw } from 'vue';
+import { HyperFormula } from 'hyperformula';
+
+// Create a HyperFormula instance with initial data.
+const hf = markRaw(
+  HyperFormula.buildFromArray(
+    [
+      [10, 20, '=SUM(A1:B1)'],
+      [30, 40, '=SUM(A2:B2)'],
+    ],
+    { licenseKey: 'gpl-v3' }
+  )
+);
+
+// Read calculated values from the sheet.
+const sheetId = 0;
+const data = ref(hf.getSheetValues(sheetId));
+</script>
+```
+
+### Step 2. Render the results
+
+Display the calculated values in a template.
+
+```html
+<template>
+  <table>
+    <tr v-for="(row, rowIdx) in data" :key="rowIdx">
+      <td v-for="(cell, colIdx) in row" :key="colIdx">{{ cell }}</td>
+    </tr>
+  </table>
+</template>
+```
+
 ## Troubleshooting
 
 ### Vue reactivity issues
