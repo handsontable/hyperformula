@@ -16,10 +16,19 @@ result = llm.invoke(
 **With HyperFormula tool:**
 
 ```python
-tools = [HyperFormulaTool()]
-agent = create_react_agent(llm, tools)
+from langchain_core.tools import tool
+from hyperformula import HyperFormula
 
-# Agent calls: hf.evaluate("=IRR(A1:A5)")
+hf = HyperFormula.build_from_array([[-1000, 300, 400, 500, 200]])
+
+@tool
+def evaluate_formula(formula: str) -> str:
+    """Evaluate an Excel-compatible formula using HyperFormula."""
+    return hf.calculate_formula(formula, sheet_id=0)
+
+agent = create_react_agent(llm, [evaluate_formula])
+
+# Agent calls: evaluate_formula("=IRR(A1:E1)")
 # → 0.1189 ← deterministic, auditable
 ```
 
@@ -40,5 +49,5 @@ agent = create_react_agent(llm, tools)
 ## Beta access
 
 ::: tip
-Email [hello.hyperformula@handsontable.com](mailto:hello.hyperformula@handsontable.com) to sign up for beta access.
+[Sign up for beta access](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA)
 :::

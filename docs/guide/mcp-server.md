@@ -40,5 +40,5 @@ Agent: "$138.43" ← deterministic, auditable
 ## Beta access
 
 ::: tip
-Email [hello.hyperformula@handsontable.com](mailto:hello.hyperformula@handsontable.com) to sign up for beta access.
+[Sign up for beta access](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA)
 :::
