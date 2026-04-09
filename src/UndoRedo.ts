@@ -22,12 +22,26 @@ export interface UndoEntry {
   doUndo(undoRedo: UndoRedo): void,
 
   doRedo(undoRedo: UndoRedo): void,
+
+  /**
+   * Returns the LazilyTransformingAstService version keys referenced by this entry's oldData storage.
+   * Used to clean up oldData when the entry is permanently evicted from the undo/redo stack.
+   */
+  getReferencedOldDataVersions(): number[],
 }
 
 export abstract class BaseUndoEntry implements UndoEntry {
   abstract doUndo(undoRedo: UndoRedo): void
 
   abstract doRedo(undoRedo: UndoRedo): void
+
+  /**
+   * Returns LazilyTransformingAstService version keys referenced by this entry's oldData.
+   * Default implementation returns empty — override in entries that store oldData.
+   */
+  public getReferencedOldDataVersions(): number[] {
+    return []
+  }
 }
 
 export class RemoveRowsUndoEntry extends BaseUndoEntry {
@@ -44,6 +58,10 @@ export class RemoveRowsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoRemoveRows(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.rowsRemovals.filter(r => r.version > 0).map(r => r.version - 1)
   }
 }
 
@@ -66,6 +84,10 @@ export class MoveCellsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoMoveCells(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.version > 0 ? [this.version - 1] : []
   }
 }
 
@@ -162,6 +184,10 @@ export class MoveRowsUndoEntry extends BaseUndoEntry {
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoMoveRows(this)
   }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.version > 0 ? [this.version - 1] : []
+  }
 }
 
 export class MoveColumnsUndoEntry extends BaseUndoEntry {
@@ -186,6 +212,10 @@ export class MoveColumnsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoMoveColumns(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.version > 0 ? [this.version - 1] : []
   }
 }
 
@@ -219,6 +249,10 @@ export class RemoveColumnsUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoRemoveColumns(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.columnsRemovals.filter(r => r.version > 0).map(r => r.version - 1)
   }
 }
 
@@ -285,6 +319,10 @@ export class RenameSheetUndoEntry extends BaseUndoEntry {
 
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoRenameSheet(this)
+  }
+
+  public getReferencedOldDataVersions(): number[] {
+    return (this.version !== undefined && this.version > 0) ? [this.version - 1] : []
   }
 }
 
@@ -421,8 +459,44 @@ export class BatchUndoEntry extends BaseUndoEntry {
   public doRedo(undoRedo: UndoRedo): void {
     undoRedo.redoBatch(this)
   }
+
+  public getReferencedOldDataVersions(): number[] {
+    return this.operations.flatMap(op => op.getReferencedOldDataVersions())
+  }
 }
 
+/**
+ * Manages undo/redo stacks for all spreadsheet operations.
+ *
+ * ## oldData: Preserving Formula ASTs Across Irreversible Transformations
+ *
+ * Some structural operations (e.g., removing rows/columns, moving cells) destroy
+ * formula information that cannot be reconstructed from the transformation alone.
+ * For example, when a row is removed, formulas referencing that row are rewritten
+ * to `#REF!` — an irreversible change.
+ *
+ * To support undo of such operations, `oldData` stores snapshots of formula AST
+ * hashes keyed by the LazilyTransformingAstService version at which the irreversible
+ * transformation was applied. Each entry maps a version number to an array of
+ * `[cellAddress, astHash]` pairs that can be used to restore the original formula
+ * from the parser cache.
+ *
+ * ### Memory Management
+ *
+ * Without cleanup, `oldData` grows indefinitely as undo entries are evicted but
+ * their oldData keys remain. Three mechanisms prevent this:
+ *
+ * 1. **Eviction cleanup**: When undo entries are evicted (due to `undoLimit`),
+ *    `cleanupOldDataForEntries()` deletes their referenced oldData keys
+ *    (unless still needed by entries on the other stack).
+ * 2. **Orphan cleanup**: Compaction may force lazy formula evaluation, which
+ *    writes new oldData entries for already-evicted undo entries. After compaction,
+ *    `cleanupOrphanedOldData()` removes any keys not referenced by entries on
+ *    either stack or the in-progress batch.
+ * 3. **Short-circuit**: When `undoLimit` is 0 (undo disabled),
+ *    `storeDataForVersion()` returns immediately to avoid storing data that
+ *    would never be used.
+ */
 export class UndoRedo {
   public oldData: Map<number, [SimpleCellAddress, string][]> = new Map()
   private undoStack: UndoEntry[] = []
@@ -457,7 +531,14 @@ export class UndoRedo {
     this.batchUndoEntry = undefined
   }
 
+  /**
+   * Stores a formula AST hash snapshot for the given LazilyTransformingAstService version.
+   * Skipped when `undoLimit` is 0 (undo disabled) to avoid storing data that would never be used.
+   */
   public storeDataForVersion(version: number, address: SimpleCellAddress, astHash: string) {
+    if (this.undoLimit === 0) {
+      return
+    }
     if (!this.oldData.has(version)) {
       this.oldData.set(version, [])
     }
@@ -465,11 +546,15 @@ export class UndoRedo {
     currentOldData.push([address, astHash])
   }
 
+  /** Clears the redo stack and removes oldData entries no longer referenced by any remaining entry. */
   public clearRedoStack() {
+    this.cleanupOldDataForEntries(this.redoStack, this.undoStack)
     this.redoStack = []
   }
 
+  /** Clears the undo stack and removes oldData entries no longer referenced by any remaining entry. */
   public clearUndoStack() {
+    this.cleanupOldDataForEntries(this.undoStack, this.redoStack)
     this.undoStack = []
   }
 
@@ -565,12 +650,14 @@ export class UndoRedo {
   }
 
   public undoMoveRows(operation: MoveRowsUndoEntry) {
+    this.operations.forceApplyPostponedTransformations()
     const {sheet} = operation
     this.operations.moveRows(sheet, operation.undoStart, operation.numberOfRows, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
   }
 
   public undoMoveColumns(operation: MoveColumnsUndoEntry) {
+    this.operations.forceApplyPostponedTransformations()
     const {sheet} = operation
     this.operations.moveColumns(sheet, operation.undoStart, operation.numberOfColumns, operation.undoEnd)
     this.restoreOldDataFromVersion(operation.version - 1)
@@ -771,9 +858,56 @@ export class UndoRedo {
     this.operations.setColumnOrder(operation.sheetId, operation.columnMapping)
   }
 
+  /**
+   * Adds an entry to the undo stack, evicting the oldest entries when undoLimit is exceeded.
+   * Evicted entries have their oldData keys cleaned up to prevent memory leaks.
+   */
   private addUndoEntry(operation: UndoEntry) {
     this.undoStack.push(operation)
-    this.undoStack.splice(0, Math.max(0, this.undoStack.length - this.undoLimit))
+    const evictCount = Math.max(0, this.undoStack.length - this.undoLimit)
+    if (evictCount > 0) {
+      const evicted = this.undoStack.splice(0, evictCount)
+      this.cleanupOldDataForEntries(evicted, [...this.undoStack, ...this.redoStack])
+    }
+  }
+
+  /**
+   * Removes oldData entries whose version keys are not referenced by any
+   * entry on the undo stack, redo stack, or in-progress batch. Called after
+   * compaction forces lazy formula evaluation, which may insert oldData for
+   * already-evicted entries.
+   */
+  public cleanupOrphanedOldData() {
+    const referencedVersions = this.collectReferencedOldDataVersions(this.undoStack, this.redoStack)
+    for (const version of this.oldData.keys()) {
+      if (!referencedVersions.has(version)) {
+        this.oldData.delete(version)
+      }
+    }
+  }
+
+  /**
+   * Removes oldData entries referenced by permanently discarded undo/redo entries,
+   * but only if not still referenced by entries remaining on the other stack or
+   * in-progress batch.
+   */
+  private cleanupOldDataForEntries(discardedEntries: UndoEntry[], retainedEntries: UndoEntry[]) {
+    const retainedVersions = this.collectReferencedOldDataVersions(retainedEntries)
+    for (const entry of discardedEntries) {
+      for (const version of entry.getReferencedOldDataVersions()) {
+        if (!retainedVersions.has(version)) {
+          this.oldData.delete(version)
+        }
+      }
+    }
+  }
+
+  /** Collects all oldData version keys referenced by the given entry lists and in-progress batch. */
+  private collectReferencedOldDataVersions(...entryLists: UndoEntry[][]): Set<number> {
+    return new Set<number>([
+      ...entryLists.flatMap(list => list.flatMap(e => e.getReferencedOldDataVersions())),
+      ...(this.batchUndoEntry?.getReferencedOldDataVersions() ?? []),
+    ])
   }
 
   private undoEntry(operation: UndoEntry) {

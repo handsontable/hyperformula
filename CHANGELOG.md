@@ -9,10 +9,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
+- Added `maxPendingLazyTransformations` configuration option to control memory usage by limiting accumulated transformations before cleanup. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
 - Added a new function: TEXTJOIN. [#1640](https://github.com/handsontable/hyperformula/pull/1640)
+- Added a new function: SEQUENCE. [#1645](https://github.com/handsontable/hyperformula/pull/1645)
 
 ### Fixed
 
+- Fixed a memory leak in `LazilyTransformingAstService` where the transformations array grew unboundedly, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
+- Fixed a memory leak in `UndoRedo` where `oldData` entries for evicted undo stack entries were never cleaned up, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
 - Fixed the IRR function returning `#NUM!` error when the initial investment significantly exceeds the sum of returns. [#1628](https://github.com/handsontable/hyperformula/issues/1628)
 - Fixed the ADDRESS function ignoring `defaultValue` when arguments are syntactically empty (e.g., `=ADDRESS(2,3,,FALSE())`). [#1632](https://github.com/handsontable/hyperformula/issues/1632)
 

@@ -403,6 +403,21 @@ export interface ConfigParams {
    */
   undoLimit: number,
   /**
+   * Controls memory usage for long-running instances by limiting the number of
+   * pending lazy transformations before cleanup occurs.
+   *
+   * Structural operations (adding/removing rows/columns, moving cells) create
+   * transformations that are applied lazily to formulas. This setting determines
+   * how many can accumulate before they are flushed and memory is reclaimed.
+   *
+   * Lower values reduce peak memory usage but may slightly increase CPU overhead.
+   * Higher values reduce overhead but allow more memory accumulation.
+   *
+   * @default 50
+   * @category Engine
+   */
+  maxPendingLazyTransformations: number,
+  /**
    * When set to `true`, criteria in functions (SUMIF, COUNTIF, ...) are allowed to use regular expressions.
    * @default false
    * @category String
