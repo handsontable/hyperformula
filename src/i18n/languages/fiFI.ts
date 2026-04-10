@@ -75,6 +75,7 @@ const dictionary: RawTranslationPackage = {
     DAYS360: 'PÄIVÄT360',
     DAYS: 'PV',
     DB: 'DB',
+    DCOUNT: 'TLASKE',
     DDB: 'DDB',
     DEC2BIN: 'DESBIN',
     DEC2HEX: 'DESHEKSA',

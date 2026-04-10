@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added `maxPendingLazyTransformations` configuration option to control memory usage by limiting accumulated transformations before cleanup. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
 - Added a new function: TEXTJOIN. [#1640](https://github.com/handsontable/hyperformula/pull/1640)
 - Added a new function: SEQUENCE. [#1645](https://github.com/handsontable/hyperformula/pull/1645)
+- Added a new function: DCOUNT. (#1623)
 
 ### Fixed
 

@@ -75,6 +75,7 @@ const dictionary: RawTranslationPackage = {
     DAYS360: 'JOURS360',
     DAYS: 'JOURS',
     DB: 'DB',
+    DCOUNT: 'BDNB',
     DDB: 'DDB',
     DEC2BIN: 'DECBIN',
     DEC2HEX: 'DECHEX',
