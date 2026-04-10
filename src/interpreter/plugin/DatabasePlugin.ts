@@ -32,14 +32,69 @@ type DatabaseCriteriaRow = DatabaseCriterionEntry[]
 /**
  * Interpreter plugin implementing Excel database functions.
  *
- * Currently implements: DCOUNT.
- * Designed to be extended with DSUM, DAVERAGE, DMAX, DMIN, etc.
+ * Implements: DAVERAGE, DCOUNT, DCOUNTA, DGET, DMAX, DMIN, DPRODUCT, DSUM.
  */
 export class DatabasePlugin extends FunctionPlugin implements FunctionPluginTypecheck<DatabasePlugin> {
 
   public static implementedFunctions: ImplementedFunctions = {
     'DCOUNT': {
       method: 'dcount',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DCOUNTA': {
+      method: 'dcounta',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DPRODUCT': {
+      method: 'dproduct',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DSUM': {
+      method: 'dsum',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DAVERAGE': {
+      method: 'daverage',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DGET': {
+      method: 'dget',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DMAX': {
+      method: 'dmax',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DMIN': {
+      method: 'dmin',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.SCALAR},
@@ -80,6 +135,281 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         }
 
         return count
+      })
+  }
+
+  /**
+   * Counts all non-blank cells in the specified field of a database range,
+   * for rows that match all criteria.
+   *
+   * DCOUNTA(database, field, criteria)
+   */
+  public dcounta(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DCOUNTA'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const dbData = database.data
+        let count = 0
+
+        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+            const cellValue = dbData[rowIdx][fieldIndex]
+            if (cellValue !== EmptyValue && cellValue !== undefined && cellValue !== null) {
+              count++
+            }
+          }
+        }
+
+        return count
+      })
+  }
+
+  /**
+   * Returns the product of numeric values in the specified field of a database range,
+   * for rows that match all criteria.
+   *
+   * DPRODUCT(database, field, criteria)
+   */
+  public dproduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DPRODUCT'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const dbData = database.data
+        let product = 1
+        let hasNumeric = false
+
+        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+            const cellValue = dbData[rowIdx][fieldIndex]
+            if (isExtendedNumber(cellValue)) {
+              product *= getRawValue(cellValue) as number
+              hasNumeric = true
+            }
+          }
+        }
+
+        return hasNumeric ? product : 0
+      })
+  }
+
+  /**
+   * Returns the sum of numeric values in the specified field of a database range,
+   * for rows that match all criteria.
+   *
+   * DSUM(database, field, criteria)
+   */
+  public dsum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DSUM'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const dbData = database.data
+        let sum = 0
+
+        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+            const cellValue = dbData[rowIdx][fieldIndex]
+            if (isExtendedNumber(cellValue)) {
+              sum += getRawValue(cellValue) as number
+            }
+          }
+        }
+
+        return sum
+      })
+  }
+
+  /**
+   * Returns the average of numeric values in the specified field of a database range,
+   * for rows that match all criteria.
+   * Returns #DIV/0! when no numeric values are found.
+   *
+   * DAVERAGE(database, field, criteria)
+   */
+  public daverage(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DAVERAGE'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const dbData = database.data
+        let sum = 0
+        let count = 0
+
+        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+            const cellValue = dbData[rowIdx][fieldIndex]
+            if (isExtendedNumber(cellValue)) {
+              sum += getRawValue(cellValue) as number
+              count++
+            }
+          }
+        }
+
+        if (count === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+
+        return sum / count
+      })
+  }
+
+  /**
+   * Returns a single value from the specified field of a database range,
+   * for the row that matches all criteria.
+   * Returns #VALUE! if no rows match, #NUM! if more than one row matches.
+   *
+   * DGET(database, field, criteria)
+   */
+  public dget(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DGET'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const dbData = database.data
+        let matchedValue: InternalScalarValue | undefined
+        let matchCount = 0
+
+        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+            matchCount++
+            if (matchCount > 1) {
+              return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+            }
+            matchedValue = dbData[rowIdx][fieldIndex]
+          }
+        }
+
+        if (matchCount === 0) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+        }
+
+        return matchedValue === EmptyValue || matchedValue === undefined || matchedValue === null
+          ? 0
+          : matchedValue
+      })
+  }
+
+  /**
+   * Returns the maximum numeric value in the specified field of a database range,
+   * for rows that match all criteria.
+   * Returns 0 when no numeric values are found (Excel behavior).
+   *
+   * DMAX(database, field, criteria)
+   */
+  public dmax(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DMAX'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const dbData = database.data
+        let max = -Infinity
+        let hasNumeric = false
+
+        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+            const cellValue = dbData[rowIdx][fieldIndex]
+            if (isExtendedNumber(cellValue)) {
+              const numValue = getRawValue(cellValue) as number
+              if (numValue > max) {
+                max = numValue
+              }
+              hasNumeric = true
+            }
+          }
+        }
+
+        return hasNumeric ? max : 0
+      })
+  }
+
+  /**
+   * Returns the minimum numeric value in the specified field of a database range,
+   * for rows that match all criteria.
+   * Returns 0 when no numeric values are found (Excel behavior).
+   *
+   * DMIN(database, field, criteria)
+   */
+  public dmin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DMIN'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const dbData = database.data
+        let min = Infinity
+        let hasNumeric = false
+
+        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+            const cellValue = dbData[rowIdx][fieldIndex]
+            if (isExtendedNumber(cellValue)) {
+              const numValue = getRawValue(cellValue) as number
+              if (numValue < min) {
+                min = numValue
+              }
+              hasNumeric = true
+            }
+          }
+        }
+
+        return hasNumeric ? min : 0
       })
   }
 
