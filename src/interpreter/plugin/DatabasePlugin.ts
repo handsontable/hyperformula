@@ -232,7 +232,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
           if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
             const cellValue = dbData[rowIdx][fieldIndex]
             if (isExtendedNumber(cellValue)) {
-              product *= getRawValue(cellValue) as number
+              product *= getRawValue(cellValue) 
               hasNumeric = true
             }
           }
@@ -268,7 +268,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
           if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
             const cellValue = dbData[rowIdx][fieldIndex]
             if (isExtendedNumber(cellValue)) {
-              sum += getRawValue(cellValue) as number
+              sum += getRawValue(cellValue) 
             }
           }
         }
@@ -592,7 +592,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
         const cellValue = dbData[rowIdx][fieldIndex]
         if (isExtendedNumber(cellValue)) {
-          values.push(getRawValue(cellValue) as number)
+          values.push(getRawValue(cellValue) )
         }
       }
     }
