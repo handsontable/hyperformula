@@ -273,7 +273,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
           if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
             const cellValue = dbData[rowIdx][fieldIndex]
             if (isExtendedNumber(cellValue)) {
-              sum += getRawValue(cellValue) as number
+              sum += getRawValue(cellValue)
               count++
             }
           }
@@ -359,7 +359,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
           if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
             const cellValue = dbData[rowIdx][fieldIndex]
             if (isExtendedNumber(cellValue)) {
-              const numValue = getRawValue(cellValue) as number
+              const numValue = getRawValue(cellValue)
               if (numValue > max) {
                 max = numValue
               }
@@ -400,7 +400,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
           if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
             const cellValue = dbData[rowIdx][fieldIndex]
             if (isExtendedNumber(cellValue)) {
-              const numValue = getRawValue(cellValue) as number
+              const numValue = getRawValue(cellValue)
               if (numValue < min) {
                 min = numValue
               }
