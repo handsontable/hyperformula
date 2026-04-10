@@ -32,7 +32,7 @@ type DatabaseCriteriaRow = DatabaseCriterionEntry[]
 /**
  * Interpreter plugin implementing Excel database functions.
  *
- * Implements: DAVERAGE, DCOUNT, DCOUNTA, DGET, DMAX, DMIN, DPRODUCT, DSUM.
+ * Implements: DAVERAGE, DCOUNT, DCOUNTA, DGET, DMAX, DMIN, DPRODUCT, DSTDEV, DSTDEVP, DSUM, DVAR, DVARP.
  */
 export class DatabasePlugin extends FunctionPlugin implements FunctionPluginTypecheck<DatabasePlugin> {
 
@@ -61,8 +61,40 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         {argumentType: FunctionArgumentType.RANGE},
       ],
     },
+    'DSTDEV': {
+      method: 'dstdev',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DSTDEVP': {
+      method: 'dstdevp',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
     'DSUM': {
       method: 'dsum',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DVAR': {
+      method: 'dvar',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.SCALAR},
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+    },
+    'DVARP': {
+      method: 'dvarp',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.SCALAR},
@@ -411,6 +443,161 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
 
         return hasNumeric ? min : 0
       })
+  }
+
+  /**
+   * Returns the sample standard deviation of numeric values in the specified field
+   * of a database range, for rows that match all criteria.
+   * Returns #DIV/0! when fewer than 2 numeric values are found.
+   *
+   * DSTDEV(database, field, criteria)
+   */
+  public dstdev(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DSTDEV'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
+
+        if (values.length <= 1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+
+        const mean = values.reduce((a, b) => a + b, 0) / values.length
+        const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
+        return Math.sqrt(variance)
+      })
+  }
+
+  /**
+   * Returns the population standard deviation of numeric values in the specified field
+   * of a database range, for rows that match all criteria.
+   * Returns #DIV/0! when no numeric values are found.
+   * Returns 0 when exactly one numeric value is found.
+   *
+   * DSTDEVP(database, field, criteria)
+   */
+  public dstdevp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DSTDEVP'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
+
+        if (values.length === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+
+        const mean = values.reduce((a, b) => a + b, 0) / values.length
+        const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
+        return Math.sqrt(variance)
+      })
+  }
+
+  /**
+   * Returns the sample variance of numeric values in the specified field
+   * of a database range, for rows that match all criteria.
+   * Returns #DIV/0! when fewer than 2 numeric values are found.
+   *
+   * DVAR(database, field, criteria)
+   */
+  public dvar(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DVAR'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
+
+        if (values.length <= 1) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+
+        const mean = values.reduce((a, b) => a + b, 0) / values.length
+        return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
+      })
+  }
+
+  /**
+   * Returns the population variance of numeric values in the specified field
+   * of a database range, for rows that match all criteria.
+   * Returns #DIV/0! when no numeric values are found.
+   * Returns 0 when exactly one numeric value is found.
+   *
+   * DVARP(database, field, criteria)
+   */
+  public dvarp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('DVARP'),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
+
+        if (values.length === 0) {
+          return new CellError(ErrorType.DIV_BY_ZERO)
+        }
+
+        const mean = values.reduce((a, b) => a + b, 0) / values.length
+        return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
+      })
+  }
+
+  /**
+   * Collects numeric values from the specified field column of matching database rows.
+   *
+   * @param dbData - Full database data including header row.
+   * @param fieldIndex - 0-based column index of the target field.
+   * @param criteriaRows - Parsed criteria rows.
+   * @returns Array of numeric values from matching rows.
+   */
+  private collectNumericValues(
+    dbData: InternalScalarValue[][],
+    fieldIndex: number,
+    criteriaRows: DatabaseCriteriaRow[]
+  ): number[] {
+    const values: number[] = []
+
+    for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+      if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+        const cellValue = dbData[rowIdx][fieldIndex]
+        if (isExtendedNumber(cellValue)) {
+          values.push(getRawValue(cellValue) as number)
+        }
+      }
+    }
+
+    return values
   }
 
   /**
