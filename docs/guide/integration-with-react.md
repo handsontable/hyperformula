@@ -98,6 +98,13 @@ export default function Page() {
 
 In the Pages Router, the same `dynamic(..., { ssr: false })` pattern works without `'use client'`.
 
+## Next steps
+
+- [Configuration options](configuration-options.md) — full list of `buildFromArray` / `buildEmpty` options
+- [Basic operations](basic-operations.md) — CRUD on cells, rows, columns, sheets
+- [Advanced usage](advanced-usage.md) — multi-sheet workbooks, named expressions
+- [Custom functions](custom-functions.md) — register your own formulas
+
 ## Demo
 
 For a more advanced example, check out the [React demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/react-demo?v=${$page.buildDateURIEncoded}).

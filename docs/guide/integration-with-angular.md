@@ -124,6 +124,13 @@ updateCell(row: number, col: number, value: unknown) {
 }
 ```
 
+## Next steps
+
+- [Configuration options](configuration-options.md) — full list of `buildFromArray` / `buildEmpty` options
+- [Basic operations](basic-operations.md) — CRUD on cells, rows, columns, sheets
+- [Advanced usage](advanced-usage.md) — multi-sheet workbooks, named expressions
+- [Custom functions](custom-functions.md) — register your own formulas
+
 ## Demo
 
 For a more advanced example, check out the [Angular demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/angular-demo?v=${$page.buildDateURIEncoded}).

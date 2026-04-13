@@ -95,6 +95,13 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
 
 Wire `updateCell` in the template the same way as in the Basic usage section (`<input ... onchange=...>`). For Svelte 4, replace `let values = $state<CellValue[][]>([])` with `let values: CellValue[][] = []`; the rest is identical. As an alternative, guard the top-level init with `if (browser)` from `$app/environment`.
 
+## Next steps
+
+- [Configuration options](configuration-options.md) — full list of `buildFromArray` / `buildEmpty` options
+- [Basic operations](basic-operations.md) — CRUD on cells, rows, columns, sheets
+- [Advanced usage](advanced-usage.md) — multi-sheet workbooks, named expressions
+- [Custom functions](custom-functions.md) — register your own formulas
+
 ## Demo
 
 For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v=${$page.buildDateURIEncoded}).
