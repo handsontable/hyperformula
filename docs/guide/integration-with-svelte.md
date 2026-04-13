@@ -1,34 +1,99 @@
 # Integration with Svelte
 
-Installing HyperFormula in a Svelte application works the same as with vanilla JavaScript.
+The HyperFormula API is identical in a Svelte app and in plain JavaScript. What changes is how you scope the engine to a component's lifetime and how you bridge its values into Svelte's reactivity.
 
-For more details, see the [client-side installation](client-side-installation.md) section.
+Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
-## Basic usage
+::: warning SvelteKit SSR
+The primary snippet below assumes a browser environment. If you use SvelteKit with default SSR, skip to [Server-side rendering](#server-side-rendering-sveltekit) — `HyperFormula.buildFromArray` at `<script>` top level will crash on the server.
+:::
 
-Initialize HyperFormula at the top of a component's `<script>` block. Svelte's reactivity handles updates automatically when you reassign the variable that holds the calculated values.
+## Basic usage (Svelte 5, with runes)
 
-```html
-<script>
-  import { HyperFormula } from 'hyperformula';
+Declare the engine at the top of `<script>` so it lives for the component's lifetime. Hold derived data in a `$state` rune so reassignment triggers re-rendering. Release the engine with `onDestroy`.
+
+```svelte
+<script lang="ts">
+  import { onDestroy } from 'svelte';
+  import { HyperFormula, type CellValue } from 'hyperformula';
 
   const hf = HyperFormula.buildFromArray(
     [
-      // your data goes here
+      [1, 2, '=A1+B1'],
+      // your data rows go here
     ],
     {
-      // your configuration goes here
+      licenseKey: 'gpl-v3',
+      // more configuration options go here
     }
   );
 
-  let values = hf.getSheetValues(0);
+  let values = $state<CellValue[][]>(hf.getSheetValues(0));
 
-  function updateCell(row, col, value) {
+  function updateCell(row: number, col: number, value: unknown) {
     hf.setCellContents({ sheet: 0, row, col }, value);
     values = hf.getSheetValues(0);
   }
+
+  onDestroy(() => hf.destroy());
+</script>
+
+<table>
+  {#each values as row, r}
+    <tr>
+      {#each row as cell, c}
+        <td>
+          <input
+            value={cell ?? ''}
+            onchange={(e) => updateCell(r, c, (e.target as HTMLInputElement).value)}
+          />
+        </td>
+      {/each}
+    </tr>
+  {/each}
+</table>
+```
+
+### Svelte 4
+
+Under Svelte 4, replace `let values = $state<CellValue[][]>(...)` with plain `let values: CellValue[][] = ...`. The compiler transforms `let` reassignments into reactive updates automatically. Use `on:change` (colon syntax) instead of the Svelte 5 `onchange` attribute. Everything else — including `onDestroy` — is unchanged.
+
+## Server-side rendering (SvelteKit)
+
+HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine inside `onMount` so the code never runs during SSR:
+
+```svelte
+<script lang="ts">
+  // Svelte 5 + SvelteKit
+  import { onMount, onDestroy } from 'svelte';
+  import type { HyperFormula as HyperFormulaType, CellValue } from 'hyperformula';
+
+  let hf: HyperFormulaType | null = null;
+  let values = $state<CellValue[][]>([]);
+
+  onMount(async () => {
+    const { HyperFormula } = await import('hyperformula');
+    hf = HyperFormula.buildFromArray(
+      [
+        [1, 2, '=A1+B1'],
+        // your data rows go here
+      ],
+      { licenseKey: 'gpl-v3' }
+    );
+    values = hf.getSheetValues(0);
+  });
+
+  function updateCell(row: number, col: number, value: unknown) {
+    if (!hf) return;
+    hf.setCellContents({ sheet: 0, row, col }, value);
+    values = hf.getSheetValues(0);
+  }
+
+  onDestroy(() => hf?.destroy());
 </script>
 ```
+
+Wire `updateCell` in the template the same way as in the Basic usage section (`<input ... onchange=...>`). For Svelte 4, replace `let values = $state<CellValue[][]>([])` with `let values: CellValue[][] = []`; the rest is identical. As an alternative, guard the top-level init with `if (browser)` from `$app/environment`.
 
 ## Demo
 
