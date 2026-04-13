@@ -737,8 +737,14 @@ export class Operations {
     return changes
   }
 
+  /**
+   * Forces all formula vertices and column index entries to apply pending lazy
+   * transformations, bringing them up to the current LazilyTransformingAstService version.
+   * Called before undo of move operations and before compaction.
+   */
   public forceApplyPostponedTransformations(): void {
     this.dependencyGraph.forceApplyPostponedTransformations()
+    this.columnSearch.forceApplyPostponedTransformations()
   }
 
   /**
