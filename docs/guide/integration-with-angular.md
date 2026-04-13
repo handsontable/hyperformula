@@ -133,4 +133,4 @@ updateCell(row: number, col: number, value: unknown) {
 
 ## Demo
 
-For a more advanced example, check out the [Angular demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/angular-demo?v=${$page.buildDateURIEncoded}).
+For a more advanced example, check out the [Angular demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/angular-demo?v={{ $page.buildDateURIEncoded }}).

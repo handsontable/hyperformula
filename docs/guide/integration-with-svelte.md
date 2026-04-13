@@ -104,4 +104,4 @@ Wire `updateCell` in the template the same way as in the Basic usage section (`<
 
 ## Demo
 
-For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v=${$page.buildDateURIEncoded}).
+For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v={{ $page.buildDateURIEncoded }}).
