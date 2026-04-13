@@ -6,60 +6,42 @@ For more details, see the [client-side installation](client-side-installation.md
 
 ## Basic usage
 
-### Step 1. Initialize HyperFormula
-
-Use `useRef` to hold the HyperFormula instance so it persists across re-renders. Initialize it inside a `useEffect` hook.
+Hold the HyperFormula instance in a `useRef` so it persists across re-renders. Initialize it inside a `useEffect` hook and destroy it in the cleanup function.
 
 ```javascript
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HyperFormula } from 'hyperformula';
 
 function SpreadsheetComponent() {
   const hfRef = useRef(null);
-  const [sheetData, setSheetData] = useState([]);
+  const [values, setValues] = useState([]);
 
   useEffect(() => {
-    // Create a HyperFormula instance with initial data.
     hfRef.current = HyperFormula.buildFromArray(
       [
-        [10, 20, '=SUM(A1:B1)'],
-        [30, 40, '=SUM(A2:B2)'],
+        // your data goes here
       ],
-      { licenseKey: 'gpl-v3' }
+      {
+        // your configuration goes here
+      }
     );
 
-    // Read calculated values from the sheet.
-    const sheetId = 0;
-    setSheetData(hfRef.current.getSheetValues(sheetId));
+    setValues(hfRef.current.getSheetValues(0));
 
-    return () => {
-      // Clean up the instance when the component unmounts.
-      hfRef.current?.destroy();
-    };
+    return () => hfRef.current?.destroy();
   }, []);
+
+  // render `values` as a table
+}
 ```
 
-### Step 2. Render the results
-
-Display the calculated values in a table.
+To update a cell and re-render with the new calculated values, call `setCellContents` and re-read the sheet:
 
 ```javascript
-  return (
-    <table>
-      <tbody>
-        {sheetData.map((row, rowIdx) => (
-          <tr key={rowIdx}>
-            {row.map((cell, colIdx) => (
-              <td key={colIdx}>{cell}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
+hfRef.current.setCellContents({ sheet: 0, row, col }, newValue);
+setValues(hfRef.current.getSheetValues(0));
 ```
 
 ## Demo
 
-Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/react-demo?v=${$page.buildDateURIEncoded}).
+For a more advanced example, check out the [React demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/react-demo?v=${$page.buildDateURIEncoded}).

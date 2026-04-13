@@ -6,44 +6,31 @@ For more details, see the [client-side installation](client-side-installation.md
 
 ## Basic usage
 
-### Step 1. Initialize HyperFormula
-
-Wrap the HyperFormula instance in `markRaw` to prevent Vue's reactivity system from converting it into a proxy (see [Troubleshooting](#vue-reactivity-issues) below). Use `ref` for the data you want to display.
+Wrap the HyperFormula instance in `markRaw` to prevent Vue from converting it into a reactive proxy (see [Troubleshooting](#vue-reactivity-issues) below). Hold derived data in `ref` so the template updates automatically.
 
 ```javascript
 <script setup>
-import { ref, markRaw } from 'vue';
+import { markRaw, ref } from 'vue';
 import { HyperFormula } from 'hyperformula';
 
-// Create a HyperFormula instance with initial data.
 const hf = markRaw(
   HyperFormula.buildFromArray(
     [
-      [10, 20, '=SUM(A1:B1)'],
-      [30, 40, '=SUM(A2:B2)'],
+      // your data goes here
     ],
-    { licenseKey: 'gpl-v3' }
+    {
+      // your configuration goes here
+    }
   )
 );
 
-// Read calculated values from the sheet.
-const sheetId = 0;
-const data = ref(hf.getSheetValues(sheetId));
+const values = ref(hf.getSheetValues(0));
+
+function updateCell(row, col, value) {
+  hf.setCellContents({ sheet: 0, row, col }, value);
+  values.value = hf.getSheetValues(0);
+}
 </script>
-```
-
-### Step 2. Render the results
-
-Display the calculated values in a template.
-
-```html
-<template>
-  <table>
-    <tr v-for="(row, rowIdx) in data" :key="rowIdx">
-      <td v-for="(cell, colIdx) in row" :key="colIdx">{{ cell }}</td>
-    </tr>
-  </table>
-</template>
 ```
 
 ## Troubleshooting
@@ -73,7 +60,7 @@ This function prevents Vue from converting the HyperFormula instance into a reac
 
 ## Demo
 
-Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/vue-3-demo?v=${$page.buildDateURIEncoded}).
+For a more advanced example, check out the [Vue 3 demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/vue-3-demo?v=${$page.buildDateURIEncoded}).
 
 ::: tip
 This demo uses the [Vue 3](https://v3.vuejs.org/) framework. If you are looking for an example using Vue 2, check out the [code on GitHub](https://github.com/handsontable/hyperformula-demos/tree/2.5.x/vue-demo).

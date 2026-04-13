@@ -6,50 +6,30 @@ For more details, see the [client-side installation](client-side-installation.md
 
 ## Basic usage
 
-### Step 1. Initialize HyperFormula
-
-Create the HyperFormula instance directly in the component's `<script>` block. Use a reactive variable for the results.
+Initialize HyperFormula at the top of a component's `<script>` block. Svelte's reactivity handles updates automatically when you reassign the variable that holds the calculated values.
 
 ```html
 <script>
   import { HyperFormula } from 'hyperformula';
 
-  // Create a HyperFormula instance with initial data.
   const hf = HyperFormula.buildFromArray(
     [
-      [10, 20, '=SUM(A1:B1)'],
-      [30, 40, '=SUM(A2:B2)'],
+      // your data goes here
     ],
-    { licenseKey: 'gpl-v3' }
+    {
+      // your configuration goes here
+    }
   );
 
-  const sheetId = 0;
-  let data = [];
+  let values = hf.getSheetValues(0);
 
-  function calculate() {
-    data = hf.getSheetValues(sheetId);
+  function updateCell(row, col, value) {
+    hf.setCellContents({ sheet: 0, row, col }, value);
+    values = hf.getSheetValues(0);
   }
 </script>
 ```
 
-### Step 2. Render the results
-
-Display the data in a table and trigger calculation with a button.
-
-```html
-<button on:click={calculate}>Calculate</button>
-
-<table>
-  {#each data as row, rowIdx}
-    <tr>
-      {#each row as cell, colIdx}
-        <td>{cell}</td>
-      {/each}
-    </tr>
-  {/each}
-</table>
-```
-
 ## Demo
 
-Explore the full working example on [Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v=${$page.buildDateURIEncoded}).
+For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v=${$page.buildDateURIEncoded}).
