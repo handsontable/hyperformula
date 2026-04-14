@@ -11,7 +11,7 @@ Wrap the HyperFormula instance in `markRaw` so Vue does not convert it into a re
 ```vue
 <script setup lang="ts">
 import { markRaw, onUnmounted, ref } from 'vue';
-import { HyperFormula, type CellValue } from 'hyperformula';
+import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
 
 const hf = markRaw(
   HyperFormula.buildFromArray(
@@ -28,7 +28,7 @@ const hf = markRaw(
 
 const values = ref<CellValue[][]>(hf.getSheetValues(0));
 
-function updateCell(row: number, col: number, value: unknown) {
+function updateCell(row: number, col: number, value: RawCellContent) {
   hf.setCellContents({ sheet: 0, row, col }, value);
   values.value = hf.getSheetValues(0);
 }
@@ -87,13 +87,13 @@ If the same engine is used from multiple components, put it in a Pinia store. Ap
 ```typescript
 import { defineStore } from 'pinia';
 import { markRaw, ref } from 'vue';
-import { HyperFormula, type CellValue } from 'hyperformula';
+import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
 
 export const useSpreadsheetStore = defineStore('spreadsheet', () => {
   const hf = markRaw(HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' }));
   const values = ref<CellValue[][]>(hf.getSheetValues(0));
 
-  function updateCell(row: number, col: number, value: unknown) {
+  function updateCell(row: number, col: number, value: RawCellContent) {
     hf.setCellContents({ sheet: 0, row, col }, value);
     values.value = hf.getSheetValues(0);
   }

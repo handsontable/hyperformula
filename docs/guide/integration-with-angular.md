@@ -11,7 +11,7 @@ Wrap the engine in an `@Injectable` service. Use `DestroyRef` for cleanup and ex
 ```typescript
 // spreadsheet.service.ts
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
-import { CellValue, HyperFormula } from 'hyperformula';
+import { CellValue, HyperFormula, RawCellContent } from 'hyperformula';
 
 @Injectable({ providedIn: 'root' })
 export class SpreadsheetService {
@@ -33,7 +33,7 @@ export class SpreadsheetService {
     inject(DestroyRef).onDestroy(() => this.hf.destroy());
   }
 
-  updateCell(row: number, col: number, value: unknown) {
+  updateCell(row: number, col: number, value: RawCellContent) {
     this.hf.setCellContents({ sheet: 0, row, col }, value);
     this.values.set(this.hf.getSheetValues(0));
   }
@@ -75,7 +75,7 @@ If your project uses RxJS and `async` pipes rather than signals, swap `signal` f
 ```typescript
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CellValue, HyperFormula } from 'hyperformula';
+import { CellValue, HyperFormula, RawCellContent } from 'hyperformula';
 
 @Injectable({ providedIn: 'root' })
 export class SpreadsheetService {
@@ -86,7 +86,7 @@ export class SpreadsheetService {
     inject(DestroyRef).onDestroy(() => this.hf.destroy());
   }
 
-  updateCell(row: number, col: number, value: unknown) {
+  updateCell(row: number, col: number, value: RawCellContent) {
     this.hf.setCellContents({ sheet: 0, row, col }, value);
     this.values$.next(this.hf.getSheetValues(0));
   }
@@ -115,7 +115,7 @@ import { NgZone } from '@angular/core';
 
 private readonly ngZone = inject(NgZone);
 
-updateCell(row: number, col: number, value: unknown) {
+updateCell(row: number, col: number, value: RawCellContent) {
   this.ngZone.runOutsideAngular(() => {
     this.hf.setCellContents({ sheet: 0, row, col }, value);
     const next = this.hf.getSheetValues(0);

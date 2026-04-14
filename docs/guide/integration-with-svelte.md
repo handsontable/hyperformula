@@ -15,7 +15,7 @@ Declare the engine at the top of `<script>` so it lives for the component's life
 ```svelte
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { HyperFormula, type CellValue } from 'hyperformula';
+  import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
 
   const hf = HyperFormula.buildFromArray(
     [
@@ -30,7 +30,7 @@ Declare the engine at the top of `<script>` so it lives for the component's life
 
   let values = $state<CellValue[][]>(hf.getSheetValues(0));
 
-  function updateCell(row: number, col: number, value: unknown) {
+  function updateCell(row: number, col: number, value: RawCellContent) {
     hf.setCellContents({ sheet: 0, row, col }, value);
     values = hf.getSheetValues(0);
   }
@@ -83,7 +83,7 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
     values = hf.getSheetValues(0);
   });
 
-  function updateCell(row: number, col: number, value: unknown) {
+  function updateCell(row: number, col: number, value: RawCellContent) {
     if (!hf) return;
     hf.setCellContents({ sheet: 0, row, col }, value);
     values = hf.getSheetValues(0);
