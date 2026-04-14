@@ -1,6 +1,7 @@
 .idea/
 .vscode
 /commonjs/
+/coverage/
 /dist/
 /doc/
 /docs/api/
@@ -21,3 +22,5 @@ node_modules/
 *.iml
 dev*.html
 .DS_Store
+
+/test/hyperformula-tests/

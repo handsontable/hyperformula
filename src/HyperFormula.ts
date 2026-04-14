@@ -4596,6 +4596,20 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * When enough transformations have accumulated, forces all formula vertices and
+   * column index entries to apply pending lazy transformations, then compacts the
+   * transformation history and cleans up orphaned undo oldData entries.
+   */
+  private compactLazyTransformationsIfNeeded(): void {
+    if (this._lazilyTransformingAstService.needsCompaction()) {
+      this._dependencyGraph.forceApplyPostponedTransformations()
+      this._columnSearch.forceApplyPostponedTransformations()
+      this._lazilyTransformingAstService.compact()
+      this._lazilyTransformingAstService.undoRedo?.cleanupOrphanedOldData()
+    }
+  }
+
+  /**
    * Runs a recomputation starting from recently changed vertices.
    *
    * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
@@ -4609,6 +4623,8 @@ export class HyperFormula implements TypedEmitter {
       const changes = this._crudOperations.getAndClearContentChanges()
       const verticesToRecomputeFrom = this.dependencyGraph.verticesToRecompute()
       this.dependencyGraph.clearDirtyVertices()
+
+      this.compactLazyTransformationsIfNeeded()
 
       if (verticesToRecomputeFrom.length > 0) {
         changes.addAll(this.evaluator.partialRun(verticesToRecomputeFrom))

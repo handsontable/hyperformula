@@ -72,7 +72,7 @@ export class BuildEngineFactory {
 
     const namedExpressions = new NamedExpressions()
     const functionRegistry = new FunctionRegistry(config)
-    const lazilyTransformingAstService = new LazilyTransformingAstService(stats)
+    const lazilyTransformingAstService = new LazilyTransformingAstService(stats, config.maxPendingLazyTransformations)
     const dependencyGraph = DependencyGraph.buildEmpty(lazilyTransformingAstService, config, functionRegistry, namedExpressions, stats)
     const columnSearch = buildColumnSearchStrategy(dependencyGraph, config, stats)
     const sheetMapping = dependencyGraph.sheetMapping

@@ -7,6 +7,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {Maybe} from '../../Maybe'
 import {ProcedureAst} from '../../parser'
+import {coerceScalarToString} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {ExtendedNumber, InterpreterValue, isExtendedNumber, RawScalarValue, InternalScalarValue} from '../InterpreterValue'
@@ -20,7 +21,7 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'CONCATENATE': {
       method: 'concatenate',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ],
       repeatLastArgs: 1,
       expandRanges: true,
@@ -28,133 +29,142 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'EXACT': {
       method: 'exact',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'SPLIT': {
       method: 'split',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
       ]
     },
     'LEN': {
       method: 'len',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'LOWER': {
       method: 'lower',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'MID': {
       method: 'mid',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.NUMBER },
       ]
     },
     'TRIM': {
       method: 'trim',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'T': {
       method: 't',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR}
+        { argumentType: FunctionArgumentType.SCALAR }
       ]
     },
     'N': {
       method: 'n',
       parameters: [
-        {argumentType: FunctionArgumentType.ANY}
+        { argumentType: FunctionArgumentType.ANY }
       ]
     },
     'PROPER': {
       method: 'proper',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'CLEAN': {
       method: 'clean',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'REPT': {
       method: 'rept',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
       ]
     },
     'RIGHT': {
       method: 'right',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'LEFT': {
       method: 'left',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'REPLACE': {
       method: 'replace',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.NUMBER },
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'SEARCH': {
       method: 'search',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'SUBSTITUTE': {
       method: 'substitute',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true}
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, optionalArg: true }
       ]
     },
     'FIND': {
       method: 'find',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.STRING},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.STRING },
+        { argumentType: FunctionArgumentType.NUMBER, defaultValue: 1 },
       ]
     },
     'UPPER': {
       method: 'upper',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING}
+        { argumentType: FunctionArgumentType.STRING }
       ]
     },
     'VALUE': {
       method: 'value',
       parameters: [
-        {argumentType: FunctionArgumentType.SCALAR}
+        { argumentType: FunctionArgumentType.SCALAR }
       ]
+    },
+    'TEXTJOIN': {
+      method: 'textjoin',
+      repeatLastArgs: 1,
+      parameters: [
+        {argumentType: FunctionArgumentType.ANY},
+        {argumentType: FunctionArgumentType.BOOLEAN},
+        {argumentType: FunctionArgumentType.ANY},
+      ],
     },
   }
 
@@ -425,6 +435,78 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   }
 
   /**
+   * Corresponds to TEXTJOIN(delimiter, ignore_empty, text1, [text2], …)
+   *
+   * Joins text from multiple strings/ranges with a configurable delimiter.
+   * Supports array/range delimiters that cycle through gaps between text values.
+   * When ignore_empty is TRUE, empty strings are skipped.
+   * Returns #VALUE! if the result exceeds 32,767 characters (Excel cell content limit).
+   *
+   * @param {ProcedureAst} ast - The procedure AST node
+   * @param {InterpreterState} state - The interpreter state
+   */
+  public textjoin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('TEXTJOIN'),
+      (delimiterArg: InternalScalarValue | SimpleRangeValue,
+        ignoreEmpty: boolean,
+        ...textArgs: (InternalScalarValue | SimpleRangeValue)[]) => {
+
+        const delimiters = this.flattenArgToStrings(delimiterArg)
+        if (delimiters instanceof CellError) {
+          return delimiters
+        }
+
+        const texts: string[] = []
+        for (const arg of textArgs) {
+          const coerced = this.flattenArgToStrings(arg)
+          if (coerced instanceof CellError) {
+            return coerced
+          }
+          texts.push(...coerced)
+        }
+
+        const parts = ignoreEmpty ? texts.filter((t) => t !== '') : texts
+
+        if (parts.length === 0) {
+          return ''
+        }
+
+        const result = parts.reduce((acc, part, i) =>
+          i === 0 ? part : acc + delimiters[(i - 1) % delimiters.length] + part
+        , '')
+
+        if (result.length > 32767) {
+          return new CellError(ErrorType.VALUE, ErrorMessage.ResultTooLong)
+        }
+        return result
+      }
+    )
+  }
+
+  /**
+   * Flattens a scalar or range argument into an array of coerced strings.
+   * Returns a CellError immediately if any value in the argument is an error or cannot be coerced.
+   *
+   * @param {InternalScalarValue | SimpleRangeValue} arg - Scalar or range to flatten
+   * @returns {string[] | CellError} - Array of string values, or the first error encountered
+   */
+  private flattenArgToStrings(arg: InternalScalarValue | SimpleRangeValue): string[] | CellError {
+    const values = arg instanceof SimpleRangeValue ? arg.valuesFromTopLeftCorner() : [arg]
+    const result: string[] = []
+    for (const val of values) {
+      if (val instanceof CellError) {
+        return val
+      }
+      const coerced = coerceScalarToString(val as InternalScalarValue)
+      if (coerced instanceof CellError) {
+        return coerced
+      }
+      result.push(coerced)
+    }
+    return result
+  }
+
+  /**
    * Parses a string to a numeric value, handling whitespace trimming and empty string validation.
    *
    * @param {string} input - The string to parse
@@ -443,4 +525,5 @@ export class TextPlugin extends FunctionPlugin implements FunctionPluginTypechec
   private escapeRegExpSpecialCharacters(text: string): string {
     return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   }
+
 }
