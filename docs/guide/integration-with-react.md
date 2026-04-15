@@ -79,13 +79,18 @@ In development, React 18 runs effects twice (mount → unmount → mount) to sur
 
 ### Server-side rendering (Next.js)
 
-HyperFormula depends on browser-only APIs. In the Next.js App Router, mark the file with `'use client'` and load the component only on the client:
+HyperFormula depends on browser-only APIs. Mark `SpreadsheetComponent.tsx` with `'use client'`, then load it lazily from a **server** page component using `dynamic(..., { ssr: false })`:
 
 ```tsx
-// app/spreadsheet/page.tsx
+// app/spreadsheet/SpreadsheetComponent.tsx
 'use client';
+// ... component definition as above
+```
 
+```tsx
+// app/spreadsheet/page.tsx  ← server component, no 'use client'
 import dynamic from 'next/dynamic';
+
 const SpreadsheetComponent = dynamic(
   () => import('./SpreadsheetComponent').then((m) => m.SpreadsheetComponent),
   { ssr: false }
@@ -96,7 +101,7 @@ export default function Page() {
 }
 ```
 
-In the Pages Router, the same `dynamic(..., { ssr: false })` pattern works without `'use client'`.
+Putting `'use client'` on `page.tsx` itself would make the entire page a client component — the point is to keep the page server-rendered and only hydrate the spreadsheet widget on the client. In the Pages Router, the same `dynamic(..., { ssr: false })` pattern works without `'use client'`.
 
 ## Next steps
 

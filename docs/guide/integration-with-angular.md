@@ -47,6 +47,7 @@ Consume the service from a component and bind `values$ | async` in the template:
 ```typescript
 // spreadsheet.component.ts
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { SpreadsheetService } from './spreadsheet.service';
 import { type CellValue } from 'hyperformula';
@@ -54,6 +55,10 @@ import { type CellValue } from 'hyperformula';
 @Component({
   selector: 'app-spreadsheet',
   templateUrl: './spreadsheet.component.html',
+  // For NgModule-based apps, declare this component in AppModule and import
+  // CommonModule there instead of in the component itself.
+  imports: [CommonModule],
+  standalone: true,
 })
 export class SpreadsheetComponent {
   values$: Observable<CellValue[][]>;
@@ -100,7 +105,7 @@ export class SpreadsheetService implements OnDestroy {
 }
 ```
 
-For a scope-agnostic alternative, use `DestroyRef` — it fires at the right moment whether the service is root-scoped or component-scoped:
+For a scope-agnostic alternative, use `DestroyRef` — it fires at the right moment whether the service is root-scoped or component-scoped. Call `inject()` synchronously inside the constructor (or as a field initializer); it cannot be called in lifecycle hooks or async callbacks:
 
 ```typescript
 import { DestroyRef, inject } from '@angular/core';
@@ -136,7 +141,7 @@ export class SpreadsheetService {
 }
 ```
 
-Use the service from a standalone component with `ChangeDetectionStrategy.OnPush`:
+Use the service from a standalone component with `ChangeDetectionStrategy.OnPush`. Read `spreadsheet.values()` in the template — Angular automatically re-renders when the signal changes:
 
 ```typescript
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
@@ -151,6 +156,19 @@ import { SpreadsheetService } from './spreadsheet.service';
 export class SpreadsheetComponent {
   readonly spreadsheet = inject(SpreadsheetService);
 }
+```
+
+```html
+<!-- spreadsheet.component.html (signals variant, Angular 17+) -->
+<table>
+  @for (row of spreadsheet.values(); track $index; let r = $index) {
+    <tr>
+      @for (cell of row; track $index) {
+        <td>{{ cell }}</td>
+      }
+    </tr>
+  }
+</table>
 ```
 
 ### Keeping recalculation outside the Angular zone

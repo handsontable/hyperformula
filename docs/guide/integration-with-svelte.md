@@ -28,7 +28,8 @@ Declare the engine at the top of `<script>` so it lives for the component's life
   });
 
   const sheetId = 0;
-  let result = '';
+  /** @type {import('hyperformula').CellValue} */
+  let result = null;
 
   function calculate() {
     result = hf.getCellValue({ sheet: sheetId, row: 0, col: 2 });
@@ -38,7 +39,7 @@ Declare the engine at the top of `<script>` so it lives for the component's life
 </script>
 
 <button on:click={calculate}>Calculate</button>
-{#if result !== ''}
+{#if result !== null}
   <p>Result: <strong>{result}</strong></p>
 {/if}
 
@@ -114,10 +115,11 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
 ```svelte
 <script>
   // Svelte 4 + SvelteKit
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
 
   let hf;
-  let result = '';
+  /** @type {import('hyperformula').CellValue} */
+  let result = null;
 
   onMount(async () => {
     const { HyperFormula } = await import('hyperformula');
@@ -128,23 +130,23 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
       ],
       { licenseKey: 'gpl-v3' }
     );
+    // Return a cleanup function — this is the correct teardown pattern in onMount.
+    return () => hf?.destroy();
   });
 
   function calculate() {
     if (!hf) return;
     result = hf.getCellValue({ sheet: 0, row: 0, col: 2 });
   }
-
-  onDestroy(() => hf?.destroy());
 </script>
 
 <button on:click={calculate}>Calculate</button>
-{#if result !== ''}
+{#if result !== null}
   <p>Result: <strong>{result}</strong></p>
 {/if}
 ```
 
-For Svelte 5 + SvelteKit, replace `let result = ''` with `let result = $state('')` and `on:click` with `onclick`. As an alternative, guard the top-level init with `if (browser)` from `$app/environment`.
+For Svelte 5 + SvelteKit, replace `let result = null` with `let result: CellValue = $state(null)` and `on:click` with `onclick`. As an alternative, guard the top-level init with `if (browser)` from `$app/environment`.
 
 ## Next steps
 

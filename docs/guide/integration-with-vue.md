@@ -53,14 +53,15 @@ HyperFormula depends on browser-only APIs. In Nuxt, render the spreadsheet on th
 
 ```vue
 <script setup lang="ts">
-import { markRaw, onMounted, onUnmounted, ref, shallowRef } from 'vue';
+import { markRaw, onMounted, onUnmounted, ref } from 'vue';
 import type { HyperFormula as HyperFormulaType, CellValue } from 'hyperformula';
 
-const hf = shallowRef<HyperFormulaType | null>(null);
+const hf = ref<HyperFormulaType | null>(null);
 const values = ref<CellValue[][]>([]);
 
 onMounted(async () => {
   const { HyperFormula } = await import('hyperformula');
+  // markRaw must be applied before the instance is assigned to any ref or reactive
   const instance = markRaw(HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' }));
   hf.value = instance;
   values.value = instance.getSheetValues(0);
@@ -72,12 +73,15 @@ onUnmounted(() => hf.value?.destroy());
 
 ### Reacting to internal changes
 
-If you mutate the engine from multiple places (not just one `updateCell`), subscribe to HyperFormula's `valuesUpdated` event once and refresh `values.value` from the handler rather than calling `getSheetValues` after every mutation:
+If you mutate the engine from multiple places (not just one `updateCell`), subscribe to HyperFormula's `valuesUpdated` event once and refresh `values.value` from the handler rather than calling `getSheetValues` after every mutation. Always remove the listener in `onUnmounted` to avoid stale closures:
 
 ```typescript
-hf.on('valuesUpdated', () => {
+function onValuesUpdated() {
   values.value = hf.getSheetValues(0);
-});
+}
+
+hf.on('valuesUpdated', onValuesUpdated);
+onUnmounted(() => hf.off('valuesUpdated', onValuesUpdated));
 ```
 
 ### Sharing the instance across components (Pinia)
@@ -90,6 +94,8 @@ import { markRaw, ref } from 'vue';
 import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
 
 export const useSpreadsheetStore = defineStore('spreadsheet', () => {
+  // Keep hf private — exposing the raw instance lets callers bypass the store's
+  // updateCell and also risks Pinia devtools trying to serialise it.
   const hf = markRaw(HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' }));
   const values = ref<CellValue[][]>(hf.getSheetValues(0));
 
@@ -98,7 +104,7 @@ export const useSpreadsheetStore = defineStore('spreadsheet', () => {
     values.value = hf.getSheetValues(0);
   }
 
-  return { hf, values, updateCell };
+  return { values, updateCell };
 });
 ```
 
