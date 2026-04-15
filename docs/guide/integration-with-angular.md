@@ -6,17 +6,20 @@ Install with `npm install hyperformula`. For other options, see the [client-side
 
 ## Basic usage
 
-Wrap the engine in an `@Injectable` service. Use `DestroyRef` for cleanup and expose derived data as a `signal` so views using `ChangeDetectionStrategy.OnPush` update automatically.
+Wrap the engine in an `@Injectable` service backed by a `BehaviorSubject`. Components subscribe to the observable with the `async` pipe, which handles subscription cleanup automatically.
 
 ```typescript
 // spreadsheet.service.ts
-import { DestroyRef, Injectable, inject, signal } from '@angular/core';
-import { CellValue, HyperFormula, RawCellContent } from 'hyperformula';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
 
 @Injectable({ providedIn: 'root' })
 export class SpreadsheetService {
   private readonly hf: HyperFormula;
-  readonly values = signal<CellValue[][]>([]);
+
+  private readonly _values = new BehaviorSubject<CellValue[][]>([]);
+  readonly values$ = this._values.asObservable();
 
   constructor() {
     this.hf = HyperFormula.buildFromArray(
@@ -29,7 +32,100 @@ export class SpreadsheetService {
         // more configuration options go here
       }
     );
-    this.values.set(this.hf.getSheetValues(0));
+    this._values.next(this.hf.getSheetValues(0) as CellValue[][]);
+  }
+
+  updateCell(row: number, col: number, value: RawCellContent) {
+    this.hf.setCellContents({ sheet: 0, row, col }, value);
+    this._values.next(this.hf.getSheetValues(0) as CellValue[][]);
+  }
+}
+```
+
+Consume the service from a component and bind `values$ | async` in the template:
+
+```typescript
+// spreadsheet.component.ts
+import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
+import { SpreadsheetService } from './spreadsheet.service';
+import { type CellValue } from 'hyperformula';
+
+@Component({
+  selector: 'app-spreadsheet',
+  templateUrl: './spreadsheet.component.html',
+})
+export class SpreadsheetComponent {
+  values$: Observable<CellValue[][]>;
+
+  constructor(private spreadsheetService: SpreadsheetService) {
+    this.values$ = this.spreadsheetService.values$;
+  }
+
+  updateCell(row: number, col: number, value: string) {
+    this.spreadsheetService.updateCell(row, col, value);
+  }
+}
+```
+
+```html
+<!-- spreadsheet.component.html -->
+<table>
+  <tr *ngFor="let row of values$ | async; let r = index">
+    <td *ngFor="let cell of row; let c = index">{{ cell }}</td>
+  </tr>
+</table>
+```
+
+## Notes
+
+### Provider scope
+
+`providedIn: 'root'` makes the service an application-wide singleton — suitable when a single HyperFormula instance is shared across the app. For per-feature or per-component instances (for example, several independent reports on one screen), provide the service at the component level via `providers: [SpreadsheetService]`; the service is then created and destroyed alongside the component.
+
+### Cleanup
+
+Root-scoped services live for the application's full lifetime — `ngOnDestroy` fires only at app shutdown. If you scope the service to a component (`providers: [SpreadsheetService]`), implement `OnDestroy` to release the engine:
+
+```typescript
+import { Injectable, OnDestroy } from '@angular/core';
+
+@Injectable()
+export class SpreadsheetService implements OnDestroy {
+  // ...
+
+  ngOnDestroy() {
+    this.hf.destroy();
+  }
+}
+```
+
+For a scope-agnostic alternative, use `DestroyRef` — it fires at the right moment whether the service is root-scoped or component-scoped:
+
+```typescript
+import { DestroyRef, inject } from '@angular/core';
+
+constructor() {
+  // ...
+  inject(DestroyRef).onDestroy(() => this.hf.destroy());
+}
+```
+
+### Signals variant (Angular 17+)
+
+If your project targets Angular 17 or later and uses standalone components, you can replace `BehaviorSubject` with `signal` and drop the `async` pipe:
+
+```typescript
+// spreadsheet.service.ts
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { CellValue, HyperFormula, RawCellContent } from 'hyperformula';
+
+@Injectable({ providedIn: 'root' })
+export class SpreadsheetService {
+  private readonly hf = HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' });
+  readonly values = signal<CellValue[][]>(this.hf.getSheetValues(0));
+
+  constructor() {
     inject(DestroyRef).onDestroy(() => this.hf.destroy());
   }
 
@@ -40,10 +136,9 @@ export class SpreadsheetService {
 }
 ```
 
-Use the service from a standalone component and bind `values()` in the template:
+Use the service from a standalone component with `ChangeDetectionStrategy.OnPush`:
 
 ```typescript
-// spreadsheet.component.ts
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SpreadsheetService } from './spreadsheet.service';
 
@@ -58,56 +153,9 @@ export class SpreadsheetComponent {
 }
 ```
 
-## Notes
-
-### Provider scope
-
-`providedIn: 'root'` makes the service an application-wide singleton — suitable when a single HyperFormula instance is shared across the app. For per-feature or per-component instances (for example, several independent reports on one screen), provide the service at the component level via `providers: [SpreadsheetService]`; the service is then created and destroyed alongside the component, and `DestroyRef` fires at the expected moment.
-
-### Why `DestroyRef` instead of `ngOnDestroy`
-
-Services registered with `providedIn: 'root'` live for the lifetime of the application — Angular only invokes `ngOnDestroy` when the app itself is torn down. Using `DestroyRef.onDestroy` keeps cleanup behaviour consistent whether the service is root-scoped or component-scoped.
-
-### RxJS variant
-
-If your project uses RxJS and `async` pipes rather than signals, swap `signal` for `BehaviorSubject`:
-
-```typescript
-import { DestroyRef, Injectable, inject } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { CellValue, HyperFormula, RawCellContent } from 'hyperformula';
-
-@Injectable({ providedIn: 'root' })
-export class SpreadsheetService {
-  private readonly hf = HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' });
-  readonly values$ = new BehaviorSubject<CellValue[][]>(this.hf.getSheetValues(0));
-
-  constructor() {
-    inject(DestroyRef).onDestroy(() => this.hf.destroy());
-  }
-
-  updateCell(row: number, col: number, value: RawCellContent) {
-    this.hf.setCellContents({ sheet: 0, row, col }, value);
-    this.values$.next(this.hf.getSheetValues(0));
-  }
-}
-```
-
-Bind with `values$ | async` in the template. In standalone components, add `AsyncPipe` to the component's `imports` array:
-
-```typescript
-import { AsyncPipe } from '@angular/common';
-
-@Component({
-  standalone: true,
-  imports: [AsyncPipe],
-  // …
-})
-```
-
 ### Keeping recalculation outside the Angular zone
 
-For large sheets or frequent edits, HyperFormula's synchronous recalculation can trigger unnecessary change-detection cycles. Wrap heavy calls with `NgZone.runOutsideAngular` and re-enter the zone only when publishing new values to signals or subjects:
+For large sheets or frequent edits, HyperFormula's synchronous recalculation can trigger unnecessary change-detection cycles. Wrap heavy calls with `NgZone.runOutsideAngular` and re-enter the zone only when publishing new values:
 
 ```typescript
 // inside SpreadsheetService
@@ -118,8 +166,8 @@ private readonly ngZone = inject(NgZone);
 updateCell(row: number, col: number, value: RawCellContent) {
   this.ngZone.runOutsideAngular(() => {
     this.hf.setCellContents({ sheet: 0, row, col }, value);
-    const next = this.hf.getSheetValues(0);
-    this.ngZone.run(() => this.values.set(next));
+    const next = this.hf.getSheetValues(0) as CellValue[][];
+    this.ngZone.run(() => this._values.next(next));
   });
 }
 ```

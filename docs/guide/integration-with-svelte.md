@@ -8,9 +8,62 @@ Install with `npm install hyperformula`. For other options, see the [client-side
 The primary snippet below assumes a browser environment. If you use SvelteKit with default SSR, skip to [Server-side rendering](#server-side-rendering-sveltekit) — `HyperFormula.buildFromArray` at `<script>` top level will crash on the server.
 :::
 
-## Basic usage (Svelte 5, with runes)
+## Basic usage
 
-Declare the engine at the top of `<script>` so it lives for the component's lifetime. Hold derived data in a `$state` rune so reassignment triggers re-rendering. Release the engine with `onDestroy`.
+Declare the engine at the top of `<script>` so it lives for the component's lifetime. Call `getCellValue` on demand and display results in the template. Release the engine with `onDestroy`.
+
+```svelte
+<script>
+  import { onDestroy } from 'svelte';
+  import { HyperFormula } from 'hyperformula';
+
+  const data = [
+    [1, 2, '=A1+B1'],
+    // your data rows go here
+  ];
+
+  const hf = HyperFormula.buildFromArray(data, {
+    licenseKey: 'gpl-v3',
+    // more configuration options go here
+  });
+
+  const sheetId = 0;
+  let result = '';
+
+  function calculate() {
+    result = hf.getCellValue({ sheet: sheetId, row: 0, col: 2 });
+  }
+
+  onDestroy(() => hf.destroy());
+</script>
+
+<button on:click={calculate}>Calculate</button>
+{#if result !== ''}
+  <p>Result: <strong>{result}</strong></p>
+{/if}
+
+<table>
+  <tbody>
+    {#each data as row, r}
+      <tr>
+        {#each row as cell, c}
+          <td>
+            {#if hf.doesCellHaveFormula({ sheet: sheetId, row: r, col: c })}
+              {hf.getCellFormula({ sheet: sheetId, row: r, col: c })}
+            {:else}
+              {hf.getCellValue({ sheet: sheetId, row: r, col: c })}
+            {/if}
+          </td>
+        {/each}
+      </tr>
+    {/each}
+  </tbody>
+</table>
+```
+
+### Svelte 5 (runes)
+
+Under Svelte 5, hold the sheet values in a `$state` rune so reassignment triggers re-rendering. Replace `on:click` with the `onclick` attribute:
 
 ```svelte
 <script lang="ts">
@@ -54,22 +107,17 @@ Declare the engine at the top of `<script>` so it lives for the component's life
 </table>
 ```
 
-### Svelte 4
-
-Under Svelte 4, replace `let values = $state<CellValue[][]>(...)` with plain `let values: CellValue[][] = ...`. The compiler transforms `let` reassignments into reactive updates automatically. Use `on:change` (colon syntax) instead of the Svelte 5 `onchange` attribute. Everything else — including `onDestroy` — is unchanged.
-
 ## Server-side rendering (SvelteKit)
 
 HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine inside `onMount` so the code never runs during SSR:
 
 ```svelte
-<script lang="ts">
-  // Svelte 5 + SvelteKit
+<script>
+  // Svelte 4 + SvelteKit
   import { onMount, onDestroy } from 'svelte';
-  import type { HyperFormula as HyperFormulaType, CellValue } from 'hyperformula';
 
-  let hf: HyperFormulaType | null = null;
-  let values = $state<CellValue[][]>([]);
+  let hf;
+  let result = '';
 
   onMount(async () => {
     const { HyperFormula } = await import('hyperformula');
@@ -80,20 +128,23 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
       ],
       { licenseKey: 'gpl-v3' }
     );
-    values = hf.getSheetValues(0);
   });
 
-  function updateCell(row: number, col: number, value: RawCellContent) {
+  function calculate() {
     if (!hf) return;
-    hf.setCellContents({ sheet: 0, row, col }, value);
-    values = hf.getSheetValues(0);
+    result = hf.getCellValue({ sheet: 0, row: 0, col: 2 });
   }
 
   onDestroy(() => hf?.destroy());
 </script>
+
+<button on:click={calculate}>Calculate</button>
+{#if result !== ''}
+  <p>Result: <strong>{result}</strong></p>
+{/if}
 ```
 
-Wire `updateCell` in the template the same way as in the Basic usage section (`<input ... onchange=...>`). For Svelte 4, replace `let values = $state<CellValue[][]>([])` with `let values: CellValue[][] = []`; the rest is identical. As an alternative, guard the top-level init with `if (browser)` from `$app/environment`.
+For Svelte 5 + SvelteKit, replace `let result = ''` with `let result = $state('')` and `on:click` with `onclick`. As an alternative, guard the top-level init with `if (browser)` from `$app/environment`.
 
 ## Next steps
 
