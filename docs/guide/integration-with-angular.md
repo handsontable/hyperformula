@@ -199,4 +199,4 @@ updateCell(row: number, col: number, value: RawCellContent) {
 
 ## Demo
 
-For a more advanced example, check out the [Angular demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/angular-demo?v={{ $page.buildDateURIEncoded }}).
+For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/angular-demo?v=' + $page.buildDateURIEncoded">Angular demo on Stackblitz</a>.

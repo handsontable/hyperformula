@@ -157,4 +157,4 @@ For Svelte 5 + SvelteKit, replace `let result = null` with `let result: CellValu
 
 ## Demo
 
-For a more advanced example, check out the [Svelte demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v={{ $page.buildDateURIEncoded }}).
+For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v=' + $page.buildDateURIEncoded">Svelte demo on Stackblitz</a>.

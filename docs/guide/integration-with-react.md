@@ -106,4 +106,4 @@ Putting `'use client'` on `page.tsx` itself would make the entire page a client 
 
 ## Demo
 
-For a more advanced example, check out the [React demo on Stackblitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/react-demo?v={{ $page.buildDateURIEncoded }}).
+For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/react-demo?v=' + $page.buildDateURIEncoded">React demo on Stackblitz</a>.
