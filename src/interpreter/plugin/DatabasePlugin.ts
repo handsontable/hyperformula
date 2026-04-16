@@ -29,6 +29,13 @@ interface DatabaseCriterionEntry {
  */
 type DatabaseCriteriaRow = DatabaseCriterionEntry[]
 
+/** Shared parameter signature for all database functions: (database RANGE, field SCALAR, criteria RANGE). */
+const databaseFunctionParameters = [
+  {argumentType: FunctionArgumentType.RANGE},
+  {argumentType: FunctionArgumentType.SCALAR},
+  {argumentType: FunctionArgumentType.RANGE},
+]
+
 /**
  * Interpreter plugin implementing Excel database functions.
  *
@@ -37,102 +44,44 @@ type DatabaseCriteriaRow = DatabaseCriterionEntry[]
 export class DatabasePlugin extends FunctionPlugin implements FunctionPluginTypecheck<DatabasePlugin> {
 
   public static implementedFunctions: ImplementedFunctions = {
-    'DCOUNT': {
-      method: 'dcount',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DCOUNTA': {
-      method: 'dcounta',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DPRODUCT': {
-      method: 'dproduct',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DSTDEV': {
-      method: 'dstdev',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DSTDEVP': {
-      method: 'dstdevp',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DSUM': {
-      method: 'dsum',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DVAR': {
-      method: 'dvar',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DVARP': {
-      method: 'dvarp',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DAVERAGE': {
-      method: 'daverage',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DGET': {
-      method: 'dget',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DMAX': {
-      method: 'dmax',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
-    'DMIN': {
-      method: 'dmin',
-      parameters: [
-        {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.SCALAR},
-        {argumentType: FunctionArgumentType.RANGE},
-      ],
-    },
+    'DCOUNT': {method: 'dcount', parameters: databaseFunctionParameters},
+    'DCOUNTA': {method: 'dcounta', parameters: databaseFunctionParameters},
+    'DPRODUCT': {method: 'dproduct', parameters: databaseFunctionParameters},
+    'DSTDEV': {method: 'dstdev', parameters: databaseFunctionParameters},
+    'DSTDEVP': {method: 'dstdevp', parameters: databaseFunctionParameters},
+    'DSUM': {method: 'dsum', parameters: databaseFunctionParameters},
+    'DVAR': {method: 'dvar', parameters: databaseFunctionParameters},
+    'DVARP': {method: 'dvarp', parameters: databaseFunctionParameters},
+    'DAVERAGE': {method: 'daverage', parameters: databaseFunctionParameters},
+    'DGET': {method: 'dget', parameters: databaseFunctionParameters},
+    'DMAX': {method: 'dmax', parameters: databaseFunctionParameters},
+    'DMIN': {method: 'dmin', parameters: databaseFunctionParameters},
+  }
+
+  /**
+   * Resolves field index and criteria, then delegates to the callback with the parsed database arguments.
+   * Shared boilerplate for all 12 database functions.
+   */
+  private withDatabaseArgs(
+    ast: ProcedureAst,
+    state: InterpreterState,
+    functionName: string,
+    callback: (dbData: InternalScalarValue[][], fieldIndex: number, criteriaRows: DatabaseCriteriaRow[]) => InternalScalarValue
+  ): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata(functionName),
+      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
+        const fieldIndex = this.resolveFieldIndex(database, field)
+        if (fieldIndex instanceof CellError) {
+          return fieldIndex
+        }
+
+        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
+        if (criteriaRows instanceof CellError) {
+          return criteriaRows
+        }
+
+        return callback(database.data, fieldIndex, criteriaRows)
+      })
   }
 
   /**
@@ -142,32 +91,19 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DCOUNT(database, field, criteria)
    */
   public dcount(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DCOUNT'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DCOUNT', (dbData, fieldIndex, criteriaRows) => {
+      let count = 0
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let count = 0
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            const cellValue = dbData[rowIdx][fieldIndex]
-            if (isExtendedNumber(cellValue)) {
-              count++
-            }
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          if (isExtendedNumber(dbData[rowIdx][fieldIndex])) {
+            count++
           }
         }
+      }
 
-        return count
-      })
+      return count
+    })
   }
 
   /**
@@ -177,32 +113,20 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DCOUNTA(database, field, criteria)
    */
   public dcounta(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DCOUNTA'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DCOUNTA', (dbData, fieldIndex, criteriaRows) => {
+      let count = 0
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let count = 0
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            const cellValue = dbData[rowIdx][fieldIndex]
-            if (cellValue !== EmptyValue && cellValue !== undefined && cellValue !== null) {
-              count++
-            }
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue !== EmptyValue && cellValue !== undefined && cellValue !== null) {
+            count++
           }
         }
+      }
 
-        return count
-      })
+      return count
+    })
   }
 
   /**
@@ -212,34 +136,22 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DPRODUCT(database, field, criteria)
    */
   public dproduct(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DPRODUCT'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DPRODUCT', (dbData, fieldIndex, criteriaRows) => {
+      let product = 1
+      let hasNumeric = false
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let product = 1
-        let hasNumeric = false
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            const cellValue = dbData[rowIdx][fieldIndex]
-            if (isExtendedNumber(cellValue)) {
-              product *= getRawValue(cellValue) 
-              hasNumeric = true
-            }
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (isExtendedNumber(cellValue)) {
+            product *= getRawValue(cellValue)
+            hasNumeric = true
           }
         }
+      }
 
-        return hasNumeric ? product : 0
-      })
+      return hasNumeric ? product : 0
+    })
   }
 
   /**
@@ -249,32 +161,20 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DSUM(database, field, criteria)
    */
   public dsum(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DSUM'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DSUM', (dbData, fieldIndex, criteriaRows) => {
+      let sum = 0
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let sum = 0
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            const cellValue = dbData[rowIdx][fieldIndex]
-            if (isExtendedNumber(cellValue)) {
-              sum += getRawValue(cellValue) 
-            }
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (isExtendedNumber(cellValue)) {
+            sum += getRawValue(cellValue)
           }
         }
+      }
 
-        return sum
-      })
+      return sum
+    })
   }
 
   /**
@@ -285,38 +185,26 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DAVERAGE(database, field, criteria)
    */
   public daverage(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DAVERAGE'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DAVERAGE', (dbData, fieldIndex, criteriaRows) => {
+      let sum = 0
+      let count = 0
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let sum = 0
-        let count = 0
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            const cellValue = dbData[rowIdx][fieldIndex]
-            if (isExtendedNumber(cellValue)) {
-              sum += getRawValue(cellValue)
-              count++
-            }
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (isExtendedNumber(cellValue)) {
+            sum += getRawValue(cellValue)
+            count++
           }
         }
+      }
 
-        if (count === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
-        }
+      if (count === 0) {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
 
-        return sum / count
-      })
+      return sum / count
+    })
   }
 
   /**
@@ -327,40 +215,28 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DGET(database, field, criteria)
    */
   public dget(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DGET'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DGET', (dbData, fieldIndex, criteriaRows) => {
+      let matchedValue: InternalScalarValue | undefined
+      let matchCount = 0
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let matchedValue: InternalScalarValue | undefined
-        let matchCount = 0
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            matchCount++
-            if (matchCount > 1) {
-              return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
-            }
-            matchedValue = dbData[rowIdx][fieldIndex]
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          matchCount++
+          if (matchCount > 1) {
+            return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
+          matchedValue = dbData[rowIdx][fieldIndex]
         }
+      }
 
-        if (matchCount === 0) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
-        }
+      if (matchCount === 0) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
+      }
 
-        return matchedValue === EmptyValue || matchedValue === undefined || matchedValue === null
-          ? 0
-          : matchedValue
-      })
+      return matchedValue === EmptyValue || matchedValue === undefined || matchedValue === null
+        ? 0
+        : matchedValue
+    })
   }
 
   /**
@@ -371,37 +247,25 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DMAX(database, field, criteria)
    */
   public dmax(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DMAX'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DMAX', (dbData, fieldIndex, criteriaRows) => {
+      let max = -Infinity
+      let hasNumeric = false
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let max = -Infinity
-        let hasNumeric = false
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            const cellValue = dbData[rowIdx][fieldIndex]
-            if (isExtendedNumber(cellValue)) {
-              const numValue = getRawValue(cellValue)
-              if (numValue > max) {
-                max = numValue
-              }
-              hasNumeric = true
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (isExtendedNumber(cellValue)) {
+            const numValue = getRawValue(cellValue)
+            if (numValue > max) {
+              max = numValue
             }
+            hasNumeric = true
           }
         }
+      }
 
-        return hasNumeric ? max : 0
-      })
+      return hasNumeric ? max : 0
+    })
   }
 
   /**
@@ -412,37 +276,25 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DMIN(database, field, criteria)
    */
   public dmin(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DMIN'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DMIN', (dbData, fieldIndex, criteriaRows) => {
+      let min = Infinity
+      let hasNumeric = false
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
-
-        const dbData = database.data
-        let min = Infinity
-        let hasNumeric = false
-
-        for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
-          if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-            const cellValue = dbData[rowIdx][fieldIndex]
-            if (isExtendedNumber(cellValue)) {
-              const numValue = getRawValue(cellValue)
-              if (numValue < min) {
-                min = numValue
-              }
-              hasNumeric = true
+      for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
+        if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (isExtendedNumber(cellValue)) {
+            const numValue = getRawValue(cellValue)
+            if (numValue < min) {
+              min = numValue
             }
+            hasNumeric = true
           }
         }
+      }
 
-        return hasNumeric ? min : 0
-      })
+      return hasNumeric ? min : 0
+    })
   }
 
   /**
@@ -453,28 +305,17 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DSTDEV(database, field, criteria)
    */
   public dstdev(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DSTDEV'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DSTDEV', (dbData, fieldIndex, criteriaRows) => {
+      const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
+      if (values.length <= 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
 
-        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
-
-        if (values.length <= 1) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
-        }
-
-        const mean = values.reduce((a, b) => a + b, 0) / values.length
-        const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
-        return Math.sqrt(variance)
-      })
+      const mean = values.reduce((a, b) => a + b, 0) / values.length
+      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
+      return Math.sqrt(variance)
+    })
   }
 
   /**
@@ -486,28 +327,17 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DSTDEVP(database, field, criteria)
    */
   public dstdevp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DSTDEVP'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DSTDEVP', (dbData, fieldIndex, criteriaRows) => {
+      const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
+      if (values.length === 0) {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
 
-        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
-
-        if (values.length === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
-        }
-
-        const mean = values.reduce((a, b) => a + b, 0) / values.length
-        const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
-        return Math.sqrt(variance)
-      })
+      const mean = values.reduce((a, b) => a + b, 0) / values.length
+      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
+      return Math.sqrt(variance)
+    })
   }
 
   /**
@@ -518,27 +348,16 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DVAR(database, field, criteria)
    */
   public dvar(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DVAR'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DVAR', (dbData, fieldIndex, criteriaRows) => {
+      const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
+      if (values.length <= 1) {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
 
-        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
-
-        if (values.length <= 1) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
-        }
-
-        const mean = values.reduce((a, b) => a + b, 0) / values.length
-        return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
-      })
+      const mean = values.reduce((a, b) => a + b, 0) / values.length
+      return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / (values.length - 1)
+    })
   }
 
   /**
@@ -550,27 +369,16 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * DVARP(database, field, criteria)
    */
   public dvarp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('DVARP'),
-      (database: SimpleRangeValue, field: RawScalarValue, criteria: SimpleRangeValue) => {
-        const fieldIndex = this.resolveFieldIndex(database, field)
-        if (fieldIndex instanceof CellError) {
-          return fieldIndex
-        }
+    return this.withDatabaseArgs(ast, state, 'DVARP', (dbData, fieldIndex, criteriaRows) => {
+      const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
 
-        const criteriaRows = this.buildDatabaseCriteria(database, criteria)
-        if (criteriaRows instanceof CellError) {
-          return criteriaRows
-        }
+      if (values.length === 0) {
+        return new CellError(ErrorType.DIV_BY_ZERO)
+      }
 
-        const values = this.collectNumericValues(database.data, fieldIndex, criteriaRows)
-
-        if (values.length === 0) {
-          return new CellError(ErrorType.DIV_BY_ZERO)
-        }
-
-        const mean = values.reduce((a, b) => a + b, 0) / values.length
-        return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
-      })
+      const mean = values.reduce((a, b) => a + b, 0) / values.length
+      return values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length
+    })
   }
 
   /**
