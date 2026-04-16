@@ -35,10 +35,15 @@ Declare the engine at the top of `<script>` so it lives for the component's life
     result = hf.getCellValue({ sheet: sheetId, row: 0, col: 2 });
   }
 
+  function reset() {
+    result = null;
+  }
+
   onDestroy(() => hf.destroy());
 </script>
 
-<button on:click={calculate}>Calculate</button>
+<button on:click={calculate}>Run calculations</button>
+<button on:click={reset}>Reset</button>
 {#if result !== null}
   <p>Result: <strong>{result}</strong></p>
 {/if}
@@ -92,9 +97,14 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
     if (!hf) return;
     result = hf.getCellValue({ sheet: 0, row: 0, col: 2 });
   }
+
+  function reset() {
+    result = null;
+  }
 </script>
 
-<button on:click={calculate}>Calculate</button>
+<button on:click={calculate}>Run calculations</button>
+<button on:click={reset}>Reset</button>
 {#if result !== null}
   <p>Result: <strong>{result}</strong></p>
 {/if}

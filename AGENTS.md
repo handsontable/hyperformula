@@ -27,7 +27,7 @@ When helping users integrate HyperFormula with a framework, follow these idiomat
 |---|---|---|---|---|
 | React | `useRef<HyperFormula>` | `useEffect` return | `useState<CellValue[][]>` | `dynamic(..., { ssr: false })` |
 | Angular | `@Injectable` service with `BehaviorSubject` | `ngOnDestroy` (component-scoped) | `async` pipe | N/A (no default SSR) |
-| Vue 3 | Class wrapper with private HF field | `onUnmounted` | `ref<CellValue[][]>` | `onMounted` + dynamic import |
+| Vue 3 | Class wrapper with private HF field | `onUnmounted` | `ref<CellValue[][]>` | `<ClientOnly>` (Nuxt) |
 | Svelte | top-level `const` in `<script>` | `onDestroy` | plain `let` (Svelte 4) | `onMount` + dynamic import |
 
 Critical rules:
