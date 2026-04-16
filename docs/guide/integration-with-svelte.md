@@ -62,52 +62,6 @@ Declare the engine at the top of `<script>` so it lives for the component's life
 </table>
 ```
 
-### Svelte 5 (runes)
-
-Under Svelte 5, hold the sheet values in a `$state` rune so reassignment triggers re-rendering. Replace `on:click` with the `onclick` attribute:
-
-```svelte
-<script lang="ts">
-  import { onDestroy } from 'svelte';
-  import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
-
-  const hf = HyperFormula.buildFromArray(
-    [
-      [1, 2, '=A1+B1'],
-      // your data rows go here
-    ],
-    {
-      licenseKey: 'gpl-v3',
-      // more configuration options go here
-    }
-  );
-
-  let values = $state<CellValue[][]>(hf.getSheetValues(0));
-
-  function updateCell(row: number, col: number, value: RawCellContent) {
-    hf.setCellContents({ sheet: 0, row, col }, value);
-    values = hf.getSheetValues(0);
-  }
-
-  onDestroy(() => hf.destroy());
-</script>
-
-<table>
-  {#each values as row, r}
-    <tr>
-      {#each row as cell, c}
-        <td>
-          <input
-            value={cell ?? ''}
-            onchange={(e) => updateCell(r, c, (e.target as HTMLInputElement).value)}
-          />
-        </td>
-      {/each}
-    </tr>
-  {/each}
-</table>
-```
-
 ## Server-side rendering (SvelteKit)
 
 HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine inside `onMount` so the code never runs during SSR:
@@ -146,7 +100,6 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
 {/if}
 ```
 
-For Svelte 5 + SvelteKit, replace `let result = null` with `let result: CellValue = $state(null)` and `on:click` with `onclick`. As an alternative, guard the top-level init with `if (browser)` from `$app/environment`.
 
 ## Next steps
 

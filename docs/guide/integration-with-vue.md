@@ -72,92 +72,9 @@ The class keeps the HyperFormula instance as a private field, so Vue's reactivit
 
 ## Notes
 
-### Using `markRaw` instead of a class wrapper
-
-If you prefer to use the HyperFormula instance directly in `<script setup>` without a wrapper class, apply [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw) to opt it out of Vue's reactivity:
-
-```vue
-<script setup lang="ts">
-import { markRaw, onUnmounted, ref } from 'vue';
-import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
-
-const hf = markRaw(
-  HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' })
-);
-
-const values = ref<CellValue[][]>(hf.getSheetValues(0));
-
-function updateCell(row: number, col: number, value: RawCellContent) {
-  hf.setCellContents({ sheet: 0, row, col }, value);
-  values.value = hf.getSheetValues(0);
-}
-
-onUnmounted(() => hf.destroy());
-</script>
-```
-
-`markRaw` is essential when the instance is exposed directly — without it, Vue wraps it in a Proxy that breaks internal state. The class wrapper approach avoids this because the instance stays private.
-
 ### Server-side rendering (Nuxt)
 
-HyperFormula depends on browser-only APIs. In Nuxt, render the spreadsheet on the client only — wrap the component with `<ClientOnly>` or instantiate the instance inside `onMounted` rather than at the top of `<script setup>`:
-
-```vue
-<script setup lang="ts">
-import { markRaw, onMounted, onUnmounted, ref } from 'vue';
-import type { HyperFormula as HyperFormulaType, CellValue } from 'hyperformula';
-
-const hf = ref<HyperFormulaType | null>(null);
-const values = ref<CellValue[][]>([]);
-
-onMounted(async () => {
-  const { HyperFormula } = await import('hyperformula');
-  // markRaw must be applied before the instance is assigned to any ref or reactive
-  const instance = markRaw(HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' }));
-  hf.value = instance;
-  values.value = instance.getSheetValues(0);
-});
-
-onUnmounted(() => hf.value?.destroy());
-</script>
-```
-
-### Reacting to internal changes
-
-If you mutate the engine from multiple places (not just one `updateCell`), subscribe to HyperFormula's `valuesUpdated` event once and refresh `values.value` from the handler rather than calling `getSheetValues` after every mutation. Always remove the listener in `onUnmounted` to avoid stale closures:
-
-```typescript
-function onValuesUpdated() {
-  values.value = hf.getSheetValues(0);
-}
-
-hf.on('valuesUpdated', onValuesUpdated);
-onUnmounted(() => hf.off('valuesUpdated', onValuesUpdated));
-```
-
-### Sharing the instance across components (Pinia)
-
-If the same engine is used from multiple components, put it in a Pinia store. Apply `markRaw` inside the store so Pinia does not proxy the instance:
-
-```typescript
-import { defineStore } from 'pinia';
-import { markRaw, ref } from 'vue';
-import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
-
-export const useSpreadsheetStore = defineStore('spreadsheet', () => {
-  // Keep hf private — exposing the raw instance lets callers bypass the store's
-  // updateCell and also risks Pinia devtools trying to serialise it.
-  const hf = markRaw(HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' }));
-  const values = ref<CellValue[][]>(hf.getSheetValues(0));
-
-  function updateCell(row: number, col: number, value: RawCellContent) {
-    hf.setCellContents({ sheet: 0, row, col }, value);
-    values.value = hf.getSheetValues(0);
-  }
-
-  return { values, updateCell };
-});
-```
+HyperFormula depends on browser-only APIs. In Nuxt, render the spreadsheet on the client only by wrapping the component with `<ClientOnly>`.
 
 ## Troubleshooting
 

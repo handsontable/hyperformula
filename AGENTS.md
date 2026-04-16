@@ -31,10 +31,10 @@ When helping users integrate HyperFormula with a framework, follow these idiomat
 | Svelte | top-level `const` in `<script>` | `onDestroy` | plain `let` (Svelte 4) | `onMount` + dynamic import |
 
 Critical rules:
-- **Vue:** keep the HF instance inside a wrapper class or use `markRaw()` — Vue's Proxy breaks HF internal state
+- **Vue:** keep the HF instance inside a wrapper class — Vue's Proxy breaks HF internal state (see Troubleshooting in guide)
 - **Svelte:** always `onDestroy(() => hf.destroy())` — omitting it leaks the engine
 - **React:** pattern survives `StrictMode` double-invocation (mount→unmount→mount)
-- **Angular:** `providedIn: 'root'` services don't fire `ngOnDestroy` until app shutdown — use `DestroyRef` for scope-agnostic cleanup
+- **Angular:** `providedIn: 'root'` services live for the app lifetime — scope to component for per-feature cleanup
 - **SSR:** HF depends on browser-only APIs — guard with framework's client-only mechanism
 
 Full guide with TypeScript snippets: `docs/guide/integration-with-{react,angular,vue,svelte}.md`
