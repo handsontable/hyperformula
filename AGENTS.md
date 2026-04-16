@@ -26,15 +26,15 @@ When helping users integrate HyperFormula with a framework, follow these idiomat
 | Framework | Instance storage | Cleanup | Reactive bridge | SSR guard |
 |---|---|---|---|---|
 | React | `useRef<HyperFormula>` | `useEffect` return | `useState<CellValue[][]>` | `dynamic(..., { ssr: false })` |
-| Angular | `@Injectable` service field | `inject(DestroyRef).onDestroy` | `signal<CellValue[][]>` | N/A (no default SSR) |
-| Vue 3 | `markRaw(HyperFormula.build...)` | `onUnmounted` | `ref<CellValue[][]>` | `onMounted` + dynamic import |
-| Svelte 5 | top-level `const` in `<script>` | `onDestroy` | `$state<CellValue[][]>` | `onMount` + dynamic import |
+| Angular | `@Injectable` service with `BehaviorSubject` | `ngOnDestroy` (component-scoped) | `async` pipe | N/A (no default SSR) |
+| Vue 3 | Class wrapper with private HF field | `onUnmounted` | `ref<CellValue[][]>` | `onMounted` + dynamic import |
+| Svelte | top-level `const` in `<script>` | `onDestroy` | plain `let` (Svelte 4) | `onMount` + dynamic import |
 
 Critical rules:
-- **Vue:** always `markRaw()` the HF instance — Vue's Proxy breaks HF internal state
+- **Vue:** keep the HF instance inside a wrapper class or use `markRaw()` — Vue's Proxy breaks HF internal state
 - **Svelte:** always `onDestroy(() => hf.destroy())` — omitting it leaks the engine
 - **React:** pattern survives `StrictMode` double-invocation (mount→unmount→mount)
-- **Angular:** `providedIn: 'root'` services don't fire `ngOnDestroy` until app shutdown — use `DestroyRef`
+- **Angular:** `providedIn: 'root'` services don't fire `ngOnDestroy` until app shutdown — use `DestroyRef` for scope-agnostic cleanup
 - **SSR:** HF depends on browser-only APIs — guard with framework's client-only mechanism
 
 Full guide with TypeScript snippets: `docs/guide/integration-with-{react,angular,vue,svelte}.md`

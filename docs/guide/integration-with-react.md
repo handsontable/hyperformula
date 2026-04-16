@@ -38,14 +38,8 @@ export function SpreadsheetComponent() {
 
   function handleCellEdit(row: number, col: number, newValue: RawCellContent) {
     if (!hfRef.current) return;
-    try {
-      hfRef.current.setCellContents({ sheet: 0, row, col }, newValue);
-      setValues(hfRef.current.getSheetValues(0));
-    } catch (error) {
-      // setCellContents can throw on invalid addresses or sheet-size limits.
-      // Handle or surface the error according to your app's UX.
-      console.error(error);
-    }
+    hfRef.current.setCellContents({ sheet: 0, row, col }, newValue);
+    setValues(hfRef.current.getSheetValues(0));
   }
 
   return (

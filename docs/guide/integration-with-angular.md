@@ -32,12 +32,12 @@ export class SpreadsheetService {
         // more configuration options go here
       }
     );
-    this._values.next(this.hf.getSheetValues(0) as CellValue[][]);
+    this._values.next(this.hf.getSheetValues(0));
   }
 
   updateCell(row: number, col: number, value: RawCellContent) {
     this.hf.setCellContents({ sheet: 0, row, col }, value);
-    this._values.next(this.hf.getSheetValues(0) as CellValue[][]);
+    this._values.next(this.hf.getSheetValues(0));
   }
 }
 ```
@@ -184,7 +184,7 @@ private readonly ngZone = inject(NgZone);
 updateCell(row: number, col: number, value: RawCellContent) {
   this.ngZone.runOutsideAngular(() => {
     this.hf.setCellContents({ sheet: 0, row, col }, value);
-    const next = this.hf.getSheetValues(0) as CellValue[][];
+    const next = this.hf.getSheetValues(0);
     this.ngZone.run(() => this._values.next(next));
   });
 }

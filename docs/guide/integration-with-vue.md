@@ -1,39 +1,62 @@
 # Integration with Vue
 
-The HyperFormula API is identical in a Vue 3 app and in plain JavaScript. What changes is how you keep the engine out of Vue's reactivity system (critical) and how you surface its values into the template.
+The HyperFormula API is identical in a Vue 3 app and in plain JavaScript. What changes is how you keep the engine out of Vue's reactivity system and how you surface its values into the template.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
 ## Basic usage
 
-Wrap the HyperFormula instance in `markRaw` so Vue does not convert it into a reactive proxy (see [Troubleshooting](#vue-reactivity-issues) below). Hold derived data in `ref` so the template updates when you reassign the ref's `.value`.
+Wrap the HyperFormula instance inside a plain class so it stays outside Vue's reactivity system (see [Troubleshooting](#vue-reactivity-issues) below for why this matters). Hold derived data in `ref` so the template updates when you reassign the ref's `.value`.
+
+```typescript
+// spreadsheet-provider.ts
+import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
+
+export class SpreadsheetProvider {
+  private hf: HyperFormula;
+
+  constructor(data: RawCellContent[][]) {
+    this.hf = HyperFormula.buildFromArray(data, {
+      licenseKey: 'gpl-v3',
+      // more configuration options go here
+    });
+  }
+
+  getValues(): CellValue[][] {
+    return this.hf.getSheetValues(0);
+  }
+
+  updateCell(row: number, col: number, value: RawCellContent) {
+    this.hf.setCellContents({ sheet: 0, row, col }, value);
+  }
+
+  destroy() {
+    this.hf.destroy();
+  }
+}
+```
+
+Use the class from a component with `<script setup>`:
 
 ```vue
 <script setup lang="ts">
-import { markRaw, onUnmounted, ref } from 'vue';
-import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
+import { onUnmounted, ref } from 'vue';
+import type { CellValue } from 'hyperformula';
+import { SpreadsheetProvider } from './spreadsheet-provider';
 
-const hf = markRaw(
-  HyperFormula.buildFromArray(
-    [
-      [1, 2, '=A1+B1'],
-      // your data rows go here
-    ],
-    {
-      licenseKey: 'gpl-v3',
-      // more configuration options go here
-    }
-  )
-);
+const provider = new SpreadsheetProvider([
+  [1, 2, '=A1+B1'],
+  // your data rows go here
+]);
 
-const values = ref<CellValue[][]>(hf.getSheetValues(0));
+const values = ref<CellValue[][]>(provider.getValues());
 
-function updateCell(row: number, col: number, value: RawCellContent) {
-  hf.setCellContents({ sheet: 0, row, col }, value);
-  values.value = hf.getSheetValues(0);
+function handleUpdate(row: number, col: number, value: string) {
+  provider.updateCell(row, col, value);
+  values.value = provider.getValues();
 }
 
-onUnmounted(() => hf.destroy());
+onUnmounted(() => provider.destroy());
 </script>
 
 <template>
@@ -45,7 +68,35 @@ onUnmounted(() => hf.destroy());
 </template>
 ```
 
+The class keeps the HyperFormula instance as a private field, so Vue's reactivity Proxy never reaches it. This is the same pattern used in the [Vue 3 demo](#demo).
+
 ## Notes
+
+### Using `markRaw` instead of a class wrapper
+
+If you prefer to use the HyperFormula instance directly in `<script setup>` without a wrapper class, apply [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw) to opt it out of Vue's reactivity:
+
+```vue
+<script setup lang="ts">
+import { markRaw, onUnmounted, ref } from 'vue';
+import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
+
+const hf = markRaw(
+  HyperFormula.buildFromArray([/* data */], { licenseKey: 'gpl-v3' })
+);
+
+const values = ref<CellValue[][]>(hf.getSheetValues(0));
+
+function updateCell(row: number, col: number, value: RawCellContent) {
+  hf.setCellContents({ sheet: 0, row, col }, value);
+  values.value = hf.getSheetValues(0);
+}
+
+onUnmounted(() => hf.destroy());
+</script>
+```
+
+`markRaw` is essential when the instance is exposed directly — without it, Vue wraps it in a Proxy that breaks internal state. The class wrapper approach avoids this because the instance stays private.
 
 ### Server-side rendering (Nuxt)
 
