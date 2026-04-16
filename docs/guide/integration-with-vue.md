@@ -10,24 +10,24 @@ Wrap the HyperFormula instance inside a plain class so it stays outside Vue's re
 
 ```typescript
 // spreadsheet-provider.ts
-import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
+import { HyperFormula, type CellValue } from 'hyperformula';
 
 export class SpreadsheetProvider {
   private hf: HyperFormula;
 
-  constructor(data: RawCellContent[][]) {
+  constructor(data: (string | number | null)[][]) {
     this.hf = HyperFormula.buildFromArray(data, {
       licenseKey: 'gpl-v3',
       // more configuration options go here
     });
   }
 
-  getValues(): CellValue[][] {
+  getCalculatedValues(): CellValue[][] {
     return this.hf.getSheetValues(0);
   }
 
-  updateCell(row: number, col: number, value: RawCellContent) {
-    this.hf.setCellContents({ sheet: 0, row, col }, value);
+  getRawFormulas(): (string | number | null)[][] {
+    return this.hf.getSheetSerialized(0) as (string | number | null)[][];
   }
 
   destroy() {
@@ -49,18 +49,23 @@ const provider = new SpreadsheetProvider([
   // your data rows go here
 ]);
 
-const values = ref<CellValue[][]>(provider.getValues());
+const values = ref<CellValue[][]>([]);
 
-function handleUpdate(row: number, col: number, value: string) {
-  provider.updateCell(row, col, value);
-  values.value = provider.getValues();
+function runCalculations() {
+  values.value = provider.getCalculatedValues();
+}
+
+function reset() {
+  values.value = [];
 }
 
 onUnmounted(() => provider.destroy());
 </script>
 
 <template>
-  <table>
+  <button @click="runCalculations">Run calculations</button>
+  <button @click="reset">Reset</button>
+  <table v-if="values.length">
     <tr v-for="(row, r) in values" :key="r">
       <td v-for="(cell, c) in row" :key="c">{{ cell }}</td>
     </tr>

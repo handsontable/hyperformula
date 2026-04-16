@@ -6,11 +6,11 @@ Install with `npm install hyperformula`. For other options, see the [client-side
 
 ## Basic usage
 
-Hold the HyperFormula instance in a `useRef` so it survives re-renders. Initialize it inside `useEffect` and release it in the cleanup function. Mirror the computed sheet values in `useState` so React re-renders when they change.
+Hold the HyperFormula instance in a `useRef` so it survives re-renders. Initialize it inside `useEffect` and release it in the cleanup function. Use `useState` to toggle between raw formulas and computed values.
 
 ```tsx
 import { useEffect, useRef, useState } from 'react';
-import { HyperFormula, CellValue, RawCellContent } from 'hyperformula';
+import { HyperFormula, CellValue } from 'hyperformula';
 
 export function SpreadsheetComponent() {
   const hfRef = useRef<HyperFormula | null>(null);
@@ -28,7 +28,6 @@ export function SpreadsheetComponent() {
       }
     );
     hfRef.current = hf;
-    setValues(hf.getSheetValues(0));
 
     return () => {
       hf.destroy();
@@ -36,29 +35,33 @@ export function SpreadsheetComponent() {
     };
   }, []);
 
-  function handleCellEdit(row: number, col: number, newValue: RawCellContent) {
+  function runCalculations() {
     if (!hfRef.current) return;
-    hfRef.current.setCellContents({ sheet: 0, row, col }, newValue);
     setValues(hfRef.current.getSheetValues(0));
   }
 
+  function reset() {
+    setValues([]);
+  }
+
   return (
-    <table>
-      <tbody>
-        {values.map((row, r) => (
-          <tr key={r}>
-            {row.map((cell, c) => (
-              <td key={c}>
-                <input
-                  value={String(cell ?? '')}
-                  onChange={(e) => handleCellEdit(r, c, e.target.value)}
-                />
-              </td>
+    <>
+      <button onClick={runCalculations}>Run calculations</button>
+      <button onClick={reset}>Reset</button>
+      {values.length > 0 && (
+        <table>
+          <tbody>
+            {values.map((row, r) => (
+              <tr key={r}>
+                {row.map((cell, c) => (
+                  <td key={c}>{String(cell ?? '')}</td>
+                ))}
+              </tr>
             ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      )}
+    </>
   );
 }
 ```

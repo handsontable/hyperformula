@@ -12,7 +12,7 @@ Wrap the engine in an `@Injectable` service backed by a `BehaviorSubject`. Compo
 // spreadsheet.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { HyperFormula, type CellValue, type RawCellContent } from 'hyperformula';
+import { HyperFormula, type CellValue } from 'hyperformula';
 
 @Injectable({ providedIn: 'root' })
 export class SpreadsheetService {
@@ -35,19 +35,21 @@ export class SpreadsheetService {
     this._values.next(this.hf.getSheetValues(0));
   }
 
-  updateCell(row: number, col: number, value: RawCellContent) {
-    this.hf.setCellContents({ sheet: 0, row, col }, value);
+  calculate() {
     this._values.next(this.hf.getSheetValues(0));
+  }
+
+  reset() {
+    this._values.next([]);
   }
 }
 ```
 
-Consume the service from a component and bind `values$ | async` in the template:
+Consume the service from a component and bind `values$ | async` in the template. Declare the component in your `AppModule` alongside `CommonModule`:
 
 ```typescript
 // spreadsheet.component.ts
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { SpreadsheetService } from './spreadsheet.service';
 import { type CellValue } from 'hyperformula';
@@ -55,10 +57,6 @@ import { type CellValue } from 'hyperformula';
 @Component({
   selector: 'app-spreadsheet',
   templateUrl: './spreadsheet.component.html',
-  // For NgModule-based apps, declare this component in AppModule and import
-  // CommonModule there instead of in the component itself.
-  imports: [CommonModule],
-  standalone: true,
 })
 export class SpreadsheetComponent {
   values$: Observable<CellValue[][]>;
@@ -67,17 +65,23 @@ export class SpreadsheetComponent {
     this.values$ = this.spreadsheetService.values$;
   }
 
-  updateCell(row: number, col: number, value: string) {
-    this.spreadsheetService.updateCell(row, col, value);
+  runCalculations() {
+    this.spreadsheetService.calculate();
+  }
+
+  reset() {
+    this.spreadsheetService.reset();
   }
 }
 ```
 
 ```html
 <!-- spreadsheet.component.html -->
-<table>
-  <tr *ngFor="let row of values$ | async; let r = index">
-    <td *ngFor="let cell of row; let c = index">{{ cell }}</td>
+<button (click)="runCalculations()">Run calculations</button>
+<button (click)="reset()">Reset</button>
+<table *ngIf="(values$ | async) as values">
+  <tr *ngFor="let row of values">
+    <td *ngFor="let cell of row">{{ cell }}</td>
   </tr>
 </table>
 ```
