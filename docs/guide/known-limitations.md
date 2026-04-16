@@ -39,4 +39,4 @@ you can't compare the arguments in a formula like this:
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
 * DGET returns `#VALUE!` when no records match the criteria, and `#NUM!` when more than one record matches.
-* DMAX, DMIN, and DPRODUCT return `0` when no records match the criteria (consistent with Excel behavior).
+* DMAX, DMIN, and DPRODUCT return `0` when no records match the criteria.

@@ -400,7 +400,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
         const cellValue = dbData[rowIdx][fieldIndex]
         if (isExtendedNumber(cellValue)) {
-          values.push(getRawValue(cellValue) )
+          values.push(getRawValue(cellValue))
         }
       }
     }
