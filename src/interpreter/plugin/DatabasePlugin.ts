@@ -417,6 +417,10 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * @returns 0-based column index, or CellError if field is invalid.
    */
   private resolveFieldIndex(database: SimpleRangeValue, field: RawScalarValue): number | CellError {
+    if (field instanceof CellError) {
+      return field
+    }
+
     const headers = database.data[0]
 
     if (typeof field === 'string') {
@@ -483,6 +487,11 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
         // Empty/blank criteria cell = match-all for that column — skip
         if (criterionValue === EmptyValue || criterionValue === undefined || criterionValue === null) {
           continue
+        }
+
+        // Propagate errors from the criteria cells instead of masking them as BadCriterion
+        if (criterionValue instanceof CellError) {
+          return criterionValue
         }
 
         const rawCriterionValue = isExtendedNumber(criterionValue) ? getRawValue(criterionValue) : criterionValue
