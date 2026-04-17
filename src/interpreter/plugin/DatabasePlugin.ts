@@ -143,6 +143,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
           const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
           if (isExtendedNumber(cellValue)) {
             product *= getRawValue(cellValue)
             hasNumeric = true
@@ -167,6 +170,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
           const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
           if (isExtendedNumber(cellValue)) {
             sum += getRawValue(cellValue)
           }
@@ -192,6 +198,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
           const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
           if (isExtendedNumber(cellValue)) {
             sum += getRawValue(cellValue)
             count++
@@ -254,6 +263,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
           const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
           if (isExtendedNumber(cellValue)) {
             const numValue = getRawValue(cellValue)
             if (numValue > max) {
@@ -283,6 +295,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
           const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
           if (isExtendedNumber(cellValue)) {
             const numValue = getRawValue(cellValue)
             if (numValue < min) {
@@ -307,6 +322,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
   public dstdev(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.withDatabaseArgs(ast, state, 'DSTDEV', (dbData, fieldIndex, criteriaRows) => {
       const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
+      if (values instanceof CellError) {
+        return values
+      }
 
       if (values.length <= 1) {
         return new CellError(ErrorType.DIV_BY_ZERO)
@@ -329,6 +347,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
   public dstdevp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.withDatabaseArgs(ast, state, 'DSTDEVP', (dbData, fieldIndex, criteriaRows) => {
       const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
+      if (values instanceof CellError) {
+        return values
+      }
 
       if (values.length === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)
@@ -350,6 +371,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
   public dvar(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.withDatabaseArgs(ast, state, 'DVAR', (dbData, fieldIndex, criteriaRows) => {
       const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
+      if (values instanceof CellError) {
+        return values
+      }
 
       if (values.length <= 1) {
         return new CellError(ErrorType.DIV_BY_ZERO)
@@ -371,6 +395,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
   public dvarp(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.withDatabaseArgs(ast, state, 'DVARP', (dbData, fieldIndex, criteriaRows) => {
       const values = this.collectNumericValues(dbData, fieldIndex, criteriaRows)
+      if (values instanceof CellError) {
+        return values
+      }
 
       if (values.length === 0) {
         return new CellError(ErrorType.DIV_BY_ZERO)
@@ -387,18 +414,22 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    * @param dbData - Full database data including header row.
    * @param fieldIndex - 0-based column index of the target field.
    * @param criteriaRows - Parsed criteria rows.
-   * @returns Array of numeric values from matching rows.
+   * @returns Array of numeric values from matching rows, or the first CellError
+   *   encountered in a matching field cell (propagated per Excel semantics).
    */
   private collectNumericValues(
     dbData: InternalScalarValue[][],
     fieldIndex: number,
     criteriaRows: DatabaseCriteriaRow[]
-  ): number[] {
+  ): number[] | CellError {
     const values: number[] = []
 
     for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
       if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
         const cellValue = dbData[rowIdx][fieldIndex]
+        if (cellValue instanceof CellError) {
+          return cellValue
+        }
         if (isExtendedNumber(cellValue)) {
           values.push(getRawValue(cellValue))
         }
