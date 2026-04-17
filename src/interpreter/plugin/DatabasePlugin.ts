@@ -237,11 +237,15 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
 
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
           matchCount++
           if (matchCount > 1) {
             return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
           }
-          matchedValue = dbData[rowIdx][fieldIndex]
+          matchedValue = cellValue
         }
       }
 
