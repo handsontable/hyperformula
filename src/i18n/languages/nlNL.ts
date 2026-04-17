@@ -77,7 +77,7 @@ const dictionary: RawTranslationPackage = {
     DB: 'DB',
     DAVERAGE: 'DBGEMIDDELDE',
     DCOUNT: 'DBAANTAL',
-    DCOUNTA: 'DBAAANTALC',
+    DCOUNTA: 'DBAANTALC',
     DGET: 'DBLEZEN',
     DMAX: 'DBMAX',
     DMIN: 'DBMIN',
