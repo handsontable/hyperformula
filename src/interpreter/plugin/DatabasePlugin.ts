@@ -413,6 +413,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
    *
    * @param database - The database range (first row = headers).
    * @param field - A string (header name, case-insensitive) or number (1-based column index).
+   *   Booleans are coerced to numbers (TRUE → 1, FALSE → 0) per Excel convention.
    * @returns 0-based column index, or CellError if field is invalid.
    */
   private resolveFieldIndex(database: SimpleRangeValue, field: RawScalarValue): number | CellError {
@@ -429,8 +430,10 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
 
-    if (isExtendedNumber(field)) {
-      const index = Math.trunc(getRawValue(field))
+    const numericField = typeof field === 'boolean' ? Number(field) : field
+
+    if (isExtendedNumber(numericField)) {
+      const index = Math.trunc(getRawValue(numericField))
       if (index < 1 || index > headers.length) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
