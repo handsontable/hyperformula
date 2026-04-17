@@ -96,7 +96,11 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
 
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
-          if (isExtendedNumber(dbData[rowIdx][fieldIndex])) {
+          const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
+          if (isExtendedNumber(cellValue)) {
             count++
           }
         }
@@ -119,6 +123,9 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
       for (let rowIdx = 1; rowIdx < dbData.length; rowIdx++) {
         if (this.rowMatchesCriteria(dbData[rowIdx], criteriaRows)) {
           const cellValue = dbData[rowIdx][fieldIndex]
+          if (cellValue instanceof CellError) {
+            return cellValue
+          }
           if (cellValue !== EmptyValue && cellValue !== undefined && cellValue !== null) {
             count++
           }
