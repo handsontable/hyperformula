@@ -434,7 +434,7 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
 
     if (isExtendedNumber(numericField)) {
       const index = Math.trunc(getRawValue(numericField))
-      if (index < 1 || index > headers.length) {
+      if (!Number.isFinite(index) || index < 1 || index > headers.length) {
         return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
       }
       return index - 1
