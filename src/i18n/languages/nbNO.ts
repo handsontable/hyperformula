@@ -76,7 +76,7 @@ const dictionary: RawTranslationPackage = {
     DAYS: 'DAGER',
     DB: 'DAVSKR',
     DAVERAGE: 'DGJENNOMSNITT',
-    DCOUNT: 'ANTALLDB',
+    DCOUNT: 'DANTALL',
     DCOUNTA: 'DANTALLA',
     DGET: 'DHENT',
     DMAX: 'DMAKS',
