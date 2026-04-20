@@ -72,11 +72,13 @@ If you use JavaScript instead of TypeScript, drop the type annotations — the r
 
 ### `React.StrictMode` double invocation
 
-In development, React 18 runs effects twice (mount → unmount → mount) to surface cleanup bugs. The pattern above is correct for StrictMode because `destroy()` runs before the re-mount creates a new instance, so no work leaks between the two lifecycles. Do not switch to a module-scoped singleton as a workaround — it will break StrictMode semantics.
+In development, React runs effects twice (mount → unmount → mount) to surface cleanup bugs. The pattern above is correct for StrictMode because `destroy()` runs before the re-mount creates a new instance, so no work leaks between the two lifecycles. Do not switch to a module-scoped singleton as a workaround — it will break StrictMode semantics.
 
 ### Server-side rendering (Next.js)
 
-HyperFormula depends on browser-only APIs. Mark `SpreadsheetComponent.tsx` with `'use client'`, then load it lazily from a **server** page component using `dynamic(..., { ssr: false })`:
+HyperFormula itself runs in Node.js, and the component above is already safe under SSR: the engine is constructed inside `useEffect`, which runs only on the client, and the initial render emits no cell values. You only need to take extra steps if you want to keep the HyperFormula bundle out of the server-rendered HTML, in which case lazy-load the component with `next/dynamic` and `ssr: false`.
+
+In the App Router, `ssr: false` is not allowed inside a Server Component, so declare the component with `'use client'` and create a small client-side wrapper that performs the dynamic import:
 
 ```tsx
 // app/spreadsheet/SpreadsheetComponent.tsx
@@ -85,20 +87,26 @@ HyperFormula depends on browser-only APIs. Mark `SpreadsheetComponent.tsx` with 
 ```
 
 ```tsx
-// app/spreadsheet/page.tsx  ← server component, no 'use client'
+// app/spreadsheet/SpreadsheetLazy.tsx  ← client component that owns the dynamic import
+'use client';
 import dynamic from 'next/dynamic';
 
-const SpreadsheetComponent = dynamic(
+export const SpreadsheetLazy = dynamic(
   () => import('./SpreadsheetComponent').then((m) => m.SpreadsheetComponent),
   { ssr: false }
 );
+```
+
+```tsx
+// app/spreadsheet/page.tsx  ← server component, no 'use client'
+import { SpreadsheetLazy } from './SpreadsheetLazy';
 
 export default function Page() {
-  return <SpreadsheetComponent />;
+  return <SpreadsheetLazy />;
 }
 ```
 
-Putting `'use client'` on `page.tsx` itself would make the entire page a client component — the point is to keep the page server-rendered and only hydrate the spreadsheet widget on the client. In the Pages Router, the same `dynamic(..., { ssr: false })` pattern works without `'use client'`.
+Keeping `dynamic(..., { ssr: false })` in a dedicated client wrapper preserves the server component status of `page.tsx` so only the spreadsheet widget hydrates on the client. In the Pages Router, the same `dynamic(..., { ssr: false })` call can live directly in the page file — the App Router's Server Component restriction does not apply there.
 
 ## Next steps
 
