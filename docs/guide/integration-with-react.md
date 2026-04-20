@@ -10,9 +10,10 @@ Hold the HyperFormula instance in a `useRef` so it survives re-renders. Initiali
 
 ```tsx
 import { useEffect, useRef, useState } from 'react';
-import { HyperFormula, CellValue } from 'hyperformula';
+import { HyperFormula } from 'hyperformula';
+import type { CellValue } from 'hyperformula';
 
-export function SpreadsheetComponent() {
+export default function SpreadsheetComponent() {
   const hfRef = useRef<HyperFormula | null>(null);
   const [values, setValues] = useState<CellValue[][]>([]);
 
@@ -74,31 +75,37 @@ If you use JavaScript instead of TypeScript, drop the type annotations — the r
 
 In development, React 18 runs effects twice (mount → unmount → mount) to surface cleanup bugs. The pattern above is correct for StrictMode because `destroy()` runs before the re-mount creates a new instance, so no work leaks between the two lifecycles. Do not switch to a module-scoped singleton as a workaround — it will break StrictMode semantics.
 
-### Server-side rendering (Next.js)
+### Server-side rendering (Next.js App Router)
 
-HyperFormula depends on browser-only APIs. Mark `SpreadsheetComponent.tsx` with `'use client'`, then load it lazily from a **server** page component using `dynamic(..., { ssr: false })`:
+The component above is already SSR-safe — the engine is constructed in `useEffect`, which never runs on the server. If you still want to skip the initial bundle on the server (it is a few hundred kB), wrap it in a client-only dynamic import.
+
+In the App Router, `dynamic(..., { ssr: false })` is only allowed inside a client component. Put the dynamic call in a `'use client'` wrapper and import the wrapper from your server page:
 
 ```tsx
-// app/spreadsheet/SpreadsheetComponent.tsx
+// app/spreadsheet/SpreadsheetLazy.tsx
 'use client';
-// ... component definition as above
-```
-
-```tsx
-// app/spreadsheet/page.tsx  ← server component, no 'use client'
 import dynamic from 'next/dynamic';
 
 const SpreadsheetComponent = dynamic(
-  () => import('./SpreadsheetComponent').then((m) => m.SpreadsheetComponent),
+  () => import('./SpreadsheetComponent'),
   { ssr: false }
 );
 
-export default function Page() {
+export default function SpreadsheetLazy() {
   return <SpreadsheetComponent />;
 }
 ```
 
-Putting `'use client'` on `page.tsx` itself would make the entire page a client component — the point is to keep the page server-rendered and only hydrate the spreadsheet widget on the client. In the Pages Router, the same `dynamic(..., { ssr: false })` pattern works without `'use client'`.
+```tsx
+// app/spreadsheet/page.tsx  ← server component, no 'use client'
+import SpreadsheetLazy from './SpreadsheetLazy';
+
+export default function Page() {
+  return <SpreadsheetLazy />;
+}
+```
+
+In the Pages Router, the same `dynamic(..., { ssr: false })` call works directly in the page file without a wrapper.
 
 ## Next steps
 

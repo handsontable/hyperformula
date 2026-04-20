@@ -71,10 +71,12 @@ Declare the engine at the top of `<script>` so it lives for the component's life
 
 HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine inside `onMount` so the code never runs during SSR:
 
+`onMount` is allowed to be `async`, but any cleanup function returned from an async callback is silently ignored — an async function always returns a `Promise`, not the cleanup. Put the teardown in a separate `onDestroy` instead:
+
 ```svelte
 <script>
   // Svelte 4 + SvelteKit
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   let hf;
   /** @type {import('hyperformula').CellValue} */
@@ -89,9 +91,10 @@ HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine i
       ],
       { licenseKey: 'gpl-v3' }
     );
-    // Return a cleanup function — this is the correct teardown pattern in onMount.
-    return () => hf?.destroy();
   });
+
+  // Separate onDestroy — async onMount cannot return a cleanup.
+  onDestroy(() => hf?.destroy());
 
   function calculate() {
     if (!hf) return;
