@@ -1,25 +1,24 @@
 # Integration with Angular
 
-The HyperFormula API is identical in an Angular app and in plain JavaScript. What changes is where the engine lives (typically an injectable service), how it is cleaned up, and how you bridge its values into the change-detection cycle.
+The HyperFormula API is identical in an Angular app and in plain JavaScript. What changes is where the engine lives (typically an injectable service), how it is cleaned up, and how you expose its derived values as signals so the template stays in sync.
+
+The snippets below target Angular 20 and later, where standalone components, the `@if` / `@for` control flow, `inject()`, `DestroyRef`, and signals are the idiomatic defaults.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
 ## Basic usage
 
-Wrap the engine in an `@Injectable` service backed by a `BehaviorSubject`. Components subscribe to the observable with the `async` pipe, which handles subscription cleanup automatically.
+Wrap the engine in an `@Injectable` service and expose its derived values through a `signal`. Components read the signal directly in the template — no subscriptions to manage, no async pipe needed.
 
 ```typescript
 // spreadsheet.service.ts
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { HyperFormula, type CellValue } from 'hyperformula';
 
 @Injectable({ providedIn: 'root' })
 export class SpreadsheetService {
   private readonly hf: HyperFormula;
-
-  private readonly _values = new BehaviorSubject<CellValue[][]>([]);
-  readonly values$ = this._values.asObservable();
+  readonly values = signal<CellValue[][]>([]);
 
   constructor() {
     this.hf = HyperFormula.buildFromArray(
@@ -32,38 +31,36 @@ export class SpreadsheetService {
         // more configuration options go here
       }
     );
-    this._values.next(this.hf.getSheetValues(0));
+    this.values.set(this.hf.getSheetValues(0));
+
+    inject(DestroyRef).onDestroy(() => this.hf.destroy());
   }
 
   calculate() {
-    this._values.next(this.hf.getSheetValues(0));
+    this.values.set(this.hf.getSheetValues(0));
   }
 
   reset() {
-    this._values.next([]);
+    this.values.set([]);
   }
 }
 ```
 
-Consume the service from a component and bind `values$ | async` in the template. Declare the component in your `AppModule` alongside `CommonModule`:
+Consume the service from a standalone component. Modern Angular apps bootstrap with `bootstrapApplication(AppComponent)` in `main.ts` — there is no `AppModule` and no `declarations` array to update.
 
 ```typescript
 // spreadsheet.component.ts
-import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SpreadsheetService } from './spreadsheet.service';
-import { type CellValue } from 'hyperformula';
 
 @Component({
   selector: 'app-spreadsheet',
   templateUrl: './spreadsheet.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SpreadsheetComponent {
-  values$: Observable<CellValue[][]>;
-
-  constructor(private spreadsheetService: SpreadsheetService) {
-    this.values$ = this.spreadsheetService.values$;
-  }
+  private readonly spreadsheetService = inject(SpreadsheetService);
+  readonly values = this.spreadsheetService.values;
 
   runCalculations() {
     this.spreadsheetService.calculate();
@@ -79,36 +76,39 @@ export class SpreadsheetComponent {
 <!-- spreadsheet.component.html -->
 <button (click)="runCalculations()">Run calculations</button>
 <button (click)="reset()">Reset</button>
-<table *ngIf="(values$ | async) as values">
-  <tr *ngFor="let row of values">
-    <td *ngFor="let cell of row">{{ cell }}</td>
-  </tr>
-</table>
+@if (values().length) {
+  <table>
+    @for (row of values(); track $index) {
+      <tr>
+        @for (cell of row; track $index) {
+          <td>{{ cell }}</td>
+        }
+      </tr>
+    }
+  </table>
+}
 ```
+
+The template reads the signal by calling `values()`. `@if` and `@for` are compiler built-ins, so the component does not need to import `CommonModule`.
 
 ## Notes
 
 ### Provider scope
 
-`providedIn: 'root'` makes the service an application-wide singleton — suitable when a single HyperFormula instance is shared across the app. For per-feature or per-component instances (for example, several independent reports on one screen), provide the service at the component level via `providers: [SpreadsheetService]`; the service is then created and destroyed alongside the component.
+`providedIn: 'root'` makes the service an application-wide singleton — suitable when a single HyperFormula instance is shared across the app. For per-feature or per-component instances (for example, several independent reports on one screen), provide the service at the component level with `providers: [SpreadsheetService]`; the service is then created when the component is created and torn down when it is destroyed.
 
 ### Cleanup
 
-Root-scoped services live for the application's full lifetime — `ngOnDestroy` fires only at app shutdown. If you scope the service to a component (`providers: [SpreadsheetService]`), implement `OnDestroy` to release the engine:
+`inject(DestroyRef).onDestroy(...)` in the service constructor releases the engine automatically:
 
-```typescript
-import { Injectable, OnDestroy } from '@angular/core';
+- For a root-provided service, the callback runs when the application is destroyed (`appRef.destroy()` or page unload).
+- For a component-provided service, it runs when the owning component is destroyed.
 
-@Injectable()
-export class SpreadsheetService implements OnDestroy {
-  // ...
+This replaces the older `implements OnDestroy` / `ngOnDestroy()` pattern. `DestroyRef` callbacks fire after the injector is torn down, which is fine for releasing a HyperFormula engine — there is no other Angular state that needs to observe the shutdown.
 
-  ngOnDestroy() {
-    this.hf.destroy();
-  }
-}
-```
+### Signals vs. RxJS
 
+The service above exposes state through a `WritableSignal` because the value is a plain snapshot produced by a synchronous engine call. If you already model your domain as RxJS streams, you can still keep `Observable`s in the service and bridge them with `toSignal()` at the component boundary — that keeps the template code signal-based while leaving stream composition in RxJS.
 
 ## Next steps
 
@@ -120,3 +120,7 @@ export class SpreadsheetService implements OnDestroy {
 ## Demo
 
 For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/angular-demo?v=' + $page.buildDateURIEncoded">Angular demo on Stackblitz</a>.
+
+::: tip
+The linked demo targets an older Angular version and uses the NgModule + RxJS pattern. The snippets above reflect the current Angular idiom (standalone components, signals, `@if` / `@for`, `inject()`, `DestroyRef`) and should be preferred for new projects.
+:::
