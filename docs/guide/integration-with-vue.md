@@ -6,65 +6,55 @@ Install with `npm install hyperformula`. For other options, see the [client-side
 
 ## Basic usage
 
-Wrap the HyperFormula instance inside a plain class so it stays outside Vue's reactivity system (see [Troubleshooting](#vue-reactivity-issues) below for why this matters). Hold derived data in `ref` so the template updates when you reassign the ref's `.value`.
+The idiomatic Vue 3 way to encapsulate stateful logic is a [composable](https://vuejs.org/guide/reusability/composables.html). Create one function that owns the HyperFormula instance, exposes the derived state as refs, and cleans up on unmount.
 
 ```typescript
-// spreadsheet-provider.ts
-import { HyperFormula, type CellValue } from 'hyperformula';
+// use-spreadsheet.ts
+import { onBeforeUnmount, shallowRef } from 'vue';
+import { HyperFormula, type CellValue, type Sheet } from 'hyperformula';
 
-export class SpreadsheetProvider {
-  private hf: HyperFormula;
+export function useSpreadsheet(initialData: Sheet) {
+  // Plain `const` — Vue only proxies values passed to ref()/reactive(),
+  // so the engine never enters the reactivity system. See Troubleshooting
+  // for the case where you do need to hold it in reactive state.
+  const hf = HyperFormula.buildFromArray(initialData, {
+    licenseKey: 'gpl-v3',
+    // more configuration options go here
+  });
 
-  constructor(data: (string | number | null)[][]) {
-    this.hf = HyperFormula.buildFromArray(data, {
-      licenseKey: 'gpl-v3',
-      // more configuration options go here
-    });
+  // shallowRef triggers re-renders on reassignment of `.value` but
+  // does not recursively proxy the grid — cheap for large result sets.
+  const values = shallowRef<CellValue[][]>([]);
+
+  function runCalculations() {
+    values.value = hf.getSheetValues(0);
   }
 
-  getCalculatedValues(): CellValue[][] {
-    return this.hf.getSheetValues(0);
+  function reset() {
+    values.value = [];
   }
 
-  getRawFormulas(): (string | number | null)[][] {
-    return this.hf.getSheetSerialized(0) as (string | number | null)[][];
-  }
+  onBeforeUnmount(() => hf.destroy());
 
-  destroy() {
-    this.hf.destroy();
-  }
+  return { values, runCalculations, reset };
 }
 ```
 
-Use the class from a component with `<script setup>`:
+Use the composable from a component with `<script setup>`:
 
 ```vue
 <script setup lang="ts">
-import { onUnmounted, ref } from 'vue';
-import type { CellValue } from 'hyperformula';
-import { SpreadsheetProvider } from './spreadsheet-provider';
+import { useSpreadsheet } from './use-spreadsheet';
 
-const provider = new SpreadsheetProvider([
+const { values, runCalculations, reset } = useSpreadsheet([
   [1, 2, '=A1+B1'],
   // your data rows go here
 ]);
-
-const values = ref<CellValue[][]>([]);
-
-function runCalculations() {
-  values.value = provider.getCalculatedValues();
-}
-
-function reset() {
-  values.value = [];
-}
-
-onUnmounted(() => provider.destroy());
 </script>
 
 <template>
-  <button @click="runCalculations">Run calculations</button>
-  <button @click="reset">Reset</button>
+  <button type="button" @click="runCalculations">Run calculations</button>
+  <button type="button" @click="reset">Reset</button>
   <table v-if="values.length">
     <tr v-for="(row, r) in values" :key="r">
       <td v-for="(cell, c) in row" :key="c">{{ cell }}</td>
@@ -73,13 +63,24 @@ onUnmounted(() => provider.destroy());
 </template>
 ```
 
-The class keeps the HyperFormula instance as a private field, so Vue's reactivity Proxy never reaches it. This is the same pattern used in the [Vue 3 demo](#demo).
+Two things are doing the real work here:
+
+- `hf` is a plain local variable, so Vue never wraps it in a Proxy. Reactivity is opt-in in Vue 3 — only values passed through `ref`, `reactive`, `shallowRef`, etc. become reactive.
+- `values` is a `shallowRef`, so the template re-renders whenever you reassign `values.value`, but the rows and cells themselves are not recursively converted to reactive Proxies. This is the right default for data you replace wholesale (as opposed to mutating in place).
 
 ## Notes
 
 ### Server-side rendering (Nuxt)
 
-HyperFormula depends on browser-only APIs. In Nuxt, render the spreadsheet on the client only by wrapping the component with `<ClientOnly>`.
+HyperFormula depends on browser-only APIs and should not run during SSR. In Nuxt, wrap the component with [`<ClientOnly>`](https://nuxt.com/docs/api/components/client-only) so its `setup` executes on the client only:
+
+```vue
+<template>
+  <ClientOnly>
+    <Spreadsheet />
+  </ClientOnly>
+</template>
+```
 
 ## Troubleshooting
 
@@ -91,20 +92,24 @@ If you encounter an error like
 Uncaught TypeError: Cannot read properties of undefined (reading 'licenseKeyValidityState')
 ```
 
-it means that Vue's reactivity system tried to deeply observe the HyperFormula instance. Vue wraps reactive objects in a `Proxy` that intercepts every property access; when that proxy reaches a non-trivial instance with its own internal state, identity checks and lazy-initialized maps break. The fix is to opt the instance out of reactivity with Vue's [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw):
+it means Vue's reactivity system wrapped the HyperFormula instance in a `Proxy`. That proxy intercepts every property access; when it reaches a non-trivial instance with its own internal state, identity checks and lazy-initialized maps break.
+
+This only happens when you place the instance inside reactive state — for example, in a `reactive({...})` object, a Pinia store, or a `ref()`. The fix is to mark it raw with [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw) before it gets there:
 
 ```typescript
 import { markRaw } from 'vue';
 import { HyperFormula } from 'hyperformula';
 
-const hfInstance = markRaw(
+const hf = markRaw(
   HyperFormula.buildEmpty({
     licenseKey: 'gpl-v3',
   })
 );
 ```
 
-`shallowRef` is not a substitute: it skips proxying only at the top level, so writing the instance into a nested reactive structure (Pinia state, `reactive({...})`) will still wrap it. Always pass the instance itself through `markRaw` before putting it anywhere Vue can reach.
+`markRaw` flags the object so Vue skips it on every subsequent call to `reactive`, `ref`, or similar. It must be applied to the instance itself — `shallowRef` only skips proxying at the top level, so writing the raw instance into a nested reactive structure (e.g. a Pinia store) would still wrap it.
+
+If you keep the instance in a plain `const` (or inside a composable, as shown [above](#basic-usage)), you do not need `markRaw` — the instance never enters the reactivity system in the first place.
 
 ## Next steps
 
