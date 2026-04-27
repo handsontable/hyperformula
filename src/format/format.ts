@@ -19,6 +19,10 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryDuration !== undefined) {
     return tryDuration
   }
+  const tryCurrency = config.stringifyCurrency(value, formatArg)
+  if (tryCurrency !== undefined) {
+    return tryCurrency
+  }
   const expression = parseForNumberFormat(formatArg)
   if (expression !== undefined) {
     return numberFormat(expression.tokens, value)
