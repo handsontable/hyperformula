@@ -15,7 +15,7 @@ import {defaultParseToDateTime} from './DateTimeDefault'
 import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} from './DateTimeHelper'
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
-import {defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
+import {defaultStringifyCurrency, defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
 import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
@@ -59,6 +59,7 @@ export class Config implements ConfigParams, ParserConfig {
     smartRounding: true,
     stringifyDateTime: defaultStringifyDateTime,
     stringifyDuration: defaultStringifyDuration,
+    stringifyCurrency: defaultStringifyCurrency,
     timeFormats: ['hh:mm', 'hh:mm:ss.sss'],
     thousandSeparator: '',
     undoLimit: 20,
@@ -119,6 +120,8 @@ export class Config implements ConfigParams, ParserConfig {
   public readonly stringifyDateTime: (date: SimpleDateTime, formatArg: string) => Maybe<string>
   /** @inheritDoc */
   public readonly stringifyDuration: (time: SimpleTime, formatArg: string) => Maybe<string>
+  /** @inheritDoc */
+  public readonly stringifyCurrency: (value: number, currencyFormat: string) => Maybe<string>
   /** @inheritDoc */
   public readonly precisionEpsilon: number
   /** @inheritDoc */
@@ -195,6 +198,7 @@ export class Config implements ConfigParams, ParserConfig {
       precisionRounding,
       stringifyDateTime,
       stringifyDuration,
+      stringifyCurrency,
       smartRounding,
       timeFormats,
       thousandSeparator,
@@ -243,6 +247,7 @@ export class Config implements ConfigParams, ParserConfig {
     this.parseDateTime = configValueFromParam(parseDateTime, 'function', 'parseDateTime')
     this.stringifyDateTime = configValueFromParam(stringifyDateTime, 'function', 'stringifyDateTime')
     this.stringifyDuration = configValueFromParam(stringifyDuration, 'function', 'stringifyDuration')
+    this.stringifyCurrency = configValueFromParam(stringifyCurrency, 'function', 'stringifyCurrency')
     this.translationPackage = HyperFormula.getLanguage(this.language)
     this.errorMapping = this.translationPackage.buildErrorMapping()
     this.nullDate = configValueFromParamCheck(nullDate, instanceOfSimpleDate, 'IDate', 'nullDate')
