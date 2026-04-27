@@ -311,6 +311,21 @@ export interface ConfigParams {
    */
   stringifyDuration: (time: SimpleTime, timeFormat: string) => Maybe<string>,
   /**
+   * Sets a function that converts numeric values into currency-formatted strings.
+   *
+   * The function receives the raw value and the format string passed to `TEXT`
+   * and should return a string or `undefined`. Returning `undefined` lets the
+   * formatter fall through to the built-in number formatter, so a callback that
+   * recognizes only some format strings can safely opt out of the rest.
+   *
+   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md#currency-integration).
+   *
+   * @default defaultStringifyCurrency
+   *
+   * @category Number
+   */
+  stringifyCurrency: (value: number, currencyFormat: string) => Maybe<string>,
+  /**
    * When set to `false`, no rounding happens, and numbers are equal if and only if they are of truly identical value.
    *
    * For more information, see [precisionEpsilon](/api/interfaces/configparams.md#precisionepsilon).
