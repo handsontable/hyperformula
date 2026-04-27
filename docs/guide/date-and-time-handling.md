@@ -144,7 +144,10 @@ const CURRENCY_RULES = [
       maximumFractionDigits: (match[1] || '.').length - 1,
     }),
   },
-  // #,##0.00 "SYM" — trailing quoted symbol (e.g. zł, €)
+  // #,##0.00 "SYM" — trailing quoted symbol (e.g. zł, €).
+  // Note: HyperFormula's formula parser does not accept embedded double quotes
+  // inside TEXT format strings. This rule is illustrative for callback usage
+  // outside TEXT — to format PLN through TEXT, prefer "[$zł-415] #,##0.00".
   {
     pattern: /^#,##0(\.0+)?\s+"([^"]+)"$/,
     build: (match) => {
@@ -207,7 +210,11 @@ const hf = HyperFormula.buildFromArray([
   [12345.5, '=TEXT(A2, "[$zł-415] #,##0.00")'],
   [-1234.5, '=TEXT(A3, "$#,##0.00;($#,##0.00)")'],
 ], options)
+```
 
+Note: the actual return values from `Intl.NumberFormat` use non-breaking spaces (U+00A0) as locale-appropriate separators. The comments above show them as regular spaces for readability. Be aware when comparing strings programmatically.
+
+```javascript
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })) // "1.234,50 €"
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 1 })) // "12 345,50 zł"
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 2 })) // "($1,234.50)"
