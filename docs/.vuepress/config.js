@@ -8,6 +8,26 @@ const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet')
 
 const searchPattern = new RegExp('^/api', 'i');
 
+// Build configuration (override via env vars or docs/.vuepress/build.config.js)
+const buildConfigOverrides = (() => {
+  try {
+    return require('./build.config.js');
+  } catch (e) {
+    return {};
+  }
+})();
+
+const normalizeBase = (b) => {
+  if (!b) return '/';
+  let v = b.startsWith('/') ? b : '/' + b;
+  if (!v.endsWith('/')) v += '/';
+  return v;
+};
+
+const DOCS_BASE = normalizeBase(process.env.DOCS_BASE || buildConfigOverrides.base || '/');
+const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || 'docs/.vuepress/dist';
+const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://hyperformula.handsontable.com';
+
 module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
@@ -61,10 +81,11 @@ module.exports = {
     ['link', { rel: 'manifest', href: '/favicon/site.webmanifest' }],
     ['link', { rel: 'mask-icon', color: '#ffffff', href: '/favicon/safari-pinned-tab.svg' }],
   ],
-  base: '/',
+  base: DOCS_BASE,
+  dest: DOCS_DEST,
   plugins: [
     ['sitemap', {
-      hostname: 'https://hyperformula.handsontable.com',
+      hostname: DOCS_HOSTNAME,
       exclude: ['/404.html'],
       changefreq: 'weekly'
     }],
