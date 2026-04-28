@@ -1,0 +1,6 @@
+[build]
+  command = "npm run docs:build"
+  publish = "docs/.vuepress/dist/docs"
+
+[build.environment]
+  NODE_VERSION = "18"
