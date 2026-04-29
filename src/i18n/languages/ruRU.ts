@@ -77,7 +77,7 @@ const dictionary: RawTranslationPackage = {
     DB: 'ФУО',
     DAVERAGE: 'БДСРЕДНЕЕ',
     DCOUNT: 'БСЧЁТ',
-    DCOUNTA: 'БСЧЕТА',
+    DCOUNTA: 'БСЧЁТА',
     DGET: 'БИЗВЛЕЧЬ',
     DMAX: 'БДМАКС',
     DMIN: 'БДМИН',
