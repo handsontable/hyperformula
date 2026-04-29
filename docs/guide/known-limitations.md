@@ -46,14 +46,14 @@ Unlike Excel and Google Sheets, HyperFormula resolves the OFFSET function at par
 * The first argument must be a reference to a single cell. Passing a range raises a parsing error.
 
   ```js
-  // Parsing error: First argument to OFFSET is not a reference
+  // Raises a parsing error — the first argument must be a single cell, not a range
   hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=OFFSET(A1:B1, 0, 0)');
   ```
 
 * The row-shift, column-shift, height, and width arguments must be static integer literals known at parse time. Cell references and formulas passed as shift or size arguments produce a parsing error.
 
   ```js
-  // Parsing error: Second argument to OFFSET is not a static number
+  // Raises a parsing error — the row-shift argument must be a static integer literal
   hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=OFFSET(A1, C3, 0)');
   ```
 
