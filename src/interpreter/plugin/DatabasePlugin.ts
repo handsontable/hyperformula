@@ -502,6 +502,14 @@ export class DatabasePlugin extends FunctionPlugin implements FunctionPluginType
     const criteriaData = criteria.data
     const criteriaHeaders = criteriaData[0]
 
+    // Propagate errors from criteria header cells (Excel returns the header
+    // error when the D-function is evaluated, instead of silently skipping).
+    for (const criteriaHeader of criteriaHeaders) {
+      if (criteriaHeader instanceof CellError) {
+        return criteriaHeader
+      }
+    }
+
     // Map each criteria column to a database column index (or -1 if no match)
     const criteriaColumnMapping: number[] = criteriaHeaders.map(criteriaHeader => {
       if (typeof criteriaHeader !== 'string') {
