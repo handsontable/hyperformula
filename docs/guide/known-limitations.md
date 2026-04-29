@@ -38,3 +38,39 @@ you can't compare the arguments in a formula like this:
 * The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
+
+### OFFSET function
+
+Unlike Excel and Google Sheets, HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.
+
+* The first argument must be a reference to a single cell. Passing a range raises a parsing error.
+
+  ```js
+  // Raises a parsing error — the first argument must be a single cell, not a range
+  hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=OFFSET(A1:B1, 0, 0)');
+  ```
+
+* The row-shift, column-shift, height, and width arguments must be static integer literals known at parse time. Cell references and formulas passed as shift or size arguments produce a parsing error.
+
+  ```js
+  // Raises a parsing error — the row-shift argument must be a static integer literal
+  hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=OFFSET(A1, C3, 0)');
+  ```
+
+  Lifting this restriction requires treating OFFSET as a regular interpreted function. The work is tracked in [issue #910](https://github.com/handsontable/hyperformula/issues/910).
+
+* The height and width arguments must be positive integers. Values less than 1 and non-integer values are rejected at parse time.
+
+* When the computed target falls outside the sheet, OFFSET evaluates to a `#REF!` error indicating the resulting reference is out of the sheet bounds.
+
+  ```js
+  // Cell A1 evaluates to #REF!
+  hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=OFFSET(A1, -1, 0)');
+  ```
+
+* Because OFFSET is resolved at parse time, `getCellFormula` returns the computed reference, not the original `OFFSET` call.
+
+  ```js
+  const hf = HyperFormula.buildFromArray([[1, 45, '=OFFSET(A1, 0, 1)']]);
+  hf.getCellFormula({ sheet: 0, row: 0, col: 2 }); // '=B1'
+  ```
