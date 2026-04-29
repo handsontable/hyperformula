@@ -243,9 +243,9 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
  * [`stringifyCurrency`](../../api/interfaces/configparams.md#stringifycurrency)
  * config option.
  *
- * @param {number} _value - the numeric value to format (unused in default).
- * @param {string} _formatArg - the format string passed to `TEXT` (unused in default).
- * @returns {Maybe<string>} `undefined` — caller should fall through to the built-in formatter.
+ * @param _value - the numeric value to format (unused in default).
+ * @param _formatArg - the format string passed to `TEXT` (unused in default).
+ * @returns `undefined` — caller should fall through to the built-in formatter.
  */
 export function defaultStringifyCurrency(_value: number, _formatArg: string): Maybe<string> {
   return undefined
