@@ -19,6 +19,10 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryDuration !== undefined) {
     return tryDuration
   }
+  const tryCurrency = config.stringifyCurrency(value, formatArg)
+  if (tryCurrency !== undefined) {
+    return tryCurrency
+  }
   const expression = parseForNumberFormat(formatArg)
   if (expression !== undefined) {
     return numberFormat(expression.tokens, value)
@@ -228,4 +232,21 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
   }
 
   return result
+}
+
+/**
+ * Default implementation of the `stringifyCurrency` config option.
+ *
+ * Returning `undefined` instructs the formatter to fall through to the
+ * built-in number formatter, preserving HyperFormula's zero-dependency
+ * default behavior. Replace this default by setting the
+ * [`stringifyCurrency`](../../api/interfaces/configparams.md#stringifycurrency)
+ * config option.
+ *
+ * @param _value - the numeric value to format (unused in default).
+ * @param _formatArg - the format string passed to `TEXT` (unused in default).
+ * @returns `undefined` — caller should fall through to the built-in formatter.
+ */
+export function defaultStringifyCurrency(_value: number, _formatArg: string): Maybe<string> {
+  return undefined
 }
