@@ -28,6 +28,7 @@ The latest version of HyperFormula has an extensive collection of
 **{{ $page.functionsCount }}** functions grouped into categories:
 
 - [Array manipulation](#array-manipulation)
+- [Database](#database)
 - [Date and time](#date-and-time)
 - [Engineering](#engineering)
 - [Information](#information)
@@ -40,8 +41,7 @@ The latest version of HyperFormula has an extensive collection of
 - [Statistical](#statistical)
 - [Text](#text)
 
-_Some categories such as compatibility, cube, and database are yet to be
-supported._
+_Some categories such as compatibility and cube are yet to be supported._
 
 ::: tip
 You can modify the built-in functions or create your own, by adding a [custom function](custom-functions).
@@ -90,6 +90,23 @@ Total number of functions: **{{ $page.functionsCount }}**
 | WORKDAY.INTL     | Returns the working day number of days from start day.                                                                                                                                                                                  | WORKDAY(Date, Shift[, Mode[, Holidays]])            |
 | YEAR             | Returns the year as a number according to the internal calculation rules.                                                                                                                                                               | YEAR(Number)                                        |
 | YEARFRAC         | Computes the difference between two date values, in fraction of years.                                                                                                                                                                  | YEARFRAC(Date2, Date1[, Format])                    |
+
+### Database
+
+| Function ID | Description                                                                                                     | Syntax                            |
+|:------------|:----------------------------------------------------------------------------------------------------------------|:----------------------------------|
+| DAVERAGE    | Returns the average of all values in a database field that match the given criteria.                            | DAVERAGE(Database, Field, Criteria) |
+| DCOUNT      | Counts the cells containing numbers in a database field that match the given criteria.                          | DCOUNT(Database, Field, Criteria)   |
+| DCOUNTA     | Counts the non-empty cells in a database field that match the given criteria.                                   | DCOUNTA(Database, Field, Criteria)  |
+| DGET        | Returns the single value from a database field that matches the given criteria. Returns #VALUE! if no records match, and #NUM! if more than one record matches. | DGET(Database, Field, Criteria) |
+| DMAX        | Returns the maximum value in a database field that matches the given criteria.                                  | DMAX(Database, Field, Criteria)     |
+| DMIN        | Returns the minimum value in a database field that matches the given criteria.                                  | DMIN(Database, Field, Criteria)     |
+| DPRODUCT    | Returns the product of all values in a database field that match the given criteria.                            | DPRODUCT(Database, Field, Criteria) |
+| DSTDEV      | Returns the sample standard deviation of all values in a database field that match the given criteria.          | DSTDEV(Database, Field, Criteria)   |
+| DSTDEVP     | Returns the population standard deviation of all values in a database field that match the given criteria.      | DSTDEVP(Database, Field, Criteria)  |
+| DSUM        | Returns the sum of all values in a database field that match the given criteria.                                | DSUM(Database, Field, Criteria)     |
+| DVAR        | Returns the sample variance of all values in a database field that match the given criteria.                    | DVAR(Database, Field, Criteria)     |
+| DVARP       | Returns the population variance of all values in a database field that match the given criteria.                | DVARP(Database, Field, Criteria)    |
 
 ### Engineering
 
