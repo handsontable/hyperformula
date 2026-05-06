@@ -5,7 +5,7 @@ The HyperFormula API is identical in a Svelte app and in plain JavaScript. This 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
 ::: warning SvelteKit SSR
-The primary snippet below assumes a browser environment. If you use SvelteKit with default SSR, skip to [Server-side rendering](#server-side-rendering-sveltekit) — `HyperFormula.buildFromArray` at `<script>` top level will crash on the server.
+The primary snippet below assumes a browser environment. If you use SvelteKit with default SSR, skip to [Server-side rendering](#server-side-rendering-sveltekit) — `HyperFormula.buildFromArray` at `<script>` top level will run on every server render, which is unnecessary work.
 :::
 
 ## Basic usage
