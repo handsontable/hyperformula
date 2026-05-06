@@ -1,6 +1,6 @@
 # Integration with React
 
-The HyperFormula API is identical in a React app and in plain JavaScript. What changes is where the engine lives in a component tree and how its lifecycle maps to React hooks.
+The HyperFormula API is identical in a React app and in plain JavaScript. This guide demonstrates how HyperFormula is integrated with the React component tree and how its lifecycle maps to React hooks.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 

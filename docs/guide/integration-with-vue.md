@@ -1,6 +1,6 @@
 # Integration with Vue
 
-The HyperFormula API is identical in a Vue 3 app and in plain JavaScript. What changes is how you keep the engine out of Vue's reactivity system and how you surface its values into the template.
+The HyperFormula API is identical in a Vue 3 app and in plain JavaScript. This guide demonstrates how HyperFormula integrates with the Vue reactivity system and how to surface its values in the template.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 

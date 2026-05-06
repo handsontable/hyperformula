@@ -1,6 +1,6 @@
 # Integration with Svelte
 
-The HyperFormula API is identical in a Svelte app and in plain JavaScript. What changes is how you scope the engine to a component's lifetime and how you bridge its values into Svelte's reactivity.
+The HyperFormula API is identical in a Svelte app and in plain JavaScript. This guide demonstrates how HyperFormula integrates with the Svelte component's lifecycle and how you bridge its values into Svelte's reactivity.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
@@ -12,7 +12,7 @@ The primary snippet below assumes a browser environment. If you use SvelteKit wi
 
 Declare the engine at the top of `<script>` so it lives for the component's lifetime. Call `getCellValue` on demand and display results in the template. Release the engine with `onDestroy`.
 
-```svelte
+```html
 <script>
   import { onDestroy } from 'svelte';
   import { HyperFormula } from 'hyperformula';
@@ -73,7 +73,7 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
 
 `onMount` is allowed to be `async`, but any cleanup function returned from an async callback is silently ignored — an async function always returns a `Promise`, not the cleanup. Put the teardown in a separate `onDestroy` instead:
 
-```svelte
+```html
 <script>
   // Svelte 4 + SvelteKit
   import { onDestroy, onMount } from 'svelte';

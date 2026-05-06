@@ -1,6 +1,6 @@
 # Integration with Angular
 
-The HyperFormula API is identical in an Angular app and in plain JavaScript. What changes is where the engine lives (typically an injectable service), how it is cleaned up, and how you bridge its values into the change-detection cycle.
+The HyperFormula API is identical in an Angular app and in plain JavaScript. This guide demonstrates how HyperFormula is integrated with an Angular app (typically as an injectable service), how it is cleaned up, and how you bridge its values into the change-detection cycle.
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
