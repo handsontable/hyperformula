@@ -111,6 +111,9 @@ export class SpreadsheetService implements OnDestroy {
 }
 ```
 
+## Server-side rendering (Angular Universal)
+
+The service above is already SSR-safe — HyperFormula has no browser-only API dependency. To skip the (otherwise wasted) server-side instantiation in Angular Universal, gate the engine init with [`isPlatformBrowser`](https://angular.dev/api/common/isPlatformBrowser) from `@angular/common`.
 
 ## Next steps
 

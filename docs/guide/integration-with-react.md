@@ -69,13 +69,11 @@ export default function SpreadsheetComponent() {
 
 If you use JavaScript instead of TypeScript, drop the type annotations — the rest of the pattern is unchanged.
 
-## Notes
-
-### `React.StrictMode` double invocation
+## `React.StrictMode` double invocation
 
 In development, React runs effects twice (mount → unmount → mount) to surface cleanup bugs. The pattern above is correct for StrictMode because `destroy()` runs before the re-mount creates a new instance, so no work leaks between the two lifecycles. Do not switch to a module-scoped singleton as a workaround — it will break StrictMode semantics.
 
-### Server-side rendering (Next.js App Router)
+## Server-side rendering (Next.js App Router)
 
 The component above is already SSR-safe — the engine is constructed in `useEffect`, which never runs on the server. If you still want to skip the initial bundle on the server (it is a few hundred kB), wrap it in a client-only dynamic import.
 

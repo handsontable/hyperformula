@@ -75,9 +75,7 @@ onUnmounted(() => provider.destroy());
 
 The class keeps the HyperFormula instance as a private field, so Vue's reactivity Proxy never reaches it. This is the same pattern used in the [Vue 3 demo](#demo).
 
-## Notes
-
-### Server-side rendering (Nuxt)
+## Server-side rendering (Nuxt)
 
 The class above is already SSR-safe — HyperFormula has no browser-only API dependency. To skip the (otherwise wasted) server-side instantiation in Nuxt, wrap the component with `<ClientOnly>`.
 
