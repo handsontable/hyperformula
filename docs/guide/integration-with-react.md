@@ -73,7 +73,7 @@ If you use JavaScript instead of TypeScript, drop the type annotations — the r
 
 ### `React.StrictMode` double invocation
 
-In development, React 18 runs effects twice (mount → unmount → mount) to surface cleanup bugs. The pattern above is correct for StrictMode because `destroy()` runs before the re-mount creates a new instance, so no work leaks between the two lifecycles. Do not switch to a module-scoped singleton as a workaround — it will break StrictMode semantics.
+In development, React runs effects twice (mount → unmount → mount) to surface cleanup bugs. The pattern above is correct for StrictMode because `destroy()` runs before the re-mount creates a new instance, so no work leaks between the two lifecycles. Do not switch to a module-scoped singleton as a workaround — it will break StrictMode semantics.
 
 ### Server-side rendering (Next.js App Router)
 

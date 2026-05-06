@@ -69,7 +69,7 @@ Declare the engine at the top of `<script>` so it lives for the component's life
 
 ## Server-side rendering (SvelteKit)
 
-HyperFormula depends on browser-only APIs. In SvelteKit, initialize the engine inside `onMount` so the code never runs during SSR:
+In SvelteKit, top-level statements in `<script>` run on the server too. HyperFormula has no browser-only API dependency, but instantiating it during SSR is wasted work. Move the initialization into `onMount` so it only runs on the client:
 
 `onMount` is allowed to be `async`, but any cleanup function returned from an async callback is silently ignored — an async function always returns a `Promise`, not the cleanup. Put the teardown in a separate `onDestroy` instead:
 

@@ -79,7 +79,7 @@ The class keeps the HyperFormula instance as a private field, so Vue's reactivit
 
 ### Server-side rendering (Nuxt)
 
-HyperFormula depends on browser-only APIs. In Nuxt, render the spreadsheet on the client only by wrapping the component with `<ClientOnly>`.
+The class above is already SSR-safe — HyperFormula has no browser-only API dependency. To skip the (otherwise wasted) server-side instantiation in Nuxt, wrap the component with `<ClientOnly>`.
 
 ## Troubleshooting
 
