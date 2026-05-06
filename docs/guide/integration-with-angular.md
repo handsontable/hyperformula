@@ -79,11 +79,13 @@ export class SpreadsheetComponent {
 <!-- spreadsheet.component.html -->
 <button (click)="runCalculations()">Run calculations</button>
 <button (click)="reset()">Reset</button>
-<table *ngIf="(values$ | async) as values">
-  <tr *ngFor="let row of values">
-    <td *ngFor="let cell of row">{{ cell }}</td>
-  </tr>
-</table>
+<ng-container *ngIf="(values$ | async) as values">
+  <table *ngIf="values.length">
+    <tr *ngFor="let row of values">
+      <td *ngFor="let cell of row">{{ cell }}</td>
+    </tr>
+  </table>
+</ng-container>
 ```
 
 ## Notes
