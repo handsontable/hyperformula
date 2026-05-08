@@ -322,7 +322,7 @@ export interface ConfigParams {
    *
    * @default defaultStringifyCurrency
    *
-   * @category Number
+   * @category Date and Time
    */
   stringifyCurrency: (value: number, currencyFormat: string) => Maybe<string>,
   /**
