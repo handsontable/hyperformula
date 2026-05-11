@@ -11,6 +11,16 @@ import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): RawScalarValue {
+  // Currency callback runs first so a user-supplied stringifyCurrency can
+  // intercept LCID-tagged or bare-letter currency formats before the
+  // date/time parser greedily consumes characters like 'D', 'M', 'S', 'Y'
+  // (e.g. '[$USD-409] #,##0.00' would otherwise become '[$US9-409] #,##0.00').
+  // The default callback returns undefined for every input, preserving the
+  // existing dispatch path bit-for-bit when stringifyCurrency is not set.
+  const tryCurrency = config.stringifyCurrency(value, formatArg)
+  if (tryCurrency !== undefined) {
+    return tryCurrency
+  }
   const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), formatArg) // default points to defaultStringifyDateTime()
   if (tryDateTime !== undefined) {
     return tryDateTime
@@ -18,10 +28,6 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   const tryDuration = config.stringifyDuration(numberToSimpleTime(value), formatArg)
   if (tryDuration !== undefined) {
     return tryDuration
-  }
-  const tryCurrency = config.stringifyCurrency(value, formatArg)
-  if (tryCurrency !== undefined) {
-    return tryCurrency
   }
   const expression = parseForNumberFormat(formatArg)
   if (expression !== undefined) {
