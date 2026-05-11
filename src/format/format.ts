@@ -91,6 +91,14 @@ function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
 }
 
 export function defaultStringifyDuration(time: SimpleTime, formatArg: string): Maybe<string> {
+  // Same LCID-tagged currency guard as defaultStringifyDateTime — Excel
+  // currency tags `[$SYMBOL-LCID]` contain duration-token letters
+  // (H in CHF/HUF, m in AMD/HMD) that parseForDateTimeFormat would
+  // otherwise interpret as time tokens. See defaultStringifyDateTime
+  // for the symbol-vs-locale-modifier rationale.
+  if (/\[\$[^\-\]]+-/.test(formatArg)) {
+    return undefined
+  }
   const expression = parseForDateTimeFormat(formatArg)
   if (expression === undefined) {
     return undefined
