@@ -213,7 +213,9 @@ const hf = HyperFormula.buildFromArray([
 ], options)
 ```
 
-Note: the actual return values from `Intl.NumberFormat` use non-breaking spaces as locale-appropriate separators — typically U+00A0 (regular NBSP), but modern ICU/CLDR also emit U+202F (narrow NBSP) for some locales, e.g. `pl-PL` digit grouping. The comments above show both as regular spaces for readability. Be aware when comparing strings programmatically; normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
+::: tip
+The actual return values from `Intl.NumberFormat` use non-breaking spaces as locale-appropriate separators — typically U+00A0 (regular NBSP), but modern ICU/CLDR also emit U+202F (narrow NBSP) for some locales, e.g. `pl-PL` digit grouping. The comments above show both as regular spaces for readability. Be aware when comparing strings programmatically; normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
+:::
 
 ```javascript
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })) // "1.234,50 €"
