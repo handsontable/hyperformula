@@ -212,7 +212,7 @@ const hf = HyperFormula.buildFromArray([
 ], options)
 ```
 
-Note: the actual return values from `Intl.NumberFormat` use non-breaking spaces (U+00A0) as locale-appropriate separators. The comments above show them as regular spaces for readability. Be aware when comparing strings programmatically.
+Note: the actual return values from `Intl.NumberFormat` use non-breaking spaces as locale-appropriate separators — typically U+00A0 (regular NBSP), but modern ICU/CLDR also emit U+202F (narrow NBSP) for some locales, e.g. `pl-PL` digit grouping. The comments above show both as regular spaces for readability. Be aware when comparing strings programmatically; normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
 
 ```javascript
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })) // "1.234,50 €"
@@ -222,7 +222,7 @@ console.log(hf.getCellValue({ sheet: 0, col: 1, row: 2 })) // "($1,234.50)"
 
 ### When to swap in a library
 
-The adapter above covers six common Excel format shapes in under one page of code. If you need:
+The adapter above covers a small but representative subset of Excel currency format strings (LCID-tagged, USD shorthand, accounting two-section) in under one page of code, with a fall-through path for everything else. If you need:
 
 - Arbitrary Excel-style format strings beyond this subset,
 - Precision-safe arithmetic on currency values (e.g. cents as integers),
