@@ -98,7 +98,7 @@ And now, HyperFormula recognizes these values as valid dates and can operate on 
 
 ## Currency integration
 
-By default, the `TEXT` function recognizes a limited set of currency-looking formats such as `"$#,##0.00"` via the built-in number formatter. When you need richer, locale-aware currency output — for example `"[$€-2] #,##0.00"` (EUR with German grouping) or `"[$zł-415] #,##0.00"` (PLN, locale `pl-PL`) — provide a [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency) callback.
+By default, the `TEXT` function renders only the simplest currency-looking formats — `"$0.00"`, `"$0"`, or `"$#.00"` (no thousands separator). Common Excel patterns such as `"$#,##0.00"` (with comma grouping), `"[$€-2] #,##0.00"` (EUR with German grouping), `"[$zł-415] #,##0.00"` (PLN), or accounting two-section formats like `"$#,##0.00;($#,##0.00)"` are **not** rendered correctly by the built-in number formatter; provide a [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency) callback to handle them.
 
 HyperFormula itself ships with **no currency data** and **no currency library dependency**. You choose how to format: native `Intl.NumberFormat`, a third-party library, or a hand-rolled lookup table.
 
@@ -128,7 +128,17 @@ This callback handles `$`-prefixed formats and falls through (returns `undefined
 
 ### Default behavior
 
-If you don't set `stringifyCurrency`, HyperFormula uses `defaultStringifyCurrency` which returns `undefined` for every input — the built-in dispatch chain (date, duration, and number formatters) handles the format string. For non-currency formats this preserves the existing `TEXT` behavior. For LCID-tagged currency formats (`[$SYMBOL-LCID] ...`), the built-in number formatter produces best-effort output (the LCID tag is treated as literal characters); setting `stringifyCurrency` is the recommended way to get locale-aware output for these formats.
+If you don't set `stringifyCurrency`, HyperFormula uses `defaultStringifyCurrency` which returns `undefined` for every input. For non-currency formats (`mm/dd/yyyy`, `hh:mm`, etc.) the built-in dispatch chain handles the format string and preserves the existing `TEXT` behavior bit-for-bit. For currency-looking formats the built-in number formatter is intentionally limited:
+
+| Format | `TEXT(1234.5, ...)` without callback | With docs adapter callback | Excel |
+|---|---|---|---|
+| `"$0.00"` | `"$1234.50"` | `"$1234.50"` | `"$1234.50"` |
+| `"$#.00"` | `"$1234.50"` | `"$1234.50"` | `"$1234.50"` |
+| `"$#,##0.00"` | `"$1235,##0.00"` (broken) | `"$1,234.50"` | `"$1,234.50"` |
+| `"[$€-2] #,##0.00"` | `"[$€-2] 1235,##0.00"` (broken) | `"1.234,50 €"` | `"1.234,50 €"` |
+| `"$#,##0.00;($#,##0.00)"` (value `-1234.5`) | `"$-1235,##0.00;($#,##0.00)"` (broken) | `"($1,234.50)"` | `"($1,234.50)"` |
+
+**Recommendation:** for any application that surfaces currency to end users, configure `stringifyCurrency` — either with the `Intl.NumberFormat` adapter below (zero dependencies) or with a library of your choice. Leaving it unset is appropriate only when the formula corpus does not include currency-shaped TEXT formats.
 
 ### Error behavior
 
