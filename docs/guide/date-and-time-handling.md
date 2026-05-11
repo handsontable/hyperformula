@@ -100,11 +100,43 @@ And now, HyperFormula recognizes these values as valid dates and can operate on 
 
 By default, the `TEXT` function recognizes a limited set of currency-looking formats such as `"$#,##0.00"` via the built-in number formatter. When you need richer, locale-aware currency output — for example `"[$€-2] #,##0.00"` (EUR with German grouping) or `"[$zł-415] #,##0.00"` (PLN, locale `pl-PL`) — provide a [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency) callback.
 
-HyperFormula itself ships with **no currency data** and **no currency library dependency**. You choose how to format: native `Intl.NumberFormat`, a third-party library, or a hand-rolled lookup table. The callback receives the raw number and the Excel format string and returns either a formatted string or `undefined` (to fall through to the built-in formatter).
+HyperFormula itself ships with **no currency data** and **no currency library dependency**. You choose how to format: native `Intl.NumberFormat`, a third-party library, or a hand-rolled lookup table.
+
+The callback contract:
+
+```ts
+stringifyCurrency: (value: number, currencyFormat: string) => string | undefined
+```
+
+The function receives the raw number and the format string passed to `TEXT`. Return a formatted string to override the built-in formatter, or `undefined` to fall through to it.
+
+### Minimal example
+
+```javascript
+// Recognize "$..."-prefixed formats and ignore the rest:
+const stringifyCurrency = (value, fmt) =>
+  fmt.startsWith('$') ? `$${value.toFixed(2)}` : undefined
+
+const hf = HyperFormula.buildFromArray([
+  [1234.5, '=TEXT(A1, "$#,##0.00")'],
+], { stringifyCurrency })
+
+console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })) // "$1234.50"
+```
+
+This callback handles `$`-prefixed formats and falls through (returns `undefined`) for everything else. Dates, durations, and unrecognized formats continue through HyperFormula's existing dispatch chain.
+
+### Default behavior
+
+If you don't set `stringifyCurrency`, HyperFormula uses `defaultStringifyCurrency` which returns `undefined` for every input — the built-in number formatter then handles `$`-prefixed formats and other Excel format strings as before. The callback is purely additive; leaving it unset preserves the existing `TEXT` behavior bit-for-bit.
+
+### Error behavior
+
+If your callback throws, HyperFormula propagates the exception. Wrap your formatter in `try/catch` if it can fail, and return `undefined` as the opt-out signal for unsupported formats — throwing is reserved for unexpected errors.
 
 ### Example: `Intl.NumberFormat` adapter (zero dependencies)
 
-This example maps a small but representative subset of Excel currency format strings onto the native [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat) API.
+This adapter handles a representative subset of Excel currency format strings using native [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat). Extend the `LCID_TO_LOCALE` map to cover more locales — see the [MS-LCID](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) specification for canonical identifiers.
 
 ```javascript
 // Minimal Excel-format-string → Intl.NumberFormat adapter.
@@ -143,24 +175,6 @@ const CURRENCY_RULES = [
       minimumFractionDigits: (match[1] || '.').length - 1,
       maximumFractionDigits: (match[1] || '.').length - 1,
     }),
-  },
-  // #,##0.00 "SYM" — trailing quoted symbol (e.g. zł, €).
-  // Note: HyperFormula's formula parser does not accept embedded double quotes
-  // inside TEXT format strings. This rule is illustrative for callback usage
-  // outside TEXT — to format PLN through TEXT, prefer "[$zł-415] #,##0.00".
-  {
-    pattern: /^#,##0(\.0+)?\s+"([^"]+)"$/,
-    build: (match) => {
-      const fractionDigits = (match[1] || '.').length - 1
-      const symbol = match[2]
-      const localeBySymbol = { 'zł': 'pl-PL', '€': 'de-DE', '£': 'en-GB', '¥': 'ja-JP' }
-      const locale = localeBySymbol[symbol] || 'en-US'
-      const nf = new Intl.NumberFormat(locale, {
-        minimumFractionDigits: fractionDigits,
-        maximumFractionDigits: fractionDigits,
-      })
-      return { format: (value) => `${nf.format(value)} ${symbol}` }
-    },
   },
 ]
 
@@ -213,15 +227,15 @@ const hf = HyperFormula.buildFromArray([
 ], options)
 ```
 
-::: tip
-The actual return values from `Intl.NumberFormat` use non-breaking spaces as locale-appropriate separators — typically U+00A0 (regular NBSP), but modern ICU/CLDR also emit U+202F (narrow NBSP) for some locales, e.g. `pl-PL` digit grouping. The comments above show both as regular spaces for readability. Be aware when comparing strings programmatically; normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
-:::
-
 ```javascript
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })) // "1.234,50 €"
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 1 })) // "12 345,50 zł"
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 2 })) // "($1,234.50)"
 ```
+
+::: tip
+The output values above contain non-breaking spaces (U+00A0 or U+202F depending on locale and ICU/CLDR version) as locale-appropriate separators. The comments show them as regular spaces for readability. When comparing programmatically, normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
+:::
 
 ### When to swap in a library
 
