@@ -15,8 +15,12 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   // intercept LCID-tagged or bare-letter currency formats before the
   // date/time parser greedily consumes characters like 'D', 'M', 'S', 'Y'
   // (e.g. '[$USD-409] #,##0.00' would otherwise become '[$US9-409] #,##0.00').
-  // The default callback returns undefined for every input, preserving the
-  // existing dispatch path bit-for-bit when stringifyCurrency is not set.
+  // The default callback returns undefined for every input. For non-currency
+  // formats (dates, durations, $#,##0.00, etc.) this preserves the existing
+  // dispatch path bit-for-bit. For LCID-tagged currency formats (`[$SYMBOL-LCID] ...`)
+  // the LCID guards in defaultStringifyDateTime/Duration also short-circuit,
+  // so the value falls through to parseForNumberFormat — a deliberate change
+  // versus pre-HF-24 behavior, where the date parser would mangle the symbol.
   const tryCurrency = config.stringifyCurrency(value, formatArg)
   if (tryCurrency !== undefined) {
     return tryCurrency
