@@ -185,6 +185,7 @@ function tryAccountingFormat(value, format) {
 }
 
 export const customStringifyCurrency = (value, currencyFormat) => {
+  if (typeof currencyFormat !== 'string') return undefined
   const accounting = tryAccountingFormat(value, currencyFormat)
   if (accounting !== undefined) return accounting
 
