@@ -2,15 +2,18 @@
 
 A [Vercel AI SDK](https://sdk.vercel.ai/docs) tool that gives your agents deterministic spreadsheet and formula computation — backed by HyperFormula's Excel-compatible engine.
 
-::: warning Prototype — not yet released
-We have a working prototype. We'll make it available as soon as we open the beta. The API below is a preview and is likely to change before the first release.
+::: warning Not available yet — coming soon
+This integration is on our roadmap and **cannot be installed or used today**. The API shown below is a preview and may still change before the first release.
+
+If you'd like to try it, [join the early access list](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA) — we'll ping you the moment the first beta is ready, and your sign-up directly tells us how strongly to prioritize this integration.
 :::
 
 ## What it does
 
-- **Evaluate formulas on the fly** — your agent runs any Excel-compatible formula without placing it in a cell, so the model never has to do math itself.
+- **Evaluate formulas deterministically** — your agent runs any Excel-compatible formula through HyperFormula instead of asking the LLM to do math. Results are exact, reproducible, and auditable.
 - **Read and write cells and ranges** — the agent inspects, populates, or modifies sheet data through typed tool calls.
-- **Trace dependencies** — precedents and dependents are surfaced so the agent can explain how a value is derived.
+- **Trace dependencies** — precedents and dependents are surfaced so the agent can explain how every value was derived.
+- **400+ built-in functions out of the box** — the agent has access to the full Excel-compatible function set (`SUM`, `VLOOKUP`, `IRR`, `INDEX/MATCH`, and the rest), no implementation work required.
 
 ## Example
 
@@ -41,26 +44,18 @@ A single import, one extra line in `tools`, and the model can evaluate formulas,
 
 ## Use cases
 
-- **Explain a sheet** — an agent summarizes what a spreadsheet does, which cells are inputs, and how outputs are derived.
-- **Generate a what-if scenario** — the model tweaks assumptions and reports how downstream results change.
+- **Spreadsheet Q&A** — ask the agent what a workbook does, which cells are inputs, and how each output is derived; get answers grounded in real formula evaluation.
+- **What-if scenarios and forecasting** — the agent tweaks assumptions and reports how downstream results change, deterministically.
 - **Validate and clean data** — the agent scans ranges for errors, missing values, or inconsistencies and fixes them in place.
-- **Create formulas from natural language** — the model translates a plain-English calculation into a verified Excel formula.
+- **Generate formulas from natural language** — the agent translates a plain-English calculation into a verified, working Excel formula.
+- **Financial modeling and reporting** — NPV, IRR, amortization, KPI rollups, and other quantitative workflows where the answer must be exact and auditable.
 
-## Safety and guardrails
+## Get early access
 
-HyperFormula runs locally in your Node.js or browser process — there's no remote service and no network or filesystem access through the tools. The agent's blast radius is limited to the in-memory workbook you hand it.
+::: tip Be the first to try it
+We're actively building this integration. Drop your email and we'll notify you the moment the first beta lands — so you can try it before the public release.
 
-Planned for the beta:
-
-- **Permissions per tool** — opt in to read-only, write, or formula-evaluation tools individually.
-- **Range scoping** — restrict an agent to a named range, sheet, or address pattern.
-- **Operation limits** — cap the number of cell writes or formula evaluations per turn.
-- **Audit log** — every tool call returns a structured record of what changed.
-
-## Join the waitlist
-
-::: tip
-**When we're ready to launch the beta, you'll be the first to know.** [Drop your email in the waitlist →](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA)
+[Join the early access list →](https://2fmjvg.share-eu1.hsforms.com/2e6drCkuLTn-1RuiYB91eJA)
 :::
 
 ## Links
