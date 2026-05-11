@@ -128,7 +128,7 @@ This callback handles `$`-prefixed formats and falls through (returns `undefined
 
 ### Default behavior
 
-If you don't set `stringifyCurrency`, HyperFormula uses `defaultStringifyCurrency` which returns `undefined` for every input — the built-in number formatter then handles `$`-prefixed formats and other Excel format strings as before. The callback is purely additive; leaving it unset preserves the existing `TEXT` behavior bit-for-bit.
+If you don't set `stringifyCurrency`, HyperFormula uses `defaultStringifyCurrency` which returns `undefined` for every input — the built-in dispatch chain (date, duration, and number formatters) handles the format string. For non-currency formats this preserves the existing `TEXT` behavior. For LCID-tagged currency formats (`[$SYMBOL-LCID] ...`), the built-in number formatter produces best-effort output (the LCID tag is treated as literal characters); setting `stringifyCurrency` is the recommended way to get locale-aware output for these formats.
 
 ### Error behavior
 

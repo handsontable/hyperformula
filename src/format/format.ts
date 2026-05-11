@@ -153,13 +153,18 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
 }
 
 export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: string): Maybe<string> {
-  // Skip date/time interpretation for currency formats marked with Excel's
-  // LCID-tagged notation `[$SYMBOL-LCID]`. parseForDateTimeFormat would
-  // otherwise greedily consume characters like D, M, S, Y, H inside the
-  // currency code (e.g. 'USD' contains D, 'CHF' contains H), mangling the
-  // output when a user-supplied stringifyCurrency callback opts out by
-  // returning undefined. Excel format strings never use `[$...]` for dates.
-  if (/\[\$[^\]]*\]/.test(formatArg)) {
+  // Skip date/time interpretation for Excel currency formats tagged with
+  // `[$SYMBOL-LCID]` (non-empty SYMBOL portion). parseForDateTimeFormat
+  // would otherwise greedily consume characters like D, M, S, Y, H inside
+  // the currency code (e.g. 'USD' contains D, 'CHF' contains H), mangling
+  // the output when a user-supplied stringifyCurrency callback opts out by
+  // returning undefined.
+  //
+  // The guard intentionally requires at least one character between `[$`
+  // and the `-` to distinguish currency tags (`[$USD-409]`, `[$€-2]`) from
+  // Excel's locale-only modifier (`[$-409]`, `[$-F800]`), which is valid
+  // on date/time formats and must continue to flow through this function.
+  if (/\[\$[^\-\]]+-/.test(formatArg)) {
     return undefined
   }
   const expression = parseForDateTimeFormat(formatArg)
