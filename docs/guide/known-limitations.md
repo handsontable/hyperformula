@@ -57,8 +57,6 @@ HyperFormula resolves the OFFSET function at parse time rather than during evalu
   hf.setCellContents({ sheet: 0, row: 0, col: 0 }, '=OFFSET(A1, C3, 0)');
   ```
 
-  Lifting this restriction requires treating OFFSET as a regular interpreted function. The work is tracked in [issue #910](https://github.com/handsontable/hyperformula/issues/910).
-
 * The height and width arguments must be bare positive integer literals (the parser accepts only `NUMBER` AST nodes). Unary `+` prefixes, parenthesised expressions, values less than 1, and non-integer values are rejected at parse time.
 
 * When the computed target falls outside the sheet, the parser stores a `#REF!` error in the cell at parse time (rather than during evaluation) with the message *Resulting reference is out of the sheet*.
