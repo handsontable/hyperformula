@@ -318,7 +318,7 @@ export interface ConfigParams {
    * formatter fall through to the built-in number formatter, so a callback that
    * recognizes only some format strings can safely opt out of the rest.
    *
-   * For more information, see the [Date and time handling guide](/guide/date-and-time-handling.md#currency-integration).
+   * For more information, see the [Currency handling guide](/guide/currency-handling.md).
    *
    * @default defaultStringifyCurrency
    *

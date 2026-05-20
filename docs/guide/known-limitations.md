@@ -38,7 +38,7 @@ you can't compare the arguments in a formula like this:
 * The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
 * Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
-* The TEXT function does not accept embedded double-quote literals in the format string (e.g., `=TEXT(A1, "#,##0.00 ""zł""")` fails at parse time). Use the LCID-tagged form (`[$zł-415] #,##0.00`) or supply a custom [`stringifyCurrency`](configuration-options.md#stringifycurrency) callback that handles such formats outside the parser.
+* The TEXT function does not accept embedded double-quote literals in the format string (e.g., `=TEXT(A1, "#,##0.00 ""zł""")` fails at parse time). Use Excel's LCID-tagged form — `[$SYMBOL-LCID]` where LCID is a hex [Microsoft Locale ID](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid), e.g. `[$zł-415] #,##0.00` for Polish złoty — or supply a custom [`stringifyCurrency`](currency-handling.md) callback that handles such formats outside the parser. For locale-specific patterns like the Polish `"1234,50 zł"` (decimal comma), the callback is required because the built-in number formatter always emits `.` as the decimal separator.
 
 ### OFFSET function
 
