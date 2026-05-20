@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- Fixed the `IFS` function evaluating later condition/value pairs after the first true condition.
 - Fixed a memory leak in `LazilyTransformingAstService` where the transformations array grew unboundedly, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
 - Fixed a memory leak in `UndoRedo` where `oldData` entries for evicted undo stack entries were never cleaned up, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
 - Fixed the IRR function returning `#NUM!` error when the initial investment significantly exceeds the sum of returns. [#1628](https://github.com/handsontable/hyperformula/issues/1628)
