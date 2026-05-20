@@ -6,6 +6,7 @@
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
+import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {InterpreterState} from '../InterpreterState'
 import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
@@ -135,6 +136,14 @@ export class BooleanPlugin extends FunctionPlugin implements FunctionPluginTypec
    * @param state
    */
   public conditionalIf(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const conditionValue = this.evaluateAst(ast.args[0], state)
+    if (conditionValue instanceof SimpleRangeValue && conditionValue.isAdHoc() && conditionValue.numberOfElements() > 1) {
+      const vectorizedState = new InterpreterState(state.formulaAddress, true, state.formulaVertex)
+      return this.runFunction(ast.args, vectorizedState, this.metadata('IF'), (condition, arg2, arg3) => {
+        return condition ? arg2 : arg3
+      })
+    }
+
     return this.runFunction(ast.args, state, this.metadata('IF'), (condition, arg2, arg3) => {
       return condition ? arg2 : arg3
     })
