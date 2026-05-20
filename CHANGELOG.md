@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-05-20
+
 ### Added
 
 - Added 12 database functions: DCOUNT, DSUM, DAVERAGE, DMAX, DMIN, DGET, DPRODUCT, DCOUNTA, DSTDEV, DSTDEVP, DVAR, DVARP. [#1652](https://github.com/handsontable/hyperformula/pull/1652)
