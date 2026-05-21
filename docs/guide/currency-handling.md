@@ -1,12 +1,42 @@
 # Currency handling
 
-The `TEXT` function renders numbers as strings, and HyperFormula handles the most common currency-shaped formats out of the box. For richer locale-aware rendering — locale-specific decimal separators, non-`$` symbols, accounting two-section patterns — plug in a [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency) callback and pick the formatter that fits your application (native [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat), a third-party library, or a hand-rolled lookup).
+HyperFormula treats currency through **two independent mechanisms**:
 
-HyperFormula ships with no currency data and no currency-library dependency — you stay in control of locale, symbol placement, and grouping.
+- **Currency input** — recognizing currency literals (e.g. `"100 zł"`) when they appear in cell values, so they become numeric values tagged as currency rather than strings. Controlled by [`currencySymbol`](../api/interfaces/configparams.md#currencysymbol).
+- **Currency output** — rendering numbers as currency strings via the `TEXT` function. Simple `$`-prefixed formats work out of the box; richer locale-aware patterns plug in through [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency).
 
-## Default behavior
+The two mechanisms are orthogonal — configure both for full coverage. HyperFormula ships with no currency data and no currency-library dependency, so you stay in control of which symbols are recognized and how they render.
 
-By default (no `stringifyCurrency` configured) HyperFormula's built-in number formatter handles simple `$`-prefixed formats — `"$0.00"`, `"$0"`, and `"$#.00"`:
+## Currency input
+
+By default, HyperFormula recognizes `$` as a currency symbol in cell input. To add more (for example Polish złoty), pass an array of recognized symbols to [`currencySymbol`](../api/interfaces/configparams.md#currencysymbol):
+
+```javascript
+const hf = HyperFormula.buildFromArray(
+  [['100 zł', '=A1 * 1.23']],
+  { currencySymbol: ['$', 'zł'] }
+);
+
+console.log(hf.getCellValue({ sheet: 0, col: 0, row: 0 }));            // 100
+console.log(hf.getCellValueDetailedType({ sheet: 0, col: 0, row: 0 })); // 'NUMBER_CURRENCY'
+console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 }));            // 123
+```
+
+Notes:
+
+- The symbol can appear as a **prefix** (`"$100"`) or as a **suffix** (`"100 zł"`). Both forms are recognized.
+- Each entry in `currencySymbol` is a literal string — no regular expressions. To support multiple locales, list every symbol you want recognized.
+- Detected literals are exposed as numeric values; the currency tag is available via [`getCellValueDetailedType()`](../api/classes/hyperformula.md#getcellvaluedetailedtype) as `NUMBER_CURRENCY`.
+
+`currencySymbol` controls **only** how HyperFormula parses input. It does not influence what the `TEXT` function returns — that is governed by the format string and the [`stringifyCurrency`](#currency-output) callback described below.
+
+## Currency output
+
+The `TEXT` function renders a number with a format string. HyperFormula's built-in number formatter handles the simplest currency-shaped patterns out of the box; richer patterns need a [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency) callback.
+
+### Default behavior
+
+With no `stringifyCurrency` configured, the built-in formatter handles simple `$`-prefixed formats — `"$0.00"`, `"$0"`, and `"$#.00"`:
 
 ```javascript
 const hf = HyperFormula.buildFromArray([
@@ -18,14 +48,21 @@ console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "$1234.50"
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 1 })); // "$1234.50"
 ```
 
-Configure `stringifyCurrency` when your formula corpus uses any of:
+A non-`$` symbol used purely as a suffix (no thousands grouping, no decimal-comma) also passes through unchanged:
+
+```javascript
+const hf = HyperFormula.buildFromArray([[1234.5, '=TEXT(A1, "0.00 zł")']]);
+console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "1234.50 zł"
+```
+
+Configure `stringifyCurrency` when your formula corpus needs:
 
 - thousands grouping (`"$#,##0.00"`),
-- non-`$` symbols (`"[$€-2] #,##0.00"`, `"[$zł-415] #,##0.00"`),
-- locale-specific decimal separators (e.g. the Polish `"1234,50 zł"` pattern, which the built-in formatter cannot produce because it always emits `.` as the decimal),
+- non-`$` symbols with grouping (`"[$€-2] #,##0.00"`, `"[$zł-415] #,##0.00"`),
+- locale-specific decimal separators (e.g. the Polish `"1234,50 zł"` pattern — the built-in formatter always emits `.` as the decimal),
 - accounting two-section formats (`"$#,##0.00;($#,##0.00)"`).
 
-## Custom currency formatting
+### Custom currency formatting
 
 The callback contract:
 
@@ -35,7 +72,7 @@ stringifyCurrency: (value: number, currencyFormat: string) => string | undefined
 
 The function receives the raw number and the format string passed to `TEXT`. Return a formatted string to override the built-in formatter, or `undefined` to fall through to it.
 
-### Minimal example
+#### Minimal example
 
 ```javascript
 // Recognize "$..."-prefixed formats and ignore the rest:
@@ -51,7 +88,7 @@ console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "$1234.50"
 
 This callback handles `$`-prefixed formats and falls through (returns `undefined`) for everything else. Dates, durations, and unrecognized formats continue through HyperFormula's existing dispatch chain.
 
-### Reference table
+#### Reference table
 
 Side-by-side comparison of the default formatter, the docs adapter from the section below, and Excel:
 
@@ -63,11 +100,11 @@ Side-by-side comparison of the default formatter, the docs adapter from the sect
 | `"[$€-2] #,##0.00"` | `"[$€-2] 1235,##0.00"` (no grouping) | `"1.234,50 €"` | `"1.234,50 €"` |
 | `"$#,##0.00;($#,##0.00)"` (value `-1234.5`) | `"$-1235,##0.00;($#,##0.00)"` (no grouping) | `"($1,234.50)"` | `"($1,234.50)"` |
 
-### Error behavior
+#### Error behavior
 
 If your callback throws, HyperFormula propagates the exception. Wrap your formatter in `try/catch` if it can fail, and return `undefined` as the opt-out signal for unsupported formats — throwing is reserved for unexpected errors.
 
-### Example: `Intl.NumberFormat` adapter (zero dependencies)
+#### Example: `Intl.NumberFormat` adapter (zero dependencies)
 
 This adapter handles a representative subset of Excel currency format strings using native [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat). Extend the `LCID_TO_LOCALE` map to cover more locales — see the [MS-LCID](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) specification for canonical identifiers.
 
@@ -167,14 +204,14 @@ console.log(hf.getCellValue({ sheet: 0, col: 1, row: 2 })) // "($1,234.50)"
 ```
 
 ::: tip
-The output values above contain non-breaking spaces (U+00A0 or U+202F depending on locale and ICU/CLDR version) as locale-appropriate separators. The comments show them as regular spaces for readability. When comparing programmatically, normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
+The output values above contain non-breaking spaces (U+00A0 or U+202F depending on locale and ICU/CLDR version) as locale-appropriate separators. The comments show them as regular spaces for readability. When comparing programmatically, normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
 :::
 
-### What is an LCID tag?
+#### What is an LCID tag?
 
 Excel can mark a currency format with a [Microsoft Locale Identifier](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) (LCID) so the symbol carries locale context. The syntax is `[$SYMBOL-LCID]` followed by the number template — for example `[$zł-415] #,##0.00` means *"Polish złoty, hex LCID `415` = `pl-PL`"*, and `[$€-2] #,##0.00` means *"euro, generic"*. The adapter above parses the LCID to pick the matching `Intl.NumberFormat` locale and ISO 4217 currency code.
 
-### When to swap in a library
+#### When to swap in a library
 
 The adapter above covers a small but representative subset of Excel currency format strings (LCID-tagged, USD shorthand, accounting two-section) in under one page of code, with a fall-through path for everything else. If you need:
 
@@ -186,5 +223,4 @@ consider wrapping [`Dinero.js` v2](https://v2.dinerojs.com/) or your own format 
 
 ## Related configuration
 
-- [`currencySymbol`](../api/interfaces/configparams.md#currencysymbol) — governs how HyperFormula **parses** currency literals in input (e.g. `"$100"` → `100`). It is **independent** of `stringifyCurrency`, which governs `TEXT` output.
 - [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) / [`stringifyDuration`](../api/interfaces/configparams.md#stringifyduration) — sister callbacks for date and duration formatting. Combine with `stringifyCurrency` when your formulas mix date/time and currency formats.
