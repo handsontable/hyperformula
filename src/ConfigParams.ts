@@ -314,15 +314,16 @@ export interface ConfigParams {
    * Sets a function that converts numeric values into currency-formatted strings.
    *
    * The function receives the raw value and the format string passed to `TEXT`
-   * and should return a string or `undefined`. Returning `undefined` lets the
-   * formatter fall through to the built-in number formatter, so a callback that
-   * recognizes only some format strings can safely opt out of the rest.
+   * and should return a string or `undefined`. The formatter calls this for
+   * every format string that reaches it, not only currency-shaped ones — return
+   * `undefined` for any format your callback does not handle and HyperFormula
+   * will fall through to the built-in number formatter.
    *
    * For more information, see the [Currency handling guide](/guide/currency-handling.md).
    *
    * @default defaultStringifyCurrency
    *
-   * @category Date and Time
+   * @category Number
    */
   stringifyCurrency: (value: number, currencyFormat: string) => Maybe<string>,
   /**

@@ -10,6 +10,21 @@ import {RawScalarValue} from '../interpreter/InterpreterValue'
 import {Maybe} from '../Maybe'
 import {FormatToken, parseForDateTimeFormat, parseForNumberFormat, TokenType} from './parser'
 
+/**
+ * Detects Excel LCID-tagged currency tags (`[$SYMBOL-LCID]` with a non-empty
+ * SYMBOL portion). Shared by `defaultStringifyDateTime` and
+ * `defaultStringifyDuration` so a format string carrying such a tag short-
+ * circuits both date and duration dispatch and falls through to the
+ * number formatter (or the user-supplied `stringifyCurrency` callback).
+ *
+ * The pattern is intentionally unanchored: any occurrence of `[$SYMBOL-`
+ * in the format string triggers the guard. Excel does not mix date/time
+ * tokens with a currency tag in the same format string, so a mid-string
+ * match cannot misclassify a legitimate composite — every observed
+ * format string with a currency tag is currency-only.
+ */
+const LCID_CURRENCY_TAG = /\[\$[^\-\]]+-/
+
 export function format(value: number, formatArg: string, config: Config, dateHelper: DateTimeHelper): RawScalarValue {
   // Currency callback runs first so a user-supplied stringifyCurrency can
   // intercept LCID-tagged or bare-letter currency formats before the
@@ -100,7 +115,7 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
   // (H in CHF/HUF, m in AMD/HMD) that parseForDateTimeFormat would
   // otherwise interpret as time tokens. See defaultStringifyDateTime
   // for the symbol-vs-locale-modifier rationale.
-  if (/\[\$[^\-\]]+-/.test(formatArg)) {
+  if (LCID_CURRENCY_TAG.test(formatArg)) {
     return undefined
   }
   const expression = parseForDateTimeFormat(formatArg)
@@ -176,7 +191,7 @@ export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: st
   // and the `-` to distinguish currency tags (`[$USD-409]`, `[$€-2]`) from
   // Excel's locale-only modifier (`[$-409]`, `[$-F800]`), which is valid
   // on date/time formats and must continue to flow through this function.
-  if (/\[\$[^\-\]]+-/.test(formatArg)) {
+  if (LCID_CURRENCY_TAG.test(formatArg)) {
     return undefined
   }
   const expression = parseForDateTimeFormat(formatArg)
