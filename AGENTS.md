@@ -4,9 +4,9 @@ Instructions for AI coding agents (Cursor, Claude Code, Codex, Aider, and any ot
 
 ## Start here
 
-All project knowledge a developer needs &mdash; project overview, architecture, build and test commands, code style, definition of done, how to add a function, and more &mdash; lives in **[DEV_DOCS.md](DEV_DOCS.md)**. Start there. Everything in `DEV_DOCS.md` applies to AI agents as well.
+Whatever you do, start by reading entire [DEV_DOCS.md](DEV_DOCS.md). Only then proceed to your task.
 
-For additional context, also consult:
+## Other important resources
 
 - the repository [README.md](README.md) &mdash; high-level project description and quick install/usage
 - the markdown files in [`docs/guide/`](docs/guide/) &mdash; user-facing guides (installation, configuration, built-in functions, custom functions, integrations, etc.)
