@@ -301,7 +301,7 @@ export class AbsoluteCellRange implements SimpleCellRange {
   }
 
   /**
-   * Checks whether the given row index is strictly above the bottom edge and at or below the top edge.
+   * Checks whether the given row index is strictly below the top edge and at or above the bottom edge.
    * @param {number} row - Row index to test
    * @returns {boolean} True if the row lies inside the range (excluding the top boundary)
    */
@@ -861,11 +861,11 @@ export class AbsoluteRowRange extends AbsoluteCellRange {
 
   /**
    * Returns a new row range shifted by the given row offset (column offset is ignored).
-   * @param {number} byCols - Ignored
+   * @param {number} _byCols - Ignored
    * @param {number} byRows - Row offset
    * @returns {AbsoluteCellRange} New row range
    */
-  public shifted(byCols: number, byRows: number): AbsoluteCellRange {
+  public shifted(_byCols: number, byRows: number): AbsoluteCellRange {
     return new AbsoluteRowRange(this.sheet, this.start.row + byRows, this.end.row + byRows)
   }
 
