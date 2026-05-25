@@ -122,9 +122,12 @@ const LCID_TO_LOCALE = {
 }
 
 const CURRENCY_RULES = [
-  // [$SYMBOL-LCID] #,##0[.00] — Excel's locale-tagged currency
+  // [$SYMBOL-LCID] #,##0[.00] — Excel's locale-tagged currency.
+  // SYMBOL portion requires at least one character (`+`, not `*`) so that
+  // locale-only modifiers like `[$-409]` (used on date/time formats) are
+  // NOT misclassified as currency by this adapter.
   {
-    pattern: /^\[\$([^\-\]]*)-([0-9A-Fa-f]+)\]\s*#,##0(\.0+)?$/,
+    pattern: /^\[\$([^\-\]]+)-([0-9A-Fa-f]+)\]\s*#,##0(\.0+)?$/,
     build: (match) => {
       const lcid = '-' + match[2]
       const fractionDigits = (match[3] || '.').length - 1
