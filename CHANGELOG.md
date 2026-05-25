@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
+- Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
+
+### Fixed
+
+- Fixed the `TEXT` function mangling LCID-tagged currency format strings (e.g. `[$USD-409] #,##0.00`) — pre-fix, the date-time parser greedily consumed letter tokens inside the currency code (`D` in USD, `H` in CHF/HUF, etc.), producing strings like `[$US9-409]`. The default dispatch now short-circuits LCID-tagged currency formats so they fall through to the number formatter (or the user-supplied `stringifyCurrency` callback). Applies to every LCID-tagged currency format regardless of whether `stringifyCurrency` is configured. [#1665](https://github.com/handsontable/hyperformula/pull/1665)
 
 ## [3.3.0] - 2026-05-20
 
@@ -20,7 +25,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added `maxPendingLazyTransformations` configuration option to control memory usage by limiting accumulated transformations before cleanup. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
 - Added a new function: TEXTJOIN. [#1640](https://github.com/handsontable/hyperformula/pull/1640)
 - Added a new function: SEQUENCE. [#1645](https://github.com/handsontable/hyperformula/pull/1645)
-- Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 
 ### Fixed
 
@@ -28,7 +32,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Fixed a memory leak in `UndoRedo` where `oldData` entries for evicted undo stack entries were never cleaned up, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
 - Fixed the IRR function returning `#NUM!` error when the initial investment significantly exceeds the sum of returns. [#1628](https://github.com/handsontable/hyperformula/issues/1628)
 - Fixed the ADDRESS function ignoring `defaultValue` when arguments are syntactically empty (e.g., `=ADDRESS(2,3,,FALSE())`). [#1632](https://github.com/handsontable/hyperformula/issues/1632)
-- Fixed the `TEXT` function mangling LCID-tagged currency format strings (e.g. `[$USD-409] #,##0.00`) — pre-fix, the date-time parser greedily consumed letter tokens inside the currency code (`D` in USD, `H` in CHF/HUF, etc.), producing strings like `[$US9-409]`. The default dispatch now short-circuits LCID-tagged currency formats so they fall through to the number formatter (or the user-supplied `stringifyCurrency` callback). Applies to every LCID-tagged currency format regardless of whether `stringifyCurrency` is configured. [#1665](https://github.com/handsontable/hyperformula/pull/1665)
 
 ## [3.2.0] - 2026-02-19
 

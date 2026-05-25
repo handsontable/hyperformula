@@ -11,10 +11,20 @@
  *     ```
  *     <!-- /snippet:NAME -->
  *
- * writes the code (verbatim) to `test-utils/snippets/<NAME>.generated.ts` with
- * a header banner naming the source file. Tests then `import { … }` from the
+ * writes the code to `test-utils/snippets/<NAME>.generated.ts` with a header
+ * banner naming the source file. Tests then `import { … }` from the
  * generated file instead of re-defining the snippet inline; CI gates drift via
  * `npm run snippets:extract && git diff --exit-code -- test-utils/snippets/`.
+ *
+ * **Generated content vs docs source.** The generated `.ts` is functionally
+ * equivalent to the docs snippet but NOT byte-identical: `stripBlockComments`
+ * removes lines whose entire content is a `//` comment (e.g. editorial
+ * section dividers) before writing. Trailing `// comment` after live code is
+ * preserved. The docs page keeps the educational comments for human readers;
+ * the generated artifact keeps only the runnable surface for the import
+ * consumer. Both regenerate from the same source so the drift gate still
+ * applies — what's gated is "generated matches its OWN regeneration", not
+ * "generated matches docs body byte-for-byte".
  *
  * The script intentionally has zero npm deps so it runs in the same Node we
  * use for `compile` without adding to package.json.
