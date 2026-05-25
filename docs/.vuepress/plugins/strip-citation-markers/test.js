@@ -78,6 +78,70 @@ assert(
   'Expected subsection heading text to be cleaned of marker'
 );
 
+// 6a. Mutation kill (M1) — zero-digit `[V]` must NOT be stripped; the
+//     regex must require `\d+`, not `\d*`. If the quantifier is weakened,
+//     literal `[V]` (no digits) would also be removed.
+const mdM1 = new MarkdownIt({ html: true });
+mdM1.use(stripCitationMarkers);
+const renderedM1 = mdM1.render('Bare brackets like [V] are not markers.');
+assert(
+  /\[V\]/.test(renderedM1),
+  'Expected literal [V] (no digits) to be preserved'
+);
+
+// 6b. Mutation kill (M2) — the negative-lookahead `(?!\()` anchors the
+//     "real markdown link survives" guarantee. Re-assert post-parse that
+//     the link text is "V12" (digits intact), not collapsed to "V".
+assert(
+  /<a [^>]*href="https:\/\/example\.com\/v12"[^>]*>V12<\/a>/.test(rendered) &&
+    !/<a [^>]*href="https:\/\/example\.com\/v12"[^>]*>V<\/a>/.test(rendered),
+  'Expected link text to remain "V12", not be collapsed to "V"'
+);
+
+// 6c. Mutation kill (M3) — `SOURCES_HEADING_PATTERN` uses the `i` flag.
+//     A lowercase `## sources` footer must also be stripped.
+const mdM3 = new MarkdownIt({ html: true });
+mdM3.use(stripCitationMarkers);
+const renderedM3 = mdM3.render(
+  '# Page\n\nBody.\n\n## sources\n\n- lower-case sources body\n'
+);
+assert(
+  !/lower-case sources body/.test(renderedM3),
+  'Expected case-insensitive Sources heading match (lowercase variant stripped)'
+);
+
+// 6d. Mutation kill (M5) — `findFooterEnd` terminates at an `h1` boundary,
+//     NOT an `h2`. A top-level `# Second page` after the Sources footer must
+//     end the splice so its body survives.
+const mdM5 = new MarkdownIt({ html: true });
+mdM5.use(stripCitationMarkers);
+const renderedM5 = mdM5.render([
+  '# First page',
+  '',
+  'First body.',
+  '',
+  '## § Sources',
+  '',
+  '- footer to drop',
+  '',
+  '# Second page',
+  '',
+  'Second body must survive.',
+].join('\n'));
+assert(
+  /Second body must survive/.test(renderedM5) &&
+    !/footer to drop/.test(renderedM5),
+  'Expected footer stripping to stop at the next h1 boundary'
+);
+
+// 6e. Mutation kill (M11) — `stripInlineMarkers` collapses 2+ spaces left
+//     behind by marker removal. The fixture line "multiple markers [V3] [V4]
+//     should collapse..." must not contain a run of 2+ spaces in the output.
+assert(
+  !/multiple markers {2,}should collapse/.test(rendered),
+  'Expected double whitespace left by marker removal to be collapsed to a single space'
+);
+
 // 7. Synthetic token-stream: a §Sources heading followed by footer text
 //    followed by `footnote_*` tokens must keep the footnote tokens after the
 //    footer is spliced out. Mirrors what markdown-it-footnote appends at the
@@ -167,4 +231,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('PASS strip-citation-markers (' + 10 + ' assertions)');
+console.log('PASS strip-citation-markers (' + 15 + ' assertions)');
