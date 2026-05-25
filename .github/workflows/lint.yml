@@ -44,5 +44,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check docs snippets are in sync with extracted source-of-truth
+        run: npm run snippets:check
+
       - name: Run linter
         run: npm run lint
