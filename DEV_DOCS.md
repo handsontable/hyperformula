@@ -22,8 +22,7 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 │   │   └── plugin/             # Built-in spreadsheet function plugins
 │   ├── DependencyGraph/        # Cell dependency tracking and recalculation order
 │   ├── CrudOperations.ts       # Create/read/update/delete operations on sheets and cells
-│   └── i18n/
-│       └── languages/          # Function-name translations per language
+│   └── i18n/                   # Function-name translations per language
 ├── test/                       # Test suite
 ├── docs/                       # Public documentation portal (VuePress)
 │   ├── guide/                  # Markdown guides (building, contributing, usage…)
@@ -34,7 +33,7 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 ├── .github/                    # CI workflows, issue and PR templates
 ├── DEV_DOCS.md                 # Canonical developer documentation (this file)
 ├── AGENTS.md                   # Guidance for AI agents
-├── CONTRIBUTING.md             # → docs/guide/contributing.md (symlink)
+├── CONTRIBUTING.md             # Guide for external contributors
 ├── README.md                   # Project overview
 ├── CHANGELOG.md
 ├── LICENSE.txt
