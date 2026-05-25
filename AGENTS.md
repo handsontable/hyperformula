@@ -9,7 +9,7 @@ All project knowledge a developer needs &mdash; project overview, architecture, 
 For additional context, also consult:
 
 - the repository [README.md](README.md) &mdash; high-level project description and quick install/usage
-- the public [documentation portal](https://hyperformula.handsontable.com/docs) &mdash; full end-user documentation
+- the public [documentation portal](https://hyperformula.handsontable.com/docs) &mdash; main documentation
 
 ## Response style
 

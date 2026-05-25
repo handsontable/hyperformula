@@ -5,9 +5,8 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 ## Quick links
 
 - **[Building, testing, and linting](docs/guide/building.md)** &mdash; all `npm` commands and build outputs
-- **[Code of conduct](docs/guide/code-of-conduct.md)**
 - **[Test suite](test/README.md)** &mdash; smoke tests and how to attach the private test suite
-- **[Public docs portal](https://hyperformula.handsontable.com/docs)** &mdash; end-user documentation
+- **[Public docs portal](https://hyperformula.handsontable.com/docs)** &mdash; main documentation
 - **[Public docs source](docs/README.md)** &mdash; how to run the docs portal locally
 - **[Changelog](CHANGELOG.md)**
 - **[Pull request template](.github/pull_request_template.md)**
@@ -25,26 +24,19 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 │   ├── CrudOperations.ts       # Create/read/update/delete operations on sheets and cells
 │   └── i18n/
 │       └── languages/          # Function-name translations per language
-├── test/                       # Smoke tests + hook for the private test suite
-│   ├── smoke.spec.ts
-│   ├── fetch-tests.sh          # Pulls the private hyperformula-tests repo
-│   └── README.md               # How the test suite is organized
+├── test/                       # Test suite
 ├── docs/                       # Public documentation portal (VuePress)
 │   ├── guide/                  # Markdown guides (building, contributing, usage…)
 │   ├── api/                    # API reference (generated from JSDoc)
 │   ├── .vuepress/              # VuePress configuration, theme, components
 │   └── README.md               # How to run the docs portal locally
-├── examples/                   # Runnable usage examples
 ├── script/                     # Maintenance and release scripts
 ├── .github/                    # CI workflows, issue and PR templates
-├── .cursor/rules/              # Cursor agent rules (point to AGENTS.md)
 ├── DEV_DOCS.md                 # Canonical developer documentation (this file)
 ├── AGENTS.md                   # Guidance for AI agents
-├── CLAUDE.md                   # → AGENTS.md (symlink)
 ├── CONTRIBUTING.md             # → docs/guide/contributing.md (symlink)
-├── README.md                   # Project overview for end users
+├── README.md                   # Project overview
 ├── CHANGELOG.md
-├── CODE_OF_CONDUCT.md
 ├── LICENSE.txt
 ├── package.json
 └── tsconfig.json
