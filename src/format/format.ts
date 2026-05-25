@@ -109,12 +109,27 @@ function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
   return result
 }
 
+/**
+ * Default `stringifyDuration` callback — formats a duration value against an
+ * Excel-style time format string (e.g. `[hh]:mm:ss`).
+ *
+ * Returns `undefined` for format strings that are not duration formats so the
+ * dispatcher in `format()` can fall through to other handlers.
+ *
+ * **LCID currency-tag guard** — sibling to the same guard in
+ * `defaultStringifyDateTime`; explicitly returns `undefined` for Excel
+ * currency tags `[$SYMBOL-LCID]` because the SYMBOL portion contains
+ * duration-token letters (`H` in CHF/HUF, `m` in AMD/HMD) that
+ * `parseForDateTimeFormat` would otherwise interpret as time tokens and
+ * mangle the output. See `defaultStringifyDateTime` for the full
+ * symbol-vs-locale-modifier rationale and the historical pre-HF-24
+ * behaviour the guard corrects.
+ *
+ * @param time parsed duration value to render
+ * @param formatArg Excel-style format string
+ * @returns formatted string, or `undefined` to defer to the next dispatch step
+ */
 export function defaultStringifyDuration(time: SimpleTime, formatArg: string): Maybe<string> {
-  // Same LCID-tagged currency guard as defaultStringifyDateTime — Excel
-  // currency tags `[$SYMBOL-LCID]` contain duration-token letters
-  // (H in CHF/HUF, m in AMD/HMD) that parseForDateTimeFormat would
-  // otherwise interpret as time tokens. See defaultStringifyDateTime
-  // for the symbol-vs-locale-modifier rationale.
   if (LCID_CURRENCY_TAG.test(formatArg)) {
     return undefined
   }
@@ -179,18 +194,34 @@ export function defaultStringifyDuration(time: SimpleTime, formatArg: string): M
   return result
 }
 
+/**
+ * Default `stringifyDateTime` callback — formats a date/time value against an
+ * Excel-style format string (e.g. `YYYY-MM-DD HH:mm:ss`).
+ *
+ * Returns `undefined` for format strings that are not date/time formats so the
+ * dispatcher in `format()` can fall through to `parseForNumberFormat` (or to a
+ * user-supplied `stringifyCurrency` callback for currency-tagged formats).
+ *
+ * **LCID currency-tag guard** — explicitly returns `undefined` for Excel
+ * currency tags `[$SYMBOL-LCID]` (non-empty SYMBOL portion). Without the
+ * guard, `parseForDateTimeFormat` greedily consumes letters like `D`/`M`/`S`/`Y`/`H`
+ * inside the currency code (e.g. `D` in USD, `H` in CHF, `M`+`D` in AMD),
+ * mangling the output of an `[$USD-409] #,##0.00` format into
+ * `[$US9-409] #,##0.00` because `D` is read as a day token. The pre-HF-24
+ * behaviour was to mis-format; the guarded return is the deliberate
+ * correction, not a regression. Bit-for-bit compatibility is preserved for
+ * every non-currency format (dates, durations, `$#,##0.00`, etc.).
+ *
+ * The guard pattern (`/\[\$[^\-\]]+-/`) requires ≥1 character between `[$`
+ * and `-` so it distinguishes currency tags (`[$USD-409]`, `[$€-2]`) from
+ * Excel's locale-only modifier (`[$-409]`, `[$-F800]`), which is valid on
+ * date/time formats and must continue to flow through this function.
+ *
+ * @param dateTime parsed date/time value to render
+ * @param formatArg Excel-style format string
+ * @returns formatted string, or `undefined` to defer to the next dispatch step
+ */
 export function defaultStringifyDateTime(dateTime: SimpleDateTime, formatArg: string): Maybe<string> {
-  // Skip date/time interpretation for Excel currency formats tagged with
-  // `[$SYMBOL-LCID]` (non-empty SYMBOL portion). parseForDateTimeFormat
-  // would otherwise greedily consume characters like D, M, S, Y, H inside
-  // the currency code (e.g. 'USD' contains D, 'CHF' contains H), mangling
-  // the output when a user-supplied stringifyCurrency callback opts out by
-  // returning undefined.
-  //
-  // The guard intentionally requires at least one character between `[$`
-  // and the `-` to distinguish currency tags (`[$USD-409]`, `[$€-2]`) from
-  // Excel's locale-only modifier (`[$-409]`, `[$-F800]`), which is valid
-  // on date/time formats and must continue to flow through this function.
   if (LCID_CURRENCY_TAG.test(formatArg)) {
     return undefined
   }
