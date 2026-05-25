@@ -5,6 +5,7 @@ const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
 const HyperFormula = require('../../dist/hyperformula.full');
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
+const stripCitationMarkers = require('./plugins/strip-citation-markers');
 
 const searchPattern = new RegExp('^/api', 'i');
 
@@ -136,6 +137,9 @@ module.exports = {
       })
       md.use(footnotePlugin)
       md.use(includeCodeSnippet)
+      // Strip internal audit-harness annotations ([V<n>] markers and the
+      // §Sources footer) so they never appear in customer-facing docs.
+      md.use(stripCitationMarkers)
     }
   },
   // TODO: It doesn't work. It's seems that this option is bugged. Documentation says that this option is configurable,
