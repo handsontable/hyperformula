@@ -1,21 +1,54 @@
 # Developer documentation
 
-Canonical reference for everyone working on the HyperFormula source code: maintainers, external contributors, and AI agents. Everything a developer needs to know lives here or is linked from here.
+Canonical reference for everyone working on the HyperFormula source code: maintainers, the internal team, and AI agents triggered by them. Everything a developer needs to know lives here or is linked from here.
 
 ## Quick links
 
 - **[Building, testing, and linting](docs/guide/building.md)** &mdash; all `npm` commands and build outputs
-- **[Contributing guide](docs/guide/contributing.md)** &mdash; how to submit a pull request
 - **[Code of conduct](docs/guide/code-of-conduct.md)**
 - **[Test suite](test/README.md)** &mdash; smoke tests and how to attach the private test suite
-- **[Public docs portal](https://hyperformula.handsontable.com/)** &mdash; end-user documentation
+- **[Public docs portal](https://hyperformula.handsontable.com/docs)** &mdash; end-user documentation
 - **[Public docs source](docs/README.md)** &mdash; how to run the docs portal locally
 - **[Changelog](CHANGELOG.md)**
 - **[Pull request template](.github/pull_request_template.md)**
 
-## Project overview
+## Repository layout
 
-HyperFormula is a headless spreadsheet engine written in TypeScript. It parses and evaluates Excel-compatible formulas and runs in both browser and Node.js environments. The library implements ~400 built-in functions with support for custom functions, undo/redo, CRUD operations, and i18n (17 languages).
+```text
+.
+├── src/                        # Source code
+│   ├── HyperFormula.ts         # Main engine class, public API entry point
+│   ├── parser/                 # Formula parsing (uses Chevrotain parser generator)
+│   ├── interpreter/            # Formula evaluation engine
+│   │   └── plugin/             # Built-in spreadsheet function plugins
+│   ├── DependencyGraph/        # Cell dependency tracking and recalculation order
+│   ├── CrudOperations.ts       # Create/read/update/delete operations on sheets and cells
+│   └── i18n/
+│       └── languages/          # Function-name translations per language
+├── test/                       # Smoke tests + hook for the private test suite
+│   ├── smoke.spec.ts
+│   ├── fetch-tests.sh          # Pulls the private hyperformula-tests repo
+│   └── README.md               # How the test suite is organized
+├── docs/                       # Public documentation portal (VuePress)
+│   ├── guide/                  # Markdown guides (building, contributing, usage…)
+│   ├── api/                    # API reference (generated from JSDoc)
+│   ├── .vuepress/              # VuePress configuration, theme, components
+│   └── README.md               # How to run the docs portal locally
+├── examples/                   # Runnable usage examples
+├── script/                     # Maintenance and release scripts
+├── .github/                    # CI workflows, issue and PR templates
+├── .cursor/rules/              # Cursor agent rules (point to AGENTS.md)
+├── DEV_DOCS.md                 # Canonical developer documentation (this file)
+├── AGENTS.md                   # Guidance for AI agents
+├── CLAUDE.md                   # → AGENTS.md (symlink)
+├── CONTRIBUTING.md             # → docs/guide/contributing.md (symlink)
+├── README.md                   # Project overview for end users
+├── CHANGELOG.md
+├── CODE_OF_CONDUCT.md
+├── LICENSE.txt
+├── package.json
+└── tsconfig.json
+```
 
 ## Architecture
 
@@ -34,10 +67,6 @@ All spreadsheet functions are implemented as plugins extending `FunctionPlugin`.
 - declares an `implementedFunctions` static property mapping function names to metadata
 - uses the `runFunction()` helper for argument validation, coercion, and array handling
 - registers function translations in `src/i18n/languages/`
-
-### i18n (`src/i18n/languages/`)
-
-Function-name translations for each supported language. New functions must include translations for all built-in languages. See [Sources of the function translations](#sources-of-the-function-translations).
 
 ## How to add a new function
 
@@ -71,9 +100,11 @@ Each change to the production code (bugfix, new feature, or improvement) must in
 - Changelog entry
 - Pull request description
 
-## Sources of the function translations
+## Internationalization and function translations
 
-HyperFormula supports internationalization and provides localized function names for all built-in languages. When looking for the valid translations for new functions, try these sources:
+HyperFormula supports internationalization and provides localized function names for all built-in languages. Translation files live in `src/i18n/languages/`. New functions must include translations for all built-in languages.
+
+When looking for the valid translations for new functions, try these sources:
 
 - https://support.microsoft.com/en-us/office/excel-functions-translator-f262d0c0-991c-485b-89b6-32cc8d326889
 - http://dolf.trieschnigg.nl/excel/index.php
