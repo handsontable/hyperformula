@@ -56,11 +56,26 @@ jobs:
             exit 0
           fi
           echo "Scanning ${paths[*]} for audit-harness markers..."
-          if grep -rnE '\[V[0-9]+\]|§[[:space:]]*Sources' "${paths[@]}"; then
-            echo ""
-            echo "ERROR: audit-harness markers ([V<n>] or §Sources) found in build output."
-            echo "These markers are an internal spec-drafting convention and must never"
-            echo "ship in compiled JS. Strip them from the source comments/strings above."
-            exit 1
-          fi
-          echo "OK: no audit-harness markers found in build output."
+          # grep exit codes: 0=match, 1=no-match, 2+=scan/IO error. A bare
+          # `if grep` collapses 1 and 2 into the same branch, silently green-
+          # lighting the step on a read error. Branch on rc explicitly.
+          set +e
+          grep -rnE '\[V[0-9]+\]|§[[:space:]]*Sources' "${paths[@]}"
+          rc=$?
+          set -e
+          case "$rc" in
+            0)
+              echo ""
+              echo "ERROR: audit-harness markers ([V<n>] or §Sources) found in build output."
+              echo "These markers are an internal spec-drafting convention and must never"
+              echo "ship in compiled JS. Strip them from the source comments/strings above."
+              exit 1
+              ;;
+            1)
+              echo "OK: no audit-harness markers found in build output."
+              ;;
+            *)
+              echo "ERROR: grep exited with rc=$rc while scanning ${paths[*]} — aborting CI step." >&2
+              exit "$rc"
+              ;;
+          esac
