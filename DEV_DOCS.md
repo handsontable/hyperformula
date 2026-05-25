@@ -7,7 +7,7 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 - **[Building, testing, and linting](docs/guide/building.md)** &mdash; all `npm` commands and build outputs
 - **[Test suite](test/README.md)** &mdash; smoke tests and how to attach the private test suite
 - **[Public docs portal](https://hyperformula.handsontable.com/docs)** &mdash; main documentation
-- **[Public docs source](docs/README.md)** &mdash; how to run the docs portal locally
+- **[Docs README](docs/README.md)** &mdash; how to run the docs portal locally
 - **[Changelog](CHANGELOG.md)**
 - **[Pull request template](.github/pull_request_template.md)**
 
@@ -60,6 +60,8 @@ All spreadsheet functions are implemented as plugins extending `FunctionPlugin`.
 - registers function translations in `src/i18n/languages/`
 
 ## How to add a new function
+
+Adding a built-in function is similar to adding a [custom function](docs/guide/custom-functions.md), so that guide is a useful reference for the function-implementation patterns (argument metadata, return types, array handling). The built-in flow on top of that is:
 
 1. Create or modify a plugin in `src/interpreter/plugin/`.
 2. Add function metadata to `implementedFunctions`.
