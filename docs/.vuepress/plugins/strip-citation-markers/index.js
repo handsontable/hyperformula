@@ -73,8 +73,13 @@ const isSourcesHeading = (tokens, headingOpenIdx) => {
 };
 
 /**
- * Returns the index after which the Sources footer ends: either the index
- * of the next top-level (`h1`) heading_open token, or tokens.length.
+ * Returns the index after which the Sources footer ends. The footer extends
+ * from the Sources heading up to (but not including) the FIRST of:
+ *   - the next top-level (`h1`) heading_open token, or
+ *   - any `footnote_*` token (markdown-it-footnote appends `footnote_block`
+ *     and friends at the END of the stream; they belong to the page body,
+ *     not to the footer), or
+ *   - end-of-stream.
  *
  * @param {Array} tokens - Full token array.
  * @param {number} startIdx - Index of the Sources heading_open token.
@@ -86,6 +91,9 @@ const findFooterEnd = (tokens, startIdx) => {
     if (t.type === 'heading_open' && t.tag === 'h1') {
       return i;
     }
+    if (typeof t.type === 'string' && t.type.startsWith('footnote_')) {
+      return i;
+    }
   }
   return tokens.length;
 };
@@ -93,6 +101,12 @@ const findFooterEnd = (tokens, startIdx) => {
 /**
  * Mutates the token array in place to remove the Sources footer (heading +
  * everything below) and apply inline marker stripping to every text token.
+ *
+ * Footnote invariant: markdown-it-footnote (registered in `config.js`)
+ * appends `footnote_block` / `footnote_anchor` / `footnote_open` /
+ * `footnote_close` / `footnote_ref` tokens at the END of the token stream.
+ * The footer splice stops before any such token so footnotes on pages that
+ * also carry a `§ Sources` footer are not silently swallowed.
  *
  * @param {Array} tokens - markdown-it token array.
  * @returns {Array} The same token array (for chaining).

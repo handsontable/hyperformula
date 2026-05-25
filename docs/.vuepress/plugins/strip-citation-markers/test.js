@@ -14,7 +14,9 @@
 const fs = require('fs');
 const path = require('path');
 const MarkdownIt = require('markdown-it');
+const footnotePlugin = require('markdown-it-footnote');
 const stripCitationMarkers = require('./index');
+const { transformTokens } = stripCitationMarkers;
 
 const fixturePath = path.join(__dirname, 'test-fixture.md');
 const source = fs.readFileSync(fixturePath, 'utf8');
@@ -76,11 +78,93 @@ assert(
   'Expected subsection heading text to be cleaned of marker'
 );
 
+// 7. Synthetic token-stream: a §Sources heading followed by footer text
+//    followed by `footnote_*` tokens must keep the footnote tokens after the
+//    footer is spliced out. Mirrors what markdown-it-footnote appends at the
+//    END of the token stream.
+const makeToken = (type, tag = '', extra = {}) =>
+  Object.assign({ type, tag, content: '', children: null }, extra);
+
+const syntheticTokens = [
+  makeToken('heading_open', 'h1', { markup: '#' }),
+  makeToken('inline', '', { content: 'Page title', children: [] }),
+  makeToken('heading_close', 'h1'),
+  makeToken('paragraph_open', 'p'),
+  makeToken('inline', '', { content: 'Body with a footnote ref.', children: [] }),
+  makeToken('paragraph_close', 'p'),
+  makeToken('heading_open', 'h2', { markup: '##' }),
+  makeToken('inline', '', { content: '§ Sources', children: [] }),
+  makeToken('heading_close', 'h2'),
+  makeToken('paragraph_open', 'p'),
+  makeToken('inline', '', { content: 'Trailing footer body.', children: [] }),
+  makeToken('paragraph_close', 'p'),
+  makeToken('footnote_block_open'),
+  makeToken('footnote_open', '', { meta: { id: 0 } }),
+  makeToken('inline', '', { content: 'Footnote text.', children: [] }),
+  makeToken('footnote_anchor'),
+  makeToken('footnote_close'),
+  makeToken('footnote_block_close'),
+];
+
+transformTokens(syntheticTokens);
+
+const survivingTypes = syntheticTokens.map((t) => t.type);
+assert(
+  survivingTypes.includes('footnote_block_open') &&
+    survivingTypes.includes('footnote_open') &&
+    survivingTypes.includes('footnote_anchor') &&
+    survivingTypes.includes('footnote_close') &&
+    survivingTypes.includes('footnote_block_close'),
+  'Expected footnote_* tokens to survive past the §Sources splice (got: ' +
+    survivingTypes.join(',') + ')'
+);
+assert(
+  !syntheticTokens.some(
+    (t) => t.type === 'inline' && /Trailing footer body/.test(t.content || '')
+  ),
+  'Expected §Sources footer body to be removed from synthetic token stream'
+);
+
+// 8. Full-pipeline check with markdown-it-footnote: a page that has a
+//    footnote AND a §Sources footer must still render the footnote anchor.
+const mdWithFootnotes = new MarkdownIt({ html: true });
+mdWithFootnotes.use(footnotePlugin);
+mdWithFootnotes.use(stripCitationMarkers);
+
+const footnoteSource = [
+  '# Footnote-aware page',
+  '',
+  'Body text with a footnote ref.[^note] [V5]',
+  '',
+  '[^note]: Footnote body content.',
+  '',
+  '## § Sources',
+  '',
+  '- [V5] https://example.com/source-5',
+  '',
+].join('\n');
+
+const footnoteRendered = mdWithFootnotes.render(footnoteSource);
+
+assert(
+  /class="footnote-ref"|class="footnotes"|<section[^>]*footnotes/i.test(footnoteRendered),
+  'Expected footnote anchor/section to survive in full-pipeline render'
+);
+assert(
+  /Footnote body content/.test(footnoteRendered),
+  'Expected footnote body content to survive in full-pipeline render'
+);
+assert(
+  !/Trailing footer/.test(footnoteRendered) && !/\[V5\]/.test(footnoteRendered.replace(/<code[\s\S]*?<\/code>/g, '')),
+  'Expected §Sources footer and inline [V<n>] markers to still be stripped'
+);
+
 if (failures.length > 0) {
   console.error('FAIL strip-citation-markers');
   failures.forEach((f) => console.error('  - ' + f));
   console.error('\n--- rendered output ---\n' + rendered);
+  console.error('\n--- footnote rendered output ---\n' + footnoteRendered);
   process.exit(1);
 }
 
-console.log('PASS strip-citation-markers (' + 6 + ' assertions)');
+console.log('PASS strip-citation-markers (' + 10 + ' assertions)');
