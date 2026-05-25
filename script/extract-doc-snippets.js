@@ -19,10 +19,20 @@
  * The script intentionally has zero npm deps so it runs in the same Node we
  * use for `compile` without adding to package.json.
  *
+ * Constraints:
+ *   - Snippet bodies must NOT contain nested triple-backtick fences. The
+ *     closing fence matcher accepts any `^```\s*$` line, so a nested fenced
+ *     block inside a snippet would terminate the outer match early.
+ *   - Symlinks under `docs/` are not followed (loop / sandbox-escape guard).
+ *   - Recursion depth is capped at MAX_DEPTH to prevent runaway walks.
+ *   - File enumeration order is stabilised via sort() so generated content
+ *     is byte-identical across platforms (CI-determinism).
+ *
  * Exit codes:
- *   0 — snippets extracted successfully
- *   1 — duplicate snippet name across files, mismatched markers, or other
- *       structural error
+ *   0 — snippets extracted successfully (or no markers present)
+ *   1 — any structural error: malformed marker, mismatched markers,
+ *       duplicate name, fence opened-but-not-closed, marker mismatch,
+ *       or missing docs dir
  */
 'use strict'
 
@@ -32,30 +42,60 @@ const path = require('path')
 const REPO_ROOT = path.resolve(__dirname, '..')
 const DOCS_DIR = path.join(REPO_ROOT, 'docs')
 const OUT_DIR = path.join(REPO_ROOT, 'test-utils', 'snippets')
+const MAX_DEPTH = 8
 
-/** Recursively list every `.md` file under `dir`. */
-function listMarkdown(dir) {
+/**
+ * Recursively list every `.md` file under `dir`. Skips symlinks and bails
+ * past MAX_DEPTH so a stray loop under `docs/` can't hang the build.
+ * Entries are sorted at every level for deterministic ordering across
+ * platforms / filesystems.
+ */
+function listMarkdown(dir, depth = 0) {
+  if (depth > MAX_DEPTH) {
+    console.error(`extract-doc-snippets: depth limit (${MAX_DEPTH}) exceeded under ${dir} — refusing to recurse further`)
+    return []
+  }
+  const entries = fs.readdirSync(dir, { withFileTypes: true })
+    .filter((e) => !e.isSymbolicLink())  // never follow symlinks
+    .sort((a, b) => a.name.localeCompare(b.name))
   const out = []
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+  for (const entry of entries) {
     const p = path.join(dir, entry.name)
-    if (entry.isDirectory()) out.push(...listMarkdown(p))
+    if (entry.isDirectory()) out.push(...listMarkdown(p, depth + 1))
     else if (entry.isFile() && entry.name.endsWith('.md')) out.push(p)
   }
   return out
 }
 
+/** Throw with a precise diagnostic when a line looks like a snippet marker
+ *  but doesn't match the strict grammar (open or close). Catches typos such
+ *  as `<!--snippet:foo-->` (no spaces) which the strict regex skips silently. */
+const malformedSniffRe = /<!--\s*\/?\s*snippet\b/i
+
 /** Parse a markdown file and yield { name, lang, code, sourceFile, line }. */
 function * extractSnippets(filePath) {
   const text = fs.readFileSync(filePath, 'utf8')
   const lines = text.split('\n')
-  const openRe = /^<!--\s*snippet:([a-zA-Z][a-zA-Z0-9_-]*)\s*-->\s*$/
-  const closeRe = /^<!--\s*\/snippet:([a-zA-Z][a-zA-Z0-9_-]*)\s*-->\s*$/
+  const openRe = /^<!--\s+snippet:([a-zA-Z][a-zA-Z0-9_-]*)\s+-->\s*$/
+  const closeRe = /^<!--\s+\/snippet:([a-zA-Z][a-zA-Z0-9_-]*)\s+-->\s*$/
   const fenceRe = /^```([a-zA-Z0-9]*)\s*$/
 
   let i = 0
   while (i < lines.length) {
-    const openMatch = openRe.exec(lines[i])
-    if (!openMatch) { i++; continue }
+    const line = lines[i]
+    const openMatch = openRe.exec(line)
+    if (!openMatch) {
+      // Distinguish "not a marker at all" from "looks like a malformed marker".
+      if (malformedSniffRe.test(line) && !closeRe.exec(line)) {
+        throw new Error(
+          `${filePath}:${i + 1} — line looks like a snippet marker but doesn't match the grammar. ` +
+          `Required form: \`<!-- snippet:NAME -->\` (note the spaces around the marker body). ` +
+          `Got: \`${line.trim()}\``,
+        )
+      }
+      i++
+      continue
+    }
 
     const name = openMatch[1]
     const startLine = i + 1
@@ -103,10 +143,30 @@ function render({ name, lang, code, sourceFile, line }) {
     '// Edit the source markdown then run `npm run snippets:extract`.',
     '// CI fails if this file drifts from the source.',
     '',
+    // Docs snippets are written in JS without TypeScript annotations (they
+    // need to copy-paste runnable for the reader). The .ts extension lets
+    // consumers `import { … }` without a tsconfig.allowJs change, but the
+    // body is intentionally untyped — `@ts-nocheck` keeps tsc quiet without
+    // forcing every snippet author to learn TypeScript.
+    '// @ts-nocheck',
+    '',
   ].join('\n')
   // Snippets in docs are JS for readability; the generated `.ts` file consumes
   // them as TypeScript. Preserve the original content byte-for-byte.
   return banner + code + (code.endsWith('\n') ? '' : '\n')
+}
+
+/** Remove `*.generated.ts` files in OUT_DIR that aren't in `keep`. */
+function pruneOrphans(keep) {
+  if (!fs.existsSync(OUT_DIR)) return []
+  const removed = []
+  for (const name of fs.readdirSync(OUT_DIR).sort()) {
+    if (!name.endsWith('.generated.ts')) continue
+    if (keep.has(name)) continue
+    fs.unlinkSync(path.join(OUT_DIR, name))
+    removed.push(path.relative(REPO_ROOT, path.join(OUT_DIR, name)))
+  }
+  return removed
 }
 
 function main() {
@@ -118,6 +178,7 @@ function main() {
 
   const seen = new Map()
   const written = []
+  const keepBasenames = new Set()
   for (const file of listMarkdown(DOCS_DIR)) {
     for (const snippet of extractSnippets(file)) {
       if (seen.has(snippet.name)) {
@@ -128,18 +189,28 @@ function main() {
         process.exit(1)
       }
       seen.set(snippet.name, snippet)
-      const outPath = path.join(OUT_DIR, `${snippet.name}.generated.ts`)
+      const basename = `${snippet.name}.generated.ts`
+      const outPath = path.join(OUT_DIR, basename)
       fs.writeFileSync(outPath, render(snippet))
       written.push(path.relative(REPO_ROOT, outPath))
+      keepBasenames.add(basename)
     }
   }
 
-  if (written.length === 0) {
+  const removed = pruneOrphans(keepBasenames)
+
+  if (written.length === 0 && removed.length === 0) {
     console.log('extract-doc-snippets: no <!-- snippet:NAME --> blocks found')
     return
   }
-  console.log(`extract-doc-snippets: wrote ${written.length} file(s)`)
-  for (const w of written) console.log(`  ${w}`)
+  if (written.length > 0) {
+    console.log(`extract-doc-snippets: wrote ${written.length} file(s)`)
+    for (const w of written) console.log(`  ${w}`)
+  }
+  if (removed.length > 0) {
+    console.log(`extract-doc-snippets: pruned ${removed.length} orphan(s)`)
+    for (const r of removed) console.log(`  - ${r}`)
+  }
 }
 
 main()

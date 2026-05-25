@@ -2,6 +2,8 @@
 // Source: docs/guide/currency-handling.md:111 (snippet:currency-adapter)
 // Edit the source markdown then run `npm run snippets:extract`.
 // CI fails if this file drifts from the source.
+
+// @ts-nocheck
 // Minimal Excel-format-string → Intl.NumberFormat adapter.
 // Extend the LCID_TO_LOCALE map and CURRENCY_RULES list to cover more formats.
 
@@ -42,6 +44,7 @@ const CURRENCY_RULES = [
 ]
 
 // Accounting: $#,##0.00;($#,##0.00) — positive;negative with parentheses
+// (or $#,##0.00;$#,##0.00 — both sections plain, sign rendered explicitly)
 function tryAccountingFormat(value, format) {
   const sections = format.split(';')
   if (sections.length !== 2) return undefined
@@ -58,7 +61,8 @@ function tryAccountingFormat(value, format) {
     maximumFractionDigits: fractionDigits,
   })
   const formatted = nf.format(Math.abs(value))
-  return isNegative && parenMatch ? `(${formatted})` : formatted
+  if (!isNegative) return formatted
+  return parenMatch ? `(${formatted})` : `-${formatted}`
 }
 
 export const customStringifyCurrency = (value, currencyFormat) => {

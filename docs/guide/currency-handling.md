@@ -150,6 +150,7 @@ const CURRENCY_RULES = [
 ]
 
 // Accounting: $#,##0.00;($#,##0.00) — positive;negative with parentheses
+// (or $#,##0.00;$#,##0.00 — both sections plain, sign rendered explicitly)
 function tryAccountingFormat(value, format) {
   const sections = format.split(';')
   if (sections.length !== 2) return undefined
@@ -166,7 +167,8 @@ function tryAccountingFormat(value, format) {
     maximumFractionDigits: fractionDigits,
   })
   const formatted = nf.format(Math.abs(value))
-  return isNegative && parenMatch ? `(${formatted})` : formatted
+  if (!isNegative) return formatted
+  return parenMatch ? `(${formatted})` : `-${formatted}`
 }
 
 export const customStringifyCurrency = (value, currencyFormat) => {
