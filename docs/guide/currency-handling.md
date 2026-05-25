@@ -86,7 +86,7 @@ const hf = HyperFormula.buildFromArray([
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "$1234.50"
 ```
 
-This callback handles `$`-prefixed formats and falls through (returns `undefined`) for everything else. Dates, durations, and unrecognized formats continue through HyperFormula's existing dispatch chain.
+This callback handles `$`-prefixed formats and falls through (returns `undefined`) for everything else. For any format the callback opts out of, HyperFormula proceeds to the next handler in the dispatch chain: the default date / duration formatters, then the built-in number formatter, and finally the raw format string if nothing matched.
 
 #### Reference table
 

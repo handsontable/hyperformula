@@ -4,8 +4,6 @@
 // CI fails if this file drifts from the source.
 
 // @ts-nocheck
-// Minimal Excel-format-string → Intl.NumberFormat adapter.
-// Extend the LCID_TO_LOCALE map and CURRENCY_RULES list to cover more formats.
 
 const LCID_TO_LOCALE = {
   '-409': { locale: 'en-US', currency: 'USD' },  // USD
@@ -16,10 +14,6 @@ const LCID_TO_LOCALE = {
 }
 
 const CURRENCY_RULES = [
-  // [$SYMBOL-LCID] #,##0[.00] — Excel's locale-tagged currency.
-  // SYMBOL portion requires at least one character (`+`, not `*`) so that
-  // locale-only modifiers like `[$-409]` (used on date/time formats) are
-  // NOT misclassified as currency by this adapter.
   {
     pattern: /^\[\$([^\-\]]+)-([0-9A-Fa-f]+)\]\s*#,##0(\.0+)?$/,
     build: (match) => {
@@ -34,7 +28,6 @@ const CURRENCY_RULES = [
       })
     },
   },
-  // $#,##0.00 — USD shorthand
   {
     pattern: /^\$#,##0(\.0+)?$/,
     build: (match) => new Intl.NumberFormat('en-US', {
@@ -46,11 +39,6 @@ const CURRENCY_RULES = [
   },
 ]
 
-// Accounting: $#,##0.00;($#,##0.00) — positive;negative with parentheses.
-// Note: when both sections are plain (e.g. `$#,##0.00;$#,##0.00`), Excel
-// honors the negative section AS-IS without auto-prepending `-` — the
-// format author explicitly opted out of automatic sign. This adapter
-// mirrors that behavior.
 function tryAccountingFormat(value, format) {
   const sections = format.split(';')
   if (sections.length !== 2) return undefined
@@ -79,7 +67,5 @@ export const customStringifyCurrency = (value, currencyFormat) => {
     const match = rule.pattern.exec(currencyFormat)
     if (match) return rule.build(match).format(value)
   }
-  // Not a recognized currency format — let HyperFormula fall through
-  // to the built-in number formatter.
   return undefined
 }

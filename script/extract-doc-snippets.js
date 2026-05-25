@@ -135,6 +135,37 @@ function * extractSnippets(filePath) {
   }
 }
 
+/**
+ * Strip pure-comment lines from the snippet body.
+ *
+ * Editorial `//` comments in the docs snippet (e.g. `// EUR (generic)`,
+ * `// $#,##0.00 — USD shorthand`) are useful in the published page where
+ * a reader is studying the code, but they add noise in the generated test
+ * artifact where a downstream `import` consumer only cares about the
+ * functional code. We strip lines that contain ONLY whitespace + `//
+ * comment` (block-level). Trailing `// comment` after live code is left
+ * alone — that case needs a JS-aware tokenizer to avoid clobbering URL
+ * literals like `'https://…'`, and the noise reduction from block-level
+ * stripping alone is already significant. Collapses runs of resulting
+ * blank lines to a single blank for readability.
+ */
+function stripBlockComments(code) {
+  const lines = code.split('\n')
+  const blockCommentRe = /^\s*\/\/.*$/
+  const kept = lines.filter((ln) => !blockCommentRe.test(ln))
+  // Collapse 2+ consecutive blank lines into 1 — keeps section breaks but
+  // avoids the "every comment was here" gaps the strip would otherwise leave.
+  const out = []
+  let prevBlank = false
+  for (const ln of kept) {
+    const isBlank = ln.trim() === ''
+    if (isBlank && prevBlank) continue
+    out.push(ln)
+    prevBlank = isBlank
+  }
+  return out.join('\n')
+}
+
 /** Render the generated file with a stable header banner. */
 function render({ name, lang, code, sourceFile, line }) {
   const banner = [
@@ -151,9 +182,8 @@ function render({ name, lang, code, sourceFile, line }) {
     '// @ts-nocheck',
     '',
   ].join('\n')
-  // Snippets in docs are JS for readability; the generated `.ts` file consumes
-  // them as TypeScript. Preserve the original content byte-for-byte.
-  return banner + code + (code.endsWith('\n') ? '' : '\n')
+  const body = stripBlockComments(code)
+  return banner + body + (body.endsWith('\n') ? '' : '\n')
 }
 
 /** Remove `*.generated.ts` files in OUT_DIR that aren't in `keep`. */
