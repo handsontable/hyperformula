@@ -9,7 +9,10 @@ All project knowledge a developer needs &mdash; project overview, architecture, 
 For additional context, also consult:
 
 - the repository [README.md](README.md) &mdash; high-level project description and quick install/usage
-- the public [documentation portal](https://hyperformula.handsontable.com/docs) &mdash; main documentation
+- the markdown files in [`docs/guide/`](docs/guide/) &mdash; user-facing guides (installation, configuration, built-in functions, custom functions, integrations, etc.)
+- the markdown files in [`docs/api/`](docs/api/) &mdash; API reference (generated from JSDoc; run `npm run docs:build` if the folder is missing)
+
+Prefer reading these local files over fetching the rendered documentation from the web.
 
 ## Response style
 
