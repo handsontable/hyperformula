@@ -149,8 +149,11 @@ const CURRENCY_RULES = [
   },
 ]
 
-// Accounting: $#,##0.00;($#,##0.00) — positive;negative with parentheses
-// (or $#,##0.00;$#,##0.00 — both sections plain, sign rendered explicitly)
+// Accounting: $#,##0.00;($#,##0.00) — positive;negative with parentheses.
+// Note: when both sections are plain (e.g. `$#,##0.00;$#,##0.00`), Excel
+// honors the negative section AS-IS without auto-prepending `-` — the
+// format author explicitly opted out of automatic sign. This adapter
+// mirrors that behavior.
 function tryAccountingFormat(value, format) {
   const sections = format.split(';')
   if (sections.length !== 2) return undefined
@@ -167,8 +170,7 @@ function tryAccountingFormat(value, format) {
     maximumFractionDigits: fractionDigits,
   })
   const formatted = nf.format(Math.abs(value))
-  if (!isNegative) return formatted
-  return parenMatch ? `(${formatted})` : `-${formatted}`
+  return isNegative && parenMatch ? `(${formatted})` : formatted
 }
 
 export const customStringifyCurrency = (value, currencyFormat) => {
