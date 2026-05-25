@@ -44,6 +44,15 @@ jobs:
           # Fails the build if internal audit-harness citation markers ([V<n>])
           # or `§Sources` footers leak from spec drafts/comments into compiled output.
           # Markers belong only in internal docs/prompts, never in shipped JS.
+          #
+          # Empirical scope notes (probed 2026-05-25, see scripts/test-marker-scan.sh):
+          # Source comments leak through THREE surfaces and ALL are covered here:
+          #   1) commonjs/*.js and es/*.mjs (babel preserves comments)
+          #   2) dist/hyperformula.js and dist/hyperformula.full.js (webpack preserves
+          #      comments in the development build)
+          #   3) dist/*.js.map (`sourcesContent` embeds full original source, so
+          #      markers survive in source-maps even if stripped from .js)
+          # `grep -rn` over dist/ catches .map files because they are plain JSON.
           set -u
           paths=()
           for dir in dist commonjs es; do
@@ -79,3 +88,11 @@ jobs:
               exit "$rc"
               ;;
           esac
+
+      - name: Self-test marker-scan logic against synthetic fixtures
+        # Run once per OS (the script is platform-agnostic and only takes <1s).
+        # Validates that the inline scan above catches markers in dist/*.js,
+        # dist/*.js.map (sourcesContent), commonjs/*.js, and es/*.mjs surfaces.
+        if: matrix.node-version == 22 && matrix.install-command == 'ci'
+        shell: bash
+        run: bash scripts/test-marker-scan.sh
