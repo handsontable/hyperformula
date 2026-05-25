@@ -60,6 +60,8 @@
     "docs:code-examples:generate-js": "bash docs/code-examples-generator.sh",
     "docs:code-examples:generate-all-js": "bash docs/code-examples-generator.sh --generateAll",
     "docs:code-examples:format-all-ts": "bash docs/code-examples-generator.sh --formatAllTsExamples",
+    "snippets:extract": "node script/extract-doc-snippets.js",
+    "snippets:check": "node script/extract-doc-snippets.js && git diff --exit-code -- test-utils/snippets/",
     "bundle-all": "cross-env HF_COMPILE=1 npm-run-all clean compile bundle:** verify-bundles",
     "bundle:es": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=es env-cmd -f ht.config.js babel lib --out-file-extension .mjs --out-dir es",
     "bundle:cjs": "(node script/if-ne-env.js HF_COMPILE=1 || npm run compile) && cross-env-shell BABEL_ENV=commonjs env-cmd -f ht.config.js babel lib --out-dir commonjs",
