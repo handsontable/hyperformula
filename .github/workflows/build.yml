@@ -37,3 +37,30 @@ jobs:
 
       - name: Build
         run: npm run bundle-all
+
+      - name: Verify no audit-harness markers leaked into build output
+        shell: bash
+        run: |
+          # Fails the build if internal audit-harness citation markers ([V<n>])
+          # or `§Sources` footers leak from spec drafts/comments into compiled output.
+          # Markers belong only in internal docs/prompts, never in shipped JS.
+          set -u
+          paths=()
+          for dir in dist commonjs es; do
+            if [ -d "$dir" ]; then
+              paths+=("$dir")
+            fi
+          done
+          if [ ${#paths[@]} -eq 0 ]; then
+            echo "No build output directories found (dist/, commonjs/, es/); skipping marker scan."
+            exit 0
+          fi
+          echo "Scanning ${paths[*]} for audit-harness markers..."
+          if grep -rnE '\[V[0-9]+\]|§[[:space:]]*Sources' "${paths[@]}"; then
+            echo ""
+            echo "ERROR: audit-harness markers ([V<n>] or §Sources) found in build output."
+            echo "These markers are an internal spec-drafting convention and must never"
+            echo "ship in compiled JS. Strip them from the source comments/strings above."
+            exit 1
+          fi
+          echo "OK: no audit-harness markers found in build output."
