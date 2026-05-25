@@ -1,3 +1,1 @@
-# Contributing
-
-See the [Contributing guide](docs/guide/contributing.md).
+docs/guide/contributing.md
