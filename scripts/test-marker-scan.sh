@@ -2,30 +2,34 @@
 # Self-test for the audit-harness marker scan used in .github/workflows/build.yml.
 #
 # Why this exists:
-#   The CI step in build.yml greps the build output (dist/, commonjs/, es/) for
-#   `[V<n>]` and `§Sources` markers — internal spec-drafting tokens that must
-#   never ship in compiled JS. Empirically (probed 2026-05-25 by planting
-#   `// [V99] test marker` in src/index.ts and running `npm run bundle-all`),
-#   markers leak through THREE distinct surfaces:
+#   The CI step in build.yml invokes `scripts/marker-scan.sh dist commonjs es`
+#   to grep the build output for `[V<n>]` and `§Sources` markers — internal
+#   spec-drafting tokens that must never ship in compiled JS. Empirically
+#   (probed 2026-05-25 by planting `// [V99] test marker` in src/index.ts and
+#   running `npm run bundle-all`), markers leak through THREE distinct surfaces:
 #     1) babel-transpiled commonjs/*.js and es/*.mjs preserve source comments
 #     2) webpack-bundled dist/hyperformula.js and dist/hyperformula.full.js
 #        preserve source comments (development build, no comment-stripping)
 #     3) dist/*.js.map source-maps embed full original source in
 #        `sourcesContent`, so comments survive into the map even when stripped
 #        from the .js itself (not applicable here, but defends future configs)
-#   This script asserts the grep logic catches markers in all three surfaces.
+#   This script exercises the SAME scripts/marker-scan.sh that CI runs, against
+#   synthetic fixtures covering all three surfaces — so the workflow step and
+#   the self-test cannot drift independently.
 #
 # Exit code: 0 on all assertions pass, non-zero on any failure.
 
 set -uo pipefail
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly MARKER_SCAN="$SCRIPT_DIR/marker-scan.sh"
 readonly TMP_ROOT="$(mktemp -d -t hf-marker-scan-XXXXXX)"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
-# ---- Mirror of the CI scan logic from .github/workflows/build.yml ----------
-# Keep this in sync with build.yml. The script-under-test must behave
-# identically to the YAML inline script.
+# ---- Adapter: drives the shared scan against a synthetic fixture root ------
+# Invokes scripts/marker-scan.sh — the same script CI runs — passing the
+# fixture's dist/commonjs/es subdirectories. This is the only place where the
+# self-test couples to the scan; the scan logic itself lives in marker-scan.sh.
 run_marker_scan() {
   local root="$1"
   local paths=()
@@ -36,14 +40,16 @@ run_marker_scan() {
     fi
   done
   if [ ${#paths[@]} -eq 0 ]; then
-    echo "No build output directories found; skipping marker scan."
-    return 0
+    # Mirror the script's "no dirs" branch so the assertion harness treats this
+    # as a clean (rc=0) outcome.
+    bash "$MARKER_SCAN" "$root/__missing__"
+    return $?
   fi
   local rc=0
-  grep -rnE '\[V[0-9]+\]|§[[:space:]]*Sources' "${paths[@]}" || rc=$?
+  bash "$MARKER_SCAN" "${paths[@]}" || rc=$?
   case "$rc" in
-    0) return 1 ;;  # markers found -> CI would fail
-    1) return 0 ;;  # no markers    -> CI would pass
+    0) return 0 ;;  # no markers    -> CI would pass
+    1) return 1 ;;  # markers found -> CI would fail
     *) return "$rc" ;;
   esac
 }

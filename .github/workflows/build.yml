@@ -39,59 +39,14 @@ jobs:
         run: npm run bundle-all
 
       - name: Verify no audit-harness markers leaked into build output
+        # Delegates to scripts/marker-scan.sh so the live CI scan and the
+        # self-test below exercise the same code path and cannot drift.
         shell: bash
-        run: |
-          # Fails the build if internal audit-harness citation markers ([V<n>])
-          # or `§Sources` footers leak from spec drafts/comments into compiled output.
-          # Markers belong only in internal docs/prompts, never in shipped JS.
-          #
-          # Empirical scope notes (probed 2026-05-25, see scripts/test-marker-scan.sh):
-          # Source comments leak through THREE surfaces and ALL are covered here:
-          #   1) commonjs/*.js and es/*.mjs (babel preserves comments)
-          #   2) dist/hyperformula.js and dist/hyperformula.full.js (webpack preserves
-          #      comments in the development build)
-          #   3) dist/*.js.map (`sourcesContent` embeds full original source, so
-          #      markers survive in source-maps even if stripped from .js)
-          # `grep -rn` over dist/ catches .map files because they are plain JSON.
-          set -u
-          paths=()
-          for dir in dist commonjs es; do
-            if [ -d "$dir" ]; then
-              paths+=("$dir")
-            fi
-          done
-          if [ ${#paths[@]} -eq 0 ]; then
-            echo "No build output directories found (dist/, commonjs/, es/); skipping marker scan."
-            exit 0
-          fi
-          echo "Scanning ${paths[*]} for audit-harness markers..."
-          # grep exit codes: 0=match, 1=no-match, 2+=scan/IO error. A bare
-          # `if grep` collapses 1 and 2 into the same branch, silently green-
-          # lighting the step on a read error. Branch on rc explicitly.
-          set +e
-          grep -rnE '\[V[0-9]+\]|§[[:space:]]*Sources' "${paths[@]}"
-          rc=$?
-          set -e
-          case "$rc" in
-            0)
-              echo ""
-              echo "ERROR: audit-harness markers ([V<n>] or §Sources) found in build output."
-              echo "These markers are an internal spec-drafting convention and must never"
-              echo "ship in compiled JS. Strip them from the source comments/strings above."
-              exit 1
-              ;;
-            1)
-              echo "OK: no audit-harness markers found in build output."
-              ;;
-            *)
-              echo "ERROR: grep exited with rc=$rc while scanning ${paths[*]} — aborting CI step." >&2
-              exit "$rc"
-              ;;
-          esac
+        run: bash scripts/marker-scan.sh dist commonjs es
 
       - name: Self-test marker-scan logic against synthetic fixtures
         # Run once per OS (the script is platform-agnostic and only takes <1s).
-        # Validates that the inline scan above catches markers in dist/*.js,
+        # Validates that scripts/marker-scan.sh catches markers in dist/*.js,
         # dist/*.js.map (sourcesContent), commonjs/*.js, and es/*.mjs surfaces.
         if: matrix.node-version == 22 && matrix.install-command == 'ci'
         shell: bash
