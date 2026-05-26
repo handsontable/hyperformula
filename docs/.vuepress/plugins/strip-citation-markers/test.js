@@ -142,6 +142,52 @@ assert(
   'Expected double whitespace left by marker removal to be collapsed to a single space'
 );
 
+// 6f. Bugbot edge case — a heading whose raw inline content carries an
+//     authored `[V<n>]` marker (e.g. `§ Sources [V1]`) must still be
+//     detected as the Sources footer. Footer detection runs BEFORE inline
+//     marker stripping, so the heading-text check must normalize markers
+//     out before testing the strict-anchored regex.
+const mdBugbot = new MarkdownIt({ html: true });
+mdBugbot.use(stripCitationMarkers);
+const renderedBugbot = mdBugbot.render([
+  '# Page',
+  '',
+  'Body text.',
+  '',
+  '## § Sources [V1]',
+  '',
+  '- [V1] https://example.com/source-1 — footer body to drop',
+  '',
+].join('\n'));
+assert(
+  !/footer body to drop/.test(renderedBugbot),
+  'Expected `§ Sources [V1]` heading to be detected as Sources footer (Bugbot edge case)'
+);
+assert(
+  !/\[V1\]/.test(renderedBugbot.replace(/<code[\s\S]*?<\/code>/g, '')),
+  'Expected `[V<n>]` marker not to survive on a page with `§ Sources [V1]` heading'
+);
+
+// 6g. Mutation kill — a bare `§ Sources` heading (no markers) must still
+//     trigger the strip after the normalization shim is added; guards
+//     against accidentally swallowing the pattern test or replacing it.
+const mdBareSources = new MarkdownIt({ html: true });
+mdBareSources.use(stripCitationMarkers);
+const renderedBareSources = mdBareSources.render([
+  '# Page',
+  '',
+  'Body.',
+  '',
+  '## § Sources',
+  '',
+  '- bare-sources footer body',
+  '',
+].join('\n'));
+assert(
+  !/bare-sources footer body/.test(renderedBareSources),
+  'Expected bare `§ Sources` heading (no markers) to still trigger footer strip'
+);
+
 // 7. Synthetic token-stream: a §Sources heading followed by footer text
 //    followed by `footnote_*` tokens must keep the footnote tokens after the
 //    footer is spliced out. Mirrors what markdown-it-footnote appends at the
@@ -231,4 +277,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('PASS strip-citation-markers (' + 15 + ' assertions)');
+console.log('PASS strip-citation-markers (' + 20 + ' assertions)');

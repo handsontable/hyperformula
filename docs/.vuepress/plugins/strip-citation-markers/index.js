@@ -60,7 +60,11 @@ const stripChildren = (children) => {
 
 /**
  * Detects whether a heading_open token (already located) introduces the
- * `Sources` / `§Sources` footer.
+ * `Sources` / `§Sources` footer. The heading's raw inline content is first
+ * normalized via `stripInlineMarkers` so that an authored heading like
+ * `§ Sources [V1]` (markers next to the heading text) still matches the
+ * strict end-anchored pattern; without normalization the trailing `[V1]`
+ * would defeat the `\s*$` anchor and the footer would never be detected.
  *
  * @param {Array} tokens - Full token array.
  * @param {number} headingOpenIdx - Index of the heading_open token.
@@ -69,7 +73,7 @@ const stripChildren = (children) => {
 const isSourcesHeading = (tokens, headingOpenIdx) => {
   const inline = tokens[headingOpenIdx + 1];
   if (!inline || inline.type !== 'inline') return false;
-  return SOURCES_HEADING_PATTERN.test(inline.content || '');
+  return SOURCES_HEADING_PATTERN.test(stripInlineMarkers(inline.content || ''));
 };
 
 /**
