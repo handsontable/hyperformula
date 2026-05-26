@@ -32,3 +32,13 @@ This section is maintained by the team. Whenever an AI agent makes a mistake wor
 -->
 
 _No items yet._
+
+## Skills, MCPs, and other agent tools
+
+This section is maintained by the team. Skills, MCP servers, and other tools vetted as useful for AI agents working on this codebase are listed here.
+
+<!-- Add new items here. Use the format:
+- **Name** &mdash; What it provides and when to use it.
+-->
+
+_No items yet._
