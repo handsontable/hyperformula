@@ -24,3 +24,9 @@ Each change to the production code (bugfixes, new features, improvements) must i
 HF supports internationalization and provides the localized function names for all built-in languages. When looking for the valid translations for the new functions, try these sources:
 - https://support.microsoft.com/en-us/office/excel-functions-translator-f262d0c0-991c-485b-89b6-32cc8d326889
 - http://dolf.trieschnigg.nl/excel/index.php
+
+For languages not officially supported by Microsoft Excel, the two sources above do not apply. For these languages, use Google Sheets as the reference. Switch the `hl` query parameter to the target locale, for example:
+
+- https://support.google.com/docs/table/25273?hl=id (Indonesian)
+
+For functions that Google Sheets does not list either, fall back to the English name (matching the convention used by Excel in unsupported locales).
