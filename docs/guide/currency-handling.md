@@ -220,6 +220,8 @@ The output values above contain non-breaking spaces (U+00A0 or U+202F depending 
 
 Excel can mark a currency format with a [Microsoft Locale Identifier](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) (LCID) so the symbol carries locale context. The syntax is `[$SYMBOL-LCID]` followed by the number template — for example `[$zł-415] #,##0.00` means *"Polish złoty, hex LCID `415` = `pl-PL`"*, and `[$€-2] #,##0.00` means *"euro, generic"*. The adapter above parses the LCID to pick the matching `Intl.NumberFormat` locale and ISO 4217 currency code.
 
+**Excel resolves LCID tags natively** — no extra configuration is required. For example, `[$€-2] #,##0.00` automatically uses European grouping and decimal separators and produces `1.234,50 €`; `[$zł-415] #,##0.00` uses `pl-PL` and produces `1 234,50 zł`. HyperFormula's built-in formatter does not resolve LCID tags; the adapter above replicates that behavior via `Intl.NumberFormat`.
+
 #### When to swap in a library
 
 The adapter above covers a small but representative subset of Excel currency format strings (LCID-tagged, USD shorthand, accounting two-section) in under one page of code, with a fall-through path for everything else. If you need:
