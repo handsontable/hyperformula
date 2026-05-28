@@ -4,3 +4,16 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# The docs site is built with `base: '/docs'` in astro.config.mjs, so the
+# generated HTML references `/docs/_astro/*`, `/docs/guide/*`, etc. In
+# production, `hyperformula.handsontable.com/docs/` is served by a reverse
+# proxy that strips the `/docs/` prefix before forwarding to this Netlify
+# project's subdomain root. Netlify deploy previews don't go through that
+# proxy, so the `/docs/`-prefixed paths 404 by default. This rewrite makes
+# the preview mimic the production proxy: any `/docs/...` request is served
+# from the matching root path of the publish directory.
+[[redirects]]
+  from = "/docs/*"
+  to = "/:splat"
+  status = 200
