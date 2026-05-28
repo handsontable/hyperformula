@@ -13,7 +13,7 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 
 ## Repository layout
 
-```text
+```
 .
 ├── src/                        # Source code
 │   ├── HyperFormula.ts         # Main engine class, public API entry point

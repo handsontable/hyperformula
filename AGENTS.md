@@ -22,6 +22,7 @@ Prefer reading these local files over fetching the rendered documentation from t
 - Ask clarifying questions when the request is ambiguous rather than guessing.
 - If you do not know something, say so and ask for help.
 - When answering from project documentation, quote the exact relevant fragments to support your claim.
+- In commit messages, PR descriptions, code comments, and documentation: do not mention the names of AI tools used for code generation.
 
 ## Common ways agents fail
 
