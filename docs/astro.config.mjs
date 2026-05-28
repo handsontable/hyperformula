@@ -94,6 +94,14 @@ export default defineConfig({
         Footer: './src/components/Footer.astro',
         // Sun/moon toggle replacing the Auto/Light/Dark <select>.
         ThemeSelect: './src/components/ThemeSelect.astro',
+        // Strips the page-action button row that starlight-page-actions
+        // would otherwise inject under the page heading. The actions are
+        // moved into the right-hand sidebar (see PageSidebar override).
+        PageTitle: './src/components/PageTitle.astro',
+        // Adds a flat HT-style action list (Copy Markdown, Open in
+        // ChatGPT, Open in Claude) under the "On this page" table of
+        // contents.
+        PageSidebar: './src/components/PageSidebar.astro',
       },
     }),
 

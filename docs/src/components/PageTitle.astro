@@ -1,0 +1,13 @@
+---
+/*
+ * Override of Starlight's PageTitle to suppress the action-row that
+ * `starlight-page-actions` would otherwise inject under the heading.
+ *
+ * The actions (Copy Markdown, Open in ChatGPT, Open in Claude, etc.) are
+ * rendered in the right-hand sidebar by `PageSidebar.astro` below the
+ * "On this page" table of contents — matching the Handsontable docs UI.
+ */
+import DefaultPageTitle from '@astrojs/starlight/components/PageTitle.astro';
+---
+
+<DefaultPageTitle />
