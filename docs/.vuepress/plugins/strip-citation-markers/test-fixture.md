@@ -8,7 +8,7 @@ A line with multiple markers [V3] [V4] should collapse trailing whitespace clean
 
 Inline code like `[V99]` must NOT be stripped because authors may need to discuss the audit-harness syntax itself.
 
-```text
+```
 fenced code [V7] stays as-is
 ```
 
