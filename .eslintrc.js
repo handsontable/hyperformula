@@ -148,6 +148,22 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-non-null-assertion': 'off',
       }
-    }
+    },
+    {
+      files: ['scripts/*.js'],
+      env: {
+        node: true,
+      },
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/restrict-template-expressions': 'off',
+        'no-undef': 'off',
+      },
+    },
   ],
 }
