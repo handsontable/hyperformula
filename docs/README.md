@@ -12,7 +12,7 @@ View the documentation's latest production version at [hyperformula.handsontable
 
 ## Getting started
 
-The docs site is built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build). **Requires Node 20** (separate from the HyperFormula core's Node version).
+The docs site is built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build). **Requires Node 22.12+** (Astro 6 minimum; separate from the HyperFormula library's Node version).
 
 1. From the `docs` directory, install dependencies:
    ```bash

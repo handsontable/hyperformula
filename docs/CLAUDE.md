@@ -2,7 +2,7 @@
 
 This document is written for both human authors and AI agents. All rules are stated explicitly so both roles can apply them without ambiguity.
 
-Astro Starlight-based documentation site. **Requires Node 20** (separate from core's runtime requirements).
+Astro Starlight-based documentation site. **Requires Node 22.12+** (Astro 6 minimum; separate from the HyperFormula library's runtime requirements).
 
 ---
 

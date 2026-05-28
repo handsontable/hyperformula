@@ -161,8 +161,17 @@ function ensureFrontmatterTitle(content, slug) {
 }
 
 function cleanTitleText(s) {
-  return s
-    .replace(/<[^>]+>/g, '') // strip HTML (e.g. TypeDoc <Badge text="Class"/>)
+  // Strip HTML tags. Iterate to a fixed point so nested constructions like
+  // "<sc<script>ript>" collapse fully instead of leaving a <script> behind.
+  let prev;
+  let out = s;
+
+  do {
+    prev = out;
+    out = out.replace(/<[^>]+>/g, '');
+  } while (out !== prev);
+
+  return out
     .replace(/`/g, '')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
     .replace(/\*\*/g, '')

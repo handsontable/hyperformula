@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "description": "HyperFormula documentation",
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12"
   },
   "scripts": {
     "generate:content": "node scripts/generate-content.mjs",

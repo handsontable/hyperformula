@@ -17,7 +17,7 @@ The Netlify build is driven by [`netlify.toml`](../netlify.toml) at the **reposi
   publish = "docs/dist"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 ```
 
 On every push to a tracked branch, Netlify:
