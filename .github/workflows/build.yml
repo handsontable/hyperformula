@@ -42,7 +42,7 @@ jobs:
         # Delegates to scripts/marker-scan.sh so the live CI scan and the
         # self-test below exercise the same code path and cannot drift.
         shell: bash
-        run: bash scripts/marker-scan.sh dist commonjs es
+        run: bash scripts/marker-scan.sh dist commonjs es typings languages
 
       - name: Self-test marker-scan logic against synthetic fixtures
         # Run once per OS (the script is platform-agnostic and only takes <1s).

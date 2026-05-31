@@ -7,9 +7,12 @@
 # self-test fixture coverage.
 #
 # Why this scan exists:
-#   Greps build output for `[V<n>]` and `§Sources` markers — internal
-#   spec-drafting tokens that must never ship in compiled JS. Source comments
-#   leak through THREE surfaces and ALL are covered here:
+#   Greps build output for audit-harness citation markers and the `§Sources`
+#   footer — internal spec-drafting tokens that must never ship in compiled
+#   output. Markers are the current lowercase prefixed form `[vrf_1]`/`[dec_3]`/
+#   `[con_2]`/`[que_5]`/`[wrg_7]`/`[crf_4]` (parser `^\[[a-z][a-z0-9_]*\]$`) plus
+#   the legacy `[V<n>]` form. Source comments leak through THREE surfaces and
+#   ALL are covered here:
 #     1) commonjs/*.js and es/*.mjs (babel preserves comments)
 #     2) dist/hyperformula.js and dist/hyperformula.full.js (webpack preserves
 #        comments in the development build)
@@ -50,7 +53,7 @@ echo "Scanning ${paths[*]} for audit-harness markers..."
 # collapses 1 and 2 into the same branch, silently green-lighting on read
 # errors. Branch on rc explicitly.
 set +e
-grep -rnE '\[V[0-9]+\]|§[[:space:]]*Sources' "${paths[@]}"
+grep -rnE '\[(V[0-9]+|(vrf|dec|con|que|wrg|crf)_[0-9]+)\]|§[[:space:]]*Sources' "${paths[@]}"
 rc=$?
 set -e
 

@@ -34,7 +34,8 @@ run_marker_scan() {
   local root="$1"
   local paths=()
   local dir
-  for dir in dist commonjs es; do
+  # Mirror the build.yml invocation exactly so the self-test and CI cannot drift.
+  for dir in dist commonjs es typings languages; do
     if [ -d "$root/$dir" ]; then
       paths+=("$root/$dir")
     fi
@@ -111,6 +112,31 @@ make_marker_in_es() {
 EOF
 }
 
+# Variant: CURRENT lowercase prefixed marker (e.g. [vrf_3]) in commonjs output.
+# The pre-2026-05-21 [V<n>] form is legacy; real specs emit [vrf_/dec_/con_/
+# que_/wrg_/crf_]_<digits>. Isolates the scan-PATTERN coverage.
+make_marker_in_commonjs_current() {
+  local root="$1"
+  make_clean_fixture "$root"
+  cat >>"$root/commonjs/index.js" <<'EOF'
+// [vrf_3] current-grammar citation marker — must not ship
+EOF
+}
+
+# Variant: marker leaked into typings/*.d.ts. `bundle:typings` (tsc -d) and
+# `bundle:languages` are build outputs that preserve source comments, so they
+# are leak surfaces too. Uses a legacy [V<n>] marker to isolate the DIRECTORY-
+# coverage defect from the pattern defect.
+make_marker_in_typings() {
+  local root="$1"
+  make_clean_fixture "$root"
+  mkdir -p "$root/typings"
+  cat >"$root/typings/index.d.ts" <<'EOF'
+/** Public API surface. [V12] citation leaked into declarations. */
+export declare const foo: number;
+EOF
+}
+
 # ---- Assertion harness ------------------------------------------------------
 PASS_COUNT=0
 FAIL_COUNT=0
@@ -151,6 +177,8 @@ f="$TMP_ROOT/case-dist-js";        make_marker_in_dist_js      "$f"; assert_scan
 f="$TMP_ROOT/case-dist-map";       make_marker_in_sourcemap    "$f"; assert_scan "marker in dist/*.js.map (sourcesContent)" "dirty" "$f"
 f="$TMP_ROOT/case-commonjs";       make_marker_in_commonjs     "$f"; assert_scan "§Sources in commonjs/*.js"          "dirty" "$f"
 f="$TMP_ROOT/case-es";             make_marker_in_es           "$f"; assert_scan "marker in es/*.mjs"                 "dirty" "$f"
+f="$TMP_ROOT/case-commonjs-current"; make_marker_in_commonjs_current "$f"; assert_scan "current [vrf_n] marker in commonjs/*.js" "dirty" "$f"
+f="$TMP_ROOT/case-typings";        make_marker_in_typings      "$f"; assert_scan "marker in typings/*.d.ts"          "dirty" "$f"
 
 echo ""
 echo "=== summary: $PASS_COUNT passed, $FAIL_COUNT failed ==="
