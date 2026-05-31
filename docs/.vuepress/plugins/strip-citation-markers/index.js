@@ -2,7 +2,8 @@
  * markdown-it plugin: strip internal audit-harness annotations from rendered docs.
  *
  * Our internal authoring workflow uses the audit-harness convention:
- *   - Inline citation markers like `[V1]`, `[V12]` placed next to factual claims.
+ *   - Inline citation markers like `[vrf_1]`, `[dec_3]` (legacy `[V12]`) placed
+ *     next to factual claims.
  *   - A trailing `§ Sources` (or `§Sources`) footer listing the sources.
  *
  * These markers exist so the audit-harness can re-verify every claim against
@@ -11,8 +12,9 @@
  * at build time so the rendered site stays clean.
  *
  * Stripping rules:
- *   - Inline marker:    `[V<digits>]` NOT followed by `(` (so real
- *                       markdown links `[V12](url)` are left untouched).
+ *   - Inline marker:    `[<prefix>_<digits>]` (e.g. `[vrf_1]`) or legacy
+ *                       `[V<digits>]`, NOT followed by `(` (so real markdown
+ *                       links `[vrf_1](url)` / `[V12](url)` are left untouched).
  *   - Footer section:   a heading whose text is exactly `Sources` or
  *                       `§ Sources` / `§Sources`, together with everything
  *                       below it up to end-of-file or the next top-level
@@ -23,7 +25,13 @@
  * Implementation: walks the markdown-it token stream after parsing.
  */
 
-const INLINE_CITATION_PATTERN = /\[V\d+\](?!\()/g;
+// Audit-harness citation markers. The current convention (post-2026-05-21) is a
+// lowercase prefix + `_` + digits — `[vrf_1]`, `[dec_3]`, `[con_2]`, `[que_5]`,
+// `[wrg_7]`, `[crf_4]` — matching the parser grammar `^\[[a-z][a-z0-9_]*\]$`.
+// The legacy uppercase `[V<n>]` form is kept as an alternative for older notes.
+// In both cases a trailing `(` is excluded so real markdown links like
+// `[vrf_1](url)` / `[V12](url)` are left untouched.
+const INLINE_CITATION_PATTERN = /\[(?:V\d+|[a-z][a-z0-9]*_\d+)\](?!\()/g;
 const SOURCES_HEADING_PATTERN = /^\s*(?:§\s*)?Sources\s*$/i;
 
 /**

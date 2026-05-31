@@ -269,6 +269,52 @@ assert(
   'Expected §Sources footer and inline [V<n>] markers to still be stripped'
 );
 
+// 9. CURRENT audit-harness grammar: lowercase prefixed markers like `[vrf_1]`
+//    / `[dec_3]` (parser `^\[[a-z][a-z0-9_]*\]$`, canonical run-strip uses
+//    `[a-z][a-z0-9]*_<digits>`) must be stripped. The pre-2026-05-21 `[V<n>]`
+//    form is legacy; real specs emit the lowercase prefixed form.
+const mdLower = new MarkdownIt({ html: true });
+mdLower.use(stripCitationMarkers);
+const renderedLower = mdLower.render(
+  'Claim [vrf_1], decision [dec_3], constraint [con_2], question [que_5], wrong [wrg_7], crossref [crf_4].'
+);
+const lowerBody = renderedLower
+  .replace(/<code[\s\S]*?<\/code>/g, '')
+  .replace(/<pre[\s\S]*?<\/pre>/g, '');
+assert(
+  !/\[(?:vrf|dec|con|que|wrg|crf)_\d+\]/.test(lowerBody),
+  'Expected lowercase audit-harness markers ([vrf_1] etc.) to be stripped'
+);
+
+// 9a. Over-strip guard — bracketed tokens WITHOUT the `prefix_<digits>` grammar
+//     (plain words, no trailing `_<digits>`) must be preserved.
+const mdPlain = new MarkdownIt({ html: true });
+mdPlain.use(stripCitationMarkers);
+const renderedPlain = mdPlain.render('See [note] and [abc] inline.');
+assert(
+  /\[note\]/.test(renderedPlain) && /\[abc\]/.test(renderedPlain),
+  'Expected non-marker bracketed tokens like [note]/[abc] to be preserved'
+);
+
+// 9b. Real markdown link with a lowercase-marker-shaped label must survive
+//     (negative lookahead `(?!\()`).
+const mdLowerLink = new MarkdownIt({ html: true });
+mdLowerLink.use(stripCitationMarkers);
+const renderedLowerLink = mdLowerLink.render('Link [vrf_1](https://example.com/v) here.');
+assert(
+  /<a[^>]*href="https:\/\/example\.com\/v"[^>]*>vrf_1<\/a>/.test(renderedLowerLink),
+  'Expected [vrf_1](url) to remain a real markdown link'
+);
+
+// 9c. Lowercase marker inside inline code must survive (code tokens skipped).
+const mdLowerCode = new MarkdownIt({ html: true });
+mdLowerCode.use(stripCitationMarkers);
+const renderedLowerCode = mdLowerCode.render('Docs show `[vrf_9]` verbatim.');
+assert(
+  /<code>\[vrf_9\]<\/code>/.test(renderedLowerCode),
+  'Expected inline code `[vrf_9]` to survive untouched'
+);
+
 if (failures.length > 0) {
   console.error('FAIL strip-citation-markers');
   failures.forEach((f) => console.error('  - ' + f));
@@ -277,4 +323,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log('PASS strip-citation-markers (' + 20 + ' assertions)');
+console.log('PASS strip-citation-markers (' + 24 + ' assertions)');
