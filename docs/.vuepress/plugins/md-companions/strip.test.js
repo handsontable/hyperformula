@@ -35,4 +35,9 @@ check('content preserved',
   stripVuePressSyntax('# H\n\n`code`\n\n[link](/guide/x)\n\n| a | b |\n|---|---|'),
   '# H\n\n`code`\n\n[link](/guide/x)\n\n| a | b |\n|---|---|');
 
+// 8. :::example container (live demo) stripped entirely
+check('example container stripped',
+  stripVuePressSyntax('## Demo\n\n::: example #ex1 --html 1\n@[code](example.html)\n:::\n\nOutro'),
+  '## Demo\n\nOutro');
+
 console.log(`PASS md-companions/strip (${passed} assertions)`);

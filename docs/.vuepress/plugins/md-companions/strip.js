@@ -41,12 +41,15 @@ function stripVuePressSyntax(src) {
 
     if (/^\[\[toc\]\]$/i.test(trimmed)) continue;
 
-    const open = trimmed.match(/^:::\s*(tip|warning|danger|details)\s*(.*)$/i);
+    const open = trimmed.match(/^:::\s*(\w+)\s*(.*)$/i);
     if (open) {
+      const type = open[1].toLowerCase();
       const title = open[2].trim();
       const body = [];
       i++;
       while (i < lines.length && lines[i].trim() !== ':::') { body.push(lines[i]); i++; }
+      // Demo/example containers (live code runners) are not prose — omit entirely.
+      if (type === 'example') { continue; }
       if (title) { out.push(`> **${title}**`); out.push('>'); }
       body.forEach(b => out.push(b.trim() === '' ? '>' : `> ${b}`));
       while (out.length && out[out.length - 1] === '>') out.pop();
