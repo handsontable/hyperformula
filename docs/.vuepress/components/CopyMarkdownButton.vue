@@ -27,10 +27,22 @@ export default {
   methods: {
     copy() {
       const absolute = window.location.origin + this.mdUrl;
-      navigator.clipboard.writeText(absolute).then(() => {
-        this.copied = true;
-        setTimeout(() => { this.copied = false; }, 1500);
-      });
+      const fallback = (text) => {
+        const el = document.createElement('textarea');
+        el.value = text;
+        el.style.position = 'fixed';
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+        el.select();
+        try { document.execCommand('copy'); } finally { document.body.removeChild(el); }
+      };
+      const done = () => { this.copied = true; setTimeout(() => { this.copied = false; }, 1500); };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(absolute).then(done).catch(() => { fallback(absolute); done(); });
+      } else {
+        fallback(absolute);
+        done();
+      }
     },
   },
 };

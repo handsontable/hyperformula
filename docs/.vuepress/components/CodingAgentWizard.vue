@@ -64,10 +64,24 @@ export default {
   methods: {
     reset() { this.selected = null; this.copied = false; },
     copy() {
-      navigator.clipboard.writeText(this.current.snippet).then(() => {
-        this.copied = true;
-        setTimeout(() => { this.copied = false; }, 1500);
-      });
+      if (!this.current) return;
+      const text = this.current.snippet;
+      const fallback = (t) => {
+        const el = document.createElement('textarea');
+        el.value = t;
+        el.style.position = 'fixed';
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+        el.select();
+        try { document.execCommand('copy'); } finally { document.body.removeChild(el); }
+      };
+      const done = () => { this.copied = true; setTimeout(() => { this.copied = false; }, 1500); };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done).catch(() => { fallback(text); done(); });
+      } else {
+        fallback(text);
+        done();
+      }
     },
   },
 };

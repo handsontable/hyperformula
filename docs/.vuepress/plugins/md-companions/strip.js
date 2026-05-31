@@ -19,9 +19,12 @@ function stripVuePressSyntax(src) {
     if (fenceMatch && !inScript) {
       if (!inFence) {
         inFence = true;
-        fenceMarker = fenceMatch[1][0];
-      } else if (trimmed.startsWith(fenceMarker)) {
-        inFence = false;
+        fenceMarker = fenceMatch[1];   // full marker e.g. "```" or "````"
+      } else {
+        const closeMatch = trimmed.match(/^(```+|~~~+)/);
+        if (closeMatch && closeMatch[1][0] === fenceMarker[0] && closeMatch[1].length >= fenceMarker.length) {
+          inFence = false;
+        }
       }
       out.push(line);
       continue;
@@ -47,7 +50,14 @@ function stripVuePressSyntax(src) {
       const title = open[2].trim();
       const body = [];
       i++;
+      const bodyStart = i;
       while (i < lines.length && lines[i].trim() !== ':::') { body.push(lines[i]); i++; }
+      // If we hit EOF without finding closing :::, emit verbatim (not a real container).
+      if (i >= lines.length) {
+        out.push(lines[bodyStart - 1]); // re-emit the opening line
+        body.forEach(b => out.push(b));
+        continue;
+      }
       // Demo/example containers (live code runners) are not prose — omit entirely.
       if (type === 'example') { continue; }
       if (title) { out.push(`> **${title}**`); out.push('>'); }

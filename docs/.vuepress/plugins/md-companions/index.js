@@ -19,19 +19,23 @@ module.exports = (options, ctx) => ({
       '# HyperFormula Documentation',
       '',
       '> Full documentation corpus for LLM consumption.',
-      '> Individual pages also available at <base>/guide/<slug>.md',
+      `> Individual pages also available at ${hostname}${base}guide/<slug>.md`,
       '',
     ];
 
     for (const page of pages) {
-      const clean = stripVuePressSyntax(page._strippedContent || '');
-      const relPath = page.path.replace(/\.html$/, '.md');
-      const outFile = path.join(ctx.outDir, relPath.replace(/^\//, ''));
-      await fs.promises.mkdir(path.dirname(outFile), { recursive: true });
-      await fs.promises.writeFile(outFile, clean, 'utf8');
+      try {
+        const clean = stripVuePressSyntax(page._strippedContent || '');
+        const relPath = page.path.replace(/\.html$/, '.md');
+        const outFile = path.join(ctx.outDir, relPath.replace(/^\//, ''));
+        await fs.promises.mkdir(path.dirname(outFile), { recursive: true });
+        await fs.promises.writeFile(outFile, clean, 'utf8');
 
-      const url = hostname + base.replace(/\/$/, '') + page.path.replace(/\.html$/, '');
-      corpus.push('---', '', `## ${page.title || page.path}`, '', `URL: ${url}`, '', clean, '');
+        const url = hostname + base.replace(/\/$/, '') + page.path.replace(/\.html$/, '');
+        corpus.push('---', '', `## ${page.title || page.path}`, '', `URL: ${url}`, '', clean, '');
+      } catch (err) {
+        console.warn(`[md-companions] skipping ${page.path}: ${err.message}`);
+      }
     }
 
     const llmsFull = path.join(ctx.outDir, 'llms-full.txt');

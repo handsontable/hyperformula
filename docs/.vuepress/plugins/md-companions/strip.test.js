@@ -40,4 +40,9 @@ check('example container stripped',
   stripVuePressSyntax('## Demo\n\n::: example #ex1 --html 1\n@[code](example.html)\n:::\n\nOutro'),
   '## Demo\n\nOutro');
 
+// 9. 4-backtick outer fence is not prematurely closed by 3-backtick inner fence
+check('nested fence lengths',
+  stripVuePressSyntax('````markdown\n```js\ncode\n```\n````'),
+  '````markdown\n```js\ncode\n```\n````');
+
 console.log(`PASS md-companions/strip (${passed} assertions)`);
