@@ -12,21 +12,35 @@ Joseph (GreenFlux) already shipped in `hyperformula-website` repo: robots.txt, s
 
 Five independent components, all targeted at VuePress 1.x under `docs/`.
 
+## Critical integration constraint: base path
+
+`docs/.vuepress/build.config.js` sets `base: '/docs/'` and `dest: 'docs/.vuepress/dist/docs'`. The HF docs site is served under `/docs/`, not domain root. Every component MUST respect this:
+
+- **C1** writes companions next to the rendered `.html` inside `ctx.outDir` (which already includes the `/docs` segment) — derive paths from `ctx`, never hardcode `dist/guide/`.
+- **C2** computes the `.md` URL from `this.$page.path` (VuePress canonical path) + `ctx.base`, never from naive `window.location` string munging.
+- **C5** `llms-full.txt` is emitted under the same base. The robots.txt pointer and any absolute URLs must use `${DOCS_HOSTNAME}${base}llms-full.txt` (i.e. `.../docs/llms-full.txt`), not domain root. Confirm whether Netlify rewrites `/llms-full.txt` → `/docs/llms-full.txt`; if not, the canonical location is under `/docs/`.
+
+Verified against VuePress core: `generated` hook exists (async, receives `pagePaths`) — `@vuepress/core/lib/node/plugin-api/constants.js:8`, `build/index.js:111`. Output files are flat `<slug>.html` — `build/index.js:165`. `globalUIComponents` is a real plugin option.
+
 ---
 
 ## C1: `vuepress-plugin-md-companions`
 
 **What it does:** Post-build VuePress plugin. For every guide page source file, strips VuePress-specific syntax and emits a clean `.md` companion file into `dist/` alongside the `.html`. Also emits `dist/llms-full.txt`.
 
-**Strips from source markdown:**
-- Custom containers (`:::tip`, `:::warning`, `:::danger`) → strip fence, keep body text
+**Source of content:** Use `ctx.pages[].​_strippedContent` (raw markdown with frontmatter already removed by VuePress) rather than re-reading files from disk. Each page object also exposes `.path`, `.title`, `.frontmatter`.
+
+**Strips from source markdown — token-aware, NOT naive regex:**
+- Custom containers (`:::tip`, `:::warning`, `:::danger`) → convert to blockquote, keep body text. Must skip fenced code regions (a code block may legitimately contain `:::`). Implement by tracking fence state line-by-line, or run through a markdown-it instance.
 - Inline `<script>`, `<style>` blocks → omit entirely
+- VuePress components (`<SomeComponent/>`) → omit
 - `[[toc]]` tokens → omit
-- VuePress-specific frontmatter keys (`pageClass`, `sidebarDepth`, `prev`, `next`) → omit
 
-**Keeps:** headings, paragraphs, code blocks (fenced and indented), links (resolved to absolute URLs using `DOCS_HOSTNAME`), images, tables.
+**Keeps:** headings, paragraphs, code blocks (fenced and indented), links (resolved to absolute URLs using `DOCS_HOSTNAME` + base), images, tables.
 
-**Output per page:** `dist/guide/<slug>.md` and `dist/api/<slug>.md`
+**Output per page:** companion `.md` written next to the rendered `.html` inside `ctx.outDir`, e.g. `<outDir>/guide/<slug>.md`. Because `dest` already includes `/docs`, the served URL is `/docs/guide/<slug>.md`.
+
+**Required fixture test:** a page containing a fenced code block with `:::` inside it, plus a real `:::tip`, must produce correct output (code block untouched, tip converted). This is the acceptance test for the stripping logic.
 
 **llms-full.txt format:**
 ```
@@ -56,7 +70,10 @@ URL: https://hyperformula.handsontable.com/guide/<slug>
 
 **What it does:** Global UI component (registered in `config.js` `globalUIComponents`) rendered on every page. Displays a "Copy Markdown" button. On click: constructs the `.md` URL for the current page, copies to clipboard, shows a brief "Copied!" flash.
 
-**URL construction:** `window.location.href` with `.html` replaced by `.md` (or appended if no `.html`).
+**URL construction (do NOT use `window.location`):** VuePress serves clean URLs (`/docs/guide/foo`, sometimes trailing slash, homepage `/docs/`). Naive string munging produces garbage like `/docs/.md`. Instead use `this.$page.path` (canonical regularPath, e.g. `/guide/foo.html`):
+- `/guide/foo.html` → `${base}guide/foo.md`
+- `/` or `/index.html` (homepage) → button hidden or links to `${base}llms-full.txt`
+- Prefix with `ctx.base` (`/docs/`) to get the served path.
 
 **Placement:** Fixed `position: fixed; bottom: 1.5rem; right: 1.5rem` — matches the intent of Joseph's sidebar button but works within VuePress default theme without theme overrides. CSS scoped to the component; z-index above content, below modals (z-index: 100).
 
@@ -103,11 +120,14 @@ Links: skill repo, llms-full.txt, AGENTS.md, llms.txt
 
 **IDEs supported:** Claude Code, Cursor, GitHub Copilot, Other.
 
-**Step 2 content per IDE:**
-- **Claude Code:** `/install hyperformula` command + explanation
-- **Cursor:** Paste into `.cursorrules` or `AGENTS.md` block to add
-- **Copilot:** GitHub Copilot instructions file snippet
-- **Other:** Generic llms-full.txt fetch instruction
+**Step 2 content per IDE — install commands MUST be verified, not invented:**
+Do not write install commands from memory. Before implementing, read Joseph's published skill repo (the public HF skill) and copy its actual installation instructions verbatim. Claude Code installs skills via the plugin marketplace (`/plugin`), not a fabricated `/install hyperformula`. Each IDE section:
+- **Claude Code:** real marketplace/plugin install steps from the published skill README
+- **Cursor:** real `.cursorrules` / `AGENTS.md` snippet (verify Cursor's current mechanism)
+- **Copilot:** real GitHub Copilot instructions-file mechanism
+- **Other:** generic `llms-full.txt` fetch instruction (this one is safe — it's our own artifact)
+
+**Acceptance gate:** every command on this page must be traceable to the published skill or official IDE docs. No invented commands ship.
 
 **State:** Local Vue `data` (no Vuex). `selectedIde: null | string`, `copied: false`.
 
