@@ -1,0 +1,10 @@
+# HyperFormula
+
+> HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.
+
+## Docs
+
+- Guide: https://hyperformula.handsontable.com/docs/guide/
+- API reference: https://hyperformula.handsontable.com/docs/api/
+- Full corpus: https://hyperformula.handsontable.com/docs/llms-full.txt
+- Official Claude skill: https://github.com/handsontable/handsontable-skills
