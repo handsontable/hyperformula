@@ -5,6 +5,7 @@ const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
 const HyperFormula = require('../../dist/hyperformula.full');
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
+const mdCompanions = require('./plugins/md-companions');
 
 const searchPattern = new RegExp('^/api', 'i');
 
@@ -31,7 +32,7 @@ const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname
 module.exports = {
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
-  globalUIComponents: [],
+  globalUIComponents: ['CopyMarkdownButton'],
   head: [
     // Import HF (required for the examples)
     [ 'script', { src: 'https://cdn.jsdelivr.net/npm/hyperformula/dist/hyperformula.full.min.js' } ],
@@ -89,6 +90,7 @@ module.exports = {
       exclude: ['/404.html'],
       changefreq: 'weekly'
     }],
+    [mdCompanions, { hostname: DOCS_HOSTNAME }],
     searchBoxPlugin,
     ['container', examples()],
     {
@@ -206,6 +208,7 @@ module.exports = {
             ['/guide/advanced-usage', 'Advanced usage'],
             ['/guide/configuration-options', 'Configuration options'],
             ['/guide/license-key', 'License key'],
+            ['/guide/setup-coding-agent', 'Set up your coding agent'],
           ]
         },
         {
