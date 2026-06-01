@@ -51,9 +51,11 @@ header.header {
 }
 
 /*
- * No border-bottom here on purpose — the framed-tab strip below already
- * supplies the visual divider via its 1px gray-5 border-top, so an additional
- * row-1 hairline would double-stack into a 2px line.
+ * The single horizontal divider that runs across the toolbar is rendered as
+ * a `::before` pseudo-element on `.hf-header__row--nav` below. The framed
+ * `.hf-nav__link` top borders overlap that line where tabs exist; the
+ * pseudo-element fills the gaps to the viewport edges. Mirrors HT's
+ * `.header-row-2::before`.
  */
 
 /* — Brand (logo + version pill) — */
@@ -138,6 +140,25 @@ header.header {
 /* — Primary nav (row 2) — */
 .hf-header__row--nav {
   background: var(--sl-color-bg-nav);
+  position: relative;
+}
+
+/*
+ * Continuous full-viewport divider line. Mirrors HT's `.header-row-2::before`.
+ * Each `.hf-nav__link` keeps its own 1px top border so the framed tabs read
+ * as a segmented strip; this pseudo-element sits at the same Y-coordinate
+ * and bridges the empty space to the left of the first tab and to the right
+ * of the Support dropdown so the divider reads as one unbroken rule.
+ */
+.hf-header__row--nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 1px;
+  background: var(--sl-color-gray-5);
 }
 
 .hf-nav {
