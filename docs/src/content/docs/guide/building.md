@@ -7,6 +7,21 @@ The build process uses Webpack and Babel, as well as npm tasks
 listed in package.json. During this process, the source located in
 the `src/*` directory is transformed into the output files.
 
+The library is developed in TypeScript and the exact configuration
+options can be found in `tsconfig.json`. To run the commands you need
+to set up your environment to have `npm` or `yarn` properly installed.
+After that, navigate to the project and run `npm install`.
+
+## Output formats
+
+The build produces the following output formats, all declared as
+entry points in `package.json`:
+
+* `commonjs/` - CommonJS modules (main entry, used by Node.js and bundlers)
+* `es/` - ES modules (`.mjs` files, used by tree-shaking bundlers)
+* `dist/` - UMD bundles for direct use in the browser
+* `typings/` - TypeScript declaration files (`.d.ts`)
+
 **For UMD versions which reside in CDN:**
 
 * `./dist/hyperformula.js` - a full version which does not have
@@ -16,16 +31,6 @@ have  dependencies, they need to be added manually
 * `./dist/hyperformula.full.js` - a full version with dependencies
 * `./dist/hyperformula.full.min.js` - a minified version with
 dependencies
-
-There are also versions of builds in CommonJS, ES6, and TypeScript
-definitions. They are marked in the package.json file. Based on
-the tools used (Webpack, parsers, etc.), a proper build will be
-respectively chosen.
-
-The library is developed in TypeScript and the exact configuration
-options can be found in `tsconfig.json`. To run the commands you need
-to set up your environment to have `npm` or `yarn` properly installed.
-After that, navigate to the project and run `npm install`.
 
 ## Build the project
 

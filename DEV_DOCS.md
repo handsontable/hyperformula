@@ -1,27 +1,104 @@
-# Dev Docs
+# Developer documentation
 
-Random notes and things to know useful for maintainers and contributors.
+Canonical reference for everyone working on the HyperFormula source code: maintainers, the internal team, and AI agents triggered by them. Everything a developer needs to know lives here or is linked from here.
 
-## Definition of Done for the code changes
+## Quick links
 
-Each change to the production code (bugfixes, new features, improvements) must include these elements. They must be present in the pull request BEFORE requesting the code review.
+- **[Building, testing, and linting](docs/guide/building.md)** &mdash; all `npm` commands and build outputs
+- **[Test suite](test/README.md)** &mdash; smoke tests and how to attach the private test suite
+- **[Public docs portal](https://hyperformula.handsontable.com/docs)** &mdash; main documentation
+- **[Docs README](docs/README.md)** &mdash; how to run the docs portal locally
+- **[Changelog](CHANGELOG.md)**
+- **[Pull request template](.github/pull_request_template.md)**
 
-- changes to the production code
-  - including changes to all supported language packs in `src/i18n/languages` directory (if applicable)
-- automatic tests
-  - for bugfixes: at least one test reproducing the bug
-  - for new features: a set of tests describing the feature specification precisely
-  - pull requests from external contributors should include tests in `tests/` directory (they will be moved to the private repository by the internal team)
-  - internal team adds tests directly to the private repository (through a separate pull request)
-- updates to documentation related to the change
+## Repository layout
+
+```
+.
+├── src/                        # Source code
+│   ├── HyperFormula.ts         # Main engine class, public API entry point
+│   ├── parser/                 # Formula parsing (uses Chevrotain parser generator)
+│   ├── interpreter/            # Formula evaluation engine
+│   │   └── plugin/             # Built-in spreadsheet function plugins
+│   ├── DependencyGraph/        # Cell dependency tracking and recalculation order
+│   ├── CrudOperations.ts       # Create/read/update/delete operations on sheets and cells
+│   └── i18n/                   # Function-name translations per language
+├── test/                       # Test suite
+├── docs/                       # Public documentation portal (VuePress)
+│   ├── guide/                  # Markdown guides (building, contributing, usage…)
+│   ├── api/                    # API reference (generated from JSDoc)
+│   ├── .vuepress/              # VuePress configuration, theme, components
+│   └── README.md               # How to run the docs portal locally
+├── script/                     # Maintenance and release scripts
+├── .github/                    # CI workflows, issue and PR templates
+├── DEV_DOCS.md                 # Canonical developer documentation (this file)
+├── AGENTS.md                   # Guidance for AI agents
+├── CONTRIBUTING.md             # Guide for external contributors
+├── README.md                   # Project overview
+├── CHANGELOG.md
+├── LICENSE.txt
+├── package.json
+└── tsconfig.json
+```
+
+## Architecture
+
+### Core modules
+
+- `src/HyperFormula.ts` &mdash; main engine class, public API entry point
+- `src/parser/` &mdash; formula parsing (uses the [Chevrotain](https://chevrotain.io/) parser generator)
+- `src/interpreter/` &mdash; formula evaluation engine
+- `src/DependencyGraph/` &mdash; cell dependency tracking and recalculation order
+- `src/CrudOperations.ts` &mdash; create/read/update/delete operations on sheets and cells
+
+### Function plugins (`src/interpreter/plugin/`)
+
+All spreadsheet functions are implemented as plugins extending `FunctionPlugin`. Each plugin:
+
+- declares an `implementedFunctions` static property mapping function names to metadata
+- uses the `runFunction()` helper for argument validation, coercion, and array handling
+- registers function translations in `src/i18n/languages/`
+
+## How to add a new function
+
+Adding a built-in function is similar to adding a [custom function](docs/guide/custom-functions.md), so that guide is a useful reference for the function-implementation patterns (argument metadata, return types, array handling). The built-in flow on top of that is:
+
+1. Create or modify a plugin in `src/interpreter/plugin/`.
+2. Add function metadata to `implementedFunctions`.
+3. Implement the function method.
+4. Add translations to all language files in `src/i18n/languages/`.
+5. Add tests in `test/unit/interpreter/`.
+
+## Code style
+
+- Prefer a functional approach where possible (`filter`, `map`, `reduce`).
+- Write self-documenting code: use meaningful names for classes, functions, and variables. Add code comments only when they explain intent the code itself cannot.
+- Add JSDoc to all classes and functions.
+- ESLint is the source of truth for formatting and code rules. Run `npm run lint` before submitting changes (see [building](docs/guide/building.md#run-the-linter)).
+
+## Definition of Done
+
+Each change to the production code (bugfix, new feature, or improvement) must include the following elements **before** requesting a code review:
+
+- Changes to the production code
+  - including changes to all supported language packs in `src/i18n/languages` (if applicable)
+- Automatic tests
+  - for bug fixes: at least one test reproducing the bug
+  - for new features: a set of tests precisely describing the feature
+  - pull requests from external contributors should include tests in the `test/` directory (they will be moved to the private repository by the internal team)
+  - the internal team adds tests directly to the private repository (through a separate pull request)
+- Updates to documentation related to the change
   - for breaking changes: a section in the migration guide
-- technical documentation in the form of the jsdoc comments (high-level description of the concepts used in the more complex code fragments)
-- changelog entry
-- pull request description
+- Technical documentation in the form of JSDoc comments (high-level description of the concepts used in more complex code fragments)
+- Changelog entry
+- Pull request description
 
-## Sources of the function translations
+## Internationalization and function translations
 
-HF supports internationalization and provides the localized function names for all built-in languages. When looking for the valid translations for the new functions, try these sources:
+HyperFormula supports internationalization and provides localized function names for all built-in languages. Translation files live in `src/i18n/languages/`. New functions must include translations for all built-in languages.
+
+When looking for the valid translations for new functions, try these sources:
+
 - https://support.microsoft.com/en-us/office/excel-functions-translator-f262d0c0-991c-485b-89b6-32cc8d326889
 - http://dolf.trieschnigg.nl/excel/index.php
 
