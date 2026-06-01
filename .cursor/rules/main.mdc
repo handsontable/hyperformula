@@ -1,0 +1,6 @@
+---
+description: Project-wide guidance for AI agents working in this repository
+alwaysApply: true
+---
+
+All guidance for AI agents working in this repository lives in [AGENTS.md](mdc:AGENTS.md) at the repository root. Read it first.
