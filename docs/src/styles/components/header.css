@@ -10,7 +10,11 @@
 
 .hf-header {
   display: grid;
-  grid-template-rows: auto auto;
+  /* Row 1 hugs its content (brand · search · actions). Row 2 absorbs the
+   * remaining height of `header.header` (driven by `--sl-nav-height`) so the
+   * framed nav tabs stretch from the divider line all the way down to the
+   * bottom of the Starlight header chrome — no dead space below the tabs. */
+  grid-template-rows: auto 1fr;
   height: 100%;
   width: 100%;
   /* On wide screens, keep the header content (brand · search · actions) within
@@ -39,6 +43,13 @@ header.header {
   background: var(--sl-color-black) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  /* Drop Starlight's bottom padding so `.hf-header__row--nav` extends all the
+   * way to `header.header`'s border-bottom. Without this, Starlight's
+   * 0.75rem padding-bottom would leave dead space below the framed nav tabs
+   * and the per-tab vertical borders would stop short of the visible header
+   * boundary. Mirrors HT's `header.header { padding-block: 1rem 0.5rem }`
+   * override (with the same nav-tab-flush intent). */
+  padding-bottom: 0 !important;
 }
 
 .hf-header__row {
@@ -138,17 +149,33 @@ header.header {
 }
 
 /* — Primary nav (row 2) — */
+/*
+ * Overrides the inherited `.hf-header__row` properties (padding 0.5rem 1rem,
+ * align-items: center) so the nav links sit flush against the row's top edge.
+ * That alignment is required because the `::before` divider below is anchored
+ * at `top: 0` of this row — without `align-items: stretch` and zero vertical
+ * padding, the `.hf-nav__link` top borders would land ~0.5rem below the
+ * pseudo-element and render as a doubled line.
+ *
+ * Layout mirrors HT's `.header-row-2`:
+ *   docs-handsontable/handsontable/docs/src/components/Header.astro:557-583.
+ */
 .hf-header__row--nav {
   background: var(--sl-color-bg-nav);
   position: relative;
+  align-items: stretch;
+  gap: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 0;
 }
 
 /*
  * Continuous full-viewport divider line. Mirrors HT's `.header-row-2::before`.
- * Each `.hf-nav__link` keeps its own 1px top border so the framed tabs read
- * as a segmented strip; this pseudo-element sits at the same Y-coordinate
- * and bridges the empty space to the left of the first tab and to the right
- * of the Support dropdown so the divider reads as one unbroken rule.
+ * Sits at row-top (top: 0); the `.hf-nav__link` top borders overlap it at the
+ * same Y where tabs exist; the pseudo-element bridges the empty space to the
+ * left of the first tab and to the right of the Support dropdown so the
+ * divider reads as one unbroken rule across the full viewport.
  */
 .hf-header__row--nav::before {
   content: '';
