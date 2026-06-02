@@ -44,7 +44,7 @@ A single import, one extra line in `tools`, and the model can evaluate formulas,
 
 ## Use cases
 
-- **Spreadsheet Q&A** — ask the agent what a workbook does, which cells are inputs, and how each output is derived; get answers grounded in real formula evaluation.
+- **Explain the spreadsheet** — ask the agent what a workbook does, which cells are inputs, and how each output is derived; get answers grounded in real formula evaluation.
 - **What-if scenarios and forecasting** — the agent tweaks assumptions and reports how downstream results change, deterministically.
 - **Validate and clean data** — the agent scans ranges for errors, missing values, or inconsistencies and fixes them in place.
 - **Generate formulas from natural language** — the agent translates a plain-English calculation into a verified, working Excel formula.

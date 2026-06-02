@@ -114,4 +114,4 @@ In the Pages Router, the same `dynamic(..., { ssr: false })` call works directly
 
 ## Demo
 
-For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/react-demo?v=' + $page.buildDateURIEncoded">React demo on Stackblitz</a>.
+For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.3.x/react-demo?v=' + $page.buildDateURIEncoded">React demo on Stackblitz</a>.

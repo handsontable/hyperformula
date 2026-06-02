@@ -11,6 +11,12 @@ It makes the page wider to accommodate large tables
 .page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
   max-width: 1200px !important; /* override default max-width of 740px for this page */
 }
+/* Make wide tables horizontally scrollable on narrow screens */
+.page:has(.widePage) table {
+  display: block !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 </style>
 
 ## Overview

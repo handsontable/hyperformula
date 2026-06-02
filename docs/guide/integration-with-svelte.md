@@ -123,4 +123,4 @@ In SvelteKit, top-level statements in `<script>` run on the server too. HyperFor
 
 ## Demo
 
-For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.2.x/svelte-demo?v=' + $page.buildDateURIEncoded">Svelte demo on Stackblitz</a>.
+For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.3.x/svelte-demo?v=' + $page.buildDateURIEncoded">Svelte demo on Stackblitz</a>.
