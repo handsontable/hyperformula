@@ -2,8 +2,9 @@
 # Self-test for the audit-harness marker scan used in .github/workflows/build.yml.
 #
 # Why this exists:
-#   The CI step in build.yml invokes `scripts/marker-scan.sh dist commonjs es`
-#   to grep the build output for `[V<n>]` and `§Sources` markers — internal
+#   The CI step in build.yml invokes
+#   `scripts/marker-scan.sh dist commonjs es typings languages` to grep the build
+#   output for `[V<n>]`/`[vrf_n]` citation markers and the `§AuditSources` footer — internal
 #   spec-drafting tokens that must never ship in compiled JS. Empirically
 #   (probed 2026-05-25 by planting `// [V99] test marker` in src/index.ts and
 #   running `npm run bundle-all`), markers leak through THREE distinct surfaces:
