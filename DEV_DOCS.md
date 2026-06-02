@@ -17,11 +17,8 @@ Each change to the production code (bugfixes, new features, improvements) must i
   - for breaking changes: a section in the migration guide
 - technical documentation in the form of the jsdoc comments (high-level description of the concepts used in the more complex code fragments)
 - changelog entry
+  - not required for documentation-only changes (guides, JSDoc, README, etc.)
 - pull request description
-
-### Documentation-only changes
-
-Pull requests that only modify documentation (guides, JSDoc, README, etc.) and do not change runtime behavior do not require a `CHANGELOG.md` entry.
 
 ## Sources of the function translations
 
