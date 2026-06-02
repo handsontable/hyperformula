@@ -94,12 +94,12 @@ make_marker_in_sourcemap() {
 EOF
 }
 
-# Variant: §Sources footer leaked into commonjs output.
+# Variant: §AuditSources footer leaked into commonjs output.
 make_marker_in_commonjs() {
   local root="$1"
   make_clean_fixture "$root"
   cat >>"$root/commonjs/index.js" <<'EOF'
-// §Sources: internal/spec.md
+// §AuditSources: internal/spec.md
 EOF
 }
 
@@ -175,7 +175,7 @@ echo ""
 f="$TMP_ROOT/case-clean";          make_clean_fixture          "$f"; assert_scan "clean build (no markers)"          "clean" "$f"
 f="$TMP_ROOT/case-dist-js";        make_marker_in_dist_js      "$f"; assert_scan "marker in dist/*.js comment"        "dirty" "$f"
 f="$TMP_ROOT/case-dist-map";       make_marker_in_sourcemap    "$f"; assert_scan "marker in dist/*.js.map (sourcesContent)" "dirty" "$f"
-f="$TMP_ROOT/case-commonjs";       make_marker_in_commonjs     "$f"; assert_scan "§Sources in commonjs/*.js"          "dirty" "$f"
+f="$TMP_ROOT/case-commonjs";       make_marker_in_commonjs     "$f"; assert_scan "§AuditSources in commonjs/*.js"          "dirty" "$f"
 f="$TMP_ROOT/case-es";             make_marker_in_es           "$f"; assert_scan "marker in es/*.mjs"                 "dirty" "$f"
 f="$TMP_ROOT/case-commonjs-current"; make_marker_in_commonjs_current "$f"; assert_scan "current [vrf_n] marker in commonjs/*.js" "dirty" "$f"
 f="$TMP_ROOT/case-typings";        make_marker_in_typings      "$f"; assert_scan "marker in typings/*.d.ts"          "dirty" "$f"

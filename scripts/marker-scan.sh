@@ -7,7 +7,7 @@
 # self-test fixture coverage.
 #
 # Why this scan exists:
-#   Greps build output for audit-harness citation markers and the `§Sources`
+#   Greps build output for audit-harness citation markers and the `§AuditSources`
 #   footer — internal spec-drafting tokens that must never ship in compiled
 #   output. Markers are the current lowercase prefixed form `[vrf_1]`/`[dec_3]`/
 #   `[con_2]`/`[que_5]`/`[wrg_7]`/`[crf_4]` (parser `^\[[a-z][a-z0-9_]*\]$`) plus
@@ -53,14 +53,14 @@ echo "Scanning ${paths[*]} for audit-harness markers..."
 # collapses 1 and 2 into the same branch, silently green-lighting on read
 # errors. Branch on rc explicitly.
 set +e
-grep -rnE '\[(V[0-9]+|(vrf|dec|con|que|wrg|crf)_[0-9]+)\]|§[[:space:]]*Sources' "${paths[@]}"
+grep -rnE '\[(V[0-9]+|(vrf|dec|con|que|wrg|crf)_[0-9]+)\]|§[[:space:]]*AuditSources' "${paths[@]}"
 rc=$?
 set -e
 
 case "$rc" in
   0)
     echo ""
-    echo "ERROR: audit-harness markers ([V<n>] or §Sources) found in build output."
+    echo "ERROR: audit-harness markers ([V<n>]/[vrf_n] or §AuditSources) found in build output."
     echo "These markers are an internal spec-drafting convention and must never"
     echo "ship in compiled JS. Strip them from the source comments/strings above."
     exit 1
