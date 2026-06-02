@@ -7,10 +7,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-### Changed
-
-- Clarified the documentation for `setRowOrder` and `setColumnOrder` so the meaning of the permutation argument is unambiguous. [#1668](https://github.com/handsontable/hyperformula/issues/1668)
-
 ## [3.3.0] - 2026-05-20
 
 ### Added

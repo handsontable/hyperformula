@@ -19,6 +19,10 @@ Each change to the production code (bugfixes, new features, improvements) must i
 - changelog entry
 - pull request description
 
+### Documentation-only changes
+
+Pull requests that only modify documentation (guides, JSDoc, README, etc.) and do not change runtime behavior do not require a `CHANGELOG.md` entry.
+
 ## Sources of the function translations
 
 HF supports internationalization and provides the localized function names for all built-in languages. When looking for the valid translations for the new functions, try these sources:
