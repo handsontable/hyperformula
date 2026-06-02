@@ -16,7 +16,7 @@ fenced code [V7] stays as-is
 
 Body of a subsection [V9].
 
-## § Sources
+## §AuditSources
 
 - [V1] https://example.com/source-1
 - [V3] https://example.com/source-3

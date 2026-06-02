@@ -98,16 +98,29 @@ assert(
   'Expected link text to remain "V12", not be collapsed to "V"'
 );
 
-// 6c. Mutation kill (M3) — `SOURCES_HEADING_PATTERN` uses the `i` flag.
-//     A lowercase `## sources` footer must also be stripped.
+// 6c. `SOURCES_HEADING_PATTERN` uses the `i` flag — a lowercase
+//     `## §auditsources` footer must still be stripped.
 const mdM3 = new MarkdownIt({ html: true });
 mdM3.use(stripCitationMarkers);
 const renderedM3 = mdM3.render(
-  '# Page\n\nBody.\n\n## sources\n\n- lower-case sources body\n'
+  '# Page\n\nBody.\n\n## §auditsources\n\n- lower-case marker body\n'
 );
 assert(
-  !/lower-case sources body/.test(renderedM3),
-  'Expected case-insensitive Sources heading match (lowercase variant stripped)'
+  !/lower-case marker body/.test(renderedM3),
+  'Expected case-insensitive §AuditSources heading match (lowercase variant stripped)'
+);
+
+// 6c-bis. Footgun guard — a legitimate `Sources` / `§ Sources` heading is NOT a
+//     marker and must be PRESERVED (the whole point of the §AuditSources rename).
+const mdLegit = new MarkdownIt({ html: true });
+mdLegit.use(stripCitationMarkers);
+const renderedLegit = mdLegit.render(
+  '# Page\n\nBody.\n\n## Sources\n\n- legit sources body must survive\n\n## § Sources\n\n- legit para-sources body must survive\n'
+);
+assert(
+  /legit sources body must survive/.test(renderedLegit) &&
+    /legit para-sources body must survive/.test(renderedLegit),
+  'Expected legitimate `Sources` / `§ Sources` headings to be PRESERVED (not clobbered)'
 );
 
 // 6d. Mutation kill (M5) — `findFooterEnd` terminates at an `h1` boundary,
@@ -120,7 +133,7 @@ const renderedM5 = mdM5.render([
   '',
   'First body.',
   '',
-  '## § Sources',
+  '## §AuditSources',
   '',
   '- footer to drop',
   '',
@@ -154,7 +167,7 @@ const renderedBugbot = mdBugbot.render([
   '',
   'Body text.',
   '',
-  '## § Sources [V1]',
+  '## §AuditSources [V1]',
   '',
   '- [V1] https://example.com/source-1 — footer body to drop',
   '',
@@ -178,7 +191,7 @@ const renderedBareSources = mdBareSources.render([
   '',
   'Body.',
   '',
-  '## § Sources',
+  '## §AuditSources',
   '',
   '- bare-sources footer body',
   '',
@@ -203,7 +216,7 @@ const syntheticTokens = [
   makeToken('inline', '', { content: 'Body with a footnote ref.', children: [] }),
   makeToken('paragraph_close', 'p'),
   makeToken('heading_open', 'h2', { markup: '##' }),
-  makeToken('inline', '', { content: '§ Sources', children: [] }),
+  makeToken('inline', '', { content: '§AuditSources', children: [] }),
   makeToken('heading_close', 'h2'),
   makeToken('paragraph_open', 'p'),
   makeToken('inline', '', { content: 'Trailing footer body.', children: [] }),
@@ -248,7 +261,7 @@ const footnoteSource = [
   '',
   '[^note]: Footnote body content.',
   '',
-  '## § Sources',
+  '## §AuditSources',
   '',
   '- [V5] https://example.com/source-5',
   '',

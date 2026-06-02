@@ -64,7 +64,7 @@ const source = [
   '',
   '[^note]: Footnote body content.',
   '',
-  '## § Sources',
+  '## §AuditSources',
   '',
   '- [V5] https://example.com/source-5',
   '- Trailing footer entry that must be stripped.',

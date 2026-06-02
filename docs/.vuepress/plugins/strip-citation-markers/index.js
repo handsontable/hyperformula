@@ -4,7 +4,7 @@
  * Our internal authoring workflow uses the audit-harness convention:
  *   - Inline citation markers like `[vrf_1]`, `[dec_3]` (legacy `[V12]`) placed
  *     next to factual claims.
- *   - A trailing `§ Sources` (or `§Sources`) footer listing the sources.
+ *   - A trailing `§AuditSources` footer listing the sources.
  *
  * These markers exist so the audit-harness can re-verify every claim against
  * its source before content is shipped. They are NEVER meant to be seen by
@@ -15,10 +15,10 @@
  *   - Inline marker:    `[<prefix>_<digits>]` (e.g. `[vrf_1]`) or legacy
  *                       `[V<digits>]`, NOT followed by `(` (so real markdown
  *                       links `[vrf_1](url)` / `[V12](url)` are left untouched).
- *   - Footer section:   a heading whose text is exactly `Sources` or
- *                       `§ Sources` / `§Sources`, together with everything
- *                       below it up to end-of-file or the next top-level
- *                       (`#`) heading.
+ *   - Footer section:   a heading whose text is exactly `§AuditSources`
+ *                       (a unique token, so legitimate `Sources` headings are
+ *                       never clobbered), together with everything below it up
+ *                       to end-of-file or the next top-level (`#`) heading.
  *   - Fenced/inline code is left alone, so pages that document the
  *     audit-harness itself can still render the markers verbatim.
  *
@@ -32,7 +32,10 @@
 // In both cases a trailing `(` is excluded so real markdown links like
 // `[vrf_1](url)` / `[V12](url)` are left untouched.
 const INLINE_CITATION_PATTERN = /\[(?:V\d+|[a-z][a-z0-9]*_\d+)\](?!\()/g;
-const SOURCES_HEADING_PATTERN = /^\s*(?:§\s*)?Sources\s*$/i;
+// Footer marker. Deliberately a unique token (`§AuditSources`) rather than a
+// bare `Sources` heading, so that legitimate docs sections titled "Sources"
+// are never clobbered. The `§` is required.
+const SOURCES_HEADING_PATTERN = /^\s*§\s*AuditSources\s*$/i;
 
 /**
  * Removes inline `[V<n>]` markers from a string of text.
