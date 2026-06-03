@@ -75,7 +75,7 @@ In development, React runs effects twice (mount → unmount → mount) to surfac
 
 ## Server-side rendering (Next.js App Router)
 
-The component above is already SSR-safe — the engine is constructed in `useEffect`, which never runs on the server. If you still want to skip the initial bundle on the server (it is a few hundred kB), wrap it in a client-only dynamic import.
+The component above is already SSR-safe — the engine is constructed in `useEffect`, which never runs on the server. If you still want to keep HyperFormula out of the initial JS bundle sent to the browser (it is a few hundred kB), wrap it in a client-only dynamic import.
 
 In the App Router, `dynamic(..., { ssr: false })` is only allowed inside a client component. Put the dynamic call in a `'use client'` wrapper and import the wrapper from your server page:
 
