@@ -4,6 +4,10 @@ The HyperFormula API is identical in a React app and in plain JavaScript. This g
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](client-side-installation.md) section.
 
+::: tip TypeScript
+All examples use TypeScript. Remove the type annotations to use plain JavaScript.
+:::
+
 ## Basic usage
 
 Hold the HyperFormula instance in a `useRef` so it survives re-renders. Initialize it inside `useEffect` and release it in the cleanup function. Use `useState` to toggle between raw formulas and computed values.
@@ -66,8 +70,6 @@ export default function SpreadsheetComponent() {
   );
 }
 ```
-
-If you use JavaScript instead of TypeScript, drop the type annotations — the rest of the pattern is unchanged.
 
 ## `React.StrictMode` double invocation
 
