@@ -45,7 +45,7 @@ assert(
 
 // 2. §Sources footer must be gone.
 assert(
-  !/Sources/i.test(renderedWithoutCode) || !/source-1/.test(rendered),
+  !/Sources/i.test(renderedWithoutCode) && !/source-1/.test(rendered),
   'Expected §Sources footer to be removed'
 );
 assert(
