@@ -5,6 +5,13 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Production-context only: opts the build into the analytics + production
+# scripts that `astro.config.mjs` gates on `BUILD_MODE === 'production'`
+# (Google Tag Manager). PR deploy previews and other branch deploys keep
+# `BUILD_MODE` unset so analytics doesn't fire on non-canonical URLs.
+[context.production.environment]
+  BUILD_MODE = "production"
+
 # The docs site is built with `base: '/docs'` in astro.config.mjs, so the
 # generated HTML references `/docs/_astro/*`, `/docs/guide/*`, etc. In
 # production, `hyperformula.handsontable.com/docs/` is served by a reverse
