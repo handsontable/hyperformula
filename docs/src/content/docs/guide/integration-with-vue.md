@@ -7,67 +7,47 @@ The HyperFormula API is identical in a Vue 3 app and in plain JavaScript. This g
 
 Install with `npm install hyperformula`. For other options, see the [client-side installation](/docs/guide/client-side-installation) section.
 
+::: tip TypeScript
+All examples use TypeScript. Remove the type annotations to use plain JavaScript.
+:::
+
 ## Basic usage
 
-Wrap the HyperFormula instance inside a plain class so it stays outside Vue's reactivity system (see [Troubleshooting](#vue-reactivity-issues) below for why this matters). Hold derived data in `ref` so the template updates when you reassign the ref's `.value`.
-
-```typescript
-// spreadsheet-provider.ts
-import { HyperFormula, type CellValue } from 'hyperformula';
-
-export class SpreadsheetProvider {
-  private hf: HyperFormula;
-
-  constructor(data: (string | number | null)[][]) {
-    this.hf = HyperFormula.buildFromArray(data, {
-      licenseKey: 'gpl-v3',
-      // more configuration options go here
-    });
-  }
-
-  getCalculatedValues(): CellValue[][] {
-    return this.hf.getSheetValues(0);
-  }
-
-  getRawFormulas(): (string | number | null)[][] {
-    return this.hf.getSheetSerialized(0) as (string | number | null)[][];
-  }
-
-  destroy() {
-    this.hf.destroy();
-  }
-}
-```
-
-Use the class from a component with `<script setup>`:
+Pass the HyperFormula instance through Vue's [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw) to opt it out of the reactivity system (see [Troubleshooting](#vue-reactivity-issues) below for why this matters). Hold derived data in `ref` so the template updates when you reassign the ref's `.value`.
 
 ```vue
 <script setup lang="ts">
-import { onUnmounted, ref } from 'vue';
-import type { CellValue } from 'hyperformula';
-import { SpreadsheetProvider } from './spreadsheet-provider';
+import { markRaw, onUnmounted, ref } from "vue";
+import { HyperFormula, type CellValue } from "hyperformula";
 
-const provider = new SpreadsheetProvider([
-  [1, 2, '=A1+B1'],
-  // your data rows go here
-]);
+const hf = markRaw(
+  HyperFormula.buildFromArray(
+    [
+      [1, 2, "=A1+B1"],
+      // your data rows go here
+    ],
+    { licenseKey: "gpl-v3" },
+  ),
+);
 
 const values = ref<CellValue[][]>([]);
 
 function runCalculations() {
-  values.value = provider.getCalculatedValues();
+  values.value = hf.getSheetValues(0);
 }
 
 function reset() {
   values.value = [];
 }
 
-onUnmounted(() => provider.destroy());
+onUnmounted(() => hf.destroy());
 </script>
 
 <template>
-  <button @click="runCalculations">Run calculations</button>
-  <button @click="reset">Reset</button>
+  <button @click="runCalculations" :disabled="!!values.length">
+    Run calculations
+  </button>
+  <button @click="reset" :disabled="!values.length">Reset</button>
   <table v-if="values.length">
     <tr v-for="(row, r) in values" :key="r">
       <td v-for="(cell, c) in row" :key="c">{{ cell }}</td>
@@ -76,11 +56,11 @@ onUnmounted(() => provider.destroy());
 </template>
 ```
 
-The class keeps the HyperFormula instance as a private field, so Vue's reactivity Proxy never reaches it. This is the same pattern used in the [Vue 3 demo](#demo).
+`hf` is marked raw so Vue never proxies it — `values` is the only reactive piece. To mutate data, call any HyperFormula method (e.g. `setCellContents`) then reassign `values.value` to trigger a re-render. See [Basic operations](basic-operations.md) for the full mutation API.
 
 ## Server-side rendering (Nuxt)
 
-The class above is already SSR-safe — HyperFormula has no browser-only API dependency. To skip the (otherwise wasted) server-side instantiation in Nuxt, wrap the component with `<ClientOnly>`.
+HyperFormula has no browser-only API dependency. To skip server-side computation, wrap the component with `<ClientOnly>`.
 
 ## Troubleshooting
 
@@ -92,16 +72,16 @@ If you encounter an error like
 Uncaught TypeError: Cannot read properties of undefined (reading 'licenseKeyValidityState')
 ```
 
-it means that Vue's reactivity system tried to deeply observe the HyperFormula instance. Vue wraps reactive objects in a `Proxy` that intercepts every property access; when that proxy reaches a non-trivial instance with its own internal state, identity checks and lazy-initialized maps break. The fix is to opt the instance out of reactivity with Vue's [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw):
+it means that Vue's reactivity system tried to deeply observe the HyperFormula instance. Vue wraps reactive objects in a `Proxy` that intercepts every property access; when that proxy reaches a non-trivial instance with its own internal state, identity checks and lazy-initialized maps break. The fix is to opt the instance out of reactivity with [`markRaw`](https://vuejs.org/api/reactivity-advanced.html#markraw):
 
 ```typescript
-import { markRaw } from 'vue';
-import { HyperFormula } from 'hyperformula';
+import { markRaw } from "vue";
+import { HyperFormula } from "hyperformula";
 
-const hfInstance = markRaw(
+const hf = markRaw(
   HyperFormula.buildEmpty({
-    licenseKey: 'gpl-v3',
-  })
+    licenseKey: "gpl-v3",
+  }),
 );
 ```
 
