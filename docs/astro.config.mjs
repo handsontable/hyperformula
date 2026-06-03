@@ -36,7 +36,12 @@ export default defineConfig({
       ],
 
       editLink: {
-        baseUrl: 'https://github.com/handsontable/hyperformula/edit/develop/docs/content/',
+        // Starlight appends `entry.filePath` (relative to the Astro project
+        // root, which is `docs/`) to this baseUrl. Source files live under
+        // `docs/src/content/docs/`, so the base must point at `docs/` — not
+        // `docs/content/` (that was a copy-paste from Handsontable's setup,
+        // where content lives at `docs/content/` via a symlink).
+        baseUrl: 'https://github.com/handsontable/hyperformula/edit/develop/docs/',
       },
 
       expressiveCode: {
