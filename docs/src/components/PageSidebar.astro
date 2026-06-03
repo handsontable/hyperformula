@@ -159,7 +159,13 @@ const actions = [
     btn.addEventListener('click', async () => {
       btn.disabled = true;
       try {
-        const res = await fetch(`${path}.md`);
+        const markdownUrl = `${path}.md`;
+        const res = await fetch(markdownUrl);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch ${markdownUrl}: ${res.status} ${res.statusText}`);
+        }
+
         const text = await res.text();
         await navigator.clipboard.writeText(text);
         btn.classList.add('copied');
