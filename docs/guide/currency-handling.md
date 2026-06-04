@@ -55,7 +55,7 @@ const hf = HyperFormula.buildFromArray([[1234.5, '=TEXT(A1, "0.00 zł")']]);
 console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })); // "1234.50 zł"
 ```
 
-Configure `stringifyCurrency` when your formula corpus needs:
+Configure `stringifyCurrency` when your formula corpus needs more advanced currency formats. E.g.:
 
 - thousands grouping (`"$#,##0.00"`),
 - non-`$` symbols with grouping (`"[$€-2] #,##0.00"`, `"[$zł-415] #,##0.00"`),

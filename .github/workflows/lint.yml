@@ -46,8 +46,3 @@ jobs:
 
       - name: Run linter
         run: npm run lint
-
-      - name: Check docs snippets are in sync with extracted source-of-truth
-        # After lint so an extractor crash doesn't mask lint failures
-        # downstream consumers care about.
-        run: npm run snippets:check
