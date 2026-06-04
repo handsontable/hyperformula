@@ -44,6 +44,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Doc snippets are regenerated before the tests by the `pretest:ci` npm
+      # hook (runs `snippets:extract`); the generated files are not committed.
       - name: Run tests
         run: npm run test:ci -- --coverage
 
@@ -82,5 +84,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Doc snippets are regenerated before the tests by the `pretest:browser`
+      # npm hook (runs `snippets:extract`); the generated files are not committed.
       - name: Run tests
         run: npm run test:browser
