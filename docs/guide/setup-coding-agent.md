@@ -24,6 +24,13 @@ These tools don't yet support the Claude skill format. Point your agent at the m
 
 For agents that read a rules file (e.g. Cursor's `AGENTS.md`), add a line pointing at the corpus URL so the agent fetches authoritative docs on demand.
 
+## Live docs via MCP (any agent)
+
+Two zero-setup ways to let an agent pull authoritative HyperFormula docs on demand — both read this site's `llms.txt`:
+
+- **GitMCP** — add the MCP server `https://gitmcp.io/handsontable/hyperformula` to your agent (e.g. `claude mcp add --transport http hyperformula https://gitmcp.io/handsontable/hyperformula`). No install, no auth.
+- **Context7** — run `npx -y @upstash/context7-mcp` (or use the Context7 skill / `ctx7` CLI) and ask for the `hyperformula` library. Context7 indexes this site's `llms.txt` / `llms-full.txt` (see `context7.json` in the repo root).
+
 ## Manual install (any Claude Code setup)
 
 ```bash
