@@ -538,3 +538,29 @@ MyCustomPlugin.translations = {
 };
 ```
 :::
+
+## Function metadata
+
+HyperFormula ships metadata for its built-in functions (category, translated
+name, short description, syntax, and parameters). You can retrieve it with the
+`getAvailableFunctions()` and `getFunctionDetails()` methods, available both as
+static methods and as instance methods:
+
+```js
+// a short list of all built-in functions, with names translated for a language
+const functions = HyperFormula.getAvailableFunctions('enGB');
+
+// the full details of a single built-in function
+const sumDetails = HyperFormula.getFunctionDetails('SUM', 'enGB');
+```
+
+This metadata covers **built-in functions only**. Custom functions are not
+included: they don't appear in the `getAvailableFunctions()` list, and
+`getFunctionDetails()` returns `undefined` for them.
+
+```js
+HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPlugin.translations);
+
+// a custom function is not part of the built-in metadata
+const details = HyperFormula.getFunctionDetails('MY_FUNCTION', 'enGB'); // undefined
+```
