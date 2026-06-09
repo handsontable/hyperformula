@@ -3,7 +3,10 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {FunctionPluginDefinition} from '../plugin/FunctionPlugin'
+import {FunctionPluginDefinition, FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
+
+/** The structural subset of `FunctionMetadata` the builders read (so callers/tests need not supply `method`). */
+export type StructuralMetadata = Pick<FunctionMetadata, 'parameters' | 'repeatLastArgs'>
 
 /**
  * Returns the canonical function id set: the union of every plugin's `implementedFunctions` keys.
@@ -20,4 +23,28 @@ export function getCanonicalFunctionIds(plugins: FunctionPluginDefinition[]): st
     Object.keys(plugin.implementedFunctions).forEach(id => ids.add(id))
   })
   return Array.from(ids)
+}
+
+/**
+ * Returns whether a parameter may be omitted: it declares `optionalArg`, or it has a `defaultValue`.
+ *
+ * @param {FunctionArgument | undefined} arg - the structural argument metadata, or `undefined`
+ */
+export function isParameterOptional(arg: FunctionArgument | undefined): boolean {
+  return arg?.optionalArg === true || arg?.defaultValue !== undefined
+}
+
+/**
+ * Builds the display syntax string from parameter names and structural metadata. Required parameters are rendered
+ * bare, optional ones in brackets, and a trailing `, ...` is appended when the last `repeatLastArgs` parameters repeat.
+ *
+ * @param {string} displayName - the function name to show (the translated name in the active language)
+ * @param {string[]} parameterNames - authored parameter names, index-aligned with `metadata.parameters`
+ * @param {StructuralMetadata} metadata - structural metadata (`parameters` + `repeatLastArgs`) from `implementedFunctions`
+ */
+export function generateSyntax(displayName: string, parameterNames: string[], metadata: StructuralMetadata): string {
+  const args = metadata.parameters ?? []
+  const rendered = parameterNames.map((name, index) => isParameterOptional(args[index]) ? `[${name}]` : name)
+  const repeatSuffix = (metadata.repeatLastArgs ?? 0) > 0 ? ', ...' : ''
+  return `${displayName}(${rendered.join(', ')}${repeatSuffix})`
 }
