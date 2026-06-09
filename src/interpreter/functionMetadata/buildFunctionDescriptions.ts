@@ -4,6 +4,10 @@
  */
 
 import {FunctionPluginDefinition, FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
+import {FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescription} from './FunctionDescription'
+
+/** Resolves a function's display name: the translation for the active language, or the canonical id as fallback. */
+type TranslateName = (canonicalName: string) => string | undefined
 
 /** The structural subset of `FunctionMetadata` the builders read (so callers/tests need not supply `method`). */
 export type StructuralMetadata = Pick<FunctionMetadata, 'parameters' | 'repeatLastArgs'>
@@ -47,4 +51,62 @@ export function generateSyntax(displayName: string, parameterNames: string[], me
   const rendered = parameterNames.map((name, index) => isParameterOptional(args[index]) ? `[${name}]` : name)
   const repeatSuffix = (metadata.repeatLastArgs ?? 0) > 0 ? ', ...' : ''
   return `${displayName}(${rendered.join(', ')}${repeatSuffix})`
+}
+
+/**
+ * Resolves the display name for a function: the translated name, or the canonical id when no translation exists.
+ *
+ * @param {string} canonicalName - the language-independent function id
+ * @param {TranslateName} translate - per-id translation lookup (returns `undefined` when untranslated)
+ */
+function resolveName(canonicalName: string, translate: TranslateName): string {
+  return translate(canonicalName) ?? canonicalName
+}
+
+/**
+ * Builds a Tier-1 list entry by joining the catalogue doc with the translation on the canonical id.
+ *
+ * @param {string} canonicalName - the language-independent function id
+ * @param {FunctionDoc} doc - the function's authored catalogue entry
+ * @param {TranslateName} translate - per-id translation lookup
+ */
+export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, translate: TranslateName): FunctionListEntry {
+  return {
+    name: resolveName(canonicalName, translate),
+    canonicalName,
+    category: doc.category,
+    shortDescription: doc.shortDescription,
+  }
+}
+
+/**
+ * Builds a Tier-2 details object: the list fields plus generated syntax and per-parameter optionality/repeatability.
+ * `documentationUrl`, `examples` and each parameter `description` are present but empty in the MVP.
+ *
+ * @param {string} canonicalName - the language-independent function id
+ * @param {FunctionDoc} doc - the function's authored catalogue entry
+ * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions`
+ * @param {TranslateName} translate - per-id translation lookup
+ */
+export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, metadata: StructuralMetadata, translate: TranslateName): FunctionDetails {
+  const name = resolveName(canonicalName, translate)
+  const args = metadata.parameters ?? []
+  const repeatLastArgs = metadata.repeatLastArgs ?? 0
+  const firstRepeatableIndex = doc.parameters.length - repeatLastArgs
+  const parameters: FunctionParameterDescription[] = doc.parameters.map((param, index) => ({
+    name: param.name,
+    description: param.description,
+    optional: isParameterOptional(args[index]),
+    repeatable: repeatLastArgs > 0 && index >= firstRepeatableIndex,
+  }))
+  return {
+    name,
+    canonicalName,
+    category: doc.category,
+    shortDescription: doc.shortDescription,
+    syntax: generateSyntax(name, doc.parameters.map(parameter => parameter.name), metadata),
+    parameters,
+    documentationUrl: '',
+    examples: [],
+  }
 }
