@@ -45,6 +45,9 @@ import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
+import {FUNCTION_DOCS} from './interpreter/functionMetadata'
+import {buildFunctionDetails, buildFunctionListEntry, getCanonicalFunctionIds} from './interpreter/functionMetadata/buildFunctionDescriptions'
+import {FunctionDetails, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -647,6 +650,69 @@ export class HyperFormula implements TypedEmitter {
    */
   public static getAllFunctionPlugins(): FunctionPluginDefinition[] {
     return FunctionRegistry.getPlugins()
+  }
+
+  /**
+   * Returns metadata of all built-in functions available for a given language, as a short list suitable for a function
+   * picker. Each entry contains the translated name, the language-independent canonical name, the category, and a short
+   * description.
+   *
+   * Only documented built-in functions are listed; custom (user-registered) functions are not included. The list is
+   * sorted by category, then by canonical name.
+   *
+   * @param {string} code - language code, e.g. `'enGB'`
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[LanguageNotRegisteredError]] when the given language is not registered
+   *
+   * @example
+   * ```js
+   * // get the list of available functions, translated for enGB
+   * const functions = HyperFormula.getAvailableFunctions('enGB');
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getAvailableFunctions(code: string): FunctionListEntry[] {
+    validateArgToType(code, 'string', 'code')
+    const language = this.getLanguage(code)
+    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    return getCanonicalFunctionIds(FunctionRegistry.getPlugins())
+      .filter(id => FUNCTION_DOCS[id] !== undefined)
+      .map(id => buildFunctionListEntry(id, FUNCTION_DOCS[id], translate))
+      .sort((a, b) => a.category === b.category ? a.canonicalName.localeCompare(b.canonicalName) : a.category.localeCompare(b.category))
+  }
+
+  /**
+   * Returns the full metadata of a single built-in function for a given language, including the generated syntax and
+   * per-parameter optionality and repeatability. Returns `undefined` when the function id is unknown or has no
+   * documentation (e.g. a custom function).
+   *
+   * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
+   * @param {string} code - language code, e.g. `'enGB'`
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[LanguageNotRegisteredError]] when the given language is not registered
+   *
+   * @example
+   * ```js
+   * // get the details of the SUMIF function, translated for enGB
+   * const details = HyperFormula.getFunctionDetails('SUMIF', 'enGB');
+   * ```
+   *
+   * @category Static Methods
+   */
+  public static getFunctionDetails(canonicalName: string, code: string): FunctionDetails | undefined {
+    validateArgToType(canonicalName, 'string', 'canonicalName')
+    validateArgToType(code, 'string', 'code')
+    const doc = FUNCTION_DOCS[canonicalName]
+    const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
+    if (doc === undefined || plugin === undefined) {
+      return undefined
+    }
+    const language = this.getLanguage(code)
+    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    return buildFunctionDetails(canonicalName, doc, plugin.implementedFunctions[canonicalName], translate)
   }
 
   /**
@@ -4356,6 +4422,51 @@ export class HyperFormula implements TypedEmitter {
    */
   public getAllFunctionPlugins(): FunctionPluginDefinition[] {
     return this._functionRegistry.getPlugins()
+  }
+
+  /**
+   * Returns metadata of all built-in functions available for a function picker, with names translated according to the
+   * language set in this instance's configuration. Each entry contains the translated name, the language-independent
+   * canonical name, the category, and a short description.
+   *
+   * Only documented built-in functions are listed; custom (user-registered) functions are not included. The list is
+   * sorted by category, then by canonical name.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // get the list of available functions, translated for the configured language
+   * const functions = hfInstance.getAvailableFunctions();
+   * ```
+   *
+   * @category Custom Functions
+   */
+  public getAvailableFunctions(): FunctionListEntry[] {
+    return HyperFormula.getAvailableFunctions(this._config.language)
+  }
+
+  /**
+   * Returns the full metadata of a single built-in function, with names translated according to the language set in
+   * this instance's configuration, including the generated syntax and per-parameter optionality and repeatability.
+   * Returns `undefined` when the function id is unknown or has no documentation (e.g. a custom function).
+   *
+   * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // get the details of the SUMIF function, translated for the configured language
+   * const details = hfInstance.getFunctionDetails('SUMIF');
+   * ```
+   *
+   * @category Custom Functions
+   */
+  public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
+    return HyperFormula.getFunctionDetails(canonicalName, this._config.language)
   }
 
   /**
