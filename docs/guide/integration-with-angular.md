@@ -45,17 +45,20 @@ export class SpreadsheetService {
 }
 ```
 
-Consume the service from a component and bind `values$ | async` in the template. Declare the component in your `AppModule` alongside `CommonModule`:
+Consume the service from a component and bind `values$ | async` in the template. The component below is **standalone** (the default since Angular 17) and imports `CommonModule` directly, so it works without an `NgModule`. The structural directives `*ngIf` / `*ngFor` and the `async` pipe all come from `CommonModule`:
 
 ```typescript
 // spreadsheet.component.ts
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
 import { SpreadsheetService } from './spreadsheet.service';
 import { type CellValue } from 'hyperformula';
 
 @Component({
   selector: 'app-spreadsheet',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './spreadsheet.component.html',
 })
 export class SpreadsheetComponent {
@@ -89,6 +92,21 @@ export class SpreadsheetComponent {
 ```
 
 ## Notes
+
+### Older, `NgModule`-based apps
+
+Standalone components require Angular 14 or newer. If your project still uses `NgModule`s (or targets Angular 13 or older), drop the `standalone: true` and `imports` fields from the component, then declare it in your module and import `CommonModule` there instead:
+
+```typescript
+// app.module.ts
+@NgModule({
+  declarations: [SpreadsheetComponent],
+  imports: [BrowserModule, CommonModule],
+})
+export class AppModule {}
+```
+
+The service and template above are unchanged — only the way the component is wired up differs.
 
 ### Provider scope
 
@@ -125,3 +143,5 @@ The service above is already SSR-safe — HyperFormula has no browser-only API d
 ## Demo
 
 For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.3.x/angular-demo?v=' + $page.buildDateURIEncoded">Angular demo on Stackblitz</a>.
+
+The demo is written with modern Angular standards — standalone components, signals, the new control flow (`@if` / `@for`) and zoneless change detection — so it may differ stylistically from the `BehaviorSubject` + `async` pipe approach shown above, which is kept deliberately version-agnostic.
