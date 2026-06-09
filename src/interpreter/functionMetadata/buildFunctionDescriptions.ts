@@ -54,13 +54,16 @@ export function generateSyntax(displayName: string, parameterNames: string[], me
 }
 
 /**
- * Resolves the display name for a function: the translated name, or the canonical id when no translation exists.
+ * Resolves the display name for a function: the translated name, or the canonical id when there is no usable
+ * translation. Some bundled language packs leave a function untranslated as an empty string (e.g. `SWITCH` in
+ * several locales), so an empty translation falls back to the canonical id just like a missing one.
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {TranslateName} translate - per-id translation lookup (returns `undefined` when untranslated)
  */
 function resolveName(canonicalName: string, translate: TranslateName): string {
-  return translate(canonicalName) ?? canonicalName
+  const translated = translate(canonicalName)
+  return translated === undefined || translated === '' ? canonicalName : translated
 }
 
 /**

@@ -6,22 +6,373 @@
 import {FunctionDoc} from '../FunctionDescription'
 
 /**
- * Catalogue entries for the "Math and trigonometry" category. Seeded subset; completed by the migration.
+ * Catalogue entries for the "Math and trigonometry" category. Generated from `docs/guide/built-in-functions.md` by
+ * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
  */
 export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
-  SUMIF: {
+  ABS: {
     category: 'Math and trigonometry',
-    shortDescription: 'Sums the cells that meet a criterion.',
-    parameters: [{name: 'Range', description: ''}, {name: 'Criterion', description: ''}, {name: 'SumRange', description: ''}],
+    shortDescription: 'Returns the absolute value of a number.',
+    parameters: [{name: 'Number', description: ''}],
   },
-  SUM: {
+  ACOS: {
     category: 'Math and trigonometry',
-    shortDescription: 'Sums a series of numbers or cells.',
+    shortDescription: 'Returns the inverse trigonometric cosine of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  ACOSH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse hyperbolic cosine of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  ACOT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse trigonometric cotangent of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  ACOTH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse hyperbolic cotangent of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  ARABIC: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Converts number from roman form.',
+    parameters: [{name: 'String', description: ''}],
+  },
+  ASIN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse trigonometric sine of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  ASINH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse hyperbolic sine of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  ATAN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse trigonometric tangent of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  ATAN2: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse trigonometric tangent of the specified x and y coordinates.',
+    parameters: [{name: 'Numberx', description: ''}, {name: 'Numbery', description: ''}],
+  },
+  ATANH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the inverse hyperbolic tangent of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  BASE: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Converts a positive integer to a specified base into a text from the numbering system.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Radix', description: ''}, {name: 'Minimumlength', description: ''}],
+  },
+  CEILING: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Significance', description: ''}],
+  },
+  'CEILING.MATH': {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Significance', description: ''}, {name: 'Mode', description: ''}],
+  },
+  'CEILING.PRECISE': {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Significance', description: ''}],
+  },
+  COMBIN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns number of combinations (without repetitions).',
+    parameters: [{name: 'Number1', description: ''}, {name: 'Number2', description: ''}],
+  },
+  COMBINA: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns number of combinations (with repetitions).',
+    parameters: [{name: 'Number1', description: ''}, {name: 'Number2', description: ''}],
+  },
+  COS: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the cosine of the given angle (in radians).',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  COSH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the hyperbolic cosine of the given value.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  COT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the cotangent of the given angle (in radians).',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  COTH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the hyperbolic cotangent of the given value.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  COUNTUNIQUE: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Counts the number of unique values in a list of specified values and ranges.',
+    parameters: [{name: 'Value1', description: ''}],
+  },
+  CSC: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the cosecant of the given angle (in radians).',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  CSCH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the hyperbolic cosecant of the given value.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  DECIMAL: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Converts text with characters from a number system to a positive integer in the base radix given.',
+    parameters: [{name: 'Text', description: ''}, {name: 'Radix', description: ''}],
+  },
+  DEGREES: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Converts radians into degrees.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  EVEN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a positive number up to the next even integer and a negative number down to the next even integer.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  EXP: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns constant e raised to the power of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  FACT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns a factorial of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  FACTDOUBLE: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns a double factorial of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  FLOOR: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Significance', description: ''}],
+  },
+  'FLOOR.MATH': {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Significance', description: ''}, {name: 'Mode', description: ''}],
+  },
+  'FLOOR.PRECISE': {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Significance', description: ''}],
+  },
+  GCD: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Computes greatest common divisor of numbers.',
     parameters: [{name: 'Number1', description: ''}],
+  },
+  INT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number down to the nearest integer.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  LCM: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Computes least common multiple of numbers.',
+    parameters: [{name: 'Number1', description: ''}],
+  },
+  LN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the natural logarithm based on the constant e of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  LOG: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the logarithm of a number to the specified base.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Base', description: ''}],
+  },
+  LOG10: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the base-10 logarithm of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  MOD: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the remainder when one integer is divided by another.',
+    parameters: [{name: 'Dividend', description: ''}, {name: 'Divisor', description: ''}],
+  },
+  MROUND: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds number to the neares multiplicity.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Base', description: ''}],
+  },
+  MULTINOMIAL: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns number of multiset combinations.',
+    parameters: [{name: 'Number1', description: ''}],
+  },
+  ODD: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer.',
+    parameters: [{name: 'Number', description: ''}],
   },
   PI: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the value of pi.',
+    shortDescription: 'Returns 3.14159265358979, the value of the mathematical constant PI to 14 decimal places.',
     parameters: [],
+  },
+  POWER: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns a number raised to another number.',
+    parameters: [{name: 'Base', description: ''}, {name: 'Exponent', description: ''}],
+  },
+  PRODUCT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns product of numbers.',
+    parameters: [{name: 'Number1', description: ''}],
+  },
+  QUOTIENT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns integer part of a division.',
+    parameters: [{name: 'Dividend', description: ''}, {name: 'Divisor', description: ''}],
+  },
+  RADIANS: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Converts degrees to radians.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  RAND: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns a random number between 0 and 1.',
+    parameters: [],
+  },
+  RANDBETWEEN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns a random integer between two numbers.',
+    parameters: [{name: 'Lowerbound', description: ''}, {name: 'Upperbound', description: ''}],
+  },
+  ROMAN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Converts number to roman form.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Mode', description: ''}],
+  },
+  ROUND: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number to a certain number of decimal places.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Count', description: ''}],
+  },
+  ROUNDDOWN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number down, toward zero, to a certain precision.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Count', description: ''}],
+  },
+  ROUNDUP: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Rounds a number up, away from zero, to a certain precision.',
+    parameters: [{name: 'Number', description: ''}, {name: 'Count', description: ''}],
+  },
+  SEC: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the secant of the given angle (in radians).',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  SECH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the hyperbolic secant of the given angle (in radians).',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  SERIESSUM: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Evaluates series at a point.',
+    parameters: [{name: 'Number1', description: ''}, {name: 'Number2', description: ''}, {name: 'Number3', description: ''}, {name: 'Coefficients', description: ''}],
+  },
+  SIGN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns sign of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  SIN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the sine of the given angle (in radians).',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  SINH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the hyperbolic sine of the given value.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  SQRT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the positive square root of a number.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  SQRTPI: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns sqrt of number times pi.',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  SUBTOTAL: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Computes aggregation using function specified by number.',
+    parameters: [{name: 'Function', description: ''}, {name: 'Number1', description: ''}],
+  },
+  SUM: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Sums up the values of the specified cells.',
+    parameters: [{name: 'Number1', description: ''}],
+  },
+  SUMIF: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Sums up the values of cells that belong to the specified range and meet the specified condition.',
+    parameters: [{name: 'Range', description: ''}, {name: 'Criteria', description: ''}, {name: 'Sumrange', description: ''}],
+  },
+  SUMIFS: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Sums up the values of cells that belong to the specified range and meet the specified sets of conditions.',
+    parameters: [{name: 'Sum_Range', description: ''}, {name: 'Criterion_range1', description: ''}, {name: 'Criterion1', description: ''}],
+  },
+  SUMPRODUCT: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Multiplies corresponding elements in the given arrays, and returns the sum of those products.',
+    parameters: [{name: 'Array1', description: ''}],
+  },
+  SUMSQ: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the sum of the squares of the arguments',
+    parameters: [{name: 'Number1', description: ''}],
+  },
+  SUMX2MY2: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the sum of the square differences.',
+    parameters: [{name: 'Range1', description: ''}, {name: 'Range2', description: ''}],
+  },
+  SUMX2PY2: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the sum of the square sums.',
+    parameters: [{name: 'Range1', description: ''}, {name: 'Range2', description: ''}],
+  },
+  SUMXMY2: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the sum of the square of differences.',
+    parameters: [{name: 'Range1', description: ''}, {name: 'Range2', description: ''}],
+  },
+  TAN: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the tangent of the given angle (in radians).',
+    parameters: [{name: 'Number', description: ''}],
+  },
+  TANH: {
+    category: 'Math and trigonometry',
+    shortDescription: 'Returns the hyperbolic tangent of the given value.',
+    parameters: [{name: 'Number', description: ''}],
   },
 }
