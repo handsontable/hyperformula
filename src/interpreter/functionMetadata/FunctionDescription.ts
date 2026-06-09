@@ -1,0 +1,86 @@
+/**
+ * @license
+ * Copyright (c) 2025 Handsoncode. All rights reserved.
+ */
+
+/**
+ * The function categories, matching the `### <Category>` headers in `docs/guide/built-in-functions.md`.
+ */
+export const FUNCTION_CATEGORIES = [
+  'Array manipulation', 'Database', 'Date and time', 'Engineering',
+  'Information', 'Financial', 'Logical', 'Lookup and reference',
+  'Math and trigonometry', 'Matrix functions', 'Operator', 'Statistical', 'Text',
+] as const
+
+/**
+ * Language-independent function category identifier.
+ */
+export type FunctionCategory = typeof FUNCTION_CATEGORIES[number]
+
+/**
+ * Storage: authored, human-readable metadata for one function parameter.
+ */
+export interface ParameterDoc {
+  /** Display name as shown in the syntax, Google-Sheets style, e.g. `'Factor1'`. */
+  name: string,
+  /** What the argument does. Present but empty (`''`) in the MVP; authored in a later phase. */
+  description: string,
+}
+
+/**
+ * Storage: authored metadata for one canonical function. English in the MVP.
+ */
+export interface FunctionDoc {
+  category: FunctionCategory,
+  /** One-liner, sentence-case description. English in the MVP. (A separate long description may follow later.) */
+  shortDescription: string,
+  /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
+  parameters: ParameterDoc[],
+}
+
+/**
+ * Public: a single entry of the short function list returned by `getAvailableFunctions`.
+ */
+export interface FunctionListEntry {
+  /** Function name, translated for the active language. */
+  name: string,
+  /** Language-independent function id, e.g. `'SUMIF'`. */
+  canonicalName: string,
+  category: FunctionCategory,
+  /** One-liner description (English in the MVP). */
+  shortDescription: string,
+}
+
+/**
+ * Public: a single parameter of a function's full details returned by `getFunctionDetails`.
+ */
+export interface FunctionParameterDescription {
+  /** Human-readable parameter name. */
+  name: string,
+  /** What the argument does. Present but empty (`''`) in the MVP; populated in a later phase. */
+  description: string,
+  /** `true` when the argument may be omitted. */
+  optional: boolean,
+  /** `true` for the last `repeatLastArgs` parameters. */
+  repeatable: boolean,
+}
+
+/**
+ * Public: the full details for one function returned by `getFunctionDetails`.
+ */
+export interface FunctionDetails {
+  /** Function name, translated for the active language. */
+  name: string,
+  /** Language-independent function id, e.g. `'SUMIF'`. */
+  canonicalName: string,
+  category: FunctionCategory,
+  /** One-liner description (English in the MVP). */
+  shortDescription: string,
+  /** Generated from the parameter names, optionality and `repeatLastArgs`. */
+  syntax: string,
+  parameters: FunctionParameterDescription[],
+  /** Link to the function's documentation. Present but empty (`''`) in the MVP; populated in a later phase. */
+  documentationUrl: string,
+  /** Usage examples. Present but empty (`[]`) in the MVP; populated in a later phase. */
+  examples: string[],
+}
