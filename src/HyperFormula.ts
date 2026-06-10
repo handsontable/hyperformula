@@ -678,7 +678,9 @@ export class HyperFormula implements TypedEmitter {
     const language = this.getLanguage(code)
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     return getCanonicalFunctionIds(FunctionRegistry.getPlugins())
-      .filter(id => FUNCTION_DOCS[id] !== undefined)
+      // documented AND still registered — gate on the same resolution `getFunctionDetails` uses, so the list never
+      // advertises a function the details lookup cannot resolve (e.g. after `unregisterFunction`).
+      .filter(id => FUNCTION_DOCS[id] !== undefined && FunctionRegistry.getFunctionPlugin(id) !== undefined)
       .map(id => buildFunctionListEntry(id, FUNCTION_DOCS[id], translate))
       .sort((a, b) => a.category === b.category ? a.canonicalName.localeCompare(b.canonicalName) : a.category.localeCompare(b.category))
   }
