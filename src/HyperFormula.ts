@@ -46,8 +46,8 @@ import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
-import {buildFunctionDetails, buildFunctionListEntry, getCanonicalFunctionIds} from './interpreter/functionMetadata/buildFunctionDescriptions'
-import {FunctionDetails, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
+import {buildFunctionDetails, buildFunctionListEntry, getCanonicalFunctionIds, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
+import {FunctionDetails, FunctionDoc, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -678,11 +678,31 @@ export class HyperFormula implements TypedEmitter {
     const language = this.getLanguage(code)
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     return getCanonicalFunctionIds(FunctionRegistry.getPlugins())
-      // documented AND still registered — gate on the same resolution `getFunctionDetails` uses, so the list never
-      // advertises a function the details lookup cannot resolve (e.g. after `unregisterFunction`).
-      .filter(id => FUNCTION_DOCS[id] !== undefined && FunctionRegistry.getFunctionPlugin(id) !== undefined)
+      // List only functions whose details `getFunctionDetails` can resolve — documented, currently registered, and
+      // with catalogue arity matching the implementation — so the list and the details never disagree.
+      .filter(id => this.resolveListableMetadata(id) !== undefined)
       .map(id => buildFunctionListEntry(id, FUNCTION_DOCS[id], translate))
       .sort((a, b) => a.category === b.category ? a.canonicalName.localeCompare(b.canonicalName) : a.category.localeCompare(b.category))
+  }
+
+  /**
+   * Resolves a function's catalogue doc and structural metadata when it is listable: documented, currently
+   * registered, and with a catalogue parameter count equal to the implementation arity. Returns `undefined`
+   * otherwise. Shared by `getAvailableFunctions` and `getFunctionDetails` so the list and the details agree exactly.
+   *
+   * @param {string} canonicalName - the language-independent function id
+   */
+  private static resolveListableMetadata(canonicalName: string): { doc: FunctionDoc, metadata: StructuralMetadata } | undefined {
+    const doc = FUNCTION_DOCS[canonicalName]
+    const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
+    if (doc === undefined || plugin === undefined) {
+      return undefined
+    }
+    const metadata = plugin.implementedFunctions[canonicalName]
+    if (doc.parameters.length !== (metadata.parameters ?? []).length) {
+      return undefined
+    }
+    return {doc, metadata}
   }
 
   /**
@@ -707,21 +727,15 @@ export class HyperFormula implements TypedEmitter {
   public static getFunctionDetails(canonicalName: string, code: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
     validateArgToType(code, 'string', 'code')
-    const doc = FUNCTION_DOCS[canonicalName]
-    const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
-    if (doc === undefined || plugin === undefined) {
-      return undefined
-    }
-    // Degrade gracefully when the catalogue and implementation have drifted out of sync (parameter
-    // count mismatch). buildFunctionDetails throws on drift so tests keep it loud; the public API
-    // returns undefined instead so callers never see an undocumented crash path.
-    const implMeta = plugin.implementedFunctions[canonicalName]
-    if (doc.parameters.length !== (implMeta.parameters ?? []).length) {
+    // Same gate as `getAvailableFunctions` (documented + registered + arity-consistent). Returns undefined for
+    // unknown/custom ids or catalogue-vs-implementation drift, so callers never hit the loud throw in buildFunctionDetails.
+    const resolved = this.resolveListableMetadata(canonicalName)
+    if (resolved === undefined) {
       return undefined
     }
     const language = this.getLanguage(code)
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
-    return buildFunctionDetails(canonicalName, doc, implMeta, translate)
+    return buildFunctionDetails(canonicalName, resolved.doc, resolved.metadata, translate)
   }
 
   /**
