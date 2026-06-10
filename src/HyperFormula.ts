@@ -710,9 +710,16 @@ export class HyperFormula implements TypedEmitter {
     if (doc === undefined || plugin === undefined) {
       return undefined
     }
+    // Degrade gracefully when the catalogue and implementation have drifted out of sync (parameter
+    // count mismatch). buildFunctionDetails throws on drift so tests keep it loud; the public API
+    // returns undefined instead so callers never see an undocumented crash path.
+    const implMeta = plugin.implementedFunctions[canonicalName]
+    if (doc.parameters.length !== (implMeta.parameters ?? []).length) {
+      return undefined
+    }
     const language = this.getLanguage(code)
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
-    return buildFunctionDetails(canonicalName, doc, plugin.implementedFunctions[canonicalName], translate)
+    return buildFunctionDetails(canonicalName, doc, implMeta, translate)
   }
 
   /**
