@@ -11,6 +11,12 @@ It makes the page wider to accommodate large tables
 .page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
   max-width: 1200px !important; /* override default max-width of 740px for this page */
 }
+/* Make wide tables horizontally scrollable on narrow screens */
+.page:has(.widePage) table {
+  display: block !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 </style>
 
 See a full list of differences between HyperFormula, Microsoft Excel, and Google Sheets.
@@ -18,7 +24,7 @@ See a full list of differences between HyperFormula, Microsoft Excel, and Google
 **Contents:**
 [[toc]]
 
-## General functionalities 
+## General functionalities
 
 | Functionality                                      | Examples                                                                  | HyperFormula                                                                                                                                                                                                                                                                                                                                                 | Google Sheets                                                                                                                  | Microsoft Excel                                                                                                                |
 |----------------------------------------------------|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
@@ -35,7 +41,6 @@ See a full list of differences between HyperFormula, Microsoft Excel, and Google
 | TIMEVALUE function                                 | =TIMEVALUE("14:31")                                                       | Type of the returned value: `CellValueDetailedType.NUMBER_TIME` (compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard)                                                                                                                                  | Cell auto-formatted as **regular number**                                                                                      | Cell auto-formatted as **regular number**                                                                                      |
 | EDATE function                                     | =EDATE(DATE(2019, 7, 31), 1)                                              | Type of the returned value: `CellValueDetailedType.NUMBER_DATE`. This is non-compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, which defines the return type as a Number, while describing it as a Date serial number through the function summary. | Cell auto-formatted as **date**                                                                                                | Cell auto-formatted as **regular number**                                                                                      |
 | EOMONTH function                                   | =EOMONTH(DATE(2019, 7, 31), 1)                                            | Type of the returned value: `CellValueDetailedType.NUMBER_DATE`. This is non-compliant with the [OpenDocument](https://docs.oasis-open.org/office/OpenDocument/v1.3/os/part4-formula/OpenDocument-v1.3-os-part4-formula.html) standard, which defines the return type as a Number, while describing it as a Date serial number through the function summary. | Cell auto-formatted as **date**                                                                                                | Cell auto-formatted as **regular number**                                                                                      |
-| OFFSET function                                    | =OFFSET(A1:B1, 0, 0)                                                      | First parameter must be a **reference to a single cell**.                                                                                                                                                                                                                                                                                                    | First parameter may be a single cell or a range.                                                                               | First parameter may be a single cell or a range.                                                                               |
 
 ## Built-in functions
 
