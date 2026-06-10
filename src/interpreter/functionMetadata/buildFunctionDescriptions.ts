@@ -90,8 +90,13 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
  * @param {FunctionDoc} doc - the function's authored catalogue entry
  * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions`
  * @param {TranslateName} translate - per-id translation lookup
+ * @throws {Error} when `doc.parameters.length` does not equal `(metadata.parameters ?? []).length`
  */
 export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, metadata: StructuralMetadata, translate: TranslateName): FunctionDetails {
+  const implParamCount = (metadata.parameters ?? []).length
+  if (doc.parameters.length !== implParamCount) {
+    throw new Error(`Function metadata mismatch for ${canonicalName}: catalogue has ${doc.parameters.length} parameters, implementation has ${implParamCount}`)
+  }
   const name = resolveName(canonicalName, translate)
   const args = metadata.parameters ?? []
   const repeatLastArgs = metadata.repeatLastArgs ?? 0

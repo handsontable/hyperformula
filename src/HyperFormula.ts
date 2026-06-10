@@ -4440,7 +4440,7 @@ export class HyperFormula implements TypedEmitter {
    * const functions = hfInstance.getAvailableFunctions();
    * ```
    *
-   * @category Custom Functions
+   * @category Helpers
    */
   public getAvailableFunctions(): FunctionListEntry[] {
     return HyperFormula.getAvailableFunctions(this._config.language)
@@ -4463,7 +4463,7 @@ export class HyperFormula implements TypedEmitter {
    * const details = hfInstance.getFunctionDetails('SUMIF');
    * ```
    *
-   * @category Custom Functions
+   * @category Helpers
    */
   public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
     return HyperFormula.getFunctionDetails(canonicalName, this._config.language)
