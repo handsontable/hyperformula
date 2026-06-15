@@ -48,7 +48,7 @@
   ],
   "license": "GPL-3.0-only",
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=10"
   },
   "type": "commonjs",
