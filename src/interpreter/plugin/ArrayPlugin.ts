@@ -42,7 +42,25 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
-    }
+    },
+    'VSTACK': {
+      method: 'vstack',
+      sizeOfResultArrayMethod: 'vstackArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+      repeatLastArgs: 1,
+    },
+    'HSTACK': {
+      method: 'hstack',
+      sizeOfResultArrayMethod: 'hstackArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+      repeatLastArgs: 1,
+    },
   }
 
   public arrayformula(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -146,5 +164,99 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = Math.max(...(subChecks).map(val => val.width))
     const height = Math.max(...(subChecks).map(val => val.height))
     return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to VSTACK(array1, [array2], ...)
+   *
+   * Stacks the input arrays vertically, one on top of another, into a single array.
+   * The result has as many rows as the inputs combined and as many columns as the
+   * widest input. Cells of narrower inputs are padded on the right with the #N/A
+   * error, matching the behaviour of Excel and Google Sheets.
+   *
+   * @param ast
+   * @param state
+   */
+  public vstack(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('VSTACK'), (...ranges: SimpleRangeValue[]) => {
+      const width = Math.max(...ranges.map(range => range.width()))
+      const result: InternalScalarValue[][] = []
+
+      for (const range of ranges) {
+        for (const row of range.data) {
+          result.push(this.padRowToWidth(row, width))
+        }
+      }
+
+      return SimpleRangeValue.onlyValues(result)
+    })
+  }
+
+  public vstackArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 1) {
+      return ArraySize.error()
+    }
+
+    const subChecks = this.stackSubChecks(ast, state, 'VSTACK')
+    const width = Math.max(...subChecks.map(size => size.width))
+    const height = subChecks.reduce((total, size) => total + size.height, 0)
+    return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to HSTACK(array1, [array2], ...)
+   *
+   * Stacks the input arrays horizontally, side by side, into a single array.
+   * The result has as many columns as the inputs combined and as many rows as the
+   * tallest input. Cells of shorter inputs are padded at the bottom with the #N/A
+   * error, matching the behaviour of Excel and Google Sheets.
+   *
+   * @param ast
+   * @param state
+   */
+  public hstack(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('HSTACK'), (...ranges: SimpleRangeValue[]) => {
+      const height = Math.max(...ranges.map(range => range.height()))
+      const result: InternalScalarValue[][] = [...Array(height).keys()].map(() => [])
+
+      for (const range of ranges) {
+        const data = range.data
+        for (let row = 0; row < height; row++) {
+          const sourceRow = row < data.length ? data[row] : undefined
+          for (let col = 0; col < range.width(); col++) {
+            result[row].push(sourceRow !== undefined ? sourceRow[col] : new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
+          }
+        }
+      }
+
+      return SimpleRangeValue.onlyValues(result)
+    })
+  }
+
+  public hstackArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 1) {
+      return ArraySize.error()
+    }
+
+    const subChecks = this.stackSubChecks(ast, state, 'HSTACK')
+    const width = subChecks.reduce((total, size) => total + size.width, 0)
+    const height = Math.max(...subChecks.map(size => size.height))
+    return new ArraySize(width, height)
+  }
+
+  private stackSubChecks(ast: ProcedureAst, state: InterpreterState, functionName: 'VSTACK' | 'HSTACK'): ArraySize[] {
+    const metadata = this.metadata(functionName)
+    return ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
+  }
+
+  private padRowToWidth(row: InternalScalarValue[], width: number): InternalScalarValue[] {
+    if (row.length >= width) {
+      return row.slice(0, width)
+    }
+    const padded = row.slice()
+    while (padded.length < width) {
+      padded.push(new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    }
+    return padded
   }
 }

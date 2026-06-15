@@ -19,6 +19,8 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    VSTACK: 'VSTACK',
+    HSTACK: 'HSTACK',
     ADDRESS: 'OSOITE',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
