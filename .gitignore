@@ -26,5 +26,5 @@ dev*.html
 /test/hyperformula-tests/
 
 # Doc snippets are regenerated from the docs before every test run
-# (see the `snippets:extract` / `pretest:*` scripts), so they are never committed.
+# (the `test:*` scripts run `snippets:extract` first), so they are never committed.
 /test-utils/snippets/*.generated.ts
