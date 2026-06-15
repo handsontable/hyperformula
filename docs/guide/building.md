@@ -43,7 +43,7 @@ format , builds ES6 version
 * `npm run bundle:languages` - builds the languages
 * `npm run bundle:typings` - generates TypeScript typing, only emits ‘.d.ts’ declaration files
 
-We use the Node 22 LTS in the build-chain and recommend this version for building. Note that for using (not building) HyperFormula, a wider range of Node versions is supported.
+We use the Node 26 LTS in the build-chain and recommend this version for building. Note that for using (not building) HyperFormula, a wider range of Node versions is supported.
 
 ## Verify the build
 
