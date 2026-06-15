@@ -5,6 +5,7 @@
 
 import {DependencyGraph} from '../DependencyGraph'
 import {
+  EmptyValue,
   getRawValue,
   InternalScalarValue,
   RawInterpreterValue,
@@ -86,6 +87,13 @@ export abstract class AdvancedFind {
 
       if (value === searchKey) {
         return i
+      }
+
+      // Skip empty cells in the approximate search, consistent with findLastOccurrenceInOrderedRange:
+      // Excel/Google Sheets ignore genuinely empty cells (but not empty strings) when looking for the
+      // lower/upper bound. EmptyValue would otherwise be ranked below every value by compare().
+      if (value === EmptyValue) {
+        continue
       }
 
       if (compareFn(value, searchKey) > 0) {

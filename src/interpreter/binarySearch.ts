@@ -20,6 +20,12 @@ const NOT_FOUND = -1
  *
  * If the search range contains duplicates, returns the last matching value. If no value found in the range satisfies the above, returns -1.
  *
+ * Empty cells (EmptyValue) are skipped: they are not treated as ordered values during the
+ * approximate search. This mirrors Excel/Google Sheets, where MATCH/VLOOKUP/HLOOKUP/XLOOKUP
+ * ignore genuinely empty cells (but not empty strings) when looking for the lower/upper bound.
+ * The returned offset is always relative to the original range, so empty cells keep their slots
+ * and the position of the matched non-empty cell is reported unchanged.
+ *
  * Note: this function does not normalize input strings.
  */
 export function findLastOccurrenceInOrderedRange(
@@ -35,12 +41,31 @@ export function findLastOccurrenceInOrderedRange(
     ? (index: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, index, range.start.row)))
     : (index: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, index)))
 
+  // Collect the original indices of the non-empty cells, preserving their order. Empty cells break
+  // the sort invariant binary search relies on (compare() ranks EmptyValue below every other value),
+  // so the search runs over the compacted, empty-free index list and the result is mapped back to the
+  // original index space afterwards.
+  const nonEmptyIndices: number[] = []
+  for (let index = start; index <= end; index++) {
+    if (getValueFromIndexFn(index) !== EmptyValue) {
+      nonEmptyIndices.push(index)
+    }
+  }
+
+  // With no non-empty cells there is nothing to match against. Return early so the
+  // ifNoMatch branches below (which treat NOT_FOUND as "key past the edge of a non-empty
+  // list" and may return offset 0) are not reached for an all-empty range.
+  if (nonEmptyIndices.length === 0) {
+    return NOT_FOUND
+  }
+
   const compareFn = orderingDirection === 'asc'
     ? (left: RawNoErrorScalarValue, right: RawInterpreterValue) => compare(left, right)
     : (left: RawNoErrorScalarValue, right: RawInterpreterValue) => -compare(left, right)
 
-  const foundIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
-  const foundValue = getValueFromIndexFn(foundIndex)
+  const foundCompactedIndex = findLastMatchingIndex(compactedIndex => compareFn(searchKey, getValueFromIndexFn(nonEmptyIndices[compactedIndex])) >= 0, 0, nonEmptyIndices.length - 1)
+  const foundIndex = foundCompactedIndex === NOT_FOUND ? NOT_FOUND : nonEmptyIndices[foundCompactedIndex]
+  const foundValue = foundIndex === NOT_FOUND ? EmptyValue : getValueFromIndexFn(foundIndex)
 
   if (foundValue === searchKey) {
     return foundIndex - start
@@ -61,8 +86,8 @@ export function findLastOccurrenceInOrderedRange(
     }
 
     // orderingDirection === 'desc'
-    const nextIndex = foundIndex+1
-    return nextIndex <= end ? nextIndex - start : NOT_FOUND
+    const nextIndex = nonEmptyIndices[foundCompactedIndex + 1]
+    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
   }
 
   if (ifNoMatch === 'returnUpperBound') {
@@ -80,8 +105,8 @@ export function findLastOccurrenceInOrderedRange(
     }
 
     // orderingDirection === 'asc'
-    const nextIndex = foundIndex+1
-    return nextIndex <= end ? nextIndex - start : NOT_FOUND
+    const nextIndex = nonEmptyIndices[foundCompactedIndex + 1]
+    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
   }
 
   // ifNoMatch === 'returnNotFound'

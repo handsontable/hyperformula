@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
 
+### Fixed
+
+- Fixed approximate `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` incorrectly returning `#N/A` (or a wrong position) when the search range contained empty cells; empty cells are now skipped during approximate matching, consistent with Excel and Google Sheets. [HF-223]
+
 ## [3.3.0] - 2026-05-20
 
 ### Added
