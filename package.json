@@ -47,10 +47,6 @@
     "last 2 op_mob versions"
   ],
   "license": "GPL-3.0-only",
-  "engines": {
-    "node": ">=22",
-    "npm": ">=10"
-  },
   "type": "commonjs",
   "module": "es/index.mjs",
   "main": "commonjs/index.js",
