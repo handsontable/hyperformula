@@ -87,6 +87,18 @@ hfInstance.setCellContents({sheet: 0, col: 2, row: 0}, [['=SUM(SalesData)']]);
 hfInstance.setCellContents({sheet: 0, col: 2, row: 1}, [['=SUM(SalesData) * TaxRate']]);
 ```
 
+## Using named ranges in formulas
+
+A named expression that resolves to a range of cells behaves differently depending on where it is used:
+
+- **As a function argument** — it works as expected. `=SUM(myRange)`, `=COUNT(myRange)`, and `=INDEX(myRange, 1, 1)` all operate on the full range.
+- **As an operand of an operator** — the range is reduced to a single cell before the operation. In `=myRange + 1`, only the cell of the range that shares the formula's row (for a vertical range) or column (for a horizontal range) is used. If the formula's row or column falls outside the range, or the range is two-dimensional, the result is a `#VALUE!` error.
+- **As a bare reference** — `=myRange` on its own returns a `#VALUE!` error; a range cannot be placed directly into a single cell.
+
+The range is reduced before the operator runs, so `=SUM(myRange + 1)` receives a single value rather than adding 1 to every element.
+
+When array arithmetic is enabled (`useArrayArithmetic: true`), named ranges still work as function arguments and aggregate correctly, but they do not spill: `=myRange + 1` returns a `#VALUE!` error rather than producing one result per element.
+
 ## Available methods
 
 These are the basic methods that can be used to add and manipulate named
