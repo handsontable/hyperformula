@@ -46,7 +46,7 @@ import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
-import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
+import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, isBuiltinFunction, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
 import {FunctionDetails, FunctionDoc, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
@@ -681,6 +681,7 @@ export class HyperFormula implements TypedEmitter {
       FunctionRegistry.getListableFunctionIds(),
       (id) => FunctionRegistry.getFunctionPlugin(id),
       language,
+      code,
     )
   }
 
@@ -715,10 +716,12 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Resolves the structural metadata and catalogue doc for a registered function id, following aliases to their
-   * target. Returns `undefined` when the id is not registered or its catalogue doc disagrees with the implementation
-   * arity (catalogue drift). When the id is registered but has no catalogue doc (a custom function), `doc` is
-   * `undefined` and only the structural metadata is available. Shared by the list and the details builders so they
-   * always agree. The `getPlugin` callback abstracts over the static and the instance registry.
+   * target. Returns `undefined` when the id is not registered or its built-in catalogue doc disagrees with the
+   * implementation arity (catalogue drift). The catalogue doc is attached only when the id is genuinely provided by
+   * its built-in plugin; a user-registered plugin that shadows a built-in id is treated as a custom function (`doc`
+   * is `undefined`), so the API reflects what actually runs rather than stale built-in metadata. When the id has no
+   * applicable doc, `doc` is `undefined` and only the structural metadata is available. Shared by the list and the
+   * details builders so they always agree. The `getPlugin` callback abstracts over the static and the instance registry.
    *
    * @param {string} functionId - the language-independent function id (canonical id or alias)
    * @param {FunctionPluginDefinition | undefined} plugin - the plugin registered for `functionId`, or `undefined`
@@ -733,7 +736,9 @@ export class HyperFormula implements TypedEmitter {
     if (metadata === undefined) {
       return undefined
     }
-    const doc = FUNCTION_DOCS[metadataKey]
+    // Use the catalogue doc only when the built-in plugin that owns this id is the one actually registered for it.
+    // A custom plugin overriding a built-in id is reported as a custom function, never with the built-in's doc.
+    const doc = isBuiltinFunction(metadataKey, plugin) ? FUNCTION_DOCS[metadataKey] : undefined
     if (doc !== undefined && doc.parameters.length !== (metadata.parameters ?? []).length) {
       // Catalogue drift: drop from both the list and the details so they never disagree.
       return undefined
@@ -742,11 +747,27 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Builds the function list for a set of registered ids. Documented functions use their catalogue entry; custom
-   * functions are listed with their name only. Sorted alphabetically by localized name.
+   * Converts a HyperFormula language code (e.g. `'enGB'`, `'plPL'`) to a BCP-47 locale (e.g. `'en-GB'`, `'pl-PL'`)
+   * so the function list collator is deterministic across hosts. Codes in the canonical `<ll><RR>` shape get a
+   * hyphen inserted; any other shape is passed through and left for `Intl.Collator` to interpret (it falls back to
+   * the default locale for an unrecognized tag, which is still applied consistently within a single call).
+   *
+   * @param {string} languageCode - the HyperFormula language code
    */
-  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage): FunctionListEntry[] {
+  private static toBcp47Locale(languageCode: string): string {
+    const match = /^([a-z]{2})([A-Z]{2})$/.exec(languageCode)
+    return match !== null ? `${match[1]}-${match[2]}` : languageCode
+  }
+
+  /**
+   * Builds the function list for a set of registered ids. Documented functions use their catalogue entry; custom
+   * functions are listed with their name only. Sorted by localized name under an explicit, language-derived collator
+   * (so the order does not depend on the host locale), with the language-independent canonical name as a stable
+   * tiebreaker for entries that share a localized name.
+   */
+  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage, languageCode: string): FunctionListEntry[] {
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    const collator = new Intl.Collator(HyperFormula.toBcp47Locale(languageCode))
     return functionIds
       .map(id => {
         const resolved = HyperFormula.resolveFunctionMetadata(id, getPlugin(id))
@@ -758,7 +779,7 @@ export class HyperFormula implements TypedEmitter {
           : buildCustomFunctionListEntry(id, translate)
       })
       .filter((entry): entry is FunctionListEntry => entry !== undefined)
-      .sort((a, b) => a.localizedName.localeCompare(b.localizedName))
+      .sort((a, b) => collator.compare(a.localizedName, b.localizedName) || collator.compare(a.canonicalName, b.canonicalName))
   }
 
   /**
@@ -4518,6 +4539,7 @@ export class HyperFormula implements TypedEmitter {
       this._functionRegistry.getListableFunctionIds(),
       (id) => this._functionRegistry.getFunctionPlugin(id),
       language,
+      this._config.language,
     )
   }
 
