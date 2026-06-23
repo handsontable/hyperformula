@@ -45,6 +45,11 @@ export function findLastOccurrenceInOrderedRange(
   // the sort invariant binary search relies on (compare() ranks EmptyValue below every other value),
   // so the search runs over the compacted, empty-free index list and the result is mapped back to the
   // original index space afterwards.
+  //
+  // This pre-scan is O(n) over the range, which trades away the binary search's O(log n) guarantee.
+  // It is required for correctness: with empty cells interspersed the search predicate is no longer
+  // monotonic, so the binary search cannot run directly on the original range. A future optimization
+  // could skip the compaction (and keep O(log n)) when the range is statically known to be empty-free.
   const nonEmptyIndices: number[] = []
   for (let index = start; index <= end; index++) {
     if (getValueFromIndexFn(index) !== EmptyValue) {

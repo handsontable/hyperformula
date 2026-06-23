@@ -62,6 +62,13 @@ export abstract class AdvancedFind {
     )
   }
 
+  /**
+   * Linear search over an in-memory array for the value equal to `searchKey`, or — when `ifNoMatch`
+   * is `returnLowerBound`/`returnUpperBound` — the closest non-exceeding/non-preceding value.
+   * Genuinely empty cells (`EmptyValue`) are skipped, consistent with `findLastOccurrenceInOrderedRange`
+   * and with Excel/Google Sheets, which ignore empty cells (but not empty strings) in approximate search.
+   * Returns the 0-based index into `searchArray`, or `NOT_FOUND` (-1) when nothing matches.
+   */
   protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' = 'returnNotFound', returnOccurrence: 'first' | 'last' = 'first'): number {
     const normalizedArray = searchArray
       .map(getRawValue)
