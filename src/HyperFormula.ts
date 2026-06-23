@@ -1084,15 +1084,19 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are 2D arrays of [[RawCellContent]].
    *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type.
+   * For example, a cell set with the string `'1'` is serialized as the string `'1'`, while a cell set with the number `1` is serialized as the number `1`.
+   *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2', '=A1+10'],
+   *  ['1', 2, '=A1+10'],
    * ]);
    *
-   * // should return all sheets serialized content: { Sheet1: [ [ 1, 2, '=A1+10' ] ] }
+   * // should return all sheets serialized content: { Sheet1: [ [ '1', 2, '=A1+10' ] ] }
+   * // note: the string '1' stays a string and the number 2 stays a number
    * const allSheetsSerialized = hfInstance.getAllSheetsSerialized();
    * ```
    *
@@ -2583,6 +2587,9 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns serialized cells in given range.
    *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type
+   * (e.g., a cell set with the string `'2'` is serialized as the string `'2'`, while a cell set with the number `2` is serialized as the number `2`).
+   *
    * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
@@ -2592,9 +2599,9 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['=SUM(1, 2)', '2', '10'],
-   *  ['5', '6', '7'],
-   *  ['40', '30', '20'],
+   *  ['=SUM(1, 2)', 2, 10],
+   *  [5, 6, 7],
+   *  [40, 30, 20],
    * ]);
    *
    * // should return serialized cell content for the given range:
