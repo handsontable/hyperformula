@@ -120,6 +120,14 @@ export class FunctionRegistry {
     return Array.from(new Set(this.plugins.values()).values())
   }
 
+  /**
+   * Returns the ids of all registered, non-protected functions, including aliases. Used by the function-metadata
+   * API to list every function reachable in a formula (built-in canonical ids plus their aliases).
+   */
+  public static getListableFunctionIds(): string[] {
+    return Array.from(this.plugins.keys())
+  }
+
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {
     if (this.functionIsProtected(functionId)) {
       return undefined
@@ -231,6 +239,14 @@ export class FunctionRegistry {
       return undefined
     }
     return this.instancePlugins.get(functionId)
+  }
+
+  /**
+   * Returns the ids of all functions registered in this instance, including aliases and any custom (user-registered)
+   * functions, excluding protected ids. Used by the instance-level function-metadata API.
+   */
+  public getListableFunctionIds(): string[] {
+    return Array.from(this.instancePlugins.keys()).filter(id => !FunctionRegistry.functionIsProtected(id))
   }
 
   public getFunction(functionId: string): Maybe<PluginFunctionType> {

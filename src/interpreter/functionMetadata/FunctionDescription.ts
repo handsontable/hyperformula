@@ -5,6 +5,12 @@
 
 /**
  * The function categories, matching the `### <Category>` headers in `docs/guide/built-in-functions.md`.
+ *
+ * The ten categories with an Excel equivalent use the same names as the official Excel docs
+ * (https://support.microsoft.com/en-us/office/excel-functions-by-category-5f91f4e9-7b42-46d2-9bd1-63f26a86c0eb),
+ * which name them in full words (e.g. "Math and trigonometry functions", "Lookup and reference functions") rather
+ * than the abbreviated ribbon labels ("Math & Trig", "Lookup & Reference"). `Array manipulation`, `Matrix functions`
+ * and `Operator` are HyperFormula-specific and have no Excel equivalent.
  */
 export const FUNCTION_CATEGORIES = [
   'Array manipulation', 'Database', 'Date and time', 'Engineering',
@@ -43,11 +49,12 @@ export interface FunctionDoc {
  */
 export interface FunctionListEntry {
   /** Function name, translated for the active language. */
-  name: string,
+  localizedName: string,
   /** Language-independent function id, e.g. `'SUMIF'`. */
   canonicalName: string,
-  category: FunctionCategory,
-  /** One-liner description (English in the MVP). */
+  /** Documented category, or `undefined` for custom (user-registered) functions that ship no catalogue entry. */
+  category: FunctionCategory | undefined,
+  /** One-liner description (English in the MVP). Empty (`''`) for custom functions. */
   shortDescription: string,
 }
 
@@ -61,8 +68,6 @@ export interface FunctionParameterDescription {
   description: string,
   /** `true` when the argument may be omitted. */
   optional: boolean,
-  /** `true` for the last `repeatLastArgs` parameters. */
-  repeatable: boolean,
 }
 
 /**
@@ -70,15 +75,20 @@ export interface FunctionParameterDescription {
  */
 export interface FunctionDetails {
   /** Function name, translated for the active language. */
-  name: string,
+  localizedName: string,
   /** Language-independent function id, e.g. `'SUMIF'`. */
   canonicalName: string,
-  category: FunctionCategory,
-  /** One-liner description (English in the MVP). */
+  /** Documented category, or `undefined` for custom (user-registered) functions that ship no catalogue entry. */
+  category: FunctionCategory | undefined,
+  /** One-liner description (English in the MVP). Empty (`''`) for custom functions. */
   shortDescription: string,
-  /** Generated from the parameter names, optionality and `repeatLastArgs`. */
-  syntax: string,
   parameters: FunctionParameterDescription[],
+  /**
+   * How many of the trailing `parameters` repeat indefinitely (a function with a variable number of arguments).
+   * `0` when the argument list is fixed; e.g. `1` for `SUM(Number1, ...)`, `2` for `SUMIFS` where the last
+   * (Criteria range, Criterion) pair repeats. The caller renders the syntax string from this.
+   */
+  repeatLastArgs: number,
   /** Link to the function's documentation. Present but empty (`''`) in the MVP; populated in a later phase. */
   documentationUrl: string,
   /** Usage examples. Present but empty (`[]`) in the MVP; populated in a later phase. */

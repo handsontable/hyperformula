@@ -46,7 +46,7 @@ import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
-import {buildFunctionDetails, buildFunctionListEntry, getCanonicalFunctionIds, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
+import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
 import {FunctionDetails, FunctionDoc, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
@@ -653,12 +653,13 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns metadata of all built-in functions available for a given language, as a short list suitable for a function
-   * picker. Each entry contains the translated name, the language-independent canonical name, the category, and a short
-   * description.
+   * Returns metadata of all functions available for a given language, as a short list suitable for a function
+   * picker. Each entry contains the translated name, the language-independent canonical name, the category, and a
+   * short description. Entries are sorted alphabetically by their localized name.
    *
-   * Only documented built-in functions are listed; custom (user-registered) functions are not included. The list is
-   * sorted by category, then by canonical name.
+   * The static method covers the globally-registered built-in functions and their aliases. Custom (user-registered)
+   * functions are instance-scoped, so they are listed only by the instance method [[getAvailableFunctions]], not by
+   * this static one.
    *
    * @param {string} code - language code, e.g. `'enGB'`
    *
@@ -676,39 +677,20 @@ export class HyperFormula implements TypedEmitter {
   public static getAvailableFunctions(code: string): FunctionListEntry[] {
     validateArgToType(code, 'string', 'code')
     const language = this.getLanguage(code)
-    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
-    return getCanonicalFunctionIds(FunctionRegistry.getPlugins())
-      // List only functions whose details `getFunctionDetails` can resolve — documented, currently registered, and
-      // with catalogue arity matching the implementation — so the list and the details never disagree.
-      .filter(id => this.resolveListableMetadata(id) !== undefined)
-      .map(id => buildFunctionListEntry(id, FUNCTION_DOCS[id], translate))
-      .sort((a, b) => a.category === b.category ? a.canonicalName.localeCompare(b.canonicalName) : a.category.localeCompare(b.category))
+    return HyperFormula.buildAvailableFunctions(
+      FunctionRegistry.getListableFunctionIds(),
+      (id) => FunctionRegistry.getFunctionPlugin(id),
+      language,
+    )
   }
 
   /**
-   * Resolves a function's catalogue doc and structural metadata when it is listable: documented, currently
-   * registered, and with a catalogue parameter count equal to the implementation arity. Returns `undefined`
-   * otherwise. Shared by `getAvailableFunctions` and `getFunctionDetails` so the list and the details agree exactly.
+   * Returns the full metadata of a single function for a given language: the parameter list (with per-parameter
+   * optionality), the number of trailing parameters that repeat (`repeatLastArgs`), the category and a short
+   * description. Returns `undefined` when the function id is unknown or not registered.
    *
-   * @param {string} canonicalName - the language-independent function id
-   */
-  private static resolveListableMetadata(canonicalName: string): { doc: FunctionDoc, metadata: StructuralMetadata } | undefined {
-    const doc = FUNCTION_DOCS[canonicalName]
-    const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
-    if (doc === undefined || plugin === undefined) {
-      return undefined
-    }
-    const metadata = plugin.implementedFunctions[canonicalName]
-    if (doc.parameters.length !== (metadata.parameters ?? []).length) {
-      return undefined
-    }
-    return {doc, metadata}
-  }
-
-  /**
-   * Returns the full metadata of a single built-in function for a given language, including the generated syntax and
-   * per-parameter optionality and repeatability. Returns `undefined` when the function id is unknown or has no
-   * documentation (e.g. a custom function).
+   * The static method resolves the globally-registered built-in functions and their aliases. For custom
+   * (user-registered) functions, use the instance method [[getFunctionDetails]].
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    * @param {string} code - language code, e.g. `'enGB'`
@@ -727,15 +709,71 @@ export class HyperFormula implements TypedEmitter {
   public static getFunctionDetails(canonicalName: string, code: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
     validateArgToType(code, 'string', 'code')
-    // Same gate as `getAvailableFunctions` (documented + registered + arity-consistent). Returns undefined for
-    // unknown/custom ids or catalogue-vs-implementation drift, so callers never hit the loud throw in buildFunctionDetails.
-    const resolved = this.resolveListableMetadata(canonicalName)
+    const language = this.getLanguage(code)
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, FunctionRegistry.getFunctionPlugin(canonicalName), language)
+  }
+
+  /**
+   * Resolves the structural metadata and catalogue doc for a registered function id, following aliases to their
+   * target. Returns `undefined` when the id is not registered or its catalogue doc disagrees with the implementation
+   * arity (catalogue drift). When the id is registered but has no catalogue doc (a custom function), `doc` is
+   * `undefined` and only the structural metadata is available. Shared by the list and the details builders so they
+   * always agree. The `getPlugin` callback abstracts over the static and the instance registry.
+   *
+   * @param {string} functionId - the language-independent function id (canonical id or alias)
+   * @param {FunctionPluginDefinition | undefined} plugin - the plugin registered for `functionId`, or `undefined`
+   */
+  private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata } | undefined {
+    if (plugin === undefined) {
+      return undefined
+    }
+    // An alias shares its target's implementation metadata and catalogue doc, but keeps its own (alias) name.
+    const metadataKey = plugin.aliases?.[functionId] ?? functionId
+    const metadata = plugin.implementedFunctions[metadataKey]
+    if (metadata === undefined) {
+      return undefined
+    }
+    const doc = FUNCTION_DOCS[metadataKey]
+    if (doc !== undefined && doc.parameters.length !== (metadata.parameters ?? []).length) {
+      // Catalogue drift: drop from both the list and the details so they never disagree.
+      return undefined
+    }
+    return {doc, metadata}
+  }
+
+  /**
+   * Builds the function list for a set of registered ids. Documented functions use their catalogue entry; custom
+   * functions are listed with their name only. Sorted alphabetically by localized name.
+   */
+  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage): FunctionListEntry[] {
+    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    return functionIds
+      .map(id => {
+        const resolved = HyperFormula.resolveFunctionMetadata(id, getPlugin(id))
+        if (resolved === undefined) {
+          return undefined
+        }
+        return resolved.doc !== undefined
+          ? buildFunctionListEntry(id, resolved.doc, translate)
+          : buildCustomFunctionListEntry(id, translate)
+      })
+      .filter((entry): entry is FunctionListEntry => entry !== undefined)
+      .sort((a, b) => a.localizedName.localeCompare(b.localizedName))
+  }
+
+  /**
+   * Builds the full details for a single registered id, or `undefined` when it is unknown/not registered.
+   * Documented functions use their catalogue entry; custom functions report their structural metadata only.
+   */
+  private static buildFunctionDetailsFor(functionId: string, plugin: FunctionPluginDefinition | undefined, language: TranslationPackage): FunctionDetails | undefined {
+    const resolved = HyperFormula.resolveFunctionMetadata(functionId, plugin)
     if (resolved === undefined) {
       return undefined
     }
-    const language = this.getLanguage(code)
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
-    return buildFunctionDetails(canonicalName, resolved.doc, resolved.metadata, translate)
+    return resolved.doc !== undefined
+      ? buildFunctionDetails(functionId, resolved.doc, resolved.metadata, translate)
+      : buildCustomFunctionDetails(functionId, resolved.metadata, translate)
   }
 
   /**
@@ -4455,12 +4493,14 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns metadata of all built-in functions available for a function picker, with names translated according to the
-   * language set in this instance's configuration. Each entry contains the translated name, the language-independent
-   * canonical name, the category, and a short description.
+   * Returns metadata of all functions available in this instance for a function picker, with names translated
+   * according to the language set in this instance's configuration. Each entry contains the translated name, the
+   * language-independent canonical name, the category, and a short description. Entries are sorted alphabetically by
+   * their localized name.
    *
-   * Only documented built-in functions are listed; custom (user-registered) functions are not included. The list is
-   * sorted by category, then by canonical name.
+   * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
+   * functions, plus their aliases. Custom functions ship no catalogue entry, so their `category` is `undefined` and
+   * their `shortDescription` is empty.
    *
    * @example
    * ```js
@@ -4473,13 +4513,21 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public getAvailableFunctions(): FunctionListEntry[] {
-    return HyperFormula.getAvailableFunctions(this._config.language)
+    const language = HyperFormula.getLanguage(this._config.language)
+    return HyperFormula.buildAvailableFunctions(
+      this._functionRegistry.getListableFunctionIds(),
+      (id) => this._functionRegistry.getFunctionPlugin(id),
+      language,
+    )
   }
 
   /**
-   * Returns the full metadata of a single built-in function, with names translated according to the language set in
-   * this instance's configuration, including the generated syntax and per-parameter optionality and repeatability.
-   * Returns `undefined` when the function id is unknown or has no documentation (e.g. a custom function).
+   * Returns the full metadata of a single function registered in this instance, with names translated according to
+   * the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
+   * number of trailing parameters that repeat (`repeatLastArgs`), the category and a short description. Resolves both
+   * built-in and custom (user-registered) functions, as well as aliases. Returns `undefined` when the function id is
+   * unknown or not registered in this instance. For a custom function, `category` is `undefined`, `shortDescription`
+   * is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *
@@ -4496,7 +4544,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
-    return HyperFormula.getFunctionDetails(canonicalName, this._config.language)
+    validateArgToType(canonicalName, 'string', 'canonicalName')
+    const language = HyperFormula.getLanguage(this._config.language)
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry.getFunctionPlugin(canonicalName), language)
   }
 
   /**

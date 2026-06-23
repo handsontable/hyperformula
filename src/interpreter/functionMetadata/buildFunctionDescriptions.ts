@@ -39,21 +39,6 @@ export function isParameterOptional(arg: FunctionArgument | undefined): boolean 
 }
 
 /**
- * Builds the display syntax string from parameter names and structural metadata. Required parameters are rendered
- * bare, optional ones in brackets, and a trailing `, ...` is appended when the last `repeatLastArgs` parameters repeat.
- *
- * @param {string} displayName - the function name to show (the translated name in the active language)
- * @param {string[]} parameterNames - authored parameter names, index-aligned with `metadata.parameters`
- * @param {StructuralMetadata} metadata - structural metadata (`parameters` + `repeatLastArgs`) from `implementedFunctions`
- */
-export function generateSyntax(displayName: string, parameterNames: string[], metadata: StructuralMetadata): string {
-  const args = metadata.parameters ?? []
-  const rendered = parameterNames.map((name, index) => isParameterOptional(args[index]) ? `[${name}]` : name)
-  const repeatSuffix = (metadata.repeatLastArgs ?? 0) > 0 ? ', ...' : ''
-  return `${displayName}(${rendered.join(', ')}${repeatSuffix})`
-}
-
-/**
  * Resolves the display name for a function: the translated name, or the canonical id when there is no usable
  * translation. Some bundled language packs leave a function untranslated as an empty string (e.g. `SWITCH` in
  * several locales), so an empty translation falls back to the canonical id just like a missing one.
@@ -75,7 +60,7 @@ function resolveName(canonicalName: string, translate: TranslateName): string {
  */
 export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, translate: TranslateName): FunctionListEntry {
   return {
-    name: resolveName(canonicalName, translate),
+    localizedName: resolveName(canonicalName, translate),
     canonicalName,
     category: doc.category,
     shortDescription: doc.shortDescription,
@@ -83,7 +68,8 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
 }
 
 /**
- * Builds a Tier-2 details object: the list fields plus generated syntax and per-parameter optionality/repeatability.
+ * Builds a Tier-2 details object: the list fields plus the parameter list (name, description, optionality) and
+ * `repeatLastArgs` (how many trailing parameters repeat). The caller renders the syntax string from these.
  * `documentationUrl`, `examples` and each parameter `description` are present but empty in the MVP.
  *
  * @param {string} canonicalName - the language-independent function id
@@ -97,23 +83,62 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
   if (doc.parameters.length !== implParamCount) {
     throw new Error(`Function metadata mismatch for ${canonicalName}: catalogue has ${doc.parameters.length} parameters, implementation has ${implParamCount}`)
   }
-  const name = resolveName(canonicalName, translate)
   const args = metadata.parameters ?? []
-  const repeatLastArgs = metadata.repeatLastArgs ?? 0
-  const firstRepeatableIndex = doc.parameters.length - repeatLastArgs
   const parameters: FunctionParameterDescription[] = doc.parameters.map((param, index) => ({
     name: param.name,
     description: param.description,
     optional: isParameterOptional(args[index]),
-    repeatable: repeatLastArgs > 0 && index >= firstRepeatableIndex,
   }))
   return {
-    name,
+    localizedName: resolveName(canonicalName, translate),
     canonicalName,
     category: doc.category,
     shortDescription: doc.shortDescription,
-    syntax: generateSyntax(name, doc.parameters.map(parameter => parameter.name), metadata),
     parameters,
+    repeatLastArgs: metadata.repeatLastArgs ?? 0,
+    documentationUrl: '',
+    examples: [],
+  }
+}
+
+/**
+ * Builds a Tier-1 list entry for a custom (user-registered) function, which ships no catalogue doc. Only the name
+ * is known; `category` is `undefined` and `shortDescription` is empty.
+ *
+ * @param {string} canonicalName - the language-independent function id
+ * @param {TranslateName} translate - per-id translation lookup
+ */
+export function buildCustomFunctionListEntry(canonicalName: string, translate: TranslateName): FunctionListEntry {
+  return {
+    localizedName: resolveName(canonicalName, translate),
+    canonicalName,
+    category: undefined,
+    shortDescription: '',
+  }
+}
+
+/**
+ * Builds Tier-2 details for a custom (user-registered) function from its structural metadata alone (no catalogue
+ * doc): positional parameter names (`Arg1`, `Arg2`, ...), per-parameter optionality, and `repeatLastArgs`.
+ *
+ * @param {string} canonicalName - the language-independent function id
+ * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions`
+ * @param {TranslateName} translate - per-id translation lookup
+ */
+export function buildCustomFunctionDetails(canonicalName: string, metadata: StructuralMetadata, translate: TranslateName): FunctionDetails {
+  const args = metadata.parameters ?? []
+  const parameters: FunctionParameterDescription[] = args.map((arg, index) => ({
+    name: `Arg${index + 1}`,
+    description: '',
+    optional: isParameterOptional(arg),
+  }))
+  return {
+    localizedName: resolveName(canonicalName, translate),
+    canonicalName,
+    category: undefined,
+    shortDescription: '',
+    parameters,
+    repeatLastArgs: metadata.repeatLastArgs ?? 0,
     documentationUrl: '',
     examples: [],
   }
