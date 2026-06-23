@@ -33,22 +33,22 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   BESSELI: {
     category: 'Statistical',
     shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: ''}, {name: 'n', description: ''}],
+    parameters: [{name: 'X', description: ''}, {name: 'N', description: ''}],
   },
   BESSELJ: {
     category: 'Statistical',
     shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: ''}, {name: 'n', description: ''}],
+    parameters: [{name: 'X', description: ''}, {name: 'N', description: ''}],
   },
   BESSELK: {
     category: 'Statistical',
     shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: ''}, {name: 'n', description: ''}],
+    parameters: [{name: 'X', description: ''}, {name: 'N', description: ''}],
   },
   BESSELY: {
     category: 'Statistical',
     shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: ''}, {name: 'n', description: ''}],
+    parameters: [{name: 'X', description: ''}, {name: 'N', description: ''}],
   },
   'BETA.DIST': {
     category: 'Statistical',

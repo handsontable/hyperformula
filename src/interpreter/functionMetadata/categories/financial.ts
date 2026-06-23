@@ -13,7 +13,7 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
   CUMIPMT: {
     category: 'Financial',
     shortDescription: 'Returns the cumulative interest paid on a loan between a start period and an end period.',
-    parameters: [{name: 'Rate', description: ''}, {name: 'Nper', description: ''}, {name: 'Pv', description: ''}, {name: 'Start', description: ''}, {name: 'End', description: ''}, {name: 'type', description: ''}],
+    parameters: [{name: 'Rate', description: ''}, {name: 'Nper', description: ''}, {name: 'Pv', description: ''}, {name: 'Start', description: ''}, {name: 'End', description: ''}, {name: 'Type', description: ''}],
   },
   CUMPRINC: {
     category: 'Financial',
@@ -113,7 +113,7 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
   RATE: {
     category: 'Financial',
     shortDescription: 'Returns the interest rate per period of an annuity.',
-    parameters: [{name: 'Nper', description: ''}, {name: 'Pmt', description: ''}, {name: 'Pv', description: ''}, {name: 'Fv', description: ''}, {name: 'Type', description: ''}, {name: 'guess', description: ''}],
+    parameters: [{name: 'Nper', description: ''}, {name: 'Pmt', description: ''}, {name: 'Pv', description: ''}, {name: 'Fv', description: ''}, {name: 'Type', description: ''}, {name: 'Guess', description: ''}],
   },
   RRI: {
     category: 'Financial',

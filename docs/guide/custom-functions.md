@@ -554,6 +554,19 @@ const functions = HyperFormula.getAvailableFunctions('enGB');
 const sumDetails = HyperFormula.getFunctionDetails('SUM', 'enGB');
 ```
 
+The same methods are also available on an instance, where they use the
+instance's configured language by default:
+
+```js
+const hf = HyperFormula.buildEmpty({ language: 'enGB' });
+
+// a short list of all built-in functions
+const functions = hf.getAvailableFunctions();
+
+// the full details of a single built-in function
+const sumDetails = hf.getFunctionDetails('SUM');
+```
+
 This metadata covers **built-in functions only**. Custom functions are not
 included: they don't appear in the `getAvailableFunctions()` list, and
 `getFunctionDetails()` returns `undefined` for them.
