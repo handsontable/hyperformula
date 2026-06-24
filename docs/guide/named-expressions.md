@@ -95,9 +95,12 @@ A named expression that resolves to a range of cells behaves differently dependi
 - **As an operand of an operator** — the range is reduced to a single cell before the operation. In `=myRange + 1`, only the cell of the range that shares the formula's row (for a vertical range) or column (for a horizontal range) is used. If the formula's row or column falls outside the range, or the range is two-dimensional, the result is a `#VALUE!` error.
 - **As a bare reference** — `=myRange` on its own returns a `#VALUE!` error; a range cannot be placed directly into a single cell.
 
-The range is reduced before the operator runs, so `=SUM(myRange + 1)` receives a single value rather than adding 1 to every element.
+In the default mode the range is reduced before the operator runs, so `=SUM(myRange + 1)` adds 1 to that single reduced value rather than to every element (for a formula in row 1 of a vertical range, the result is `SUM(A1 + 1)`).
 
-When array arithmetic is enabled (`useArrayArithmetic: true`), named ranges still work as function arguments and aggregate correctly, but they do not spill: `=myRange + 1` returns a `#VALUE!` error rather than producing one result per element.
+When array arithmetic is enabled (`useArrayArithmetic: true`), named ranges still work as function arguments and aggregate correctly, but as an operand they behave differently from the default mode:
+
+- A bare `=myRange + 1` does not spill — it returns a `#VALUE!` error rather than producing one result per element.
+- Inside an aggregate the operator becomes element-wise. `=SUM(myRange + 1)` adds 1 to every element and then sums, so for `myRange` covering values `1..5` it returns `20` (`SUM(2, 3, 4, 5, 6)`), not the single reduced value of the default mode.
 
 ## Available methods
 
