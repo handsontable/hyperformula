@@ -559,9 +559,7 @@ localized name, each with `localizedName`, `canonicalName`, `category`, and
 `shortDescription`. `getFunctionDetails()` returns the same fields plus the
 ordered `parameters` list (each with `name`, `description`, and `optional`) and
 `repeatLastArgs` — the number of trailing parameters that repeat for functions
-with a variable number of arguments (`0` for a fixed argument list). The
-methods do not return a pre-rendered syntax string; build it from `parameters`
-and `repeatLastArgs` as your UI needs.
+with a variable number of arguments (`0` for a fixed argument list).
 
 The same methods are also available on an instance, where they use the
 instance's configured language by default:
