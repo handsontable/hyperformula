@@ -39,6 +39,18 @@ function validateAndReturnMetadataFromName(functionId: string, plugin: FunctionP
 export class FunctionRegistry {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
 
+  /**
+   * Maps each built-in canonical id to the built-in plugin that canonically provides it. Captured once at module
+   * init (from `index.ts`, which already imports the plugin barrel to register the built-ins) so the metadata API
+   * can tell a genuine built-in id from a user plugin that merely shadows a built-in id. Keyed by
+   * `implementedFunctions` keys only, never aliases: callers resolve an alias to its target id before consulting it.
+   *
+   * Lives here rather than in the metadata builders so those builders need not import the plugin barrel: doing so
+   * eagerly would create a module-load-order cycle (`HyperFormula.ts` pulls in the builders early). This map is a
+   * frozen snapshot of the original built-in ownership, unaffected by later `registerFunction`/`unregister` calls.
+   */
+  private static readonly _builtinFunctionOwners: Map<string, FunctionPluginDefinition> = new Map()
+
   private static readonly _protectedPlugins: Map<string, FunctionPluginDefinition | undefined> = new Map([
     ['VERSION', VersionPlugin],
     ['OFFSET', undefined],
@@ -76,6 +88,35 @@ export class FunctionRegistry {
     if (translations !== undefined) {
       this.loadTranslations(translations)
     }
+  }
+
+  /**
+   * Records the given plugins as the canonical built-in owners. Called once at module init by `index.ts` with the
+   * complete built-in plugin set (which it already imports to register them). Only `implementedFunctions` keys are
+   * snapshotted, not aliases, because alias lookups are resolved to their target id before {@link isBuiltinFunction}
+   * is consulted. Idempotent: re-recording the same id keeps the last writer, but the built-in set is fixed.
+   *
+   * @param {FunctionPluginDefinition[]} builtinPlugins - the built-in plugin classes, as imported by `index.ts`
+   */
+  public static captureBuiltinFunctionOwners(builtinPlugins: FunctionPluginDefinition[]): void {
+    for (const plugin of builtinPlugins) {
+      for (const id of Object.keys(plugin.implementedFunctions)) {
+        this._builtinFunctionOwners.set(id, plugin)
+      }
+    }
+  }
+
+  /**
+   * Returns whether `plugin` is the built-in plugin that canonically provides `canonicalId`. `false` when the id is
+   * not a built-in id at all, or when a different (e.g. user-registered) plugin currently provides it. Lets the
+   * metadata API gate use of the catalogue doc so a custom function shadowing a built-in id is never described with
+   * the built-in's metadata.
+   *
+   * @param {string} canonicalId - the language-independent function id (the alias target, never an alias)
+   * @param {FunctionPluginDefinition} plugin - the plugin currently registered for the id
+   */
+  public static isBuiltinFunction(canonicalId: string, plugin: FunctionPluginDefinition): boolean {
+    return this._builtinFunctionOwners.get(canonicalId) === plugin
   }
 
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {

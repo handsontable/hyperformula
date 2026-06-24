@@ -46,7 +46,7 @@ import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
-import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, isBuiltinFunction, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
+import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
 import {FunctionDetails, FunctionDoc, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
@@ -738,7 +738,7 @@ export class HyperFormula implements TypedEmitter {
     }
     // Use the catalogue doc only when the built-in plugin that owns this id is the one actually registered for it.
     // A custom plugin overriding a built-in id is reported as a custom function, never with the built-in's doc.
-    const doc = isBuiltinFunction(metadataKey, plugin) ? FUNCTION_DOCS[metadataKey] : undefined
+    const doc = FunctionRegistry.isBuiltinFunction(metadataKey, plugin) ? FUNCTION_DOCS[metadataKey] : undefined
     if (doc !== undefined && doc.parameters.length !== (metadata.parameters ?? []).length) {
       // Catalogue drift: drop from both the list and the details so they never disagree.
       return undefined

@@ -3,8 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import * as builtinPlugins from '../plugin'
-import {FunctionPluginDefinition, FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
+import {FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
 import {FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescription} from './FunctionDescription'
 
 /** Resolves a function's display name: the translation for the active language, or the canonical id as fallback. */
@@ -12,48 +11,6 @@ type TranslateName = (canonicalName: string) => string | undefined
 
 /** The structural subset of `FunctionMetadata` the builders read (so callers/tests need not supply `method`). */
 export type StructuralMetadata = Pick<FunctionMetadata, 'parameters' | 'repeatLastArgs'>
-
-/**
- * Maps each catalogue-documented canonical id to the built-in plugin that canonically provides it. The catalogue
- * (`FUNCTION_DOCS`) was generated from exactly this built-in plugin set, so this map is the source of truth for
- * "is the id genuinely served by its built-in plugin?". Built lazily once from the static `* as plugins` export.
- *
- * Used by the metadata API to decide whether a registered id may borrow the catalogue doc: a user plugin that
- * shadows a built-in id (e.g. a custom `SUM`) is a different class than the value stored here, so it is treated as
- * a custom function rather than mislabelled with the built-in's category/description.
- */
-let builtinOwnersCache: Map<string, FunctionPluginDefinition> | undefined
-
-/**
- * Returns the canonical-id -> built-in-plugin ownership map, computing it once and memoizing it.
- *
- * Only `implementedFunctions` keys are recorded (not aliases): callers resolve an alias to its target id before
- * consulting this map, so the target id is what must be matched.
- */
-function getBuiltinFunctionOwners(): Map<string, FunctionPluginDefinition> {
-  if (builtinOwnersCache === undefined) {
-    const owners = new Map<string, FunctionPluginDefinition>()
-    Object.keys(builtinPlugins).forEach(exportName => {
-      const plugin = (builtinPlugins as Record<string, FunctionPluginDefinition>)[exportName]
-      Object.keys(plugin.implementedFunctions).forEach(id => owners.set(id, plugin))
-    })
-    builtinOwnersCache = owners
-  }
-  return builtinOwnersCache
-}
-
-/**
- * Returns whether `plugin` is the built-in plugin that canonically provides `canonicalId`. `false` when the id is
- * not a built-in id at all, or when a different (e.g. user-registered) plugin currently provides it. Used to gate
- * use of the catalogue doc so a custom function shadowing a built-in id is never described with the built-in's
- * metadata.
- *
- * @param {string} canonicalId - the language-independent function id (the alias target, never an alias)
- * @param {FunctionPluginDefinition} plugin - the plugin currently registered for the id
- */
-export function isBuiltinFunction(canonicalId: string, plugin: FunctionPluginDefinition): boolean {
-  return getBuiltinFunctionOwners().get(canonicalId) === plugin
-}
 
 /**
  * Returns whether a parameter may be omitted: it declares `optionalArg`, or it has a `defaultValue`.

@@ -49,6 +49,7 @@ import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata, EmptyValue} from './interpreter'
+import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {FunctionCategory, FunctionDetails, FunctionListEntry, FunctionParameterDescription} from './interpreter/functionMetadata/FunctionDescription'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
@@ -110,13 +111,21 @@ const defaultLanguage = Config.defaultConfig.language
 HyperFormula.registerLanguage(defaultLanguage, enGB)
 HyperFormula.languages[enGB.langCode] = enGB
 
+const builtinPlugins: FunctionPluginDefinition[] = []
 for (const pluginName of Object.getOwnPropertyNames(plugins)) {
   if (!pluginName.startsWith('_')) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    HyperFormula.registerFunctionPlugin(plugins[pluginName])
+    const plugin = plugins[pluginName] as FunctionPluginDefinition
+    HyperFormula.registerFunctionPlugin(plugin)
+    builtinPlugins.push(plugin)
   }
 }
+// Snapshot the original built-in id -> plugin ownership so the function-metadata API can distinguish a genuine
+// built-in id from a user plugin that shadows one. Captured here (the only place that bulk-registers the built-ins)
+// rather than in the metadata builders, which must not import the plugin barrel: doing so eagerly creates a
+// module-load-order cycle that crashes the bundled build ("Class extends value undefined").
+FunctionRegistry.captureBuiltinFunctionOwners(builtinPlugins)
 
 export default HyperFormulaNS
 
