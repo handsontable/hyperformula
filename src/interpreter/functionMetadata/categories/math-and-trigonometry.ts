@@ -325,15 +325,27 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Computes aggregation using function specified by number.',
     parameters: [{name: 'Function', description: ''}, {name: 'Number1', description: ''}],
   },
+  // HAND-AUTHORED reference functions (HF-249): SUM and SUMIF carry real parameter descriptions, examples and a
+  // documentationUrl so the Formula Builder team can test rendering of populated metadata. The migration generator
+  // (scripts/hf249-migrate-function-docs.ts) does NOT emit `examples`/`documentationUrl`, so DO NOT re-run it over
+  // this file without merge-preserving these two entries, or they will be silently reset to empty.
   SUM: {
     category: 'Math and trigonometry',
     shortDescription: 'Sums up the values of the specified cells.',
-    parameters: [{name: 'Number1', description: ''}],
+    parameters: [{name: 'Number1', description: 'A number, cell reference, or range whose values are added together. Further numbers or ranges can be passed as additional arguments.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions',
+    examples: ['=SUM(1, 2, 3)', '=SUM(A1:A10)', '=SUM(B1:B5, 100)'],
   },
   SUMIF: {
     category: 'Math and trigonometry',
     shortDescription: 'Sums up the values of cells that belong to the specified range and meet the specified condition.',
-    parameters: [{name: 'Range', description: ''}, {name: 'Criteria', description: ''}, {name: 'Sumrange', description: ''}],
+    parameters: [
+      {name: 'Range', description: 'The range of cells tested against the criterion.'},
+      {name: 'Criteria', description: 'The condition that selects which cells are summed, e.g. ">5", "apples", or a cell reference.'},
+      {name: 'Sumrange', description: 'The range of cells to sum. When omitted, the cells in Range are summed instead.'},
+    ],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions',
+    examples: ['=SUMIF(A1:A10, ">5")', '=SUMIF(B1:B10, "apples", C1:C10)'],
   },
   SUMIFS: {
     category: 'Math and trigonometry',

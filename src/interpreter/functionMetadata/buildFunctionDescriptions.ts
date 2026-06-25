@@ -53,7 +53,8 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
 /**
  * Builds a Tier-2 details object: the list fields plus the parameter list (name, description, optionality) and
  * `repeatLastArgs` (how many trailing parameters repeat). The caller renders the syntax string from these.
- * `documentationUrl`, `examples` and each parameter `description` are present but empty in the MVP.
+ * `documentationUrl` and `examples` come from the catalogue doc when authored, and fall back to `''`/`[]`
+ * otherwise; each parameter `description` is present but empty for functions not yet authored.
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {FunctionDoc} doc - the function's authored catalogue entry
@@ -79,8 +80,8 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     shortDescription: doc.shortDescription,
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
-    documentationUrl: '',
-    examples: [],
+    documentationUrl: doc.documentationUrl ?? '',
+    examples: doc.examples ?? [],
   }
 }
 

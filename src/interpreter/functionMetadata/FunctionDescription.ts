@@ -42,6 +42,16 @@ export interface FunctionDoc {
   shortDescription: string,
   /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
   parameters: ParameterDoc[],
+  /**
+   * Link to the function's documentation. Optional and absent for most functions in the MVP (surfaced as `''`);
+   * authored per function in a later phase.
+   */
+  documentationUrl?: string,
+  /**
+   * Usage examples. Optional and absent for most functions in the MVP (surfaced as `[]`); authored per function
+   * in a later phase.
+   */
+  examples?: string[],
 }
 
 /**
@@ -89,8 +99,8 @@ export interface FunctionDetails {
    * (Criteria range, Criterion) pair repeats. The caller renders the syntax string from this.
    */
   repeatLastArgs: number,
-  /** Link to the function's documentation. Present but empty (`''`) in the MVP; populated in a later phase. */
+  /** Link to the function's documentation. Authored per function; `''` for functions not yet documented. */
   documentationUrl: string,
-  /** Usage examples. Present but empty (`[]`) in the MVP; populated in a later phase. */
+  /** Usage examples. Authored per function; `[]` for functions not yet documented. */
   examples: string[],
 }
