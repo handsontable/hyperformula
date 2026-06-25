@@ -41,15 +41,29 @@ export function findLastOccurrenceInOrderedRange(
     ? (index: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, index, range.start.row)))
     : (index: number) => getRawValue(dependencyGraph.getCellValue(simpleCellAddress(range.sheet, range.start.col, index)))
 
+  const compareFn = orderingDirection === 'asc'
+    ? (left: RawNoErrorScalarValue, right: RawInterpreterValue) => compare(left, right)
+    : (left: RawNoErrorScalarValue, right: RawInterpreterValue) => -compare(left, right)
+
+  // Exact-match mode (returnNotFound) does not skip empty cells: HF-223 changes only the approximate
+  // (bound) lookups, and an exact search must neither match a blank nor be redirected by one. Run the
+  // binary search directly over the original range — this keeps the mode O(log n) and preserves its
+  // pre-HF-223 behaviour: an exact hit is returned, everything else is NOT_FOUND. (The empty-skipping
+  // compaction below would otherwise let an exact search land on, and report, a non-empty cell that
+  // sits past an interspersed blank — silently changing exact-match results.)
+  if (ifNoMatch === 'returnNotFound') {
+    const exactIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
+    return exactIndex !== NOT_FOUND && getValueFromIndexFn(exactIndex) === searchKey ? exactIndex - start : NOT_FOUND
+  }
+
   // Collect the original indices of the non-empty cells, preserving their order. Empty cells break
   // the sort invariant binary search relies on (compare() ranks EmptyValue below every other value),
-  // so the search runs over the compacted, empty-free index list and the result is mapped back to the
-  // original index space afterwards.
+  // so the bound search runs over the compacted, empty-free index list and the result is mapped back
+  // to the original index space afterwards.
   //
   // This pre-scan is O(n) over the range, which trades away the binary search's O(log n) guarantee.
-  // It is required for correctness: with empty cells interspersed the search predicate is no longer
-  // monotonic, so the binary search cannot run directly on the original range. A future optimization
-  // could skip the compaction (and keep O(log n)) when the range is statically known to be empty-free.
+  // It is required for correctness in the bound modes: with empty cells interspersed the search
+  // predicate is no longer monotonic, so the binary search cannot run directly on the original range.
   const nonEmptyIndices: number[] = []
   for (let index = start; index <= end; index++) {
     if (getValueFromIndexFn(index) !== EmptyValue) {
@@ -63,10 +77,6 @@ export function findLastOccurrenceInOrderedRange(
   if (nonEmptyIndices.length === 0) {
     return NOT_FOUND
   }
-
-  const compareFn = orderingDirection === 'asc'
-    ? (left: RawNoErrorScalarValue, right: RawInterpreterValue) => compare(left, right)
-    : (left: RawNoErrorScalarValue, right: RawInterpreterValue) => -compare(left, right)
 
   const foundCompactedIndex = findLastMatchingIndex(compactedIndex => compareFn(searchKey, getValueFromIndexFn(nonEmptyIndices[compactedIndex])) >= 0, 0, nonEmptyIndices.length - 1)
   const foundIndex = foundCompactedIndex === NOT_FOUND ? NOT_FOUND : nonEmptyIndices[foundCompactedIndex]
