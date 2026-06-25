@@ -557,9 +557,11 @@ const sumDetails = HyperFormula.getFunctionDetails('SUM', 'enGB');
 `getAvailableFunctions()` returns entries sorted alphabetically by their
 localized name, each with `localizedName`, `canonicalName`, `category`, and
 `shortDescription`. `getFunctionDetails()` returns the same fields plus the
-ordered `parameters` list (each with `name`, `description`, and `optional`) and
+ordered `parameters` list (each with `name`, `description`, and `optional`),
 `repeatLastArgs` — the number of trailing parameters that repeat for functions
-with a variable number of arguments (`0` for a fixed argument list).
+with a variable number of arguments (`0` for a fixed argument list) — and
+`documentationUrl` and `examples`, which carry the function's documentation link
+and usage examples where authored (otherwise `''` and `[]`).
 
 The same methods are also available on an instance, where they use the
 instance's configured language by default:
