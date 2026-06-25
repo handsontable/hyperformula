@@ -222,10 +222,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       for (const range of ranges) {
         const data = range.data
         for (let row = 0; row < height; row++) {
-          const sourceRow = row < data.length ? data[row] : undefined
-          for (let col = 0; col < range.width(); col++) {
-            result[row].push(sourceRow !== undefined ? sourceRow[col] : new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
-          }
+          const sourceRow = row < data.length ? data[row] : []
+          result[row].push(...this.padRowToWidth(sourceRow, range.width()))
         }
       }
 
