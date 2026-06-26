@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added new functions: VSTACK, HSTACK. [#1690](https://github.com/handsontable/hyperformula/issues/1690)
+- Added new functions: VSTACK, HSTACK. [#1698](https://github.com/handsontable/hyperformula/pull/1698)
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
 
 ## [3.3.0] - 2026-05-20
