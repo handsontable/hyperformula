@@ -192,6 +192,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     })
   }
 
+  /**
+   * Calculates the spilled array size of VSTACK: the width is the widest input
+   * and the height is the sum of all input heights.
+   *
+   * @param ast
+   * @param state
+   */
   public vstackArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length < 1) {
       return ArraySize.error()
@@ -221,9 +228,16 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
       for (const range of ranges) {
         const data = range.data
+        const width = range.width()
         for (let row = 0; row < height; row++) {
-          const sourceRow = row < data.length ? data[row] : []
-          result[row].push(...this.padRowToWidth(sourceRow, range.width()))
+          const sourceRow = row < data.length ? data[row] : undefined
+          for (let col = 0; col < width; col++) {
+            // Pad both missing rows (sourceRow === undefined) and short rows
+            // (col beyond the row's length) with #N/A, exactly as VSTACK does.
+            result[row].push(sourceRow !== undefined && col < sourceRow.length
+              ? sourceRow[col]
+              : new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
+          }
         }
       }
 
@@ -231,6 +245,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     })
   }
 
+  /**
+   * Calculates the spilled array size of HSTACK: the width is the sum of all
+   * input widths and the height is the tallest input.
+   *
+   * @param ast
+   * @param state
+   */
   public hstackArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length < 1) {
       return ArraySize.error()
@@ -242,11 +263,27 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     return new ArraySize(width, height)
   }
 
+  /**
+   * Resolves the array size of every argument of a stacking function, enabling
+   * array arithmetic for the arguments when the function's metadata requests it.
+   *
+   * @param ast
+   * @param state
+   * @param functionName - the stacking function whose metadata drives the array-arithmetic flag
+   */
   private stackSubChecks(ast: ProcedureAst, state: InterpreterState, functionName: 'VSTACK' | 'HSTACK'): ArraySize[] {
     const metadata = this.metadata(functionName)
     return ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
   }
 
+  /**
+   * Returns a copy of the given row resized to exactly `width` cells: longer
+   * rows are truncated and shorter rows are padded on the right with #N/A. Used
+   * by VSTACK to align every stacked row to the widest input.
+   *
+   * @param row - the source row to resize
+   * @param width - the target number of cells
+   */
   private padRowToWidth(row: InternalScalarValue[], width: number): InternalScalarValue[] {
     if (row.length >= width) {
       return row.slice(0, width)
