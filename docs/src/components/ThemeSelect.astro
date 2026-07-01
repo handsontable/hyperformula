@@ -1,0 +1,70 @@
+---
+// Sun/moon toggle — replaces Starlight's Auto/Light/Dark <select>. Persists to
+// the same `starlight-theme` localStorage key Starlight already manages.
+---
+
+<button
+  type="button"
+  class="hf-theme-toggle"
+  data-hf-theme-toggle
+  aria-label="Toggle theme"
+  title="Toggle theme"
+>
+  <svg class="hf-theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+    <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <path d="M12 2v3"></path>
+      <path d="M12 19v3"></path>
+      <path d="M2 12h3"></path>
+      <path d="M19 12h3"></path>
+      <path d="M4.93 4.93l2.12 2.12"></path>
+      <path d="M16.95 16.95l2.12 2.12"></path>
+      <path d="M4.93 19.07l2.12-2.12"></path>
+      <path d="M16.95 7.05l2.12-2.12"></path>
+    </g>
+  </svg>
+  <svg class="hf-theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"
+      fill="currentColor"
+    ></path>
+  </svg>
+</button>
+
+<style is:global>
+  .hf-theme-toggle {
+    --size: 2rem;
+    width: var(--size);
+    height: var(--size);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--sl-color-hairline-light);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sl-color-gray-2);
+    cursor: pointer;
+    padding: 0;
+    transition: color 120ms, border-color 120ms, background 120ms;
+  }
+
+  .hf-theme-toggle:hover {
+    color: var(--sl-color-white);
+    border-color: var(--sl-color-gray-4);
+    background: var(--sl-color-gray-6);
+  }
+
+  .hf-theme-toggle svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  /* Light theme → show moon (switch to dark); dark → show sun (switch to light). */
+  :root[data-theme='light'] .hf-theme-toggle__sun {
+    display: none;
+  }
+  :root[data-theme='dark'] .hf-theme-toggle__moon,
+  :root:not([data-theme='light']) .hf-theme-toggle__moon {
+    display: none;
+  }
+</style>

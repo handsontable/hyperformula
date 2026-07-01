@@ -1,58 +1,77 @@
 # HyperFormula documentation
 
-HyperFormula comes with a dedicated, regularly-updated documentation portal.
+We treat documentation as an integral part of the HyperFormula developer experience.
 
-View the documentation's latest production version at https://handsontable.com/docs/hyperformula.
+View the documentation's latest production version at [hyperformula.handsontable.com](https://hyperformula.handsontable.com/).
 
-## About HyperFormula documentation
+**See also:**
 
-The HyperFormula documentation is built with [VuePress](https://vuepress.vuejs.org/), a Vue-powered Static Site Generator.
+- [Documentation standards](./CLAUDE.md) -- authoring rules for humans and AI agents
+- [Documentation editing guidelines](./README-EDITING.md) -- practical reference for frontmatter, markdown containers, links, and interactive examples
+- [Documentation deployment guidelines](./README-DEPLOYMENT.md) -- Netlify, CI, and the `docs:build` pipeline
 
-When editing the docs, you can use features described [here](https://vuepress.vuejs.org/guide/markdown.html).
+## Getting started
 
-## Getting started with HyperFormula documentation
+The docs site is built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build). **Requires Node 22.12+** (Astro 6 minimum; separate from the HyperFormula library's Node version).
 
-To start a local HyperFormula docs server:
-
-1. Make sure you're running [Node.js](https://nodejs.org/en/) 14+.
-2. From the main `hyperformula` directory, install the docs dependencies:
-    ```bash
-    npm install
-    ```
-3. From the main `hyperformula` directory, build HyperFormula:
+1. From the `docs` directory, install dependencies:
    ```bash
-   npm run bundle-all
+   npm install
    ```
-4. From the main `hyperformula` directory, create a dev build of the docs and start your local docs server:
+2. Start the local docs server:
    ```bash
-   npm run docs:dev
+   npm run dev
    ```
-5. In your browser, go to: http://localhost:8080/hyperformula/.
+3. In your browser, go to [http://localhost:4321/docs/](http://localhost:4321/docs/).
 
-## HyperFormula documentation npm scripts
+> **Note:** Content collection files (`.md` under `src/content/docs/`) are cached by Astro's data store. After editing `.md` content files, restart the dev server with `npm run dev -- --force` to invalidate the cache. CSS and component changes are picked up by HMR automatically.
 
-From the `hyperformula` directory, you can run the following npm scripts:
+## npm scripts
 
-* `npm run docs:dev` - Starts a local docs server at http://localhost:8080/hyperformula/.
-* `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
+From the `docs` directory:
 
-## HyperFormula docs directory structure
+- `npm run dev` -- Generates content, then starts the local docs server at `localhost:4321/docs/`.
+- `npm run start` -- Alias for `npm run dev`.
+- `npm run build` -- Generates content, then builds the production output into `dist/`.
+- `npm run preview` -- Previews the built output locally.
+- `npm run generate:content` -- Runs `scripts/generate-content.mjs` to populate `src/content/docs/{guide,api}` from the legacy `docs/{guide,api}` trees plus the TypeDoc-generated API reference.
+- `npm run test:build` -- Smoke-test the production build via `scripts/test-build.mjs`.
+- `npm run docs:lint` -- Runs ESLint on `.js,.mjs,.ts,.astro` files in `src/`.
+
+## Directory structure
 
 ```bash
-docs                            # All documentation files
-├── .vuepress                   # All VuePress files
-│   ├── components              # Vue components
-│   ├── dist                    # The docs output. Both the docs and the API reference are built into this folder.
-│   ├── public                  # Public assets
-│   ├── styles                  # Style-related files
-│   ├── subtheme                # Subtheme files
-│   ├── templates               # HTML templates
-│   ├── config.js               # VuePress configuration
-│   ├── enhanceApp.js           # VuePress app-level enhancements
-│   └── highlight.js            # Code highlight configuration
-├── api                         # The API reference files, generated automatically from JsDoc. Do not edit!
-├── guide                       # The docs source files: Markdown content
-├── api-ref-readme.md           # The API reference welcome page
-├── index.md                    # The main docs portal welcome page
-└── README.md                   # The file you're looking at right now!
+docs/                            # All documentation files
+├── astro.config.mjs             # Astro + Starlight configuration
+├── tsconfig.json                # TypeScript configuration
+├── package.json                 # Docs-only dependencies and scripts
+├── CLAUDE.md                    # Documentation authoring standards
+├── AGENTS.md                    # → symlink to CLAUDE.md
+├── README.md                    # The file you're looking at right now
+│
+├── src/                         # Astro source
+│   ├── components/              # Astro component overrides (Header, Footer, Head, ThemeSelect)
+│   ├── content/                 # Generated content collection (build artifact)
+│   │   └── docs/                # Starlight content root
+│   │       ├── guide/           # Guide pages -- authored here going forward
+│   │       ├── api/             # API reference (auto-generated from TypeDoc)
+│   │       └── index.md         # Home page
+│   ├── content.config.ts        # Content collection schema (extends Starlight's docsSchema)
+│   ├── plugins/                 # Build-time plugins (vuepress-preprocessor, docs-data)
+│   ├── scripts/                 # Client-side runtime (example-runner, theme-toggle)
+│   ├── sidebar.mjs              # Sidebar navigation tree
+│   └── styles/                  # CSS partials
+│       ├── base/                # Tokens (variables.css)
+│       └── components/          # Per-component styles (header, footer, content, interactive-example)
+│
+├── scripts/                     # Docs build helpers
+│   ├── generate-content.mjs     # Populates src/content/docs/ from legacy sources
+│   └── test-build.mjs           # Production-build smoke test
+│
+├── public/                      # Static assets served as-is (logos, images, favicons)
+└── examples/                    # Live example source files referenced from `::: example` blocks
 ```
+
+## Content sources
+
+New guide pages are authored directly in `src/content/docs/guide/`. A legacy `docs/guide/` tree exists from the VuePress era and is scheduled for migration -- it should not receive new content. The API reference under `src/content/docs/api/` is auto-generated from TypeDoc; do not edit those files by hand. See [CLAUDE.md §11](./CLAUDE.md#11-content-sources) for the full set of rules.

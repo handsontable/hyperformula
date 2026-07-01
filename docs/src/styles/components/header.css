@@ -1,0 +1,331 @@
+/*
+ * Two-row header layout (mirrors Handsontable's docs header):
+ *   Row 1: logo + version | search | stars + theme toggle
+ *   Row 2: primary nav | support dropdown
+ *
+ * Rows are `auto`-sized and each row carries its own vertical padding so
+ * controls (search, theme toggle, nav links) sit on a centered baseline with
+ * breathing room above and below — no element hugs the row-divider.
+ */
+
+.hf-header {
+  display: grid;
+  /* Row 1 hugs its content (brand · search · actions). Row 2 absorbs the
+   * remaining height of `header.header` (driven by `--sl-nav-height`) so the
+   * framed nav tabs stretch from the divider line all the way down to the
+   * bottom of the Starlight header chrome — no dead space below the tabs. */
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  width: 100%;
+  /* On wide screens, keep the header content (brand · search · actions) within
+   * the same 1500px canvas as `.page`, so the search bar stays visually
+   * centered and the stars/theme controls don't drift to the far right edge.
+   * The outer `header.header` keeps a full-width dark surface so the bar still
+   * reads as a continuous strip behind the centered content. */
+  max-width: 1500px;
+  margin-inline: auto;
+  font-family: var(--sl-font);
+}
+
+/*
+ * starlight-theme-rapide sets the Starlight header to a translucent
+ * `--sl-rapide-ui-header-bg-color` with a backdrop blur. That lets the
+ * lighter content area below tint the top of the bar, making the brand row
+ * look slightly lighter than the sidebar/body. Force the header to a solid
+ * black surface and disable the backdrop filter so the whole chrome reads
+ * as one uniform dark canvas.
+ */
+:root {
+  --sl-rapide-ui-header-bg-color: var(--sl-color-black);
+}
+
+header.header {
+  background: var(--sl-color-black) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  /* Drop Starlight's bottom padding so `.hf-header__row--nav` extends all the
+   * way to `header.header`'s border-bottom. Without this, Starlight's
+   * 0.75rem padding-bottom would leave dead space below the framed nav tabs
+   * and the per-tab vertical borders would stop short of the visible header
+   * boundary. Mirrors HT's `header.header { padding-block: 1rem 0.5rem }`
+   * override (with the same nav-tab-flush intent). */
+  padding-bottom: 0 !important;
+}
+
+.hf-header__row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  min-width: 0;
+  min-height: 3rem;
+}
+
+/*
+ * The single horizontal divider that runs across the toolbar is rendered as
+ * a `::before` pseudo-element on `.hf-header__row--nav` below. The framed
+ * `.hf-nav__link` top borders overlap that line where tabs exist; the
+ * pseudo-element fills the gaps to the viewport edges. Mirrors HT's
+ * `.header-row-2::before`.
+ */
+
+/* — Brand (logo + version pill) — */
+.hf-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.hf-brand__logo {
+  height: 1.4rem;
+  width: auto;
+  display: block;
+}
+
+.hf-brand__version {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  color: var(--sl-color-gray-2);
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-hairline-light);
+}
+
+/* — Search slot — */
+.hf-header__search {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.hf-header__search :global(button[data-open-modal]),
+.hf-header__search > * {
+  width: 100%;
+  max-width: 28rem;
+}
+
+/* — Right group on row 1 — */
+.hf-header__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.hf-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--sl-color-gray-2);
+  border: 1px solid var(--sl-color-hairline-light);
+  background: transparent;
+  transition: color 120ms, border-color 120ms, background 120ms;
+}
+
+.hf-stars:hover {
+  color: var(--sl-color-white);
+  border-color: var(--sl-color-gray-4);
+  background: var(--sl-color-gray-6);
+}
+
+.hf-stars__icon {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.hf-stars__count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* — Primary nav (row 2) — */
+/*
+ * Overrides the inherited `.hf-header__row` properties (padding 0.5rem 1rem,
+ * align-items: center) so the nav links sit flush against the row's top edge.
+ * That alignment is required because the `::before` divider below is anchored
+ * at `top: 0` of this row — without `align-items: stretch` and zero vertical
+ * padding, the `.hf-nav__link` top borders would land ~0.5rem below the
+ * pseudo-element and render as a doubled line.
+ *
+ * Layout mirrors HT's `.header-row-2`:
+ *   docs-handsontable/handsontable/docs/src/components/Header.astro:557-583.
+ */
+.hf-header__row--nav {
+  background: var(--sl-color-bg-nav);
+  position: relative;
+  align-items: stretch;
+  gap: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 0;
+}
+
+/*
+ * Continuous full-viewport divider line. Mirrors HT's `.header-row-2::before`.
+ * Sits at row-top (top: 0); the `.hf-nav__link` top borders overlap it at the
+ * same Y where tabs exist; the pseudo-element bridges the empty space to the
+ * left of the first tab and to the right of the Support dropdown so the
+ * divider reads as one unbroken rule across the full viewport.
+ */
+.hf-header__row--nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 1px;
+  background: var(--sl-color-gray-5);
+}
+
+.hf-nav {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  /* Must stay `visible` (NOT auto/hidden) — the Support dropdown lives inside
+   * this strip and its absolutely-positioned menu drops below the nav row,
+   * so any overflow clip on the nav crops the menu to a sliver. The mobile
+   * breakpoint hides the whole row, so nothing to scroll horizontally. */
+  overflow: visible;
+}
+
+/*
+ * Connected framed-tab strip (mirrors Handsontable's .nav-link rule). Each tab
+ * has a 1px top + right hairline; the leftmost tab also gets a left hairline,
+ * so the row reads as a single segmented bar. The active tab's frame turns
+ * brand blue and lifts via z-index so its border overlays its neighbours.
+ */
+.hf-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-top-color: var(--sl-color-gray-5);
+  border-right-color: var(--sl-color-gray-5);
+  border-radius: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--sl-color-gray-2);
+  background: transparent;
+  white-space: nowrap;
+  position: relative;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.hf-nav__link:first-child {
+  border-left-color: var(--sl-color-gray-5);
+}
+
+.hf-nav__link:hover {
+  color: var(--sl-color-white);
+  background: var(--sl-color-gray-7);
+}
+
+.hf-nav__link[aria-current='page'],
+.hf-nav__link[aria-current='page']:first-child {
+  color: var(--sl-color-white);
+  font-weight: 600;
+  border-color: var(--sl-color-accent);
+  background: var(--sl-color-gray-7);
+  z-index: 1;
+}
+
+.hf-nav__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* — Support dropdown — sits inside `.hf-nav` so its button inherits the
+ * framed-tab look from `.hf-nav__link`. We only add button-specific bits and
+ * the open-state border treatment. */
+.hf-support {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.hf-support__btn {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.hf-support__btn[aria-expanded='true'] {
+  color: var(--sl-color-white);
+  background: var(--sl-color-gray-7);
+  border-color: var(--sl-color-accent);
+  z-index: 1;
+}
+
+.hf-support__chev {
+  width: 0.7rem;
+  height: 0.7rem;
+  margin-inline-start: 0.1rem;
+  transition: transform 0.15s;
+}
+
+.hf-support__btn[aria-expanded='true'] .hf-support__chev {
+  transform: rotate(180deg);
+}
+
+.hf-support__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  min-width: 14rem;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: var(--sl-color-bg);
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: var(--hf-radius, 6px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
+
+.hf-support__menu li {
+  list-style: none;
+}
+
+.hf-support__menu a {
+  display: block;
+  padding: 0.5rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--sl-color-gray-2);
+  text-decoration: none;
+}
+
+.hf-support__menu a:hover {
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+}
+
+/* — Responsive: collapse nav row on small screens (Row 1 keeps essentials) — */
+@media (max-width: 50rem) {
+  .hf-header {
+    grid-template-rows: auto;
+  }
+
+  .hf-header__row--nav {
+    display: none;
+  }
+
+  .hf-brand__version {
+    display: none;
+  }
+}
