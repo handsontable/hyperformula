@@ -34,7 +34,7 @@ function main(): void {
   const updated = buildUpdatedFile()
   const current = fs.readFileSync(DOC_PATH, 'utf8')
   if (check) {
-    // Function IDs live in the per-function anchors (`<a id="SUM"></a>`), §3.1.4.
+    // Function IDs live in the per-function anchors (`<a id="SUM"></a>`).
     const idsIn = (text: string) => new Set(
       [...text.matchAll(/<a id="([^"]+)"><\/a>/g)].map(match => match[1])
     )
