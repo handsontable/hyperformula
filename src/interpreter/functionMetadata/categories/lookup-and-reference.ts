@@ -6,8 +6,9 @@
 import {FunctionDoc} from '../FunctionDescription'
 
 /**
- * Catalogue entries for the "Lookup and reference" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
+ * Catalogue entries for the "Lookup and reference" category. Most entries were migrated from
+ * `docs/guide/built-in-functions.md` by `scripts/hf249-migrate-function-docs.ts`; some (e.g. the protected `OFFSET`
+ * function) are hand-authored. Parameter descriptions are authored in a later phase.
  */
 export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   ADDRESS: {

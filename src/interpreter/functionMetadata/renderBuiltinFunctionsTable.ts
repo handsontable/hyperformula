@@ -22,8 +22,10 @@ function escapeCell(text: string): string {
 /**
  * Renders the built-in functions table as markdown: one `### Category` section per category (in the canonical
  * `FUNCTION_CATEGORIES` order), each a 3-column table (Function ID | Description | Syntax). Rows are sorted by a
- * pinned collator for deterministic, byte-idempotent output. Reads only the passed entries + details provider,
- * so it is independent of how the catalogue is stored (forward-compatible with a per-function file split).
+ * pinned collator for deterministic, byte-idempotent output, with the canonical name as a stable tiebreaker for
+ * entries that share a localized name (mirrors `HyperFormula.buildAvailableFunctions`). Reads only the passed
+ * entries + details provider, so it is independent of how the catalogue is stored (forward-compatible with a
+ * per-function file split).
  *
  * @param {FunctionListEntry[]} entries - the function set to document (e.g. `HyperFormula.getAvailableFunctions`)
  * @param {(canonicalName: string) => FunctionDetails | undefined} detailsFor - resolves a function's details
@@ -50,7 +52,7 @@ export function renderBuiltinFunctionsTable(
     if (bucket === undefined || bucket.length === 0) {
       continue
     }
-    bucket.sort((a, b) => COLLATOR.compare(a.localizedName, b.localizedName))
+    bucket.sort((a, b) => COLLATOR.compare(a.localizedName, b.localizedName) || COLLATOR.compare(a.canonicalName, b.canonicalName))
     const rows = bucket.map(entry => {
       const details = detailsFor(entry.canonicalName)
       if (details === undefined) {

@@ -6,8 +6,9 @@
 import {FunctionDoc} from '../FunctionDescription'
 
 /**
- * Catalogue entries for the "Information" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
+ * Catalogue entries for the "Information" category. Most entries were migrated from `docs/guide/built-in-functions.md`
+ * by `scripts/hf249-migrate-function-docs.ts`; some (e.g. the protected `VERSION` function) are hand-authored.
+ * Parameter descriptions are authored in a later phase.
  */
 export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   ISBINARY: {
