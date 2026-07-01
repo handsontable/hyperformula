@@ -34,6 +34,18 @@ function main(): void {
   const updated = buildUpdatedFile()
   const current = fs.readFileSync(DOC_PATH, 'utf8')
   if (check) {
+    // Function IDs live in the per-function anchors (`<a id="SUM"></a>`), §3.1.4.
+    const idsIn = (text: string) => new Set(
+      [...text.matchAll(/<a id="([^"]+)"><\/a>/g)].map(match => match[1])
+    )
+    const generatedIds = idsIn(updated)
+    const currentIds = idsIn(current)
+    const dropped = [...currentIds].filter(id => !generatedIds.has(id))
+    const added = [...generatedIds].filter(id => !currentIds.has(id))
+    if (dropped.length > 0 || added.length > 0) {
+      process.stderr.write(`Function set changed. dropped=[${dropped}] added=[${added}]\n`)
+      process.exit(1)
+    }
     if (updated !== current) {
       process.stderr.write('built-in-functions.md is out of date. Run `npm run docs:generate-functions`.\n')
       process.exit(1)
