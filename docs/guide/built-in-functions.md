@@ -188,6 +188,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | <a id="NA"></a>NA | Returns #N/A! error value. | NA() |
 | <a id="SHEET"></a>SHEET | Returns sheet number of a given value or a formula sheet number if no argument is provided. | SHEET(Value) |
 | <a id="SHEETS"></a>SHEETS | Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided. | SHEETS(Value) |
+| <a id="VERSION"></a>VERSION | Returns the version number of HyperFormula. | VERSION() |
 
 ### Financial
 
@@ -251,6 +252,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | <a id="HYPERLINK"></a>HYPERLINK | Stores the url in the cell's metadata. It can be read using method [`getCellHyperlink`](../api/classes/hyperformula.md#getcellhyperlink) | HYPERLINK(Url, [LinkLabel]) |
 | <a id="INDEX"></a>INDEX | Returns the contents of a cell specified by row and column number. The column number is optional and defaults to 1. | INDEX(Range, Row, [Column]) |
 | <a id="MATCH"></a>MATCH | Returns the relative position of an item in an array that matches a specified value. | MATCH(Searchcriterion, LookupArray, [MatchType]) |
+| <a id="OFFSET"></a>OFFSET | Returns the value of a cell offset by a certain number of rows and columns from a given reference point. | OFFSET(Reference, Rows, Columns, [Height], [Width]) |
 | <a id="ROW"></a>ROW | Returns row number of a given reference or formula reference if argument not provided. | ROW([Reference]) |
 | <a id="ROWS"></a>ROWS | Returns the number of rows in the given reference. | ROWS(Array) |
 | <a id="VLOOKUP"></a>VLOOKUP | Searches vertically with reference to adjacent cells to the right. | VLOOKUP(Search_Criterion, Array, Index, [Sort_Order]) |
