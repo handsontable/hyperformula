@@ -48,6 +48,7 @@ import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
 import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
 import {FunctionDetails, FunctionDoc, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
+import {PROTECTED_FUNCTION_METADATA} from './interpreter/functionMetadata/protectedFunctionMetadata'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -738,6 +739,14 @@ export class HyperFormula implements TypedEmitter {
    * @param {FunctionPluginDefinition | undefined} plugin - the plugin registered for `functionId`, or `undefined`
    */
   private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata } | undefined {
+    // Protected ids (VERSION, OFFSET) are excluded from the plugin registry by design (`getFunctionPlugin` always
+    // returns `undefined` for them), so they would otherwise fall straight into the `plugin === undefined` case
+    // below and disappear from the metadata API. Kuba decided (HF-249) that they must still be described, because
+    // a user can call them from a formula: resolve them here from the authored catalogue doc and structural
+    // metadata instead of from a plugin. Functions without a catalogue entry stay unlisted.
+    if (FunctionRegistry.functionIsProtected(functionId) && FUNCTION_DOCS[functionId] !== undefined) {
+      return {doc: FUNCTION_DOCS[functionId], metadata: PROTECTED_FUNCTION_METADATA[functionId]}
+    }
     if (plugin === undefined) {
       return undefined
     }

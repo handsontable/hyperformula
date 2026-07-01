@@ -162,9 +162,13 @@ export class FunctionRegistry {
   }
 
   /**
-   * Returns the ids of all registered, non-protected built-in functions, including aliases. Used by the static
-   * function-metadata API to list every built-in function reachable in a formula. Custom functions registered via
-   * registerFunctionPlugin are excluded; they appear only in the instance method variant.
+   * Returns the ids of all functions the function-metadata API (`getAvailableFunctions`/`getFunctionDetails`)
+   * should describe: every registered, non-protected built-in function (canonical ids plus their aliases), plus
+   * the protected ids (e.g. `VERSION`, `OFFSET`). Custom functions registered via registerFunctionPlugin are
+   * excluded; they appear only in the instance method variant. Protected ids are excluded from registration
+   * (`this.plugins`) so they can never be unregistered or shadowed, but a user can still call them from a formula,
+   * so the metadata API surfaces them too (HF-249). Safe to include here: this method is consumed only by the
+   * metadata API, never by anything that would let a caller register/unregister against a protected id.
    */
   public static getListableFunctionIds(): string[] {
     const ids: string[] = []
@@ -175,6 +179,9 @@ export class FunctionRegistry {
         ids.push(functionId)
       }
     }
+    // Surface protected ids (e.g. VERSION, OFFSET): excluded from `this.plugins` so they can't be
+    // unregistered or shadowed, but callable from a formula, so the metadata API lists them too (HF-249).
+    ids.push(...this._protectedPlugins.keys())
     return ids
   }
 
@@ -292,11 +299,18 @@ export class FunctionRegistry {
   }
 
   /**
-   * Returns the ids of all functions registered in this instance, including aliases and any custom (user-registered)
-   * functions, excluding protected ids. Used by the instance-level function-metadata API.
+   * Returns the ids of all functions the instance-level function-metadata API should describe: every function
+   * registered in this instance (aliases and any custom/user-registered functions included), plus the protected
+   * ids (e.g. `VERSION`, `OFFSET`). `instancePlugins` already contains `VERSION` (the constructor loads any
+   * protected id that has a plugin, unprotected, so it can be executed), but not `OFFSET` (it has no plugin at
+   * all — it is transformed at parse time). Appending `FunctionRegistry._protectedPlugins`'s keys explicitly, the
+   * same way the static {@link FunctionRegistry.getListableFunctionIds} does, covers both uniformly instead of
+   * relying on the constructor's incidental loading; de-duplicated via `Set` because `VERSION` would otherwise be
+   * listed twice (once from `instancePlugins`, once from `_protectedPlugins`). A user can see these ids via
+   * `getAvailableFunctions`/`getFunctionDetails` even though they can never be unregistered (HF-249).
    */
   public getListableFunctionIds(): string[] {
-    return Array.from(this.instancePlugins.keys()).filter(id => !FunctionRegistry.functionIsProtected(id))
+    return Array.from(new Set([...this.instancePlugins.keys(), ...FunctionRegistry._protectedPlugins.keys()]))
   }
 
   public getFunction(functionId: string): Maybe<PluginFunctionType> {

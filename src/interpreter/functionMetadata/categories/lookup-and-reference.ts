@@ -55,6 +55,14 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns the relative position of an item in an array that matches a specified value.',
     parameters: [{name: 'search_criterion', description: ''}, {name: 'lookup_array', description: ''}, {name: 'match_type', description: ''}],
   },
+  // OFFSET is a protected function (parse-time transformed into a cell/range reference, so it has no plugin or
+  // implementation metadata; see `FunctionRegistry._protectedPlugins`). Its structural metadata (parameter
+  // optionality, repeatLastArgs) is authored separately in `PROTECTED_FUNCTION_METADATA`.
+  OFFSET: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the value of a cell offset by a certain number of rows and columns from a given reference point.',
+    parameters: [{name: 'Reference', description: ''}, {name: 'Rows', description: ''}, {name: 'Columns', description: ''}, {name: 'Height', description: ''}, {name: 'Width', description: ''}],
+  },
   ROW: {
     category: 'Lookup and reference',
     shortDescription: 'Returns row number of a given reference or formula reference if argument not provided.',

@@ -90,4 +90,12 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided.',
     parameters: [{name: 'value', description: ''}],
   },
+  // VERSION is a protected function (its plugin, VersionPlugin, is kept out of the general registry so it can
+  // never be unregistered; see `FunctionRegistry._protectedPlugins`). Its structural metadata (parameters,
+  // repeatLastArgs) is authored separately in `PROTECTED_FUNCTION_METADATA`.
+  VERSION: {
+    category: 'Information',
+    shortDescription: 'Returns the version number of HyperFormula.',
+    parameters: [],
+  },
 }
