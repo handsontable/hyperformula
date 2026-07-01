@@ -43,7 +43,7 @@ function main(): void {
     const dropped = [...currentIds].filter(id => !generatedIds.has(id))
     const added = [...generatedIds].filter(id => !currentIds.has(id))
     if (dropped.length > 0 || added.length > 0) {
-      process.stderr.write(`Function set changed. dropped=[${dropped}] added=[${added}]\n`)
+      process.stderr.write(`Function set changed. dropped=[${dropped.join(', ')}] added=[${added.join(', ')}]\n`)
       process.exit(1)
     }
     if (updated !== current) {
