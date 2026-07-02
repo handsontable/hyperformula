@@ -45,15 +45,20 @@ export function findLastOccurrenceInOrderedRange(
     ? (left: RawNoErrorScalarValue, right: RawInterpreterValue) => compare(left, right)
     : (left: RawNoErrorScalarValue, right: RawInterpreterValue) => -compare(left, right)
 
-  // Exact-match mode (returnNotFound) does not skip empty cells: HF-223 changes only the approximate
-  // (bound) lookups, and an exact search must neither match a blank nor be redirected by one. Run the
-  // binary search directly over the original range — this keeps the mode O(log n) and preserves its
-  // pre-HF-223 behaviour: an exact hit is returned, everything else is NOT_FOUND. (The empty-skipping
-  // compaction below would otherwise let an exact search land on, and report, a non-empty cell that
-  // sits past an interspersed blank — silently changing exact-match results.)
+  // Exact-match mode (returnNotFound) reports a hit iff the searchKey is genuinely present in the
+  // range, independent of ordering artifacts and interspersed empty cells. Fast path: run the binary
+  // search directly over the original range (O(log n)). A range with no empty gaps is monotonic, so an
+  // exact hit is found immediately and returned. Only when the direct search misses do we fall through
+  // to the O(n) empty-skipping compaction below (shared with the bound modes), which recovers a match
+  // that an interspersed blank would otherwise hide from the binary search. This keeps the common,
+  // gap-free case O(log n) while making exact match gap-independent (HF-223): binary search over a
+  // blank-containing range is non-monotonic, so a direct search alone can miss a value that is present.
   if (ifNoMatch === 'returnNotFound') {
-    const exactIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
-    return exactIndex !== NOT_FOUND && getValueFromIndexFn(exactIndex) === searchKey ? exactIndex - start : NOT_FOUND
+    const directIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
+    if (directIndex !== NOT_FOUND && getValueFromIndexFn(directIndex) === searchKey) {
+      return directIndex - start
+    }
+    // Direct search missed — fall through to the empty-skipping compaction to recover a hidden match.
   }
 
   // Collect the original indices of the non-empty cells, preserving their order. Empty cells break
