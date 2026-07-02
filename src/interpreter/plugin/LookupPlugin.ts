@@ -12,7 +12,7 @@ import { ProcedureAst } from '../../parser'
 import { StatType } from '../../statistics'
 import { zeroIfEmpty } from '../ArithmeticHelper'
 import { InterpreterState } from '../InterpreterState'
-import { InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
+import { EmptyValue, InternalScalarValue, InterpreterValue, RawNoErrorScalarValue } from '../InterpreterValue'
 import { SimpleRangeValue } from '../../SimpleRangeValue'
 import { FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions } from './FunctionPlugin'
 import { ArraySize } from '../../ArraySize'
@@ -237,7 +237,7 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
-    return value
+    return this.zeroIfEmptyResult(value)
   }
 
   private doHlookup(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, index: number, searchOptions: SearchOptions): InternalScalarValue {
@@ -265,7 +265,15 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     if (value instanceof SimpleRangeValue) {
       return new CellError(ErrorType.VALUE, ErrorMessage.WrongType)
     }
-    return value
+    return this.zeroIfEmptyResult(value)
+  }
+
+  /**
+   * Excel returns 0 (not blank) for a matched cell that is empty — a reference to an empty cell coerces
+   * to 0 in Excel. Mirror that on the lookup RETURN value so VLOOKUP/HLOOKUP/XLOOKUP match Excel.
+   */
+  private zeroIfEmptyResult(value: InternalScalarValue): InternalScalarValue {
+    return value === EmptyValue ? 0 : value
   }
 
   private doXlookup(key: RawNoErrorScalarValue, lookupRange: SimpleRangeValue, returnRange: SimpleRangeValue, notFoundFlag: any, isWildcardMatchMode: boolean, searchOptions: SearchOptions): InterpreterValue {
@@ -284,7 +292,8 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
     }
 
     const returnValues: InternalScalarValue[][] = isVerticalSearch ? [returnRange.data[indexFound]] : returnRange.data.map((row) => [row[indexFound]])
-    return SimpleRangeValue.onlyValues(returnValues)
+    const coerced = returnValues.map((row) => row.map((value) => this.zeroIfEmptyResult(value)))
+    return SimpleRangeValue.onlyValues(coerced)
   }
 
   private doMatch(key: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, type: number): InternalScalarValue {
