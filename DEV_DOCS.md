@@ -76,6 +76,8 @@ Each change to the production code (bugfix, new feature, or improvement) must in
 - Changelog entry
 - Pull request description
 
+A single pull request should contain an atomic self-contained functional change (single bugfix, single feature, single improvement). If a pull request contains multiple features or bugfixes, it should be split.
+
 ## Code style
 
 - Prefer a functional approach where possible (`filter`, `map`, `reduce`).
