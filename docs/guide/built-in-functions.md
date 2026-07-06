@@ -11,6 +11,12 @@ It makes the page wider to accommodate large tables
 .page:has(.widePage) .page-nav /* footer links to the next and prev page */ {
   max-width: 1200px !important; /* override default max-width of 740px for this page */
 }
+/* Make wide tables horizontally scrollable on narrow screens */
+.page:has(.widePage) table {
+  display: block !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 </style>
 
 ## Overview
@@ -22,7 +28,7 @@ spreadsheet software. That is because a spreadsheet is probably the most
 universal software ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
-Each of HyperFormula's built-in function names is available in [17 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions) can be added.
+Each of HyperFormula's built-in function names is available in [17 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions.md) can be added.
 
 The latest version of HyperFormula has an extensive collection of
 **{{ $page.functionsCount }}** functions grouped into categories:
@@ -44,7 +50,7 @@ The latest version of HyperFormula has an extensive collection of
 _Some categories such as compatibility and cube are yet to be supported._
 
 ::: tip
-You can modify the built-in functions or create your own, by adding a [custom function](custom-functions).
+You can modify the built-in functions or create your own, by adding a [custom function](custom-functions.md).
 :::
 
 ## List of available functions
@@ -525,7 +531,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | SPLIT       | Divides the provided text using the space character as a separator and returns the substring at the zero-based position specified by the second argument.<br>`SPLIT("Lorem ipsum", 0) -> "Lorem"`<br>`SPLIT("Lorem ipsum", 1) -> "ipsum"`                                                                                       | SPLIT(Text, Index)                                 |
 | SUBSTITUTE  | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.                                                                                                                                                                                         | SUBSTITUTE(Text, Old_text, New_text, [Occurrence]) |
 | T           | Returns text if given value is text, empty string otherwise.                                                                                                                                                                                                                                                                    | T(Value)                                           |
-| TEXT        | Converts a number into text according to a given format.<br>By default, accepts the same formats that can be passed to the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option, but can be further customized with the [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) option. | TEXT(Number, Format)                               |
+| TEXT        | Converts a number into text according to a given format.<br>By default, accepts the same formats that can be passed to the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option, but can be further customized with the [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) and [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency) options. | TEXT(Number, Format)                               |
 | TEXTJOIN    | Joins text from multiple strings and/or ranges with a delimiter. Supports array/range delimiters that cycle through gaps. When ignore_empty is TRUE, empty strings are skipped. Returns #VALUE! if result exceeds 32,767 characters.                                                                                                 | TEXTJOIN(Delimiter, Ignore_empty, Text1, [Text2, ...]) |
 | TRIM        | Strips extra spaces from text.                                                                                                                                                                                                                                                                                                  | TRIM("Text")                                       |
 | UNICHAR     | Returns the character created by using provided code point.                                                                                                                                                                                                                                                                     | UNICHAR(Number)                                    |

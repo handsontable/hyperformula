@@ -96,6 +96,8 @@ const data = [["31st Jan 00", "2nd Jun 01", "=B1-A1"]];
 
 And now, HyperFormula recognizes these values as valid dates and can operate on them.
 
+For currency formatting in the `TEXT` function (locale-aware grouping, non-`$` symbols, accounting patterns), see the [Currency handling](currency-handling.md) guide.
+
 ## Demo
 
 ::: example #example1 --html 1 --css 2 --js 3 --ts 4
