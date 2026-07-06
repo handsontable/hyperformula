@@ -194,7 +194,6 @@ export const customStringifyCurrency = (value, currencyFormat) => {
 
 #### Limitations of the reference adapter
 
-The adapter above is a compact, illustrative example — not a complete Excel format engine. Two things are worth calling out before you rely on it:
 
 - **It uses each currency's CLDR locale conventions, not your HyperFormula config.** Output is produced by `Intl.NumberFormat`, so the thousands grouping and decimal separator come from the currency's locale (e.g. `pl-PL` → `1 234,50 zł`, `de-DE` → `1.234,50 €`). The adapter does **not** read HyperFormula's [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) / [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) config. If you need the currency output to honor those settings instead, use the [config-aware variant](#config-aware-variant) below.
 - **It recognizes only a representative subset of format shapes.** It handles LCID-tagged formats (`[$SYM-LCID] #,##0.00`), `$`-shorthand (`$#,##0.00`), and simple two-section accounting (`$#,##0.00;($#,##0.00)`). For any other shape it returns `undefined`, so HyperFormula falls through to its built-in number formatter — which cannot expand `#,##0` thousands grouping nor interpret multi-section `;` formats, producing incorrect output for those patterns.
