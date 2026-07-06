@@ -14,9 +14,7 @@ the full evaluation of expressions and condition statements. The
 most prominent example of this behavior is the "IF" function which
 returns a cycle error regardless of whether TRUE or FALSE causes
 a circular reference.
-* There is no data validation against named ranges. For example,
-you can't compare the arguments in a formula like this:
-=IF(firstRange>secondRange, TRUE, FALSE).
+* Named ranges behave differently depending on where they are used in a formula. For details, see [Using named ranges in formulas](named-expressions.md#using-named-ranges-in-formulas).
 * [Custom functions](custom-functions.md) don't automatically recalculate the size of their [result arrays](custom-functions.md#return-an-array-of-data) when the formula dependencies change.
 * There is no relative referencing in named ranges.
 * The library doesn't offer (at least not yet) the following features:
