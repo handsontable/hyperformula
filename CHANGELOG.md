@@ -11,7 +11,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
 - Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
-- Added support for LCID-tagged currency format strings (e.g. `[$USD-409] #,##0.00`) in the `TEXT` function. [#1665](https://github.com/handsontable/hyperformula/pull/1665)
 
 ## [3.3.0] - 2026-05-20
 
