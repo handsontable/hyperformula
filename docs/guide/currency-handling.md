@@ -92,13 +92,13 @@ This callback handles `$`-prefixed formats and falls through (returns `undefined
 
 Side-by-side comparison of the default formatter, the docs adapter from the section below, and Excel:
 
-| Format | `TEXT(1234.5, ...)` without callback | With docs adapter callback | Excel |
-|---|---|---|---|
-| `"$0.00"` | `"$1234.50"` | `"$1234.50"` | `"$1234.50"` |
-| `"$#.00"` | `"$1234.50"` | `"$1234.50"` | `"$1234.50"` |
-| `"$#,##0.00"` | `"$1235,##0.00"` (no grouping) | `"$1,234.50"` | `"$1,234.50"` |
-| `"[$€-2] #,##0.00"` | `"[$€-2] 1235,##0.00"` (no grouping) | `"1.234,50 €"` | `"1.234,50 €"` |
-| `"$#,##0.00;($#,##0.00)"` (value `-1234.5`) | `"$-1235,##0.00;($#,##0.00)"` (no grouping) | `"($1,234.50)"` | `"($1,234.50)"` |
+| Format | Without callback | With adapter callback (section below) |
+|---|---|---|
+| `"$0.00"` | `"$1234.50"` | `"$1234.50"` |
+| `"$#.00"` | `"$1234.50"` | `"$1234.50"` |
+| `"$#,##0.00"` | `"$1235,##0.00"` (no grouping) | `"$1,234.50"` |
+| `"[$€-2] #,##0.00"` | `"[$€-2] 1235,##0.00"` (no grouping) | `"1.234,50 €"` |
+| `"$#,##0.00;($#,##0.00)"` (value `-1234.5`) | `"$-1235,##0.00;($#,##0.00)"` (no grouping) | `"($1,234.50)"` |
 
 #### Error behavior
 
