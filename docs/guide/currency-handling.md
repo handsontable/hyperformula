@@ -90,7 +90,7 @@ This callback handles `$`-prefixed formats and falls through (returns `undefined
 
 #### Reference table
 
-Side-by-side comparison of the default formatter, the docs adapter from the section below, and Excel:
+Side-by-side comparison of the default formatter and the docs adapter from the section below:
 
 | Format | Without callback | With adapter callback (section below) |
 |---|---|---|
@@ -106,11 +106,10 @@ If your callback throws, HyperFormula propagates the exception. Wrap your format
 
 #### Example: `Intl.NumberFormat` adapter (zero dependencies)
 
-This adapter handles a representative subset of Excel currency format strings using native [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat). Extend the `LCID_TO_LOCALE` map to cover more locales — see the [MS-LCID](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) specification for canonical identifiers.
+This adapter handles a representative subset of popular currency format strings using native [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat). Extend the `LCID_TO_LOCALE` map to cover more locales — see the [MS-LCID](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) specification for canonical identifiers.
 
 <!-- snippet:currency-adapter -->
 ```javascript
-// Minimal Excel-format-string → Intl.NumberFormat adapter.
 // Extend the LCID_TO_LOCALE map and CURRENCY_RULES list to cover more formats.
 
 const LCID_TO_LOCALE = {
@@ -122,7 +121,7 @@ const LCID_TO_LOCALE = {
 }
 
 const CURRENCY_RULES = [
-  // [$SYMBOL-LCID] #,##0[.00] — Excel's locale-tagged currency.
+  // [$SYMBOL-LCID] #,##0[.00] — locale-tagged currency format.
   // SYMBOL portion requires at least one character (`+`, not `*`) so that
   // locale-only modifiers like `[$-409]` (used on date/time formats) are
   // NOT misclassified as currency by this adapter.
@@ -153,10 +152,9 @@ const CURRENCY_RULES = [
 ]
 
 // Accounting: $#,##0.00;($#,##0.00) — positive;negative with parentheses.
-// Note: when both sections are plain (e.g. `$#,##0.00;$#,##0.00`), Excel
+// Note: when both sections are plain (e.g. `$#,##0.00;$#,##0.00`), the adapter
 // honors the negative section AS-IS without auto-prepending `-` — the
-// format author explicitly opted out of automatic sign. This adapter
-// mirrors that behavior.
+// format author explicitly opted out of automatic sign.
 function tryAccountingFormat(value, format) {
   const sections = format.split(';')
   if (sections.length !== 2) return undefined
