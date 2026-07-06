@@ -194,148 +194,19 @@ export const customStringifyCurrency = (value, currencyFormat) => {
 
 #### Limitations of the reference adapter
 
-
 - **It uses each currency's CLDR locale conventions, not your HyperFormula config.** Output is produced by `Intl.NumberFormat`, so the thousands grouping and decimal separator come from the currency's locale (e.g. `pl-PL` → `1 234,50 zł`, `de-DE` → `1.234,50 €`). The adapter does **not** read HyperFormula's [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) / [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) config. If you need the currency output to honor those settings instead, use the [config-aware variant](#config-aware-variant) below.
 - **It recognizes only a representative subset of format shapes.** It handles LCID-tagged formats (`[$SYM-LCID] #,##0.00`), `$`-shorthand (`$#,##0.00`), and simple two-section accounting (`$#,##0.00;($#,##0.00)`). For any other shape it returns `undefined`, so HyperFormula falls through to its built-in number formatter — which cannot expand `#,##0` thousands grouping nor interpret multi-section `;` formats, producing incorrect output for those patterns.
 
-| Format string | Handled by the reference adapter? |
-|---|---|
-| `[$USD-409] #,##0.00` | Yes — LCID-tagged |
-| `$#,##0.00` | Yes — `$`-shorthand |
-| `$#,##0.00;($#,##0.00)` | Yes — two-section accounting |
-| `$#,##0.00;[Red]($#,##0.00)` | No — color section `[Red]` not parsed |
-| `$#,##0.00;-$#,##0.00` | No — explicit `-$` negative section not parsed |
-| `#,##0.00;-#,##0.00` | No — multi-section without `$` not parsed |
-| `#,##0.00 "zł"` | No — quoted-literal suffix not parsed |
-
-For the "No" rows the adapter returns `undefined` and HyperFormula's built-in formatter takes over; because that formatter does not expand `#,##0` grouping or handle `;` sections, the rendered result will not match Excel. Extend `CURRENCY_RULES` (or swap in a format library — see [When to swap in a library](#when-to-swap-in-a-library)) if you need those shapes.
-
-Then plug it into your [configuration options](configuration-options.md):
-
-```javascript
-const options = {
-    stringifyCurrency: customStringifyCurrency,
-}
-
-const hf = HyperFormula.buildFromArray([
-  [1234.5, '=TEXT(A1, "[$€-2] #,##0.00")'],
-  [12345.5, '=TEXT(A2, "[$zł-415] #,##0.00")'],
-  [-1234.5, '=TEXT(A3, "$#,##0.00;($#,##0.00)")'],
-], options)
-```
-
-```javascript
-console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })) // "1.234,50 €"
-console.log(hf.getCellValue({ sheet: 0, col: 1, row: 1 })) // "12 345,50 zł"
-console.log(hf.getCellValue({ sheet: 0, col: 1, row: 2 })) // "($1,234.50)"
-```
-
-::: tip
-The output values above contain non-breaking spaces (U+00A0 or U+202F depending on locale and ICU/CLDR version) as locale-appropriate separators. The comments show them as regular spaces for readability. When comparing programmatically, normalize with `.replace(/[  ]/g, ' ')` if you need ASCII-space output.
-:::
-
-#### What is an LCID tag?
-
-Excel can mark a currency format with a [Microsoft Locale Identifier](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) (LCID) so the symbol carries locale context. The syntax is `[$SYMBOL-LCID]` followed by the number template — for example `[$zł-415] #,##0.00` means *"Polish złoty, hex LCID `415` = `pl-PL`"*, and `[$€-2] #,##0.00` means *"euro, generic"*. The adapter above parses the LCID to pick the matching `Intl.NumberFormat` locale and ISO 4217 currency code.
-
-**Excel resolves LCID tags natively** — no extra configuration is required. For example, `[$€-2] #,##0.00` automatically uses European grouping and decimal separators and produces `1.234,50 €`; `[$zł-415] #,##0.00` uses `pl-PL` and produces `1 234,50 zł`. HyperFormula's built-in formatter does not resolve LCID tags; the adapter above replicates that behavior via `Intl.NumberFormat`.
-
-#### When to swap in a library
-
-The adapter above covers a small but representative subset of Excel currency format strings (LCID-tagged, USD shorthand, accounting two-section) in under one page of code, with a fall-through path for everything else. If you need:
-
-- Arbitrary Excel-style format strings beyond this subset,
+If you need more complex currency formatting such as:
+- Arbitrary Excel-style format strings,
 - Precision-safe arithmetic on currency values (e.g. cents as integers),
 - ISO 4217 currency metadata for dozens of currencies,
 
-consider wrapping [`Dinero.js` v2](https://v2.dinerojs.com/) or your own format library inside the callback. The contract is the same: `(value: number, currencyFormat: string) => string | undefined`. Return `undefined` for any format string you don't want to handle and HyperFormula will fall back to its built-in number formatter.
+consider wrapping a specialized currency formatter library such as [`Dinero.js` v2](https://v2.dinerojs.com/) inside the callback. The contract is the same: `(value: number, currencyFormat: string) => string | undefined`. Return `undefined` for any format string you don't want to handle and HyperFormula will fall back to its built-in number formatter.
 
-#### Config-aware variant
+#### What is an LCID tag?
 
-The reference adapter above renders separators using each currency's CLDR locale (see [Limitations](#limitations-of-the-reference-adapter)). Use this variant instead if you want the currency output to honor the separators from your HyperFormula config: it wraps the same `Intl.NumberFormat` logic but post-processes the result so the thousands and decimal separators match the [`thousandSeparator`](../api/interfaces/configparams.md#thousandseparator) / [`decimalSeparator`](../api/interfaces/configparams.md#decimalseparator) you set on the engine.
-
-`makeStringifyCurrency` is a small factory: pass it the same separators you configure on HyperFormula and it returns a `stringifyCurrency` callback.
-
-```javascript
-const LCID_TO_LOCALE = {
-  '-409': { locale: 'en-US', currency: 'USD' },  // USD
-  '-2':   { locale: 'de-DE', currency: 'EUR' },  // EUR (generic)
-  '-411': { locale: 'ja-JP', currency: 'JPY' },  // JPY
-  '-415': { locale: 'pl-PL', currency: 'PLN' },  // PLN
-  '-809': { locale: 'en-GB', currency: 'GBP' },  // GBP
-}
-
-// Factory: build a stringifyCurrency that honors HyperFormula's configured
-// separators instead of the currency locale's CLDR defaults.
-export function makeStringifyCurrency({ decimalSeparator = '.', thousandSeparator = ',' } = {}) {
-  // Swap the locale's own group/decimal separators for the configured ones.
-  // A space placeholder avoids a multi-character swap re-colliding.
-  const reseparate = (formatted, locale) => {
-    const parts = new Intl.NumberFormat(locale).formatToParts(11111.1)
-    const localeGroup = (parts.find((p) => p.type === 'group') || {}).value
-    const localeDecimal = (parts.find((p) => p.type === 'decimal') || {}).value
-    let out = formatted
-    if (localeGroup) out = out.split(localeGroup).join(' ')
-    if (localeDecimal) out = out.split(localeDecimal).join(decimalSeparator)
-    return out.split(' ').join(thousandSeparator)
-  }
-
-  const formatWith = (value, locale, currency, fractionDigits) => {
-    const nf = new Intl.NumberFormat(locale, {
-      style: 'currency',
-      currency,
-      minimumFractionDigits: fractionDigits,
-      maximumFractionDigits: fractionDigits,
-    })
-    return reseparate(nf.format(value), locale)
-  }
-
-  return (value, currencyFormat) => {
-    if (typeof currencyFormat !== 'string') return undefined
-
-    const lcidMatch = /^\[\$([^\-\]]+)-([0-9A-Fa-f]+)\]\s*#,##0(\.0+)?$/.exec(currencyFormat)
-    if (lcidMatch) {
-      const fractionDigits = (lcidMatch[3] || '.').length - 1
-      const entry = LCID_TO_LOCALE['-' + lcidMatch[2]] || { locale: 'en-US', currency: 'USD' }
-      return formatWith(value, entry.locale, entry.currency, fractionDigits)
-    }
-
-    const usdMatch = /^\$#,##0(\.0+)?$/.exec(currencyFormat)
-    if (usdMatch) {
-      const fractionDigits = (usdMatch[1] || '.').length - 1
-      return formatWith(value, 'en-US', 'USD', fractionDigits)
-    }
-
-    // Not a recognized currency format — fall through to the built-in formatter.
-    return undefined
-  }
-}
-```
-
-Configure it with the same separators you pass to HyperFormula:
-
-```javascript
-const decimalSeparator = ','
-const thousandSeparator = ' '
-
-const options = {
-  decimalSeparator,
-  thousandSeparator,
-  stringifyCurrency: makeStringifyCurrency({ decimalSeparator, thousandSeparator }),
-}
-
-const hf = HyperFormula.buildFromArray([
-  [1234.5, '=TEXT(A1, "$#,##0.00")'],
-  [12345.5, '=TEXT(A2, "[$zł-415] #,##0.00")'],
-], options)
-```
-
-```javascript
-console.log(hf.getCellValue({ sheet: 0, col: 1, row: 0 })) // "$1 234,50"
-console.log(hf.getCellValue({ sheet: 0, col: 1, row: 1 })) // "12 345,50 zł"
-```
-
-Because the separators are taken from the factory arguments rather than the currency locale, configuring the engine with comma-decimal / space-thousands produces `1 234,50`-style output regardless of which currency's locale `Intl` selected. The same opt-out rule applies: any format the factory does not recognize returns `undefined` and HyperFormula falls back to its built-in number formatter.
+[Microsoft Locale Identifier](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) (LCID) adds locale context to a currency format. The syntax is `[$SYMBOL-LCID]` followed by the number template — for example `[$zł-415] #,##0.00` means *"Polish złoty, hex LCID `415` = `pl-PL`"*, and `[$€-2] #,##0.00` means *"euro, generic"*. The adapter above parses the LCID to pick the matching `Intl.NumberFormat` locale and ISO 4217 currency code.
 
 ## Related configuration
 
