@@ -41,6 +41,18 @@ module.exports.create = function create() {
 
   configFull.forEach(function(c) {
     c.output.filename = `${PACKAGE_FILENAME}.full.js`;
+    // The 'full' bundle inlines HyperFormula's own dependencies, but exceljs is
+    // kept external: it is large and its transitive licenses would break the
+    // single-preamble bundle invariant. xlsx import/export in the UMD 'full'
+    // build therefore requires providing exceljs (global `ExcelJS`) separately.
+    c.externals = {
+      exceljs: {
+        root: 'ExcelJS',
+        commonjs2: 'exceljs',
+        commonjs: 'exceljs',
+        amd: 'exceljs',
+      },
+    };
     c.plugins.push(new WebpackBar({ name: ` ${PACKAGE_FILENAME}.full.js` }));
   });
 

@@ -17,12 +17,15 @@ export async function loadXlsxWorkbook(data: ArrayBuffer | Uint8Array): Promise<
     throw new UnsupportedFileError('empty')
   }
 
-  const buffer = Buffer.from(data)
+  // Copy to a fresh, zero-offset Uint8Array (works in Node and the browser
+  // without pulling in the Node `Buffer` polyfill). `.slice()` on a subarray
+  // view copies exactly the view's logical bytes, so byteOffset is honored.
+  const bytes = data instanceof Uint8Array ? data.slice() : new Uint8Array(data)
 
   try {
     const ExcelJS = await import(/* webpackMode: "eager" */ 'exceljs')
     const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.load(buffer)
+    await workbook.xlsx.load(bytes.buffer)
     return workbook
   } catch (e) {
     const detail = e instanceof Error ? e.message : String(e)
