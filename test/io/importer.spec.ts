@@ -1,5 +1,21 @@
-import {Workbook} from 'exceljs'
+import ExcelJS, {Workbook, Worksheet} from 'exceljs'
 import {workbookToSheets} from '../../src/io/xlsx/importer'
+import {Sheets} from '../../src/Sheet'
+
+/**
+ * Builds a worksheet via `build`, then writes and reloads the workbook through
+ * ExcelJS so formulas come back in their real stored form (e.g. `_xlfn.`
+ * prefixes, per-cell-rebased shared formulas) rather than the in-memory form
+ * that a directly-constructed cell may not exhibit.
+ */
+async function roundTripSheet(build: (ws: Worksheet) => void): Promise<Sheets> {
+  const wb = new ExcelJS.Workbook()
+  build(wb.addWorksheet('S1'))
+  const buf = await wb.xlsx.writeBuffer()
+  const wb2 = new ExcelJS.Workbook()
+  await wb2.xlsx.load(buf as never)
+  return workbookToSheets(wb2)
+}
 
 describe('workbookToSheets', () => {
   it('keys the result by worksheet name, preserving multiple sheets', () => {
@@ -69,5 +85,55 @@ describe('workbookToSheets', () => {
     const sheets = workbookToSheets(wb)
 
     expect(sheets.Empty).toEqual([])
+  })
+})
+
+describe('workbookToSheets - formula dialect normalization (HF-107)', () => {
+  it('strips the _xlfn. prefix Excel adds for newer functions', async () => {
+    const sheets = await roundTripSheet(ws => {
+      ws.getCell('A1').value = 1
+      ws.getCell('A2').value = 2
+      ws.getCell('A3').value = 3
+      ws.getCell('C1').value = {formula: '_xlfn.XLOOKUP(1,A1:A3,A1:A3)', result: 1} as unknown as number
+    })
+
+    expect(sheets.S1[0][2]).toBe('=XLOOKUP(1,A1:A3,A1:A3)')
+  })
+
+  it('strips both _xlfn. and _xlws. when a formula carries the combined prefix', async () => {
+    const sheets = await roundTripSheet(ws => {
+      ws.getCell('A1').value = 1
+      ws.getCell('C1').value = {formula: '_xlfn._xlws.ANCHORARRAY(A1)', result: 1} as unknown as number
+    })
+
+    expect(sheets.S1[0][2]).toBe('=ANCHORARRAY(A1)')
+  })
+
+  it('imports a shared formula group with each cell already rebased to its own row (no rebasing logic needed)', async () => {
+    const sheets = await roundTripSheet(ws => {
+      ws.getCell('A1').value = 1
+      ws.getCell('A2').value = 2
+      ws.getCell('A3').value = 3
+      ws.fillFormula('B1:B3', 'A1*2', [2, 4, 6])
+    })
+
+    expect(sheets.S1[0][1]).toBe('=A1*2')
+    expect(sheets.S1[1][1]).toBe('=A2*2')
+    expect(sheets.S1[2][1]).toBe('=A3*2')
+  })
+
+  it('passes a cross-sheet, quoted-name reference through verbatim', async () => {
+    const wb = new ExcelJS.Workbook()
+    const other = wb.addWorksheet('My Sheet')
+    other.getCell('A1').value = 42
+    const s1 = wb.addWorksheet('S1')
+    s1.getCell('D1').value = {formula: "'My Sheet'!A1", result: 42} as unknown as number
+
+    const buf = await wb.xlsx.writeBuffer()
+    const wb2 = new ExcelJS.Workbook()
+    await wb2.xlsx.load(buf as never)
+    const sheets = workbookToSheets(wb2)
+
+    expect(sheets.S1[0][3]).toBe("='My Sheet'!A1")
   })
 })

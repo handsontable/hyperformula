@@ -21,8 +21,12 @@ import {Sheet, Sheets} from '../../Sheet'
  * - any other (object-valued: error / rich text / hyperlink) cell falls back
  *   to `cell.text` so we never emit the raw object.
  *
- * Shared/array formulas, `_xlfn.` prefix normalization, and a full Excel/HF
- * error-token table are out of scope here (deferred).
+ * Excel's `_xlfn.` / `_xlws.` function-name prefixes are stripped from
+ * formula strings (see {@link stripFunctionPrefixes}); shared formulas and
+ * cross-sheet references already come back correctly rebased/verbatim from
+ * ExcelJS, so no further formula rewriting is needed.
+ *
+ * A full Excel/HF error-token table is out of scope here (deferred).
  */
 export function workbookToSheets(workbook: Workbook): Sheets {
   const sheets: Sheets = {}
@@ -63,10 +67,23 @@ function worksheetToSheet(worksheet: Worksheet): Sheet {
   return sheet
 }
 
+/**
+ * Strips Excel's internal `_xlfn.` / `_xlws.` function-name prefixes.
+ *
+ * Excel stores newer/relocated functions (e.g. `XLOOKUP`, dynamic-array
+ * functions) with a `_xlfn.` prefix, and some with a combined
+ * `_xlfn._xlws.` prefix, in the raw formula string. Left in place, HF would
+ * fail to recognize the function name (`_xlfn.XLOOKUP` → `#NAME?`) even when
+ * it natively supports the function.
+ */
+function stripFunctionPrefixes(formula: string): string {
+  return formula.replace(/_xlfn\.|_xlws\./g, '')
+}
+
 /** Maps a single ExcelJS cell to a HyperFormula {@link RawCellContent} per the v1 mapping rule. */
 function cellToRawContent(cell: Cell): RawCellContent {
   if (cell.formula != null) {
-    return '=' + cell.formula
+    return '=' + stripFunctionPrefixes(cell.formula)
   }
 
   const value = cell.value
