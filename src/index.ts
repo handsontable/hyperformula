@@ -42,7 +42,8 @@ import {
   SheetSizeLimitExceededError,
   SourceLocationHasArrayError,
   TargetLocationHasArrayError,
-  UnableToParseError
+  UnableToParseError,
+  UnsupportedFileError
 } from './errors'
 import {ExportedCellChange, ExportedChange, ExportedNamedExpressionChange} from './Exporter'
 import {HyperFormula} from './HyperFormula'
@@ -103,6 +104,7 @@ class HyperFormulaNS extends HyperFormula {
   public static SourceLocationHasArrayError = SourceLocationHasArrayError
   public static TargetLocationHasArrayError = TargetLocationHasArrayError
   public static UnableToParseError = UnableToParseError
+  public static UnsupportedFileError = UnsupportedFileError
 }
 
 const defaultLanguage = Config.defaultConfig.language
@@ -188,5 +190,6 @@ export {
   SourceLocationHasArrayError,
   TargetLocationHasArrayError,
   UnableToParseError,
+  UnsupportedFileError,
   SerializedNamedExpression,
 }
