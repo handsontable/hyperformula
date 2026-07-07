@@ -107,6 +107,7 @@
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
+    "exceljs": "^4.4.0",
     "tiny-emitter": "^2.1.0"
   },
   "devDependencies": {
@@ -147,7 +148,6 @@
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",
     "esm": "^3.2.25",
-    "exceljs": "^4.4.0",
     "full-icu": "^1.5.0",
     "jasmine": "^5.4.0",
     "jest": "^26.6.3",
