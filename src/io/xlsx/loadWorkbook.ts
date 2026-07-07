@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {Workbook} from 'exceljs'
+import type {Workbook} from 'exceljs'
 import {UnsupportedFileError} from '../../errors'
 
 /**
@@ -20,7 +20,8 @@ export async function loadXlsxWorkbook(data: ArrayBuffer | Uint8Array): Promise<
   const buffer = Buffer.from(data)
 
   try {
-    const workbook = new Workbook()
+    const ExcelJS = await import(/* webpackMode: "eager" */ 'exceljs')
+    const workbook = new ExcelJS.Workbook()
     await workbook.xlsx.load(buffer)
     return workbook
   } catch (e) {

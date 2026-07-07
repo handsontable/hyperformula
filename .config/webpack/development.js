@@ -29,6 +29,12 @@ module.exports.create = function create() {
         commonjs: 'tiny-emitter',
         amd: 'tiny-emitter',
       },
+      exceljs: {
+        root: 'ExcelJS',
+        commonjs2: 'exceljs',
+        commonjs: 'exceljs',
+        amd: 'exceljs',
+      },
     };
     c.plugins.push(new WebpackBar({ name: ` ${PACKAGE_FILENAME}.js` }));
   });

@@ -19,6 +19,9 @@ Only **cell values and formulas** are imported and exported. Cell styling,
 number formats, merged cells, charts, images, data validation, and other
 Excel-specific features are **not** preserved &mdash; HyperFormula stores only
 values and formulas. Formula import assumes the English (`en`) function dialect.
+On export, formulas that use newer or dynamic-array Excel functions are written
+without Excel's internal `_xlfn.` prefix, so they may not resolve when the
+exported file is opened in real Excel.
 :::
 
 ## Import XLSX files

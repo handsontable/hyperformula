@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {Cell, Workbook, Worksheet} from 'exceljs'
+import type {Cell, Workbook, Worksheet} from 'exceljs'
 import {RawCellContent} from '../../CellContentParser'
 import {Sheet, Sheets} from '../../Sheet'
 
@@ -75,6 +75,10 @@ function worksheetToSheet(worksheet: Worksheet): Sheet {
  * `_xlfn._xlws.` prefix, in the raw formula string. Left in place, HF would
  * fail to recognize the function name (`_xlfn.XLOOKUP` → `#NAME?`) even when
  * it natively supports the function.
+ *
+ * NOTE: this operates on the whole formula string, so a matching substring
+ * inside a string literal (e.g. `="_xlfn."`) would also be rewritten. That
+ * edge case is not handled here — accepted best-effort limitation for v1.
  */
 function stripFunctionPrefixes(formula: string): string {
   return formula.replace(/_xlfn\.|_xlws\./g, '')

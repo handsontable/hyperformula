@@ -3,7 +3,6 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {Workbook} from 'exceljs'
 import {RawCellContent} from '../../CellContentParser'
 
 /**
@@ -20,7 +19,8 @@ import {RawCellContent} from '../../CellContentParser'
  * Values and formulas only &mdash; no styles, number formats, or merged cells.
  */
 export async function sheetsToXlsx(sheets: Record<string, RawCellContent[][]>): Promise<Uint8Array> {
-  const workbook = new Workbook()
+  const ExcelJS = await import(/* webpackMode: "eager" */ 'exceljs')
+  const workbook = new ExcelJS.Workbook()
 
   for (const sheetName of Object.keys(sheets)) {
     const worksheet = workbook.addWorksheet(sheetName)
