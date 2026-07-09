@@ -1,4 +1,4 @@
-# Quality
+# Quality & Security
 
 HyperFormula is built with the highest standards of software quality, backed by rigorous research, comprehensive testing, and transparent development practices.
 
@@ -54,6 +54,18 @@ HyperFormula maintains the highest security standards to protect your applicatio
 - **Dependency vulnerability scanning** using industry-leading tools including Fossa, Dependabot, and Snyk
 - **Security risk assessments** to identify and mitigate potential threats
 - **Proactive monitoring** of security advisories and immediate response to emerging threats
+
+### Independent security certificate
+
+In July 2026, HyperFormula was awarded a security certificate by **TestArmy Group S.A.** (signed by Wojciech Humiński, CEO), confirming an independent security assessment of the library.
+
+The assessment covered HyperFormula [v3.3.0](https://www.npmjs.com/package/hyperformula/v/3.3.0) and included:
+
+- **Code review and white-box penetration testing** of the source code
+- **Static, dynamic, and manual code analysis** carried out against the OWASP Application Security Verification Standard (ASVS), with a focus on the OWASP Top 10
+- **Dependency and dev-dependency analysis** to identify vulnerabilities in third-party packages
+
+<a :href="$withBase('/hyperformula_security_certificate.pdf')">Download the security certificate (PDF) &#8594;</a>
 
 ## Quality Assurance Process
 
