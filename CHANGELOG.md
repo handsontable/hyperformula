@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added agent-friendly documentation: per-page `.md` companions, a Copy-Markdown button, an `llms.txt` index, and a coding-agent setup guide. [#1696](https://github.com/handsontable/hyperformula/pull/1696)
+- Added agent-friendly documentation: per-page `.md` companions, a Copy-Markdown button, an `llms.txt` index, and a coding-agent setup guide. [#1703](https://github.com/handsontable/hyperformula/pull/1703)
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
 - Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 
