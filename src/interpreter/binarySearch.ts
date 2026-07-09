@@ -69,6 +69,11 @@ export function findLastOccurrenceInOrderedRange(
   // This pre-scan is O(n) over the range, which trades away the binary search's O(log n) guarantee.
   // It is required for correctness in the bound modes: with empty cells interspersed the search
   // predicate is no longer monotonic, so the binary search cannot run directly on the original range.
+  //
+  // Two invariants this relies on: (1) genuinely empty cells surface here as the `EmptyValue` sentinel
+  // (empty strings and 0 do not), so `!== EmptyValue` is an exact empties filter; (2) `compare()` ranks
+  // `EmptyValue` below every non-empty value — which is precisely why an interspersed blank breaks the
+  // monotonic ordering and forces this compaction instead of a direct search over the original range.
   const nonEmptyIndices: number[] = []
   for (let index = start; index <= end; index++) {
     if (getValueFromIndexFn(index) !== EmptyValue) {
