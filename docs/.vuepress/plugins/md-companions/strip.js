@@ -66,7 +66,10 @@ function stripVuePressSyntax(src) {
       continue;
     }
 
-    out.push(line);
+    // Strip inline self-closing Vue components (e.g. `# Heading <Badge text="Class"/>`);
+    // whole-line component tags are already dropped above. The `[A-Z]` guard leaves
+    // plain HTML like `<br/>` untouched, and code fences are handled earlier.
+    out.push(line.replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, ''));
   }
 
   return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();

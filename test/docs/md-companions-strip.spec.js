@@ -55,4 +55,21 @@ describe('md-companions stripVuePressSyntax', () => {
     expect(stripVuePressSyntax('````markdown\n```js\ncode\n```\n````'))
       .toBe('````markdown\n```js\ncode\n```\n````')
   })
+
+  it('strips an inline self-closing Vue component but keeps the surrounding text', () => {
+    expect(stripVuePressSyntax('# AbsoluteCellRange <Badge text="Class"/>'))
+      .toBe('# AbsoluteCellRange')
+    expect(stripVuePressSyntax('### end <Badge text="Readonly" vertical="middle"/>'))
+      .toBe('### end')
+  })
+
+  it('leaves lowercase inline HTML (e.g. <br/>) untouched', () => {
+    expect(stripVuePressSyntax('line one<br/>line two'))
+      .toBe('line one<br/>line two')
+  })
+
+  it('does not strip an inline component inside a code fence', () => {
+    expect(stripVuePressSyntax('```md\n# Foo <Badge text="Class"/>\n```'))
+      .toBe('```md\n# Foo <Badge text="Class"/>\n```')
+  })
 })
