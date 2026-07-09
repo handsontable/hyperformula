@@ -34,7 +34,13 @@ function stripVuePressSyntax(src) {
       continue;
     }
 
-    if (/^<(script|style)[\s>]/i.test(trimmed)) { inScript = true; continue; }
+    if (/^<(script|style)[\s>]/i.test(trimmed)) {
+      // A self-contained one-liner (`<script>…</script>`) must NOT open a
+      // multi-line skip — otherwise every following line up to the next
+      // closing tag would be swallowed. Drop just this line in that case.
+      if (!/<\/(script|style)>/i.test(trimmed)) inScript = true;
+      continue;
+    }
     if (inScript) {
       if (/<\/(script|style)>/i.test(trimmed)) inScript = false;
       continue;
@@ -76,7 +82,26 @@ function stripVuePressSyntax(src) {
     out.push(line.replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, ''));
   }
 
-  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  // Collapse runs of blank lines to a single blank — but NEVER inside code
+  // fences, where consecutive blank lines are significant code content.
+  const collapsed = [];
+  let outFence = false;
+  let outMarker = '';
+  let blanks = 0;
+  for (const l of out) {
+    const t = l.trim();
+    const fm = t.match(/^(```+|~~~+)/);
+    if (fm && (!outFence || (fm[1][0] === outMarker[0] && fm[1].length >= outMarker.length))) {
+      if (!outFence) { outFence = true; outMarker = fm[1]; } else { outFence = false; }
+      collapsed.push(l);
+      blanks = 0;
+      continue;
+    }
+    if (outFence) { collapsed.push(l); continue; }
+    if (t === '') { if (++blanks >= 2) continue; } else { blanks = 0; }
+    collapsed.push(l);
+  }
+  return collapsed.join('\n').trim();
 }
 
 module.exports = { stripVuePressSyntax };

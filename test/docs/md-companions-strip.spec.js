@@ -77,4 +77,19 @@ describe('md-companions stripVuePressSyntax', () => {
     expect(stripVuePressSyntax('<Collapse>\ninner prose\n</Collapse>'))
       .toBe('inner prose')
   })
+
+  it('drops a single-line <script>…</script> without swallowing following content', () => {
+    expect(stripVuePressSyntax('# T\n\n<script>var x=1;</script>\n\nReal para.'))
+      .toBe('# T\n\nReal para.')
+  })
+
+  it('does not collapse blank lines inside a code fence', () => {
+    expect(stripVuePressSyntax('```js\nline1\n\n\n\nline4\n```'))
+      .toBe('```js\nline1\n\n\n\nline4\n```')
+  })
+
+  it('collapses 3+ blank lines to one outside fences', () => {
+    expect(stripVuePressSyntax('a\n\n\n\nb'))
+      .toBe('a\n\nb')
+  })
 })

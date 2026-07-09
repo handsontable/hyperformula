@@ -14,19 +14,27 @@ module.exports = (options, ctx) => ({
   async generated() {
     const hostname = (options && options.hostname) || 'https://hyperformula.handsontable.com';
     const base = ctx.base || '/';
-    const pages = ctx.pages.filter(p => /\.html$/.test(p.path) && p.path !== '/404.html');
+    // Include `.html` pages AND clean-URL / section-index pages whose path ends
+    // in `/` (home, directory landings) — otherwise they are silently absent
+    // from the corpus. Skip the 404 page (never a useful companion).
+    const pages = ctx.pages.filter(
+      p => (/\.html$/.test(p.path) || p.path.endsWith('/')) && p.path !== '/404.html'
+    );
     const corpus = [
       '# HyperFormula Documentation',
       '',
       '> Full documentation corpus for LLM consumption.',
-      `> Individual pages also available at ${hostname}${base}guide/<slug>.md`,
+      '> Each page below is also served as clean Markdown — append `.md` to any docs URL.',
       '',
     ];
 
     for (const page of pages) {
       try {
         const clean = stripVuePressSyntax(page._strippedContent || '');
-        const relPath = page.path.replace(/\.html$/, '.md');
+        // `.html` → `<slug>.md`; directory URL (`/guide/`) → `<dir>/index.md`.
+        const relPath = page.path.endsWith('/')
+          ? `${page.path}index.md`
+          : page.path.replace(/\.html$/, '.md');
         const outFile = path.join(ctx.outDir, relPath.replace(/^\//, ''));
         await fs.promises.mkdir(path.dirname(outFile), { recursive: true });
         await fs.promises.writeFile(outFile, clean, 'utf8');
@@ -38,7 +46,13 @@ module.exports = (options, ctx) => ({
       }
     }
 
-    const llmsFull = path.join(ctx.outDir, 'llms-full.txt');
-    await fs.promises.writeFile(llmsFull, corpus.join('\n'), 'utf8');
+    // Best-effort like the per-page writes: a corpus-write failure warns rather
+    // than aborting the whole docs build.
+    try {
+      const llmsFull = path.join(ctx.outDir, 'llms-full.txt');
+      await fs.promises.writeFile(llmsFull, corpus.join('\n'), 'utf8');
+    } catch (err) {
+      console.warn(`[md-companions] failed to write llms-full.txt: ${err.message}`);
+    }
   }
 });

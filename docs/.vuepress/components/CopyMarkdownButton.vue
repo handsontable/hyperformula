@@ -19,7 +19,9 @@ export default {
   computed: {
     mdUrl() {
       const p = this.$page && this.$page.path;
-      if (!p || !/\.html$/.test(p)) return null;
+      // Only `.html` pages have a generated `.md` companion; the 404 page is
+      // explicitly excluded from generation, so hide the button there.
+      if (!p || !/\.html$/.test(p) || p === '/404.html') return null;
       return this.$withBase(p.replace(/\.html$/, '.md'));
     },
     label() {

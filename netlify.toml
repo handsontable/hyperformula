@@ -4,3 +4,16 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# The docs site is served under base `/docs/`, but the llms.txt convention
+# expects the index at the domain root. Rewrite the well-known root paths to
+# the built files so agents probing `/llms.txt` (and the full corpus) resolve.
+[[redirects]]
+  from = "/llms.txt"
+  to = "/docs/llms.txt"
+  status = 200
+
+[[redirects]]
+  from = "/llms-full.txt"
+  to = "/docs/llms-full.txt"
+  status = 200
