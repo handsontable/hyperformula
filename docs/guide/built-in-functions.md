@@ -217,6 +217,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | TBILLEQ     | Returns the bond-equivalent yield for a Treasury bill.                                                                     | TBILLEQ(Settlement, Maturity, Discount)    |
 | TBILLPRICE  | Returns the price per $100 face value for a Treasury bill.                                                                 | TBILLPRICE(Settlement, Maturity, Discount) |
 | TBILLYIELD  | Returns the yield for a Treasury bill.                                                                                     | TBILLYIELD(Settlement, Maturity, Price)    |
+| XIRR        | Returns the internal rate of return for a schedule of cash flows that is not necessarily periodic.                         | XIRR(Values, Dates[, Guess])               |
 | XNPV        | Returns net present value.                                                                                                 | XNPV(Rate, Payments, Dates)                |
 
 ### Logical
