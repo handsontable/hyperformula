@@ -150,24 +150,8 @@ module.exports = {
       }
     },
     {
-      files: ['scripts/*.js'],
-      env: {
-        node: true,
-      },
-      rules: {
-        '@typescript-eslint/no-var-requires': 'off',
-        '@typescript-eslint/no-unsafe-argument': 'off',
-        '@typescript-eslint/no-unsafe-assignment': 'off',
-        '@typescript-eslint/no-unsafe-call': 'off',
-        '@typescript-eslint/no-unsafe-member-access': 'off',
-        '@typescript-eslint/no-unsafe-return': 'off',
-        '@typescript-eslint/restrict-template-expressions': 'off',
-        'no-undef': 'off',
-      },
-    },
-    {
       // Plain-Node Jest specs (e.g. docs tooling tests that `require` JS modules
-      // rather than importing typed sources). Same relaxations as `scripts/*.js`.
+      // rather than importing typed sources).
       files: ['**/test/**/*.spec.js'],
       env: {
         node: true,
