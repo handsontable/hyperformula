@@ -59,23 +59,6 @@ All spreadsheet functions are implemented as plugins extending `FunctionPlugin`.
 - uses the `runFunction()` helper for argument validation, coercion, and array handling
 - registers function translations in `src/i18n/languages/`
 
-## How to add a new function
-
-Adding a built-in function is similar to adding a [custom function](docs/guide/custom-functions.md), so that guide is a useful reference for the function-implementation patterns (argument metadata, return types, array handling). The built-in flow on top of that is:
-
-1. Create or modify a plugin in `src/interpreter/plugin/`.
-2. Add function metadata to `implementedFunctions`.
-3. Implement the function method.
-4. Add translations to all language files in `src/i18n/languages/`.
-5. Add tests in `test/unit/interpreter/`.
-
-## Code style
-
-- Prefer a functional approach where possible (`filter`, `map`, `reduce`).
-- Write self-documenting code: use meaningful names for classes, functions, and variables. Add code comments only when they explain intent the code itself cannot.
-- Add JSDoc to all classes and functions.
-- ESLint is the source of truth for formatting and code rules. Run `npm run lint` before submitting changes (see [building](docs/guide/building.md#run-the-linter)).
-
 ## Definition of Done
 
 Each change to the production code (bugfix, new feature, or improvement) must include the following elements **before** requesting a code review:
@@ -92,6 +75,30 @@ Each change to the production code (bugfix, new feature, or improvement) must in
 - Technical documentation in the form of JSDoc comments (high-level description of the concepts used in more complex code fragments)
 - Changelog entry
 - Pull request description
+
+A single pull request should contain an atomic self-contained functional change (single bugfix, single feature, single improvement). If a pull request contains multiple features or bugfixes, it should be split.
+
+## Code style
+
+- Prefer a functional approach where possible (`filter`, `map`, `reduce`).
+- Write self-documenting code: use meaningful names for classes, functions, and variables. Add code comments only when they explain intent the code itself cannot.
+- Add JSDoc to all classes and functions.
+- ESLint is the source of truth for formatting and code rules. Run `npm run lint` before submitting changes (see [building](docs/guide/building.md#run-the-linter)).
+
+## Automatic tests
+
+- All changes to the production code must be covered by automatic tests kept in the `test/` directory.
+- Each test case must be very simple and focused on a single assertion. Don't use loops, conditionals, or other control flow statements in test cases.
+
+## How to add a new function
+
+Adding a built-in function is similar to adding a [custom function](docs/guide/custom-functions.md), so that guide is a useful reference for the function-implementation patterns (argument metadata, return types, array handling). The built-in flow on top of that is:
+
+1. Create or modify a plugin in `src/interpreter/plugin/`.
+2. Add function metadata to `implementedFunctions`.
+3. Implement the function method.
+4. Add translations to all language files in `src/i18n/languages/`.
+5. Add tests in `test/unit/interpreter/`.
 
 ## Internationalization and function translations
 

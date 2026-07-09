@@ -258,6 +258,7 @@ module.exports = {
             ['/guide/i18n-features', 'Internationalization features'],
             ['/guide/localizing-functions', 'Localizing functions'],
             ['/guide/date-and-time-handling', 'Date and time handling'],
+            ['/guide/currency-handling', 'Currency handling'],
           ]
         },
         {

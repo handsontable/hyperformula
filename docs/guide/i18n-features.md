@@ -48,13 +48,7 @@ thousandSeparator: ',',
 
 ## Currency symbol
 
-To match your users' currency, you can configure multiple currency symbols ([`currencySymbol`](../api/interfaces/configparams.md#currencysymbol)).
-
-The default currency symbol is `$`. To add `USD` as an alternative, set:
-
-```js
-currencySymbol: ['$', 'USD'],
-```
+To match your users' currency, configure recognized currency symbols and (optionally) custom `TEXT` output formatting. Both sides are covered in the dedicated [Currency handling](currency-handling.md) guide.
 
 ## String comparison rules
 
