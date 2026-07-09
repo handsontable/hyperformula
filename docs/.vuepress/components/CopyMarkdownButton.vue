@@ -21,7 +21,7 @@ export default {
       return this.$withBase(p.replace(/\.html$/, '.md'));
     },
     label() {
-      return this.copied ? 'Copied!' : 'Copy Markdown';
+      return this.copied ? 'Copied!' : 'Copy Markdown link';
     },
   },
   methods: {

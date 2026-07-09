@@ -2,6 +2,3 @@ User-agent: *
 Allow: /
 
 Sitemap: https://hyperformula.handsontable.com/sitemap.xml
-
-# AI/LLM agent index
-# Full documentation corpus: https://hyperformula.handsontable.com/docs/llms-full.txt
