@@ -65,6 +65,8 @@ The assessment covered HyperFormula [v3.3.0](https://www.npmjs.com/package/hyper
 - **Static, dynamic, and manual code analysis** carried out against the OWASP Application Security Verification Standard (ASVS), with a focus on the OWASP Top 10
 - **Dependency and dev-dependency analysis** to identify vulnerabilities in third-party packages
 
+<a :href="$withBase('/hyperformula_security_certificate.pdf')">Download the security certificate (PDF) &#8594;</a>
+
 ## Quality Assurance Process
 
 Our development includes multiple quality layers:
