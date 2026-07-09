@@ -31,7 +31,7 @@ This section is maintained by the team. Whenever an AI agent makes a mistake wor
 - **Short title** &mdash; What the agent did wrong. What it should have done instead.
 -->
 
-_No items yet._
+1. Often pull request descriptions becomes obsolete. Remember to update it as you work.
 
 ## Skills, MCPs, and other agent tools
 
