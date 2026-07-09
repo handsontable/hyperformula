@@ -72,4 +72,9 @@ describe('md-companions stripVuePressSyntax', () => {
     expect(stripVuePressSyntax('```md\n# Foo <Badge text="Class"/>\n```'))
       .toBe('```md\n# Foo <Badge text="Class"/>\n```')
   })
+
+  it('drops both tags of a paired block component but keeps the inner content', () => {
+    expect(stripVuePressSyntax('<Collapse>\ninner prose\n</Collapse>'))
+      .toBe('inner prose')
+  })
 })

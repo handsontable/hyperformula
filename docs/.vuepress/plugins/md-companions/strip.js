@@ -42,6 +42,10 @@ function stripVuePressSyntax(src) {
 
     if (/^<[A-Z][A-Za-z0-9]*(\s[^>]*)?\/?>$/.test(trimmed)) continue;
 
+    // Whole-line closing tag of a paired block component (e.g. `</Collapse>`) — drop the
+    // tag but keep the inner content that sits between it and its opening tag.
+    if (/^<\/[A-Z][A-Za-z0-9]*>$/.test(trimmed)) continue;
+
     if (/^\[\[toc\]\]$/i.test(trimmed)) continue;
 
     const open = trimmed.match(/^:::\s*(\w+)\s*(.*)$/i);
