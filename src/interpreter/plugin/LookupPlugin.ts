@@ -271,6 +271,9 @@ export class LookupPlugin extends FunctionPlugin implements FunctionPluginTypech
   /**
    * Excel returns 0 (not blank) for a matched cell that is empty — a reference to an empty cell coerces
    * to 0 in Excel. Mirror that on the lookup RETURN value so VLOOKUP/HLOOKUP/XLOOKUP match Excel.
+   *
+   * Same rule as `ArithmeticHelper.zeroIfEmpty`, kept as a separate method because the lookup RETURN
+   * value is an `InternalScalarValue` (wider than that helper's `RawNoErrorScalarValue` parameter).
    */
   private zeroIfEmptyResult(value: InternalScalarValue): InternalScalarValue {
     return value === EmptyValue ? 0 : value
