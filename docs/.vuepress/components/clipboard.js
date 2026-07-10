@@ -9,13 +9,17 @@
  */
 export function copyToClipboard(text) {
   const fallback = () => {
-    const el = document.createElement('textarea');
-    el.value = text;
-    el.style.position = 'fixed';
-    el.style.opacity = '0';
-    document.body.appendChild(el);
-    el.select();
-    try { document.execCommand('copy'); } finally { document.body.removeChild(el); }
+    // Never throw: the "always resolves" contract must hold even if the DOM
+    // or execCommand path fails (e.g. detached document, disabled command).
+    try {
+      const el = document.createElement('textarea');
+      el.value = text;
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.select();
+      try { document.execCommand('copy'); } finally { document.body.removeChild(el); }
+    } catch (_) { /* clipboard truly unavailable — nothing more we can do */ }
   };
   if (navigator.clipboard && window.isSecureContext) {
     return navigator.clipboard.writeText(text).catch(fallback);
