@@ -24,7 +24,7 @@ module.exports = (options, ctx) => ({
       '# HyperFormula Documentation',
       '',
       '> Full documentation corpus for LLM consumption.',
-      '> Each page below is also served as clean Markdown — append `.md` to any docs URL.',
+      '> Each page below is also served as clean Markdown — append `.md` to a docs page URL.',
       '',
     ];
 
