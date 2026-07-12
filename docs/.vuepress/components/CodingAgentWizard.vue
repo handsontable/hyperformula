@@ -88,6 +88,20 @@ export default {
 .agent-wizard__choice:hover,
 .agent-wizard__copy:hover { background: #3eaf7c; color: #fff; }
 .agent-wizard__back { border-color: #ccc; color: #666; }
-.agent-wizard__snippet { background: #f6f6f6; padding: 0.75rem; border-radius: 4px; overflow-x: auto; }
+.agent-wizard__snippet {
+  background: #f6f6f6;
+  color: #2c3e50;
+  padding: 0.75rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.agent-wizard__snippet code {
+  color: inherit;
+  background: transparent;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-size: 0.85rem;
+}
 .agent-wizard__note { font-size: 0.85rem; color: #666; }
 </style>
