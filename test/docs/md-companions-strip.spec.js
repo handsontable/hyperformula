@@ -92,4 +92,24 @@ describe('md-companions stripVuePressSyntax', () => {
     expect(stripVuePressSyntax('a\n\n\n\nb'))
       .toBe('a\n\nb')
   })
+
+  it('removes VuePress {{ }} interpolations', () => {
+    expect(stripVuePressSyntax('HyperFormula ships {{ $page.functionsCount }} functions.'))
+      .toBe('HyperFormula ships  functions.')
+  })
+
+  it('unwraps a Vue-bound anchor, keeping its link text', () => {
+    expect(stripVuePressSyntax("See the <a :href=\"'https://x/' + $page.buildDateURIEncoded\">demo</a> here."))
+      .toBe('See the demo here.')
+  })
+
+  it('drops a Vue-bound image tag', () => {
+    expect(stripVuePressSyntax('<img :src="$withBase(\'/logo.png\')">'))
+      .toBe('')
+  })
+
+  it('leaves {{ }} and :href inside a code fence untouched', () => {
+    expect(stripVuePressSyntax('```md\n{{ $page.x }} <a :href="y">z</a>\n```'))
+      .toBe('```md\n{{ $page.x }} <a :href="y">z</a>\n```')
+  })
 })

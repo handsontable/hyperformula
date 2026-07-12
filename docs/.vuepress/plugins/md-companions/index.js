@@ -48,11 +48,27 @@ module.exports = (options, ctx) => ({
 
     // Best-effort like the per-page writes: a corpus-write failure warns rather
     // than aborting the whole docs build.
+    const corpusText = corpus.join('\n');
     try {
-      const llmsFull = path.join(ctx.outDir, 'llms-full.txt');
-      await fs.promises.writeFile(llmsFull, corpus.join('\n'), 'utf8');
+      await fs.promises.writeFile(path.join(ctx.outDir, 'llms-full.txt'), corpusText, 'utf8');
     } catch (err) {
       console.warn(`[md-companions] failed to write llms-full.txt: ${err.message}`);
+    }
+
+    // The site is served under base `/docs/` (GH Pages in prod, Netlify preview),
+    // but the llms.txt convention expects the index at the domain ROOT. Mirror
+    // both files one level above the base dir (the served root) so `/llms.txt`
+    // and `/llms-full.txt` resolve on GH Pages — where netlify.toml redirects do
+    // not apply. Best-effort: never fail the build over the mirror.
+    try {
+      const root = path.dirname(ctx.outDir);
+      await fs.promises.writeFile(path.join(root, 'llms-full.txt'), corpusText, 'utf8');
+      const indexTxt = await fs.promises
+        .readFile(path.join(ctx.outDir, 'llms.txt'), 'utf8')
+        .catch(() => null);
+      if (indexTxt) await fs.promises.writeFile(path.join(root, 'llms.txt'), indexTxt, 'utf8');
+    } catch (err) {
+      console.warn(`[md-companions] failed to mirror llms files to site root: ${err.message}`);
     }
   }
 });

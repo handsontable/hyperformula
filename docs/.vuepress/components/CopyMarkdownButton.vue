@@ -19,10 +19,14 @@ export default {
   computed: {
     mdUrl() {
       const p = this.$page && this.$page.path;
-      // Only `.html` pages have a generated `.md` companion; the 404 page is
-      // explicitly excluded from generation, so hide the button there.
-      if (!p || !/\.html$/.test(p) || p === '/404.html') return null;
-      return this.$withBase(p.replace(/\.html$/, '.md'));
+      // The 404 page is excluded from companion generation — no button there.
+      if (!p || p === '/404.html') return null;
+      // `.html` page → sibling `.md`; directory / landing URL (`/`, `/guide/`)
+      // → its `index.md` companion. Both are emitted by the md-companions plugin,
+      // so the button is available on every generated page.
+      if (/\.html$/.test(p)) return this.$withBase(p.replace(/\.html$/, '.md'));
+      if (p.endsWith('/')) return this.$withBase(`${p}index.md`);
+      return null;
     },
     label() {
       return this.copied ? 'Copied!' : 'Copy Markdown link';

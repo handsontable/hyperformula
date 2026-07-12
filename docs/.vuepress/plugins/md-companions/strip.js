@@ -76,10 +76,19 @@ function stripVuePressSyntax(src) {
       continue;
     }
 
-    // Strip inline self-closing Vue components (e.g. `# Heading <Badge text="Class"/>`);
-    // whole-line component tags are already dropped above. The `[A-Z]` guard leaves
-    // plain HTML like `<br/>` untouched, and code fences are handled earlier.
-    out.push(line.replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, ''));
+    // Neutralise VuePress/Vue-only markup that would otherwise ship as literal,
+    // non-portable syntax in the `.md` companions (all outside code fences):
+    //   - `{{ … }}` interpolations (never expanded from source markdown),
+    //   - Vue-bound `<a :href="…">text</a>` → keep the link text, drop the tag,
+    //   - Vue-bound `<img :src="…">` → drop (no useful text for an LLM),
+    //   - inline self-closing PascalCase components (e.g. `<Badge text="…"/>`).
+    // The `[A-Z]` guard on the last rule leaves plain HTML like `<br/>` untouched.
+    const cleaned = line
+      .replace(/\{\{[^{}]*\}\}/g, '')
+      .replace(/<a\s[^>]*:href[^>]*>(.*?)<\/a>/gi, '$1')
+      .replace(/<img\s[^>]*:src[^>]*\/?>/gi, '')
+      .replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, '');
+    out.push(cleaned);
   }
 
   // Collapse runs of blank lines to a single blank — but NEVER inside code
