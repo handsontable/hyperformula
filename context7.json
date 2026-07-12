@@ -3,7 +3,7 @@
   "projectTitle": "HyperFormula",
   "description": "Headless, Excel-compatible spreadsheet engine in TypeScript — parses and evaluates ~400 functions in the browser or Node.js. In-process library (no REST API).",
   "folders": ["docs"],
-  "excludeFolders": ["docs/.vuepress/dist", "docs/api"],
+  "excludeFolders": ["docs/.vuepress", "docs/api"],
   "rules": [
     "HyperFormula is an in-process library, not a REST API — there is no HTTP endpoint or base URL.",
     "Public API cell addresses are 0-indexed: { sheet, col, row }.",
