@@ -87,6 +87,7 @@ function stripVuePressSyntax(src) {
     // values (e.g. a function count). Full expansion needs rendered-HTML
     // extraction — tracked as a follow-up.
     const cleaned = line
+      .replace(/\[\[toc\]\]/gi, '')
       .replace(/<a\s[^>]*:href[^>]*>(.*?)<\/a>/gi, '$1')
       .replace(/<img\s[^>]*:src[^>]*\/?>/gi, '')
       .replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, '');

@@ -41,6 +41,11 @@ describe('md-companions stripVuePressSyntax', () => {
       .toBe('# Title\nBody')
   })
 
+  it('removes an inline [[toc]] marker, keeping surrounding text', () => {
+    expect(stripVuePressSyntax('**Contents:** [[toc]]'))
+      .toBe('**Contents:**')
+  })
+
   it('preserves plain markdown content', () => {
     expect(stripVuePressSyntax('# H\n\n`code`\n\n[link](/guide/x)\n\n| a | b |\n|---|---|'))
       .toBe('# H\n\n`code`\n\n[link](/guide/x)\n\n| a | b |\n|---|---|')
