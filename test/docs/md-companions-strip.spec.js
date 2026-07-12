@@ -46,6 +46,16 @@ describe('md-companions stripVuePressSyntax', () => {
       .toBe('**Contents:**')
   })
 
+  it('drops a trailing heading whose only body was a stripped :::example demo', () => {
+    expect(stripVuePressSyntax('Body text.\n\n## Demo\n\n::: example #ex --html 1\n@[code](example.html)\n:::'))
+      .toBe('Body text.')
+  })
+
+  it('normalises whitespace-only lines to clean blank lines', () => {
+    expect(stripVuePressSyntax('a\n  \nb'))
+      .toBe('a\n\nb')
+  })
+
   it('preserves plain markdown content', () => {
     expect(stripVuePressSyntax('# H\n\n`code`\n\n[link](/guide/x)\n\n| a | b |\n|---|---|'))
       .toBe('# H\n\n`code`\n\n[link](/guide/x)\n\n| a | b |\n|---|---|')

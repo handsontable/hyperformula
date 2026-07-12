@@ -110,8 +110,29 @@ function stripVuePressSyntax(src) {
       continue;
     }
     if (outFence) { collapsed.push(l); continue; }
-    if (t === '') { if (++blanks >= 2) continue; } else { blanks = 0; }
+    if (t === '') {
+      if (++blanks >= 2) continue;   // collapse runs of blank lines
+      collapsed.push('');            // normalise whitespace-only lines to a clean blank
+      continue;
+    }
+    blanks = 0;
     collapsed.push(l);
+  }
+
+  // Drop trailing empty sections: a heading left with no body (e.g. a `## Demo`
+  // whose `:::example` live-demo was stripped) would otherwise dangle at EOF.
+  // Guard: only when the doc has real prose, so a page that is legitimately just
+  // a title (e.g. `# AbsoluteCellRange`) is never wiped.
+  const hasProse = collapsed.some(l => {
+    const s = l.trim();
+    return s !== '' && !/^#{1,6}\s/.test(s);
+  });
+  if (hasProse) {
+    while (collapsed.length) {
+      const last = collapsed[collapsed.length - 1].trim();
+      if (last === '' || /^#{1,6}\s/.test(last)) collapsed.pop();
+      else break;
+    }
   }
   return collapsed.join('\n').trim();
 }
