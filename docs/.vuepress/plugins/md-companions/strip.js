@@ -76,15 +76,17 @@ function stripVuePressSyntax(src) {
       continue;
     }
 
-    // Neutralise VuePress/Vue-only markup that would otherwise ship as literal,
-    // non-portable syntax in the `.md` companions (all outside code fences):
-    //   - `{{ … }}` interpolations (never expanded from source markdown),
+    // Neutralise Vue-only markup that ships as broken, non-portable syntax in
+    // the `.md` companions (all outside code fences):
     //   - Vue-bound `<a :href="…">text</a>` → keep the link text, drop the tag,
     //   - Vue-bound `<img :src="…">` → drop (no useful text for an LLM),
     //   - inline self-closing PascalCase components (e.g. `<Badge text="…"/>`).
     // The `[A-Z]` guard on the last rule leaves plain HTML like `<br/>` untouched.
+    // NOTE: `{{ … }}` interpolations are intentionally LEFT AS-IS. They can't be
+    // expanded from source markdown, and wiping them drops meaningful inline
+    // values (e.g. a function count). Full expansion needs rendered-HTML
+    // extraction — tracked as a follow-up.
     const cleaned = line
-      .replace(/\{\{[^{}]*\}\}/g, '')
       .replace(/<a\s[^>]*:href[^>]*>(.*?)<\/a>/gi, '$1')
       .replace(/<img\s[^>]*:src[^>]*\/?>/gi, '')
       .replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, '');

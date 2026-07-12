@@ -93,9 +93,9 @@ describe('md-companions stripVuePressSyntax', () => {
       .toBe('a\n\nb')
   })
 
-  it('removes VuePress {{ }} interpolations', () => {
+  it('keeps {{ }} interpolations verbatim (cannot expand from source markdown)', () => {
     expect(stripVuePressSyntax('HyperFormula ships {{ $page.functionsCount }} functions.'))
-      .toBe('HyperFormula ships  functions.')
+      .toBe('HyperFormula ships {{ $page.functionsCount }} functions.')
   })
 
   it('unwraps a Vue-bound anchor, keeping its link text', () => {
