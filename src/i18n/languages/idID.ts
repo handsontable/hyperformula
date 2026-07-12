@@ -252,6 +252,7 @@ const dictionary: RawTranslationPackage = {
     WORKDAY: 'HARI.KERJA.SELESAI',
     'WORKDAY.INTL': 'HARI.KERJA.SELESAI.INTL',
     XNPV: 'XNPV',
+    XIRR: 'XIRR',
     XOR: 'XATAU',
     XLOOKUP: 'XLOOKUP',
     YEAR: 'TAHUN',
