@@ -94,7 +94,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
     parameters: [
       {name: 'Number', description: 'The value to round up.'},
-      {name: 'Significance', description: 'The multiple to round up to; must have the same sign as Number.'},
+      {name: 'Significance', description: 'The multiple to round up to. When Number is positive, Significance must also be positive; otherwise the result is a #NUM! error.'},
     ],
     examples: ['=CEILING(4.3, 1)', '=CEILING(22.5, 5)'],
   },
@@ -195,7 +195,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   EVEN: {
     category: 'Math and trigonometry',
     shortDescription: 'Rounds a positive number up to the next even integer and a negative number down to the next even integer.',
-    parameters: [{name: 'Number', description: 'The number to round to the nearest even integer, away from zero.'}],
+    parameters: [{name: 'Number', description: 'The number to round away from zero to the next even integer.'}],
     examples: ['=EVEN(3)', '=EVEN(-3)'],
   },
   EXP: {
@@ -221,7 +221,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
     parameters: [
       {name: 'Number', description: 'The value to round down.'},
-      {name: 'Significance', description: 'The multiple to round down to; must have the same sign as Number.'},
+      {name: 'Significance', description: 'The multiple to round down to. When Number is positive, Significance must also be positive; otherwise the result is a #NUM! error.'},
     ],
     examples: ['=FLOOR(4.7, 1)', '=FLOOR(22.5, 5)'],
   },
@@ -288,7 +288,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns the remainder when one integer is divided by another.',
     parameters: [
       {name: 'Dividend', description: 'The number to be divided.'},
-      {name: 'Divisor', description: 'The non-zero number to divide by; the result takes the sign of the divisor.'},
+      {name: 'Divisor', description: 'The non-zero number to divide by. The result has the same sign as the dividend.'},
     ],
     examples: ['=MOD(10, 3)', '=MOD(-7, 2)'],
   },
@@ -310,7 +310,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   ODD: {
     category: 'Math and trigonometry',
     shortDescription: 'Rounds a positive number up to the nearest odd integer and a negative number down to the nearest odd integer.',
-    parameters: [{name: 'Number', description: 'The number to round to the nearest odd integer, away from zero.'}],
+    parameters: [{name: 'Number', description: 'The number to round away from zero to the next odd integer.'}],
     examples: ['=ODD(2)', '=ODD(-2)'],
   },
   PI: {

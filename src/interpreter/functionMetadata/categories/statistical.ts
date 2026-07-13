@@ -210,8 +210,8 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   COUNTBLANK: {
     category: 'Statistical',
     shortDescription: 'Returns the number of empty cells.',
-    parameters: [{name: 'Range', description: 'The range of cells checked for emptiness.'}],
-    examples: ['=COUNTBLANK(A1:A10)'],
+    parameters: [{name: 'Range', description: 'A value, cell reference, or range checked for emptiness. Further values or ranges can be passed as additional arguments.'}],
+    examples: ['=COUNTBLANK(A1:A10)', '=COUNTBLANK(A1:A10, C1:C10)'],
   },
   COUNTIF: {
     category: 'Statistical',

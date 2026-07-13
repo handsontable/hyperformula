@@ -308,7 +308,7 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     parameters: [
       {name: 'Rate', description: 'The discount rate applied to the cash flows.'},
       {name: 'Payments', description: 'A range of cash flow values; paid-out amounts are negative, received amounts are positive.'},
-      {name: 'Dates', description: 'A range of dates, one per payment, that must be the same length as Payments; the earliest date defines the starting point of the calculation.'},
+      {name: 'Dates', description: 'A range of dates, one per payment, that must be the same length as Payments; the first date is the reference point, and every other date must fall on or after it.'},
     ],
     examples: ['=XNPV(0.09, A1:A4, B1:B4)', '=XNPV(0.1, C2:C6, D2:D6)'],
   },

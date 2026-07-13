@@ -24,13 +24,13 @@ export const ARRAY_MANIPULATION_DOCS: Record<string, FunctionDoc> = {
     category: 'Array manipulation',
     shortDescription: 'Enables the array arithmetic mode for a single formula.',
     parameters: [{name: 'Formula', description: 'The formula or expression to evaluate in array arithmetic mode, so operations are applied element-by-element across the referenced ranges.'}],
-    examples: ['=ARRAYFORMULA(A1:A3*B1:B3)', '=SUM(ARRAYFORMULA(A1:A3+A1:A3))'],
+    examples: ['=ARRAYFORMULA(A1:A3*B1:B3)', '=SUM(ARRAYFORMULA(A1:A3*B1:B3))'],
   },
   FILTER: {
     category: 'Array manipulation',
     shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
     parameters: [
-      {name: 'SourceArray', description: 'The range of values to filter.'},
+      {name: 'SourceArray', description: 'The range of values to filter; it must be a single row or a single column (a two-dimensional range is not supported).'},
       {name: 'BoolArray1', description: 'A range of boolean values, with the same dimensions as SourceArray, marking which rows or columns to keep; only entries where every boolean array is TRUE are returned. Further boolean arrays can be passed as additional arguments, and all of them must evaluate to TRUE for an entry to be kept.'},
     ],
     examples: ['=FILTER(A1:C1, A2:C2)', '=FILTER(A1:A5, A1:A5>10)', '=FILTER(A1:C1, A2:C2, A3:C3)'],
