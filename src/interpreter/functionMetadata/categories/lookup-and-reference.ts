@@ -7,7 +7,8 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Lookup and reference" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
+ * `scripts/hf249-migrate-function-docs.ts`. The `examples` and parameter
+ * descriptions are hand-authored; re-running that script overwrites them.
  */
 export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   ADDRESS: {

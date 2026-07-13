@@ -7,7 +7,8 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Logical" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
+ * `scripts/hf249-migrate-function-docs.ts`. The `examples` and parameter
+ * descriptions are hand-authored; re-running that script overwrites them.
  */
 export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
   AND: {
