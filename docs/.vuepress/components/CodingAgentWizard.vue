@@ -88,11 +88,13 @@ export default {
 .agent-wizard__choice:hover,
 .agent-wizard__copy:hover { background: #3eaf7c; color: #fff; }
 .agent-wizard__back { border-color: #ccc; color: #666; }
+/* Match VuePress fenced code blocks ($codeBgColor = #282c34) so the snippet is
+   visually consistent with the rest of the docs' code blocks. */
 .agent-wizard__snippet {
-  background: #f6f6f6;
-  color: #2c3e50;
-  padding: 0.75rem;
-  border-radius: 4px;
+  background: #282c34;
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
