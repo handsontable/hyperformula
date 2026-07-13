@@ -26,6 +26,14 @@ describe('md-companions stripVuePressSyntax', () => {
       .toBe('```js\nconst x = ":::tip";\n```')
   })
 
+  it('cleans Vue markup ([[toc]], :href, <Badge/>) inside a container body', () => {
+    const out = stripVuePressSyntax(':::tip\nSee <a :href="$withBase(\'/x\')">docs</a> [[toc]] <Badge text="New"/>\n:::')
+    expect(out).toContain('> See docs')
+    expect(out).not.toMatch(/\[\[toc\]\]/)
+    expect(out).not.toMatch(/<Badge/)
+    expect(out).not.toMatch(/:href/)
+  })
+
   it('does not close a container on a ::: that sits inside a fenced block in its body', () => {
     const out = stripVuePressSyntax(':::tip\nBe careful\n```\n:::\n```\ndone\n:::')
     expect(out).toContain('> Be careful')  // container recognised

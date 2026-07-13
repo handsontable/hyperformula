@@ -1,4 +1,20 @@
 /**
+ * Neutralise inline Vue-only markup on a single prose line: `[[toc]]`,
+ * Vue-bound `<a :href>` (keep text) / `<img :src>` (drop), and inline
+ * self-closing PascalCase components (`<Badge …/>`; the `[A-Z]` guard leaves
+ * plain HTML like `<br/>` alone). `{{ … }}` interpolations are left verbatim.
+ * @param {string} line
+ * @returns {string}
+ */
+function cleanInlineMarkup(line) {
+  return line
+    .replace(/\[\[toc\]\]/gi, '')
+    .replace(/<a\s[^>]*:href[^>]*>(.*?)<\/a>/gi, '$1')
+    .replace(/<img\s[^>]*:src[^>]*\/?>/gi, '')
+    .replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, '');
+}
+
+/**
  * Strips VuePress-specific markdown syntax, producing clean markdown
  * suitable for LLM consumption. Fence-aware: never edits inside code blocks.
  * @param {string} src raw markdown (frontmatter already removed)
@@ -86,27 +102,15 @@ function stripVuePressSyntax(src) {
       // Demo/example containers (live code runners) are not prose — omit entirely.
       if (type === 'example') { continue; }
       if (title) { out.push(`> **${title}**`); out.push('>'); }
-      body.forEach(b => out.push(b.trim() === '' ? '>' : `> ${b}`));
+      // Container bodies must run through the same inline cleanup as normal
+      // prose, otherwise Vue markup inside a tip/warning leaks into companions.
+      body.forEach(b => out.push(b.trim() === '' ? '>' : `> ${cleanInlineMarkup(b)}`));
       while (out.length && out[out.length - 1] === '>') out.pop();
       continue;
     }
 
-    // Neutralise Vue-only markup that ships as broken, non-portable syntax in
-    // the `.md` companions (all outside code fences):
-    //   - Vue-bound `<a :href="…">text</a>` → keep the link text, drop the tag,
-    //   - Vue-bound `<img :src="…">` → drop (no useful text for an LLM),
-    //   - inline self-closing PascalCase components (e.g. `<Badge text="…"/>`).
-    // The `[A-Z]` guard on the last rule leaves plain HTML like `<br/>` untouched.
-    // NOTE: `{{ … }}` interpolations are intentionally LEFT AS-IS. They can't be
-    // expanded from source markdown, and wiping them drops meaningful inline
-    // values (e.g. a function count). Full expansion needs rendered-HTML
-    // extraction — tracked as a follow-up.
-    const cleaned = line
-      .replace(/\[\[toc\]\]/gi, '')
-      .replace(/<a\s[^>]*:href[^>]*>(.*?)<\/a>/gi, '$1')
-      .replace(/<img\s[^>]*:src[^>]*\/?>/gi, '')
-      .replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, '');
-    out.push(cleaned);
+    // Normal prose line: run the shared inline cleanup (see cleanInlineMarkup).
+    out.push(cleanInlineMarkup(line));
   }
 
   // Collapse runs of blank lines to a single blank — but NEVER inside code
