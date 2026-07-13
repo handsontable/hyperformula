@@ -15,7 +15,21 @@ const { stripVuePressSyntax } = require('./strip');
 function rebaseRootLinks(md, base) {
   const prefix = (base || '/').replace(/\/$/, '');
   if (!prefix) return md;
-  return md.replace(/(\]\()\/(?!\/)/g, `$1${prefix}/`);
+  // Fence-aware: never touch link-shaped text inside fenced code blocks.
+  const out = [];
+  let inFence = false;
+  let marker = '';
+  for (const line of md.split('\n')) {
+    const t = line.trim();
+    const fm = t.match(/^(```+|~~~+)/);
+    if (fm && (!inFence || (fm[1][0] === marker[0] && fm[1].length >= marker.length))) {
+      if (!inFence) { inFence = true; marker = fm[1]; } else { inFence = false; }
+      out.push(line);
+      continue;
+    }
+    out.push(inFence ? line : line.replace(/(\]\()\/(?!\/)/g, `$1${prefix}/`));
+  }
+  return out.join('\n');
 }
 
 /**

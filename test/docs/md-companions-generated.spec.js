@@ -91,6 +91,14 @@ describe('md-companions generated()', () => {
     expect(md).not.toContain('](/guide/')  // no un-rebased root-relative link
   })
 
+  it('does not rebase root-relative links inside code fences', async () => {
+    await run([{ path: '/z.html', title: 'Z', _strippedContent: 'prose [a](/api/y.md)\n```md\nsee [b](/guide/x.md)\n```' }])
+    const md = writes.find(w => w.f.endsWith('z.md')).c
+    expect(md).toContain('](/docs/api/y.md)')       // prose link rebased
+    expect(md).toContain('](/guide/x.md)')            // fenced link left verbatim
+    expect(md).not.toContain('](/docs/guide/x.md)')
+  })
+
   it('builds per-entry URL from hostname + base + slug (no double/missing slash)', async () => {
     await run([{ path: '/guide/basic.html', title: 'Basic', _strippedContent: 'x' }])
     const c = writes.find(w => w.f === '/out/llms-full.txt').c
