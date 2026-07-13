@@ -6,6 +6,13 @@
 import {FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
 import {FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescription} from './FunctionDescription'
 
+/**
+ * The single shared documentation URL surfaced for every built-in function (HF-300). One URL for the whole
+ * catalogue in v1 — no per-function anchors. Custom (user-registered) functions are not documented here and
+ * keep an empty string.
+ */
+export const DEFAULT_DOCUMENTATION_URL = 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html'
+
 /** Resolves a function's display name: the translation for the active language, or the canonical id as fallback. */
 type TranslateName = (canonicalName: string) => string | undefined
 
@@ -53,8 +60,9 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
 /**
  * Builds a Tier-2 details object: the list fields plus the parameter list (name, description, optionality) and
  * `repeatLastArgs` (how many trailing parameters repeat). The caller renders the syntax string from these.
- * `documentationUrl` and `examples` come from the catalogue doc when authored, and fall back to `''`/`[]`
- * otherwise; each parameter `description` is present but empty for functions not yet authored.
+ * `documentationUrl` comes from the catalogue doc when authored, and otherwise falls back to the shared
+ * `DEFAULT_DOCUMENTATION_URL`; `examples` falls back to `[]`. Each parameter `description` is present but
+ * empty for functions not yet authored.
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {FunctionDoc} doc - the function's authored catalogue entry
@@ -80,7 +88,7 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     shortDescription: doc.shortDescription,
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
-    documentationUrl: doc.documentationUrl ?? '',
+    documentationUrl: doc.documentationUrl ?? DEFAULT_DOCUMENTATION_URL,
     examples: doc.examples ?? [],
   }
 }
