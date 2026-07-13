@@ -15,7 +15,7 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Logical',
     shortDescription: 'Returns TRUE if all arguments are TRUE.',
     parameters: [{name: 'Logical_value1', description: 'A logical value, expression, or range to test. Further logical values can be passed as additional arguments; the result is TRUE only if all of them are TRUE.'}],
-    examples: ['=AND(TRUE, TRUE)', '=AND(A1>0, A2>0)', '=AND(A1:A5)'],
+    examples: ['=AND(TRUE(), TRUE())', '=AND(A1>0, A2>0)', '=AND(A1:A5)'],
   },
   FALSE: {
     category: 'Logical',
@@ -40,7 +40,7 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Value', description: 'The value or formula checked for an error.'},
       {name: 'Alternate_value', description: 'The value returned when Value evaluates to any error; otherwise Value itself is returned.'},
     ],
-    examples: ['=IFERROR(A1/B1, "error")', '=IFERROR(VLOOKUP(A1, B1:C10, 2, FALSE), "not found")'],
+    examples: ['=IFERROR(A1/B1, "error")', '=IFERROR(VLOOKUP(A1, B1:C10, 2, FALSE()), "not found")'],
   },
   IFNA: {
     category: 'Logical',
@@ -49,7 +49,7 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Value', description: 'The value or formula checked for the #N/A error.'},
       {name: 'Alternate_value', description: 'The value returned when Value evaluates to #N/A; other error types and non-error values are returned unchanged.'},
     ],
-    examples: ['=IFNA(VLOOKUP(A1, B1:C10, 2, FALSE), "not found")', '=IFNA(A1, "n/a")'],
+    examples: ['=IFNA(VLOOKUP(A1, B1:C10, 2, FALSE()), "not found")', '=IFNA(A1, "n/a")'],
   },
   IFS: {
     category: 'Logical',
@@ -64,13 +64,13 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Logical',
     shortDescription: 'Complements (inverts) a logical value.',
     parameters: [{name: 'Logicalvalue', description: 'The logical value or expression to invert: TRUE becomes FALSE and vice versa.'}],
-    examples: ['=NOT(TRUE)', '=NOT(A1>10)'],
+    examples: ['=NOT(TRUE())', '=NOT(A1>10)'],
   },
   OR: {
     category: 'Logical',
     shortDescription: 'Returns TRUE if at least one argument is TRUE.',
     parameters: [{name: 'Logical_value1', description: 'A logical value, expression, or range to test. Further logical values can be passed as additional arguments; the result is TRUE if any of them is TRUE.'}],
-    examples: ['=OR(TRUE, FALSE)', '=OR(A1>10, A2>10)', '=OR(A1:A5)'],
+    examples: ['=OR(TRUE(), FALSE())', '=OR(A1>10, A2>10)', '=OR(A1:A5)'],
   },
   SWITCH: {
     category: 'Logical',
@@ -92,6 +92,6 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Logical',
     shortDescription: 'Returns true if an odd number of arguments evaluates to TRUE.',
     parameters: [{name: 'Logical_value1', description: 'A logical value, expression, or range to test. Further logical values can be passed as additional arguments; the result is TRUE when an odd number of them are TRUE.'}],
-    examples: ['=XOR(TRUE, FALSE)', '=XOR(A1>0, A2>0)'],
+    examples: ['=XOR(TRUE(), FALSE())', '=XOR(A1>0, A2>0)'],
   },
 }

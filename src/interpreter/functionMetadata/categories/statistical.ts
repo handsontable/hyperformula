@@ -27,7 +27,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns the average of the arguments.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range whose values are averaged; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=AVERAGEA(1, 2, TRUE)', '=AVERAGEA(A1:A10)'],
+    examples: ['=AVERAGEA(1, 2, TRUE())', '=AVERAGEA(A1:A10)'],
   },
   AVERAGEIF: {
     category: 'Statistical',
@@ -86,7 +86,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Number4', description: 'The lower bound of the interval of Number1; defaults to 0 when omitted.'},
       {name: 'Number5', description: 'The upper bound of the interval of Number1; defaults to 1 when omitted.'},
     ],
-    examples: ['=BETA.DIST(0.5, 2, 3, TRUE)', '=BETA.DIST(2, 2, 3, FALSE, 0, 4)'],
+    examples: ['=BETA.DIST(0.5, 2, 3, TRUE())', '=BETA.DIST(2, 2, 3, FALSE(), 0, 4)'],
   },
   'BETA.INV': {
     category: 'Statistical',
@@ -109,7 +109,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Number3', description: 'The probability of success on a single trial.'},
       {name: 'Boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'},
     ],
-    examples: ['=BINOM.DIST(3, 10, 0.5, FALSE)', '=BINOM.DIST(3, 10, 0.5, TRUE)'],
+    examples: ['=BINOM.DIST(3, 10, 0.5, FALSE())', '=BINOM.DIST(3, 10, 0.5, TRUE())'],
   },
   'BINOM.INV': {
     category: 'Statistical',
@@ -129,7 +129,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Degrees', description: 'The number of degrees of freedom.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=CHISQ.DIST(2, 3, TRUE)', '=CHISQ.DIST(2, 3, FALSE)'],
+    examples: ['=CHISQ.DIST(2, 3, TRUE())', '=CHISQ.DIST(2, 3, FALSE())'],
   },
   'CHISQ.DIST.RT': {
     category: 'Statistical',
@@ -206,7 +206,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Counts how many values are in the list of arguments.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range counted if it is not empty. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=COUNTA(A1:A10)', '=COUNTA(1, "text", TRUE)'],
+    examples: ['=COUNTA(A1:A10)', '=COUNTA(1, "text", TRUE())'],
   },
   COUNTBLANK: {
     category: 'Statistical',
@@ -264,7 +264,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Number2', description: 'The lambda rate parameter of the distribution; must be greater than 0.'},
       {name: 'Boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=EXPON.DIST(1, 0.5, TRUE)', '=EXPON.DIST(1, 0.5, FALSE)'],
+    examples: ['=EXPON.DIST(1, 0.5, TRUE())', '=EXPON.DIST(1, 0.5, FALSE())'],
   },
   'F.DIST': {
     category: 'Statistical',
@@ -275,7 +275,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Degree2', description: 'The denominator degrees of freedom.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=F.DIST(2, 3, 10, TRUE)', '=F.DIST(2, 3, 10, FALSE)'],
+    examples: ['=F.DIST(2, 3, 10, TRUE())', '=F.DIST(2, 3, 10, FALSE())'],
   },
   'F.DIST.RT': {
     category: 'Statistical',
@@ -343,7 +343,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Number3', description: 'The beta scale parameter of the distribution; must be greater than 0.'},
       {name: 'Boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=GAMMA.DIST(2, 1, 2, TRUE)', '=GAMMA.DIST(2, 1, 2, FALSE)'],
+    examples: ['=GAMMA.DIST(2, 1, 2, TRUE())', '=GAMMA.DIST(2, 1, 2, FALSE())'],
   },
   'GAMMA.INV': {
     category: 'Statistical',
@@ -389,7 +389,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Number4', description: 'The size of the population.'},
       {name: 'Boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'},
     ],
-    examples: ['=HYPGEOM.DIST(1, 4, 8, 20, FALSE)', '=HYPGEOM.DIST(1, 4, 8, 20, TRUE)'],
+    examples: ['=HYPGEOM.DIST(1, 4, 8, 20, FALSE())', '=HYPGEOM.DIST(1, 4, 8, 20, TRUE())'],
   },
   LARGE: {
     category: 'Statistical',
@@ -409,7 +409,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Stddev', description: 'The standard deviation of the natural logarithm of the distribution; must be greater than 0.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=LOGNORM.DIST(4, 0, 1, TRUE)', '=LOGNORM.DIST(4, 0, 1, FALSE)'],
+    examples: ['=LOGNORM.DIST(4, 0, 1, TRUE())', '=LOGNORM.DIST(4, 0, 1, FALSE())'],
   },
   'LOGNORM.INV': {
     category: 'Statistical',
@@ -431,7 +431,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns the maximum value in a list of arguments.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range compared against the current maximum; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=MAXA(1, TRUE, "text")', '=MAXA(A1:A10)'],
+    examples: ['=MAXA(1, TRUE(), "text")', '=MAXA(A1:A10)'],
   },
   MAXIFS: {
     category: 'Statistical',
@@ -459,7 +459,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns the minimum value in a list of arguments.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range compared against the current minimum; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=MINA(1, TRUE, "text")', '=MINA(A1:A10)'],
+    examples: ['=MINA(1, TRUE(), "text")', '=MINA(A1:A10)'],
   },
   MINIFS: {
     category: 'Statistical',
@@ -480,7 +480,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Number3', description: 'The probability of success on a single trial.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'},
     ],
-    examples: ['=NEGBINOM.DIST(3, 5, 0.5, FALSE)', '=NEGBINOM.DIST(3, 5, 0.5, TRUE)'],
+    examples: ['=NEGBINOM.DIST(3, 5, 0.5, FALSE())', '=NEGBINOM.DIST(3, 5, 0.5, TRUE())'],
   },
   'NORM.DIST': {
     category: 'Statistical',
@@ -491,7 +491,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Stddev', description: 'The standard deviation of the distribution; must be greater than 0.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=NORM.DIST(1, 0, 1, TRUE)', '=NORM.DIST(1, 0, 1, FALSE)'],
+    examples: ['=NORM.DIST(1, 0, 1, TRUE())', '=NORM.DIST(1, 0, 1, FALSE())'],
   },
   'NORM.INV': {
     category: 'Statistical',
@@ -510,7 +510,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'X', description: 'The value at which to evaluate the standard normal distribution.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=NORM.S.DIST(1, TRUE)', '=NORM.S.DIST(1, FALSE)'],
+    examples: ['=NORM.S.DIST(1, TRUE())', '=NORM.S.DIST(1, FALSE())'],
   },
   'NORM.S.INV': {
     category: 'Statistical',
@@ -550,7 +550,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Mean', description: 'The expected number of events; must be greater than 0.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'},
     ],
-    examples: ['=POISSON.DIST(3, 5, FALSE)', '=POISSON.DIST(3, 5, TRUE)'],
+    examples: ['=POISSON.DIST(3, 5, FALSE())', '=POISSON.DIST(3, 5, TRUE())'],
   },
   'QUARTILE.EXC': {
     category: 'Statistical',
@@ -635,13 +635,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns standard deviation of a sample.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range included in the sample standard deviation calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=STDEVA(1, TRUE, 3)', '=STDEVA(A1:A10)'],
+    examples: ['=STDEVA(1, TRUE(), 3)', '=STDEVA(A1:A10)'],
   },
   STDEVPA: {
     category: 'Statistical',
     shortDescription: 'Returns standard deviation of a population.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range included in the population standard deviation calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=STDEVPA(1, TRUE, 3)', '=STDEVPA(A1:A10)'],
+    examples: ['=STDEVPA(1, TRUE(), 3)', '=STDEVPA(A1:A10)'],
   },
   STEYX: {
     category: 'Statistical',
@@ -660,7 +660,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Degrees', description: 'The number of degrees of freedom.'},
       {name: 'Mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=T.DIST(1, 10, TRUE)', '=T.DIST(1, 10, FALSE)'],
+    examples: ['=T.DIST(1, 10, TRUE())', '=T.DIST(1, 10, FALSE())'],
   },
   'T.DIST.2T': {
     category: 'Statistical',
@@ -735,13 +735,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns variance of a sample.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range included in the sample variance calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=VARA(1, TRUE, 3)', '=VARA(A1:A10)'],
+    examples: ['=VARA(1, TRUE(), 3)', '=VARA(A1:A10)'],
   },
   VARPA: {
     category: 'Statistical',
     shortDescription: 'Returns variance of a population.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range included in the population variance calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=VARPA(1, TRUE, 3)', '=VARPA(A1:A10)'],
+    examples: ['=VARPA(1, TRUE(), 3)', '=VARPA(A1:A10)'],
   },
   'WEIBULL.DIST': {
     category: 'Statistical',
@@ -752,7 +752,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
       {name: 'Number3', description: 'The beta scale parameter of the distribution; must be greater than 0.'},
       {name: 'Boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'},
     ],
-    examples: ['=WEIBULL.DIST(2, 1, 2, TRUE)', '=WEIBULL.DIST(2, 1, 2, FALSE)'],
+    examples: ['=WEIBULL.DIST(2, 1, 2, TRUE())', '=WEIBULL.DIST(2, 1, 2, FALSE())'],
   },
   'Z.TEST': {
     category: 'Statistical',

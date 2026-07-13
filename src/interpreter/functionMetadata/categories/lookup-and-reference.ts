@@ -21,7 +21,7 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
       {name: 'UseA1Notation', description: 'TRUE (default) returns the reference in A1 notation, FALSE returns it in R1C1 notation.'},
       {name: 'Sheet', description: 'The name of the sheet to prefix the reference with. When omitted, no sheet name is included.'},
     ],
-    examples: ['=ADDRESS(2, 3)', '=ADDRESS(2, 3, 4)', '=ADDRESS(1, 1, 1, FALSE, "Sheet2")'],
+    examples: ['=ADDRESS(2, 3)', '=ADDRESS(2, 3, 4)', '=ADDRESS(1, 1, 1, FALSE(), "Sheet2")'],
   },
   CHOOSE: {
     category: 'Lookup and reference',
@@ -59,7 +59,7 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
       {name: 'Index', description: 'The row number within Array (counting from 1) whose value in the matching column is returned.'},
       {name: 'Sort_Order', description: 'TRUE (default) performs an approximate match against ascending-sorted data, FALSE performs an exact match. HyperFormula skips empty cells when matching approximately.'},
     ],
-    examples: ['=HLOOKUP("apple", A1:D5, 3, FALSE)', '=HLOOKUP(5, A1:F2, 2)'],
+    examples: ['=HLOOKUP("apple", A1:D5, 3, FALSE())', '=HLOOKUP(5, A1:F2, 2)'],
   },
   HYPERLINK: {
     category: 'Lookup and reference',
@@ -111,7 +111,7 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
       {name: 'Index', description: 'The column number within Array (counting from 1) whose value in the matching row is returned.'},
       {name: 'Sort_Order', description: 'TRUE (default) performs an approximate match against ascending-sorted data, FALSE performs an exact match. HyperFormula skips empty cells when matching approximately.'},
     ],
-    examples: ['=VLOOKUP("apple", A1:B10, 2, FALSE)', '=VLOOKUP(5, A1:C10, 3)'],
+    examples: ['=VLOOKUP("apple", A1:B10, 2, FALSE())', '=VLOOKUP(5, A1:C10, 3)'],
   },
   XLOOKUP: {
     category: 'Lookup and reference',

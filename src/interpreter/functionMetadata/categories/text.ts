@@ -89,7 +89,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     category: 'Text',
     shortDescription: 'Converts a value to a number.',
     parameters: [{name: 'Value', description: 'The value to convert: numbers and dates return themselves, TRUE/FALSE return 1/0, and text or empty values return 0.'}],
-    examples: ['=N(TRUE)', '=N("5")', '=N(A1)'],
+    examples: ['=N(TRUE())', '=N("5")', '=N(A1)'],
   },
   PROPER: {
     category: 'Text',
@@ -179,7 +179,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
       {name: 'Ignore_empty', description: 'When TRUE, empty strings among the joined values are skipped instead of producing an extra delimiter.'},
       {name: 'Text1', description: 'A text value, cell reference, or range to join. Further text values or ranges can be passed as additional arguments and are appended in order.'},
     ],
-    examples: ['=TEXTJOIN(", ", TRUE, A1:A3)', '=TEXTJOIN("-", FALSE, "a", "b", "c")'],
+    examples: ['=TEXTJOIN(", ", TRUE(), A1:A3)', '=TEXTJOIN("-", FALSE(), "a", "b", "c")'],
   },
   TRIM: {
     category: 'Text',
