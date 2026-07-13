@@ -26,6 +26,13 @@ describe('md-companions stripVuePressSyntax', () => {
       .toBe('```js\nconst x = ":::tip";\n```')
   })
 
+  it('does not close a container on a ::: that sits inside a fenced block in its body', () => {
+    const out = stripVuePressSyntax(':::tip\nBe careful\n```\n:::\n```\ndone\n:::')
+    expect(out).toContain('> Be careful')  // container recognised
+    expect(out).toContain('done')          // body not truncated at the fenced :::
+    expect(out).not.toMatch(/^:::$/m)      // no leaked bare ::: closer
+  })
+
   it('removes <script> blocks', () => {
     expect(stripVuePressSyntax('Text before\n<script>\nconsole.log(1)\n</script>\nText after'))
       .toBe('Text before\nText after')

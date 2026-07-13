@@ -83,6 +83,14 @@ describe('md-companions generated()', () => {
     expect(writes.some(w => w.f.endsWith('e.md') && w.c === '')).toBe(true)
   })
 
+  it('rebases root-relative links in companions to include the base', async () => {
+    await run([{ path: '/x.html', title: 'X', _strippedContent: 'See [nx](/guide/named-expressions.md) and [api](/api/y.md).' }])
+    const md = writes.find(w => w.f.endsWith('x.md')).c
+    expect(md).toContain('](/docs/guide/named-expressions.md)')
+    expect(md).toContain('](/docs/api/y.md)')
+    expect(md).not.toContain('](/guide/')  // no un-rebased root-relative link
+  })
+
   it('builds per-entry URL from hostname + base + slug (no double/missing slash)', async () => {
     await run([{ path: '/guide/basic.html', title: 'Basic', _strippedContent: 'x' }])
     const c = writes.find(w => w.f === '/out/llms-full.txt').c

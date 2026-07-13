@@ -61,7 +61,22 @@ function stripVuePressSyntax(src) {
       const body = [];
       i++;
       const bodyStart = i;
-      while (i < lines.length && lines[i].trim() !== ':::') { body.push(lines[i]); i++; }
+      // Fence-aware close: a bare `:::` inside a fenced code block in the body is
+      // NOT the container closer.
+      let bodyFence = false;
+      let bodyMarker = '';
+      while (i < lines.length) {
+        const bt = lines[i].trim();
+        const bfm = bt.match(/^(```+|~~~+)/);
+        if (bfm) {
+          if (!bodyFence) { bodyFence = true; bodyMarker = bfm[1]; }
+          else if (bfm[1][0] === bodyMarker[0] && bfm[1].length >= bodyMarker.length) { bodyFence = false; }
+        } else if (!bodyFence && bt === ':::') {
+          break;
+        }
+        body.push(lines[i]);
+        i++;
+      }
       // If we hit EOF without finding closing :::, emit verbatim (not a real container).
       if (i >= lines.length) {
         out.push(lines[bodyStart - 1]); // re-emit the opening line

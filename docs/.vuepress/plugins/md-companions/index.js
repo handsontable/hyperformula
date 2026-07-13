@@ -3,6 +3,22 @@ const path = require('path');
 const { stripVuePressSyntax } = require('./strip');
 
 /**
+ * Rewrite root-relative Markdown links (`](/guide/…)`, `](/api/…)`) to include
+ * the configured `base` (`/docs/`). VuePress rebases these for the HTML site,
+ * but the raw `.md` companions do not — so without this an agent resolving them
+ * from the site origin lands outside `/docs/` and 404s. Protocol-relative
+ * (`//…`), absolute (`http…`), anchor (`#…`) and relative links are untouched.
+ * @param {string} md stripped markdown
+ * @param {string} base configured base, e.g. '/docs/'
+ * @returns {string}
+ */
+function rebaseRootLinks(md, base) {
+  const prefix = (base || '/').replace(/\/$/, '');
+  if (!prefix) return md;
+  return md.replace(/(\]\()\/(?!\/)/g, `$1${prefix}/`);
+}
+
+/**
  * VuePress plugin: after build, write a clean `.md` companion next to each
  * rendered `.html`, plus an aggregate `llms-full.txt`. Respects ctx.outDir
  * (which already includes the configured base segment).
@@ -30,7 +46,7 @@ module.exports = (options, ctx) => ({
 
     for (const page of pages) {
       try {
-        const clean = stripVuePressSyntax(page._strippedContent || '');
+        const clean = rebaseRootLinks(stripVuePressSyntax(page._strippedContent || ''), base);
         // `.html` → `<slug>.md`; directory URL (`/guide/`) → `<dir>/index.md`.
         const relPath = page.path.endsWith('/')
           ? `${page.path}index.md`
