@@ -33,6 +33,38 @@ function rebaseRootLinks(md, base) {
 }
 
 /**
+ * Resolve every Markdown link in a page to an ABSOLUTE URL, relative to that
+ * page's own URL. Needed only for `llms-full.txt`: it aggregates all pages into
+ * one file at a single URL, so page-relative links (`](basic-usage.md)`,
+ * `](../api/x.md)`) would otherwise resolve against the corpus URL and 404.
+ * Per-page `.md` companions keep relative links (they resolve within the
+ * companion tree). Fence-aware; leaves absolute/protocol/anchor links alone.
+ * @param {string} md
+ * @param {string} pageUrl absolute URL of the page this content came from
+ * @returns {string}
+ */
+function absolutizeLinks(md, pageUrl) {
+  const out = [];
+  let inFence = false;
+  let marker = '';
+  for (const line of md.split('\n')) {
+    const t = line.trim();
+    const fm = t.match(/^(```+|~~~+)/);
+    if (fm && (!inFence || (fm[1][0] === marker[0] && fm[1].length >= marker.length))) {
+      if (!inFence) { inFence = true; marker = fm[1]; } else { inFence = false; }
+      out.push(line);
+      continue;
+    }
+    if (inFence) { out.push(line); continue; }
+    out.push(line.replace(/\]\(([^)\s]+)\)/g, (m, target) => {
+      if (/^(https?:|mailto:|#)/i.test(target) || target.startsWith('//')) return m;
+      try { return `](${new URL(target, pageUrl).href})`; } catch (_) { return m; }
+    }));
+  }
+  return out.join('\n');
+}
+
+/**
  * VuePress plugin: after build, write a clean `.md` companion next to each
  * rendered `.html`, plus an aggregate `llms-full.txt`. Respects ctx.outDir
  * (which already includes the configured base segment).
@@ -70,7 +102,9 @@ module.exports = (options, ctx) => ({
         await fs.promises.writeFile(outFile, clean, 'utf8');
 
         const url = hostname + base.replace(/\/$/, '') + page.path.replace(/\.html$/, '');
-        corpus.push('---', '', `## ${page.title || page.path}`, '', `URL: ${url}`, '', clean, '');
+        // The per-page `.md` keeps relative links (resolve within the companion
+        // tree); the aggregated corpus needs absolute links (single-file URL).
+        corpus.push('---', '', `## ${page.title || page.path}`, '', `URL: ${url}`, '', absolutizeLinks(clean, url), '');
       } catch (err) {
         console.warn(`[md-companions] skipping ${page.path}: ${err.message}`);
       }

@@ -91,6 +91,15 @@ describe('md-companions generated()', () => {
     expect(md).not.toContain('](/guide/')  // no un-rebased root-relative link
   })
 
+  it('absolutizes links in the corpus but keeps per-page .md links relative', async () => {
+    await run([{ path: '/guide/cell-references.html', title: 'CR', _strippedContent: 'see [a](basic-usage.md) and [b](../api/x.md)' }])
+    const md = writes.find(w => w.f.endsWith('cell-references.md')).c
+    const corpus = writes.find(w => w.f === '/out/llms-full.txt').c
+    expect(md).toContain('](basic-usage.md)')  // per-page: relative kept
+    expect(corpus).toContain('](https://h.example.com/docs/guide/basic-usage.md)')  // corpus: absolute
+    expect(corpus).toContain('](https://h.example.com/docs/api/x.md)')              // ../ resolved
+  })
+
   it('does not rebase root-relative links inside code fences', async () => {
     await run([{ path: '/z.html', title: 'Z', _strippedContent: 'prose [a](/api/y.md)\n```md\nsee [b](/guide/x.md)\n```' }])
     const md = writes.find(w => w.f.endsWith('z.md')).c
