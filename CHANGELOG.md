@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 
 - Added the `getAvailableFunctions()` and `getFunctionDetails()` methods (both static and instance) for retrieving function metadata. [#1692](https://github.com/handsontable/hyperformula/pull/1692)
-- Enriched `getFunctionDetails()` to return a usage example, a documentation URL, and a per-parameter description for every built-in function. [#PR-TBD](https://github.com/handsontable/hyperformula/pull/PR-TBD)
+- Enriched `getFunctionDetails()` to return a usage example, a documentation URL, and a per-parameter description for every built-in function. [#1705](https://github.com/handsontable/hyperformula/pull/1705)
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
 
 ## [3.3.0] - 2026-05-20
