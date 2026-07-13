@@ -240,6 +240,7 @@ const dictionary: RawTranslationPackage = {
     TRUNC: 'TRUNCAR',
     UNICHAR: 'CARACTUNI',
     UNICODE: 'UNICODE',
+    UNIQUE: 'EXCLUSIVOS',
     UPPER: 'MAIÚSCULA',
     VALUE: 'VALOR',
     VARA: 'VARA',
