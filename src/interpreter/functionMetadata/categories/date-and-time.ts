@@ -15,7 +15,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
     category: 'Date and time',
     shortDescription: 'Returns the specified date as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).',
     parameters: [
-      {name: 'Year', description: 'The year of the date; values below HyperFormula\'s epoch year (derived from `nullDate`) are added to it, similar to Excel\'s short-year handling.'},
+      {name: 'Year', description: 'The year of the date; values below HyperFormula\'s epoch year (derived from `nullDate`) are added to that epoch year.'},
       {name: 'Month', description: 'The month of the date. Values outside 1-12 roll over into adjacent years.'},
       {name: 'Day', description: 'The day of the month. Values outside the month\'s range roll over into adjacent months.'},
     ],
