@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'GIORNO.LAVORATIVO.INTL',
     XLOOKUP: 'CERCA.X',
     XNPV: 'VAN.X',
+    XIRR: 'TIR.X',
     XOR: 'XOR',
     YEAR: 'ANNO',
     YEARFRAC: 'FRAZIONE.ANNO',

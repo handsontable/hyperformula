@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'TYÖPÄIVÄ.KANSVÄL',
     XLOOKUP: 'XHAKU',
     XNPV: 'NNA.JAKSOTON',
+    XIRR: 'SISÄINEN.KORKO.JAKSOTON',
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
     YEARFRAC: 'VUOSI.OSA',

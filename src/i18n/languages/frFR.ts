@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'SERIE.JOUR.OUVRE.INTL',
     XLOOKUP: 'RECHERCHEX',
     XNPV: 'VAN.PAIEMENTS',
+    XIRR: 'TRI.PAIEMENTS',
     XOR: 'OUX',
     YEAR: 'ANNEE',
     YEARFRAC: 'FRACTION.ANNEE',

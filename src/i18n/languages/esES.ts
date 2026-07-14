@@ -253,6 +253,7 @@ export const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'DIA.LAB.INTL',
     XLOOKUP: 'BUSCARX',
     XNPV: 'VNA.NO.PER',
+    XIRR: 'TIR.NO.PER',
     XOR: 'XOR',
     YEAR: 'AÑO',
     YEARFRAC: 'FRAC.AÑO',

@@ -253,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'WERKDAG.INTL',
     XLOOKUP: 'X.ZOEKEN',
     XNPV: 'NHW2',
+    XIRR: 'IR.SCHEMA',
     XOR: 'EX.OF',
     YEAR: 'JAAR',
     YEARFRAC: 'JAAR.DEEL',
