@@ -55,60 +55,32 @@ You can modify the built-in functions or create your own, by adding a [custom fu
 
 ## Function metadata
 
-HyperFormula exposes metadata about the functions it knows (category, translated
-name, short description, and the parameter list). You can retrieve it with the
-`getAvailableFunctions()` and `getFunctionDetails()` methods, available both as
-static methods and as instance methods:
+HyperFormula exposes metadata about the functions it knows — localized and
+canonical names, category, a short description, and the parameter list — which is
+useful for building UI such as a function picker or a reference panel. Two
+methods return it, each available as a **static** method (covering the
+globally-registered built-ins and their aliases) and as an **instance** method
+(which additionally sees the instance's [custom functions](custom-functions.md)
+and defaults to its configured language):
+
+- [`getAvailableFunctions()`](../api/classes/hyperformula.md#getavailablefunctions)
+  — a short list with one entry per function.
+- [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails)
+  — the full details of a single function, including its parameters.
 
 ```js
-// a short list of available functions, with names translated for a language
+// static methods take the language code explicitly
 const functions = HyperFormula.getAvailableFunctions('enGB');
-
-// the full details of a single function
 const sumDetails = HyperFormula.getFunctionDetails('SUM', 'enGB');
-```
 
-`getAvailableFunctions()` returns entries sorted alphabetically by their
-localized name, each with `localizedName`, `canonicalName`, `category`, and
-`shortDescription`. `getFunctionDetails()` returns the same fields plus the
-ordered `parameters` list (each with `name`, `description`, and `optional`),
-`repeatLastArgs` — the number of trailing parameters that repeat for functions
-with a variable number of arguments — and `documentationUrl` and `examples`,
-which carry the function's documentation link and usage examples where authored
-(otherwise `''` and `[]`).
-
-The same methods are also available on an instance, where they use the
-instance's configured language by default:
-
-```js
+// instance methods use the instance's configured language
 const hf = HyperFormula.buildEmpty({ language: 'enGB' });
-
-// a short list of available functions
-const functions = hf.getAvailableFunctions();
-
-// the full details of a single function
-const sumDetails = hf.getFunctionDetails('SUM');
+const instanceFunctions = hf.getAvailableFunctions();
+const instanceSumDetails = hf.getFunctionDetails('SUM');
 ```
 
-Both built-in functions and their aliases are included. Custom (user-registered)
-functions are registered per instance, so they are listed by the **instance**
-methods, not by the static ones — the static methods only see the globally
-registered built-ins and their aliases. A custom function has no shipped
-catalogue entry, so its `category` is `undefined`, its `shortDescription` is
-empty, and its parameters are reported positionally (`Arg1`, `Arg2`, ...).
-
-```js
-const hf = HyperFormula.buildEmpty({
-  language: 'enGB',
-  functionPlugins: [MyCustomPlugin],
-});
-
-// the instance methods include the custom function
-const details = hf.getFunctionDetails('MY_FUNCTION'); // { canonicalName: 'MY_FUNCTION', category: undefined, ... }
-
-// the static methods do not, as custom functions are instance-scoped
-const staticDetails = HyperFormula.getFunctionDetails('MY_FUNCTION', 'enGB'); // undefined
-```
+See the linked API reference for each method's exact return shape and for how
+custom functions are reported.
 
 ## List of available functions
 

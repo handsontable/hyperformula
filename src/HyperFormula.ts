@@ -687,8 +687,9 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns the full metadata of a single function for a given language: the parameter list (with per-parameter
-   * optionality), the number of trailing parameters that repeat (`repeatLastArgs`), the category and a short
-   * description. Returns `undefined` when the function id is unknown or not registered.
+   * optionality), the number of trailing parameters that repeat (`repeatLastArgs`), the category, a short
+   * description, and the documentation link (`documentationUrl`) and usage examples (`examples`) where authored
+   * (otherwise `''` and `[]`). Returns `undefined` when the function id is unknown or not registered.
    *
    * The static method resolves the globally-registered built-in functions and their aliases. For custom
    * (user-registered) functions, use the instance method [[getFunctionDetails]].
@@ -4546,10 +4547,11 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the full metadata of a single function registered in this instance, with names translated according to
    * the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
-   * number of trailing parameters that repeat (`repeatLastArgs`), the category and a short description. Resolves both
-   * built-in and custom (user-registered) functions, as well as aliases. Returns `undefined` when the function id is
-   * unknown or not registered in this instance. For a custom function, `category` is `undefined`, `shortDescription`
-   * is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
+   * number of trailing parameters that repeat (`repeatLastArgs`), the category, a short description, and the
+   * documentation link (`documentationUrl`) and usage examples (`examples`) where authored (otherwise `''` and `[]`).
+   * Resolves both built-in and custom (user-registered) functions, as well as aliases. Returns `undefined` when the
+   * function id is unknown or not registered in this instance. For a custom function, `category` is `undefined`,
+   * `shortDescription` is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *
