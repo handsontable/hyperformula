@@ -35,7 +35,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
     category: 'Date and time',
     shortDescription: 'Parses a date string and returns it as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).<br>Accepts formats set by the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option.',
     parameters: [{name: 'Datestring', description: 'A text string representing a date, in one of the formats configured via `dateFormats`.'}],
-    examples: ['=DATEVALUE("30/03/2020")', '=DATEVALUE("2020-03-30")'],
+    examples: ['=DATEVALUE("30/03/2020")', '=DATEVALUE("31/12/2020")'],
   },
   DAY: {
     category: 'Date and time',

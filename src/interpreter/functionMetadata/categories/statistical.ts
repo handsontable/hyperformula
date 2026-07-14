@@ -431,7 +431,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns the maximum value in a list of arguments.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range compared against the current maximum; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=MAXA(1, TRUE(), "text")', '=MAXA(A1:A10)'],
+    examples: ['=MAXA(1, 2, TRUE())', '=MAXA(A1:A10)'],
   },
   MAXIFS: {
     category: 'Statistical',
@@ -459,7 +459,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns the minimum value in a list of arguments.',
     parameters: [{name: 'Value1', description: 'A value, cell reference, or range compared against the current minimum; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=MINA(1, TRUE(), "text")', '=MINA(A1:A10)'],
+    examples: ['=MINA(1, 2, FALSE())', '=MINA(A1:A10)'],
   },
   MINIFS: {
     category: 'Statistical',
