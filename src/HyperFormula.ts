@@ -711,8 +711,18 @@ export class HyperFormula implements TypedEmitter {
   public static getFunctionDetails(canonicalName: string, code: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
     validateArgToType(code, 'string', 'code')
+    const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
+    if (plugin === undefined) {
+      return undefined
+    }
+    // Resolve aliases to their canonical target id before checking built-in ownership
+    const canonicalId = plugin.aliases?.[canonicalName] ?? canonicalName
+    // The static method only describes built-in functions; custom plugins are excluded and available via the instance method
+    if (!FunctionRegistry.isBuiltinFunction(canonicalId, plugin)) {
+      return undefined
+    }
     const language = this.getLanguage(code)
-    return HyperFormula.buildFunctionDetailsFor(canonicalName, FunctionRegistry.getFunctionPlugin(canonicalName), language)
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, plugin, language)
   }
 
   /**
