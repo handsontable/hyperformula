@@ -90,6 +90,10 @@ A single pull request should contain an atomic self-contained functional change 
 - All changes to the production code must be covered by automatic tests kept in the `test/` directory.
 - Each test case must be very simple and focused on a single assertion. Don't use loops, conditionals, or other control flow statements in test cases.
 
+## Documentation
+
+- We try not to duplicate information in the documentation. The API reference (generated from JSDocs) should contain all the details about each function and class (it is the primary source of truth). Guides should provide high-level overview. They may duplicate some of the information from the API reference if they are relevant to the context but, above all, they should link to the API reference for the detailed information.
+
 ## How to add a new function
 
 Adding a built-in function is similar to adding a [custom function](docs/guide/custom-functions.md), so that guide is a useful reference for the function-implementation patterns (argument metadata, return types, array handling). The built-in flow on top of that is:
