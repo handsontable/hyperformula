@@ -28,7 +28,18 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+      - name: Checkout main repository
+        uses: actions/checkout@722adc63f1aa60a57ec37892e133b1d319cae598 # https://github.com/actions/checkout/releases/tag/v2.0.0
+
+      - name: Checkout hyperformula-tests repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          ssh-key: ${{ secrets.DEPLOY_TOKEN }}
+          repository: handsontable/hyperformula-tests
+          path: test/hyperformula-tests
+
+      - name: Fetch hyperformula-tests and sync branches
+        run: cd test && ./fetch-tests.sh
 
       - name: Install dependencies
         run: npm ci

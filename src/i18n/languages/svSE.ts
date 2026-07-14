@@ -251,6 +251,7 @@ const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'ARBETSDAGAR.INT',
     XLOOKUP: 'XLETAUPP',
     XNPV: 'XNUVÄRDE',
+    XIRR: 'XIRR',
     XOR: 'XOR',
     YEAR: 'ÅR',
     YEARFRAC: 'ÅRDEL',

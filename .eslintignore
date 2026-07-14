@@ -24,5 +24,6 @@ lib
 script
 test-jasmine
 test-jest
+test-utils/snippets
 typedoc
 typings
