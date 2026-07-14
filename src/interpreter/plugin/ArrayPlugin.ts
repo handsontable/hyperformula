@@ -42,7 +42,25 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         {argumentType: FunctionArgumentType.RANGE},
       ],
       repeatLastArgs: 1,
-    }
+    },
+    'VSTACK': {
+      method: 'vstack',
+      sizeOfResultArrayMethod: 'vstackArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+      repeatLastArgs: 1,
+    },
+    'HSTACK': {
+      method: 'hstack',
+      sizeOfResultArrayMethod: 'hstackArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+      ],
+      repeatLastArgs: 1,
+    },
   }
 
   public arrayformula(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
@@ -146,5 +164,134 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = Math.max(...(subChecks).map(val => val.width))
     const height = Math.max(...(subChecks).map(val => val.height))
     return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to VSTACK(array1, [array2], ...)
+   *
+   * Stacks the input arrays vertically, one on top of another, into a single array.
+   * The result has as many rows as the inputs combined and as many columns as the
+   * widest input. Cells of narrower inputs are padded on the right with the #N/A
+   * error, matching the behaviour of Excel and Google Sheets.
+   *
+   * @param ast
+   * @param state
+   */
+  public vstack(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('VSTACK'), (...ranges: SimpleRangeValue[]) => {
+      const width = Math.max(...ranges.map(range => range.width()))
+      const result: InternalScalarValue[][] = []
+
+      for (const range of ranges) {
+        for (const row of range.data) {
+          result.push(this.padRowToWidth(row, width))
+        }
+      }
+
+      return SimpleRangeValue.onlyValues(result)
+    })
+  }
+
+  /**
+   * Calculates the spilled array size of VSTACK: the width is the widest input
+   * and the height is the sum of all input heights.
+   *
+   * @param ast
+   * @param state
+   */
+  public vstackArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 1) {
+      return ArraySize.error()
+    }
+
+    const subChecks = this.stackSubChecks(ast, state, 'VSTACK')
+    const width = Math.max(...subChecks.map(size => size.width))
+    const height = subChecks.reduce((total, size) => total + size.height, 0)
+    return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to HSTACK(array1, [array2], ...)
+   *
+   * Stacks the input arrays horizontally, side by side, into a single array.
+   * The result has as many columns as the inputs combined and as many rows as the
+   * tallest input. Cells of shorter inputs are padded at the bottom with the #N/A
+   * error, matching the behaviour of Excel and Google Sheets.
+   *
+   * @param ast
+   * @param state
+   */
+  public hstack(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('HSTACK'), (...ranges: SimpleRangeValue[]) => {
+      const height = Math.max(...ranges.map(range => range.height()))
+      const result: InternalScalarValue[][] = [...Array(height).keys()].map(() => [])
+
+      for (const range of ranges) {
+        const data = range.data
+        const width = range.width()
+        for (let row = 0; row < height; row++) {
+          const sourceRow = row < data.length ? data[row] : undefined
+          for (let col = 0; col < width; col++) {
+            // Pad both missing rows (sourceRow === undefined) and short rows
+            // (col beyond the row's length) with #N/A, exactly as VSTACK does.
+            result[row].push(sourceRow !== undefined && col < sourceRow.length
+              ? sourceRow[col]
+              : new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
+          }
+        }
+      }
+
+      return SimpleRangeValue.onlyValues(result)
+    })
+  }
+
+  /**
+   * Calculates the spilled array size of HSTACK: the width is the sum of all
+   * input widths and the height is the tallest input.
+   *
+   * @param ast
+   * @param state
+   */
+  public hstackArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 1) {
+      return ArraySize.error()
+    }
+
+    const subChecks = this.stackSubChecks(ast, state, 'HSTACK')
+    const width = subChecks.reduce((total, size) => total + size.width, 0)
+    const height = Math.max(...subChecks.map(size => size.height))
+    return new ArraySize(width, height)
+  }
+
+  /**
+   * Resolves the array size of every argument of a stacking function, enabling
+   * array arithmetic for the arguments when the function's metadata requests it.
+   *
+   * @param ast
+   * @param state
+   * @param functionName - the stacking function whose metadata drives the array-arithmetic flag
+   */
+  private stackSubChecks(ast: ProcedureAst, state: InterpreterState, functionName: 'VSTACK' | 'HSTACK'): ArraySize[] {
+    const metadata = this.metadata(functionName)
+    return ast.args.map((arg) => this.arraySizeForAst(arg, new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false))))
+  }
+
+  /**
+   * Returns a copy of the given row resized to exactly `width` cells: longer
+   * rows are truncated and shorter rows are padded on the right with #N/A. Used
+   * by VSTACK to align every stacked row to the widest input.
+   *
+   * @param row - the source row to resize
+   * @param width - the target number of cells
+   */
+  private padRowToWidth(row: InternalScalarValue[], width: number): InternalScalarValue[] {
+    if (row.length >= width) {
+      return row.slice(0, width)
+    }
+    const padded = row.slice()
+    while (padded.length < width) {
+      padded.push(new CellError(ErrorType.NA, ErrorMessage.ValueNotFound))
+    }
+    return padded
   }
 }
