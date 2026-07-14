@@ -53,6 +53,63 @@ _Some categories such as compatibility and cube are yet to be supported._
 You can modify the built-in functions or create your own, by adding a [custom function](custom-functions.md).
 :::
 
+## Function metadata
+
+HyperFormula exposes metadata about the functions it knows (category, translated
+name, short description, and the parameter list). You can retrieve it with the
+`getAvailableFunctions()` and `getFunctionDetails()` methods, available both as
+static methods and as instance methods:
+
+```js
+// a short list of available functions, with names translated for a language
+const functions = HyperFormula.getAvailableFunctions('enGB');
+
+// the full details of a single function
+const sumDetails = HyperFormula.getFunctionDetails('SUM', 'enGB');
+```
+
+`getAvailableFunctions()` returns entries sorted alphabetically by their
+localized name, each with `localizedName`, `canonicalName`, `category`, and
+`shortDescription`. `getFunctionDetails()` returns the same fields plus the
+ordered `parameters` list (each with `name`, `description`, and `optional`),
+`repeatLastArgs` — the number of trailing parameters that repeat for functions
+with a variable number of arguments — and `documentationUrl` and `examples`,
+which carry the function's documentation link and usage examples where authored
+(otherwise `''` and `[]`).
+
+The same methods are also available on an instance, where they use the
+instance's configured language by default:
+
+```js
+const hf = HyperFormula.buildEmpty({ language: 'enGB' });
+
+// a short list of available functions
+const functions = hf.getAvailableFunctions();
+
+// the full details of a single function
+const sumDetails = hf.getFunctionDetails('SUM');
+```
+
+Both built-in functions and their aliases are included. Custom (user-registered)
+functions are registered per instance, so they are listed by the **instance**
+methods, not by the static ones — the static methods only see the globally
+registered built-ins and their aliases. A custom function has no shipped
+catalogue entry, so its `category` is `undefined`, its `shortDescription` is
+empty, and its parameters are reported positionally (`Arg1`, `Arg2`, ...).
+
+```js
+const hf = HyperFormula.buildEmpty({
+  language: 'enGB',
+  functionPlugins: [MyCustomPlugin],
+});
+
+// the instance methods include the custom function
+const details = hf.getFunctionDetails('MY_FUNCTION'); // { canonicalName: 'MY_FUNCTION', category: undefined, ... }
+
+// the static methods do not, as custom functions are instance-scoped
+const staticDetails = HyperFormula.getFunctionDetails('MY_FUNCTION', 'enGB'); // undefined
+```
+
 ## List of available functions
 
 Total number of functions: **{{ $page.functionsCount }}**

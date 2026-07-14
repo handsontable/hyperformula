@@ -150,4 +150,9 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns net present value.',
     parameters: [{name: 'Rate', description: ''}, {name: 'Payments', description: ''}, {name: 'Dates', description: ''}],
   },
+  XIRR: {
+    category: 'Financial',
+    shortDescription: 'Returns the internal rate of return for a schedule of cash flows that is not necessarily periodic.',
+    parameters: [{name: 'Values', description: ''}, {name: 'Dates', description: ''}, {name: 'Guess', description: ''}],
+  },
 }

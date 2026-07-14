@@ -30,4 +30,14 @@ export const ARRAY_MANIPULATION_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns an array of sequential numbers.',
     parameters: [{name: 'Rows', description: ''}, {name: 'Cols', description: ''}, {name: 'Start', description: ''}, {name: 'Step', description: ''}],
   },
+  VSTACK: {
+    category: 'Array manipulation',
+    shortDescription: 'Stacks arrays vertically into a single array.',
+    parameters: [{name: 'Array1', description: ''}],
+  },
+  HSTACK: {
+    category: 'Array manipulation',
+    shortDescription: 'Stacks arrays horizontally into a single array.',
+    parameters: [{name: 'Array1', description: ''}],
+  },
 }
