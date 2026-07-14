@@ -217,7 +217,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   INT: {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds a number down to the nearest integer.',
+    shortDescription: 'Returns the integer part of a number by discarding its fractional part.',
     parameters: [{name: 'number', description: 'The number to convert to an integer by dropping its fractional part (rounding toward zero, so INT(-8.9) is -8).'}],
     examples: ['=GCD(24, 36)', '=GCD(A1:A5)'],
   },
