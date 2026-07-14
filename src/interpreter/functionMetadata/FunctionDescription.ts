@@ -89,6 +89,7 @@ export interface FunctionDetails {
   category: FunctionCategory | undefined,
   /** One-liner description (English in the MVP). Empty (`''`) for custom functions. */
   shortDescription: string,
+  /** The function's parameters, in declaration order. */
   parameters: FunctionParameterDescription[],
   /**
    * How many of the trailing `parameters` repeat indefinitely (a function with a variable number of arguments).

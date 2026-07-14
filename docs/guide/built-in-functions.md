@@ -28,7 +28,7 @@ spreadsheet software. That is because a spreadsheet is probably the most
 universal software ever created. We wanted the same flexibility for HyperFormula
 but without the constraints of the spreadsheet UI.
 
-Each of HyperFormula's built-in function names is available in [17 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions) can be added.
+Each of HyperFormula's built-in function names is available in [17 languages](localizing-functions.md#list-of-supported-languages) and [custom language packs](localizing-functions.md) can be added.
 
 The latest version of HyperFormula has an extensive collection of
 **{{ $page.functionsCount }}** functions grouped into categories:
@@ -50,8 +50,37 @@ The latest version of HyperFormula has an extensive collection of
 _Some categories such as compatibility and cube are yet to be supported._
 
 ::: tip
-You can modify the built-in functions or create your own, by adding a [custom function](custom-functions).
+You can modify the built-in functions or create your own, by adding a [custom function](custom-functions.md).
 :::
+
+## Function metadata
+
+HyperFormula exposes metadata about the functions it knows — localized and
+canonical names, category, a short description, and the parameter list — which is
+useful for building UI such as a function picker or a reference panel. Two
+methods return it, each available as a **static** method (covering the
+globally-registered built-ins and their aliases) and as an **instance** method
+(which additionally sees the instance's [custom functions](custom-functions.md)
+and defaults to its configured language):
+
+- [`getAvailableFunctions()`](../api/classes/hyperformula.md#getavailablefunctions)
+  — a short list with one entry per function.
+- [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails)
+  — the full details of a single function, including its parameters.
+
+```js
+// static methods take the language code explicitly
+const functions = HyperFormula.getAvailableFunctions('enGB');
+const sumDetails = HyperFormula.getFunctionDetails('SUM', 'enGB');
+
+// instance methods use the instance's configured language
+const hf = HyperFormula.buildEmpty({ language: 'enGB' });
+const instanceFunctions = hf.getAvailableFunctions();
+const instanceSumDetails = hf.getFunctionDetails('SUM');
+```
+
+See the linked API reference for each method's exact return shape and for how
+custom functions are reported.
 
 ## List of available functions
 
@@ -65,6 +94,8 @@ Total number of functions: **{{ $page.functionsCount }}**
 | FILTER          | Filters an array, based on multiple conditions (boolean arrays). | FILTER(SourceArray, BoolArray1, BoolArray2, ...BoolArrayN) |
 | ARRAY_CONSTRAIN | Truncates an array to given dimensions.                          | ARRAY_CONSTRAIN(Array, Height, Width)                      |
 | SEQUENCE        | Returns an array of sequential numbers.                          | SEQUENCE(Rows, [Cols], [Start], [Step])                    |
+| VSTACK          | Stacks arrays vertically into a single array.                    | VSTACK(Array1, [Array2], ...[ArrayN])                      |
+| HSTACK          | Stacks arrays horizontally into a single array.                  | HSTACK(Array1, [Array2], ...[ArrayN])                      |
 
 ### Date and time
 
@@ -217,6 +248,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | TBILLEQ     | Returns the bond-equivalent yield for a Treasury bill.                                                                     | TBILLEQ(Settlement, Maturity, Discount)    |
 | TBILLPRICE  | Returns the price per $100 face value for a Treasury bill.                                                                 | TBILLPRICE(Settlement, Maturity, Discount) |
 | TBILLYIELD  | Returns the yield for a Treasury bill.                                                                                     | TBILLYIELD(Settlement, Maturity, Price)    |
+| XIRR        | Returns the internal rate of return for a schedule of cash flows that is not necessarily periodic.                         | XIRR(Values, Dates[, Guess])               |
 | XNPV        | Returns net present value.                                                                                                 | XNPV(Rate, Payments, Dates)                |
 
 ### Logical
@@ -531,7 +563,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | SPLIT       | Divides the provided text using the space character as a separator and returns the substring at the zero-based position specified by the second argument.<br>`SPLIT("Lorem ipsum", 0) -> "Lorem"`<br>`SPLIT("Lorem ipsum", 1) -> "ipsum"`                                                                                       | SPLIT(Text, Index)                                 |
 | SUBSTITUTE  | Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.                                                                                                                                                                                         | SUBSTITUTE(Text, Old_text, New_text, [Occurrence]) |
 | T           | Returns text if given value is text, empty string otherwise.                                                                                                                                                                                                                                                                    | T(Value)                                           |
-| TEXT        | Converts a number into text according to a given format.<br>By default, accepts the same formats that can be passed to the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option, but can be further customized with the [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) option. | TEXT(Number, Format)                               |
+| TEXT        | Converts a number into text according to a given format.<br>By default, accepts the same formats that can be passed to the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option, but can be further customized with the [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) and [`stringifyCurrency`](../api/interfaces/configparams.md#stringifycurrency) options. | TEXT(Number, Format)                               |
 | TEXTJOIN    | Joins text from multiple strings and/or ranges with a delimiter. Supports array/range delimiters that cycle through gaps. When ignore_empty is TRUE, empty strings are skipped. Returns #VALUE! if result exceeds 32,767 characters.                                                                                                 | TEXTJOIN(Delimiter, Ignore_empty, Text1, [Text2, ...]) |
 | TRIM        | Strips extra spaces from text.                                                                                                                                                                                                                                                                                                  | TRIM("Text")                                       |
 | UNICHAR     | Returns the character created by using provided code point.                                                                                                                                                                                                                                                                     | UNICHAR(Number)                                    |

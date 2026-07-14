@@ -162,11 +162,20 @@ export class FunctionRegistry {
   }
 
   /**
-   * Returns the ids of all registered, non-protected functions, including aliases. Used by the function-metadata
-   * API to list every function reachable in a formula (built-in canonical ids plus their aliases).
+   * Returns the ids of all registered, non-protected built-in functions, including aliases. Used by the static
+   * function-metadata API to list every built-in function reachable in a formula. Custom functions registered via
+   * registerFunctionPlugin are excluded; they appear only in the instance method variant.
    */
   public static getListableFunctionIds(): string[] {
-    return Array.from(this.plugins.keys())
+    const ids: string[] = []
+    for (const [functionId, plugin] of this.plugins.entries()) {
+      // Resolve aliases to their canonical target id before checking built-in ownership
+      const canonicalId = plugin.aliases?.[functionId] ?? functionId
+      if (this.isBuiltinFunction(canonicalId, plugin)) {
+        ids.push(functionId)
+      }
+    }
+    return ids
   }
 
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {

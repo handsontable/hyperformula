@@ -33,9 +33,47 @@ const DOC_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.md')
 const CATEGORIES_DIR = path.join(REPO_ROOT, 'src/interpreter/functionMetadata/categories')
 const INDEX_PATH = path.join(REPO_ROOT, 'src/interpreter/functionMetadata/index.ts')
 
-/** Parameter names the documentation under-specifies relative to the implementation arity. */
+/** Parameter names the documentation under-specifies relative to the implementation arity (already snake_case). */
 const PARAMETER_NAME_OVERRIDES: Record<string, string[]> = {
-  'T.TEST': ['Array1', 'Array2', 'Tails', 'Type'],
+  'T.TEST': ['array1', 'array2', 'tails', 'type'],
+}
+
+/**
+ * Word-segmentation fixes for parameter tokens the documentation writes as a single run-on word (e.g. `Sumrange`),
+ * so they read consistently with their multi-word siblings (`Sum_Range` -> `sum_range`). Keyed by the mechanically
+ * snake-cased token; the value is the corrected snake_case name.
+ */
+const SNAKE_CASE_SEGMENTATION: Record<string, string> = {
+  sumrange: 'sum_range',
+  searchcriterion: 'search_criterion',
+  logicalvalue: 'logical_value',
+  datestring: 'date_string',
+  timestring: 'time_string',
+  startdate: 'start_date',
+  minimumlength: 'minimum_length',
+  lowerbound: 'lower_bound',
+  upperbound: 'upper_bound',
+  numberx: 'number_x',
+  numbery: 'number_y',
+}
+
+/**
+ * Converts a raw parameter name to snake_case: lowercase words joined by underscores, with camelCase/PascalCase and
+ * acronym boundaries split, existing separators unified, and trailing digits kept attached to their word
+ * (`Number1`, `Number_1` -> `number1`). A small segmentation table then fixes run-on tokens the docs left unsplit.
+ *
+ * @param {string} name - the raw parameter name from the syntax column
+ */
+export function toSnakeCase(name: string): string {
+  const mechanical = name
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+    .replace(/[\s.\-]+/g, '_')
+    .toLowerCase()
+    .replace(/_+(\d)/g, '$1')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
+  return SNAKE_CASE_SEGMENTATION[mechanical] ?? mechanical
 }
 
 interface DocRow {
@@ -98,8 +136,9 @@ function uniquify(names: string[]): string[] {
 }
 
 /**
- * Produces exactly `arity` unique, non-empty parameter names. The syntax column lists `Name1, Name2, ...NameN`
- * for repeating groups, so the first `arity` names already collapse those groups onto the implementation arity.
+ * Produces exactly `arity` unique, non-empty snake_case parameter names. The syntax column lists
+ * `Name1, Name2, ...NameN` for repeating groups, so the first `arity` names already collapse those groups onto the
+ * implementation arity; each is normalized to snake_case and any shortfall is padded with `arg1`, `arg2`, ...
  */
 function deriveParameterNames(id: string, syntax: string, arity: number): string[] {
   const override = PARAMETER_NAME_OVERRIDES[id]
@@ -109,9 +148,9 @@ function deriveParameterNames(id: string, syntax: string, arity: number): string
     }
     return override
   }
-  const names = parseSyntaxNames(syntax).slice(0, arity)
+  const names = parseSyntaxNames(syntax).slice(0, arity).map(toSnakeCase)
   while (names.length < arity) {
-    names.push(`Arg${names.length + 1}`)
+    names.push(`arg${names.length + 1}`)
   }
   return uniquify(names)
 }
@@ -236,4 +275,7 @@ function main(): void {
   console.log(`wrote ${path.relative(REPO_ROOT, INDEX_PATH)}; ${total} functions across ${categories.length} categories`)
 }
 
-main()
+// Only regenerate when executed directly; guarded so helpers (e.g. `toSnakeCase`) can be imported without side effects.
+if (require.main === module) {
+  main()
+}

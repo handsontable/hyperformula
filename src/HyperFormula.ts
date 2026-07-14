@@ -687,8 +687,9 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Returns the full metadata of a single function for a given language: the parameter list (with per-parameter
-   * optionality), the number of trailing parameters that repeat (`repeatLastArgs`), the category and a short
-   * description. Returns `undefined` when the function id is unknown or not registered.
+   * optionality), the number of trailing parameters that repeat (`repeatLastArgs`), the category, a short
+   * description, and the documentation link (`documentationUrl`) and usage examples (`examples`) where authored
+   * (otherwise `''` and `[]`). Returns `undefined` when the function id is unknown or not registered.
    *
    * The static method resolves the globally-registered built-in functions and their aliases. For custom
    * (user-registered) functions, use the instance method [[getFunctionDetails]].
@@ -710,8 +711,18 @@ export class HyperFormula implements TypedEmitter {
   public static getFunctionDetails(canonicalName: string, code: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
     validateArgToType(code, 'string', 'code')
+    const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
+    if (plugin === undefined) {
+      return undefined
+    }
+    // Resolve aliases to their canonical target id before checking built-in ownership
+    const canonicalId = plugin.aliases?.[canonicalName] ?? canonicalName
+    // The static method only describes built-in functions; custom plugins are excluded and available via the instance method
+    if (!FunctionRegistry.isBuiltinFunction(canonicalId, plugin)) {
+      return undefined
+    }
     const language = this.getLanguage(code)
-    return HyperFormula.buildFunctionDetailsFor(canonicalName, FunctionRegistry.getFunctionPlugin(canonicalName), language)
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, plugin, language)
   }
 
   /**
@@ -749,14 +760,32 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Converts a HyperFormula language code (e.g. `'enGB'`, `'plPL'`) to a BCP-47 locale (e.g. `'en-GB'`, `'pl-PL'`)
    * so the function list collator is deterministic across hosts. Codes in the canonical `<ll><RR>` shape get a
-   * hyphen inserted; any other shape is passed through and left for `Intl.Collator` to interpret (it falls back to
-   * the default locale for an unrecognized tag, which is still applied consistently within a single call).
+   * hyphen inserted; any other shape is passed through unchanged. A structurally valid but unknown tag is accepted
+   * by `Intl.Collator`, but a structurally invalid tag (e.g. an underscore-style `'pt_BR'`) makes `Intl.Collator`
+   * throw a `RangeError`; that case is handled by [[createLocaleCollator]], not here.
    *
    * @param {string} languageCode - the HyperFormula language code
    */
   private static toBcp47Locale(languageCode: string): string {
     const match = /^([a-z]{2})([A-Z]{2})$/.exec(languageCode)
     return match !== null ? `${match[1]}-${match[2]}` : languageCode
+  }
+
+  /**
+   * Builds a collator for the given HyperFormula language code, using the BCP-47 form of the code so ordering is
+   * deterministic across hosts. `registerLanguage` does not constrain the shape of a language code, so a caller may
+   * register a structurally invalid one (e.g. an underscore-style `'pt_BR'`); such a tag makes `Intl.Collator`
+   * throw a `RangeError`, so we fall back to the environment default collator to keep the function list from
+   * crashing on a caller-registered, non-BCP-47 code.
+   *
+   * @param {string} languageCode - the HyperFormula language code
+   */
+  private static createLocaleCollator(languageCode: string): Intl.Collator {
+    try {
+      return new Intl.Collator(HyperFormula.toBcp47Locale(languageCode))
+    } catch (e) {
+      return new Intl.Collator()
+    }
   }
 
   /**
@@ -767,7 +796,7 @@ export class HyperFormula implements TypedEmitter {
    */
   private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage, languageCode: string): FunctionListEntry[] {
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
-    const collator = new Intl.Collator(HyperFormula.toBcp47Locale(languageCode))
+    const collator = HyperFormula.createLocaleCollator(languageCode)
     return functionIds
       .map(id => {
         const resolved = HyperFormula.resolveFunctionMetadata(id, getPlugin(id))
@@ -4546,10 +4575,11 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the full metadata of a single function registered in this instance, with names translated according to
    * the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
-   * number of trailing parameters that repeat (`repeatLastArgs`), the category and a short description. Resolves both
-   * built-in and custom (user-registered) functions, as well as aliases. Returns `undefined` when the function id is
-   * unknown or not registered in this instance. For a custom function, `category` is `undefined`, `shortDescription`
-   * is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
+   * number of trailing parameters that repeat (`repeatLastArgs`), the category, a short description, and the
+   * documentation link (`documentationUrl`) and usage examples (`examples`) where authored (otherwise `''` and `[]`).
+   * Resolves both built-in and custom (user-registered) functions, as well as aliases. Returns `undefined` when the
+   * function id is unknown or not registered in this instance. For a custom function, `category` is `undefined`,
+   * `shortDescription` is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *
