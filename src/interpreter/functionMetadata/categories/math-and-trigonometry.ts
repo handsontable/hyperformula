@@ -398,7 +398,6 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     shortDescription: 'Sums up the values of the specified cells.',
     parameters: [{name: 'number1', description: 'A number, cell reference, or range whose values are added together. Further numbers or ranges can be passed as additional arguments.'}],
-    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions',
     examples: ['=SUM(1, 2, 3)', '=SUM(A1:A10)', '=SUM(B1:B5, 100)'],
   },
   SUMIF: {
