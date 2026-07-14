@@ -760,14 +760,32 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Converts a HyperFormula language code (e.g. `'enGB'`, `'plPL'`) to a BCP-47 locale (e.g. `'en-GB'`, `'pl-PL'`)
    * so the function list collator is deterministic across hosts. Codes in the canonical `<ll><RR>` shape get a
-   * hyphen inserted; any other shape is passed through and left for `Intl.Collator` to interpret (it falls back to
-   * the default locale for an unrecognized tag, which is still applied consistently within a single call).
+   * hyphen inserted; any other shape is passed through unchanged. A structurally valid but unknown tag is accepted
+   * by `Intl.Collator`, but a structurally invalid tag (e.g. an underscore-style `'pt_BR'`) makes `Intl.Collator`
+   * throw a `RangeError`; that case is handled by [[createLocaleCollator]], not here.
    *
    * @param {string} languageCode - the HyperFormula language code
    */
   private static toBcp47Locale(languageCode: string): string {
     const match = /^([a-z]{2})([A-Z]{2})$/.exec(languageCode)
     return match !== null ? `${match[1]}-${match[2]}` : languageCode
+  }
+
+  /**
+   * Builds a collator for the given HyperFormula language code, using the BCP-47 form of the code so ordering is
+   * deterministic across hosts. `registerLanguage` does not constrain the shape of a language code, so a caller may
+   * register a structurally invalid one (e.g. an underscore-style `'pt_BR'`); such a tag makes `Intl.Collator`
+   * throw a `RangeError`, so we fall back to the environment default collator to keep the function list from
+   * crashing on a caller-registered, non-BCP-47 code.
+   *
+   * @param {string} languageCode - the HyperFormula language code
+   */
+  private static createLocaleCollator(languageCode: string): Intl.Collator {
+    try {
+      return new Intl.Collator(HyperFormula.toBcp47Locale(languageCode))
+    } catch (e) {
+      return new Intl.Collator()
+    }
   }
 
   /**
@@ -778,7 +796,7 @@ export class HyperFormula implements TypedEmitter {
    */
   private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage, languageCode: string): FunctionListEntry[] {
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
-    const collator = new Intl.Collator(HyperFormula.toBcp47Locale(languageCode))
+    const collator = HyperFormula.createLocaleCollator(languageCode)
     return functionIds
       .map(id => {
         const resolved = HyperFormula.resolveFunctionMetadata(id, getPlugin(id))
