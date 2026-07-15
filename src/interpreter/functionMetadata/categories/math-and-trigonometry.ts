@@ -219,7 +219,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     shortDescription: 'Returns the integer part of a number by discarding its fractional part.',
     parameters: [{name: 'number', description: 'The number to convert to an integer by dropping its fractional part (rounding toward zero, so INT(-8.9) is -8).'}],
-    examples: ['=GCD(24, 36)', '=GCD(A1:A5)'],
+    examples: ['=INT(8.9)', '=INT(-8.9)'],
   },
   LCM: {
     category: 'Math and trigonometry',
