@@ -8,6 +8,7 @@ Canonical reference for everyone working on the HyperFormula source code: mainta
 - **[Test suite](test/README.md)** &mdash; smoke tests and how to attach the private test suite
 - **[Public docs portal](https://hyperformula.handsontable.com/docs)** &mdash; main documentation
 - **[Docs README](docs/README.md)** &mdash; how to run the docs portal locally
+- **[Docs content guide](DOCS_CONTENT_GUIDE.md)** &mdash; how to create and edit docs content
 - **[Changelog](CHANGELOG.md)**
 - **[Pull request template](.github/pull_request_template.md)**
 
@@ -92,7 +93,7 @@ A single pull request should contain an atomic self-contained functional change 
 
 ## Documentation
 
-- Avoid long text with no subsections — make them more granular, use H2s and H3s.
+- Follow the [documentation content guide](DOCS_CONTENT_GUIDE.md) when creating or editing docs (writing style, language, and how to structure guides).
 
 ## How to add a new function
 
