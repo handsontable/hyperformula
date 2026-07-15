@@ -151,11 +151,13 @@ You can change the order of rows by using the [`setRowOrder`](../api/classes/hyp
 * Sheet ID
 * [New row order](../api/classes/hyperformula.md#setroworder)
 
+The new row order is a permutation of the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`. The value at index `i` is the new position for the row that is currently at index `i`. See the [Sorting data](sorting-data.md) guide for details.
+
 This method returns [an array of changed cells](#changes-array).
 
 ```javascript
-// row 0 and row 2 swap places
-const changes = hfInstance.setRowOrder(0, [2, 1, 0]);
+// move row 0 to position 1, row 1 to position 2, and row 2 to position 0
+const changes = hfInstance.setRowOrder(0, [1, 2, 0]);
 ```
 
 ## Columns
@@ -212,11 +214,13 @@ You can change the order of columns by using the [`setColumnOrder`](../api/class
 * Sheet ID
 * [New column order](../api/classes/hyperformula.md#setcolumnorder)
 
+The new column order is a permutation of the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`. The value at index `i` is the new position for the column that is currently at index `i`. See the [Sorting data](sorting-data.md) guide for details.
+
 This method returns [an array of changed cells](#changes-array).
 
 ```javascript
-// column 0 and column 2 swap places
-const changes = hfInstance.setColumnOrder(0, [2, 1, 0]);
+// move column 0 to position 1, column 1 to position 2, and column 2 to position 0
+const changes = hfInstance.setColumnOrder(0, [1, 2, 0]);
 ```
 
 ## Cells
