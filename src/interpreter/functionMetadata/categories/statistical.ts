@@ -63,7 +63,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     shortDescription: 'Returns the density of Beta distribution.',
     parameters: [{name: 'number1', description: 'The value at which to evaluate the distribution, within the interval bounded by Number4 and Number5.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta shape parameter of the distribution; must be greater than 0.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}, {name: 'number4', description: 'The lower bound of the interval of Number1; defaults to 0 when omitted.'}, {name: 'number5', description: 'The upper bound of the interval of Number1; defaults to 1 when omitted.'}],
-    examples: ['=BETA.DIST(0.5, 2, 3, TRUE())', '=BETA.DIST(2, 2, 3, FALSE(), 0, 4)'],
+    examples: ['=BETA.DIST(0.5, 2, 3, TRUE())', '=BETA.DIST(2, 2, 3, TRUE(), 0, 4)'],
   },
   'BETA.INV': {
     category: 'Statistical',

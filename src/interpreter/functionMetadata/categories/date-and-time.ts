@@ -14,7 +14,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   DATE: {
     category: 'Date and time',
     shortDescription: 'Returns the specified date as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).',
-    parameters: [{name: 'year', description: 'The year of the date; values below HyperFormula\'s epoch year (derived from `nullDate`) are added to that epoch year.'}, {name: 'month', description: 'The month of the date. Values outside 1-12 roll over into adjacent years.'}, {name: 'day', description: 'The day of the month. Values outside the month\'s range roll over into adjacent months.'}],
+    parameters: [{name: 'year', description: 'The year of the date; values below HyperFormula\'s epoch year (derived from nullDate) are added to that epoch year.'}, {name: 'month', description: 'The month of the date. Values outside 1-12 roll over into adjacent years.'}, {name: 'day', description: 'The day of the month. Values outside the month\'s range roll over into adjacent months.'}],
     examples: ['=DATE(2020, 1, 15)', '=DATE(2020, 13, 1)'],
   },
   DATEDIF: {
@@ -26,13 +26,13 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   DATEVALUE: {
     category: 'Date and time',
     shortDescription: 'Parses a date string and returns it as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).<br>Accepts formats set by the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option.',
-    parameters: [{name: 'date_string', description: 'A text string representing a date, in one of the formats configured via `dateFormats`.'}],
+    parameters: [{name: 'date_string', description: 'A text string representing a date, in one of the formats configured via dateFormats.'}],
     examples: ['=DATEVALUE("30/03/2020")', '=DATEVALUE("31/12/2020")'],
   },
   DAY: {
     category: 'Date and time',
     shortDescription: 'Returns the day of the given date value.',
-    parameters: [{name: 'number', description: 'A date value (serial number of days since `nullDate`) whose day-of-month is returned.'}],
+    parameters: [{name: 'number', description: 'A date value (serial number of days since nullDate) whose day-of-month is returned.'}],
     examples: ['=DAY(DATE(2020, 3, 30))', '=DAY(A1)'],
   },
   DAYS: {
@@ -86,7 +86,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   MONTH: {
     category: 'Date and time',
     shortDescription: 'Returns the month for the given date value.',
-    parameters: [{name: 'number', description: 'A date value (serial number of days since `nullDate`) whose month is returned.'}],
+    parameters: [{name: 'number', description: 'A date value (serial number of days since nullDate) whose month is returned.'}],
     examples: ['=MONTH(DATE(2020, 3, 30))', '=MONTH(A1)'],
   },
   NETWORKDAYS: {
@@ -122,7 +122,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   TIMEVALUE: {
     category: 'Date and time',
     shortDescription: 'Parses a time string and returns a number that represents it as a fraction of a full day.<br>Accepts formats set by the [`timeFormats`](../api/interfaces/configparams.md#timeformats) option.',
-    parameters: [{name: 'time_string', description: 'A text string representing a time, in one of the formats configured via `timeFormats`.'}],
+    parameters: [{name: 'time_string', description: 'A text string representing a time, in one of the formats configured via timeFormats.'}],
     examples: ['=TIMEVALUE("14:30:00")', '=TIMEVALUE(A1)'],
   },
   TODAY: {
@@ -158,7 +158,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   YEAR: {
     category: 'Date and time',
     shortDescription: 'Returns the year as a number according to the internal calculation rules.',
-    parameters: [{name: 'number', description: 'A date value (serial number of days since `nullDate`) whose year is returned.'}],
+    parameters: [{name: 'number', description: 'A date value (serial number of days since nullDate) whose year is returned.'}],
     examples: ['=YEAR(DATE(2020, 3, 30))', '=YEAR(A1)'],
   },
   YEARFRAC: {
