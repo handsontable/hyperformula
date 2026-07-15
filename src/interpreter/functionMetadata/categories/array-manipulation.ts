@@ -32,7 +32,7 @@ export const ARRAY_MANIPULATION_DOCS: Record<string, FunctionDoc> = {
   SEQUENCE: {
     category: 'Array manipulation',
     shortDescription: 'Returns an array of sequential numbers.',
-    parameters: [{name: 'rows', description: 'The number of rows in the returned array. Must be a literal number; a dynamic value such as a cell reference or formula causes a #VALUE! error, since the array size cannot be determined at parse time.'}, {name: 'cols', description: 'The number of columns in the returned array. Defaults to 1 when omitted; like rows, it must be a literal number.'}, {name: 'start', description: 'The first value of the sequence. Defaults to 1 when omitted.'}, {name: 'step', description: 'The increment between consecutive values, filled row by row. Defaults to 1 when omitted.'}],
+    parameters: [{name: 'rows', description: 'The number of rows in the returned array. The size must be resolvable at parse time, so use a literal (e.g. 3); a cell reference or formula yields a #VALUE! error whenever the result would span more than one cell, since the array size cannot be determined at parse time.'}, {name: 'cols', description: 'The number of columns in the returned array. Defaults to 1 when omitted; like rows, it must be resolvable at parse time.'}, {name: 'start', description: 'The first value of the sequence. Defaults to 1 when omitted.'}, {name: 'step', description: 'The increment between consecutive values, filled row by row. Defaults to 1 when omitted.'}],
     examples: ['=SEQUENCE(4)', '=SEQUENCE(3, 2)', '=SEQUENCE(3, 1, 10, 5)'],
   },
   VSTACK: {

@@ -260,13 +260,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   GEOMEAN: {
     category: 'Statistical',
     shortDescription: 'Returns the geometric average.',
-    parameters: [{name: 'number1', description: 'A number, cell reference, or range whose positive values are averaged geometrically. Further numbers or ranges can be passed as additional arguments.'}],
+    parameters: [{name: 'number1', description: 'A number, cell reference, or range to average geometrically; all values must be positive, otherwise the result is #NUM!. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=GEOMEAN(1, 2, 3)', '=GEOMEAN(A1:A10)'],
   },
   HARMEAN: {
     category: 'Statistical',
     shortDescription: 'Returns the harmonic average.',
-    parameters: [{name: 'number1', description: 'A number, cell reference, or range whose positive values are averaged harmonically. Further numbers or ranges can be passed as additional arguments.'}],
+    parameters: [{name: 'number1', description: 'A number, cell reference, or range to average harmonically; all values must be positive, otherwise the result is #NUM!. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=HARMEAN(1, 2, 4)', '=HARMEAN(A1:A10)'],
   },
   'HYPGEOM.DIST': {
@@ -386,7 +386,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'POISSON.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of Poisson distribution.',
-    parameters: [{name: 'x', description: 'The number of events; must be non-negative.'}, {name: 'mean', description: 'The expected number of events; must be greater than 0.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
+    parameters: [{name: 'x', description: 'The number of events; must be non-negative.'}, {name: 'mean', description: 'The expected number of events; must be non-negative.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
     examples: ['=POISSON.DIST(3, 5, FALSE())', '=POISSON.DIST(3, 5, TRUE())'],
   },
   'QUARTILE.EXC': {
