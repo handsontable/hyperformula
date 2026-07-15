@@ -223,7 +223,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   FISHERINV: {
     category: 'Statistical',
-    shortDescription: 'Returns inverse Fischer transformation value.',
+    shortDescription: 'Returns inverse Fisher transformation value.',
     parameters: [{name: 'number', description: 'The value of the Fisher transformation to invert.'}],
     examples: ['=FISHERINV(0.5)'],
   },
@@ -379,7 +379,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   PHI: {
     category: 'Statistical',
-    shortDescription: 'Returns probability densitity of normal distribution.',
+    shortDescription: 'Returns probability density of normal distribution.',
     parameters: [{name: 'x', description: 'The value at which to evaluate the standard normal probability density function.'}],
     examples: ['=PHI(1)'],
   },
@@ -409,13 +409,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   SKEW: {
     category: 'Statistical',
-    shortDescription: 'Returns skeweness of a sample.',
+    shortDescription: 'Returns skewness of a sample.',
     parameters: [{name: 'number1', description: 'A number, cell reference, or range included in the sample skewness calculation. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=SKEW(1, 2, 3, 10)', '=SKEW(A1:A10)'],
   },
   'SKEW.P': {
     category: 'Statistical',
-    shortDescription: 'Returns skeweness of a population.',
+    shortDescription: 'Returns skewness of a population.',
     parameters: [{name: 'number1', description: 'A number, cell reference, or range included in the population skewness calculation. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=SKEW.P(1, 2, 3, 10)', '=SKEW.P(A1:A10)'],
   },

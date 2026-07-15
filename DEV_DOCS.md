@@ -73,7 +73,7 @@ Each change to the production code (bugfix, new feature, or improvement) must in
 - Updates to documentation related to the change
   - for breaking changes: a section in the migration guide
 - Technical documentation in the form of JSDoc comments (high-level description of the concepts used in more complex code fragments)
-- Changelog entry
+- Changelog entry (not required for documentation-only changes (guides, JSDoc, README, etc.)
 - Pull request description
 
 A single pull request should contain an atomic self-contained functional change (single bugfix, single feature, single improvement). If a pull request contains multiple features or bugfixes, it should be split.

@@ -79,7 +79,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   BASE: {
     category: 'Math and trigonometry',
-    shortDescription: 'Converts a positive integer to a specified base into a text from the numbering system.',
+    shortDescription: 'Converts a non-negative integer to a specified base into a text from the numbering system.',
     parameters: [{name: 'number', description: 'The non-negative integer to convert.'}, {name: 'radix', description: 'The base (from 2 to 36) to convert the number into.'}, {name: 'minimum_length', description: 'The minimum length of the returned string; the result is left-padded with zeros when shorter.'}],
     examples: ['=BASE(15, 2)', '=BASE(100, 16, 4)'],
   },
@@ -253,7 +253,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   MROUND: {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds number to the neares multiplicity.',
+    shortDescription: 'Rounds a number to the nearest multiple.',
     parameters: [{name: 'number', description: 'The value to round.'}, {name: 'base', description: 'The multiple to round Number to; must have the same sign as Number.'}],
     examples: ['=MROUND(10, 3)', '=MROUND(-10, -3)'],
   },
@@ -343,7 +343,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   SECH: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the hyperbolic secant of the given angle (in radians).',
+    shortDescription: 'Returns the hyperbolic secant of the given value.',
     parameters: [{name: 'number', description: 'A number whose hyperbolic secant is returned.'}],
     examples: ['=SECH(0)', '=SECH(1)'],
   },

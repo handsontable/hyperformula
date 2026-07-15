@@ -85,7 +85,7 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
   },
   MIRR: {
     category: 'Financial',
-    shortDescription: 'Returns modified internal value for cashflows.',
+    shortDescription: 'Returns the modified internal rate of return for a series of cash flows.',
     parameters: [{name: 'flows', description: 'A range of cash flow values; must contain at least one negative and one positive value.'}, {name: 'f_rate', description: 'The finance rate paid on the money used in the negative cash flows.'}, {name: 'r_rate', description: 'The reinvestment rate received on the positive cash flows.'}],
     examples: ['=MIRR(A1:A5, 0.08, 0.1)', '=MIRR(B2:B6, 0.06, 0.12)'],
   },
@@ -175,7 +175,7 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
   },
   XNPV: {
     category: 'Financial',
-    shortDescription: 'Returns net present value.',
+    shortDescription: 'Returns the net present value for a schedule of cash flows that is not necessarily periodic.',
     parameters: [{name: 'rate', description: 'The discount rate applied to the cash flows.'}, {name: 'payments', description: 'A range of cash flow values; paid-out amounts are negative, received amounts are positive.'}, {name: 'dates', description: 'A range of dates, one per payment, that must be the same length as Payments; the first date is the reference point, and every other date must fall on or after it.'}],
     examples: ['=XNPV(0.09, A1:A4, B1:B4)', '=XNPV(0.1, C2:C6, D2:D6)'],
   },
