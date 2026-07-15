@@ -7,7 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Math and trigonometry" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
+ * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
  */
 export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   ABS: {
@@ -326,9 +326,9 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'function', description: ''}, {name: 'number1', description: ''}],
   },
   // HAND-AUTHORED reference functions (HF-249): SUM and SUMIF carry real parameter descriptions, examples and a
-  // documentationUrl so the Formula Builder team can test rendering of populated metadata. The migration generator
-  // (scripts/hf249-migrate-function-docs.ts) does NOT emit `examples`/`documentationUrl`, so DO NOT re-run it over
-  // this file without merge-preserving these two entries, or they will be silently reset to empty.
+  // documentationUrl so the Formula Builder team can test rendering of populated metadata. They are the only
+  // entries with `examples`/`documentationUrl` populated, so preserve them if this catalogue is ever re-seeded in
+  // bulk from the guide, or they will be silently reset to empty.
   SUM: {
     category: 'Math and trigonometry',
     shortDescription: 'Sums up the values of the specified cells.',

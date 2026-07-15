@@ -7,7 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Statistical" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
+ * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
  */
 export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   AVEDEV: {

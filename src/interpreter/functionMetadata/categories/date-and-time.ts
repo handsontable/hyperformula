@@ -7,7 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Date and time" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`; parameter descriptions are authored in a later phase.
+ * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
  */
 export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   DATE: {

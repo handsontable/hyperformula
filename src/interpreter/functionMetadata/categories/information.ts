@@ -7,7 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Information" category. Most entries were migrated from `docs/guide/built-in-functions.md`
- * by `scripts/hf249-migrate-function-docs.ts`; some (e.g. the protected `VERSION` function) are hand-authored.
+ * by a one-time migration script (since removed); some (e.g. the protected `VERSION` function) are hand-authored.
  * Parameter descriptions are authored in a later phase.
  */
 export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
