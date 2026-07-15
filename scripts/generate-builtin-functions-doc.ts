@@ -6,8 +6,8 @@
 /**
  * HF-249 bullet 3 — generates the built-in functions table in `docs/guide/built-in-functions.md` from
  * HyperFormula's public API (single source of truth). Dev-only; never shipped (`tsconfig.json` `include` is
- * `["src"]`). Run: `npm run tsnode scripts/generate-builtin-functions-doc.ts` (writes the file) or
- * `... --check` (CI: regenerate in memory, fail on drift / membership mismatch, write nothing).
+ * `["src"]`). Run via `npm run docs:generate-functions`; it also runs as the first step of `docs:build` and
+ * `docs:dev`, so the committed table is regenerated on every build and cannot drift from the catalogue.
  */
 
 import * as fs from 'fs'
@@ -28,32 +28,9 @@ function buildUpdatedFile(): string {
   return spliceFunctionsTable(current, generated)
 }
 
-/** Writes the regenerated file (default) or exits non-zero if the file is out of date (`--check`). */
+/** Regenerates the table region of the doc file from the current catalogue. */
 function main(): void {
-  const check = process.argv.includes('--check')
-  const updated = buildUpdatedFile()
-  const current = fs.readFileSync(DOC_PATH, 'utf8')
-  if (check) {
-    // Function IDs live in the per-function anchors (`<a id="SUM"></a>`).
-    const idsIn = (text: string) => new Set(
-      [...text.matchAll(/<a id="([^"]+)"><\/a>/g)].map(match => match[1])
-    )
-    const generatedIds = idsIn(updated)
-    const currentIds = idsIn(current)
-    const dropped = [...currentIds].filter(id => !generatedIds.has(id))
-    const added = [...generatedIds].filter(id => !currentIds.has(id))
-    if (dropped.length > 0 || added.length > 0) {
-      process.stderr.write(`Function set changed. dropped=[${dropped.join(', ')}] added=[${added.join(', ')}]\n`)
-      process.exit(1)
-    }
-    if (updated !== current) {
-      process.stderr.write('built-in-functions.md is out of date. Run `npm run docs:generate-functions`.\n')
-      process.exit(1)
-    }
-    process.stdout.write('built-in-functions.md is up to date.\n')
-    return
-  }
-  fs.writeFileSync(DOC_PATH, updated, 'utf8')
+  fs.writeFileSync(DOC_PATH, buildUpdatedFile(), 'utf8')
   process.stdout.write('built-in-functions.md regenerated.\n')
 }
 
