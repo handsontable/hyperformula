@@ -19,6 +19,8 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    VSTACK: 'VSTACK',
+    HSTACK: 'HSTACK',
     ADDRESS: 'ADRESSE',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
@@ -251,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'SERIE.JOUR.OUVRE.INTL',
     XLOOKUP: 'RECHERCHEX',
     XNPV: 'VAN.PAIEMENTS',
+    XIRR: 'TRI.PAIEMENTS',
     XOR: 'OUX',
     YEAR: 'ANNEE',
     YEARFRAC: 'FRACTION.ANNEE',
