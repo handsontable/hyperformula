@@ -22,6 +22,24 @@ export function isParameterOptional(arg: FunctionArgument | undefined): boolean 
 }
 
 /**
+ * Strips the presentational markdown that the docs table renders (line breaks, links, footnote references) from a
+ * short description, so the metadata API (`getFunctionDetails`) returns plain prose rather than doc markup. A
+ * `<br>` becomes a space; a `[label](url)` link keeps only its `label`; a `[^ref]` footnote marker is dropped. The
+ * rendered built-in-functions table keeps the raw catalogue text (via the list entry), so doc links stay clickable
+ * there; only the details API is normalized.
+ *
+ * @param {string} shortDescription - the raw catalogue short description (may contain doc markdown)
+ */
+export function stripDocMarkup(shortDescription: string): string {
+  return shortDescription
+    .replace(/\[\^[^\]]+\]/g, '')            // drop footnote references, e.g. [^1]
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // markdown links -> their visible label
+    .replace(/<br\s*\/?>/gi, ' ')            // <br>, <br/>, <br /> -> space
+    .replace(/\s+/g, ' ')                    // collapse the whitespace the substitutions introduce
+    .trim()
+}
+
+/**
  * Resolves the display name for a function: the translated name, or the canonical id when there is no usable
  * translation. Some bundled language packs leave a function untranslated as an empty string (e.g. `SWITCH` in
  * several locales), so an empty translation falls back to the canonical id just like a missing one.
@@ -77,7 +95,9 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
     category: doc.category,
-    shortDescription: doc.shortDescription,
+    // Tier-2 details are the plain-text API: strip the doc markdown the guide table renders (the list entry keeps
+    // it raw so the table's links stay clickable).
+    shortDescription: stripDocMarkup(doc.shortDescription),
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
     documentationUrl: doc.documentationUrl ?? '',
