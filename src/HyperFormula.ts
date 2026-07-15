@@ -714,7 +714,16 @@ export class HyperFormula implements TypedEmitter {
     validateArgToType(code, 'string', 'code')
     const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
     if (plugin === undefined) {
-      return undefined
+      // Protected ids (VERSION, OFFSET) have no registered plugin by design (`getFunctionPlugin` always returns
+      // `undefined` for them), but the metadata API still describes them — resolved from the authored catalogue
+      // doc, so getFunctionDetails agrees with getAvailableFunctions. Anything else with no plugin is genuinely
+      // unknown. `buildFunctionDetailsFor` returns `undefined` for a protected id without a catalogue doc, so the
+      // list and the details stay consistent for those too.
+      if (!FunctionRegistry.functionIsProtected(canonicalName)) {
+        return undefined
+      }
+      const language = this.getLanguage(code)
+      return HyperFormula.buildFunctionDetailsFor(canonicalName, undefined, language)
     }
     // Resolve aliases to their canonical target id before checking built-in ownership
     const canonicalId = plugin.aliases?.[canonicalName] ?? canonicalName
