@@ -11,7 +11,7 @@ import {FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescri
  * catalogue in v1 — no per-function anchors. Custom (user-registered) functions are not documented here and
  * keep an empty string.
  */
-export const DEFAULT_DOCUMENTATION_URL = 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html'
+export {DEFAULT_DOCUMENTATION_URL} from './FunctionDescription'
 
 /** Resolves a function's display name: the translation for the active language, or the canonical id as fallback. */
 type TranslateName = (canonicalName: string) => string | undefined
@@ -88,7 +88,7 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     shortDescription: doc.shortDescription,
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
-    documentationUrl: doc.documentationUrl ?? DEFAULT_DOCUMENTATION_URL,
+    documentationUrl: doc.documentationUrl,
     examples: doc.examples ?? [],
   }
 }
