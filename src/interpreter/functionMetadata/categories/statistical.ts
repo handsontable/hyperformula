@@ -187,7 +187,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   FISHERINV: {
     category: 'Statistical',
-    shortDescription: 'Returns inverse Fischer transformation value.',
+    shortDescription: 'Returns inverse Fisher transformation value.',
     parameters: [{name: 'number', description: ''}],
   },
   GAMMA: {
@@ -317,7 +317,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   PHI: {
     category: 'Statistical',
-    shortDescription: 'Returns probability densitity of normal distribution.',
+    shortDescription: 'Returns probability density of normal distribution.',
     parameters: [{name: 'x', description: ''}],
   },
   'POISSON.DIST': {
@@ -342,12 +342,12 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   SKEW: {
     category: 'Statistical',
-    shortDescription: 'Returns skeweness of a sample.',
+    shortDescription: 'Returns skewness of a sample.',
     parameters: [{name: 'number1', description: ''}],
   },
   'SKEW.P': {
     category: 'Statistical',
-    shortDescription: 'Returns skeweness of a population.',
+    shortDescription: 'Returns skewness of a population.',
     parameters: [{name: 'number1', description: ''}],
   },
   SLOPE: {

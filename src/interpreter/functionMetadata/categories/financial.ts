@@ -72,7 +72,7 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
   },
   MIRR: {
     category: 'Financial',
-    shortDescription: 'Returns modified internal value for cashflows.',
+    shortDescription: 'Returns the modified internal rate of return for a series of cash flows.',
     parameters: [{name: 'flows', description: ''}, {name: 'f_rate', description: ''}, {name: 'r_rate', description: ''}],
   },
   NOMINAL: {
@@ -147,7 +147,7 @@ export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
   },
   XNPV: {
     category: 'Financial',
-    shortDescription: 'Returns net present value.',
+    shortDescription: 'Returns the net present value for a schedule of cash flows that is not necessarily periodic.',
     parameters: [{name: 'rate', description: ''}, {name: 'payments', description: ''}, {name: 'dates', description: ''}],
   },
   XIRR: {

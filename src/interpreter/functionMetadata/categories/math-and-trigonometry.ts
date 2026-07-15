@@ -67,7 +67,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   BASE: {
     category: 'Math and trigonometry',
-    shortDescription: 'Converts a positive integer to a specified base into a text from the numbering system.',
+    shortDescription: 'Converts a non-negative integer to a specified base into a text from the numbering system.',
     parameters: [{name: 'number', description: ''}, {name: 'radix', description: ''}, {name: 'minimum_length', description: ''}],
   },
   CEILING: {
@@ -212,7 +212,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   MROUND: {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds number to the neares multiplicity.',
+    shortDescription: 'Rounds a number to the nearest multiple.',
     parameters: [{name: 'number', description: ''}, {name: 'base', description: ''}],
   },
   MULTINOMIAL: {
@@ -287,7 +287,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   SECH: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the hyperbolic secant of the given angle (in radians).',
+    shortDescription: 'Returns the hyperbolic secant of the given value.',
     parameters: [{name: 'number', description: ''}],
   },
   SERIESSUM: {

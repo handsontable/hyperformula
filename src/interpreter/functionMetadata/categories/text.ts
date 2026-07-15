@@ -92,7 +92,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   SPLIT: {
     category: 'Text',
-    shortDescription: 'Divides the provided text using the space character as a separator and returns the substring at the zero-based position specified by the second argument.<br>`SPLIT("Lorem ipsum", 0) -> "Lorem"`<br>`SPLIT("Lorem ipsum", 1) -> "ipsum"`',
+    shortDescription: 'Divides the provided text using the space character as a separator and returns the substring at the zero-based position specified by the second argument. For example, SPLIT("Lorem ipsum", 0) returns "Lorem" and SPLIT("Lorem ipsum", 1) returns "ipsum".',
     parameters: [{name: 'text', description: ''}, {name: 'index', description: ''}],
   },
   SUBSTITUTE: {
@@ -107,7 +107,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   TEXT: {
     category: 'Text',
-    shortDescription: 'Converts a number into text according to a given format.<br>By default, accepts the same formats that can be passed to the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option, but can be further customized with the [`stringifyDateTime`](../api/interfaces/configparams.md#stringifydatetime) option.',
+    shortDescription: 'Converts a number into text according to a given format. By default it accepts the same formats as the dateFormats option, and can be further customized with the stringifyDateTime and stringifyCurrency options.',
     parameters: [{name: 'number', description: ''}, {name: 'format', description: ''}],
   },
   TEXTJOIN: {
