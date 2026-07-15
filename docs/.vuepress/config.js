@@ -294,7 +294,7 @@ module.exports = {
           title: 'About',
           collapsable: false,
           children: [
-            ['/guide/quality', 'Quality'],
+            ['/guide/quality', 'Quality & Security'],
             ['/guide/supported-browsers', 'Supported browsers'],
             ['/guide/dependencies', 'Dependencies'],
             ['/guide/licensing', 'Licensing'],

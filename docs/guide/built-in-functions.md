@@ -65,6 +65,8 @@ Total number of functions: **{{ $page.functionsCount }}**
 | FILTER          | Filters an array, based on multiple conditions (boolean arrays). | FILTER(SourceArray, BoolArray1, BoolArray2, ...BoolArrayN) |
 | ARRAY_CONSTRAIN | Truncates an array to given dimensions.                          | ARRAY_CONSTRAIN(Array, Height, Width)                      |
 | SEQUENCE        | Returns an array of sequential numbers.                          | SEQUENCE(Rows, [Cols], [Start], [Step])                    |
+| VSTACK          | Stacks arrays vertically into a single array.                    | VSTACK(Array1, [Array2], ...[ArrayN])                      |
+| HSTACK          | Stacks arrays horizontally into a single array.                  | HSTACK(Array1, [Array2], ...[ArrayN])                      |
 
 ### Date and time
 
@@ -217,6 +219,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | TBILLEQ     | Returns the bond-equivalent yield for a Treasury bill.                                                                     | TBILLEQ(Settlement, Maturity, Discount)    |
 | TBILLPRICE  | Returns the price per $100 face value for a Treasury bill.                                                                 | TBILLPRICE(Settlement, Maturity, Discount) |
 | TBILLYIELD  | Returns the yield for a Treasury bill.                                                                                     | TBILLYIELD(Settlement, Maturity, Price)    |
+| XIRR        | Returns the internal rate of return for a schedule of cash flows that is not necessarily periodic.                         | XIRR(Values, Dates[, Guess])               |
 | XNPV        | Returns net present value.                                                                                                 | XNPV(Rate, Payments, Dates)                |
 
 ### Logical

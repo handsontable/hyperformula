@@ -19,6 +19,8 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    VSTACK: 'VSTACK',
+    HSTACK: 'HSTACK',
     ADDRESS: 'ALAMAT',
     'ARRAY_CONSTRAIN': 'BATASAN.MATRIKS',
     ARRAYFORMULA: 'RUMUS.MATRIKS',
@@ -252,6 +254,7 @@ const dictionary: RawTranslationPackage = {
     WORKDAY: 'HARI.KERJA.SELESAI',
     'WORKDAY.INTL': 'HARI.KERJA.SELESAI.INTL',
     XNPV: 'XNPV',
+    XIRR: 'XIRR',
     XOR: 'XATAU',
     XLOOKUP: 'XLOOKUP',
     YEAR: 'TAHUN',
