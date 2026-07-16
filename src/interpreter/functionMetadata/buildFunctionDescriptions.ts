@@ -53,8 +53,7 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
 /**
  * Builds a Tier-2 details object: the list fields plus the parameter list (name, description, optionality) and
  * `repeatLastArgs` (how many trailing parameters repeat). The caller renders the syntax string from these.
- * `documentationUrl` comes from the catalogue doc when authored, and otherwise falls back to the shared
- * `DEFAULT_DOCUMENTATION_URL`; `examples` falls back to `[]`. Built-in parameters carry authored
+ * `documentationUrl` comes from the catalogue doc; `examples` falls back to `[]`. Built-in parameters carry authored
  * descriptions; custom functions surface empty values.
  *
  * @param {string} canonicalName - the language-independent function id

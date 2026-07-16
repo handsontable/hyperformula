@@ -43,8 +43,7 @@ export interface FunctionDoc {
   /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
   parameters: ParameterDoc[],
   /**
-   * Link to the function's documentation. Optional here: when omitted, the builder supplies the single shared
-   * documentation URL (`DEFAULT_DOCUMENTATION_URL`) to every built-in function.
+   * Link to the function's documentation. Required for all functions.
    */
   documentationUrl: string,
   /** Usage examples (English). Authored for every built-in function; at least one per function. */
