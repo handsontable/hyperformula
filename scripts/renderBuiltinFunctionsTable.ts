@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {FUNCTION_CATEGORIES, FunctionCategory, FunctionDetails, FunctionListEntry} from './FunctionDescription'
+import {FUNCTION_CATEGORIES, FunctionCategory, FunctionDetails, FunctionListEntry} from '../src/interpreter/functionMetadata/FunctionDescription'
 import {formatFunctionSyntax} from './formatFunctionSyntax'
 
 /** Opening marker; the generated table region begins on the next line. */
