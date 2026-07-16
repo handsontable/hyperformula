@@ -45,7 +45,7 @@ export interface FunctionDoc {
   /**
    * Link to the function's documentation. Required for all functions.
    */
-  documentationUrl: string,
+  documentationUrl?: string,
   /** Usage examples (English). Authored for every built-in function; at least one per function. */
   examples?: string[],
 }
