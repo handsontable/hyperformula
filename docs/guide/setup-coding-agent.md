@@ -20,7 +20,7 @@ Claude Code loads the `hyperformula` skill automatically based on what you ask.
 These tools don't yet support the Claude skill format. Point your agent at the machine-readable docs instead:
 
 - **Full corpus:** [`llms-full.txt`](../llms-full.txt) — the entire documentation in one LLM-friendly file.
-- **Per-page Markdown:** append `.md` to a docs page URL (e.g. `/docs/guide/basic-usage.md`), or use the **Copy Markdown link** button on any page.
+- **Per-page Markdown:** append `.md` to a docs page URL (e.g. `/docs/guide/basic-usage.md`), or use the **View as Markdown** link on any page.
 
 For agents that read a rules file (e.g. Cursor's `AGENTS.md`), add a line pointing at the corpus URL so the agent fetches authoritative docs on demand.
 
