@@ -48,5 +48,9 @@ export async function sheetsToXlsx(sheets: Record<string, RawCellContent[][]>): 
   }
 
   const buffer = await workbook.xlsx.writeBuffer()
-  return Uint8Array.from(buffer as Buffer)
+  // ExcelJS returns a Node `Buffer` in Node and an `ArrayBuffer` in the browser.
+  // `Uint8Array.from()` treats an `ArrayBuffer` as an empty array-like and silently
+  // drops the bytes, corrupting browser exports; `new Uint8Array(...)` copies a
+  // Buffer and views an ArrayBuffer, so it is correct on both targets.
+  return buffer instanceof ArrayBuffer ? new Uint8Array(buffer) : new Uint8Array(buffer as Uint8Array)
 }
