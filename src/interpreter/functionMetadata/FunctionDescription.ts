@@ -97,7 +97,7 @@ export interface FunctionDetails {
    */
   repeatLastArgs: number,
   /** Link to the function's documentation. The single shared docs URL for built-ins; `''` for custom functions. */
-  documentationUrl: string,
+  documentationUrl?: string,
   /** Usage examples (English). At least one per built-in function; `[]` for custom functions. */
   examples: string[],
 }
