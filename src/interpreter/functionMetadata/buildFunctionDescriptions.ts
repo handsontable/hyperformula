@@ -6,13 +6,6 @@
 import {FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
 import {FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescription} from './FunctionDescription'
 
-/**
- * The single shared documentation URL surfaced for every built-in function (HF-300). One URL for the whole
- * catalogue in v1 — no per-function anchors. Custom (user-registered) functions are not documented here and
- * keep an empty string.
- */
-export {DEFAULT_DOCUMENTATION_URL} from './FunctionDescription'
-
 /** Resolves a function's display name: the translation for the active language, or the canonical id as fallback. */
 type TranslateName = (canonicalName: string) => string | undefined
 

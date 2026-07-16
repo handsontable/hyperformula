@@ -36,9 +36,6 @@ export interface ParameterDoc {
 /**
  * Storage: authored metadata for one canonical function. English (translations are a later phase).
  */
-/** Shared documentation URL for every built-in function (single guide page; no per-function anchors). */
-export const DEFAULT_DOCUMENTATION_URL = 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html'
-
 export interface FunctionDoc {
   category: FunctionCategory,
   /** One-liner, sentence-case description (English). (A separate long description may follow later.) */
