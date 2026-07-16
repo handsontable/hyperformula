@@ -6,6 +6,12 @@
 import {FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
 import {FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescription} from './FunctionDescription'
 
+/**
+ * The single shared documentation URL for all built-in functions. Exported for use by test suites.
+ * Not used internally—each function sets its documentationUrl as a literal string.
+ */
+export const DEFAULT_DOCUMENTATION_URL = 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html'
+
 /** Resolves a function's display name: the translation for the active language, or the canonical id as fallback. */
 type TranslateName = (canonicalName: string) => string | undefined
 
