@@ -16,6 +16,10 @@
  *   - parameter names come from the "Syntax" column, but their COUNT and optionality are governed by the
  *     implementation arity — the syntax column is only a (sometimes dirty) source of human-readable names.
  *
+ * WARNING: this regenerates each category file from scratch and does NOT preserve the hand-authored
+ * `examples` and parameter `description` fields (HF-300). Re-running it silently wipes them — re-author
+ * afterwards, or extend this tool to carry those fields forward, before committing the result.
+ *
  * Run with: `npm run tsnode scripts/hf249-migrate-function-docs.ts`
  */
 
@@ -198,7 +202,8 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "${category}" category. Generated from \`docs/guide/built-in-functions.md\` by
- * \`scripts/hf249-migrate-function-docs.ts\`; parameter descriptions are authored in a later phase.
+ * \`scripts/hf249-migrate-function-docs.ts\`. The \`examples\` and parameter
+ * descriptions are hand-authored; re-running that script overwrites them.
  */
 export const ${constName(category)}: Record<string, FunctionDoc> = {
 ${body}
