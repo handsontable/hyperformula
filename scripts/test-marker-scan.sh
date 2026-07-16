@@ -36,7 +36,7 @@ run_marker_scan() {
   local paths=()
   local dir
   # Mirror the build.yml invocation exactly so the self-test and CI cannot drift.
-  for dir in dist commonjs es typings languages; do
+  for dir in dist commonjs es typings languages docs/api docs/guide; do
     if [ -d "$root/$dir" ]; then
       paths+=("$root/$dir")
     fi
@@ -138,6 +138,20 @@ export declare const foo: number;
 EOF
 }
 
+# Variant: marker leaked into a published docs page. build.yml also scans
+# docs/api (generated) and docs/guide (hand-written) so citation markers never
+# reach the online docs; this fixture isolates that DIRECTORY-coverage surface.
+make_marker_in_docs_guide() {
+  local root="$1"
+  make_clean_fixture "$root"
+  mkdir -p "$root/docs/guide"
+  cat >"$root/docs/guide/some-page.md" <<'EOF'
+# Some guide page
+
+Content with an internal [vrf_3] citation that must never ship to the docs site.
+EOF
+}
+
 # ---- Assertion harness ------------------------------------------------------
 PASS_COUNT=0
 FAIL_COUNT=0
@@ -180,6 +194,7 @@ f="$TMP_ROOT/case-commonjs";       make_marker_in_commonjs     "$f"; assert_scan
 f="$TMP_ROOT/case-es";             make_marker_in_es           "$f"; assert_scan "marker in es/*.mjs"                 "dirty" "$f"
 f="$TMP_ROOT/case-commonjs-current"; make_marker_in_commonjs_current "$f"; assert_scan "current [vrf_n] marker in commonjs/*.js" "dirty" "$f"
 f="$TMP_ROOT/case-typings";        make_marker_in_typings      "$f"; assert_scan "marker in typings/*.d.ts"          "dirty" "$f"
+f="$TMP_ROOT/case-docs-guide";     make_marker_in_docs_guide   "$f"; assert_scan "marker in docs/guide/*.md"         "dirty" "$f"
 
 echo ""
 echo "=== summary: $PASS_COUNT passed, $FAIL_COUNT failed ==="
