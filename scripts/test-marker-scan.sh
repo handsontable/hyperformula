@@ -148,7 +148,7 @@ assert_scan() {
   local root="$3"
 
   local rc=0
-  run_marker_scan "$root" >/tmp/scan-out 2>&1 || rc=$?
+  run_marker_scan "$root" >"$TMP_ROOT/scan-out" 2>&1 || rc=$?
 
   local got
   case "$rc" in
@@ -163,7 +163,7 @@ assert_scan() {
   else
     echo "FAIL  $name  (expected=$expected, got=$got)"
     echo "  scan output:"
-    sed 's/^/    /' /tmp/scan-out
+    sed 's/^/    /' "$TMP_ROOT/scan-out"
     FAIL_COUNT=$((FAIL_COUNT + 1))
   fi
 }
