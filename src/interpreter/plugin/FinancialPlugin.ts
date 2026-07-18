@@ -10,6 +10,7 @@ import {InterpreterState} from '../InterpreterState'
 import {
   EmptyValue,
   getRawValue,
+  InternalScalarValue,
   InterpreterValue,
   isExtendedNumber,
   NumberType,
@@ -284,6 +285,15 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
     'IRR': {
       method: 'irr',
       parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0.1},
+      ],
+      returnNumberType: NumberType.NUMBER_PERCENT
+    },
+    'XIRR': {
+      method: 'xirr',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 0.1},
       ],
@@ -788,6 +798,49 @@ export class FinancialPlugin extends FunctionPlugin implements FunctionPluginTyp
       }
     )
   }
+
+  /**
+   * Calculates the internal rate of return for a schedule of cash flows that is not necessarily periodic.
+   * @param {ProcedureAst} ast - The AST node representing the function call.
+   * @param {InterpreterState} state - The interpreter state.
+   * @returns {InterpreterValue} The internal rate of return.
+   */
+  public xirr(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    return this.runFunction(ast.args, state, this.metadata('XIRR'),
+      (values: SimpleRangeValue, dates: SimpleRangeValue, guess: number) => {
+        if (guess <= -1) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        const cashFlows = sanitizeXirrRange(values.valuesFromTopLeftCorner())
+        if (cashFlows instanceof CellError) {
+          return cashFlows
+        }
+
+        const paymentDates = sanitizeXirrRange(dates.valuesFromTopLeftCorner())
+        if (paymentDates instanceof CellError) {
+          return paymentDates
+        }
+
+        if (cashFlows.length !== paymentDates.length) {
+          return new CellError(ErrorType.NUM, ErrorMessage.EqualLength)
+        }
+
+        // A schedule needs at least two cash flows to define a rate of return.
+        if (cashFlows.length < 2) {
+          return new CellError(ErrorType.NA)
+        }
+
+        const hasPositive = cashFlows.some(value => value > 0)
+        const hasNegative = cashFlows.some(value => value < 0)
+        if (!hasPositive || !hasNegative) {
+          return new CellError(ErrorType.NUM)
+        }
+
+        return xirrCore(cashFlows, paymentDates, guess)
+      }
+    )
+  }
 }
 
 function pmtCore(rate: number, periods: number, present: number, future: number, type: number): number {
@@ -888,6 +941,113 @@ function irrCore(values: number[], guess: number): number | CellError {
     }
 
     // Check for convergence based on rate change
+    if (Math.abs(newRate - rate) < epsMax) {
+      return newRate
+    }
+
+    rate = newRate
+  }
+
+  return new CellError(ErrorType.NUM)
+}
+
+/**
+ * Converts raw range values into an array of numbers for XIRR.
+ *
+ * Empty cells are treated as zeros, errors are propagated, and any non-numeric
+ * value (text or logical) results in a #VALUE! error.
+ * @param {InternalScalarValue[]} rawValues - The raw values taken from a range.
+ * @returns {number[] | CellError} The numeric values, or a propagated/coercion error.
+ */
+function sanitizeXirrRange(rawValues: InternalScalarValue[]): number[] | CellError {
+  const result: number[] = []
+  for (const rawValue of rawValues) {
+    if (rawValue instanceof CellError) {
+      return rawValue
+    } else if (rawValue === EmptyValue) {
+      result.push(0)
+    } else if (isExtendedNumber(rawValue)) {
+      result.push(getRawValue(rawValue))
+    } else {
+      return new CellError(ErrorType.VALUE, ErrorMessage.NumberExpected)
+    }
+  }
+  return result
+}
+
+/**
+ * Calculates XIRR using the Newton-Raphson method.
+ *
+ * XIRR is the rate r for which the net present value of the cash flows, discounted
+ * over the actual number of days between payments (assuming a 365-day year), equals zero:
+ * sum( values[i] / (1 + r)^((dates[i] - dates[0]) / 365) ) = 0
+ * @param {number[]} values - The cash flow amounts.
+ * @param {number[]} dates - The payment dates as serial numbers, aligned with `values`.
+ * @param {number} guess - The initial estimate of the rate of return.
+ * @returns {number | CellError} The internal rate of return, or a #NUM! error.
+ */
+function xirrCore(values: number[], dates: number[], guess: number): number | CellError {
+  const epsMax = 1e-10
+  const iterMax = 50
+
+  const startDate = Math.floor(dates[0])
+  if (startDate < 0) {
+    return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+  }
+
+  const dayOffsets: number[] = []
+  for (let i = 0; i < dates.length; i++) {
+    const truncatedDate = Math.floor(dates[i])
+    if (truncatedDate < startDate) {
+      return new CellError(ErrorType.NUM, ErrorMessage.ValueSmall)
+    }
+    dayOffsets.push(truncatedDate - startDate)
+  }
+
+  let rate = guess
+
+  for (let iter = 0; iter < iterMax; iter++) {
+    // Calculate XNPV and its derivative at the current rate.
+    let npv = 0
+    let dnpv = 0
+
+    for (let i = 0; i < values.length; i++) {
+      const exponent = dayOffsets[i] / 365
+      const base = 1 + rate
+      const factor = Math.pow(base, exponent)
+      if (!isFinite(factor) || factor === 0) {
+        return new CellError(ErrorType.NUM)
+      }
+      npv += values[i] / factor
+      dnpv -= exponent * values[i] / (factor * base)
+    }
+
+    if (!isFinite(npv) || !isFinite(dnpv)) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    // Check for convergence.
+    if (Math.abs(npv) < epsMax) {
+      return rate
+    }
+
+    // Check if the derivative is too small (avoid division by zero).
+    if (Math.abs(dnpv) < epsMax) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    // Newton-Raphson step.
+    let newRate = rate - npv / dnpv
+    if (!isFinite(newRate)) {
+      return new CellError(ErrorType.NUM)
+    }
+
+    // Clamp: when Newton overshoots past -1, bisect between current rate and -1.
+    if (newRate <= -1) {
+      newRate = (rate - 1) / 2
+    }
+
+    // Check for convergence based on rate change.
     if (Math.abs(newRate - rate) < epsMax) {
       return newRate
     }

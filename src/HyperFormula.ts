@@ -995,15 +995,19 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are 2D arrays of [[RawCellContent]].
    *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type.
+   * For example, a cell set with the string `'1'` is serialized as the string `'1'`, while a cell set with the number `1` is serialized as the number `1`.
+   *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2', '=A1+10'],
+   *  ['1', 2, '=A1+10'],
    * ]);
    *
-   * // should return all sheets serialized content: { Sheet1: [ [ 1, 2, '=A1+10' ] ] }
+   * // should return all sheets serialized content: { Sheet1: [ [ '1', 2, '=A1+10' ] ] }
+   * // note: the string '1' stays a string and the number 2 stays a number
    * const allSheetsSerialized = hfInstance.getAllSheetsSerialized();
    * ```
    *
@@ -1385,7 +1389,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders rows of a sheet according to a permutation of 0-based indexes.
-   * Parameter `newRowOrder` should have a form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`.
+   *
+   * Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`.
+   * In other words, the value at index `i` is the new position for the row that is currently at index `i`.
+   * Note that this is the opposite of `[ previousPositionForRow0, previousPositionForRow1, ... ]`.
+   *
    * This method might be used to [sort the rows of a sheet](../../guide/sorting-data.md).
    *
    * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
@@ -1407,15 +1415,15 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['A'],
    *  ['B'],
-   *  ['C'],
-   *  ['D']
+   *  ['C']
    * ]);
    *
-   * const newRowOrder = [0, 3, 2, 1]; // [ newPosForA, newPosForB, newPosForC, newPosForD ]
+   * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
+   * const newRowOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
    *
    * const changes = hfInstance.setRowOrder(0, newRowOrder);
    *
-   * // Sheet after this operation: [['A'], ['D'], ['C'], ['B']]
+   * // Sheet after this operation: [['C'], ['A'], ['B']]
    * ```
    *
    * @category Rows
@@ -1429,6 +1437,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Checks if it is possible to reorder rows of a sheet according to a permutation.
    *
+   * Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`,
+   * i.e. the value at index `i` is the new position for the row that is currently at index `i`.
+   * See [[setRowOrder]] for details.
+   *
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {number[]} newRowOrder - permutation of rows
    *
@@ -1437,15 +1449,15 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  [1],
-   *  [2],
-   *  [4, 5],
+   *  ['A'],
+   *  ['B'],
+   *  ['C']
    * ]);
    *
    * // returns true
-   * hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
+   * hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
    *
-   * // returns false
+   * // returns false (array length must match the number of rows)
    * hfInstance.isItPossibleToSetRowOrder(0, [2]);
    * ```
    *
@@ -1550,7 +1562,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders columns of a sheet according to a permutation of 0-based indexes.
-   * Parameter `newColumnOrder` should have a form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`.
+   *
+   * Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`.
+   * In other words, the value at index `i` is the new position for the column that is currently at index `i`.
+   * Note that this is the opposite of `[ previousPositionForColumn0, previousPositionForColumn1, ... ]`.
+   *
    * This method might be used to [sort the columns of a sheet](../../guide/sorting-data.md).
    *
    * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
@@ -1570,14 +1586,15 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *   ['A', 'B', 'C', 'D']
+   *   ['A', 'B', 'C']
    * ]);
    *
-   * const newColumnOrder = [0, 3, 2, 1]; // [ newPosForA, newPosForB, newPosForC, newPosForD ]
+   * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
+   * const newColumnOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
    *
    * const changes = hfInstance.setColumnOrder(0, newColumnOrder);
    *
-   * // Sheet after this operation: [['A', 'D', 'C', 'B']]
+   * // Sheet after this operation: [['C', 'A', 'B']]
    * ```
    *
    * @category Columns
@@ -1591,6 +1608,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Checks if it is possible to reorder columns of a sheet according to a permutation.
    *
+   * Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`,
+   * i.e. the value at index `i` is the new position for the column that is currently at index `i`.
+   * See [[setColumnOrder]] for details.
+   *
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {number[]} newColumnOrder - permutation of columns
    *
@@ -1599,14 +1620,13 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  [1, 2, 4],
-   *  [5]
+   *  ['A', 'B', 'C']
    * ]);
    *
    * // returns true
-   * hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
+   * hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
    *
-   * // returns false
+   * // returns false (array length must match the number of columns)
    * hfInstance.isItPossibleToSetColumnOrder(0, [1]);
    * ```
    *
@@ -2494,6 +2514,9 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns serialized cells in given range.
    *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type
+   * (e.g., a cell set with the string `'2'` is serialized as the string `'2'`, while a cell set with the number `2` is serialized as the number `2`).
+   *
    * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
@@ -2503,9 +2526,9 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['=SUM(1, 2)', '2', '10'],
-   *  ['5', '6', '7'],
-   *  ['40', '30', '20'],
+   *  ['=SUM(1, 2)', 2, 10],
+   *  [5, 6, 7],
+   *  [40, 30, 20],
    * ]);
    *
    * // should return serialized cell content for the given range:

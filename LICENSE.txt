@@ -3,7 +3,7 @@ Copyright (c) HANDSONCODE sp. z o. o.
 HYPERFORMULA is a software distributed by HANDSONCODE sp. z o. o., a
 Polish corporation based in Gdynia, Poland, at Aleja Zwyciestwa 96-98,
 registered by the District Court in Gdansk under number 538651,
-EU VAT: PL5862294002, share capital: PLN 62,800.00.
+EU VAT: PL5862294002, share capital: PLN 67,200.00.
 
 This software is dual-licensed, giving you the option to use it under
 either a proprietary license or the GNU General Public License version 3

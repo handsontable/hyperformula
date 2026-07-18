@@ -19,6 +19,8 @@ const dictionary: RawTranslationPackage = {
   },
   functions: {
     FILTER: 'FILTER',
+    VSTACK: 'VSTACK',
+    HSTACK: 'HSTACK',
     ADDRESS: 'OSOITE',
     'ARRAY_CONSTRAIN': 'ARRAY_CONSTRAIN',
     ARRAYFORMULA: 'ARRAYFORMULA',
@@ -251,6 +253,7 @@ const dictionary: RawTranslationPackage = {
     'WORKDAY.INTL': 'TYÖPÄIVÄ.KANSVÄL',
     XLOOKUP: 'XHAKU',
     XNPV: 'NNA.JAKSOTON',
+    XIRR: 'SISÄINEN.KORKO.JAKSOTON',
     XOR: 'EHDOTON.TAI',
     YEAR: 'VUOSI',
     YEARFRAC: 'VUOSI.OSA',

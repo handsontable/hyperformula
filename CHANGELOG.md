@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added new functions: VSTACK, HSTACK. [#1698](https://github.com/handsontable/hyperformula/pull/1698)
+- Added a new function: `XIRR`. [#1701](https://github.com/handsontable/hyperformula/pull/1701)
+- Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
+- Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
+
+### Fixed
+
+- Fixed the behavior of `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions when the search range contained empty cells. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
+- Fixed the `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions to return `0` instead of an empty value when the matched cell in the result range is empty. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
+
 ## [3.3.0] - 2026-05-20
 
 ### Added
