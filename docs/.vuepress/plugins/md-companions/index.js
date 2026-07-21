@@ -119,20 +119,10 @@ module.exports = (options, ctx) => ({
       console.warn(`[md-companions] failed to write llms-full.txt: ${err.message}`);
     }
 
-    // The site is served under base `/docs/` (GH Pages in prod, Netlify preview),
-    // but the llms.txt convention expects the index at the domain ROOT. Mirror
-    // both files one level above the base dir (the served root) so `/llms.txt`
-    // and `/llms-full.txt` resolve on GH Pages — where netlify.toml redirects do
-    // not apply. Best-effort: never fail the build over the mirror.
-    try {
-      const root = path.dirname(ctx.outDir);
-      await fs.promises.writeFile(path.join(root, 'llms-full.txt'), corpusText, 'utf8');
-      const indexTxt = await fs.promises
-        .readFile(path.join(ctx.outDir, 'llms.txt'), 'utf8')
-        .catch(() => null);
-      if (indexTxt) await fs.promises.writeFile(path.join(root, 'llms.txt'), indexTxt, 'utf8');
-    } catch (err) {
-      console.warn(`[md-companions] failed to mirror llms files to site root: ${err.message}`);
-    }
+    // The docs site is served under base `/docs/`, so its llms files live at
+    // `/docs/llms.txt` and `/docs/llms-full.txt`. The domain-root `/llms.txt`
+    // is owned by the website repo (it advertises more than just the docs), so
+    // this plugin deliberately does NOT write to the served root — see the note
+    // in netlify.toml.
   }
 });
