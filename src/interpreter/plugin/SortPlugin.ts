@@ -27,6 +27,7 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
     'SORT': {
       method: 'sort',
       sizeOfResultArrayMethod: 'sortArraySize',
+      enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1, emptyAsDefault: true},
