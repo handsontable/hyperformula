@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Fixed the behavior of `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions when the search range contained empty cells. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
 - Fixed the `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions to return `0` instead of an empty value when the matched cell in the result range is empty. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
+- Fixed the page freezing when entering a long string of digits ending in a non-digit character (e.g. `012...789a`) into a cell, caused by catastrophic regex backtracking in number parsing. [#1713](https://github.com/handsontable/hyperformula/pull/1713)
 
 ## [3.3.0] - 2026-05-20
 
