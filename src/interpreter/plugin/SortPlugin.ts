@@ -8,7 +8,7 @@ import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
 import {ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
-import {InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {EmptyValue, InternalNoErrorScalarValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
@@ -87,6 +87,18 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
 
         const keyIndex = index - 1
         const compare = (a: InternalNoErrorScalarValue, b: InternalNoErrorScalarValue): number => {
+          // Excel keeps empty cells at the end of the result regardless of
+          // sort_order, rather than coercing them to 0 and ordering by value.
+          // Force empties last (direction-independent) before delegating the
+          // rest to ArithmeticHelper.
+          const aEmpty = a === EmptyValue
+          const bEmpty = b === EmptyValue
+          if (aEmpty || bEmpty) {
+            if (aEmpty && bEmpty) {
+              return 0
+            }
+            return aEmpty ? 1 : -1
+          }
           if (this.arithmeticHelper.lt(a, b)) {
             return -sortOrder
           }
