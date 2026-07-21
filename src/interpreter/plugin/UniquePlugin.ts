@@ -27,6 +27,7 @@ export class UniquePlugin extends FunctionPlugin implements FunctionPluginTypech
     'UNIQUE': {
       method: 'unique',
       sizeOfResultArrayMethod: 'uniqueArraySize',
+      enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.BOOLEAN, defaultValue: false, emptyAsDefault: true},
