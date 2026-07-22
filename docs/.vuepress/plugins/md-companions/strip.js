@@ -1,16 +1,33 @@
 /**
  * Neutralise inline Vue-only markup on a single prose line: `[[toc]]`,
- * Vue-bound `<a :href>` (keep text) / `<img :src>` (drop), and inline
- * self-closing PascalCase components (`<Badge …/>`; the `[A-Z]` guard leaves
- * plain HTML like `<br/>` alone). `{{ … }}` interpolations are left verbatim.
+ * Vue-bound `<a :href>` and `<img :src>`, and inline self-closing PascalCase
+ * components (`<Badge …/>`; the `[A-Z]` guard leaves plain HTML like `<br/>`
+ * alone). `{{ … }}` interpolations are left verbatim (resolved upstream against
+ * the page data before stripping).
+ *
+ * For `:href` / `:src`, the bound value is a JS expression (e.g.
+ * `$withBase('/x.zip')` or `'https://…?v=' + $page.buildDateURIEncoded`); we
+ * extract its first string literal and emit a real Markdown link / image so the
+ * destination survives into the companion, instead of dropping it. Bindings
+ * with no string literal fall back to text (links) or are removed (images).
  * @param {string} line
  * @returns {string}
  */
 function cleanInlineMarkup(line) {
+  const firstLiteral = expr => {
+    const m = expr.match(/'([^']*)'|"([^"]*)"/);
+    return m ? (m[1] !== undefined ? m[1] : m[2]) : null;
+  };
   return line
     .replace(/\[\[toc\]\]/gi, '')
-    .replace(/<a\s[^>]*:href[^>]*>(.*?)<\/a>/gi, '$1')
-    .replace(/<img\s[^>]*:src[^>]*\/?>/gi, '')
+    .replace(/<a\b[^>]*?:href\s*=\s*"([^"]*)"[^>]*>(.*?)<\/a>/gi, (_m, expr, text) => {
+      const url = firstLiteral(expr);
+      return url ? `[${text}](${url})` : text;
+    })
+    .replace(/<img\b[^>]*?:src\s*=\s*"([^"]*)"[^>]*?\/?>/gi, (_m, expr) => {
+      const url = firstLiteral(expr);
+      return url ? `![](${url})` : '';
+    })
     .replace(/\s*<[A-Z][A-Za-z0-9]*(?:\s[^>]*?)?\/>/g, '');
 }
 

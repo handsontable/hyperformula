@@ -3,6 +3,22 @@ const path = require('path');
 const { stripVuePressSyntax } = require('./strip');
 
 /**
+ * Resolve the `{{ $page.* }}` interpolations that `extendPageData` injects
+ * (config.js) against the page's own values, so the companion `.md` ships the
+ * real value instead of the raw mustache. Only the known injected keys are
+ * substituted; any other `{{ … }}` is left untouched.
+ * @param {string} md raw page markdown
+ * @param {object} page VuePress page object (carries the injected fields)
+ * @returns {string}
+ */
+function resolvePageVars(md, page) {
+  return md.replace(
+    /\{\{\s*\$page\.(version|buildDate|buildDateURIEncoded|releaseDate|functionsCount)\s*\}\}/g,
+    (m, key) => (page && page[key] != null ? String(page[key]) : m)
+  );
+}
+
+/**
  * Rewrite root-relative Markdown links (`](/guide/…)`, `](/api/…)`) to include
  * the configured `base` (`/docs/`). VuePress rebases these for the HTML site,
  * but the raw `.md` companions do not — so without this an agent resolving them
@@ -92,7 +108,8 @@ module.exports = (options, ctx) => ({
 
     for (const page of pages) {
       try {
-        const clean = rebaseRootLinks(stripVuePressSyntax(page._strippedContent || ''), base);
+        const resolved = resolvePageVars(page._strippedContent || '', page);
+        const clean = rebaseRootLinks(stripVuePressSyntax(resolved), base);
         // `.html` → `<slug>.md`; directory URL (`/guide/`) → `<dir>/index.md`.
         const relPath = page.path.endsWith('/')
           ? `${page.path}index.md`
