@@ -63,6 +63,7 @@ export class DependencyGraph {
     public readonly lazilyTransformingAstService: LazilyTransformingAstService,
     public readonly functionRegistry: FunctionRegistry,
     public readonly namedExpressions: NamedExpressions,
+    public readonly config: Config,
   ) {
     this.graph = new Graph<Vertex>(this.dependencyQueryVertices)
     this.sheetReferenceRegistrar = new SheetReferenceRegistrar(sheetMapping, addressMapping)
@@ -82,7 +83,8 @@ export class DependencyGraph {
       stats,
       lazilyTransformingAstService,
       functionRegistry,
-      namedExpressions
+      namedExpressions,
+      config
     )
   }
 
@@ -478,6 +480,30 @@ export class DependencyGraph {
       }
     }
     return true
+  }
+
+  /**
+   * True when an array spill collision may be resolved by overwriting the occupants
+   * (i.e. `arrayFunctionResultOverwritesData` is on) AND doing so would not clobber
+   * another array. Array-vs-array collisions always keep `#SPILL!` (matches Excel and
+   * avoids corrupting the pre-existing array), even in overwrite mode.
+   */
+  public canOverwriteArrayResult(arrayVertex: ArrayFormulaVertex): boolean {
+    return this.config.arrayFunctionResultOverwritesData && !this.overwriteWouldHitArray(arrayVertex)
+  }
+
+  private overwriteWouldHitArray(arrayVertex: ArrayFormulaVertex): boolean {
+    const range = arrayVertex.getRangeOrUndef()
+    if (range === undefined) {
+      return false
+    }
+    for (const address of range.addresses(this)) {
+      const vertexUnderAddress = this.addressMapping.getCell(address)
+      if (vertexUnderAddress instanceof ArrayFormulaVertex && vertexUnderAddress !== arrayVertex) {
+        return true
+      }
+    }
+    return false
   }
 
   public moveCells(sourceRange: AbsoluteCellRange, toRight: number, toBottom: number, toSheet: number) {
@@ -1119,14 +1145,35 @@ export class DependencyGraph {
     this.addressMapping.setCell(address, vertex)
 
     if (vertex instanceof ArrayFormulaVertex) {
-      if (!this.isThereSpaceForArray(vertex)) {
+      const spaceForArray = this.isThereSpaceForArray(vertex)
+      if (!spaceForArray && !this.canOverwriteArrayResult(vertex)) {
         return
       }
+      // We reach the loop either because the array spills into free space, or because there is no
+      // free space but `arrayFunctionResultOverwritesData` lets it overwrite the occupants. Only
+      // the latter actually claims occupied cells, so only then do we record the overwrite.
+      const isOverwritingOccupants = !spaceForArray
       for (const cellAddress of range.addresses(this)) {
         if (vertex.isLeftCorner(cellAddress)) {
           continue
         }
         const old = this.getCell(cellAddress)
+        // Record each overwritten occupant's previous value as a content change (new value
+        // `EmptyValue`, carrying the old value) BEFORE dropping the vertex, so every caller —
+        // `setCellContents`, array replace/expand, restore-from-cache — uniformly drops the stale
+        // value from the column index via `ColumnSearch.applyChanges`. Gated on overwrite mode so
+        // the free-spill path (empty occupants, and array re-placement during row/column ops) is
+        // untouched.
+        if (isOverwritingOccupants && old !== undefined && !(old instanceof EmptyCellVertex)) {
+          // Read the occupant's previous value WITHOUT going through `getCellValue`/`addressMapping`:
+          // a `ScalarFormulaVertex` that hasn't been computed yet (e.g. a sibling cell set earlier in
+          // the same `batch()`/`suspendEvaluation()` block) throws from `getCellValue()`. `valueOrUndef`
+          // is the non-throwing accessor every `FormulaVertex` exposes for exactly this case; an
+          // uncomputed occupant is treated as `EmptyValue`, matching what it would evaluate to before
+          // its formula runs.
+          const previousValue = old instanceof FormulaVertex ? (old.valueOrUndef() ?? EmptyValue) : old.getCellValue()
+          this.changes.addChange(EmptyValue, cellAddress, previousValue)
+        }
         this.exchangeOrAddGraphNode(old, vertex)
       }
     }
@@ -1149,7 +1196,7 @@ export class DependencyGraph {
     }
     this.setArray(range, vertex)
 
-    if (!this.isThereSpaceForArray(vertex)) {
+    if (!this.isThereSpaceForArray(vertex) && !this.canOverwriteArrayResult(vertex)) {
       return
     }
 
