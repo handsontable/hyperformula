@@ -41,7 +41,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 
 - [Function syntax compatible with Microsoft Excel](https://hyperformula.handsontable.com/guide/compatibility-with-microsoft-excel.html) and [Google Sheets](https://hyperformula.handsontable.com/guide/compatibility-with-google-sheets.html)
 - High-speed parsing and evaluation of spreadsheet formulas
-- [A library of ~400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
+- [A library of over 400 built-in functions](https://hyperformula.handsontable.com/guide/built-in-functions.html)
 - [Support for custom functions](https://hyperformula.handsontable.com/guide/custom-functions.html)
 - [Support for Node.js](https://hyperformula.handsontable.com/guide/server-side-installation.html#install-with-npm-or-yarn)
 - [Support for undo/redo](https://hyperformula.handsontable.com/guide/undo-redo.html)
@@ -49,7 +49,7 @@ HyperFormula doesn't assume any existing user interface, making it a general-pur
 - [Support for clipboard](https://hyperformula.handsontable.com/guide/clipboard-operations.html)
 - [Support for named expressions](https://hyperformula.handsontable.com/guide/named-expressions.html)
 - [Support for data sorting](https://hyperformula.handsontable.com/guide/sorting-data.html)
-- [Support for formula localization with 17 built-in languages](https://hyperformula.handsontable.com/guide/i18n-features.html)
+- [Support for formula localization with 18 built-in languages](https://hyperformula.handsontable.com/guide/i18n-features.html)
 - Easy integration with any front-end or back-end application
 - GPLv3 or a [commercial license](https://handsontable.com/get-a-quote)
 - Maintained by the team that stands behind the [Handsontable](https://handsontable.com/) data grid

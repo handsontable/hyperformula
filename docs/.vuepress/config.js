@@ -4,6 +4,19 @@ const footnotePlugin = require('markdown-it-footnote');
 const searchBoxPlugin = require('./plugins/search-box');
 const examples = require('./plugins/examples/examples');
 const HyperFormula = require('../../dist/hyperformula.full');
+const fs = require('fs');
+const path = require('path');
+
+// HF-282: count HF built-in languages from the i18n export barrel (source of truth):
+// one `export {default as xxYY}` line per shipped language. Read once at config load —
+// no dist/ dependency, so it resolves identically in `docs:dev` and `docs:build`.
+const languagesCount = (
+  fs.readFileSync(path.resolve(__dirname, '../../src/i18n/languages/index.ts'), 'utf8')
+    .match(/^export \{\s*default as \w+\}/gm) || []
+).length;
+if (!languagesCount) {
+  throw new Error('HF-282: derived languagesCount is 0 — src/i18n/languages/index.ts barrel format changed; fix the regex in docs/.vuepress/config.js.');
+}
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
 const mdCompanions = require('./plugins/md-companions');
 
@@ -117,6 +130,8 @@ module.exports = {
         // be kept in step by hand, or the page prints a total that contradicts the number of rows under it. The
         // renderer throws on the one divergence it can see from its side; this side cannot detect any.
         $page.functionsCount = HyperFormula.getRegisteredFunctionNames('enGB').length
+        // inject current HF built-in language count as {{ $page.languagesCount }} variable
+        $page.languagesCount = languagesCount
 
         if (searchPattern.test($page.path) || generatedPagePattern.test($page.path)) {
           $page.frontmatter.editLink = false
