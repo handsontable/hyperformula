@@ -129,6 +129,7 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   VERSION: {
     category: 'Information',
     shortDescription: 'Returns the version number of HyperFormula.',
+    documentationUrl: '',
     parameters: [],
   },
 }

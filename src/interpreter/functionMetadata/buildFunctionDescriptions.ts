@@ -13,6 +13,12 @@ type TranslateName = (canonicalName: string) => string | undefined
 export type StructuralMetadata = Pick<FunctionMetadata, 'parameters' | 'repeatLastArgs'>
 
 /**
+ * The single shared documentation URL for the built-in catalogue (HF-300). Every non-protected built-in points at
+ * this one page in v1 (no per-function anchors); the metadata-enrichment tests import it to assert coverage.
+ */
+export const DEFAULT_DOCUMENTATION_URL = 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html'
+
+/**
  * Returns whether a parameter may be omitted: it declares `optionalArg`, or it has a `defaultValue`.
  *
  * @param {FunctionArgument | undefined} arg - the structural argument metadata, or `undefined`
@@ -80,9 +86,7 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     shortDescription: doc.shortDescription,
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
-    // Default to '' (never undefined) so catalogued functions without an authored URL match the custom-function
-    // path (buildCustomFunctionDetails) — documentationUrl is always a string in the public contract.
-    documentationUrl: doc.documentationUrl ?? '',
+    documentationUrl: doc.documentationUrl,
     examples: doc.examples ?? [],
   }
 }
