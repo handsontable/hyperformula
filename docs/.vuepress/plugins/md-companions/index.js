@@ -136,10 +136,10 @@ module.exports = (options, ctx) => ({
       console.warn(`[md-companions] failed to write llms-full.txt: ${err.message}`);
     }
 
-    // The docs site is served under base `/docs/`, so its llms files live at
-    // `/docs/llms.txt` and `/docs/llms-full.txt`. The domain-root `/llms.txt`
-    // is owned by the website repo (it advertises more than just the docs), so
-    // this plugin deliberately does NOT write to the served root — see the note
-    // in netlify.toml.
+    // The docs site is served under base `/docs/`, so its corpus lives at
+    // `/docs/llms-full.txt`. The domain-root `/llms.txt` is owned by the
+    // website repo (it advertises more than just the docs), so this plugin
+    // deliberately does NOT write to the served root — see the note in
+    // netlify.toml.
   }
 });

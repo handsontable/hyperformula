@@ -9,4 +9,4 @@
 # https://hyperformula.handsontable.com/LLMs.txt is the website repo's
 # authoritative root corpus and covers more than just the docs, so this repo
 # must not shadow it. The docs-scoped corpus stays reachable at its real
-# `/docs/llms.txt` and `/docs/llms-full.txt` paths.
+# `/docs/llms-full.txt` path.
