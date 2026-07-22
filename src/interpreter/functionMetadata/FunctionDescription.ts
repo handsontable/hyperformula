@@ -29,28 +29,24 @@ export type FunctionCategory = typeof FUNCTION_CATEGORIES[number]
 export interface ParameterDoc {
   /** Display name as shown in the syntax, Google-Sheets style, e.g. `'Factor1'`. */
   name: string,
-  /** What the argument does. Present but empty (`''`) in the MVP; authored in a later phase. */
+  /** What the argument does. Authored for every built-in parameter (English). */
   description: string,
 }
 
 /**
- * Storage: authored metadata for one canonical function. English in the MVP.
+ * Storage: authored metadata for one canonical function. English (translations are a later phase).
  */
 export interface FunctionDoc {
   category: FunctionCategory,
-  /** One-liner, sentence-case description. English in the MVP. (A separate long description may follow later.) */
+  /** One-liner, sentence-case description (English). (A separate long description may follow later.) */
   shortDescription: string,
   /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
   parameters: ParameterDoc[],
   /**
-   * Link to the function's documentation. Optional and absent for most functions in the MVP (surfaced as `''`);
-   * authored per function in a later phase.
+   * Link to the function's documentation. Required for all functions.
    */
   documentationUrl?: string,
-  /**
-   * Usage examples. Optional and absent for most functions in the MVP (surfaced as `[]`); authored per function
-   * in a later phase.
-   */
+  /** Usage examples (English). Authored for every built-in function; at least one per function. */
   examples?: string[],
 }
 
@@ -74,7 +70,7 @@ export interface FunctionListEntry {
 export interface FunctionParameterDescription {
   /** Human-readable parameter name. */
   name: string,
-  /** What the argument does. Present but empty (`''`) in the MVP; populated in a later phase. */
+  /** What the argument does (English). Populated for every built-in parameter; `''` for custom functions. */
   description: string,
   /** `true` when the argument may be omitted. */
   optional: boolean,
@@ -100,8 +96,8 @@ export interface FunctionDetails {
    * (Criteria range, Criterion) pair repeats. The caller renders the syntax string from this.
    */
   repeatLastArgs: number,
-  /** Link to the function's documentation. Authored per function; `''` for functions not yet documented. */
-  documentationUrl: string,
-  /** Usage examples. Authored per function; `[]` for functions not yet documented. */
+  /** Link to the function's documentation. The single shared docs URL for built-ins; `''` for custom functions. */
+  documentationUrl?: string,
+  /** Usage examples (English). At least one per built-in function; `[]` for custom functions. */
   examples: string[],
 }
