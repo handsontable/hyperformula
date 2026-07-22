@@ -300,7 +300,6 @@ module.exports = {
             ['/guide/supported-browsers', 'Supported browsers'],
             ['/guide/dependencies', 'Dependencies'],
             ['/guide/licensing', 'Licensing'],
-            ['/guide/support', 'Support'],
           ]
         },
         {
