@@ -80,7 +80,9 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     shortDescription: doc.shortDescription,
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
-    documentationUrl: doc.documentationUrl,
+    // Default to '' (never undefined) so catalogued functions without an authored URL match the custom-function
+    // path (buildCustomFunctionDetails) — documentationUrl is always a string in the public contract.
+    documentationUrl: doc.documentationUrl ?? '',
     examples: doc.examples ?? [],
   }
 }
