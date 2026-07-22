@@ -63,9 +63,9 @@ export class UniquePlugin extends FunctionPlugin implements FunctionPluginTypech
           : data.map(row => row.slice())
 
         const equalVectors = (v1: InternalScalarValue[], v2: InternalScalarValue[]): boolean => {
-          if (v1.length !== v2.length) {
-            return false
-          }
+          // v1 and v2 are always the same length here: they are rows (or columns,
+          // after transpose) of the same rectangular range, so no length check is
+          // needed before the element-wise comparison.
           for (let i = 0; i < v1.length; i++) {
             if (!this.arithmeticHelper.eq(v1[i] as InternalNoErrorScalarValue, v2[i] as InternalNoErrorScalarValue)) {
               return false
