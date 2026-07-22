@@ -55,9 +55,6 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
         if (sortOrder !== 1 && sortOrder !== -1) {
           return new CellError(ErrorType.VALUE, ErrorMessage.BadMode)
         }
-        if (!Number.isFinite(sortIndex)) {
-          return new CellError(ErrorType.VALUE, ErrorMessage.ValueLarge)
-        }
 
         const data = range.data
         const height = range.height()
