@@ -68,6 +68,7 @@ Total number of functions: **{{ $page.functionsCount }}**
 | VSTACK          | Stacks arrays vertically into a single array.                    | VSTACK(Array1, [Array2], ...[ArrayN])                      |
 | HSTACK          | Stacks arrays horizontally into a single array.                  | HSTACK(Array1, [Array2], ...[ArrayN])                      |
 | UNIQUE          | Returns the unique rows or columns of an array.                  | UNIQUE(Array, [ByCol], [ExactlyOnce])                      |
+| SORT            | Sorts the rows or columns of an array.                           | SORT(Array, [SortIndex], [SortOrder], [ByCol])             |
 
 ### Date and time
 
