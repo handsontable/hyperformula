@@ -119,9 +119,24 @@ function stripVuePressSyntax(src) {
       // Demo/example containers (live code runners) are not prose — omit entirely.
       if (type === 'example') { continue; }
       if (title) { out.push(`> **${title}**`); out.push('>'); }
-      // Container bodies must run through the same inline cleanup as normal
-      // prose, otherwise Vue markup inside a tip/warning leaks into companions.
-      body.forEach(b => out.push(b.trim() === '' ? '>' : `> ${cleanInlineMarkup(b)}`));
+      // Container bodies run through the same inline cleanup as normal prose —
+      // EXCEPT inside fenced code blocks, where Vue-shaped samples are literal
+      // content and must survive verbatim (otherwise `<a :href>`, `<Badge/>` or
+      // `[[toc]]` shown in a tip/warning code sample get rewritten or dropped).
+      // The body scan above already located these fences; re-derive that state
+      // here so emit skips cleanInlineMarkup for code lines.
+      let emitFence = false;
+      let emitMarker = '';
+      body.forEach(b => {
+        const bfm = b.trim().match(/^(```+|~~~+)/);
+        if (bfm && (!emitFence || (bfm[1][0] === emitMarker[0] && bfm[1].length >= emitMarker.length))) {
+          if (!emitFence) { emitFence = true; emitMarker = bfm[1]; } else { emitFence = false; }
+          out.push(`> ${b}`);
+          return;
+        }
+        if (emitFence) { out.push(`> ${b}`); return; }
+        out.push(b.trim() === '' ? '>' : `> ${cleanInlineMarkup(b)}`);
+      });
       while (out.length && out[out.length - 1] === '>') out.pop();
       continue;
     }
