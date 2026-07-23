@@ -41,7 +41,7 @@ export class SortPlugin extends FunctionPlugin implements FunctionPluginTypechec
   /**
    * Corresponds to SORT(array, [sort_index], [sort_order], [by_col]).
    *
-   * `sort_order` is validated strictly to {1, -1} (the documented Excel contract);
+   * `sort_order` is validated strictly to {1, -1} (the documented contract);
    * any other value yields #VALUE!. `sort_index` is a 1-based index into the sort
    * dimension (columns when sorting rows, rows when `by_col` is TRUE). Errors found
    * anywhere in the input range are propagated.
