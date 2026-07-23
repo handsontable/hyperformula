@@ -208,6 +208,7 @@ const dictionary: RawTranslationPackage = {
     SIN: 'SIN',
     SINH: 'SINH',
     SLN: 'ODPIS.LIN',
+    SORT: 'SORT',
     SPLIT: 'SPLIT',
     SQRT: 'ODMOCNINA',
     STDEVA: 'STDEVA',
