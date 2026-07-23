@@ -87,4 +87,4 @@ HyperFormula offers comprehensive support options to ensure your success:
 
 Our expert team has been supporting enterprises since 2012 and understands how to respond to individual business needs.
 
-[Learn more about support options &#8594;](support.md)
+[Learn more about support options &#8594;](https://hyperformula.handsontable.com/#pricing)
