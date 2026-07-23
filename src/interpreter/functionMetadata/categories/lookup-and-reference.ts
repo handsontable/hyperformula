@@ -80,7 +80,7 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   OFFSET: {
     category: 'Lookup and reference',
     shortDescription: 'Returns the value of a cell offset by a certain number of rows and columns from a given reference point.',
-    documentationUrl: '',
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     parameters: [{name: 'reference', description: ''}, {name: 'rows', description: ''}, {name: 'columns', description: ''}, {name: 'height', description: ''}, {name: 'width', description: ''}],
   },
   ROW: {
