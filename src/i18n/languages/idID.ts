@@ -243,6 +243,7 @@ const dictionary: RawTranslationPackage = {
     TRUNC: 'POTONG',
     UNICHAR: 'UNIKARAKTER',
     UNICODE: 'UNICODE',
+    UNIQUE: 'UNIQUE',
     UPPER: 'HURUF.BESAR',
     VALUE: 'NILAI',
     VARA: 'VARA',

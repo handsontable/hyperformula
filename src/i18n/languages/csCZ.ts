@@ -241,6 +241,7 @@ const dictionary: RawTranslationPackage = {
     TRUNC: 'USEKNOUT',
     UNICHAR: 'UNICHAR',
     UNICODE: 'UNICODE',
+    UNIQUE: 'UNIQUE',
     UPPER: 'VELKÁ',
     VALUE: 'HODNOTA',
     VARA: 'VARA',

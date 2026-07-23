@@ -241,6 +241,7 @@ const dictionary: RawTranslationPackage = {
     TRUNC: 'NSAT',
     UNICHAR: 'UNICODEKARAKTERİ',
     UNICODE: 'UNICODE',
+    UNIQUE: 'BENZERSİZ',
     UPPER: 'BÜYÜKHARF',
     VALUE: 'DEĞER',
     VARA: 'VARA',

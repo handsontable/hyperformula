@@ -241,6 +241,7 @@ const dictionary: RawTranslationPackage = {
     TRUNC: 'KATKAISE',
     UNICHAR: 'UNICODEMERKKI',
     UNICODE: 'UNICODE',
+    UNIQUE: 'AINUTKERTAISET.ARVOT',
     UPPER: 'ISOT',
     VALUE: 'ARVO',
     VARA: 'VARA',

@@ -241,6 +241,7 @@ const dictionary: RawTranslationPackage = {
     TRUNC: 'CSONK',
     UNICHAR: 'UNIKARAKTER',
     UNICODE: 'UNICODE',
+    UNIQUE: 'EGYEDI',
     UPPER: 'NAGYBETŰS',
     VALUE: 'ÉRTÉK',
     VARA: 'VARA',
