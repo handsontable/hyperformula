@@ -40,7 +40,7 @@ a circular reference.
 
 ### UNIQUE function
 
-* Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive, matching Excel's UNIQUE.
+* Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.
 
 * When `ExactlyOnce` is TRUE and no row or column occurs exactly once, `UNIQUE` returns a `#N/A` error (the result would otherwise be empty).
 

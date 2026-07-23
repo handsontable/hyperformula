@@ -19,8 +19,7 @@ import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, Implement
  * when by_col is TRUE) of `array`, preserving first-occurrence order. When
  * exactly_once is TRUE, only rows/columns that occur exactly once are returned.
  * Equality delegates to {@link ArithmeticHelper}, so comparison honors the
- * caseSensitive/accentSensitive configuration (case-insensitive by default,
- * matching Excel).
+ * caseSensitive/accentSensitive configuration (case-insensitive by default).
  */
 export class UniquePlugin extends FunctionPlugin implements FunctionPluginTypecheck<UniquePlugin> {
   public static implementedFunctions: ImplementedFunctions = {
