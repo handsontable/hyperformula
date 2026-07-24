@@ -40,19 +40,202 @@ export function format(value: number, formatArg: string, config: Config, dateHel
   if (tryCurrency !== undefined) {
     return tryCurrency
   }
-  const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), formatArg) // default points to defaultStringifyDateTime()
+  // Strip presentational color tags AFTER the (user-pluggable) currency callback
+  // — which may inspect the raw formatArg — and BEFORE date/time dispatch. Doing
+  // it here (not inside the number path) means a colored date like
+  // `[Red]YYYY-MM-DD` loses only its color tag and still renders as a date, and
+  // a color tag such as `[Red]` (which contains a `d`) can no longer be
+  // hijacked by the date/time parser. See stripColorTags.
+  const cleanedFormatArg = stripColorTags(formatArg)
+  const tryDateTime = config.stringifyDateTime(dateHelper.numberToSimpleDateTime(value), cleanedFormatArg) // default points to defaultStringifyDateTime()
   if (tryDateTime !== undefined) {
     return tryDateTime
   }
-  const tryDuration = config.stringifyDuration(numberToSimpleTime(value), formatArg)
+  const tryDuration = config.stringifyDuration(numberToSimpleTime(value), cleanedFormatArg)
   if (tryDuration !== undefined) {
     return tryDuration
   }
-  const expression = parseForNumberFormat(formatArg)
-  if (expression !== undefined) {
-    return numberFormat(expression.tokens, value)
+  return formatNumberWithSections(cleanedFormatArg, value, config)
+}
+
+const COLOR_TAG_REGEX = /\[(black|blue|cyan|green|magenta|red|white|yellow|color\s?(?:[1-9]|[1-4]\d|5[0-6]))\]/gi
+
+/**
+ * Removes Excel color tags (`[Red]`, `[Blue]`, …, `[Color56]`) from a format
+ * string. HyperFormula's `TEXT` output is a plain string with no color channel,
+ * so presentational color tags are semantically meaningless and are simply
+ * dropped.
+ *
+ * The whitelist is deliberately color-NAME-specific (flat alternation, no
+ * nested quantifier) so it cannot clobber other bracketed tokens: duration
+ * tags `[hh]`/`[mm]`, currency/locale tags `[$USD-409]`/`[$-409]`, and
+ * condition tags `[>=100]` are all left untouched.
+ *
+ * @param formatArg the raw format string
+ * @returns the format string with recognized color tags removed
+ */
+function stripColorTags(formatArg: string): string {
+  return formatArg.replace(COLOR_TAG_REGEX, '')
+}
+
+/**
+ * Splits an Excel number-format string into its sign-selected sections on
+ * unescaped `;`, honoring `\;` escapes and `"…"` quoted literals so a semicolon
+ * inside a quoted literal does not split. Excel uses up to four sections
+ * (`positive;negative;zero;text`); only the first three are ever selected for a
+ * numeric value, so no cap is enforced here — surplus sections are simply never
+ * read.
+ *
+ * @param formatStr the (color-stripped) format string
+ * @returns the list of raw section strings, in order
+ */
+function splitIntoSections(formatStr: string): string[] {
+  const sections: string[] = []
+  let current = ''
+  let inQuotes = false
+
+  for (let i = 0; i < formatStr.length; i++) {
+    const ch = formatStr[i]
+
+    if (ch === '\\') {
+      // Keep the backslash and the escaped character together, verbatim.
+      current += ch
+      if (i + 1 < formatStr.length) {
+        current += formatStr[i + 1]
+        i++
+      }
+      continue
+    }
+    if (ch === '"') {
+      inQuotes = !inQuotes
+      current += ch
+      continue
+    }
+    if (ch === ';' && !inQuotes) {
+      sections.push(current)
+      current = ''
+      continue
+    }
+    current += ch
   }
-  return formatArg
+  sections.push(current)
+
+  return sections
+}
+
+/**
+ * Strips the delimiting double-quotes from quoted literals so `"zł"` renders as
+ * `zł`. NUANCE (documented, out of HF-287 scope): quotes are removed globally,
+ * so digit/placeholder characters *inside* quotes are NOT protected from the
+ * number tokenizer — a rare Excel case that this incremental formatter does not
+ * cover.
+ *
+ * @param section a single format section
+ * @returns the section with double-quote delimiters removed
+ */
+function stripQuotes(section: string): string {
+  return section.replace(/"/g, '')
+}
+
+/**
+ * Selects the format section for a value by its RAW sign (before rounding) and
+ * returns the value to feed the formatter:
+ *
+ * - `> 0` → positive section (section 0), formatted signed (non-negative).
+ * - `< 0` → negative section (section 1) when present, formatted on `abs` (the
+ *   section's own literals, e.g. `(0.00)`, carry the sign); when only one
+ *   section exists the signed value is passed so the formatter re-adds `-`.
+ * - `= 0` → zero section (section 2) when present, else the positive section.
+ *
+ * Excel-canonical fallbacks: 1 section → all values; 2 sections → `[pos+zero ;
+ * neg]`; 3 sections → `[pos ; neg ; zero]`; a missing zero section falls back to
+ * positive.
+ *
+ * @param sections the split format sections
+ * @param value the numeric value being formatted
+ * @returns the chosen section string and the (sign-adjusted) value to format
+ */
+function pickSection(sections: string[], value: number): { sectionStr: string, valueForFormat: number } {
+  if (value < 0 && sections.length >= 2) {
+    // Explicit negative section: its literals carry the sign, so format abs.
+    return {sectionStr: sections[1], valueForFormat: Math.abs(value)}
+  }
+  if (value === 0 && sections.length >= 3) {
+    return {sectionStr: sections[2], valueForFormat: 0}
+  }
+  // Positive, zero-without-a-zero-section, or single-section negative (the
+  // signed value flows through so numberFormat re-adds the leading `-`).
+  return {sectionStr: sections[0], valueForFormat: value}
+}
+
+/**
+ * Number path of the dispatcher: split the format into sign-selected sections,
+ * pick the section for the value, tokenize it and render.
+ *
+ * When the SELECTED section carries no `#`/`0` placeholder it is pure literal
+ * text (e.g. `"neg"`, an empty section, or a bare `Foo`): render THAT section's
+ * literal characters — never the whole format string — so `0.00;"neg"` on a
+ * negative renders `neg` (not `0.00;"neg"`) and an empty section renders `''`.
+ * A single literal section preserves `format(2, 'Foo')` → `'Foo'`. Never throws.
+ *
+ * @param formatArg the color-stripped format string
+ * @param value the numeric value being formatted
+ * @param config the live HyperFormula config (separators)
+ * @returns the formatted string
+ */
+function formatNumberWithSections(formatArg: string, value: number, config: Config): RawScalarValue {
+  const sections = splitIntoSections(formatArg)
+  const {sectionStr, valueForFormat} = pickSection(sections, value)
+  const expression = parseForNumberFormat(stripQuotes(sectionStr))
+  if (expression === undefined) {
+    return renderLiteralSection(sectionStr)
+  }
+  return numberFormat(expression.tokens, valueForFormat, config)
+}
+
+/**
+ * Renders a placeholder-less format section as literal text: double-quote
+ * delimiters are removed (`"z"` → `z`) and backslash escapes are resolved
+ * (`\-` → `-`). Used when the section selected for a value's sign carries no
+ * `#`/`0` placeholder, so the value is never spliced in — only the section's
+ * own literal characters are emitted (an empty section renders `''`). Mirrors
+ * Excel, where a literal-only section shows just its text.
+ *
+ * @param section the raw (unstripped) format section
+ * @returns the section's literal text
+ */
+function renderLiteralSection(section: string): string {
+  let result = ''
+  for (let i = 0; i < section.length; i++) {
+    const ch = section[i]
+    if (ch === '\\' && i + 1 < section.length) {
+      result += section[i + 1]
+      i++
+    } else if (ch !== '"') {
+      result += ch
+    }
+  }
+  return result
+}
+
+/**
+ * Inserts a grouping separator every three digits from the right of a run of
+ * digits (e.g. `1234567` → `1,234,567`). The caller guarantees `digits` is a
+ * pure-digit string and `separator` is non-empty.
+ *
+ * @param digits a pure-digit integer string
+ * @param separator the grouping glyph (from `config.thousandSeparator`)
+ * @returns the grouped digit string
+ */
+function insertGrouping(digits: string, separator: string): string {
+  let result = ''
+  for (let i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 === 0) {
+      result += separator
+    }
+    result += digits[i]
+  }
+  return result
 }
 
 export function padLeft(number: number | string, size: number) {
@@ -75,7 +258,32 @@ function countChars(text: string, char: string) {
   return text.split(char).length - 1
 }
 
-function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
+/**
+ * Renders a single sign-selected section's tokens against a value.
+ *
+ * The sign is extracted up front: the value is formatted on its magnitude
+ * (`Math.abs`) and a leading `-` is prepended to the whole result iff the value
+ * is negative. Callers pass `abs` for an explicit negative section (whose own
+ * literals carry the sign) and the signed value for a single-section mask (so
+ * the `-` is re-added here) — see `pickSection`.
+ *
+ * Per integer-format token:
+ * - a *trailing* comma run (Excel's scaler, OUT of HF-287 scope) is peeled off
+ *   and re-emitted as a literal so the output is recognizably un-scaled rather
+ *   than silently mis-scaled;
+ * - grouping is requested when an *interior* comma exists (`#,##0`), and the
+ *   grouping glyph is `config.thousandSeparator` (empty on default config → no
+ *   visible glyph);
+ * - the decimal glyph is `config.decimalSeparator` (was a hardcoded `.`).
+ *
+ * @param tokens the tokenized number-format section
+ * @param value the sign-adjusted numeric value to render
+ * @param config the live config (grouping / decimal separators)
+ * @returns the rendered section string
+ */
+function numberFormat(tokens: FormatToken[], value: number, config: Config): RawScalarValue {
+  const negative = value < 0
+  const absValue = Math.abs(value)
   let result = ''
 
   for (let i = 0; i < tokens.length; ++i) {
@@ -86,27 +294,42 @@ function numberFormat(tokens: FormatToken[], value: number): RawScalarValue {
     }
 
     const tokenParts = token.value.split('.')
-    const integerFormat = tokenParts[0]
+    const rawIntegerFormat = tokenParts[0]
     const decimalFormat = tokenParts[1] || ''
-    const separator = tokenParts[1] ? '.' : ''
+    const separator = tokenParts[1] ? config.decimalSeparator : ''
+
+    /* peel off a trailing comma run (Excel scaler — kept as a visible literal) */
+    const trailingScalerMatch = /,+$/.exec(rawIntegerFormat)
+    const trailingScaler = trailingScalerMatch ? trailingScalerMatch[0] : ''
+    const coreIntegerFormat = rawIntegerFormat.slice(0, rawIntegerFormat.length - trailingScaler.length)
+
+    /* grouping requested iff a comma sits between two digit placeholders */
+    const grouping = /[#0],[#0]/.test(coreIntegerFormat)
+    const integerSkeleton = coreIntegerFormat.replace(/,/g, '')
 
     /* get fixed-point number without trailing zeros */
-    const valueParts = Number(value.toFixed(decimalFormat.length)).toString().split('.')
+    const valueParts = Number(absValue.toFixed(decimalFormat.length)).toString().split('.')
     let integerPart = valueParts[0] || ''
     let decimalPart = valueParts[1] || ''
 
-    if (integerFormat.length > integerPart.length) {
-      const padSizeInteger = countChars(integerFormat.substr(0, integerFormat.length - integerPart.length), '0')
+    if (integerSkeleton.length > integerPart.length) {
+      const padSizeInteger = countChars(integerSkeleton.substr(0, integerSkeleton.length - integerPart.length), '0')
       integerPart = padLeft(integerPart, padSizeInteger + integerPart.length)
+    }
+
+    /* group only after padding, only with a configured glyph, only on pure digits
+     * (Number#toString emits scientific notation e.g. 1e+21 for huge magnitudes) */
+    if (grouping && config.thousandSeparator !== '' && /^\d+$/.test(integerPart)) {
+      integerPart = insertGrouping(integerPart, config.thousandSeparator)
     }
 
     const padSizeDecimal = countChars(decimalFormat.substr(decimalPart.length, decimalFormat.length - decimalPart.length), '0')
     decimalPart = padRight(decimalPart, padSizeDecimal + decimalPart.length)
 
-    result += integerPart + separator + decimalPart
+    result += integerPart + trailingScaler + separator + decimalPart
   }
 
-  return result
+  return negative ? '-' + result : result
 }
 
 /**

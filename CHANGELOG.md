@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
+- Fixed the `TEXT` function so that number-format masks with thousands grouping (`#,##0`) and positive/negative/zero sections (`0.00;(0.00)`) are formatted correctly instead of leaking the unparsed mask into the output. The built-in number formatter now also honors the configured `decimalSeparator` and `thousandSeparator` and ignores color tags such as `[Red]`. [#1716](https://github.com/handsontable/hyperformula/pull/1716)
 - Fixed the behavior of `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions when the search range contained empty cells. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
 - Fixed the `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions to return `0` instead of an empty value when the matched cell in the result range is empty. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
 
