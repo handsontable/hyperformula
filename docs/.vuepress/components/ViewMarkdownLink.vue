@@ -28,27 +28,45 @@ export default {
 
 // Rendered in the `page-top` slot, this sits above `.theme-default-content`
 // at the very top of `main.page` — a zone the fixed navbar covers (the theme
-// clears the navbar with margins *inside* the content block only). Clear the
-// navbar explicitly and mirror the content wrapper's `$wrapper` geometry so
-// the link lines up with the article column.
+// clears the navbar only *inside* the content block, via the first heading's
+// top padding). Mirror the content wrapper's `$wrapper` geometry but take no
+// flow height: the link floats right-aligned inside the title's transparent
+// navbar-clearance padding, just above the page title, without pushing the
+// article down. `z-index` keeps it clickable above the heading's padding box.
 .view-markdown-link
+  position relative
+  z-index 1
   max-width $contentWidth
+  height 0
   margin 0 auto
-  padding ($navbarHeight + 1.2rem) 2.5rem 0
+  padding 0 2.5rem
   font-size 0.85rem
 
   a
+    position absolute
+    top ($navbarHeight + 0.2rem)
+    right 2.5rem
+    line-height 1.4
     color $accentColor
     text-decoration none
 
     &:hover
       text-decoration underline
 
+// Keep the wrapper's paddings (and the anchor's `right` offset, resolved
+// against the wrapper's padding box) in lockstep with `$wrapper`'s responsive
+// paddings, so the link tracks the article text's right edge at every width.
 @media (max-width: $MQNarrow)
   .view-markdown-link
-    padding ($navbarHeight + 1.2rem) 2rem 0
+    padding 0 2rem
+
+    a
+      right 2rem
 
 @media (max-width: $MQMobileNarrow)
   .view-markdown-link
-    padding ($navbarHeight + 1.2rem) 1.5rem 0
+    padding 0 1.5rem
+
+    a
+      right 1.5rem
 </style>
