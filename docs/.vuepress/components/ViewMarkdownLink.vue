@@ -26,8 +26,15 @@ export default {
 <style lang="stylus" scoped>
 @require '../styles/palette.styl'
 
+// Rendered in the `page-top` slot, this sits above `.theme-default-content`
+// at the very top of `main.page` — a zone the fixed navbar covers (the theme
+// clears the navbar with margins *inside* the content block only). Clear the
+// navbar explicitly and mirror the content wrapper's `$wrapper` geometry so
+// the link lines up with the article column.
 .view-markdown-link
-  margin 0 0 1rem
+  max-width $contentWidth
+  margin 0 auto
+  padding ($navbarHeight + 1.2rem) 2.5rem 0
   font-size 0.85rem
 
   a
@@ -36,4 +43,12 @@ export default {
 
     &:hover
       text-decoration underline
+
+@media (max-width: $MQNarrow)
+  .view-markdown-link
+    padding ($navbarHeight + 1.2rem) 2rem 0
+
+@media (max-width: $MQMobileNarrow)
+  .view-markdown-link
+    padding ($navbarHeight + 1.2rem) 1.5rem 0
 </style>
