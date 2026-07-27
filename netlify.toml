@@ -4,9 +4,3 @@
 
 [build.environment]
   NODE_VERSION = "22"
-
-# No redirects for the domain-root `/llms.txt` / `/llms-full.txt` paths here:
-# https://hyperformula.handsontable.com/LLMs.txt is the website repo's
-# authoritative root corpus and covers more than just the docs, so this repo
-# must not shadow it. The docs-scoped corpus stays reachable at its real
-# `/docs/llms-full.txt` path.
