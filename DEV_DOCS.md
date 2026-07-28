@@ -77,19 +77,39 @@ Each change to the production code (bugfix, new feature, or improvement) must in
 - Changelog entry (not required for documentation-only changes (guides, JSDoc, README, etc.)
 - Pull request description
 
-A single pull request should contain an atomic self-contained functional change (single bugfix, single feature, single improvement). If a pull request contains multiple features or bugfixes, it should be split.
+Every element of the change must not only be present but also correct: the changelog entry must describe the change accurately, and the documentation updates must match the new behaviour.
+
+Read through your own diff before requesting a review, and ask yourself what could be done better. Fix what you find while the change is still yours.
+
+A single pull request should contain an atomic self-contained functional change (single bugfix, single feature, single improvement). If a pull request contains multiple features or bugfixes, it should be split. Every change in the pull request must be relevant to the issue it solves &mdash; unrelated refactors, reformatting, or clean-ups belong in a separate pull request.
 
 ## Code style
 
 - Prefer a functional approach where possible (`filter`, `map`, `reduce`).
 - Write self-documenting code: use meaningful names for classes, functions, and variables. Add code comments only when they explain intent the code itself cannot.
 - Add JSDoc to all classes and functions.
+- Choose readability over brevity. Explicit, obvious code is better than a clever one-liner.
+- Keep the logic straightforward: avoid convoluted control flow, prefer early returns and a flat structure, and make sure every branch and condition has a reason to exist.
+- Follow clean code principles and general programming best practices: small functions with a single responsibility, no hidden side effects, no magic values.
+- Avoid duplication. Extract shared logic instead of copying it, and reuse the existing helpers and abstractions of the codebase.
+- Match the style of the surrounding code and of the project as a whole. New code should not stand out from its neighbours.
+- Optimize for long-term maintainability: someone else should be able to read, extend, and safely change the code months from now.
 - ESLint is the source of truth for formatting and code rules. Run `npm run lint` before submitting changes (see [building](docs/guide/building.md#run-the-linter)).
+
+## Performance
+
+HyperFormula is a calculation engine, so the performance of the production code is a feature, not an afterthought.
+
+- Consider the computational complexity of every change, especially in code that runs per cell, per formula, or per dependency-graph node. Nested loops over ranges and repeated work that could be computed once or cached are the usual suspects.
+- Pick the best complexity that still keeps the code readable. When a faster algorithm is harder to follow, explain the trade-off in a JSDoc comment.
+- Run `npm run test:performance` for changes that may affect the evaluation or CRUD hot paths.
 
 ## Automatic tests
 
 - All changes to the production code (the `src/` directory) must be covered by automatic tests kept in the `test/` directory.
 - Each test case must be very simple and focused on a single assertion. Don't use loops, conditionals, or other control flow statements in test cases.
+- Cover more than the happy path: boundary values, empty and invalid input, error results, and interactions with related features.
+- Before requesting a review, ask yourself which further tests would be valuable and add the ones that protect against realistic regressions.
 - Don't add tests for code in the `docs/`, `examples/`, and `script/` directories.
 
 ## Documentation
