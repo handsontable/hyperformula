@@ -83,7 +83,10 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
-    aliasOf,
+    // Omitted entirely for non-aliases rather than set to `undefined`: the key would otherwise
+    // survive in memory but vanish through JSON.stringify, handing consumers two shapes for the
+    // same function (mirrors documentationUrl always being a string).
+    ...(aliasOf !== undefined ? {aliasOf} : {}),
     category: doc.category,
     shortDescription: doc.shortDescription,
     parameters,
@@ -131,7 +134,8 @@ export function buildCustomFunctionDetails(canonicalName: string, metadata: Stru
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
-    aliasOf,
+    // See buildFunctionDetails: omitted for non-aliases instead of an `undefined` value.
+    ...(aliasOf !== undefined ? {aliasOf} : {}),
     category: undefined,
     shortDescription: '',
     parameters,
