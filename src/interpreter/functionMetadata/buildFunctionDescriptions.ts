@@ -66,9 +66,10 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
  * @param {FunctionDoc} doc - the function's authored catalogue entry
  * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions`
  * @param {TranslateName} translate - per-id translation lookup
+ * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
  * @throws {Error} when `doc.parameters.length` does not equal `(metadata.parameters ?? []).length`
  */
-export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, metadata: StructuralMetadata, translate: TranslateName): FunctionDetails {
+export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, metadata: StructuralMetadata, translate: TranslateName, aliasOf?: string): FunctionDetails {
   const implParamCount = (metadata.parameters ?? []).length
   if (doc.parameters.length !== implParamCount) {
     throw new Error(`Function metadata mismatch for ${canonicalName}: catalogue has ${doc.parameters.length} parameters, implementation has ${implParamCount}`)
@@ -82,12 +83,13 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
+    aliasOf,
     category: doc.category,
     shortDescription: doc.shortDescription,
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
     documentationUrl: doc.documentationUrl,
-    examples: doc.examples ?? [],
+    examples: [...(doc.examples ?? [])],
   }
 }
 
@@ -114,8 +116,9 @@ export function buildCustomFunctionListEntry(canonicalName: string, translate: T
  * @param {string} canonicalName - the language-independent function id
  * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions`
  * @param {TranslateName} translate - per-id translation lookup
+ * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
  */
-export function buildCustomFunctionDetails(canonicalName: string, metadata: StructuralMetadata, translate: TranslateName): FunctionDetails {
+export function buildCustomFunctionDetails(canonicalName: string, metadata: StructuralMetadata, translate: TranslateName, aliasOf?: string): FunctionDetails {
   const args = metadata.parameters ?? []
   const parameters: FunctionParameterDescription[] = args.map((arg, index) => ({
     name: `Arg${index + 1}`,
@@ -128,6 +131,7 @@ export function buildCustomFunctionDetails(canonicalName: string, metadata: Stru
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
+    aliasOf,
     category: undefined,
     shortDescription: '',
     parameters,

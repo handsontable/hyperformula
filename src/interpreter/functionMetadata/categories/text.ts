@@ -7,7 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Text" category. Generated from `docs/guide/built-in-functions.md` by
- * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
+ * a one-time migration script (since removed).
  */
 export const TEXT_DOCS: Record<string, FunctionDoc> = {
   CHAR: {
@@ -146,7 +146,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   TEXT: {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Converts a number into text according to a given format. By default it accepts the same formats as the dateFormats option, and can be further customized with the stringifyDateTime and stringifyCurrency options.',
+    shortDescription: 'Converts a number into text according to a given format. By default it accepts the same formats as the [`dateFormats`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#dateformats) option, and can be further customized with the [`stringifyDateTime`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#stringifydatetime) and [`stringifyCurrency`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#stringifycurrency) options.',
     parameters: [{name: 'number', description: 'The number or date serial value to format as text.'}, {name: 'format', description: 'The format pattern used to render Number as text, e.g. "0.00" or "YYYY-MM-DD".'}],
     examples: ['=TEXT(1234.5, "0.00")', '=TEXT(TODAY(), "YYYY-MM-DD")'],
   },

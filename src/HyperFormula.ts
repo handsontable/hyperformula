@@ -692,8 +692,10 @@ export class HyperFormula implements TypedEmitter {
    * description, and the documentation link (`documentationUrl`) and usage examples (`examples`) where authored
    * (otherwise `''` and `[]`). Returns `undefined` when the function id is unknown or not registered.
    *
-   * The static method resolves the globally-registered built-in functions and their aliases. For custom
-   * (user-registered) functions, use the instance method [[getFunctionDetails]].
+   * The static method resolves the globally-registered built-in functions and their aliases. An alias reports
+   * its target's metadata (including examples, which spell the target's name) under the alias id, with the
+   * target id exposed as `aliasOf`. For custom (user-registered) functions, use the instance method
+   * [[getFunctionDetails]].
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    * @param {string} code - language code, e.g. `'enGB'`
@@ -747,7 +749,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} functionId - the language-independent function id (canonical id or alias)
    * @param {FunctionPluginDefinition | undefined} plugin - the plugin registered for `functionId`, or `undefined`
    */
-  private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata } | undefined {
+  private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata, targetId: string } | undefined {
     // Protected ids (VERSION, OFFSET) are excluded from the plugin registry by design (`getFunctionPlugin` always
     // returns `undefined` for them), so they would otherwise fall straight into the `plugin === undefined` case
     // below and disappear from the metadata API. Kuba decided (HF-249) that they must still be described, because
@@ -756,7 +758,7 @@ export class HyperFormula implements TypedEmitter {
     // structural metadata keeps `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined`
     // if the two maps ever drift (fail-safe: the function is omitted rather than crashing the metadata API).
     if (FunctionRegistry.functionIsProtected(functionId) && FUNCTION_DOCS[functionId] !== undefined && PROTECTED_FUNCTION_METADATA[functionId] !== undefined) {
-      return {doc: FUNCTION_DOCS[functionId], metadata: PROTECTED_FUNCTION_METADATA[functionId]}
+      return {doc: FUNCTION_DOCS[functionId], metadata: PROTECTED_FUNCTION_METADATA[functionId], targetId: functionId}
     }
     if (plugin === undefined) {
       return undefined
@@ -774,7 +776,7 @@ export class HyperFormula implements TypedEmitter {
       // Catalogue drift: drop from both the list and the details so they never disagree.
       return undefined
     }
-    return {doc, metadata}
+    return {doc, metadata, targetId: metadataKey}
   }
 
   /**
@@ -818,6 +820,9 @@ export class HyperFormula implements TypedEmitter {
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     const collator = HyperFormula.createLocaleCollator(languageCode)
     return functionIds
+      // The interpreter refuses to evaluate ids the active language has no translation entry for
+      // (FunctionRegistry.getFunction), so an untranslated function would be advertised but uncallable.
+      .filter(id => language.isFunctionTranslated(id))
       .map(id => {
         const resolved = HyperFormula.resolveFunctionMetadata(id, getPlugin(id))
         if (resolved === undefined) {
@@ -836,14 +841,22 @@ export class HyperFormula implements TypedEmitter {
    * Documented functions use their catalogue entry; custom functions report their structural metadata only.
    */
   private static buildFunctionDetailsFor(functionId: string, plugin: FunctionPluginDefinition | undefined, language: TranslationPackage): FunctionDetails | undefined {
+    // Mirrors the filter in buildAvailableFunctions: an id the active language cannot evaluate
+    // (no translation entry) gets no details either, so the list and the details always agree.
+    if (!language.isFunctionTranslated(functionId)) {
+      return undefined
+    }
     const resolved = HyperFormula.resolveFunctionMetadata(functionId, plugin)
     if (resolved === undefined) {
       return undefined
     }
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    // An alias borrows the target's metadata (including examples, which spell the target's name), so the
+    // alias->target relation is surfaced as `aliasOf` for consumers to detect and explain the difference.
+    const aliasOf = resolved.targetId !== functionId ? resolved.targetId : undefined
     return resolved.doc !== undefined
-      ? buildFunctionDetails(functionId, resolved.doc, resolved.metadata, translate)
-      : buildCustomFunctionDetails(functionId, resolved.metadata, translate)
+      ? buildFunctionDetails(functionId, resolved.doc, resolved.metadata, translate, aliasOf)
+      : buildCustomFunctionDetails(functionId, resolved.metadata, translate, aliasOf)
   }
 
   /**
@@ -4613,9 +4626,11 @@ export class HyperFormula implements TypedEmitter {
    * the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
    * number of trailing parameters that repeat (`repeatLastArgs`), the category, a short description, and the
    * documentation link (`documentationUrl`) and usage examples (`examples`) where authored (otherwise `''` and `[]`).
-   * Resolves both built-in and custom (user-registered) functions, as well as aliases. Returns `undefined` when the
-   * function id is unknown or not registered in this instance. For a custom function, `category` is `undefined`,
-   * `shortDescription` is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
+   * Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
+   * target's metadata (including examples, which spell the target's name) under the alias id, with the target id
+   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown or not registered in this instance.
+   * For a custom function, `category` is `undefined`, `shortDescription` is empty, and parameters are reported
+   * positionally (`Arg1`, `Arg2`, ...).
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *

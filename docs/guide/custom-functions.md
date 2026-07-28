@@ -143,7 +143,7 @@ HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
 ::: tip
-Custom functions registered with `registerFunctionPlugin()` are available in all HyperFormula instances. However, they do not appear in the static metadata API methods (`HyperFormula.getAvailableFunctions()` and `HyperFormula.getFunctionDetails()`). To retrieve metadata for custom functions, use the instance methods (`hfInstance.getAvailableFunctions()` and `hfInstance.getFunctionDetails()`). See the [Function metadata](built-in-functions.md#function-metadata) section for more details.
+Custom functions registered with `registerFunctionPlugin()` are available in all HyperFormula instances. However, they do not appear in the static metadata API methods (`HyperFormula.getAvailableFunctions()` and `HyperFormula.getFunctionDetails()`). To retrieve metadata for custom functions, use the instance methods (`hfInstance.getAvailableFunctions()` and `hfInstance.getFunctionDetails()`). See [`getAvailableFunctions`](../api/classes/hyperformula.md#getavailablefunctions) and [`getFunctionDetails`](../api/classes/hyperformula.md#getfunctiondetails) in the API reference for more details.
 :::
 
 ### 6. Use your custom function in a formula

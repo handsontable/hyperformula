@@ -7,7 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Math and trigonometry" category. Generated from `docs/guide/built-in-functions.md` by
- * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
+ * a one-time migration script (since removed).
  */
 export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   ABS: {

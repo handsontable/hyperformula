@@ -8,7 +8,7 @@ import {FunctionDoc} from '../FunctionDescription'
 /**
  * Catalogue entries for the "Lookup and reference" category. Most entries were migrated from
  * `docs/guide/built-in-functions.md` by a one-time migration script (since removed); some (e.g. the protected `OFFSET`
- * function) are hand-authored. Parameter descriptions are authored in a later phase.
+ * function) are hand-authored.
  */
 export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   ADDRESS: {
@@ -56,7 +56,7 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   HYPERLINK: {
     category: 'Lookup and reference',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Stores the url in the cell\'s metadata. It can be read using method [`getCellHyperlink`](../api/classes/hyperformula.md#getcellhyperlink)',
+    shortDescription: 'Stores the url in the cell\'s metadata. It can be read using method [`getCellHyperlink`](https://hyperformula.handsontable.com/docs/api/classes/hyperformula.html#getcellhyperlink)',
     parameters: [{name: 'url', description: 'The URL stored in the cell\'s metadata, readable via getCellHyperlink.'}, {name: 'link_label', description: 'The text displayed in the cell. When omitted, Url is displayed instead.'}],
     examples: ['=HYPERLINK("https://hyperformula.handsontable.com")', '=HYPERLINK("https://hyperformula.handsontable.com", "HyperFormula docs")'],
   },
@@ -81,7 +81,8 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     category: 'Lookup and reference',
     shortDescription: 'Returns the value of a cell offset by a certain number of rows and columns from a given reference point.',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    parameters: [{name: 'reference', description: ''}, {name: 'rows', description: ''}, {name: 'columns', description: ''}, {name: 'height', description: ''}, {name: 'width', description: ''}],
+    parameters: [{name: 'reference', description: 'The starting cell the offset is measured from.'}, {name: 'rows', description: 'The number of rows to shift down from Reference; a negative value shifts up.'}, {name: 'columns', description: 'The number of columns to shift right from Reference; a negative value shifts left.'}, {name: 'height', description: 'The number of rows of the returned range. Defaults to 1 (a single row).'}, {name: 'width', description: 'The number of columns of the returned range. Defaults to 1 (a single column).'}],
+    examples: ['=OFFSET(A1, 1, 2)', '=OFFSET(A1, 2, 0, 3, 1)'],
   },
   ROW: {
     category: 'Lookup and reference',

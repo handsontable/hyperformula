@@ -7,7 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Financial" category. Generated from `docs/guide/built-in-functions.md` by
- * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
+ * a one-time migration script (since removed).
  */
 export const FINANCIAL_DOCS: Record<string, FunctionDoc> = {
   CUMIPMT: {

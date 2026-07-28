@@ -6,12 +6,14 @@
 /**
  * Builds the human-readable syntax string for a function from its parameter list, e.g. `SUM(Number1, ...)`.
  * Reuses the convention previously shipped as `generateSyntax`: each optional parameter is wrapped in its own
- * `[brackets]`, and a single `, ...` suffix denotes that the trailing arguments repeat. Internal to the
+ * `[brackets]`, and a `, ...` suffix denotes that the trailing arguments repeat. A repeat group spanning more
+ * than one parameter (e.g. SUMIFS' criterion-range/criterion pair) is rendered with its next occurrence spelled
+ * out, `[criterion_range2, criterion2], ...`, so the group shape stays visible. Internal to the
  * functionMetadata module (docs generator + future consumers); not exported from the package index.
  *
  * @param {string} localizedName - the function name as shown to the user, e.g. `'SUMIF'`
  * @param {{ name: string, optional: boolean }[]} parameters - ordered parameters with optionality
- * @param {number} repeatLastArgs - number of trailing parameters that repeat; `> 0` adds the `, ...` suffix
+ * @param {number} repeatLastArgs - number of trailing parameters that repeat; `> 0` adds the repeat suffix
  * @returns {string} the syntax string, e.g. `'SUMIF(Range, Criteria, [Sumrange])'`
  */
 export function formatFunctionSyntax(
@@ -20,6 +22,27 @@ export function formatFunctionSyntax(
   repeatLastArgs: number,
 ): string {
   const rendered = parameters.map(parameter => parameter.optional ? `[${parameter.name}]` : parameter.name)
-  const repeatSuffix = repeatLastArgs > 0 ? ', ...' : ''
-  return `${localizedName}(${rendered.join(', ')}${repeatSuffix})`
+  return `${localizedName}(${rendered.join(', ')}${repeatSuffix(parameters, repeatLastArgs)})`
+}
+
+/**
+ * Renders the repeat suffix. A bare `, ...` after a multi-parameter repeat group would misread as "single
+ * trailing arguments repeat" (e.g. `SUMIFS(sum_range, criterion_range1, criterion1, ...)` invites appending one
+ * lone criterion), so for a group of two or more the next occurrence is spelled out by bumping the group names'
+ * trailing `1`, Excel-docs style: `, [criterion_range2, criterion2], ...`. When any group name lacks the `1`
+ * suffix the plain ellipsis is kept rather than inventing names.
+ *
+ * @param {{ name: string, optional: boolean }[]} parameters - ordered parameters with optionality
+ * @param {number} repeatLastArgs - number of trailing parameters that repeat
+ */
+function repeatSuffix(parameters: { name: string, optional: boolean }[], repeatLastArgs: number): string {
+  if (repeatLastArgs <= 0) {
+    return ''
+  }
+  const group = parameters.slice(-repeatLastArgs)
+  if (repeatLastArgs > 1 && group.every(parameter => parameter.name.endsWith('1'))) {
+    const nextGroup = group.map(parameter => `${parameter.name.slice(0, -1)}2`)
+    return `, [${nextGroup.join(', ')}], ...`
+  }
+  return ', ...'
 }

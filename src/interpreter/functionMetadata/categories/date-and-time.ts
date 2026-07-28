@@ -7,13 +7,13 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Date and time" category. Generated from `docs/guide/built-in-functions.md` by
- * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
+ * a one-time migration script (since removed).
  */
 export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   DATE: {
     category: 'Date and time',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Returns the specified date as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).',
+    shortDescription: 'Returns the specified date as the number of full days since [`nullDate`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#nulldate).',
     parameters: [{name: 'year', description: 'The year of the date; values below HyperFormula\'s epoch year (derived from nullDate) are added to that epoch year.'}, {name: 'month', description: 'The month of the date. Values outside 1-12 roll over into adjacent years.'}, {name: 'day', description: 'The day of the month. Values outside the month\'s range roll over into adjacent months.'}],
     examples: ['=DATE(2020, 1, 15)', '=DATE(2020, 13, 1)'],
   },
@@ -27,7 +27,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   DATEVALUE: {
     category: 'Date and time',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Parses a date string and returns it as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).<br>Accepts formats set by the [`dateFormats`](../api/interfaces/configparams.md#dateformats) option.',
+    shortDescription: 'Parses a date string and returns it as the number of full days since [`nullDate`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#nulldate).<br>Accepts formats set by the [`dateFormats`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#dateformats) option.',
     parameters: [{name: 'date_string', description: 'A text string representing a date, in one of the formats configured via dateFormats.'}],
     examples: ['=DATEVALUE("30/03/2020")', '=DATEVALUE("31/12/2020")'],
   },
@@ -55,14 +55,14 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   EDATE: {
     category: 'Date and time',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Shifts the given startdate by given number of months and returns it as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).[^non-odff]',
+    shortDescription: 'Shifts the given startdate by given number of months and returns it as the number of full days since [`nullDate`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#nulldate).<br>The return value complies with the OpenDocument standard, but the return type does not; see the [compatibility notes](https://hyperformula.handsontable.com/docs/guide/list-of-differences.html).',
     parameters: [{name: 'start_date', description: 'The date value to shift.'}, {name: 'months', description: 'The number of months to shift Startdate by; negative values shift backwards.'}],
     examples: ['=EDATE(A1, 3)', '=EDATE(DATE(2020, 1, 15), -2)'],
   },
   EOMONTH: {
     category: 'Date and time',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Returns the date of the last day of a month which falls months away from the start date. Returns the value in the form of number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).[^non-odff]',
+    shortDescription: 'Returns the date of the last day of a month which falls months away from the start date. Returns the value in the form of number of full days since [`nullDate`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#nulldate).<br>The return value complies with the OpenDocument standard, but the return type does not; see the [compatibility notes](https://hyperformula.handsontable.com/docs/guide/list-of-differences.html).',
     parameters: [{name: 'start_date', description: 'The date value to start counting from.'}, {name: 'months', description: 'The number of months to add to Startdate before finding the end of that month; negative values go backwards.'}],
     examples: ['=EOMONTH(A1, 1)', '=EOMONTH(DATE(2020, 1, 15), 0)'],
   },
@@ -118,7 +118,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   NOW: {
     category: 'Date and time',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Returns current date + time as a number of days since [`nullDate`](../api/interfaces/configparams.md#nulldate).',
+    shortDescription: 'Returns current date + time as a number of days since [`nullDate`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#nulldate).',
     parameters: [],
     examples: ['=NOW()'],
   },
@@ -139,14 +139,14 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   TIMEVALUE: {
     category: 'Date and time',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Parses a time string and returns a number that represents it as a fraction of a full day.<br>Accepts formats set by the [`timeFormats`](../api/interfaces/configparams.md#timeformats) option.',
+    shortDescription: 'Parses a time string and returns a number that represents it as a fraction of a full day.<br>Accepts formats set by the [`timeFormats`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#timeformats) option.',
     parameters: [{name: 'time_string', description: 'A text string representing a time, in one of the formats configured via timeFormats.'}],
     examples: ['=TIMEVALUE("14:30:00")', '=TIMEVALUE(A1)'],
   },
   TODAY: {
     category: 'Date and time',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    shortDescription: 'Returns an integer representing the current date as the number of full days since [`nullDate`](../api/interfaces/configparams.md#nulldate).',
+    shortDescription: 'Returns an integer representing the current date as the number of full days since [`nullDate`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#nulldate).',
     parameters: [],
     examples: ['=TODAY()'],
   },

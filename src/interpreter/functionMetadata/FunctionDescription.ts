@@ -38,7 +38,10 @@ export interface ParameterDoc {
  */
 export interface FunctionDoc {
   category: FunctionCategory,
-  /** One-liner, sentence-case description (English). (A separate long description may follow later.) */
+  /**
+   * One-liner, sentence-case description (English). (A separate long description may follow later.)
+   * May contain inline markdown links (absolute URLs only) and `<br>` line breaks; no other markup.
+   */
   shortDescription: string,
   /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
   parameters: ParameterDoc[],
@@ -60,7 +63,10 @@ export interface FunctionListEntry {
   canonicalName: string,
   /** Documented category, or `undefined` for custom (user-registered) functions that ship no catalogue entry. */
   category: FunctionCategory | undefined,
-  /** One-liner description (English in the MVP). Empty (`''`) for custom functions. */
+  /**
+   * One-liner description (English in the MVP). Empty (`''`) for custom functions.
+   * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
+   */
   shortDescription: string,
 }
 
@@ -84,9 +90,19 @@ export interface FunctionDetails {
   localizedName: string,
   /** Language-independent function id, e.g. `'SUMIF'`. */
   canonicalName: string,
+  /**
+   * When the queried id is an alias, the id of the function it resolves to (e.g. `'CEILING.PRECISE'` for
+   * `'ISO.CEILING'`); `undefined` for non-alias functions. An alias borrows its target's metadata — including
+   * `examples`, which spell the target's name — so a consumer rendering examples next to the alias can use this
+   * field to detect and explain the relation.
+   */
+  aliasOf?: string,
   /** Documented category, or `undefined` for custom (user-registered) functions that ship no catalogue entry. */
   category: FunctionCategory | undefined,
-  /** One-liner description (English in the MVP). Empty (`''`) for custom functions. */
+  /**
+   * One-liner description (English in the MVP). Empty (`''`) for custom functions.
+   * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
+   */
   shortDescription: string,
   /** The function's parameters, in declaration order. */
   parameters: FunctionParameterDescription[],

@@ -8,7 +8,7 @@ import {FunctionDoc} from '../FunctionDescription'
 /**
  * Catalogue entries for the "Information" category. Most entries were migrated from `docs/guide/built-in-functions.md`
  * by a one-time migration script (since removed); some (e.g. the protected `VERSION` function) are hand-authored.
- * Parameter descriptions are authored in a later phase.
+ *
  */
 export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   ISBINARY: {
@@ -128,8 +128,9 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   // repeatLastArgs) is authored separately in `PROTECTED_FUNCTION_METADATA`.
   VERSION: {
     category: 'Information',
-    shortDescription: 'Returns the version number of HyperFormula.',
+    shortDescription: 'Returns the HyperFormula version and the license key status as a single text value, e.g. "HyperFormula v3.0.0, 1" (a status code, or the last five characters of the license key).',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     parameters: [],
+    examples: ['=VERSION()'],
   },
 }
