@@ -4,11 +4,18 @@
  */
 
 export function objectDestroy(object: any) {
-  for (const [key, value] of Object.entries(object)) {
+  if (object === null || typeof object !== 'object') {
+    return
+  }
+  for (const key of Object.keys(object)) {
+    if (!Object.prototype.hasOwnProperty.call(object, key)) {
+      continue
+    }
+    const value = object[key]
     if (value instanceof Function) {
-      (object as Record<string, any>)[key] = postMortem(value)
+      object[key] = postMortem(value)
     } else {
-      delete (object as Record<string, any>)[key]
+      delete object[key]
     }
   }
 }

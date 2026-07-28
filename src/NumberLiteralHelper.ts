@@ -13,8 +13,9 @@ export class NumberLiteralHelper {
   constructor(
     private readonly config: Config
   ) {
-    const thousandSeparator = this.config.thousandSeparator === '.' ? `\\${this.config.thousandSeparator}` : this.config.thousandSeparator
-    const decimalSeparator = this.config.decimalSeparator === '.' ? `\\${this.config.decimalSeparator}` : this.config.decimalSeparator
+    const escapeRegex = (str: string): string => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const thousandSeparator = escapeRegex(this.config.thousandSeparator)
+    const decimalSeparator = escapeRegex(this.config.decimalSeparator)
 
     this.numberPattern = new RegExp(`^([+-]?((${decimalSeparator}\\d+)|(\\d+(${thousandSeparator}\\d{3,})*(${decimalSeparator}\\d*)?)))([eE][+-]?\\d+)?$`)
     this.allThousandSeparatorsRegex = new RegExp(`${thousandSeparator}`, 'g')
