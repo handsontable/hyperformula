@@ -7,8 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Math and trigonometry" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`. The `examples` and parameter
- * descriptions are hand-authored; re-running that script overwrites them.
+ * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
  */
 export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   ABS: {
@@ -452,8 +451,10 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'function', description: 'A number (1-11 or 101-111) selecting the aggregation function to apply, e.g. 9 for SUM or 1 for AVERAGE.'}, {name: 'number1', description: 'A number, cell reference, or range to aggregate. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=SUBTOTAL(9, A1:A10)', '=SUBTOTAL(1, B1:B10)'],
   },
-  // HAND-AUTHORED reference functions (HF-249): SUM and SUMIF carry real parameter descriptions and examples so
-  // the Formula Builder team can test rendering of populated metadata.
+  // HAND-AUTHORED reference functions (HF-249): SUM and SUMIF carry real parameter descriptions, examples and a
+  // documentationUrl so the Formula Builder team can test rendering of populated metadata. They are the only
+  // entries with `examples`/`documentationUrl` populated, so preserve them if this catalogue is ever re-seeded in
+  // bulk from the guide, or they will be silently reset to empty.
   SUM: {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',

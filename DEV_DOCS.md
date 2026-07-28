@@ -88,8 +88,9 @@ A single pull request should contain an atomic self-contained functional change 
 
 ## Automatic tests
 
-- All changes to the production code must be covered by automatic tests kept in the `test/` directory.
+- All changes to the production code (the `src/` directory) must be covered by automatic tests kept in the `test/` directory.
 - Each test case must be very simple and focused on a single assertion. Don't use loops, conditionals, or other control flow statements in test cases.
+- Don't add tests for code in the `docs/`, `examples/`, and `script/` directories.
 
 ## Documentation
 

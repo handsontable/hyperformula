@@ -6,9 +6,9 @@
 import {FunctionDoc} from '../FunctionDescription'
 
 /**
- * Catalogue entries for the "Lookup and reference" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`. The `examples` and parameter
- * descriptions are hand-authored; re-running that script overwrites them.
+ * Catalogue entries for the "Lookup and reference" category. Most entries were migrated from
+ * `docs/guide/built-in-functions.md` by a one-time migration script (since removed); some (e.g. the protected `OFFSET`
+ * function) are hand-authored. Parameter descriptions are authored in a later phase.
  */
 export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   ADDRESS: {
@@ -73,6 +73,15 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns the relative position of an item in an array that matches a specified value.',
     parameters: [{name: 'search_criterion', description: 'The value to search for in LookupArray.'}, {name: 'lookup_array', description: 'The single row or column of cells to search.'}, {name: 'match_type', description: '1 (default) finds the largest value less than or equal to Searchcriterion in ascending-sorted data, -1 finds the smallest value greater than or equal to it in descending-sorted data, and 0 finds an exact match.'}],
     examples: ['=MATCH(5, A1:A10, 0)', '=MATCH("apple", B1:B10)'],
+  },
+  // OFFSET is a protected function (parse-time transformed into a cell/range reference, so it has no plugin or
+  // implementation metadata; see `FunctionRegistry._protectedPlugins`). Its structural metadata (parameter
+  // optionality, repeatLastArgs) is authored separately in `PROTECTED_FUNCTION_METADATA`.
+  OFFSET: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the value of a cell offset by a certain number of rows and columns from a given reference point.',
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    parameters: [{name: 'reference', description: ''}, {name: 'rows', description: ''}, {name: 'columns', description: ''}, {name: 'height', description: ''}, {name: 'width', description: ''}],
   },
   ROW: {
     category: 'Lookup and reference',

@@ -6,9 +6,9 @@
 import {FunctionDoc} from '../FunctionDescription'
 
 /**
- * Catalogue entries for the "Information" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`. The `examples` and parameter
- * descriptions are hand-authored; re-running that script overwrites them.
+ * Catalogue entries for the "Information" category. Most entries were migrated from `docs/guide/built-in-functions.md`
+ * by a one-time migration script (since removed); some (e.g. the protected `VERSION` function) are hand-authored.
+ * Parameter descriptions are authored in a later phase.
  */
 export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   ISBINARY: {
@@ -122,5 +122,14 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns number of sheet of a given reference or number of all sheets in workbook when no argument is provided.',
     parameters: [{name: 'value', description: 'An optional cell or range reference; when omitted, returns the total number of sheets in the workbook, otherwise returns 1 for the sheet containing the reference.'}],
     examples: ['=SHEETS()', '=SHEETS(A1:B3)'],
+  },
+  // VERSION is a protected function (its plugin, VersionPlugin, is kept out of the general registry so it can
+  // never be unregistered; see `FunctionRegistry._protectedPlugins`). Its structural metadata (parameters,
+  // repeatLastArgs) is authored separately in `PROTECTED_FUNCTION_METADATA`.
+  VERSION: {
+    category: 'Information',
+    shortDescription: 'Returns the version number of HyperFormula.',
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    parameters: [],
   },
 }

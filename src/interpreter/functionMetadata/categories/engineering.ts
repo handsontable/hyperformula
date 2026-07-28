@@ -7,8 +7,7 @@ import {FunctionDoc} from '../FunctionDescription'
 
 /**
  * Catalogue entries for the "Engineering" category. Generated from `docs/guide/built-in-functions.md` by
- * `scripts/hf249-migrate-function-docs.ts`. The `examples` and parameter
- * descriptions are hand-authored; re-running that script overwrites them.
+ * a one-time migration script (since removed); parameter descriptions are authored in a later phase.
  */
 export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
   BIN2DEC: {
