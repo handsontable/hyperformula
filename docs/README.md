@@ -58,10 +58,12 @@ docs                            # All documentation files
 ├── .vuepress                   # All VuePress files
 │   ├── components              # Vue components
 │   ├── dist                    # The docs output. Both the docs and the API reference are built into this folder.
+│   ├── plugins                 # VuePress plugins, incl. md-companions (see below)
 │   ├── public                  # Public assets
 │   ├── styles                  # Style-related files
 │   ├── subtheme                # Subtheme files
 │   ├── templates               # HTML templates
+│   ├── theme                   # Local theme extending the default theme (see below)
 │   ├── config.js               # VuePress configuration
 │   ├── enhanceApp.js           # VuePress app-level enhancements
 │   └── highlight.js            # Code highlight configuration
@@ -71,3 +73,12 @@ docs                            # All documentation files
 ├── index.md                    # The main docs portal welcome page
 └── README.md                   # The file you're looking at right now!
 ```
+
+## Agent-friendly build outputs
+
+`npm run docs:build` produces docs meant to be read by both people and AI coding agents:
+
+* **HTML + Markdown per page** &mdash; every guide page is built as both an `.html` page and a companion `.md` file with the same content, via the `md-companions` VuePress plugin (`.vuepress/plugins/md-companions`). The companion lives next to its HTML page, e.g. `guide/basic-usage.html` and `guide/basic-usage.md`.
+* **`llms-full.txt`** &mdash; all guide pages concatenated into one Markdown file at the docs root (`/docs/llms-full.txt`), so an agent can fetch the whole corpus in a single request instead of crawling page by page.
+* **"View as Markdown" link** &mdash; every guide page shows a small link near the top of its content that navigates to that page's `.md` companion (rendered via the local theme in `.vuepress/theme`, which overrides the default theme's `Layout.vue`).
+* **"Set up your coding agent" page** &mdash; [`guide/setup-coding-agent.md`](guide/setup-coding-agent.md) explains how to point Claude Code, Cursor, Copilot, and other agents at these machine-readable docs, and embeds the `CodingAgentWizard` component: an interactive picker that shows the right setup instructions for the agent you choose.
