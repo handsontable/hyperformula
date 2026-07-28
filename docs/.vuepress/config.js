@@ -17,6 +17,22 @@ const languagesCount = (
 if (!languagesCount) {
   throw new Error('HF-282: derived languagesCount is 0 — src/i18n/languages/index.ts barrel format changed; fix the regex in docs/.vuepress/config.js.');
 }
+
+// HF-282: the root README.md is rendered by GitHub and npm, not VuePress, so it cannot
+// use the `{{ $page.languagesCount }}` interpolation and states the count literally.
+// Assert it against the barrel so it cannot rot unnoticed — it already did once, when
+// the Indonesian pack (#1674) left the README saying 17. The function count needs no
+// such check: "over 400" stays true as functions are added.
+const readmeLanguagesMatch = fs
+  .readFileSync(path.resolve(__dirname, '../../README.md'), 'utf8')
+  .match(/(\d+) built-in languages/);
+if (!readmeLanguagesMatch) {
+  throw new Error('HF-282: could not find the "<n> built-in languages" phrase in README.md — if the wording changed on purpose, update this check in docs/.vuepress/config.js.');
+}
+if (Number(readmeLanguagesMatch[1]) !== languagesCount) {
+  throw new Error(`HF-282: README.md says ${readmeLanguagesMatch[1]} built-in languages but src/i18n/languages/index.ts exports ${languagesCount} — update README.md.`);
+}
+
 const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet');
 const mdCompanions = require('./plugins/md-companions');
 
