@@ -121,10 +121,12 @@ for (const pluginName of Object.getOwnPropertyNames(plugins)) {
     builtinPlugins.push(plugin)
   }
 }
-// Snapshot the original built-in id -> plugin ownership so the function-metadata API can distinguish a genuine
-// built-in id from a user plugin that shadows one. Captured here (the only place that bulk-registers the built-ins)
-// rather than in the metadata builders, which must not import the plugin barrel: doing so eagerly creates a
-// module-load-order cycle that crashes the bundled build ("Class extends value undefined").
+// Snapshot the original built-in id -> plugin ownership, so the function-metadata API can tell a built-in's own
+// implementation from a user plugin that shadows its id. Captured here because the plugin identities can only come
+// from the plugin barrel, and this is the only place that already imports it — importing it from the registry or the
+// metadata builders creates a module-load-order cycle that crashes the bundled build ("Class extends value
+// undefined"). Skipping this call costs the built-ins their categories and descriptions, not their presence: which
+// ids the metadata API describes comes from the catalogue (`FunctionRegistry.isBuiltinFunctionId`), not from here.
 FunctionRegistry.captureBuiltinFunctionOwners(builtinPlugins)
 
 export default HyperFormulaNS

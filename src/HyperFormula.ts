@@ -767,11 +767,11 @@ export class HyperFormula implements TypedEmitter {
   private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata, aliasOf: string | undefined } | undefined {
     // Protected ids (VERSION, OFFSET) are excluded from the plugin registry by design (`getFunctionPlugin` always
     // returns `undefined` for them), so they would otherwise fall straight into the `plugin === undefined` case
-    // below and disappear from the metadata API. Kuba decided (HF-249) that they must still be described, because
-    // a user can call them from a formula: resolve them here from the authored catalogue doc and structural
-    // metadata instead of from a plugin. A protected id stays unlisted unless BOTH are authored — requiring the
-    // structural metadata keeps `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined`
-    // if the two maps ever drift (fail-safe: the function is omitted rather than crashing the metadata API).
+    // below and disappear from the metadata API. They must still be described, because a user can call them from a
+    // formula: resolve them here from the authored catalogue doc and structural metadata instead of from a plugin.
+    // A protected id stays unlisted unless BOTH are authored — requiring the structural metadata keeps
+    // `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined` if the two maps ever drift
+    // (fail-safe: the function is omitted rather than crashing the metadata API).
     if (FunctionRegistry.functionIsProtected(functionId) && FUNCTION_DOCS[functionId] !== undefined && PROTECTED_FUNCTION_METADATA[functionId] !== undefined) {
       const protectedDoc = FUNCTION_DOCS[functionId]
       const protectedMetadata = PROTECTED_FUNCTION_METADATA[functionId]

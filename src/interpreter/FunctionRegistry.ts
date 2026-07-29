@@ -8,6 +8,7 @@ import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionEr
 import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
+import {FUNCTION_DOCS} from './functionMetadata'
 import {Interpreter} from './Interpreter'
 import {
   FunctionMetadata,
@@ -40,15 +41,22 @@ export class FunctionRegistry {
   public static plugins: Map<string, FunctionPluginDefinition> = new Map()
 
   /**
-   * Maps each built-in canonical id to the built-in plugin that canonically provides it. Captured once at module
-   * init (from `index.ts`, which already imports the plugin barrel to register the built-ins) so the metadata API
-   * can tell a genuine built-in id from a user plugin that merely shadows a built-in id. Keyed by
-   * `implementedFunctions` keys only, never aliases: callers resolve an alias to its target id before consulting it.
+   * Maps each built-in canonical id to the built-in plugin that canonically provides it, so
+   * {@link isBuiltinFunction} can tell the original implementation of a built-in id from a user plugin that shadows
+   * it. Keyed by `implementedFunctions` keys only, never aliases: callers resolve an alias to its target id before
+   * consulting it.
    *
-   * Lives here rather than in the metadata builders so those builders need not import the plugin barrel: doing so
-   * eagerly would create a module-load-order cycle (`HyperFormula.ts` pulls in the builders early). Written exactly
-   * once, by the first {@link captureBuiltinFunctionOwners} call, and unaffected by later
-   * `registerFunction`/`unregister` calls, so it stays a snapshot of the original built-in ownership.
+   * Populated once at module init by {@link captureBuiltinFunctionOwners}, called from `index.ts` — the only place
+   * that already imports the plugin barrel, which the plugin identities can only come from. It cannot be imported
+   * here instead: doing so eagerly creates a module-load-order cycle that breaks the bundled build.
+   *
+   * That leaves one initialization-order dependency, but a narrow one. Whether an id is described at all does NOT
+   * consult this map ({@link isBuiltinFunctionId} reads the catalogue instead), so if this map were ever left empty
+   * the metadata API would still list every function — it would report the built-ins as custom, dropping their
+   * categories and descriptions, rather than dropping the functions themselves.
+   *
+   * Written exactly once and unaffected by later `registerFunction`/`unregister` calls, so it stays a snapshot of
+   * the original built-in ownership: re-registering a built-in plugin after `unregisterAll` still counts as built-in.
    */
   private static readonly _builtinFunctionOwners: Map<string, FunctionPluginDefinition> = new Map()
 
@@ -136,11 +144,18 @@ export class FunctionRegistry {
    * whether it may wear the built-in's catalogue doc: a user plugin registered over a built-in id still occupies a
    * built-in id, so it is described (as a custom function) rather than dropped from the API altogether.
    *
+   * Answered from `FUNCTION_DOCS`, not from {@link _builtinFunctionOwners}: the catalogue is a plain module constant,
+   * so the built-in id set is intrinsic and cannot depend on whether some initialization step ran. Deliberately NOT
+   * derived from the plugin barrel, which the built-in ids would otherwise have to come from — importing it here
+   * creates a module-load-order cycle that breaks the bundled build. The two sets are equal by construction: the
+   * catalogue holds an entry per built-in `implementedFunctions` key plus the protected ids (which are never
+   * registered, so they cannot reach this method from `this.plugins`), and a test enforces that coverage.
+   *
    * @internal
    * @param {string} canonicalId - the language-independent function id (the alias target, never an alias)
    */
   public static isBuiltinFunctionId(canonicalId: string): boolean {
-    return this._builtinFunctionOwners.has(canonicalId)
+    return FUNCTION_DOCS[canonicalId] !== undefined
   }
 
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {

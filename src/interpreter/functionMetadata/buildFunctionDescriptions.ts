@@ -109,13 +109,13 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
  * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
  */
 export function buildCustomFunctionListEntry(canonicalName: string, translate: TranslateName, aliasOf?: string): FunctionListEntry {
+  // No `category` key is emitted at all: a custom function has no catalogue entry, and an `undefined`-valued key
+  // would survive in memory but vanish through JSON.stringify, giving consumers two shapes for one function. The
+  // same rule governs `aliasOf` below. `shortDescription`, by contract, is always present and empty.
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
-    // See buildFunctionDetails: omitted for non-aliases instead of an `undefined` value.
     ...(aliasOf !== undefined ? {aliasOf} : {}),
-    // `category` is omitted rather than set to `undefined`, for the same reason as `aliasOf`: the key
-    // would survive in memory but vanish through JSON.stringify, giving consumers two shapes for one function.
     shortDescription: '',
   }
 }
@@ -136,18 +136,17 @@ export function buildCustomFunctionDetails(canonicalName: string, metadata: Stru
     description: '',
     optional: isParameterOptional(arg),
   }))
-  // A pathological custom plugin may declare `repeatLastArgs` larger than its parameter count, which would render
-  // as "the last N of M parameters repeat" with N > M. Clamp to the declared parameter count so the output stays
-  // meaningful. (No built-in is affected, so the built-in path keeps the verbatim value.)
+  // No `category` key is emitted at all, and `aliasOf` only when there is one — see buildCustomFunctionListEntry for
+  // why an absent key beats an `undefined`-valued one.
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
-    // See buildFunctionDetails: omitted for non-aliases instead of an `undefined` value.
     ...(aliasOf !== undefined ? {aliasOf} : {}),
-    // `category` is omitted for the same reason: a custom function has no catalogue entry, and an
-    // `undefined`-valued key disappears through JSON.stringify while an absent one round-trips cleanly.
     shortDescription: '',
     parameters,
+    // A pathological custom plugin may declare `repeatLastArgs` larger than its parameter count, which would render
+    // as "the last N of M parameters repeat" with N > M. Clamp to the declared parameter count so the output stays
+    // meaningful. (No built-in is affected, so the built-in path keeps the verbatim value.)
     repeatLastArgs: Math.min(metadata.repeatLastArgs ?? 0, parameters.length),
     documentationUrl: '',
     examples: [],
