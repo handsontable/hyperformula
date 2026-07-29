@@ -98,7 +98,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
-    parameters: [{name: 'number', description: 'The value to round up.'}, {name: 'significance', description: 'The multiple to round up to. When Number is positive, Significance must also be positive; otherwise the result is a #NUM! error.'}],
+    parameters: [{name: 'number', description: 'The value to round up.'}, {name: 'significance', description: 'The multiple to round up to. When number is positive, significance must also be positive; otherwise the result is a #NUM! error.'}],
     examples: ['=CEILING(4.3, 1)', '=CEILING(22.5, 5)'],
   },
   'CEILING.MATH': {
@@ -182,7 +182,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Converts text with characters from a number system to a positive integer in the base radix given.',
-    parameters: [{name: 'text', description: 'The text representation of the number to convert.'}, {name: 'radix', description: 'The base (from 2 to 36) that Text is expressed in.'}],
+    parameters: [{name: 'text', description: 'The text representation of the number to convert.'}, {name: 'radix', description: 'The base (from 2 to 36) that text is expressed in.'}],
     examples: ['=DECIMAL("1100", 2)', '=DECIMAL("FF", 16)'],
   },
   DEGREES: {
@@ -224,7 +224,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
-    parameters: [{name: 'number', description: 'The value to round down.'}, {name: 'significance', description: 'The multiple to round down to. When Number is positive, Significance must also be positive; otherwise the result is a #NUM! error.'}],
+    parameters: [{name: 'number', description: 'The value to round down.'}, {name: 'significance', description: 'The multiple to round down to. When number is positive, significance must also be positive; otherwise the result is a #NUM! error.'}],
     examples: ['=FLOOR(4.7, 1)', '=FLOOR(22.5, 5)'],
   },
   'FLOOR.MATH': {
@@ -294,7 +294,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Rounds a number to the nearest multiple.',
-    parameters: [{name: 'number', description: 'The value to round.'}, {name: 'base', description: 'The multiple to round Number to; must have the same sign as Number.'}],
+    parameters: [{name: 'number', description: 'The value to round.'}, {name: 'base', description: 'The multiple to round number to; must have the same sign as number.'}],
     examples: ['=MROUND(10, 3)', '=MROUND(-10, -3)'],
   },
   MULTINOMIAL: {
@@ -322,7 +322,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns a number raised to another number.',
-    parameters: [{name: 'base', description: 'The number to raise to a power.'}, {name: 'exponent', description: 'The exponent to raise Base to.'}],
+    parameters: [{name: 'base', description: 'The number to raise to a power.'}, {name: 'exponent', description: 'The exponent to raise base to.'}],
     examples: ['=POWER(2, 10)', '=POWER(9, 0.5)'],
   },
   PRODUCT: {
@@ -469,7 +469,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     parameters: [
       {name: 'range', description: 'The range of cells tested against the criterion.'},
       {name: 'criteria', description: 'The condition that selects which cells are summed, e.g. ">5", "apples", or a cell reference.'},
-      {name: 'sum_range', description: 'The range of cells to sum. When omitted, the cells in Range are summed instead.'},
+      {name: 'sum_range', description: 'The range of cells to sum. When omitted, the cells in range are summed instead.'},
     ],
     examples: ['=SUMIF(A1:A10, ">5")', '=SUMIF(B1:B10, "apples", C1:C10)'],
   },
@@ -477,7 +477,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Sums up the values of cells that belong to the specified range and meet the specified sets of conditions.',
-    parameters: [{name: 'sum_range', description: 'The range of cells to sum.'}, {name: 'criterion_range1', description: 'A range of cells tested against the paired criterion. Further criterion-range/criterion pairs can be passed as additional arguments; only cells that satisfy every pair are summed.'}, {name: 'criterion1', description: 'The condition applied to Criterion_range1, e.g. ">5", "apples", or a cell reference.'}],
+    parameters: [{name: 'sum_range', description: 'The range of cells to sum.'}, {name: 'criterion_range1', description: 'A range of cells tested against the paired criterion. Further criterion-range/criterion pairs can be passed as additional arguments; only cells that satisfy every pair are summed.'}, {name: 'criterion1', description: 'The condition applied to criterion_range1, e.g. ">5", "apples", or a cell reference.'}],
     examples: ['=SUMIFS(C1:C10, A1:A10, ">5", B1:B10, "apples")'],
   },
   SUMPRODUCT: {
@@ -498,21 +498,21 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the sum of the square differences.',
-    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as Range1, providing the second value (y) of each pair.'}],
+    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as range1, providing the second value (y) of each pair.'}],
     examples: ['=SUMX2MY2(A1:A5, B1:B5)'],
   },
   SUMX2PY2: {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the sum of the square sums.',
-    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as Range1, providing the second value (y) of each pair.'}],
+    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as range1, providing the second value (y) of each pair.'}],
     examples: ['=SUMX2PY2(A1:A5, B1:B5)'],
   },
   SUMXMY2: {
     category: 'Math and trigonometry',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the sum of the square of differences.',
-    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as Range1, providing the second value (y) of each pair.'}],
+    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as range1, providing the second value (y) of each pair.'}],
     examples: ['=SUMXMY2(A1:A5, B1:B5)'],
   },
   TAN: {

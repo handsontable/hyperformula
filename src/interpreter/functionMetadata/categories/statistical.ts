@@ -35,7 +35,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the arithmetic mean of all cells in a range that satisfy a given condition.',
-    parameters: [{name: 'range', description: 'The range of cells tested against the criterion.'}, {name: 'criterion', description: 'The condition that selects which cells are averaged, e.g. ">5", "apples", or a cell reference.'}, {name: 'average_range', description: 'The range of cells to average. When omitted, the cells in Range are averaged instead.'}],
+    parameters: [{name: 'range', description: 'The range of cells tested against the criterion.'}, {name: 'criterion', description: 'The condition that selects which cells are averaged, e.g. ">5", "apples", or a cell reference.'}, {name: 'average_range', description: 'The range of cells to average. When omitted, the cells in range are averaged instead.'}],
     examples: ['=AVERAGEIF(A1:A10, ">5")', '=AVERAGEIF(B1:B10, "apples", C1:C10)'],
   },
   BESSELI: {
@@ -70,7 +70,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the density of Beta distribution.',
-    parameters: [{name: 'number1', description: 'The value at which to evaluate the distribution, within the interval bounded by Number4 and Number5.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta shape parameter of the distribution; must be greater than 0.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}, {name: 'number4', description: 'The lower bound of the interval of Number1; defaults to 0 when omitted.'}, {name: 'number5', description: 'The upper bound of the interval of Number1; defaults to 1 when omitted.'}],
+    parameters: [{name: 'number1', description: 'The value at which to evaluate the distribution, within the interval bounded by number4 and number5.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta shape parameter of the distribution; must be greater than 0.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}, {name: 'number4', description: 'The lower bound of the interval of number1; defaults to 0 when omitted.'}, {name: 'number5', description: 'The upper bound of the interval of number1; defaults to 1 when omitted.'}],
     examples: ['=BETA.DIST(0.5, 2, 3, TRUE())', '=BETA.DIST(2, 2, 3, TRUE(), 0, 4)'],
   },
   'BETA.INV': {
@@ -126,7 +126,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns chisquared-test value for a dataset.',
-    parameters: [{name: 'array1', description: 'The range of observed values.'}, {name: 'array2', description: 'The range of expected values, matching the size of Array1.'}],
+    parameters: [{name: 'array1', description: 'The range of observed values.'}, {name: 'array2', description: 'The range of expected values, matching the size of array1.'}],
     examples: ['=CHISQ.TEST(A1:B3, D1:E3)'],
   },
   'CONFIDENCE.NORM': {
@@ -147,7 +147,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the correlation coefficient between two data sets.',
-    parameters: [{name: 'data1', description: 'The first range of numeric values.'}, {name: 'data2', description: 'The second range of numeric values, matching the size of Data1.'}],
+    parameters: [{name: 'data1', description: 'The first range of numeric values.'}, {name: 'data2', description: 'The second range of numeric values, matching the size of data1.'}],
     examples: ['=CORREL(A1:A10, B1:B10)'],
   },
   COUNT: {
@@ -189,14 +189,14 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the covariance between two data sets, population normalized.',
-    parameters: [{name: 'data1', description: 'The first range of numeric values.'}, {name: 'data2', description: 'The second range of numeric values, matching the size of Data1.'}],
+    parameters: [{name: 'data1', description: 'The first range of numeric values.'}, {name: 'data2', description: 'The second range of numeric values, matching the size of data1.'}],
     examples: ['=COVARIANCE.P(A1:A10, B1:B10)'],
   },
   'COVARIANCE.S': {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the covariance between two data sets, sample normalized.',
-    parameters: [{name: 'data1', description: 'The first range of numeric values.'}, {name: 'data2', description: 'The second range of numeric values, matching the size of Data1.'}],
+    parameters: [{name: 'data1', description: 'The first range of numeric values.'}, {name: 'data2', description: 'The second range of numeric values, matching the size of data1.'}],
     examples: ['=COVARIANCE.S(A1:A10, B1:B10)'],
   },
   DEVSQ: {
@@ -469,7 +469,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the squared correlation coefficient between two data sets.',
-    parameters: [{name: 'data1', description: 'The range of dependent (y) values.'}, {name: 'data2', description: 'The range of independent (x) values, matching the size of Data1.'}],
+    parameters: [{name: 'data1', description: 'The range of dependent (y) values.'}, {name: 'data2', description: 'The range of independent (x) values, matching the size of data1.'}],
     examples: ['=RSQ(A1:A10, B1:B10)'],
   },
   SKEW: {
@@ -490,7 +490,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the slope of a linear regression line.',
-    parameters: [{name: 'array1', description: 'The range of dependent (y) values.'}, {name: 'array2', description: 'The range of independent (x) values, matching the size of Array1.'}],
+    parameters: [{name: 'array1', description: 'The range of dependent (y) values.'}, {name: 'array2', description: 'The range of independent (x) values, matching the size of array1.'}],
     examples: ['=SLOPE(A1:A10, B1:B10)'],
   },
   SMALL: {
@@ -539,7 +539,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns standard error for predicted of the predicted y value for each x value.',
-    parameters: [{name: 'array1', description: 'The range of dependent (y) values.'}, {name: 'array2', description: 'The range of independent (x) values, matching the size of Array1.'}],
+    parameters: [{name: 'array1', description: 'The range of dependent (y) values.'}, {name: 'array2', description: 'The range of independent (x) values, matching the size of array1.'}],
     examples: ['=STEYX(A1:A10, B1:B10)'],
   },
   'T.DIST': {
@@ -630,7 +630,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Statistical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns z-test value for a dataset.',
-    parameters: [{name: 'array', description: 'The range or array of sample values to test against.'}, {name: 'x', description: 'The value to test.'}, {name: 'sigma', description: 'The known population standard deviation; when omitted, the sample standard deviation of Array is used instead.'}],
+    parameters: [{name: 'array', description: 'The range or array of sample values to test against.'}, {name: 'x', description: 'The value to test.'}, {name: 'sigma', description: 'The known population standard deviation; when omitted, the sample standard deviation of array is used instead.'}],
     examples: ['=Z.TEST(A1:A10, 5)', '=Z.TEST(A1:A10, 5, 2)'],
   },
 }

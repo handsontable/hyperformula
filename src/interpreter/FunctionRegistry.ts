@@ -46,8 +46,9 @@ export class FunctionRegistry {
    * `implementedFunctions` keys only, never aliases: callers resolve an alias to its target id before consulting it.
    *
    * Lives here rather than in the metadata builders so those builders need not import the plugin barrel: doing so
-   * eagerly would create a module-load-order cycle (`HyperFormula.ts` pulls in the builders early). This map is a
-   * frozen snapshot of the original built-in ownership, unaffected by later `registerFunction`/`unregister` calls.
+   * eagerly would create a module-load-order cycle (`HyperFormula.ts` pulls in the builders early). Written exactly
+   * once, by the first {@link captureBuiltinFunctionOwners} call, and unaffected by later
+   * `registerFunction`/`unregister` calls, so it stays a snapshot of the original built-in ownership.
    */
   private static readonly _builtinFunctionOwners: Map<string, FunctionPluginDefinition> = new Map()
 
@@ -94,11 +95,20 @@ export class FunctionRegistry {
    * Records the given plugins as the canonical built-in owners. Called once at module init by `index.ts` with the
    * complete built-in plugin set (which it already imports to register them). Only `implementedFunctions` keys are
    * snapshotted, not aliases, because alias lookups are resolved to their target id before {@link isBuiltinFunction}
-   * is consulted. Idempotent: re-recording the same id keeps the last writer, but the built-in set is fixed.
+   * is consulted.
    *
+   * Every call after the first is a no-op. The built-in set is fixed at module init, so a later call could only come
+   * from outside the library — and letting it through would let a caller pass their own plugin as a built-in owner,
+   * making {@link isBuiltinFunction} attach a built-in's catalogue doc (description, parameter names, examples) to an
+   * implementation that does not behave that way. That is exactly the misattribution this map exists to prevent.
+   *
+   * @internal
    * @param {FunctionPluginDefinition[]} builtinPlugins - the built-in plugin classes, as imported by `index.ts`
    */
   public static captureBuiltinFunctionOwners(builtinPlugins: FunctionPluginDefinition[]): void {
+    if (this._builtinFunctionOwners.size > 0) {
+      return
+    }
     for (const plugin of builtinPlugins) {
       for (const id of Object.keys(plugin.implementedFunctions)) {
         this._builtinFunctionOwners.set(id, plugin)
@@ -112,6 +122,7 @@ export class FunctionRegistry {
    * metadata API gate use of the catalogue doc so a custom function shadowing a built-in id is never described with
    * the built-in's metadata.
    *
+   * @internal
    * @param {string} canonicalId - the language-independent function id (the alias target, never an alias)
    * @param {FunctionPluginDefinition} plugin - the plugin currently registered for the id
    */

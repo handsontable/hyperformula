@@ -28,21 +28,21 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Logical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Specifies a logical test to be performed.',
-    parameters: [{name: 'test', description: 'The logical expression or value to evaluate.'}, {name: 'then_value', description: 'The value returned when Test evaluates to TRUE.'}, {name: 'otherwise_value', description: 'The value returned when Test evaluates to FALSE. When omitted, FALSE is returned instead.'}],
+    parameters: [{name: 'test', description: 'The logical expression or value to evaluate.'}, {name: 'then_value', description: 'The value returned when test evaluates to TRUE.'}, {name: 'otherwise_value', description: 'The value returned when test evaluates to FALSE. When omitted, FALSE is returned instead.'}],
     examples: ['=IF(A1>10, "big", "small")', '=IF(B1="", "empty", B1)'],
   },
   IFERROR: {
     category: 'Logical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the value if the cell does not contains an error value, or the alternative value if it does.',
-    parameters: [{name: 'value', description: 'The value or formula checked for an error.'}, {name: 'alternate_value', description: 'The value returned when Value evaluates to any error; otherwise Value itself is returned.'}],
+    parameters: [{name: 'value', description: 'The value or formula checked for an error.'}, {name: 'alternate_value', description: 'The value returned when value evaluates to any error; otherwise value itself is returned.'}],
     examples: ['=IFERROR(A1/B1, "error")', '=IFERROR(VLOOKUP(A1, B1:C10, 2, FALSE()), "not found")'],
   },
   IFNA: {
     category: 'Logical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the value if the cell does not contains the #N/A (value not available) error value, or the alternative value if it does.',
-    parameters: [{name: 'value', description: 'The value or formula checked for the #N/A error.'}, {name: 'alternate_value', description: 'The value returned when Value evaluates to #N/A; other error types and non-error values are returned unchanged.'}],
+    parameters: [{name: 'value', description: 'The value or formula checked for the #N/A error.'}, {name: 'alternate_value', description: 'The value returned when value evaluates to #N/A; other error types and non-error values are returned unchanged.'}],
     examples: ['=IFNA(VLOOKUP(A1, B1:C10, 2, FALSE()), "not found")', '=IFNA(A1, "n/a")'],
   },
   IFS: {
@@ -70,7 +70,7 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
     category: 'Logical',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Evaluates a list of arguments, consisting of an expression followed by a value.',
-    parameters: [{name: 'expression1', description: 'The expression or value compared against the candidate values that follow.'}, {name: 'value1', description: 'The first candidate value compared to Expression1.'}, {name: 'expression2', description: 'The value returned when the preceding candidate matches Expression1. Further Value/Expression pairs can be passed as additional arguments, and a final unpaired argument is returned as the default when no candidate matches.'}],
+    parameters: [{name: 'expression', description: 'The expression or value compared against the candidate values that follow.'}, {name: 'value1', description: 'The first candidate value compared to expression.'}, {name: 'result1', description: 'The value returned when value1 matches expression. Further value/result pairs can be passed as additional arguments, and a final unpaired argument is returned as the default when no candidate matches.'}],
     examples: ['=SWITCH(A1, 1, "one", 2, "two", "other")', '=SWITCH(WEEKDAY(A1), 1, "Sunday", 7, "Saturday", "weekday")'],
   },
   TRUE: {

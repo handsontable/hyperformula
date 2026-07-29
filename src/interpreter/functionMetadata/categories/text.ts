@@ -42,14 +42,14 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns TRUE if both text strings are exactly the same.',
-    parameters: [{name: 'text1', description: 'The first text value to compare.'}, {name: 'text2', description: 'The second text value to compare, matched case-sensitively against Text1.'}],
+    parameters: [{name: 'text1', description: 'The first text value to compare.'}, {name: 'text2', description: 'The second text value to compare, matched case-sensitively against text1.'}],
     examples: ['=EXACT("Apple", "apple")', '=EXACT(A1, B1)'],
   },
   FIND: {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the location of one text string inside another.',
-    parameters: [{name: 'text1', description: 'The text to search for. The search is case-sensitive.'}, {name: 'text2', description: 'The text to search within.'}, {name: 'number', description: 'The 1-based character position in Text2 at which to start searching. Defaults to 1.'}],
+    parameters: [{name: 'text1', description: 'The text to search for. The search is case-sensitive.'}, {name: 'text2', description: 'The text to search within.'}, {name: 'number', description: 'The 1-based character position in text2 at which to start searching. Defaults to 1.'}],
     examples: ['=FIND("o", "Hello World")', '=FIND("o", "Hello World", 6)'],
   },
   LEFT: {
@@ -77,7 +77,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns substring of a given length starting from Start_position.',
-    parameters: [{name: 'text', description: 'The text to extract a substring from.'}, {name: 'start_position', description: 'The 1-based position of the first character to extract.'}, {name: 'length', description: 'The number of characters to extract, starting at Start_position.'}],
+    parameters: [{name: 'text', description: 'The text to extract a substring from.'}, {name: 'start_position', description: 'The 1-based position of the first character to extract.'}, {name: 'length', description: 'The number of characters to extract, starting at start_position.'}],
     examples: ['=MID("Hello World", 7, 5)', '=MID(A1, 1, 3)'],
   },
   N: {
@@ -98,14 +98,14 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Replaces substring of a text of a given length that starts at given position.',
-    parameters: [{name: 'text', description: 'The text in which characters are replaced.'}, {name: 'start_position', description: 'The 1-based position of the first character to replace.'}, {name: 'length', description: 'The number of characters to replace, starting at Start_position.'}, {name: 'new_text', description: 'The text that replaces the removed characters.'}],
+    parameters: [{name: 'text', description: 'The text in which characters are replaced.'}, {name: 'start_position', description: 'The 1-based position of the first character to replace.'}, {name: 'length', description: 'The number of characters to replace, starting at start_position.'}, {name: 'new_text', description: 'The text that replaces the removed characters.'}],
     examples: ['=REPLACE("Hello World", 7, 5, "There")', '=REPLACE(A1, 1, 3, "New")'],
   },
   REPT: {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Repeats text a given number of times.',
-    parameters: [{name: 'text', description: 'The text to repeat.'}, {name: 'number', description: 'The number of times to repeat Text.'}],
+    parameters: [{name: 'text', description: 'The text to repeat.'}, {name: 'number', description: 'The number of times to repeat text.'}],
     examples: ['=REPT("ab", 3)', '=REPT(A1, 2)'],
   },
   RIGHT: {
@@ -119,7 +119,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the location of Search_string inside Text. Case-insensitive. Allows the use of wildcards.',
-    parameters: [{name: 'search_string', description: 'The text to search for. The search is case-insensitive and may contain "?" and "*" wildcards.'}, {name: 'text', description: 'The text to search within.'}, {name: 'start_position', description: 'The 1-based character position in Text at which to start searching. Defaults to 1.'}],
+    parameters: [{name: 'search_string', description: 'The text to search for. The search is case-insensitive and may contain "?" and "*" wildcards.'}, {name: 'text', description: 'The text to search within.'}, {name: 'start_position', description: 'The 1-based character position in text at which to start searching. Defaults to 1.'}],
     examples: ['=SEARCH("o", "Hello World")', '=SEARCH("w*d", "Hello World")'],
   },
   SPLIT: {
@@ -133,7 +133,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.',
-    parameters: [{name: 'text', description: 'The text in which occurrences of Old_text are replaced.'}, {name: 'old_text', description: 'The text to search for and replace.'}, {name: 'new_text', description: 'The text that replaces each matched occurrence of Old_text.'}, {name: 'occurrence', description: 'The 1-based occurrence of Old_text to replace. When omitted, every occurrence is replaced.'}],
+    parameters: [{name: 'text', description: 'The text in which occurrences of old_text are replaced.'}, {name: 'old_text', description: 'The text to search for and replace.'}, {name: 'new_text', description: 'The text that replaces each matched occurrence of old_text.'}, {name: 'occurrence', description: 'The 1-based occurrence of old_text to replace. When omitted, every occurrence is replaced.'}],
     examples: ['=SUBSTITUTE("a-b-c", "-", ":")', '=SUBSTITUTE("a-b-c", "-", ":", 2)'],
   },
   T: {
@@ -147,7 +147,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
     category: 'Text',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Converts a number into text according to a given format. By default it accepts the same formats as the [`dateFormats`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#dateformats) option, and can be further customized with the [`stringifyDateTime`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#stringifydatetime) and [`stringifyCurrency`](https://hyperformula.handsontable.com/docs/api/interfaces/configparams.html#stringifycurrency) options.',
-    parameters: [{name: 'number', description: 'The number or date serial value to format as text.'}, {name: 'format', description: 'The format pattern used to render Number as text, e.g. "0.00" or "YYYY-MM-DD".'}],
+    parameters: [{name: 'number', description: 'The number or date serial value to format as text.'}, {name: 'format', description: 'The format pattern used to render number as text, e.g. "0.00" or "YYYY-MM-DD".'}],
     examples: ['=TEXT(1234.5, "0.00")', '=TEXT(TODAY(), "YYYY-MM-DD")'],
   },
   TEXTJOIN: {

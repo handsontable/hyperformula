@@ -46,9 +46,10 @@ export interface FunctionDoc {
   /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
   parameters: ParameterDoc[],
   /**
-   * Link to the function's documentation. Required for all functions.
+   * Link to the function's documentation. Required for all functions, so a new catalogue entry cannot silently
+   * ship without one.
    */
-  documentationUrl?: string,
+  documentationUrl: string,
   /** Usage examples (English). Authored for every built-in function; at least one per function. */
   examples?: string[],
 }
@@ -61,8 +62,8 @@ export interface FunctionListEntry {
   localizedName: string,
   /** Language-independent function id, e.g. `'SUMIF'`. */
   canonicalName: string,
-  /** Documented category, or `undefined` for custom (user-registered) functions that ship no catalogue entry. */
-  category: FunctionCategory | undefined,
+  /** Documented category; absent for custom (user-registered) functions that ship no catalogue entry. */
+  category?: FunctionCategory,
   /**
    * One-liner description (English in the MVP). Empty (`''`) for custom functions.
    * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
@@ -97,8 +98,8 @@ export interface FunctionDetails {
    * field to detect and explain the relation.
    */
   aliasOf?: string,
-  /** Documented category, or `undefined` for custom (user-registered) functions that ship no catalogue entry. */
-  category: FunctionCategory | undefined,
+  /** Documented category; absent for custom (user-registered) functions that ship no catalogue entry. */
+  category?: FunctionCategory,
   /**
    * One-liner description (English in the MVP). Empty (`''`) for custom functions.
    * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
@@ -112,8 +113,11 @@ export interface FunctionDetails {
    * (Criteria range, Criterion) pair repeats. The caller renders the syntax string from this.
    */
   repeatLastArgs: number,
-  /** Link to the function's documentation. The single shared docs URL for built-ins; `''` for custom functions. */
-  documentationUrl?: string,
+  /**
+   * Link to the function's documentation. Always a string: the single shared docs URL for built-ins, `''` for
+   * custom functions.
+   */
+  documentationUrl: string,
   /** Usage examples (English). At least one per built-in function; `[]` for custom functions. */
   examples: string[],
 }

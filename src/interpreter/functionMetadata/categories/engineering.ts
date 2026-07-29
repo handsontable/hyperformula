@@ -105,7 +105,7 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
     category: 'Engineering',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns values of the Gaussian error integral.',
-    parameters: [{name: 'lower_limit', description: 'The lower bound of the integral, or the single integration limit from 0 when Upper_Limit is omitted.'}, {name: 'upper_limit', description: 'The upper bound of the integral; when omitted, the integral is calculated from 0 to Lower_Limit.'}],
+    parameters: [{name: 'lower_limit', description: 'The lower bound of the integral, or the single integration limit from 0 when upper_limit is omitted.'}, {name: 'upper_limit', description: 'The upper bound of the integral; when omitted, the integral is calculated from 0 to lower_limit.'}],
     examples: ['=ERF(1)', '=ERF(0, 1)'],
   },
   ERFC: {

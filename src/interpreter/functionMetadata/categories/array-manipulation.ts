@@ -14,7 +14,7 @@ export const ARRAY_MANIPULATION_DOCS: Record<string, FunctionDoc> = {
     category: 'Array manipulation',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Truncates an array to given dimensions.',
-    parameters: [{name: 'array', description: 'The array or range to truncate.'}, {name: 'height', description: 'The maximum number of rows to keep, automatically capped at the height of Array.'}, {name: 'width', description: 'The maximum number of columns to keep, automatically capped at the width of Array.'}],
+    parameters: [{name: 'array', description: 'The array or range to truncate.'}, {name: 'height', description: 'The maximum number of rows to keep, automatically capped at the height of array.'}, {name: 'width', description: 'The maximum number of columns to keep, automatically capped at the width of array.'}],
     examples: ['=ARRAY_CONSTRAIN(A1:C3, 2, 2)', '=ARRAY_CONSTRAIN(A1:C3, 1, 3)'],
   },
   ARRAYFORMULA: {
@@ -28,7 +28,7 @@ export const ARRAY_MANIPULATION_DOCS: Record<string, FunctionDoc> = {
     category: 'Array manipulation',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
-    parameters: [{name: 'source_array', description: 'The range of values to filter; it must be a single row or a single column (a two-dimensional range is not supported).'}, {name: 'bool_array1', description: 'A range of boolean values, with the same dimensions as SourceArray, marking which rows or columns to keep; only entries where every boolean array is TRUE are returned. Further boolean arrays can be passed as additional arguments, and all of them must evaluate to TRUE for an entry to be kept.'}],
+    parameters: [{name: 'source_array', description: 'The range of values to filter; it must be a single row or a single column (a two-dimensional range is not supported).'}, {name: 'bool_array1', description: 'A range of boolean values, with the same dimensions as source_array, marking which rows or columns to keep; only entries where every boolean array is TRUE are returned. Further boolean arrays can be passed as additional arguments, and all of them must evaluate to TRUE for an entry to be kept.'}],
     examples: ['=FILTER(A1:C1, A2:C2)', '=FILTER(A1:A5, A1:A5>10)', '=FILTER(A1:C1, A2:C2, A3:C3)'],
   },
   SEQUENCE: {
@@ -42,14 +42,14 @@ export const ARRAY_MANIPULATION_DOCS: Record<string, FunctionDoc> = {
     category: 'Array manipulation',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Sorts the rows or columns of an array.',
-    parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are sorted.'}, {name: 'sort_index', description: 'The 1-based row or column index within Array to sort by. Defaults to 1 (the first row or column).'}, {name: 'sort_order', description: '1 (default) sorts in ascending order; -1 sorts in descending order.'}, {name: 'by_col', description: 'FALSE (default) sorts the rows of Array; TRUE sorts its columns.'}],
+    parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are sorted.'}, {name: 'sort_index', description: 'The 1-based row or column index within array to sort by. Defaults to 1 (the first row or column).'}, {name: 'sort_order', description: '1 (default) sorts in ascending order; -1 sorts in descending order.'}, {name: 'by_col', description: 'FALSE (default) sorts the rows of array; TRUE sorts its columns.'}],
     examples: ['=SORT(A1:A10)', '=SORT(A1:B10, 2, -1)'],
   },
   UNIQUE: {
     category: 'Array manipulation',
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     shortDescription: 'Returns the unique rows or columns of an array.',
-    parameters: [{name: 'array', description: 'The range or array to return distinct entries from.'}, {name: 'by_col', description: 'FALSE (default) compares and returns rows; TRUE compares and returns columns.'}, {name: 'exactly_once', description: 'FALSE (default) returns every distinct entry once; TRUE returns only the entries that appear exactly once in Array.'}],
+    parameters: [{name: 'array', description: 'The range or array to return distinct entries from.'}, {name: 'by_col', description: 'FALSE (default) compares and returns rows; TRUE compares and returns columns.'}, {name: 'exactly_once', description: 'FALSE (default) returns every distinct entry once; TRUE returns only the entries that appear exactly once in array.'}],
     examples: ['=UNIQUE(A1:A10)', '=UNIQUE(A1:B10)'],
   },
   VSTACK: {

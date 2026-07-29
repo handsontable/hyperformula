@@ -662,6 +662,10 @@ export class HyperFormula implements TypedEmitter {
    * functions are instance-scoped, so they are listed only by the instance method [[getAvailableFunctions]], not by
    * this static one.
    *
+   * A function with no translation entry for `code` is omitted: the interpreter refuses to evaluate an untranslated
+   * id, so listing it would advertise a function that cannot be called. Some bundled language packs leave a
+   * built-in untranslated (an empty string), which is why a given language may list fewer functions than another.
+   *
    * @param {string} code - language code, e.g. `'enGB'`
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
@@ -689,8 +693,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns the full metadata of a single function for a given language: the parameter list (with per-parameter
    * optionality), the number of trailing parameters that repeat (`repeatLastArgs`), the category, a short
-   * description, and the documentation link (`documentationUrl`) and usage examples (`examples`) where authored
-   * (otherwise `''` and `[]`). Returns `undefined` when the function id is unknown or not registered.
+   * description, and the documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in
+   * authors both. Returns `undefined` when the function id is unknown, not registered, or has no translation entry
+   * for `code` (an untranslated id cannot be evaluated, so it is not described either, which keeps this method
+   * consistent with [[getAvailableFunctions]]).
    *
    * The static method resolves the globally-registered built-in functions and their aliases. An alias reports
    * its target's metadata (including examples, which spell the target's name) under the alias id, with the
@@ -714,6 +720,9 @@ export class HyperFormula implements TypedEmitter {
   public static getFunctionDetails(canonicalName: string, code: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
     validateArgToType(code, 'string', 'code')
+    // Validated before the registry lookup so an unregistered language throws for every function id, rather than
+    // only for the ids that reach a later exit path (an unknown or custom id used to return `undefined` instead).
+    const language = this.getLanguage(code)
     const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
     if (plugin === undefined) {
       // Protected ids (VERSION, OFFSET) have no registered plugin by design (`getFunctionPlugin` always returns
@@ -724,7 +733,6 @@ export class HyperFormula implements TypedEmitter {
       if (!FunctionRegistry.functionIsProtected(canonicalName)) {
         return undefined
       }
-      const language = this.getLanguage(code)
       return HyperFormula.buildFunctionDetailsFor(canonicalName, undefined, language)
     }
     // Resolve aliases to their canonical target id before checking built-in ownership
@@ -733,7 +741,6 @@ export class HyperFormula implements TypedEmitter {
     if (!FunctionRegistry.isBuiltinFunction(canonicalId, plugin)) {
       return undefined
     }
-    const language = this.getLanguage(code)
     return HyperFormula.buildFunctionDetailsFor(canonicalName, plugin, language)
   }
 
@@ -758,7 +765,12 @@ export class HyperFormula implements TypedEmitter {
     // structural metadata keeps `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined`
     // if the two maps ever drift (fail-safe: the function is omitted rather than crashing the metadata API).
     if (FunctionRegistry.functionIsProtected(functionId) && FUNCTION_DOCS[functionId] !== undefined && PROTECTED_FUNCTION_METADATA[functionId] !== undefined) {
-      return {doc: FUNCTION_DOCS[functionId], metadata: PROTECTED_FUNCTION_METADATA[functionId], targetId: functionId}
+      const protectedDoc = FUNCTION_DOCS[functionId]
+      const protectedMetadata = PROTECTED_FUNCTION_METADATA[functionId]
+      if (!HyperFormula.isCatalogueArityConsistent(protectedDoc, protectedMetadata)) {
+        return undefined
+      }
+      return {doc: protectedDoc, metadata: protectedMetadata, targetId: functionId}
     }
     if (plugin === undefined) {
       return undefined
@@ -772,11 +784,23 @@ export class HyperFormula implements TypedEmitter {
     // Use the catalogue doc only when the built-in plugin that owns this id is the one actually registered for it.
     // A custom plugin overriding a built-in id is reported as a custom function, never with the built-in's doc.
     const doc = FunctionRegistry.isBuiltinFunction(metadataKey, plugin) ? FUNCTION_DOCS[metadataKey] : undefined
-    if (doc !== undefined && doc.parameters.length !== (metadata.parameters ?? []).length) {
-      // Catalogue drift: drop from both the list and the details so they never disagree.
+    if (!HyperFormula.isCatalogueArityConsistent(doc, metadata)) {
       return undefined
     }
     return {doc, metadata, targetId: metadataKey}
+  }
+
+  /**
+   * Returns whether a catalogue doc agrees with the implementation on the number of parameters. `true` when there is
+   * no doc to disagree with. Applied to every resolution path — plugin-backed ids and the protected ids resolved from
+   * `PROTECTED_FUNCTION_METADATA` alike — so catalogue drift makes a function fail safe by being omitted from both the
+   * list and the details, rather than reaching [[buildFunctionDetails]], which throws on the mismatch.
+   *
+   * @param {FunctionDoc | undefined} doc - the function's authored catalogue entry, or `undefined` when it has none
+   * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions` or the protected map
+   */
+  private static isCatalogueArityConsistent(doc: FunctionDoc | undefined, metadata: StructuralMetadata): boolean {
+    return doc === undefined || doc.parameters.length === (metadata.parameters ?? []).length
   }
 
   /**
@@ -798,7 +822,8 @@ export class HyperFormula implements TypedEmitter {
    * deterministic across hosts. `registerLanguage` does not constrain the shape of a language code, so a caller may
    * register a structurally invalid one (e.g. an underscore-style `'pt_BR'`); such a tag makes `Intl.Collator`
    * throw a `RangeError`, so we fall back to the environment default collator to keep the function list from
-   * crashing on a caller-registered, non-BCP-47 code.
+   * crashing on a caller-registered, non-BCP-47 code. That fallback reintroduces the host-dependent ordering the
+   * explicit collator exists to avoid, so it warns rather than degrading silently.
    *
    * @param {string} languageCode - the HyperFormula language code
    */
@@ -806,6 +831,7 @@ export class HyperFormula implements TypedEmitter {
     try {
       return new Intl.Collator(HyperFormula.toBcp47Locale(languageCode))
     } catch (e) {
+      console.warn(`Language code '${languageCode}' is not a valid BCP-47 locale tag (${(e as Error).message}); falling back to the environment default collator, so the function list order depends on the host.`)
       return new Intl.Collator()
     }
   }
@@ -4598,8 +4624,13 @@ export class HyperFormula implements TypedEmitter {
    * their localized name.
    *
    * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
-   * functions, plus their aliases. Custom functions ship no catalogue entry, so their `category` is `undefined` and
+   * functions, plus their aliases. Custom functions ship no catalogue entry, so their `category` is absent and
    * their `shortDescription` is empty.
+   *
+   * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
+   * an untranslated id, so listing it would advertise a function that cannot be called. This also covers a custom
+   * plugin registered without translations for that language, and the bundled packs that leave a built-in
+   * untranslated (an empty string).
    *
    * @example
    * ```js
@@ -4625,12 +4656,14 @@ export class HyperFormula implements TypedEmitter {
    * Returns the full metadata of a single function registered in this instance, with names translated according to
    * the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
    * number of trailing parameters that repeat (`repeatLastArgs`), the category, a short description, and the
-   * documentation link (`documentationUrl`) and usage examples (`examples`) where authored (otherwise `''` and `[]`).
+   * documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in authors both.
    * Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
    * target's metadata (including examples, which spell the target's name) under the alias id, with the target id
-   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown or not registered in this instance.
-   * For a custom function, `category` is `undefined`, `shortDescription` is empty, and parameters are reported
-   * positionally (`Arg1`, `Arg2`, ...).
+   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
+   * has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
+   * described either, which keeps this method consistent with [[getAvailableFunctions]]).
+   * For a custom function, `category` is absent, `shortDescription` and `documentationUrl` are empty, `examples` is
+   * empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *

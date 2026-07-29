@@ -98,7 +98,7 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
 
 /**
  * Builds a Tier-1 list entry for a custom (user-registered) function, which ships no catalogue doc. Only the name
- * is known; `category` is `undefined` and `shortDescription` is empty.
+ * is known; `category` is omitted and `shortDescription` is empty.
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {TranslateName} translate - per-id translation lookup
@@ -107,7 +107,8 @@ export function buildCustomFunctionListEntry(canonicalName: string, translate: T
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
-    category: undefined,
+    // Omitted rather than set to `undefined`, for the same reason as `aliasOf` in buildFunctionDetails: the key
+    // would survive in memory but vanish through JSON.stringify, giving consumers two shapes for one function.
     shortDescription: '',
   }
 }
@@ -136,7 +137,8 @@ export function buildCustomFunctionDetails(canonicalName: string, metadata: Stru
     canonicalName,
     // See buildFunctionDetails: omitted for non-aliases instead of an `undefined` value.
     ...(aliasOf !== undefined ? {aliasOf} : {}),
-    category: undefined,
+    // `category` is omitted for the same reason: a custom function has no catalogue entry, and an
+    // `undefined`-valued key disappears through JSON.stringify while an absent one round-trips cleanly.
     shortDescription: '',
     parameters,
     repeatLastArgs: Math.min(metadata.repeatLastArgs ?? 0, parameters.length),
