@@ -130,6 +130,19 @@ export class FunctionRegistry {
     return this._builtinFunctionOwners.get(canonicalId) === plugin
   }
 
+  /**
+   * Returns whether `canonicalId` is a built-in function id, regardless of which plugin currently provides it. Use
+   * this to decide whether the static metadata API describes an id at all, and {@link isBuiltinFunction} to decide
+   * whether it may wear the built-in's catalogue doc: a user plugin registered over a built-in id still occupies a
+   * built-in id, so it is described (as a custom function) rather than dropped from the API altogether.
+   *
+   * @internal
+   * @param {string} canonicalId - the language-independent function id (the alias target, never an alias)
+   */
+  public static isBuiltinFunctionId(canonicalId: string): boolean {
+    return this._builtinFunctionOwners.has(canonicalId)
+  }
+
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     this.loadPluginFunction(plugin, functionId, this.plugins)
     if (translations !== undefined) {
@@ -174,9 +187,12 @@ export class FunctionRegistry {
 
   /**
    * Returns the ids of all functions the function-metadata API (`getAvailableFunctions`/`getFunctionDetails`)
-   * should describe: every registered, non-protected built-in function (canonical ids plus their aliases), plus
-   * the protected ids (e.g. `VERSION`, `OFFSET`). Custom functions registered via registerFunctionPlugin are
-   * excluded; they appear only in the instance method variant. Protected ids are excluded from registration
+   * should describe: every registered function that occupies a built-in id (canonical ids plus their aliases) even
+   * when a user plugin currently provides it, plus the protected ids (e.g. `VERSION`, `OFFSET`). Functions
+   * registered under a brand-new id via registerFunctionPlugin are excluded; they appear only in the instance
+   * method variant. A user plugin registered over a built-in id stays listed (as a custom function, since
+   * {@link isBuiltinFunction} denies it the catalogue doc) because it remains callable in every instance — dropping
+   * it would hide a working function from the list. Protected ids are excluded from registration
    * (`this.plugins`) so they can never be unregistered or shadowed, but a user can still call them from a formula,
    * so the metadata API surfaces them too (HF-249). Safe to include here: this method is consumed only by the
    * metadata API, never by anything that would let a caller register/unregister against a protected id.
@@ -184,9 +200,9 @@ export class FunctionRegistry {
   public static getListableFunctionIds(): string[] {
     const ids: string[] = []
     for (const [functionId, plugin] of this.plugins.entries()) {
-      // Resolve aliases to their canonical target id before checking built-in ownership
+      // Resolve aliases to their canonical target id before checking whether the id is a built-in one
       const canonicalId = plugin.aliases?.[functionId] ?? functionId
-      if (this.isBuiltinFunction(canonicalId, plugin)) {
+      if (this.isBuiltinFunctionId(canonicalId)) {
         ids.push(functionId)
       }
     }

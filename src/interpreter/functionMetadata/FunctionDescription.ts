@@ -46,10 +46,11 @@ export interface FunctionDoc {
   /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
   parameters: ParameterDoc[],
   /**
-   * Link to the function's documentation. Required for all functions, so a new catalogue entry cannot silently
-   * ship without one.
+   * Link to the function's documentation. Omit it to inherit `DEFAULT_DOCUMENTATION_URL`, the shared guide page
+   * every built-in points at today; set it only for an entry that needs its own link (e.g. once the guide grows
+   * per-function anchors). Every entry therefore ships with a link whether or not it authors one.
    */
-  documentationUrl: string,
+  documentationUrl?: string,
   /** Usage examples (English). Authored for every built-in function; at least one per function. */
   examples?: string[],
 }
@@ -62,6 +63,13 @@ export interface FunctionListEntry {
   localizedName: string,
   /** Language-independent function id, e.g. `'SUMIF'`. */
   canonicalName: string,
+  /**
+   * When this entry is an alias, the id of the function it resolves to (e.g. `'PERCENTILE.INC'` for
+   * `'PERCENTILE'`); absent for non-alias functions. An alias borrows its target's category and description, so a
+   * picker uses this field to collapse or annotate the aliases without having to call `getFunctionDetails` for
+   * every entry. Same meaning as [[FunctionDetails.aliasOf]].
+   */
+  aliasOf?: string,
   /** Documented category; absent for custom (user-registered) functions that ship no catalogue entry. */
   category?: FunctionCategory,
   /**

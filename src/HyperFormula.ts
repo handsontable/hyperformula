@@ -659,8 +659,10 @@ export class HyperFormula implements TypedEmitter {
    * short description. Entries are sorted alphabetically by their localized name.
    *
    * The static method covers the globally-registered built-in functions and their aliases. Custom (user-registered)
-   * functions are instance-scoped, so they are listed only by the instance method [[getAvailableFunctions]], not by
-   * this static one.
+   * functions under their own new id are instance-scoped, so they are listed only by the instance method
+   * [[getAvailableFunctions]], not by this static one; a custom plugin registered over a built-in id stays listed
+   * here, but as a custom function (no `category`, empty `shortDescription`). An alias is listed under its own id,
+   * borrowing its target's category and description, with the target id exposed as `aliasOf`.
    *
    * A function with no translation entry for `code` is omitted: the interpreter refuses to evaluate an untranslated
    * id, so listing it would advertise a function that cannot be called. Some bundled language packs leave a
@@ -681,11 +683,9 @@ export class HyperFormula implements TypedEmitter {
    */
   public static getAvailableFunctions(code: string): FunctionListEntry[] {
     validateArgToType(code, 'string', 'code')
-    const language = this.getLanguage(code)
     return HyperFormula.buildAvailableFunctions(
       FunctionRegistry.getListableFunctionIds(),
       (id) => FunctionRegistry.getFunctionPlugin(id),
-      language,
       code,
     )
   }
@@ -700,8 +700,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * The static method resolves the globally-registered built-in functions and their aliases. An alias reports
    * its target's metadata (including examples, which spell the target's name) under the alias id, with the
-   * target id exposed as `aliasOf`. For custom (user-registered) functions, use the instance method
-   * [[getFunctionDetails]].
+   * target id exposed as `aliasOf`. For custom (user-registered) functions under their own new id, use the instance
+   * method [[getFunctionDetails]]; a custom plugin registered over a built-in id is still resolved here, but as a
+   * custom function (no `category`, empty `shortDescription`) so the result describes what actually runs.
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    * @param {string} code - language code, e.g. `'enGB'`
@@ -735,10 +736,14 @@ export class HyperFormula implements TypedEmitter {
       }
       return HyperFormula.buildFunctionDetailsFor(canonicalName, undefined, language)
     }
-    // Resolve aliases to their canonical target id before checking built-in ownership
+    // Resolve aliases to their canonical target id before checking whether the id is a built-in one
     const canonicalId = plugin.aliases?.[canonicalName] ?? canonicalName
-    // The static method only describes built-in functions; custom plugins are excluded and available via the instance method
-    if (!FunctionRegistry.isBuiltinFunction(canonicalId, plugin)) {
+    // The static method describes the built-in ids only; a function registered under a brand-new id is instance
+    // scope and reachable through the instance method. An id that IS a built-in one stays described even when a
+    // user plugin has been registered over it — it remains callable in every instance, so hiding it would be a
+    // lie. `resolveFunctionMetadata` withholds the built-in catalogue doc in that case, so it is reported as a
+    // custom function rather than with metadata its implementation does not honour.
+    if (!FunctionRegistry.isBuiltinFunctionId(canonicalId)) {
       return undefined
     }
     return HyperFormula.buildFunctionDetailsFor(canonicalName, plugin, language)
@@ -753,10 +758,13 @@ export class HyperFormula implements TypedEmitter {
    * applicable doc, `doc` is `undefined` and only the structural metadata is available. Shared by the list and the
    * details builders so they always agree. The `getPlugin` callback abstracts over the static and the instance registry.
    *
+   * The returned `aliasOf` is the target's id when `functionId` is an alias, else `undefined`. It is derived here
+   * rather than at each call site so the list and the details report the alias relation identically.
+   *
    * @param {string} functionId - the language-independent function id (canonical id or alias)
    * @param {FunctionPluginDefinition | undefined} plugin - the plugin registered for `functionId`, or `undefined`
    */
-  private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata, targetId: string } | undefined {
+  private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata, aliasOf: string | undefined } | undefined {
     // Protected ids (VERSION, OFFSET) are excluded from the plugin registry by design (`getFunctionPlugin` always
     // returns `undefined` for them), so they would otherwise fall straight into the `plugin === undefined` case
     // below and disappear from the metadata API. Kuba decided (HF-249) that they must still be described, because
@@ -770,7 +778,8 @@ export class HyperFormula implements TypedEmitter {
       if (!HyperFormula.isCatalogueArityConsistent(protectedDoc, protectedMetadata)) {
         return undefined
       }
-      return {doc: protectedDoc, metadata: protectedMetadata, targetId: functionId}
+      // A protected id is never an alias, so it resolves to itself.
+      return {doc: protectedDoc, metadata: protectedMetadata, aliasOf: undefined}
     }
     if (plugin === undefined) {
       return undefined
@@ -787,7 +796,7 @@ export class HyperFormula implements TypedEmitter {
     if (!HyperFormula.isCatalogueArityConsistent(doc, metadata)) {
       return undefined
     }
-    return {doc, metadata, targetId: metadataKey}
+    return {doc, metadata, aliasOf: metadataKey !== functionId ? metadataKey : undefined}
   }
 
   /**
@@ -841,8 +850,17 @@ export class HyperFormula implements TypedEmitter {
    * functions are listed with their name only. Sorted by localized name under an explicit, language-derived collator
    * (so the order does not depend on the host locale), with the language-independent canonical name as a stable
    * tiebreaker for entries that share a localized name.
+   *
+   * Takes the language code rather than the resolved [[TranslationPackage]] and the code it came from: the package
+   * is derivable from the code, and accepting both would let a caller pass a pair that disagrees, translating names
+   * under one language while ordering them under another.
+   *
+   * @param {string[]} functionIds - the registered ids to describe
+   * @param {(id: string) => FunctionPluginDefinition | undefined} getPlugin - resolves the plugin registered for an id
+   * @param {string} languageCode - the HyperFormula language code to translate and order the names under
    */
-  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage, languageCode: string): FunctionListEntry[] {
+  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, languageCode: string): FunctionListEntry[] {
+    const language = HyperFormula.getLanguage(languageCode)
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     const collator = HyperFormula.createLocaleCollator(languageCode)
     return functionIds
@@ -854,9 +872,12 @@ export class HyperFormula implements TypedEmitter {
         if (resolved === undefined) {
           return undefined
         }
+        // An alias borrows its target's category and description, so the alias->target relation is surfaced as
+        // `aliasOf` here too — a picker can group or annotate the aliases straight from the list, without one
+        // getFunctionDetails call per entry.
         return resolved.doc !== undefined
-          ? buildFunctionListEntry(id, resolved.doc, translate)
-          : buildCustomFunctionListEntry(id, translate)
+          ? buildFunctionListEntry(id, resolved.doc, translate, resolved.aliasOf)
+          : buildCustomFunctionListEntry(id, translate, resolved.aliasOf)
       })
       .filter((entry): entry is FunctionListEntry => entry !== undefined)
       .sort((a, b) => collator.compare(a.localizedName, b.localizedName) || collator.compare(a.canonicalName, b.canonicalName))
@@ -879,10 +900,9 @@ export class HyperFormula implements TypedEmitter {
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     // An alias borrows the target's metadata (including examples, which spell the target's name), so the
     // alias->target relation is surfaced as `aliasOf` for consumers to detect and explain the difference.
-    const aliasOf = resolved.targetId !== functionId ? resolved.targetId : undefined
     return resolved.doc !== undefined
-      ? buildFunctionDetails(functionId, resolved.doc, resolved.metadata, translate, aliasOf)
-      : buildCustomFunctionDetails(functionId, resolved.metadata, translate, aliasOf)
+      ? buildFunctionDetails(functionId, resolved.doc, resolved.metadata, translate, resolved.aliasOf)
+      : buildCustomFunctionDetails(functionId, resolved.metadata, translate, resolved.aliasOf)
   }
 
   /**
@@ -4624,8 +4644,9 @@ export class HyperFormula implements TypedEmitter {
    * their localized name.
    *
    * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
-   * functions, plus their aliases. Custom functions ship no catalogue entry, so their `category` is absent and
-   * their `shortDescription` is empty.
+   * functions, plus their aliases. An alias is listed under its own id, borrowing its target's category and
+   * description, with the target id exposed as `aliasOf`. Custom functions ship no catalogue entry, so their
+   * `category` is absent and their `shortDescription` is empty.
    *
    * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
    * an untranslated id, so listing it would advertise a function that cannot be called. This also covers a custom
@@ -4643,11 +4664,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Helpers
    */
   public getAvailableFunctions(): FunctionListEntry[] {
-    const language = HyperFormula.getLanguage(this._config.language)
     return HyperFormula.buildAvailableFunctions(
       this._functionRegistry.getListableFunctionIds(),
       (id) => this._functionRegistry.getFunctionPlugin(id),
-      language,
       this._config.language,
     )
   }

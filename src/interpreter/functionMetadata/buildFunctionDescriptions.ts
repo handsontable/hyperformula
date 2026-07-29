@@ -13,8 +13,9 @@ type TranslateName = (canonicalName: string) => string | undefined
 export type StructuralMetadata = Pick<FunctionMetadata, 'parameters' | 'repeatLastArgs'>
 
 /**
- * The single shared documentation URL for the built-in catalogue (HF-300). Every non-protected built-in points at
- * this one page in v1 (no per-function anchors); the metadata-enrichment tests import it to assert coverage.
+ * The single shared documentation URL for the built-in catalogue (HF-300). Every built-in points at this one page in
+ * v1 (no per-function anchors), so it is the default for a `FunctionDoc` that omits `documentationUrl` rather than a
+ * value each catalogue entry repeats. Once the guide grows per-function anchors, an entry can override it.
  */
 export const DEFAULT_DOCUMENTATION_URL = 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html'
 
@@ -46,11 +47,14 @@ function resolveName(canonicalName: string, translate: TranslateName): string {
  * @param {string} canonicalName - the language-independent function id
  * @param {FunctionDoc} doc - the function's authored catalogue entry
  * @param {TranslateName} translate - per-id translation lookup
+ * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
  */
-export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, translate: TranslateName): FunctionListEntry {
+export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, translate: TranslateName, aliasOf?: string): FunctionListEntry {
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
+    // See buildFunctionDetails: omitted for non-aliases instead of an `undefined` value.
+    ...(aliasOf !== undefined ? {aliasOf} : {}),
     category: doc.category,
     shortDescription: doc.shortDescription,
   }
@@ -59,8 +63,8 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
 /**
  * Builds a Tier-2 details object: the list fields plus the parameter list (name, description, optionality) and
  * `repeatLastArgs` (how many trailing parameters repeat). The caller renders the syntax string from these.
- * `documentationUrl` comes from the catalogue doc; `examples` falls back to `[]`. Built-in parameters carry authored
- * descriptions; custom functions surface empty values.
+ * `documentationUrl` comes from the catalogue doc, falling back to {@link DEFAULT_DOCUMENTATION_URL}; `examples`
+ * falls back to `[]`. Built-in parameters carry authored descriptions; custom functions surface empty values.
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {FunctionDoc} doc - the function's authored catalogue entry
@@ -91,7 +95,7 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     shortDescription: doc.shortDescription,
     parameters,
     repeatLastArgs: metadata.repeatLastArgs ?? 0,
-    documentationUrl: doc.documentationUrl,
+    documentationUrl: doc.documentationUrl ?? DEFAULT_DOCUMENTATION_URL,
     examples: [...(doc.examples ?? [])],
   }
 }
@@ -102,12 +106,15 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {TranslateName} translate - per-id translation lookup
+ * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
  */
-export function buildCustomFunctionListEntry(canonicalName: string, translate: TranslateName): FunctionListEntry {
+export function buildCustomFunctionListEntry(canonicalName: string, translate: TranslateName, aliasOf?: string): FunctionListEntry {
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
-    // Omitted rather than set to `undefined`, for the same reason as `aliasOf` in buildFunctionDetails: the key
+    // See buildFunctionDetails: omitted for non-aliases instead of an `undefined` value.
+    ...(aliasOf !== undefined ? {aliasOf} : {}),
+    // `category` is omitted rather than set to `undefined`, for the same reason as `aliasOf`: the key
     // would survive in memory but vanish through JSON.stringify, giving consumers two shapes for one function.
     shortDescription: '',
   }

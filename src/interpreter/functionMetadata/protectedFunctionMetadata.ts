@@ -18,9 +18,10 @@ import {StructuralMetadata} from './buildFunctionDescriptions'
  *   into the metadata builders, which this module avoids.
  *
  * Each entry's `parameters.length` MUST equal the corresponding `FunctionDoc.parameters.length` in `FUNCTION_DOCS`.
- * Unlike plugin-backed functions, `HyperFormula.resolveFunctionMetadata`'s arity cross-check does not run for
- * protected ids (they return early, before that check), so this invariant is not enforced at runtime — it must be
- * kept true by hand when editing either map, otherwise `buildFunctionDetails` throws for the mismatched id.
+ * `HyperFormula.resolveFunctionMetadata` cross-checks the two for protected ids exactly as it does for plugin-backed
+ * ones, and a mismatch fails safe rather than loudly: the function is silently dropped from both
+ * `getAvailableFunctions` and `getFunctionDetails`, with nothing thrown and nothing logged. So keep the invariant
+ * true by hand when editing either map — the only symptom of breaking it is a function that quietly disappears.
  */
 export const PROTECTED_FUNCTION_METADATA: Record<string, StructuralMetadata> = {
   OFFSET: {
