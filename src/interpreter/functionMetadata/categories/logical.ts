@@ -68,8 +68,8 @@ export const LOGICAL_DOCS: Record<string, FunctionDoc> = {
   },
   SWITCH: {
     category: 'Logical',
-    shortDescription: 'Returns the result paired with the first value that matches expression. Further value/result pairs can follow, and a final unpaired argument is the default; without one, an unmatched expression returns #N/A.',
-    parameters: [{name: 'expression', description: 'The expression or value compared against the candidate values that follow.'}, {name: 'value1', description: 'The first candidate value compared to expression.'}, {name: 'result1', description: 'The value returned when value1 matches expression. Further value/result pairs can be passed as additional arguments, and a final unpaired argument is returned as the default when no candidate matches.'}],
+    shortDescription: 'Compares expression against value1, value2, ... in order and returns the paired result1, result2, ...; a candidate value that is an error is skipped rather than matched.',
+    parameters: [{name: 'expression', description: 'The expression or value compared against the candidate values that follow.'}, {name: 'value1', description: 'The first candidate value compared to expression; an error value is skipped rather than compared.'}, {name: 'result1', description: 'The value returned when value1 matches expression. Further value/result pairs can be passed as additional arguments, and a final unpaired argument is returned as the default when no candidate matches; without one, an unmatched expression returns #N/A.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SWITCH(A1, 1, "one", 2, "two", "other")', '=SWITCH(WEEKDAY(A1), 1, "Sunday", 7, "Saturday", "weekday")'],
   },

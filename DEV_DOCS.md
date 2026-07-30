@@ -134,7 +134,7 @@ Adding a built-in function is similar to adding a [custom function](docs/guide/c
 
 Every field is required, `documentationUrl` included. Each entry authors its own link rather than inheriting a shared default, so that the links can diverge per function without touching any code; they all happen to point at the same guide page today.
 
-An entry's `category` must be one of the categories in `FUNCTION_CATEGORIES` &mdash; the ones the generated guide page renders as `### ` sections. The separate `'Custom'` category is reserved for user-registered functions and must never appear in `FUNCTION_CATEGORIES` or in a catalogue file: it names no section, so the docs generator rejects an entry carrying it instead of quietly leaving the page a row short.
+An entry's `category` must be one of the categories in `FUNCTION_CATEGORIES` &mdash; the ones the generated guide page renders as `### ` sections. The separate `'Custom'` category is reserved for user-registered functions and must never appear in `FUNCTION_CATEGORIES` or in a catalogue file: it names no section, and the docs generator rejects an entry carrying it rather than silently dropping it from the page it is building. (This does not cover the two silent-omission modes below, which happen earlier &mdash; before an entry ever reaches the generator.)
 
 Two ways to get this wrong, both of which fail silently &mdash; the function simply disappears from the public API and from the generated docs page, with a green build:
 
