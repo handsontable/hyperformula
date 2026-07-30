@@ -124,8 +124,20 @@ Adding a built-in function is similar to adding a [custom function](docs/guide/c
 1. Create or modify a plugin in `src/interpreter/plugin/`.
 2. Add function metadata to `implementedFunctions`.
 3. Implement the function method.
-4. Add translations to all language files in `src/i18n/languages/`.
-5. Add tests in `test/unit/interpreter/`.
+4. Add a catalogue entry to `src/interpreter/functionMetadata/categories/<category>.ts` (see below).
+5. Add translations to all language files in `src/i18n/languages/`.
+6. Add tests in `test/unit/interpreter/`.
+
+### The function metadata catalogue
+
+`src/interpreter/functionMetadata/categories/` holds the human-readable metadata for every built-in function: `shortDescription`, `parameters` (`snake_case` names, each with a description), `examples`, and the category. It is the single source of truth for two consumers: the public [`getAvailableFunctions`/`getFunctionDetails`](docs/api/classes/hyperformula.md) API, and the generated built-in functions guide page (see [docs/README.md](docs/README.md)).
+
+Two ways to get this wrong, both of which fail silently &mdash; the function simply disappears from the public API and from the generated docs page, with a green build:
+
+- **No catalogue entry.** A function that is registered but absent from the catalogue is not listed and has no details.
+- **Arity drift.** If the entry's parameter list disagrees with the plugin's `implementedFunctions` (parameter count, or optionality that does not match `optionalArg`/`defaultValue`), the function is dropped from both the list and the details, deliberately, so the two can never disagree with each other.
+
+Keep the entry's parameters in step with `implementedFunctions` whenever you change a signature. Parameter descriptions must refer to parameters by their exact `snake_case` names, and `shortDescription` must not use docs-page-local markup (no relative links, no footnote references) &mdash; the strings are rendered by API consumers as well as by the docs page.
 
 ## Internationalization and function translations
 

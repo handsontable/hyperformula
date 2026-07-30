@@ -147,9 +147,17 @@ export class FunctionRegistry {
    * Answered from `FUNCTION_DOCS`, not from {@link _builtinFunctionOwners}: the catalogue is a plain module constant,
    * so the built-in id set is intrinsic and cannot depend on whether some initialization step ran. Deliberately NOT
    * derived from the plugin barrel, which the built-in ids would otherwise have to come from — importing it here
-   * creates a module-load-order cycle that breaks the bundled build. The two sets are equal by construction: the
-   * catalogue holds an entry per built-in `implementedFunctions` key plus the protected ids (which are never
-   * registered, so they cannot reach this method from `this.plugins`), and a test enforces that coverage.
+   * creates a module-load-order cycle that breaks the bundled build. The catalogue holds an entry per built-in
+   * `implementedFunctions` key plus the protected ids (which are never registered, so they cannot reach this method
+   * from `this.plugins`), and a test enforces that coverage.
+   *
+   * The catalogue keys **canonical ids only** — it carries no entry per alias — so callers must resolve an alias to
+   * its target before asking (see {@link getListableFunctionIds}). That covers every built-in alias, because the
+   * built-in plugin owning the alias declares it in its `aliases` map. It does not cover a *user* plugin registered
+   * directly under a built-in alias id: such a plugin declares no `aliases`, so the id resolves to itself, matches no
+   * catalogue entry, and is reported as not being a built-in id. The function stays callable and the instance
+   * metadata methods still list it (as a custom function), but the static ones omit it. Widening this would mean
+   * snapshotting the built-in alias keys alongside {@link _builtinFunctionOwners}.
    *
    * @internal
    * @param {string} canonicalId - the language-independent function id (the alias target, never an alias)

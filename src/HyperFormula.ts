@@ -665,8 +665,8 @@ export class HyperFormula implements TypedEmitter {
    * borrowing its target's category and description, with the target id exposed as `aliasOf`.
    *
    * A function with no translation entry for `code` is omitted: the interpreter refuses to evaluate an untranslated
-   * id, so listing it would advertise a function that cannot be called. Some bundled language packs leave a
-   * built-in untranslated (an empty string), which is why a given language may list fewer functions than another.
+   * id, so listing it would advertise a function that cannot be called. A translation set to an empty string is not
+   * a missing entry — it falls back to the canonical id, so the function stays listed under its canonical name.
    *
    * @param {string} code - language code, e.g. `'enGB'`
    *
@@ -4649,9 +4649,11 @@ export class HyperFormula implements TypedEmitter {
    * `category` is absent and their `shortDescription` is empty.
    *
    * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
-   * an untranslated id, so listing it would advertise a function that cannot be called. This also covers a custom
-   * plugin registered without translations for that language, and the bundled packs that leave a built-in
-   * untranslated (an empty string).
+   * an untranslated id, so listing it would advertise a function that cannot be called — in practice, a custom
+   * plugin registered without translations for that language. A translation set to an empty string is not a missing
+   * entry: it falls back to the canonical id, so the function stays listed under its canonical name.
+   *
+   * @throws [[LanguageNotRegisteredError]] when the language set in this instance's configuration is not registered
    *
    * @example
    * ```js
@@ -4687,6 +4689,7 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   * @throws [[LanguageNotRegisteredError]] when the language set in this instance's configuration is not registered
    *
    * @example
    * ```js

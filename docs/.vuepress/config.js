@@ -8,6 +8,10 @@ const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet')
 const mdCompanions = require('./plugins/md-companions');
 
 const searchPattern = new RegExp('^/api', 'i');
+// Pages generated at build time have no editable source file in the repository, so the "edit this page" link would
+// point at a path that does not exist. The built-in functions page is spliced together from
+// built-in-functions.tmpl.md and the function metadata catalogue (see docs/README.md).
+const generatedPagePattern = new RegExp('^/guide/built-in-functions', 'i');
 
 // Build configuration (override via env vars or docs/.vuepress/build.config.js)
 const buildConfigOverrides = (() => {
@@ -109,7 +113,7 @@ module.exports = {
         // inject current HF function count as {{ $page.functionsCount }} variable
         $page.functionsCount = HyperFormula.getRegisteredFunctionNames('enGB').length
 
-        if (searchPattern.test($page.path)) {
+        if (searchPattern.test($page.path) || generatedPagePattern.test($page.path)) {
           $page.frontmatter.editLink = false
         }
       },
