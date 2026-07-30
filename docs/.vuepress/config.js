@@ -11,7 +11,8 @@ const searchPattern = new RegExp('^/api', 'i');
 // Pages generated at build time have no editable source file in the repository, so the "edit this page" link would
 // point at a path that does not exist. The built-in functions page is spliced together from
 // built-in-functions.tmpl.md and the function metadata catalogue (see docs/README.md).
-const generatedPagePattern = new RegExp('^/guide/built-in-functions', 'i');
+// Anchored, so a hand-written sibling page (e.g. /guide/built-in-functions-faq) keeps its edit link.
+const generatedPagePattern = new RegExp('^/guide/built-in-functions(\\.html)?$', 'i');
 
 // Build configuration (override via env vars or docs/.vuepress/build.config.js)
 const buildConfigOverrides = (() => {
