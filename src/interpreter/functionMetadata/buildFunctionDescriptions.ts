@@ -26,15 +26,19 @@ export function isParameterOptional(arg: FunctionArgument | undefined): boolean 
  * non-negative integer no larger than the number of parameters. Shared by both details builders, so the built-in and
  * the custom path can never report the field under different rules.
  *
- * Neither rule is invented here:
+ * The two rules have different provenance: the first mirrors the evaluator, the second normalizes a declaration the
+ * evaluator cannot honour sensibly.
  * - Only a positive integer means anything. `FunctionPlugin.buildMetadataForEachArgumentValue` gates the repeat on
  *   `Number.isInteger(repeatLastArgs) && repeatLastArgs > 0`, so for `undefined`, `0`, a negative, a fraction, `NaN`
  *   or `Infinity` the evaluator repeats nothing and the function has a fixed arity. Reporting `0` for all of those
  *   describes what actually runs instead of echoing a value the interpreter ignores. (`Math.min` alone would not do:
  *   `Math.min(NaN, 2)` is `NaN` and `Math.min(-1, 2)` is `-1`.)
- * - A valid count is clamped to the parameter count. A plugin declaring more repeating parameters than it has
- *   parameters would otherwise render as "the last N of M parameters repeat" with N > M, and the evaluator's own
- *   `slice(length - repeatLastArgs)` cannot reach further back than the whole list either.
+ * - A valid count is clamped to the parameter count. This is a repair of a malformed declaration for reporting
+ *   purposes, not a claim about how the evaluator treats it: a count above the parameter count makes
+ *   `buildMetadataForEachArgumentValue`'s `slice(length - repeatLastArgs)` index negative, so the parameter list
+ *   doubles on every pass and the function ends up accepting an erratic set of arities that no `repeatLastArgs`
+ *   value describes. Since the field cannot be reported faithfully at all in that case, it carries the largest
+ *   meaningful count rather than rendering "the last N of M parameters repeat" with N > M.
  *
  * @param {number | undefined} repeatLastArgs - the value declared in `implementedFunctions`, if any
  * @param {number} parameterCount - the number of parameters the function declares
@@ -87,7 +91,7 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
  * Builds a Tier-2 details object: the list fields plus the parameter list (name, description, optionality) and
  * `repeatLastArgs` (how many trailing parameters repeat, normalized by [[clampRepeatLastArgs]]). The caller renders
  * the syntax string from these.
- * `documentationUrl` comes from the catalogue doc, which authors it for every entry; `examples` falls back to `[]`.
+ * `documentationUrl` and `examples` come from the catalogue doc, which authors both for every entry.
  * Built-in parameters carry authored descriptions; custom functions surface empty values.
  *
  * @param {string} canonicalName - the language-independent function id
@@ -120,7 +124,7 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     parameters,
     repeatLastArgs: clampRepeatLastArgs(metadata.repeatLastArgs, parameters.length),
     documentationUrl: doc.documentationUrl,
-    examples: [...(doc.examples ?? [])],
+    examples: [...doc.examples],
   }
 }
 

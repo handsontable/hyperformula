@@ -111,6 +111,10 @@ module.exports = {
         // inject current HF releaseDate as {{ $page.releaseDate }} variable
         $page.releaseDate = HyperFormula.releaseDate
         // inject current HF function count as {{ $page.functionsCount }} variable
+        // This total and the rows of the built-in functions page come from two different sources: the count below,
+        // and getAvailableFunctions via script/renderBuiltinFunctionsTable.ts. They agree today (423 each) and must
+        // be kept in step by hand, or the page prints a total that contradicts the number of rows under it. The
+        // renderer throws on the one divergence it can see from its side; this side cannot detect any.
         $page.functionsCount = HyperFormula.getRegisteredFunctionNames('enGB').length
 
         if (searchPattern.test($page.path) || generatedPagePattern.test($page.path)) {

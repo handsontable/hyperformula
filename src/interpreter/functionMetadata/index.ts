@@ -25,6 +25,13 @@ export * from './FunctionDescription'
  * source of truth for both the function metadata API and the generated `docs/guide/built-in-functions.md` guide page;
  * edit a category file to change what either reports. Coverage of the whole canonical set is enforced by test.
  *
+ * The *key set* is load-bearing beyond lookup: `FunctionRegistry.isBuiltinFunctionId` answers "is this a built-in
+ * id?" from this object, so the catalogue defines what counts as a built-in. A key left behind after a rename, or a
+ * typo'd one, therefore widens that set silently — nothing checks a catalogue key against a registered function —
+ * and a user plugin registered under such an orphan id is then reported by the static, built-ins-only
+ * `HyperFormula.getAvailableFunctions` (as a custom function). Removing or renaming a built-in means removing or
+ * renaming its entry in the same change.
+ *
  * Deliberately prototype-less. The catalogue doubles as the built-in id *set* (see
  * `FunctionRegistry.isBuiltinFunctionId`), and a caller-supplied id is looked up in it directly. With
  * `Object.prototype` in the chain, `FUNCTION_DOCS['toString']` resolves to a function rather than `undefined`, so ids

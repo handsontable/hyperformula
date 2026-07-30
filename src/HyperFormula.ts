@@ -705,6 +705,13 @@ export class HyperFormula implements TypedEmitter {
    * method [[getFunctionDetails]]; a custom plugin registered over a built-in id is still resolved here, but as a
    * custom function (`category: 'Custom'`, empty `shortDescription`) so the result describes what actually runs.
    *
+   * `canonicalName` is matched exactly, in two ways worth knowing:
+   * - It is **case-sensitive**, unlike formula syntax. `'SUMIF'` resolves; `'sumif'` and `'SumIf'` return
+   *   `undefined`, even though `=sumif(...)` evaluates.
+   * - It must be the **canonical (English) id, never a localized name**. `localizedName` is output only:
+   *   `getFunctionDetails('SUMIF', 'plPL')` reports `localizedName: 'SUMA.JEŻELI'`, but passing `'SUMA.JEŻELI'` back
+   *   in returns `undefined`. To look up an entry from [[getAvailableFunctions]], pass its `canonicalName`.
+   *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    * @param {string} code - language code, e.g. `'enGB'`
    *
@@ -4685,6 +4692,13 @@ export class HyperFormula implements TypedEmitter {
    * described either, which keeps this method consistent with [[getAvailableFunctions]]).
    * For a custom function, `category` is `'Custom'`, `shortDescription` and `documentationUrl` are empty, `examples`
    * is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
+   *
+   * `canonicalName` is matched exactly, in two ways worth knowing:
+   * - It is **case-sensitive**, unlike formula syntax. `'SUMIF'` resolves; `'sumif'` and `'SumIf'` return
+   *   `undefined`, even though `=sumif(...)` evaluates.
+   * - It must be the **canonical (English) id, never a localized name**. `localizedName` is output only: under
+   *   `plPL` this method reports `localizedName: 'SUMA.JEŻELI'` for `'SUMIF'`, but passing `'SUMA.JEŻELI'` back in
+   *   returns `undefined`. To look up an entry from [[getAvailableFunctions]], pass its `canonicalName`.
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *

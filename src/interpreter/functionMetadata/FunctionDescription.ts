@@ -78,8 +78,11 @@ export interface FunctionDoc {
    * means a new function cannot silently ship without a link.
    */
   documentationUrl: string,
-  /** Usage examples (English). Authored for every built-in function; at least one per function. */
-  examples?: string[],
+  /**
+   * Usage examples (English). Required, for the same reason as `documentationUrl`: every built-in authors at least
+   * one, and making the field mandatory means a new function cannot silently ship without any.
+   */
+  examples: string[],
 }
 
 /**
