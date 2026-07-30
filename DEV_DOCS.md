@@ -134,6 +134,8 @@ Adding a built-in function is similar to adding a [custom function](docs/guide/c
 
 Every field is required, `documentationUrl` included. Each entry authors its own link rather than inheriting a shared default, so that the links can diverge per function without touching any code; they all happen to point at the same guide page today.
 
+An entry's `category` must be one of the categories in `FUNCTION_CATEGORIES` &mdash; the ones the generated guide page renders as `### ` sections. The separate `'Custom'` category is reserved for user-registered functions and must never appear in `FUNCTION_CATEGORIES` or in a catalogue file: it names no section, so the docs generator rejects an entry carrying it instead of quietly leaving the page a row short.
+
 Two ways to get this wrong, both of which fail silently &mdash; the function simply disappears from the public API and from the generated docs page, with a green build:
 
 - **No catalogue entry.** A function that is registered but absent from the catalogue is not listed and has no details.
@@ -147,7 +149,7 @@ It does **not** turn ordinary English into identifiers. A parameter's own descri
 
 `shortDescription` must not use docs-page-local markup (no relative links, no footnote references): the strings are rendered by API consumers as well as by the docs page.
 
-Note what the drift check does **not** cover: **optionality is not cross-checked.** The catalogue authors no optionality of its own &mdash; a parameter's `optional` flag is derived entirely from `optionalArg`/`defaultValue` in `implementedFunctions` &mdash; so a description that calls an argument optional can sit next to `optional: false` with nothing failing. When a function accepts a call that arity alone does not express (`SHEET()`, `ROW()`, and anything else served by `runFunctionWithReferenceArgument`'s zero-argument path), the plugin must declare `optionalArg: true` explicitly, or the public API will advertise the argument as required.
+Note what the drift check does **not** cover: **optionality is not cross-checked.** The catalogue authors no optionality of its own &mdash; a parameter's `optional` flag is derived entirely from `optionalArg`/`defaultValue` in `implementedFunctions` &mdash; so a description that calls an argument optional can sit next to `optional: false` with nothing failing. When a function accepts a call that arity alone does not express (`SHEET()`, `ROW()`, and anything else served by `runFunctionWithReferenceArgument`'s zero-argument path), the plugin must declare `optionalArg: true` explicitly, or the public API will advertise the argument as required. `ROW` and `COLUMN` do declare it; `SHEET` and `SHEETS` do not yet, so their metadata still calls their argument required even though `SHEET()` and `SHEETS()` evaluate &mdash; adding the flag is a plugin change, tracked separately from the metadata API.
 
 Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of the catalogue was seeded from a hand-written page that documented Excel, and HyperFormula deliberately deviates in places (`INT` truncates toward zero, `MOD` takes the sign of the dividend, `ISEVEN`/`ISODD` do not truncate, `CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1). Verify a claim against the implementation before authoring it, and record any deviation in [the list of differences](docs/guide/list-of-differences.md).
 

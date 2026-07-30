@@ -137,7 +137,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'SHEET': {
       method: 'sheet',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING, optionalArg: true}
+        {argumentType: FunctionArgumentType.STRING}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,
@@ -145,7 +145,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     'SHEETS': {
       method: 'sheets',
       parameters: [
-        {argumentType: FunctionArgumentType.STRING, optionalArg: true}
+        {argumentType: FunctionArgumentType.STRING}
       ],
       doesNotNeedArgumentsToBeComputed: true,
       vectorizationForbidden: true,

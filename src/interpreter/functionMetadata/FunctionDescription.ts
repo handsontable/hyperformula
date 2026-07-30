@@ -15,6 +15,11 @@
  * which name them in full words (e.g. "Math and trigonometry functions", "Lookup and reference functions") rather
  * than the abbreviated ribbon labels ("Math & Trig", "Lookup & Reference"). `Array manipulation`, `Matrix functions`
  * and `Operator` are HyperFormula-specific and have no Excel equivalent.
+ *
+ * This is the *documented* category set &mdash; the categories a catalogue entry may declare and the only ones the
+ * generated page renders. [[CUSTOM_FUNCTION_CATEGORY]] is deliberately NOT a member: it gets no `### ` section, and
+ * adding it here would break `script/generate-builtin-functions-doc.ts`'s assertion that the template's table of
+ * contents matches this array label for label.
  */
 export const FUNCTION_CATEGORIES = [
   'Array manipulation', 'Database', 'Date and time', 'Engineering',
@@ -23,9 +28,25 @@ export const FUNCTION_CATEGORIES = [
 ] as const
 
 /**
- * Language-independent function category identifier.
+ * A category a built-in function's catalogue entry ([[FunctionDoc]]) may declare: one of [[FUNCTION_CATEGORIES]],
+ * never [[CUSTOM_FUNCTION_CATEGORY]]. Every documented function therefore lands in one of the sections the generated
+ * built-in functions page renders, which is what keeps that page's rows complete.
  */
-export type FunctionCategory = typeof FUNCTION_CATEGORIES[number]
+export type DocumentedFunctionCategory = typeof FUNCTION_CATEGORIES[number]
+
+/**
+ * The category reported for a custom (user-registered) function. Such a function ships no catalogue entry, so it has
+ * none of the documented categories &mdash; but `category` is a required field, so it is reported under this one
+ * rather than by omitting the key. Not a member of [[FUNCTION_CATEGORIES]]: it names no section of the built-in
+ * functions guide page.
+ */
+export const CUSTOM_FUNCTION_CATEGORY = 'Custom'
+
+/**
+ * Language-independent function category identifier: one of the documented categories for a built-in function, or
+ * `'Custom'` for a user-registered one.
+ */
+export type FunctionCategory = DocumentedFunctionCategory | typeof CUSTOM_FUNCTION_CATEGORY
 
 /**
  * Storage: authored, human-readable metadata for one function parameter.
@@ -41,7 +62,8 @@ export interface ParameterDoc {
  * Storage: authored metadata for one canonical function. English (translations are a later phase).
  */
 export interface FunctionDoc {
-  category: FunctionCategory,
+  /** Documented category. Restricted to [[FUNCTION_CATEGORIES]]: a catalogue entry can never be `'Custom'`. */
+  category: DocumentedFunctionCategory,
   /**
    * One-liner, sentence-case description (English). (A separate long description may follow later.)
    * May contain inline markdown links (absolute URLs only) and `<br>` line breaks; no other markup.
@@ -75,8 +97,11 @@ export interface FunctionListEntry {
    * every entry. Same meaning as [[FunctionDetails.aliasOf]].
    */
   aliasOf?: string,
-  /** Documented category; absent for custom (user-registered) functions that ship no catalogue entry. */
-  category?: FunctionCategory,
+  /**
+   * Function category: one of the documented categories for a built-in function, `'Custom'` for a custom
+   * (user-registered) one, which ships no catalogue entry. Always present.
+   */
+  category: FunctionCategory,
   /**
    * One-liner description (English in the MVP). Empty (`''`) for custom functions.
    * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
@@ -111,8 +136,11 @@ export interface FunctionDetails {
    * field to detect and explain the relation.
    */
   aliasOf?: string,
-  /** Documented category; absent for custom (user-registered) functions that ship no catalogue entry. */
-  category?: FunctionCategory,
+  /**
+   * Function category: one of the documented categories for a built-in function, `'Custom'` for a custom
+   * (user-registered) one, which ships no catalogue entry. Always present.
+   */
+  category: FunctionCategory,
   /**
    * One-liner description (English in the MVP). Empty (`''`) for custom functions.
    * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
@@ -124,6 +152,10 @@ export interface FunctionDetails {
    * How many of the trailing `parameters` repeat indefinitely (a function with a variable number of arguments).
    * `0` when the argument list is fixed; e.g. `1` for `SUM(number1, ...)`, `2` for `SUMIFS` where the trailing
    * (criteria_range, criteria) pair repeats. The caller renders the syntax string from this.
+   *
+   * Always an integer in `[0, parameters.length]`, for a custom (user-registered) function too: a declared value the
+   * interpreter would not honour (negative, fractional, `NaN`, `Infinity`) is reported as `0`, and a valid count
+   * larger than the parameter list is clamped to it, so "the last N of M parameters repeat" is never nonsense.
    */
   repeatLastArgs: number,
   /**

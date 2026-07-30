@@ -3,7 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {FUNCTION_CATEGORIES, FunctionCategory, FunctionDetails, FunctionListEntry} from '../src/interpreter/functionMetadata/FunctionDescription'
+import {CUSTOM_FUNCTION_CATEGORY, DocumentedFunctionCategory, FUNCTION_CATEGORIES, FunctionDetails, FunctionListEntry} from '../src/interpreter/functionMetadata/FunctionDescription'
 import {formatFunctionSyntax} from './formatFunctionSyntax'
 
 /** Opening marker; the generated table region begins on the next line. */
@@ -27,9 +27,16 @@ const COLLATOR = new Intl.Collator('en', {sensitivity: 'variant', caseFirst: 'up
  * escape; all other markdown (links, code, `<br>`, footnotes) is verbatim. Both are replaced in a
  * single pass, so an input backslash can never end up escaping a backslash we just inserted
  * (escaping `|` alone leaves `a\|b` rendering as a cell break — CodeQL js/incomplete-sanitization).
+ *
+ * Line breaks need no handling: a catalogue string spells them as a literal `<br>` (see
+ * `FunctionDoc.shortDescription`), so none of the strings that reach here — the localized name, the shortDescription,
+ * or the syntax built from the parameter names — can contain a raw newline. A newline-to-`<br>` pass would be dead
+ * code; keep the `<br>` convention in the catalogue instead.
+ *
+ * @param {string} text - the cell text to escape
  */
 function escapeCell(text: string): string {
-  return text.replace(/\r?\n/g, '<br>').replace(/[\\|]/g, '\\$&')
+  return text.replace(/[\\|]/g, '\\$&')
 }
 
 /**
@@ -40,19 +47,25 @@ function escapeCell(text: string): string {
  * entries + details provider, so it is independent of how the catalogue is stored (forward-compatible with a
  * per-function file split).
  *
+ * Only the documented categories get a section, so every entry passed in must declare one: the page is generated from
+ * the built-in catalogue, where `category` is a [[DocumentedFunctionCategory]] by type. A `'Custom'` entry is rejected
+ * rather than skipped — silently dropping it would leave the page short of a row while the printed function total,
+ * which is computed independently in `docs/.vuepress/config.js`, still claimed it.
+ *
  * @param {FunctionListEntry[]} entries - the function set to document (e.g. `HyperFormula.getAvailableFunctions`)
  * @param {(canonicalName: string) => FunctionDetails | undefined} detailsFor - resolves a function's details
  * @returns {string} the markdown for the table region (no surrounding markers, LF, trailing newline)
  * @throws {Error} when a listed entry has no resolvable details
+ * @throws {Error} when a listed entry reports a category with no section on the page (i.e. `'Custom'`)
  */
 export function renderBuiltinFunctionsTable(
   entries: FunctionListEntry[],
   detailsFor: (canonicalName: string) => FunctionDetails | undefined,
 ): string {
-  const byCategory = new Map<FunctionCategory, FunctionListEntry[]>()
+  const byCategory = new Map<DocumentedFunctionCategory, FunctionListEntry[]>()
   for (const entry of entries) {
-    if (entry.category === undefined) {
-      continue
+    if (entry.category === CUSTOM_FUNCTION_CATEGORY) {
+      throw new Error(`Function "${entry.canonicalName}" reports category "${entry.category}", which has no section on the generated page; the page is generated from the built-in catalogue only.`)
     }
     const bucket = byCategory.get(entry.category) ?? []
     bucket.push(entry)

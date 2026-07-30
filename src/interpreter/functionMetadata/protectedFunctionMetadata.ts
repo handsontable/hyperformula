@@ -22,8 +22,15 @@ import {StructuralMetadata} from './buildFunctionDescriptions'
  * ones, and a mismatch fails safe rather than loudly: the function is silently dropped from both
  * `getAvailableFunctions` and `getFunctionDetails`, with nothing thrown and nothing logged. So keep the invariant
  * true by hand when editing either map — the only symptom of breaking it is a function that quietly disappears.
+ *
+ * Deliberately prototype-less, exactly like `FUNCTION_DOCS`. `HyperFormula.resolveFunctionMetadata` indexes this map
+ * with a caller-supplied function id, and with `Object.prototype` in the chain
+ * `PROTECTED_FUNCTION_METADATA['toString']` resolves to a function rather than `undefined`. The
+ * `FunctionRegistry.functionIsProtected` guard (a `Map` lookup) short-circuits before that read today, so this is
+ * hardening rather than a live bug — but it keeps the invariant local to the map instead of resting on the order of
+ * the caller's conditions, and makes every lookup here answer only for authored ids.
  */
-export const PROTECTED_FUNCTION_METADATA: Record<string, StructuralMetadata> = {
+export const PROTECTED_FUNCTION_METADATA: Record<string, StructuralMetadata> = Object.assign(Object.create(null) as Record<string, StructuralMetadata>, {
   OFFSET: {
     parameters: [
       {argumentType: FunctionArgumentType.ANY},
@@ -38,4 +45,4 @@ export const PROTECTED_FUNCTION_METADATA: Record<string, StructuralMetadata> = {
     parameters: [],
     repeatLastArgs: 0,
   },
-}
+})

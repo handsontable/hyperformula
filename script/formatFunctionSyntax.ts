@@ -3,6 +3,8 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {clampRepeatLastArgs} from '../src/interpreter/functionMetadata/buildFunctionDescriptions'
+
 /**
  * Builds the human-readable syntax string for a function from its parameter list, e.g. `SUM(number1, ...)`.
  * Reuses the convention previously shipped as `generateSyntax`: each optional parameter is wrapped in its own
@@ -15,7 +17,8 @@
  *
  * @param {string} localizedName - the function name as shown to the user, e.g. `'SUMIF'`
  * @param {{ name: string, optional: boolean }[]} parameters - ordered parameters with optionality
- * @param {number} repeatLastArgs - number of trailing parameters that repeat; `> 0` adds the repeat suffix
+ * @param {number} repeatLastArgs - number of trailing parameters that repeat; a positive integer adds the repeat
+ *   suffix, and anything else (or a count above `parameters.length`) is normalized away — see `repeatSuffix`
  * @returns {string} the syntax string, e.g. `'SUMIF(range, criteria, [sum_range])'`
  */
 export function formatFunctionSyntax(
@@ -34,15 +37,21 @@ export function formatFunctionSyntax(
  * trailing `1`, Excel-docs style: `, [criterion_range2, criterion2], ...`. When any group name lacks the `1`
  * suffix the plain ellipsis is kept rather than inventing names.
  *
+ * `repeatLastArgs` is normalized with `clampRepeatLastArgs` before it is used, so this module holds its own contract
+ * independently of whoever computed the number. Unguarded, `parameters.slice(-repeatLastArgs)` silently returns the
+ * whole list when the count exceeds it and the group is then taken from the wrong span, and a count on an empty
+ * parameter list renders the nonsense `F(, ...)` / `F(, [], ...)`.
+ *
  * @param {{ name: string, optional: boolean }[]} parameters - ordered parameters with optionality
  * @param {number} repeatLastArgs - number of trailing parameters that repeat
  */
 function repeatSuffix(parameters: { name: string, optional: boolean }[], repeatLastArgs: number): string {
-  if (repeatLastArgs <= 0) {
+  const effectiveRepeatLastArgs = clampRepeatLastArgs(repeatLastArgs, parameters.length)
+  if (effectiveRepeatLastArgs === 0) {
     return ''
   }
-  const group = parameters.slice(-repeatLastArgs)
-  if (repeatLastArgs > 1 && group.every(parameter => parameter.name.endsWith('1'))) {
+  const group = parameters.slice(-effectiveRepeatLastArgs)
+  if (effectiveRepeatLastArgs > 1 && group.every(parameter => parameter.name.endsWith('1'))) {
     const nextGroup = group.map(parameter => `${parameter.name.slice(0, -1)}2`)
     return `, [${nextGroup.join(', ')}], ...`
   }

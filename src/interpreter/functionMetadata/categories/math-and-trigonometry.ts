@@ -478,7 +478,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   SUMSQ: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the sum of the squares of the arguments',
+    shortDescription: 'Returns the sum of the squares of the arguments.',
     parameters: [{name: 'number1', description: 'A number, cell reference, or range whose values are squared and summed. Further numbers or ranges can be passed as additional arguments.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=SUMSQ(3, 4)', '=SUMSQ(A1:A10)'],

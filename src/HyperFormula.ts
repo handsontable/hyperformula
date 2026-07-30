@@ -661,7 +661,7 @@ export class HyperFormula implements TypedEmitter {
    * The static method describes built-in ids only. A custom (user-registered) function under its own new id is
    * omitted here by design — not because it is unavailable: [[registerFunctionPlugin]] registers globally, so such a
    * function is callable in every instance, and the instance method [[getAvailableFunctions]] lists it. A custom
-   * plugin registered *over* a built-in id stays listed here, but as a custom function (no `category`, empty
+   * plugin registered *over* a built-in id stays listed here, but as a custom function (`category: 'Custom'`, empty
    * `shortDescription`). An alias is listed under its own id, borrowing its target's category and description, with
    * the target id exposed as `aliasOf`.
    *
@@ -703,7 +703,7 @@ export class HyperFormula implements TypedEmitter {
    * its target's metadata (including examples, which spell the target's name) under the alias id, with the
    * target id exposed as `aliasOf`. For custom (user-registered) functions under their own new id, use the instance
    * method [[getFunctionDetails]]; a custom plugin registered over a built-in id is still resolved here, but as a
-   * custom function (no `category`, empty `shortDescription`) so the result describes what actually runs.
+   * custom function (`category: 'Custom'`, empty `shortDescription`) so the result describes what actually runs.
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    * @param {string} code - language code, e.g. `'enGB'`
@@ -4646,7 +4646,7 @@ export class HyperFormula implements TypedEmitter {
    * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
    * functions, plus their aliases. An alias is listed under its own id, borrowing its target's category and
    * description, with the target id exposed as `aliasOf`. Custom functions ship no catalogue entry, so their
-   * `category` is absent and their `shortDescription` is empty.
+   * `category` is `'Custom'` and their `shortDescription` is empty.
    *
    * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
    * an untranslated id, so listing it would advertise a function that cannot be called — in practice, a custom
@@ -4683,8 +4683,8 @@ export class HyperFormula implements TypedEmitter {
    * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
    * has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
    * described either, which keeps this method consistent with [[getAvailableFunctions]]).
-   * For a custom function, `category` is absent, `shortDescription` and `documentationUrl` are empty, `examples` is
-   * empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
+   * For a custom function, `category` is `'Custom'`, `shortDescription` and `documentationUrl` are empty, `examples`
+   * is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
    *
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *
