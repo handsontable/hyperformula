@@ -16,6 +16,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import {HyperFormula} from '../src'
+import {FUNCTION_CATEGORIES} from '../src/interpreter/functionMetadata/FunctionDescription'
 import {renderBuiltinFunctionsTable, spliceFunctionsTable} from './renderBuiltinFunctionsTable'
 
 const REPO_ROOT = path.resolve(__dirname, '..')
@@ -23,12 +24,34 @@ const TEMPLATE_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.tmpl.m
 const DOC_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
 
+/**
+ * Fails the build when the template's hand-written category list disagrees with `FUNCTION_CATEGORIES`, in labels or
+ * in order. The list builds the page's table of contents while the sections below it are generated from the array, so
+ * a divergence ships a page whose contents links are ordered differently from the sections they point at, or point at
+ * an anchor no section emits. Reordering the array without touching the template has already caused this once.
+ *
+ * @param {string} template - the full template file content
+ * @throws {Error} when the bullet labels or their order do not match `FUNCTION_CATEGORIES`
+ */
+function assertTemplateCategoryListMatches(template: string): void {
+  const listed = Array.from(template.matchAll(/^- \[([^\]]+)]\(#[^)]+\)$/gm)).map(match => match[1])
+  const expected = [...FUNCTION_CATEGORIES]
+  if (listed.join(' | ') !== expected.join(' | ')) {
+    throw new Error(
+      'The category list in built-in-functions.tmpl.md disagrees with FUNCTION_CATEGORIES.\n' +
+      `  template: ${listed.join(', ')}\n` +
+      `  expected: ${expected.join(', ')}`
+    )
+  }
+}
+
 /** Reads the committed template and returns the page with the generated table region spliced in. */
 function buildUpdatedFile(): string {
   const entries = HyperFormula.getAvailableFunctions(LANGUAGE)
   const detailsFor = (canonicalName: string) => HyperFormula.getFunctionDetails(canonicalName, LANGUAGE)
   const generated = renderBuiltinFunctionsTable(entries, detailsFor)
   const template = fs.readFileSync(TEMPLATE_PATH, 'utf8')
+  assertTemplateCategoryListMatches(template)
   return spliceFunctionsTable(template, generated)
 }
 

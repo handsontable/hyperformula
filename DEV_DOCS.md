@@ -130,14 +130,22 @@ Adding a built-in function is similar to adding a [custom function](docs/guide/c
 
 ### The function metadata catalogue
 
-`src/interpreter/functionMetadata/categories/` holds the human-readable metadata for every built-in function: `shortDescription`, `parameters` (`snake_case` names, each with a description), `examples`, and the category. It is the single source of truth for two consumers: the public [`getAvailableFunctions`/`getFunctionDetails`](docs/api/classes/hyperformula.md) API, and the generated built-in functions guide page (see [docs/README.md](docs/README.md)).
+`src/interpreter/functionMetadata/categories/` holds the human-readable metadata for every built-in function: `shortDescription`, `parameters` (`snake_case` names, each with a description), `examples`, `documentationUrl`, and the category. It is the single source of truth for two consumers: the public [`getAvailableFunctions`/`getFunctionDetails`](docs/api/classes/hyperformula.md) API, and the generated built-in functions guide page (see [docs/README.md](docs/README.md)).
+
+Every field is required, `documentationUrl` included. Each entry authors its own link rather than inheriting a shared default, so that the links can diverge per function without touching any code; they all happen to point at the same guide page today.
 
 Two ways to get this wrong, both of which fail silently &mdash; the function simply disappears from the public API and from the generated docs page, with a green build:
 
 - **No catalogue entry.** A function that is registered but absent from the catalogue is not listed and has no details.
 - **Arity drift.** If the entry's parameter **count** disagrees with the plugin's `implementedFunctions`, the function is dropped from both the list and the details, deliberately, so the two can never disagree with each other.
 
-Keep the entry's parameters in step with `implementedFunctions` whenever you change a signature. Parameter descriptions must refer to parameters by their exact `snake_case` names, and `shortDescription` must not use docs-page-local markup (no relative links, no footnote references) &mdash; the strings are rendered by API consumers as well as by the docs page.
+Keep the entry's parameters in step with `implementedFunctions` whenever you change a signature.
+
+When a description **refers to** a parameter, use that parameter's exact `snake_case` name, never a prose variant: write "shifts `start_date` by …", not "shifts the start date by …". The same strings are rendered next to the generated syntax line, where the `snake_case` name is what the reader sees, so a prose variant leaves the reader guessing which argument is meant. This applies to `shortDescription` and to every parameter description.
+
+It does **not** turn ordinary English into identifiers. A parameter's own description may open with a prose noun phrase for the thing it describes &mdash; `lower_bound` is fine as "The lower bound, rounded up to an integer" &mdash; and words that merely happen to match a name ("entries that appear exactly once") stay as they are. The rule is about naming a *different* argument, or naming one from the syntax line.
+
+`shortDescription` must not use docs-page-local markup (no relative links, no footnote references): the strings are rendered by API consumers as well as by the docs page.
 
 Note what the drift check does **not** cover: **optionality is not cross-checked.** The catalogue authors no optionality of its own &mdash; a parameter's `optional` flag is derived entirely from `optionalArg`/`defaultValue` in `implementedFunctions` &mdash; so a description that calls an argument optional can sit next to `optional: false` with nothing failing. When a function accepts a call that arity alone does not express (`SHEET()`, `ROW()`, and anything else served by `runFunctionWithReferenceArgument`'s zero-argument path), the plugin must declare `optionalArg: true` explicitly, or the public API will advertise the argument as required.
 

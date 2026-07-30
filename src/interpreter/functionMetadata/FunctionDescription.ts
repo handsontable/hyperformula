@@ -4,7 +4,11 @@
  */
 
 /**
- * The function categories, matching the `### <Category>` headers in `docs/guide/built-in-functions.md`.
+ * The function categories, in the order the built-in functions guide page presents them. This array is the source of
+ * truth: `script/renderBuiltinFunctionsTable.ts` emits one `### <Category>` section per entry, in this order. The
+ * hand-written category list in `docs/guide/built-in-functions.tmpl.md` duplicates these labels to build the page's
+ * table of contents, so it must be kept in the same order &mdash; `script/generate-builtin-functions-doc.ts` asserts
+ * that it is.
  *
  * The ten categories with an Excel equivalent use the same names as the official Excel docs
  * (https://support.microsoft.com/en-us/office/excel-functions-by-category-5f91f4e9-7b42-46d2-9bd1-63f26a86c0eb),
@@ -46,11 +50,12 @@ export interface FunctionDoc {
   /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
   parameters: ParameterDoc[],
   /**
-   * Link to the function's documentation. Omit it to inherit `DEFAULT_DOCUMENTATION_URL`, the shared guide page
-   * every built-in points at today; set it only for an entry that needs its own link (e.g. once the guide grows
-   * per-function anchors). Every entry therefore ships with a link whether or not it authors one.
+   * Link to the function's documentation. Required, and authored per entry rather than inherited from a shared
+   * default: every built-in happens to point at the same guide page today, but the links are expected to become
+   * per-function, so each entry owns its own value and changing one touches only that entry. Making it required also
+   * means a new function cannot silently ship without a link.
    */
-  documentationUrl?: string,
+  documentationUrl: string,
   /** Usage examples (English). Authored for every built-in function; at least one per function. */
   examples?: string[],
 }
@@ -117,13 +122,13 @@ export interface FunctionDetails {
   parameters: FunctionParameterDescription[],
   /**
    * How many of the trailing `parameters` repeat indefinitely (a function with a variable number of arguments).
-   * `0` when the argument list is fixed; e.g. `1` for `SUM(number1, ...)`, `2` for `SUMIFS` where the last
-   * (Criteria range, Criterion) pair repeats. The caller renders the syntax string from this.
+   * `0` when the argument list is fixed; e.g. `1` for `SUM(number1, ...)`, `2` for `SUMIFS` where the trailing
+   * (criteria_range, criteria) pair repeats. The caller renders the syntax string from this.
    */
   repeatLastArgs: number,
   /**
-   * Link to the function's documentation. Always a string: the single shared docs URL for built-ins, `''` for
-   * custom functions.
+   * Link to the function's documentation. Always a string: the link authored in the catalogue for built-ins, `''`
+   * for custom functions.
    */
   documentationUrl: string,
   /** Usage examples (English). At least one per built-in function; `[]` for custom functions. */
