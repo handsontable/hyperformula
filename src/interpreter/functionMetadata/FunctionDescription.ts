@@ -14,7 +14,7 @@
  */
 export const FUNCTION_CATEGORIES = [
   'Array manipulation', 'Database', 'Date and time', 'Engineering',
-  'Information', 'Financial', 'Logical', 'Lookup and reference',
+  'Financial', 'Information', 'Logical', 'Lookup and reference',
   'Math and trigonometry', 'Matrix functions', 'Operator', 'Statistical', 'Text',
 ] as const
 
@@ -27,7 +27,7 @@ export type FunctionCategory = typeof FUNCTION_CATEGORIES[number]
  * Storage: authored, human-readable metadata for one function parameter.
  */
 export interface ParameterDoc {
-  /** Display name as shown in the syntax, Google-Sheets style, e.g. `'Factor1'`. */
+  /** Display name as shown in the syntax, `snake_case`, e.g. `'sum_range'`. */
   name: string,
   /** What the argument does. Authored for every built-in parameter (English). */
   description: string,
@@ -117,7 +117,7 @@ export interface FunctionDetails {
   parameters: FunctionParameterDescription[],
   /**
    * How many of the trailing `parameters` repeat indefinitely (a function with a variable number of arguments).
-   * `0` when the argument list is fixed; e.g. `1` for `SUM(Number1, ...)`, `2` for `SUMIFS` where the last
+   * `0` when the argument list is fixed; e.g. `1` for `SUM(number1, ...)`, `2` for `SUMIFS` where the last
    * (Criteria range, Criterion) pair repeats. The caller renders the syntax string from this.
    */
   repeatLastArgs: number,

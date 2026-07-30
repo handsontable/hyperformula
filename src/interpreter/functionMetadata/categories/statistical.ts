@@ -24,68 +24,44 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   AVERAGEA: {
     category: 'Statistical',
-    shortDescription: 'Returns the average of the arguments.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range whose values are averaged; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
+    shortDescription: 'Returns the average of the arguments, counting text and logical values found in ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range whose values are averaged; inside a range, text counts as 0, TRUE as 1 and FALSE as 0, where the non-A variant would skip them, while a non-numeric text passed directly as an argument gives a #VALUE! error. Further values or ranges can be passed as additional arguments.'}],
     examples: ['=AVERAGEA(1, 2, TRUE())', '=AVERAGEA(A1:A10)'],
   },
   AVERAGEIF: {
     category: 'Statistical',
     shortDescription: 'Returns the arithmetic mean of all cells in a range that satisfy a given condition.',
-    parameters: [{name: 'range', description: 'The range of cells tested against the criterion.'}, {name: 'criterion', description: 'The condition that selects which cells are averaged, e.g. ">5", "apples", or a cell reference.'}, {name: 'average_range', description: 'The range of cells to average. When omitted, the cells in range are averaged instead.'}],
+    parameters: [{name: 'range', description: 'The range of cells tested against the criteria.'}, {name: 'criteria', description: 'The condition that selects which cells are averaged, e.g. ">5", "apples", or a cell reference.'}, {name: 'average_range', description: 'The range of cells to average. When omitted, the cells in range are averaged instead.'}],
     examples: ['=AVERAGEIF(A1:A10, ">5")', '=AVERAGEIF(B1:B10, "apples", C1:C10)'],
-  },
-  BESSELI: {
-    category: 'Statistical',
-    shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: 'The value at which the modified Bessel function is evaluated.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
-    examples: ['=BESSELI(1.5, 1)'],
-  },
-  BESSELJ: {
-    category: 'Statistical',
-    shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: 'The value at which the Bessel function is evaluated.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
-    examples: ['=BESSELJ(1.9, 2)'],
-  },
-  BESSELK: {
-    category: 'Statistical',
-    shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: 'The value at which the modified Bessel function is evaluated; must be greater than 0.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
-    examples: ['=BESSELK(1.5, 1)'],
-  },
-  BESSELY: {
-    category: 'Statistical',
-    shortDescription: 'Returns value of Bessel function.',
-    parameters: [{name: 'x', description: 'The value at which the Bessel function is evaluated; must be greater than 0.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
-    examples: ['=BESSELY(1.5, 1)'],
   },
   'BETA.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns the density of Beta distribution.',
-    parameters: [{name: 'number1', description: 'The value at which to evaluate the distribution, within the interval bounded by number4 and number5.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta shape parameter of the distribution; must be greater than 0.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}, {name: 'number4', description: 'The lower bound of the interval of number1; defaults to 0 when omitted.'}, {name: 'number5', description: 'The upper bound of the interval of number1; defaults to 1 when omitted.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution, within the interval bounded by lower_bound and upper_bound.'}, {name: 'alpha', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'beta', description: 'The beta shape parameter of the distribution; must be greater than 0.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}, {name: 'lower_bound', description: 'The lower bound of the interval of x; defaults to 0 when omitted.'}, {name: 'upper_bound', description: 'The upper bound of the interval of x; defaults to 1 when omitted.'}],
     examples: ['=BETA.DIST(0.5, 2, 3, TRUE())', '=BETA.DIST(2, 2, 3, TRUE(), 0, 4)'],
   },
   'BETA.INV': {
     category: 'Statistical',
     shortDescription: 'Returns the inverse Beta distribution value.',
-    parameters: [{name: 'number1', description: 'The probability associated with the Beta distribution, between 0 and 1.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta shape parameter of the distribution; must be greater than 0.'}, {name: 'number4', description: 'The lower bound of the interval of the result; defaults to 0 when omitted.'}, {name: 'number5', description: 'The upper bound of the interval of the result; defaults to 1 when omitted.'}],
+    parameters: [{name: 'probability', description: 'The probability associated with the Beta distribution, between 0 and 1.'}, {name: 'alpha', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'beta', description: 'The beta shape parameter of the distribution; must be greater than 0.'}, {name: 'lower_bound', description: 'The lower bound of the interval of the result; defaults to 0 when omitted.'}, {name: 'upper_bound', description: 'The upper bound of the interval of the result; defaults to 1 when omitted.'}],
     examples: ['=BETA.INV(0.5, 2, 3)', '=BETA.INV(0.25, 2, 3, 0, 4)'],
   },
   'BINOM.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of binomial distribution.',
-    parameters: [{name: 'number1', description: 'The number of successes in the trials.'}, {name: 'number2', description: 'The total number of independent trials.'}, {name: 'number3', description: 'The probability of success on a single trial.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
+    parameters: [{name: 'number_s', description: 'The number of successes in the trials.'}, {name: 'trials', description: 'The total number of independent trials.'}, {name: 'probability_s', description: 'The probability of success on a single trial.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
     examples: ['=BINOM.DIST(3, 10, 0.5, FALSE())', '=BINOM.DIST(3, 10, 0.5, TRUE())'],
   },
   'BINOM.INV': {
     category: 'Statistical',
     shortDescription: 'Returns inverse binomial distribution value.',
-    parameters: [{name: 'number1', description: 'The total number of Bernoulli trials.'}, {name: 'number2', description: 'The probability of success on a single trial.'}, {name: 'number3', description: 'The criterion probability value; the function returns the smallest value for which the cumulative binomial distribution is greater than or equal to it.'}],
+    parameters: [{name: 'trials', description: 'The total number of Bernoulli trials.'}, {name: 'probability_s', description: 'The probability of success on a single trial.'}, {name: 'alpha', description: 'The criterion probability value; the function returns the smallest value for which the cumulative binomial distribution is greater than or equal to it.'}],
     examples: ['=BINOM.INV(10, 0.5, 0.75)'],
   },
   'CHISQ.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns value of chi-square distribution.',
-    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=CHISQ.DIST(2, 3, TRUE())', '=CHISQ.DIST(2, 3, FALSE())'],
   },
   'CHISQ.DIST.RT': {
@@ -157,8 +133,14 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   COUNTIFS: {
     category: 'Statistical',
     shortDescription: 'Returns the count of rows or columns that meet criteria in multiple ranges.',
-    parameters: [{name: 'range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are counted.'}, {name: 'criterion1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
+    parameters: [{name: 'criteria_range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are counted.'}, {name: 'criteria1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
     examples: ['=COUNTIFS(A1:A10, ">5")', '=COUNTIFS(A1:A10, ">5", B1:B10, "apples")'],
+  },
+  COUNTUNIQUE: {
+    category: 'Statistical',
+    shortDescription: 'Counts the number of unique values in a list of specified values and ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range to check for uniqueness. Further values or ranges can be passed as additional arguments.'}],
+    examples: ['=COUNTUNIQUE(1, 2, 2, 3)', '=COUNTUNIQUE(A1:A10)'],
   },
   'COVARIANCE.P': {
     category: 'Statistical',
@@ -181,13 +163,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'EXPON.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of a exponential distribution.',
-    parameters: [{name: 'number1', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'number2', description: 'The lambda rate parameter of the distribution; must be greater than 0.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'lambda', description: 'The lambda rate parameter of the distribution; must be greater than 0.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=EXPON.DIST(1, 0.5, TRUE())', '=EXPON.DIST(1, 0.5, FALSE())'],
   },
   'F.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns value of F distribution.',
-    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degree1', description: 'The numerator degrees of freedom.'}, {name: 'degree2', description: 'The denominator degrees of freedom.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degree1', description: 'The numerator degrees of freedom.'}, {name: 'degree2', description: 'The denominator degrees of freedom.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=F.DIST(2, 3, 10, TRUE())', '=F.DIST(2, 3, 10, FALSE())'],
   },
   'F.DIST.RT': {
@@ -235,13 +217,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'GAMMA.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of Gamma distribution.',
-    parameters: [{name: 'number1', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta scale parameter of the distribution; must be greater than 0.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'alpha', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'beta', description: 'The beta scale parameter of the distribution; must be greater than 0.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=GAMMA.DIST(2, 1, 2, TRUE())', '=GAMMA.DIST(2, 1, 2, FALSE())'],
   },
   'GAMMA.INV': {
     category: 'Statistical',
     shortDescription: 'Returns inverse Gamma distribution value.',
-    parameters: [{name: 'number1', description: 'The probability associated with the Gamma distribution, between 0 and 1.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta scale parameter of the distribution; must be greater than 0.'}],
+    parameters: [{name: 'probability', description: 'The probability associated with the Gamma distribution, between 0 and 1.'}, {name: 'alpha', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'beta', description: 'The beta scale parameter of the distribution; must be greater than 0.'}],
     examples: ['=GAMMA.INV(0.5, 1, 2)'],
   },
   GAMMALN: {
@@ -252,7 +234,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   GAUSS: {
     category: 'Statistical',
-    shortDescription: 'Returns the probability of gaussian variable falling more than this many times standard deviation from mean.',
+    shortDescription: 'Returns the probability that a member of a standard normal population falls between the mean and `number` standard deviations from the mean.',
     parameters: [{name: 'number', description: 'The number of standard deviations from the mean, Z, of a standard normal variable.'}],
     examples: ['=GAUSS(2)'],
   },
@@ -271,7 +253,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'HYPGEOM.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of hypergeometric distribution.',
-    parameters: [{name: 'number1', description: 'The number of successes in the sample.'}, {name: 'number2', description: 'The size of the sample.'}, {name: 'number3', description: 'The number of successes in the population.'}, {name: 'number4', description: 'The size of the population.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
+    parameters: [{name: 'sample_s', description: 'The number of successes in the sample.'}, {name: 'number_sample', description: 'The size of the sample.'}, {name: 'population_s', description: 'The number of successes in the population.'}, {name: 'number_population', description: 'The size of the population.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
     examples: ['=HYPGEOM.DIST(1, 4, 8, 20, FALSE())', '=HYPGEOM.DIST(1, 4, 8, 20, TRUE())'],
   },
   LARGE: {
@@ -283,7 +265,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'LOGNORM.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of lognormal distribution.',
-    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be greater than 0.'}, {name: 'mean', description: 'The mean of the natural logarithm of the distribution.'}, {name: 'stddev', description: 'The standard deviation of the natural logarithm of the distribution; must be greater than 0.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be greater than 0.'}, {name: 'mean', description: 'The mean of the natural logarithm of the distribution.'}, {name: 'stddev', description: 'The standard deviation of the natural logarithm of the distribution; must be greater than 0.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=LOGNORM.DIST(4, 0, 1, TRUE())', '=LOGNORM.DIST(4, 0, 1, FALSE())'],
   },
   'LOGNORM.INV': {
@@ -300,14 +282,14 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   MAXA: {
     category: 'Statistical',
-    shortDescription: 'Returns the maximum value in a list of arguments.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range compared against the current maximum; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
+    shortDescription: 'Returns the maximum value in a list of arguments, counting text and logical values found in ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range compared against the current maximum; inside a range, text counts as 0, TRUE as 1 and FALSE as 0, where the non-A variant would skip them, while a non-numeric text passed directly as an argument gives a #VALUE! error. Further values or ranges can be passed as additional arguments.'}],
     examples: ['=MAXA(1, 2, TRUE())', '=MAXA(A1:A10)'],
   },
   MAXIFS: {
     category: 'Statistical',
     shortDescription: 'Returns the maximum value of the cells in a range that meet a set of criteria.',
-    parameters: [{name: 'max_range', description: 'The range of cells to evaluate for the maximum.'}, {name: 'criterion_range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are considered.'}, {name: 'criterion1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
+    parameters: [{name: 'max_range', description: 'The range of cells to evaluate for the maximum.'}, {name: 'criteria_range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are considered.'}, {name: 'criteria1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
     examples: ['=MAXIFS(A1:A10, B1:B10, ">5")', '=MAXIFS(A1:A10, B1:B10, ">5", C1:C10, "apples")'],
   },
   MEDIAN: {
@@ -324,26 +306,26 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   MINA: {
     category: 'Statistical',
-    shortDescription: 'Returns the minimum value in a list of arguments.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range compared against the current minimum; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
+    shortDescription: 'Returns the minimum value in a list of arguments, counting text and logical values found in ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range compared against the current minimum; inside a range, text counts as 0, TRUE as 1 and FALSE as 0, where the non-A variant would skip them, while a non-numeric text passed directly as an argument gives a #VALUE! error. Further values or ranges can be passed as additional arguments.'}],
     examples: ['=MINA(1, 2, FALSE())', '=MINA(A1:A10)'],
   },
   MINIFS: {
     category: 'Statistical',
     shortDescription: 'Returns the minimum value of the cells in a range that meet a set of criteria.',
-    parameters: [{name: 'min_range', description: 'The range of cells to evaluate for the minimum.'}, {name: 'criterion_range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are considered.'}, {name: 'criterion1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
+    parameters: [{name: 'min_range', description: 'The range of cells to evaluate for the minimum.'}, {name: 'criteria_range1', description: 'A range of cells tested against the paired criterion. Further range/criterion pairs can be passed as additional arguments, and only cells meeting every criterion are considered.'}, {name: 'criteria1', description: 'The condition applied to the preceding range, e.g. ">5", "apples", or a cell reference.'}],
     examples: ['=MINIFS(A1:A10, B1:B10, ">5")', '=MINIFS(A1:A10, B1:B10, ">5", C1:C10, "apples")'],
   },
   'NEGBINOM.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of negative binomial distribution.',
-    parameters: [{name: 'number1', description: 'The number of failures.'}, {name: 'number2', description: 'The threshold number of successes.'}, {name: 'number3', description: 'The probability of success on a single trial.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
+    parameters: [{name: 'number_f', description: 'The number of failures.'}, {name: 'number_s', description: 'The threshold number of successes.'}, {name: 'probability_s', description: 'The probability of success on a single trial.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
     examples: ['=NEGBINOM.DIST(3, 5, 0.5, FALSE())', '=NEGBINOM.DIST(3, 5, 0.5, TRUE())'],
   },
   'NORM.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of normal distribution.',
-    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution.'}, {name: 'mean', description: 'The arithmetic mean of the distribution.'}, {name: 'stddev', description: 'The standard deviation of the distribution; must be greater than 0.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution.'}, {name: 'mean', description: 'The arithmetic mean of the distribution.'}, {name: 'stddev', description: 'The standard deviation of the distribution; must be greater than 0.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=NORM.DIST(1, 0, 1, TRUE())', '=NORM.DIST(1, 0, 1, FALSE())'],
   },
   'NORM.INV': {
@@ -354,13 +336,13 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   'NORM.S.DIST': {
     category: 'Statistical',
-    shortDescription: 'Returns density of normal distribution.',
-    parameters: [{name: 'x', description: 'The value at which to evaluate the standard normal distribution.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    shortDescription: 'Returns density of the standard normal distribution (mean 0, standard deviation 1).',
+    parameters: [{name: 'x', description: 'The value at which to evaluate the standard normal distribution.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=NORM.S.DIST(1, TRUE())', '=NORM.S.DIST(1, FALSE())'],
   },
   'NORM.S.INV': {
     category: 'Statistical',
-    shortDescription: 'Returns value of inverse normal distribution.',
+    shortDescription: 'Returns value of the inverse standard normal distribution (mean 0, standard deviation 1).',
     parameters: [{name: 'p', description: 'The probability associated with the standard normal distribution, between 0 and 1.'}],
     examples: ['=NORM.S.INV(0.5)'],
   },
@@ -385,7 +367,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'POISSON.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of Poisson distribution.',
-    parameters: [{name: 'x', description: 'The number of events; must be non-negative.'}, {name: 'mean', description: 'The expected number of events; must be non-negative.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
+    parameters: [{name: 'x', description: 'The number of events; must be non-negative.'}, {name: 'mean', description: 'The expected number of events; must be non-negative.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability mass function.'}],
     examples: ['=POISSON.DIST(3, 5, FALSE())', '=POISSON.DIST(3, 5, TRUE())'],
   },
   'QUARTILE.EXC': {
@@ -450,14 +432,14 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   STDEVA: {
     category: 'Statistical',
-    shortDescription: 'Returns standard deviation of a sample.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the sample standard deviation calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
+    shortDescription: 'Returns standard deviation of a sample, counting text and logical values found in ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the sample standard deviation calculation; inside a range, text counts as 0, TRUE as 1 and FALSE as 0, where the non-A variant would skip them, while a non-numeric text passed directly as an argument gives a #VALUE! error. Further values or ranges can be passed as additional arguments.'}],
     examples: ['=STDEVA(1, TRUE(), 3)', '=STDEVA(A1:A10)'],
   },
   STDEVPA: {
     category: 'Statistical',
-    shortDescription: 'Returns standard deviation of a population.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the population standard deviation calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
+    shortDescription: 'Returns standard deviation of a population, counting text and logical values found in ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the population standard deviation calculation; inside a range, text counts as 0, TRUE as 1 and FALSE as 0, where the non-A variant would skip them, while a non-numeric text passed directly as an argument gives a #VALUE! error. Further values or ranges can be passed as additional arguments.'}],
     examples: ['=STDEVPA(1, TRUE(), 3)', '=STDEVPA(A1:A10)'],
   },
   STEYX: {
@@ -469,7 +451,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   'T.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of Student-t distribution.',
-    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'mode', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=T.DIST(1, 10, TRUE())', '=T.DIST(1, 10, FALSE())'],
   },
   'T.DIST.2T': {
@@ -505,7 +487,7 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   TDIST: {
     category: 'Statistical',
     shortDescription: 'Returns density of Student-t distribution, both-sided or right-tailed.',
-    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'mode', description: 'The number of distribution tails to return: 1 for right-tailed, or 2 for two-tailed.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'degrees', description: 'The number of degrees of freedom.'}, {name: 'tails', description: 'The number of distribution tails to return: 1 for right-tailed, or 2 for two-tailed.'}],
     examples: ['=TDIST(1, 10, 1)', '=TDIST(1, 10, 2)'],
   },
   'VAR.P': {
@@ -522,20 +504,20 @@ export const STATISTICAL_DOCS: Record<string, FunctionDoc> = {
   },
   VARA: {
     category: 'Statistical',
-    shortDescription: 'Returns variance of a sample.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the sample variance calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
+    shortDescription: 'Returns variance of a sample, counting text and logical values found in ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the sample variance calculation; inside a range, text counts as 0, TRUE as 1 and FALSE as 0, where the non-A variant would skip them, while a non-numeric text passed directly as an argument gives a #VALUE! error. Further values or ranges can be passed as additional arguments.'}],
     examples: ['=VARA(1, TRUE(), 3)', '=VARA(A1:A10)'],
   },
   VARPA: {
     category: 'Statistical',
-    shortDescription: 'Returns variance of a population.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the population variance calculation; text and FALSE are treated as 0, and TRUE as 1. Further values or ranges can be passed as additional arguments.'}],
+    shortDescription: 'Returns variance of a population, counting text and logical values found in ranges.',
+    parameters: [{name: 'value1', description: 'A value, cell reference, or range included in the population variance calculation; inside a range, text counts as 0, TRUE as 1 and FALSE as 0, where the non-A variant would skip them, while a non-numeric text passed directly as an argument gives a #VALUE! error. Further values or ranges can be passed as additional arguments.'}],
     examples: ['=VARPA(1, TRUE(), 3)', '=VARPA(A1:A10)'],
   },
   'WEIBULL.DIST': {
     category: 'Statistical',
     shortDescription: 'Returns density of Weibull distribution.',
-    parameters: [{name: 'number1', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'number2', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'number3', description: 'The beta scale parameter of the distribution; must be greater than 0.'}, {name: 'boolean', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
+    parameters: [{name: 'x', description: 'The value at which to evaluate the distribution; must be non-negative.'}, {name: 'alpha', description: 'The alpha shape parameter of the distribution; must be greater than 0.'}, {name: 'beta', description: 'The beta scale parameter of the distribution; must be greater than 0.'}, {name: 'cumulative', description: 'TRUE returns the cumulative distribution function; FALSE returns the probability density function.'}],
     examples: ['=WEIBULL.DIST(2, 1, 2, TRUE())', '=WEIBULL.DIST(2, 1, 2, FALSE())'],
   },
   'Z.TEST': {

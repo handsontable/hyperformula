@@ -37,7 +37,7 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   },
   ISEVEN: {
     category: 'Information',
-    shortDescription: 'Returns TRUE if the value is an even integer, or FALSE if the value is odd.',
+    shortDescription: 'Returns TRUE if the value is an even integer, or FALSE otherwise. A value with a fractional part is neither even nor odd, so it returns FALSE.',
     parameters: [{name: 'value', description: 'The number to test; it is checked by its remainder without truncation, so a fractional value may return FALSE for both ISEVEN and ISODD.'}],
     examples: ['=ISEVEN(4)', '=ISEVEN(A1)'],
   },
@@ -73,7 +73,7 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
   },
   ISODD: {
     category: 'Information',
-    shortDescription: 'Returns TRUE if the value is odd, or FALSE if the number is even.',
+    shortDescription: 'Returns TRUE if the value is an odd integer, or FALSE otherwise. A value with a fractional part is neither odd nor even, so it returns FALSE.',
     parameters: [{name: 'value', description: 'The number to test; it is checked by its remainder without truncation, so a fractional value may return FALSE for both ISODD and ISEVEN.'}],
     examples: ['=ISODD(3)', '=ISODD(A1)'],
   },
@@ -88,6 +88,12 @@ export const INFORMATION_DOCS: Record<string, FunctionDoc> = {
     shortDescription: 'Returns TRUE if the cell contents reference text.',
     parameters: [{name: 'value', description: 'The value to test; returns TRUE only when the value is text.'}],
     examples: ['=ISTEXT("abc")', '=ISTEXT(A1)'],
+  },
+  N: {
+    category: 'Information',
+    shortDescription: 'Converts a value to a number.',
+    parameters: [{name: 'value', description: 'The value to convert: numbers and dates return themselves, TRUE/FALSE return 1/0, and text or empty values return 0.'}],
+    examples: ['=N(TRUE())', '=N("5")', '=N(A1)'],
   },
   NA: {
     category: 'Information',

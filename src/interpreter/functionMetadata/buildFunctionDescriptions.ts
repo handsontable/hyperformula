@@ -33,12 +33,17 @@ export function isParameterOptional(arg: FunctionArgument | undefined): boolean 
  * translation. Some bundled language packs leave a function untranslated as an empty string (e.g. `SWITCH` in
  * several locales), so an empty translation falls back to the canonical id just like a missing one.
  *
+ * Anything that is not a non-empty string falls back too. A translation package looks its ids up on a plain object, so
+ * an id colliding with an `Object.prototype` member (`toString`, `valueOf`) yields that member instead of a
+ * translation. Without this check `localizedName` could be a function, which contradicts its declared `string` type
+ * and silently disappears through `JSON.stringify`.
+ *
  * @param {string} canonicalName - the language-independent function id
  * @param {TranslateName} translate - per-id translation lookup (returns `undefined` when untranslated)
  */
 function resolveName(canonicalName: string, translate: TranslateName): string {
   const translated = translate(canonicalName)
-  return translated === undefined || translated === '' ? canonicalName : translated
+  return typeof translated !== 'string' || translated === '' ? canonicalName : translated
 }
 
 /**

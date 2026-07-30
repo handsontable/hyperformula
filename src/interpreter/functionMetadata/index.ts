@@ -24,8 +24,14 @@ export * from './FunctionDescription'
  * Canonical-id-keyed catalogue of human-readable function metadata, composed from the per-category files. This is the
  * source of truth for both the function metadata API and the generated `docs/guide/built-in-functions.md` guide page;
  * edit a category file to change what either reports. Coverage of the whole canonical set is enforced by test.
+ *
+ * Deliberately prototype-less. The catalogue doubles as the built-in id *set* (see
+ * `FunctionRegistry.isBuiltinFunctionId`), and a caller-supplied id is looked up in it directly. With
+ * `Object.prototype` in the chain, `FUNCTION_DOCS['toString']` resolves to a function rather than `undefined`, so ids
+ * like `toString`, `valueOf` or `__proto__` would report as built-in and pull `Object.prototype` members in as if they
+ * were catalogue entries. A null prototype makes every lookup on this object answer only for authored ids.
  */
-export const FUNCTION_DOCS: Record<string, FunctionDoc> = {
+export const FUNCTION_DOCS: Record<string, FunctionDoc> = Object.assign(Object.create(null) as Record<string, FunctionDoc>, {
   ...ARRAY_MANIPULATION_DOCS,
   ...DATABASE_DOCS,
   ...DATE_AND_TIME_DOCS,
@@ -39,4 +45,4 @@ export const FUNCTION_DOCS: Record<string, FunctionDoc> = {
   ...OPERATOR_DOCS,
   ...STATISTICAL_DOCS,
   ...TEXT_DOCS,
-}
+})

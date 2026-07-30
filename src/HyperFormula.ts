@@ -658,11 +658,12 @@ export class HyperFormula implements TypedEmitter {
    * picker. Each entry contains the translated name, the language-independent canonical name, the category, and a
    * short description. Entries are sorted alphabetically by their localized name.
    *
-   * The static method covers the globally-registered built-in functions and their aliases. Custom (user-registered)
-   * functions under their own new id are instance-scoped, so they are listed only by the instance method
-   * [[getAvailableFunctions]], not by this static one; a custom plugin registered over a built-in id stays listed
-   * here, but as a custom function (no `category`, empty `shortDescription`). An alias is listed under its own id,
-   * borrowing its target's category and description, with the target id exposed as `aliasOf`.
+   * The static method describes built-in ids only. A custom (user-registered) function under its own new id is
+   * omitted here by design — not because it is unavailable: [[registerFunctionPlugin]] registers globally, so such a
+   * function is callable in every instance, and the instance method [[getAvailableFunctions]] lists it. A custom
+   * plugin registered *over* a built-in id stays listed here, but as a custom function (no `category`, empty
+   * `shortDescription`). An alias is listed under its own id, borrowing its target's category and description, with
+   * the target id exposed as `aliasOf`.
    *
    * A function with no translation entry for `code` is omitted: the interpreter refuses to evaluate an untranslated
    * id, so listing it would advertise a function that cannot be called. A translation set to an empty string is not
@@ -736,14 +737,13 @@ export class HyperFormula implements TypedEmitter {
       }
       return HyperFormula.buildFunctionDetailsFor(canonicalName, undefined, language)
     }
-    // Resolve aliases to their canonical target id before checking whether the id is a built-in one
-    const canonicalId = plugin.aliases?.[canonicalName] ?? canonicalName
-    // The static method describes the built-in ids only; a function registered under a brand-new id is instance
-    // scope and reachable through the instance method. An id that IS a built-in one stays described even when a
+    // The static method describes the built-in ids only; a function registered under a brand-new id is omitted here
+    // by design and reachable through the instance method. An id that IS a built-in one stays described even when a
     // user plugin has been registered over it — it remains callable in every instance, so hiding it would be a
     // lie. `resolveFunctionMetadata` withholds the built-in catalogue doc in that case, so it is reported as a
-    // custom function rather than with metadata its implementation does not honour.
-    if (!FunctionRegistry.isBuiltinFunctionId(canonicalId)) {
+    // custom function rather than with metadata its implementation does not honour. The same gate builds the list,
+    // so the two tiers agree on which ids exist.
+    if (!FunctionRegistry.isListableFunctionId(canonicalName, plugin)) {
       return undefined
     }
     return HyperFormula.buildFunctionDetailsFor(canonicalName, plugin, language)

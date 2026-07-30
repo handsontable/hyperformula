@@ -43,7 +43,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   FIND: {
     category: 'Text',
     shortDescription: 'Returns the location of one text string inside another.',
-    parameters: [{name: 'text1', description: 'The text to search for. The search is case-sensitive.'}, {name: 'text2', description: 'The text to search within.'}, {name: 'number', description: 'The 1-based character position in text2 at which to start searching. Defaults to 1.'}],
+    parameters: [{name: 'search_string', description: 'The text to search for. The search is case-sensitive.'}, {name: 'text', description: 'The text to search within.'}, {name: 'start_position', description: 'The 1-based character position in text at which to start searching. Defaults to 1.'}],
     examples: ['=FIND("o", "Hello World")', '=FIND("o", "Hello World", 6)'],
   },
   LEFT: {
@@ -66,15 +66,9 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   MID: {
     category: 'Text',
-    shortDescription: 'Returns substring of a given length starting from Start_position.',
+    shortDescription: 'Returns a substring of a given length starting from start_position.',
     parameters: [{name: 'text', description: 'The text to extract a substring from.'}, {name: 'start_position', description: 'The 1-based position of the first character to extract.'}, {name: 'length', description: 'The number of characters to extract, starting at start_position.'}],
     examples: ['=MID("Hello World", 7, 5)', '=MID(A1, 1, 3)'],
-  },
-  N: {
-    category: 'Text',
-    shortDescription: 'Converts a value to a number.',
-    parameters: [{name: 'value', description: 'The value to convert: numbers and dates return themselves, TRUE/FALSE return 1/0, and text or empty values return 0.'}],
-    examples: ['=N(TRUE())', '=N("5")', '=N(A1)'],
   },
   PROPER: {
     category: 'Text',
@@ -102,7 +96,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   SEARCH: {
     category: 'Text',
-    shortDescription: 'Returns the location of Search_string inside Text. Case-insensitive. Allows the use of wildcards.',
+    shortDescription: 'Returns the location of search_string inside text. Case-insensitive. Allows the use of wildcards.',
     parameters: [{name: 'search_string', description: 'The text to search for. The search is case-insensitive and may contain "?" and "*" wildcards.'}, {name: 'text', description: 'The text to search within.'}, {name: 'start_position', description: 'The 1-based character position in text at which to start searching. Defaults to 1.'}],
     examples: ['=SEARCH("o", "Hello World")', '=SEARCH("w*d", "Hello World")'],
   },
@@ -114,7 +108,7 @@ export const TEXT_DOCS: Record<string, FunctionDoc> = {
   },
   SUBSTITUTE: {
     category: 'Text',
-    shortDescription: 'Returns string where occurrences of Old_text are replaced by New_text. Replaces only specific occurrence if last parameter is provided.',
+    shortDescription: 'Returns a string where occurrences of old_text are replaced by new_text. Replaces only specific occurrence if last parameter is provided.',
     parameters: [{name: 'text', description: 'The text in which occurrences of old_text are replaced.'}, {name: 'old_text', description: 'The text to search for and replace.'}, {name: 'new_text', description: 'The text that replaces each matched occurrence of old_text.'}, {name: 'occurrence', description: 'The 1-based occurrence of old_text to replace. When omitted, every occurrence is replaced.'}],
     examples: ['=SUBSTITUTE("a-b-c", "-", ":")', '=SUBSTITUTE("a-b-c", "-", ":", 2)'],
   },

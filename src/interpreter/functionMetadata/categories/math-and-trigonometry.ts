@@ -84,32 +84,32 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   CEILING: {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
-    parameters: [{name: 'number', description: 'The value to round up.'}, {name: 'significance', description: 'The multiple to round up to. When number is positive, significance must also be positive; otherwise the result is a #NUM! error.'}],
+    shortDescription: 'Rounds a number up to the nearest multiple of significance, toward positive infinity when significance is positive and toward negative infinity when it is negative.',
+    parameters: [{name: 'number', description: 'The value to round up.'}, {name: 'significance', description: 'The multiple to round up to. A #DIV/0! error when it is 0, and a #NUM! error when number is positive and significance is negative. When number is 0 the result is 0, whatever the sign of significance.'}],
     examples: ['=CEILING(4.3, 1)', '=CEILING(22.5, 5)'],
   },
   'CEILING.MATH': {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
-    parameters: [{name: 'number', description: 'The value to round up.'}, {name: 'significance', description: 'The multiple to round up to. Defaults to 1 when omitted.'}, {name: 'mode', description: 'For negative numbers, when non-zero, rounds away from zero instead of toward it.'}],
+    shortDescription: 'Rounds a number up to the nearest multiple of significance, ignoring the sign of significance; for a negative number, mode selects whether it rounds toward or away from zero.',
+    parameters: [{name: 'number', description: 'The value to round up.'}, {name: 'significance', description: 'The multiple to round up to. Defaults to 1 when omitted.'}, {name: 'mode', description: 'For negative numbers, when exactly 1, rounds away from zero instead of toward it. Every other value, including the default 0, rounds toward zero.'}],
     examples: ['=CEILING.MATH(4.3)', '=CEILING.MATH(-4.3, 2, 1)'],
   },
   'CEILING.PRECISE': {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds a number up to the nearest multiple of Significance.',
+    shortDescription: 'Rounds a number up toward positive infinity to the nearest multiple of significance, whatever the sign of significance.',
     parameters: [{name: 'number', description: 'The value to round up.'}, {name: 'significance', description: 'The multiple to round up to; its sign is ignored. Defaults to 1 when omitted.'}],
     examples: ['=CEILING.PRECISE(4.3, 1)', '=CEILING.PRECISE(-4.3, 2)'],
   },
   COMBIN: {
     category: 'Math and trigonometry',
     shortDescription: 'Returns number of combinations (without repetitions).',
-    parameters: [{name: 'number1', description: 'The total number of items.'}, {name: 'number2', description: 'The number of items in each combination.'}],
+    parameters: [{name: 'number1', description: 'The total number of items; truncated to an integer.'}, {name: 'number2', description: 'The number of items in each combination; truncated to an integer.'}],
     examples: ['=COMBIN(8, 2)', '=COMBIN(52, 5)'],
   },
   COMBINA: {
     category: 'Math and trigonometry',
     shortDescription: 'Returns number of combinations (with repetitions).',
-    parameters: [{name: 'number1', description: 'The total number of items.'}, {name: 'number2', description: 'The number of items in each combination, where an item may repeat.'}],
+    parameters: [{name: 'number1', description: 'The total number of items; truncated to an integer.'}, {name: 'number2', description: 'The number of items in each combination, where an item may repeat; truncated to an integer.'}],
     examples: ['=COMBINA(4, 3)', '=COMBINA(10, 2)'],
   },
   COS: {
@@ -136,12 +136,6 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'number', description: 'A non-zero number whose hyperbolic cotangent is returned.'}],
     examples: ['=COTH(2)', '=COTH(-1)'],
   },
-  COUNTUNIQUE: {
-    category: 'Math and trigonometry',
-    shortDescription: 'Counts the number of unique values in a list of specified values and ranges.',
-    parameters: [{name: 'value1', description: 'A value, cell reference, or range to check for uniqueness. Further values or ranges can be passed as additional arguments.'}],
-    examples: ['=COUNTUNIQUE(1, 2, 2, 3)', '=COUNTUNIQUE(A1:A10)'],
-  },
   CSC: {
     category: 'Math and trigonometry',
     shortDescription: 'Returns the cosecant of the given angle (in radians).',
@@ -156,7 +150,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   DECIMAL: {
     category: 'Math and trigonometry',
-    shortDescription: 'Converts text with characters from a number system to a positive integer in the base radix given.',
+    shortDescription: 'Converts text with characters from a number system to a non-negative integer in the base radix given.',
     parameters: [{name: 'text', description: 'The text representation of the number to convert.'}, {name: 'radix', description: 'The base (from 2 to 36) that text is expressed in.'}],
     examples: ['=DECIMAL("1100", 2)', '=DECIMAL("FF", 16)'],
   },
@@ -192,26 +186,26 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   FLOOR: {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
-    parameters: [{name: 'number', description: 'The value to round down.'}, {name: 'significance', description: 'The multiple to round down to. When number is positive, significance must also be positive; otherwise the result is a #NUM! error.'}],
+    shortDescription: 'Rounds a number down to the nearest multiple of significance, toward negative infinity when significance is positive and toward positive infinity when it is negative.',
+    parameters: [{name: 'number', description: 'The value to round down.'}, {name: 'significance', description: 'The multiple to round down to. A #DIV/0! error when it is 0, and a #NUM! error when number is positive and significance is negative. When number is 0 the result is 0, whatever the sign of significance.'}],
     examples: ['=FLOOR(4.7, 1)', '=FLOOR(22.5, 5)'],
   },
   'FLOOR.MATH': {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
-    parameters: [{name: 'number', description: 'The value to round down.'}, {name: 'significance', description: 'The multiple to round down to. Defaults to 1 when omitted.'}, {name: 'mode', description: 'For negative numbers, when non-zero, rounds toward zero instead of away from it.'}],
+    shortDescription: 'Rounds a number down to the nearest multiple of significance, ignoring the sign of significance; for a negative number, mode selects whether it rounds toward or away from zero.',
+    parameters: [{name: 'number', description: 'The value to round down.'}, {name: 'significance', description: 'The multiple to round down to. Defaults to 1 when omitted.'}, {name: 'mode', description: 'For negative numbers, when exactly 1, rounds toward zero instead of away from it. Every other value, including the default 0, rounds away from zero.'}],
     examples: ['=FLOOR.MATH(4.7)', '=FLOOR.MATH(-4.7, 2, 1)'],
   },
   'FLOOR.PRECISE': {
     category: 'Math and trigonometry',
-    shortDescription: 'Rounds a number down to the nearest multiple of Significance.',
+    shortDescription: 'Rounds a number down toward negative infinity to the nearest multiple of significance, whatever the sign of significance.',
     parameters: [{name: 'number', description: 'The value to round down.'}, {name: 'significance', description: 'The multiple to round down to; its sign is ignored. Defaults to 1 when omitted.'}],
     examples: ['=FLOOR.PRECISE(4.7, 1)', '=FLOOR.PRECISE(-4.7, 2)'],
   },
   GCD: {
     category: 'Math and trigonometry',
     shortDescription: 'Computes greatest common divisor of numbers.',
-    parameters: [{name: 'number1', description: 'A non-negative number, cell reference, or range. Further numbers or ranges can be passed as additional arguments.'}],
+    parameters: [{name: 'number1', description: 'A non-negative number, cell reference, or range; each value is truncated to an integer. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=GCD(12, 18)', '=GCD(24, 36, 60)'],
   },
   INT: {
@@ -223,7 +217,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   LCM: {
     category: 'Math and trigonometry',
     shortDescription: 'Computes least common multiple of numbers.',
-    parameters: [{name: 'number1', description: 'A non-negative number, cell reference, or range. Further numbers or ranges can be passed as additional arguments.'}],
+    parameters: [{name: 'number1', description: 'A non-negative number, cell reference, or range; each value is truncated to an integer. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=LCM(4, 6)', '=LCM(A1:A5)'],
   },
   LN: {
@@ -246,20 +240,20 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   MOD: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the remainder when one integer is divided by another.',
+    shortDescription: 'Returns the remainder when one number is divided by another.',
     parameters: [{name: 'dividend', description: 'The number to be divided.'}, {name: 'divisor', description: 'The non-zero number to divide by. The result has the same sign as the dividend.'}],
     examples: ['=MOD(10, 3)', '=MOD(-7, 2)'],
   },
   MROUND: {
     category: 'Math and trigonometry',
     shortDescription: 'Rounds a number to the nearest multiple.',
-    parameters: [{name: 'number', description: 'The value to round.'}, {name: 'base', description: 'The multiple to round number to; must have the same sign as number.'}],
+    parameters: [{name: 'number', description: 'The value to round.'}, {name: 'base', description: 'The multiple to round number to; must have the same sign as number, otherwise the result is a #NUM! error. When it is 0 the result is 0.'}],
     examples: ['=MROUND(10, 3)', '=MROUND(-10, -3)'],
   },
   MULTINOMIAL: {
     category: 'Math and trigonometry',
     shortDescription: 'Returns number of multiset combinations.',
-    parameters: [{name: 'number1', description: 'A non-negative number, cell reference, or range. Further numbers or ranges can be passed as additional arguments.'}],
+    parameters: [{name: 'number1', description: 'A non-negative number, cell reference, or range; each value is truncated to an integer. Further numbers or ranges can be passed as additional arguments.'}],
     examples: ['=MULTINOMIAL(2, 3, 4)', '=MULTINOMIAL(A1:A3)'],
   },
   ODD: {
@@ -307,13 +301,13 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   RANDBETWEEN: {
     category: 'Math and trigonometry',
     shortDescription: 'Returns a random integer between two numbers.',
-    parameters: [{name: 'lower_bound', description: 'The smallest integer that can be returned.'}, {name: 'upper_bound', description: 'The largest integer that can be returned.'}],
+    parameters: [{name: 'lower_bound', description: 'The lower bound, rounded up to an integer.'}, {name: 'upper_bound', description: 'The upper bound, rounded up to an integer; a #NUM! error when it is below lower_bound.'}],
     examples: ['=RANDBETWEEN(1, 10)', '=RANDBETWEEN(-5, 5)'],
   },
   ROMAN: {
     category: 'Math and trigonometry',
     shortDescription: 'Converts number to roman form.',
-    parameters: [{name: 'number', description: 'An integer between 1 and 3999 to convert to a Roman numeral.'}, {name: 'mode', description: 'Controls how concise the result is, from 0 (classic) to 4 (most abbreviated). Defaults to 0 when omitted.'}],
+    parameters: [{name: 'number', description: 'A number between 1 and 3999 to convert to a Roman numeral; truncated to an integer.'}, {name: 'mode', description: 'Controls how concise the result is, from 0 (classic) to 4 (most abbreviated). Defaults to 0 when omitted.'}],
     examples: ['=ROMAN(1990)', '=ROMAN(1990, 4)'],
   },
   ROUND: {
@@ -349,7 +343,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   SERIESSUM: {
     category: 'Math and trigonometry',
     shortDescription: 'Evaluates series at a point.',
-    parameters: [{name: 'number1', description: 'The input value x to the power series.'}, {name: 'number2', description: 'The initial power n to raise x to.'}, {name: 'number3', description: 'The step m by which the power increases for each successive term.'}, {name: 'coefficients', description: 'A range of coefficients multiplying each successive power of x.'}],
+    parameters: [{name: 'x', description: 'The input value x to the power series.'}, {name: 'n', description: 'The initial power n to raise x to.'}, {name: 'm', description: 'The step m by which the power increases for each successive term.'}, {name: 'coefficients', description: 'A range of coefficients multiplying each successive power of x.'}],
     examples: ['=SERIESSUM(1, 0, 1, A1:A3)', '=SERIESSUM(2, 1, 2, B1:B4)'],
   },
   SIGN: {
@@ -407,7 +401,7 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   SUMIFS: {
     category: 'Math and trigonometry',
     shortDescription: 'Sums up the values of cells that belong to the specified range and meet the specified sets of conditions.',
-    parameters: [{name: 'sum_range', description: 'The range of cells to sum.'}, {name: 'criterion_range1', description: 'A range of cells tested against the paired criterion. Further criterion-range/criterion pairs can be passed as additional arguments; only cells that satisfy every pair are summed.'}, {name: 'criterion1', description: 'The condition applied to criterion_range1, e.g. ">5", "apples", or a cell reference.'}],
+    parameters: [{name: 'sum_range', description: 'The range of cells to sum.'}, {name: 'criteria_range1', description: 'A range of cells tested against the paired criterion. Further criterion-range/criterion pairs can be passed as additional arguments; only cells that satisfy every pair are summed.'}, {name: 'criteria1', description: 'The condition applied to criteria_range1, e.g. ">5", "apples", or a cell reference.'}],
     examples: ['=SUMIFS(C1:C10, A1:A10, ">5", B1:B10, "apples")'],
   },
   SUMPRODUCT: {
@@ -424,20 +418,20 @@ export const MATH_AND_TRIGONOMETRY_DOCS: Record<string, FunctionDoc> = {
   },
   SUMX2MY2: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the sum of the square differences.',
-    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as range1, providing the second value (y) of each pair.'}],
+    shortDescription: 'Returns the sum of the differences of the squares of paired values, that is the sum of x squared minus y squared over all pairs.',
+    parameters: [{name: 'array_x', description: 'The range providing the first value (x) of each pair.'}, {name: 'array_y', description: 'The range, of the same size as array_x, providing the second value (y) of each pair.'}],
     examples: ['=SUMX2MY2(A1:A5, B1:B5)'],
   },
   SUMX2PY2: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the sum of the square sums.',
-    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as range1, providing the second value (y) of each pair.'}],
+    shortDescription: 'Returns the sum of the sums of the squares of paired values, that is the sum of x squared plus y squared over all pairs.',
+    parameters: [{name: 'array_x', description: 'The range providing the first value (x) of each pair.'}, {name: 'array_y', description: 'The range, of the same size as array_x, providing the second value (y) of each pair.'}],
     examples: ['=SUMX2PY2(A1:A5, B1:B5)'],
   },
   SUMXMY2: {
     category: 'Math and trigonometry',
-    shortDescription: 'Returns the sum of the square of differences.',
-    parameters: [{name: 'range1', description: 'The range providing the first value (x) of each pair.'}, {name: 'range2', description: 'The range, of the same size as range1, providing the second value (y) of each pair.'}],
+    shortDescription: 'Returns the sum of the squares of the differences of paired values, that is the sum of x minus y, squared, over all pairs.',
+    parameters: [{name: 'array_x', description: 'The range providing the first value (x) of each pair.'}, {name: 'array_y', description: 'The range, of the same size as array_x, providing the second value (y) of each pair.'}],
     examples: ['=SUMXMY2(A1:A5, B1:B5)'],
   },
   TAN: {

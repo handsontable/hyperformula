@@ -19,7 +19,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   DATEDIF: {
     category: 'Date and time',
     shortDescription: 'Calculates distance between two dates.<br>Supported units: "D" (days), "M" (months), "Y" (years), "MD" (days ignoring months and years), "YM" (months ignoring years), or "YD" (days ignoring years).',
-    parameters: [{name: 'date1', description: 'The earlier (start) date of the period; must not be later than date2.'}, {name: 'date2', description: 'The later (end) date of the period.'}, {name: 'unit', description: 'A code selecting the unit of the result: "D", "M", "Y", "MD", "YM", or "YD".'}],
+    parameters: [{name: 'start_date', description: 'The earlier (start) date of the period; must not be later than end_date.'}, {name: 'end_date', description: 'The later (end) date of the period.'}, {name: 'unit', description: 'A code selecting the unit of the result: "D", "M", "Y", "MD", "YM", or "YD".'}],
     examples: ['=DATEDIF(DATE(2020,1,1), DATE(2020,6,15), "M")', '=DATEDIF(A1, A2, "D")'],
   },
   DATEVALUE: {
@@ -37,13 +37,13 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   DAYS: {
     category: 'Date and time',
     shortDescription: 'Calculates the difference between two date values.',
-    parameters: [{name: 'date2', description: 'The end (more recent) date value.'}, {name: 'date1', description: 'The start (earlier) date value; the result is date2 minus date1, in days.'}],
+    parameters: [{name: 'end_date', description: 'The end (more recent) date value.'}, {name: 'start_date', description: 'The start (earlier) date value; the result is end_date minus start_date, in days.'}],
     examples: ['=DAYS(DATE(2020,3,31), DATE(2020,3,1))', '=DAYS(A2, A1)'],
   },
   DAYS360: {
     category: 'Date and time',
     shortDescription: 'Calculates the difference between two date values in days, in 360-day basis.',
-    parameters: [{name: 'date2', description: 'The start date of the 360-day (30-day-month) period.'}, {name: 'date1', description: 'The end date of the 360-day period; the result is date1 minus date2 measured with 30-day months.'}, {name: 'format', description: 'TRUE uses the European 30/360 method; FALSE (default) uses the US (NASD) method.'}],
+    parameters: [{name: 'start_date', description: 'The start date of the 360-day (30-day-month) period.'}, {name: 'end_date', description: 'The end date of the 360-day period; the result is end_date minus start_date measured with 30-day months.'}, {name: 'format', description: 'TRUE uses the European 30/360 method; FALSE (default) uses the US (NASD) method.'}],
     examples: ['=DAYS360(DATE(2020,3,1), DATE(2020,3,31))', '=DAYS360(A1, A2, TRUE())'],
   },
   EDATE: {
@@ -96,7 +96,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   },
   'NETWORKDAYS.INTL': {
     category: 'Date and time',
-    shortDescription: 'Returns the number of working days between two given dates.',
+    shortDescription: 'Returns the number of working days between two given dates, with a configurable set of weekend days.',
     parameters: [{name: 'date1', description: 'The start date of the range.'}, {name: 'date2', description: 'The end date of the range.'}, {name: 'mode', description: 'A weekend code (1-7, 11-17; default 1 for Saturday/Sunday) or a 7-character string of 0s and 1s marking weekend days, starting from Monday.'}, {name: 'holidays', description: 'An optional range of dates to exclude from the working-day count, in addition to the weekend days.'}],
     examples: ['=NETWORKDAYS.INTL(A1, A2, 2)', '=NETWORKDAYS.INTL(DATE(2020,1,1), DATE(2020,1,31), "0000011", C1:C3)'],
   },
@@ -144,13 +144,13 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   },
   WORKDAY: {
     category: 'Date and time',
-    shortDescription: 'Returns the working day number of days from start day.',
+    shortDescription: 'Returns the date a given number of working days after the start date, skipping Saturdays and Sundays.',
     parameters: [{name: 'date', description: 'The start date to count from.'}, {name: 'shift', description: 'The number of working days to add (positive) or subtract (negative), skipping weekends (Saturday and Sunday).'}, {name: 'holidays', description: 'An optional range of dates to also skip, in addition to weekends.'}],
     examples: ['=WORKDAY(A1, 10)', '=WORKDAY(DATE(2020,1,1), 5, C1:C3)'],
   },
   'WORKDAY.INTL': {
     category: 'Date and time',
-    shortDescription: 'Returns the working day number of days from start day.',
+    shortDescription: 'Returns the date a given number of working days after the start date, with a configurable set of weekend days.',
     parameters: [{name: 'date', description: 'The start date to count from.'}, {name: 'shift', description: 'The number of working days to add (positive) or subtract (negative).'}, {name: 'mode', description: 'A weekend code (1-7, 11-17; default 1 for Saturday/Sunday) or a 7-character string of 0s and 1s marking weekend days, starting from Monday.'}, {name: 'holidays', description: 'An optional range of dates to also skip, in addition to the weekend days.'}],
     examples: ['=WORKDAY.INTL(A1, 10, 2)', '=WORKDAY.INTL(DATE(2020,1,1), 5, "0000011", C1:C3)'],
   },
@@ -163,7 +163,7 @@ export const DATE_AND_TIME_DOCS: Record<string, FunctionDoc> = {
   YEARFRAC: {
     category: 'Date and time',
     shortDescription: 'Computes the difference between two date values, in fraction of years.',
-    parameters: [{name: 'date2', description: 'One of the two boundary dates of the period; HyperFormula automatically reorders date1/date2 so the result is never negative.'}, {name: 'date1', description: 'The other boundary date of the period.'}, {name: 'format', description: 'A basis code selecting the day-count convention: 0 = US 30/360 (default), 1 = actual/actual, 2 = actual/360, 3 = actual/365, or 4 = European 30/360.'}],
+    parameters: [{name: 'start_date', description: 'One of the two boundary dates of the period; HyperFormula automatically reorders end_date/start_date so the result is never negative.'}, {name: 'end_date', description: 'The other boundary date of the period.'}, {name: 'format', description: 'A basis code selecting the day-count convention: 0 = US 30/360 (default), 1 = actual/actual, 2 = actual/360, 3 = actual/365, or 4 = European 30/360.'}],
     examples: ['=YEARFRAC(DATE(2020,1,1), DATE(2020,7,1))', '=YEARFRAC(A1, A2, 1)'],
   },
 }

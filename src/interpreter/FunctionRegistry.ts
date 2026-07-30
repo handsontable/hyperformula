@@ -166,6 +166,22 @@ export class FunctionRegistry {
     return FUNCTION_DOCS[canonicalId] !== undefined
   }
 
+  /**
+   * Returns whether the static metadata API describes `functionId` at all, resolving an alias to its target before
+   * asking {@link isBuiltinFunctionId}. This is the single listability gate: {@link getListableFunctionIds} applies it
+   * to build the list and `HyperFormula.getFunctionDetails` applies it to the one id it was asked about, so the two
+   * tiers cannot disagree about which ids exist. Widening the rule (see {@link isBuiltinFunctionId} on user plugins
+   * registered under a built-in *alias* id) means editing this method only.
+   *
+   * @internal
+   * @param {string} functionId - the language-independent function id (canonical id or alias)
+   * @param {FunctionPluginDefinition} plugin - the plugin currently registered for the id
+   */
+  public static isListableFunctionId(functionId: string, plugin: FunctionPluginDefinition): boolean {
+    const canonicalId = plugin.aliases?.[functionId] ?? functionId
+    return this.isBuiltinFunctionId(canonicalId)
+  }
+
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     this.loadPluginFunction(plugin, functionId, this.plugins)
     if (translations !== undefined) {
@@ -223,9 +239,7 @@ export class FunctionRegistry {
   public static getListableFunctionIds(): string[] {
     const ids: string[] = []
     for (const [functionId, plugin] of this.plugins.entries()) {
-      // Resolve aliases to their canonical target id before checking whether the id is a built-in one
-      const canonicalId = plugin.aliases?.[functionId] ?? functionId
-      if (this.isBuiltinFunctionId(canonicalId)) {
+      if (this.isListableFunctionId(functionId, plugin)) {
         ids.push(functionId)
       }
     }

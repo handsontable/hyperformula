@@ -13,6 +13,10 @@ karma.*
 doc
 test/_setupFiles/*.js
 
+# Maintenance scripts: the legacy CommonJS helpers predate the linter and rely on
+# Node globals the shared config does not declare. The TypeScript ones are linted.
+script/*.js
+
 # Auto-generated directories
 commonjs
 coverage
@@ -21,7 +25,6 @@ doc
 es
 languages
 lib
-script
 test-jasmine
 test-jest
 test-utils/snippets

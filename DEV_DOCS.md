@@ -135,9 +135,13 @@ Adding a built-in function is similar to adding a [custom function](docs/guide/c
 Two ways to get this wrong, both of which fail silently &mdash; the function simply disappears from the public API and from the generated docs page, with a green build:
 
 - **No catalogue entry.** A function that is registered but absent from the catalogue is not listed and has no details.
-- **Arity drift.** If the entry's parameter list disagrees with the plugin's `implementedFunctions` (parameter count, or optionality that does not match `optionalArg`/`defaultValue`), the function is dropped from both the list and the details, deliberately, so the two can never disagree with each other.
+- **Arity drift.** If the entry's parameter **count** disagrees with the plugin's `implementedFunctions`, the function is dropped from both the list and the details, deliberately, so the two can never disagree with each other.
 
 Keep the entry's parameters in step with `implementedFunctions` whenever you change a signature. Parameter descriptions must refer to parameters by their exact `snake_case` names, and `shortDescription` must not use docs-page-local markup (no relative links, no footnote references) &mdash; the strings are rendered by API consumers as well as by the docs page.
+
+Note what the drift check does **not** cover: **optionality is not cross-checked.** The catalogue authors no optionality of its own &mdash; a parameter's `optional` flag is derived entirely from `optionalArg`/`defaultValue` in `implementedFunctions` &mdash; so a description that calls an argument optional can sit next to `optional: false` with nothing failing. When a function accepts a call that arity alone does not express (`SHEET()`, `ROW()`, and anything else served by `runFunctionWithReferenceArgument`'s zero-argument path), the plugin must declare `optionalArg: true` explicitly, or the public API will advertise the argument as required.
+
+Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of the catalogue was seeded from a hand-written page that documented Excel, and HyperFormula deliberately deviates in places (`INT` truncates toward zero, `MOD` takes the sign of the dividend, `ISEVEN`/`ISODD` do not truncate, `CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1). Verify a claim against the implementation before authoring it, and record any deviation in [the list of differences](docs/guide/list-of-differences.md).
 
 ## Internationalization and function translations
 

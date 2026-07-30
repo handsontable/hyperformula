@@ -10,6 +10,30 @@ import {FunctionDoc} from '../FunctionDescription'
  * truth for the function metadata API, and `docs/guide/built-in-functions.md` is generated from it.
  */
 export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
+  BESSELI: {
+    category: 'Engineering',
+    shortDescription: 'Returns the value of the modified Bessel function of the first kind, In(x).',
+    parameters: [{name: 'x', description: 'The value at which the modified Bessel function is evaluated.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
+    examples: ['=BESSELI(1.5, 1)'],
+  },
+  BESSELJ: {
+    category: 'Engineering',
+    shortDescription: 'Returns the value of the Bessel function of the first kind, Jn(x).',
+    parameters: [{name: 'x', description: 'The value at which the Bessel function is evaluated.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
+    examples: ['=BESSELJ(1.9, 2)'],
+  },
+  BESSELK: {
+    category: 'Engineering',
+    shortDescription: 'Returns the value of the modified Bessel function of the second kind, Kn(x).',
+    parameters: [{name: 'x', description: 'The value at which the modified Bessel function is evaluated; must be greater than 0.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
+    examples: ['=BESSELK(1.5, 1)'],
+  },
+  BESSELY: {
+    category: 'Engineering',
+    shortDescription: 'Returns the value of the Bessel function of the second kind, Yn(x).',
+    parameters: [{name: 'x', description: 'The value at which the Bessel function is evaluated; must be greater than 0.'}, {name: 'n', description: 'The order of the Bessel function; a non-negative integer.'}],
+    examples: ['=BESSELY(1.5, 1)'],
+  },
   BIN2DEC: {
     category: 'Engineering',
     shortDescription: 'The result is the decimal number for the binary number entered.',
@@ -19,13 +43,13 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
   BIN2HEX: {
     category: 'Engineering',
     shortDescription: 'The result is the hexadecimal number for the binary number entered.',
-    parameters: [{name: 'number', description: 'The binary number (as text, up to 10 digits) to convert to hexadecimal.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The binary number (as text, up to 10 digits) to convert to hexadecimal.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=BIN2HEX(1100100)', '=BIN2HEX(1100100, 4)'],
   },
   BIN2OCT: {
     category: 'Engineering',
     shortDescription: 'The result is the octal number for the binary number entered.',
-    parameters: [{name: 'number', description: 'The binary number (as text, up to 10 digits) to convert to octal.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The binary number (as text, up to 10 digits) to convert to octal.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=BIN2OCT(1100100)', '=BIN2OCT(1100100, 4)'],
   },
   BITAND: {
@@ -60,26 +84,26 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
   },
   COMPLEX: {
     category: 'Engineering',
-    shortDescription: 'Returns complex number from Re and Im parts.',
+    shortDescription: 'Returns a complex number built from its real and imaginary parts.',
     parameters: [{name: 're', description: 'The real coefficient of the complex number.'}, {name: 'im', description: 'The imaginary coefficient of the complex number.'}, {name: 'symbol', description: 'The suffix used for the imaginary unit, either "i" or "j"; defaults to "i" when omitted.'}],
     examples: ['=COMPLEX(3, 4)', '=COMPLEX(2, -1, "j")'],
   },
   DEC2BIN: {
     category: 'Engineering',
     shortDescription: 'Returns the binary number for the decimal number entered between –512 and 511.',
-    parameters: [{name: 'number', description: 'The decimal integer, between -512 and 511, to convert to binary.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The decimal integer, between -512 and 511, to convert to binary.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=DEC2BIN(10)', '=DEC2BIN(10, 8)'],
   },
   DEC2HEX: {
     category: 'Engineering',
     shortDescription: 'Returns the hexadecimal number for the decimal number entered.',
-    parameters: [{name: 'number', description: 'The decimal integer to convert to hexadecimal.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The decimal integer to convert to hexadecimal.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=DEC2HEX(100)', '=DEC2HEX(100, 4)'],
   },
   DEC2OCT: {
     category: 'Engineering',
     shortDescription: 'Returns the octal number for the decimal number entered.',
-    parameters: [{name: 'number', description: 'The decimal integer to convert to octal.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The decimal integer to convert to octal.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=DEC2OCT(58)', '=DEC2OCT(58, 4)'],
   },
   DELTA: {
@@ -103,7 +127,7 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
   HEX2BIN: {
     category: 'Engineering',
     shortDescription: 'The result is the binary number for the hexadecimal number entered.',
-    parameters: [{name: 'number', description: 'The hexadecimal number (as text, up to 10 digits) to convert to binary.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The hexadecimal number (as text, up to 10 digits) to convert to binary.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=HEX2BIN("2A")', '=HEX2BIN("2A", 8)'],
   },
   HEX2DEC: {
@@ -115,7 +139,7 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
   HEX2OCT: {
     category: 'Engineering',
     shortDescription: 'The result is the octal number for the hexadecimal number entered.',
-    parameters: [{name: 'number', description: 'The hexadecimal number (as text, up to 10 digits) to convert to octal.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The hexadecimal number (as text, up to 10 digits) to convert to octal.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=HEX2OCT("2A")', '=HEX2OCT("2A", 4)'],
   },
   IMABS: {
@@ -271,7 +295,7 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
   OCT2BIN: {
     category: 'Engineering',
     shortDescription: 'The result is the binary number for the octal number entered.',
-    parameters: [{name: 'number', description: 'The octal number (as text, up to 10 digits) to convert to binary.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The octal number (as text, up to 10 digits) to convert to binary.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=OCT2BIN(14)', '=OCT2BIN(14, 8)'],
   },
   OCT2DEC: {
@@ -283,7 +307,7 @@ export const ENGINEERING_DOCS: Record<string, FunctionDoc> = {
   OCT2HEX: {
     category: 'Engineering',
     shortDescription: 'The result is the hexadecimal number for the octal number entered.',
-    parameters: [{name: 'number', description: 'The octal number (as text, up to 10 digits) to convert to hexadecimal.'}, {name: 'places', description: 'The minimum number of digits to pad the result to with leading zeros; if omitted, no padding is applied.'}],
+    parameters: [{name: 'number', description: 'The octal number (as text, up to 10 digits) to convert to hexadecimal.'}, {name: 'places', description: 'The number of digits the result is padded to with leading zeros; a #NUM! error when the result needs more digits than that. Ignored for negative numbers. If omitted, no padding is applied.'}],
     examples: ['=OCT2HEX(14)', '=OCT2HEX(14, 4)'],
   },
 }
