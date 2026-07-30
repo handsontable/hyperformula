@@ -9,6 +9,7 @@ import {ErrorMessage} from '../../error-message'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {Maybe} from '../../Maybe'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
@@ -37,6 +38,45 @@ function arraySizeForPoolFunction(inputArray: ArraySize, windowSize: number, str
   )
 }
 
+/**
+ * Checks whether a square pooling window tiles the input array exactly, so that no window reaches outside of it.
+ *
+ * The window size and the stride have to be positive integers, the window has to fit inside the input array,
+ * and both of its dimensions, reduced by the window size, have to be whole multiples of the stride.
+ *
+ * @param inputArray - dimensions of the pooled input array
+ * @param windowSize - side length of the square pooling window
+ * @param stride - distance between the top-left corners of two consecutive windows
+ */
+function isPoolWindowFittingInputArray(inputArray: ArraySize, windowSize: number, stride: number): boolean {
+  return Number.isInteger(windowSize) && windowSize >= 1
+    && Number.isInteger(stride) && stride >= 1
+    && windowSize <= inputArray.width
+    && windowSize <= inputArray.height
+    && (inputArray.width - windowSize) % stride === 0
+    && (inputArray.height - windowSize) % stride === 0
+}
+
+/**
+ * Validates the arguments shared by the pooling functions (MAXPOOL, MEDIANPOOL).
+ *
+ * @param matrix - the pooled input range
+ * @param windowSize - side length of the square pooling window
+ * @param stride - distance between the top-left corners of two consecutive windows
+ * @returns a {@link CellError} describing the violated constraint, or `undefined` when the arguments are valid
+ */
+function poolFunctionArgumentsError(matrix: SimpleRangeValue, windowSize: number, stride: number): Maybe<CellError> {
+  if (!matrix.hasOnlyNumbers()) {
+    return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+  }
+
+  if (!isPoolWindowFittingInputArray(matrix.size, windowSize, stride)) {
+    return new CellError(ErrorType.VALUE, ErrorMessage.PoolDimensions)
+  }
+
+  return undefined
+}
+
 export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypecheck<MatrixPlugin> {
   public static implementedFunctions: ImplementedFunctions = {
     'MMULT': {
@@ -61,8 +101,8 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       sizeOfResultArrayMethod: 'maxpoolArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1, optionalArg: true},
       ],
       vectorizationForbidden: true,
     },
@@ -71,8 +111,8 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       sizeOfResultArrayMethod: 'medianpoolArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1},
+        {argumentType: FunctionArgumentType.INTEGER, minValue: 1, optionalArg: true},
       ],
       vectorizationForbidden: true,
     },
@@ -110,10 +150,19 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     return arraySizeForMultiplication(left, right)
   }
 
+  /**
+   * Corresponds to MAXPOOL(Range, Window_size, Stride).
+   *
+   * Reduces the input range to the maximum value of every window of `Window_size` x `Window_size` cells,
+   * moving the window by `Stride` cells. The window has to fit inside the range and the range dimensions,
+   * reduced by the window size, have to be whole multiples of the stride. Otherwise, the function
+   * returns the #VALUE! error.
+   */
   public maxpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MAXPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
-      if (!matrix.hasOnlyNumbers()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+      const argumentsError = poolFunctionArgumentsError(matrix, windowSize, stride)
+      if (argumentsError !== undefined) {
+        return argumentsError
       }
       const outputSize = arraySizeForPoolFunction(matrix.size, windowSize, stride)
 
@@ -133,10 +182,19 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
     })
   }
 
+  /**
+   * Corresponds to MEDIANPOOL(Range, Window_size, Stride).
+   *
+   * Reduces the input range to the median value of every window of `Window_size` x `Window_size` cells,
+   * moving the window by `Stride` cells. The window has to fit inside the range and the range dimensions,
+   * reduced by the window size, have to be whole multiples of the stride. Otherwise, the function
+   * returns the #VALUE! error.
+   */
   public medianpool(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('MEDIANPOOL'), (matrix: SimpleRangeValue, windowSize: number, stride: number = windowSize) => {
-      if (!matrix.hasOnlyNumbers()) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.NumberRange)
+      const argumentsError = poolFunctionArgumentsError(matrix, windowSize, stride)
+      if (argumentsError !== undefined) {
+        return argumentsError
       }
       const outputSize = arraySizeForPoolFunction(matrix.size, windowSize, stride)
 
@@ -227,9 +285,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       }
     }
 
-    if (window > array.width || window > array.height
-      || stride > window
-      || (array.width - window) % stride !== 0 || (array.height - window) % stride !== 0) {
+    if (stride > window || !isPoolWindowFittingInputArray(array, window, stride)) {
       return ArraySize.error()
     }
 
