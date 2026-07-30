@@ -687,6 +687,7 @@ export class HyperFormula implements TypedEmitter {
     return HyperFormula.buildAvailableFunctions(
       FunctionRegistry.getListableFunctionIds(),
       (id) => FunctionRegistry.getFunctionPlugin(id),
+      HyperFormula.getLanguage(code),
       code,
     )
   }
@@ -858,16 +859,19 @@ export class HyperFormula implements TypedEmitter {
    * (so the order does not depend on the host locale), with the language-independent canonical name as a stable
    * tiebreaker for entries that share a localized name.
    *
-   * Takes the language code rather than the resolved [[TranslationPackage]] and the code it came from: the package
-   * is derivable from the code, and accepting both would let a caller pass a pair that disagrees, translating names
-   * under one language while ordering them under another.
+   * Takes the [[TranslationPackage]] alongside the code it came from, rather than deriving it from the code: an
+   * instance must describe its functions under the package its own evaluator uses (`Config.translationPackage`),
+   * which is a snapshot taken when the instance was built and can differ from whatever is registered globally for
+   * the same code today. Deriving it here instead would let this method report a localized name the instance
+   * refuses to evaluate. Both callers pass a matching pair, so names are never translated under one language and
+   * ordered under another.
    *
    * @param {string[]} functionIds - the registered ids to describe
    * @param {(id: string) => FunctionPluginDefinition | undefined} getPlugin - resolves the plugin registered for an id
-   * @param {string} languageCode - the HyperFormula language code to translate and order the names under
+   * @param {TranslationPackage} language - the translation package to translate the names under
+   * @param {string} languageCode - the HyperFormula language code `language` came from, used to order the names
    */
-  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, languageCode: string): FunctionListEntry[] {
-    const language = HyperFormula.getLanguage(languageCode)
+  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage, languageCode: string): FunctionListEntry[] {
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     const collator = HyperFormula.createLocaleCollator(languageCode)
     return functionIds
@@ -4660,8 +4664,6 @@ export class HyperFormula implements TypedEmitter {
    * plugin registered without translations for that language. A translation set to an empty string is not a missing
    * entry: it falls back to the canonical id, so the function stays listed under its canonical name.
    *
-   * @throws [[LanguageNotRegisteredError]] when the language set in this instance's configuration is not registered
-   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -4676,6 +4678,9 @@ export class HyperFormula implements TypedEmitter {
     return HyperFormula.buildAvailableFunctions(
       this._functionRegistry.getListableFunctionIds(),
       (id) => this._functionRegistry.getFunctionPlugin(id),
+      // The instance's own package, the one its evaluator uses — not a fresh global lookup, which could describe
+      // the functions under a package this instance never adopted.
+      this._config.translationPackage,
       this._config.language,
     )
   }
@@ -4703,7 +4708,6 @@ export class HyperFormula implements TypedEmitter {
    * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
-   * @throws [[LanguageNotRegisteredError]] when the language set in this instance's configuration is not registered
    *
    * @example
    * ```js
@@ -4717,8 +4721,8 @@ export class HyperFormula implements TypedEmitter {
    */
   public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
-    const language = HyperFormula.getLanguage(this._config.language)
-    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry.getFunctionPlugin(canonicalName), language)
+    // The instance's own package, the one its evaluator uses — see getAvailableFunctions.
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry.getFunctionPlugin(canonicalName), this._config.translationPackage)
   }
 
   /**
