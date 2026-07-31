@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Now the calculateFormula let to specify the column and the row where the formula must be calculated. [#1320](https://github.com/handsontable/hyperformula/discussions/1320)
+- Now the calculateFormula let to specify the column and the row where the formula must be calculated. [#1720](https://github.com/handsontable/hyperformula/pull/1720)
 
 ## [3.3.0] - 2026-05-20
 
