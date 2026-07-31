@@ -136,8 +136,8 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
  * Builds a Tier-2 details object: the list fields plus the parameter list (name, description, optionality) and
  * `repeatLastArgs` (how many trailing parameters repeat, normalized by [[clampRepeatLastArgs]]). The caller renders
  * the syntax string from these.
- * `documentationUrl` and `examples` come from the catalogue doc, which authors both for every entry.
- * Built-in parameters carry authored descriptions; custom functions surface empty values.
+ * `documentationUrl` and `examples` come from the catalogue doc, which authors both for every entry, as it does the
+ * parameter descriptions. A custom function has none of them; see [[buildCustomFunctionDetails]].
  *
  * The parameter list always has one entry per implemented argument, so it describes what the evaluator actually
  * accepts even when the catalogue entry has drifted out of step with the signature; see
@@ -156,7 +156,7 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
     canonicalName,
     // Omitted entirely for non-aliases rather than set to `undefined`: the key would otherwise
     // survive in memory but vanish through JSON.stringify, handing consumers two shapes for the
-    // same function (mirrors documentationUrl always being a string).
+    // same function.
     ...(aliasOf !== undefined ? {aliasOf} : {}),
     category: doc.category,
     shortDescription: doc.shortDescription,
@@ -169,30 +169,30 @@ export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, me
 
 /**
  * Builds a Tier-1 list entry for a custom (user-registered) function, which ships no catalogue doc. The name is the
- * only authored information: `category` is reported as `'Custom'` and `shortDescription` is empty.
+ * only authored information: `category` is reported as `'Custom'` and there is no `shortDescription`.
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {TranslateName} translate - per-id translation lookup
  * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
  */
 export function buildCustomFunctionListEntry(canonicalName: string, translate: TranslateName, aliasOf?: string): FunctionListEntry {
-  // `aliasOf` is the only key ever absent: omitting it for a non-alias beats setting it to `undefined`, which would
-  // survive in memory but vanish through JSON.stringify, giving consumers two shapes for one function. `category` and
-  // `shortDescription` are by contract always present — `'Custom'` and `''` respectively — so a custom function has
-  // the same key set as a built-in one and differs only in its values.
+  // Every key with nothing to report is left out rather than filled with a placeholder, so a consumer tells "no
+  // authored description" from "an empty one" and the object survives JSON.stringify unchanged: `shortDescription`
+  // because a custom function has no catalogue entry to author it, `aliasOf` because a non-alias resolves to
+  // nothing. `category` is the exception — `'Custom'` is a real value, not a stand-in for a missing one.
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
     ...(aliasOf !== undefined ? {aliasOf} : {}),
     category: CUSTOM_FUNCTION_CATEGORY,
-    shortDescription: '',
   }
 }
 
 /**
  * Builds Tier-2 details for a custom (user-registered) function from its structural metadata alone (no catalogue
  * doc): the `'Custom'` category, positional parameter names (`Arg1`, `Arg2`, ...), per-parameter optionality, and
- * `repeatLastArgs` (normalized by [[clampRepeatLastArgs]], exactly as on the built-in path).
+ * `repeatLastArgs` (normalized by [[clampRepeatLastArgs]], exactly as on the built-in path). The authored fields —
+ * `shortDescription`, `documentationUrl` and `examples` — have no source here, so they are omitted.
  *
  * @param {string} canonicalName - the language-independent function id
  * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions`
@@ -201,17 +201,14 @@ export function buildCustomFunctionListEntry(canonicalName: string, translate: T
  */
 export function buildCustomFunctionDetails(canonicalName: string, metadata: StructuralMetadata, translate: TranslateName, aliasOf?: string): FunctionDetails {
   const parameters = buildPositionalParameters(metadata.parameters ?? [])
-  // `aliasOf` is emitted only when there is one — see buildCustomFunctionListEntry for why an absent key beats an
-  // `undefined`-valued one.
+  // Only the fields the implementation itself provides are emitted — see buildCustomFunctionListEntry for why an
+  // absent key beats a placeholder value.
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
     ...(aliasOf !== undefined ? {aliasOf} : {}),
     category: CUSTOM_FUNCTION_CATEGORY,
-    shortDescription: '',
     parameters,
     repeatLastArgs: clampRepeatLastArgs(metadata.repeatLastArgs, parameters.length),
-    documentationUrl: '',
-    examples: [],
   }
 }

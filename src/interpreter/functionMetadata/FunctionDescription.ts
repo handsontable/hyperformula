@@ -108,10 +108,11 @@ export interface FunctionListEntry {
    */
   category: FunctionCategory,
   /**
-   * One-liner description (English in the MVP). Empty (`''`) for custom functions.
+   * One-liner description (English in the MVP). Authored in the catalogue, so it is absent for a custom
+   * (user-registered) function, which ships no catalogue entry.
    * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
    */
-  shortDescription: string,
+  shortDescription?: string,
 }
 
 /**
@@ -147,10 +148,11 @@ export interface FunctionDetails {
    */
   category: FunctionCategory,
   /**
-   * One-liner description (English in the MVP). Empty (`''`) for custom functions.
+   * One-liner description (English in the MVP). Authored in the catalogue, so it is absent for a custom
+   * (user-registered) function, which ships no catalogue entry.
    * May contain inline markdown links (absolute URLs) and `<br>` line breaks.
    */
-  shortDescription: string,
+  shortDescription?: string,
   /** The function's parameters, in declaration order. */
   parameters: FunctionParameterDescription[],
   /**
@@ -164,10 +166,13 @@ export interface FunctionDetails {
    */
   repeatLastArgs: number,
   /**
-   * Link to the function's documentation. Always a string: the link authored in the catalogue for built-ins, `''`
-   * for custom functions.
+   * Link to the function's documentation, as authored in the catalogue. Absent for a custom (user-registered)
+   * function, which ships no catalogue entry.
    */
-  documentationUrl: string,
-  /** Usage examples (English). At least one per built-in function; `[]` for custom functions. */
-  examples: string[],
+  documentationUrl?: string,
+  /**
+   * Usage examples (English). At least one per built-in function; absent for a custom (user-registered) function,
+   * which ships no catalogue entry.
+   */
+  examples?: string[],
 }

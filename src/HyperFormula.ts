@@ -661,7 +661,7 @@ export class HyperFormula implements TypedEmitter {
    * The list reflects the global registry: the built-in functions and every custom function registered with
    * [[registerFunctionPlugin]] or [[registerFunction]], plus their aliases. An alias is listed under its own id,
    * borrowing its target's category and description, with the target id exposed as `aliasOf`. Custom functions
-   * ship no catalogue entry, so they are listed with `category: 'Custom'` and an empty `shortDescription` — as is
+   * ship no catalogue entry, so they are listed with `category: 'Custom'` and no `shortDescription` — as is
    * a custom plugin registered *over* a built-in id, which keeps that id but never wears the built-in's
    * description. Use the instance method [[getAvailableFunctions]] for one engine's own registry, which differs
    * from the global one when the instance was built with the `functionPlugins` configuration option.
@@ -704,7 +704,7 @@ export class HyperFormula implements TypedEmitter {
    * The static method resolves everything in the global registry: the built-in functions, their aliases, and the
    * custom (user-registered) ones. An alias reports its target's metadata (including examples, which spell the
    * target's name) under the alias id, with the target id exposed as `aliasOf`. A custom function has no catalogue
-   * entry, so it reports `category: 'Custom'`, an empty `shortDescription` and `documentationUrl`, no `examples`,
+   * entry, so it reports `category: 'Custom'`, no `shortDescription`, `documentationUrl` or `examples`,
    * and positional parameter names (`Arg1`, `Arg2`, ...) — as does a custom plugin registered over a built-in id,
    * so the result describes what actually runs rather than the built-in it replaced. Use the instance method
    * [[getFunctionDetails]] for one engine's own registry, which differs from the global one when the instance was
@@ -4636,7 +4636,7 @@ export class HyperFormula implements TypedEmitter {
    * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
    * functions, plus their aliases. An alias is listed under its own id, borrowing its target's category and
    * description, with the target id exposed as `aliasOf`. Custom functions ship no catalogue entry, so their
-   * `category` is `'Custom'` and their `shortDescription` is empty.
+   * `category` is `'Custom'` and they carry no `shortDescription`.
    *
    * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
    * an untranslated id, so listing it would advertise a function that cannot be called — in practice, a custom
@@ -4674,8 +4674,8 @@ export class HyperFormula implements TypedEmitter {
    * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
    * has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
    * described either, which keeps this method consistent with [[getAvailableFunctions]]).
-   * For a custom function, `category` is `'Custom'`, `shortDescription` and `documentationUrl` are empty, `examples`
-   * is empty, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
+   * For a custom function, `category` is `'Custom'`, there is no `shortDescription`, `documentationUrl` or
+   * `examples`, and parameters are reported positionally (`Arg1`, `Arg2`, ...).
    *
    * `canonicalName` is matched exactly, in two ways worth knowing:
    * - It is **case-sensitive**, unlike formula syntax. `'SUMIF'` resolves; `'sumif'` and `'SumIf'` return

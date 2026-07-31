@@ -140,7 +140,7 @@ The catalogue's key set decides which ids carry an authored **description**, not
 
 Two ways to get this wrong:
 
-- **No catalogue entry.** A registered function with no entry is still listed and still resolves to details, but as a custom function: `category: 'Custom'`, an empty `shortDescription`, and positional parameter names (`Arg1`, `Arg2`, …). `'Custom'` has no section on the generated docs page, so `npm run docs:generate-function-docs` fails rather than publishing a built-in with no description.
+- **No catalogue entry.** A registered function with no entry is still listed and still resolves to details, but as a custom function: `category: 'Custom'`, no `shortDescription`, `documentationUrl` or `examples` (the API omits every authored field it has no source for, rather than reporting an empty one), and positional parameter names (`Arg1`, `Arg2`, …). `'Custom'` has no section on the generated docs page, so `npm run docs:generate-function-docs` fails rather than publishing a built-in with no description.
 - **Arity drift.** If the entry's parameter **count** disagrees with the plugin's `implementedFunctions`, the implementation wins: `getFunctionDetails` reports one parameter per implemented argument under positional names, discarding the authored names and descriptions, and warns on the console naming the function. The entry's category, `shortDescription`, `examples` and `documentationUrl` are still used, and the function stays listed &mdash; the parameter prose degrades, not the availability.
 
 Keep the entry's parameters in step with `implementedFunctions` whenever you change a signature.

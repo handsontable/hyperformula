@@ -136,7 +136,9 @@ export function renderBuiltinFunctionsMarkdown(
       }
       const syntax = formatFunctionSyntax(details.localizedName, details.parameters, details.repeatLastArgs)
       const anchor = `<a id="${entry.canonicalName}"></a>`
-      return `| ${anchor}${escapeCell(entry.localizedName)} | ${escapeCell(entry.shortDescription)} | ${escapeCell(syntax)} |`
+      // `shortDescription` is optional only because a custom function has none, and those are rejected above, so
+      // the fallback is unreachable for the catalogue this page is generated from.
+      return `| ${anchor}${escapeCell(entry.localizedName)} | ${escapeCell(entry.shortDescription ?? '')} | ${escapeCell(syntax)} |`
     })
     sections.push(`### ${category}\n\n| Function ID | Description | Syntax |\n|:---|:---|:---|\n${rows.join('\n')}`)
   }
