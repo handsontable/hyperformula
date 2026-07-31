@@ -1,0 +1,29 @@
+/**
+ * Cloudflare Workers configuration for the HyperFormula documentation site.
+ *
+ * The asset directory is the VuePress `dist` root, not `dist/docs`, so that every
+ * document keeps the `/docs/` prefix it is built with (see
+ * `docs/.vuepress/build.config.js`). `worker/index.js` resolves directory and
+ * extensionless URLs; see the comment there.
+ *
+ * Deployments are driven by Workers Builds (Git integration configured in the
+ * Cloudflare dashboard):
+ *   - `master`      -> `npx wrangler deploy`          (production)
+ *   - other branches -> `npx wrangler versions upload` (per-branch preview URL)
+ */
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "hyperformula-docs",
+  "compatibility_date": "2026-07-31",
+  "preview_urls": true,
+  "main": "./worker/index.js",
+  "assets": {
+    "directory": "./docs/.vuepress/dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "none"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
