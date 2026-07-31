@@ -25,18 +25,17 @@ export * from './FunctionDescription'
  * source of truth for both the function metadata API and the generated `docs/guide/built-in-functions.md` guide page;
  * edit a category file to change what either reports. Coverage of the whole canonical set is enforced by test.
  *
- * The *key set* is load-bearing beyond lookup: `FunctionRegistry.isBuiltinFunctionId` answers "is this a built-in
- * id?" from this object, so the catalogue defines what counts as a built-in. A key left behind after a rename, or a
- * typo'd one, therefore widens that set silently — nothing checks a catalogue key against a registered function —
- * and a user plugin registered under such an orphan id is then reported by the static, built-ins-only
- * `HyperFormula.getAvailableFunctions` (as a custom function). Removing or renaming a built-in means removing or
- * renaming its entry in the same change.
+ * The key set decides which ids carry an authored description, not which ids the metadata API lists: that API
+ * describes every registered function, and applies an entry only once `FunctionRegistry.isBuiltinFunction` confirms
+ * the built-in plugin owning the id is the one currently registered for it. Nothing checks a catalogue key against a
+ * registered function, so an entry left behind after a rename, or a typo'd one, describes nothing and merely ships in
+ * the bundle. Removing or renaming a built-in means removing or renaming its entry in the same change.
  *
- * Deliberately prototype-less. The catalogue doubles as the built-in id *set* (see
- * `FunctionRegistry.isBuiltinFunctionId`), and a caller-supplied id is looked up in it directly. With
- * `Object.prototype` in the chain, `FUNCTION_DOCS['toString']` resolves to a function rather than `undefined`, so ids
- * like `toString`, `valueOf` or `__proto__` would report as built-in and pull `Object.prototype` members in as if they
- * were catalogue entries. A null prototype makes every lookup on this object answer only for authored ids.
+ * Deliberately prototype-less, because ids are looked up here directly: with `Object.prototype` in the chain,
+ * `FUNCTION_DOCS['toString']` resolves to a function rather than `undefined`, so an id colliding with a prototype
+ * member (`toString`, `valueOf`, `__proto__`) would pull that member in as if it were a catalogue entry. The
+ * ownership check above already keeps a user plugin registered under such an id away from any doc, so the null
+ * prototype is a second line of defence rather than the only one.
  */
 export const FUNCTION_DOCS: Record<string, FunctionDoc> = Object.assign(Object.create(null) as Record<string, FunctionDoc>, {
   ...ARRAY_MANIPULATION_DOCS,

@@ -134,14 +134,14 @@ Adding a built-in function is similar to adding a [custom function](docs/guide/c
 
 Every field is required, `documentationUrl` included. Each entry authors its own link rather than inheriting a shared default, so that the links can diverge per function without touching any code; they all happen to point at the same guide page today.
 
-An entry's `category` must be one of the categories in `FUNCTION_CATEGORIES` &mdash; the ones the generated guide page renders as `### ` sections. The separate `'Custom'` category is reserved for user-registered functions and must never appear in `FUNCTION_CATEGORIES` or in a catalogue file: it names no section, and the docs generator rejects an entry carrying it rather than silently dropping it from the page it is building. (This does not cover the two silent-omission modes below, which happen earlier &mdash; before an entry ever reaches the generator.)
+An entry's `category` must be one of the categories in `FUNCTION_CATEGORIES` &mdash; the ones the generated guide page renders as `### ` sections. The separate `'Custom'` category is reserved for user-registered functions and must never appear in `FUNCTION_CATEGORIES` or in a catalogue file: it names no section, and the docs generator rejects an entry carrying it rather than silently dropping it from the page it is building. (That rejection is also what turns a missing catalogue entry into a failed docs build; it cannot catch the arity drift below, which drops the function before it ever reaches the generator.)
 
-The catalogue's key set is also the built-in **id** set: `FunctionRegistry.isBuiltinFunctionId` answers from `FUNCTION_DOCS`. Nothing checks a key against a registered function, so a key left behind after a rename widens that set silently, and a user plugin registered under the orphan id then shows up in the static, built-ins-only `getAvailableFunctions`. Remove or rename the entry in the same change as the function.
+The catalogue's key set decides which ids carry an authored **description**, not which ids the API lists. Both `getAvailableFunctions` and `getFunctionDetails` describe every registered function &mdash; custom ones included &mdash; and an entry is applied only once `FunctionRegistry.isBuiltinFunction` confirms that the built-in plugin owning the id is the one currently registered for it. Nothing checks a key against a registered function, so an entry left behind after a rename describes nothing and merely ships in the bundle. Remove or rename it in the same change as the function.
 
-Two ways to get this wrong, both of which fail silently &mdash; the function simply disappears from the public API and from the generated docs page, with a green build:
+Two ways to get this wrong:
 
-- **No catalogue entry.** A function that is registered but absent from the catalogue is not listed and has no details.
-- **Arity drift.** If the entry's parameter **count** disagrees with the plugin's `implementedFunctions`, the function is dropped from both the list and the details, deliberately, so the two can never disagree with each other.
+- **No catalogue entry.** A registered function with no entry is still listed and still resolves to details, but as a custom function: `category: 'Custom'`, an empty `shortDescription`, and positional parameter names (`Arg1`, `Arg2`, …). `'Custom'` has no section on the generated docs page, so `npm run docs:generate-function-docs` fails rather than publishing a built-in with no description.
+- **Arity drift.** If the entry's parameter **count** disagrees with the plugin's `implementedFunctions`, the function is dropped from both the list and the details, deliberately, so the two can never disagree with each other. This one fails silently, with a green build.
 
 Keep the entry's parameters in step with `implementedFunctions` whenever you change a signature.
 

@@ -8,7 +8,6 @@ import {AliasAlreadyExisting, FunctionPluginValidationError, ProtectedFunctionEr
 import {HyperFormula} from '../HyperFormula'
 import {TranslationSet} from '../i18n'
 import {Maybe} from '../Maybe'
-import {FUNCTION_DOCS} from './functionMetadata'
 import {Interpreter} from './Interpreter'
 import {
   FunctionMetadata,
@@ -51,9 +50,9 @@ export class FunctionRegistry {
    * here instead: doing so eagerly creates a module-load-order cycle that breaks the bundled build.
    *
    * That leaves one initialization-order dependency, but a narrow one. Whether an id is described at all does NOT
-   * consult this map ({@link isBuiltinFunctionId} reads the catalogue instead), so if this map were ever left empty
-   * the metadata API would still list every function — it would report the built-ins as custom, dropping their
-   * categories and descriptions, rather than dropping the functions themselves.
+   * consult this map — {@link getListableFunctionIds} describes every registered id — so if this map were ever
+   * left empty the metadata API would still list every function. It would report the built-ins as custom, dropping
+   * their categories and descriptions, rather than dropping the functions themselves.
    *
    * Written exactly once and unaffected by later `registerFunction`/`unregister` calls, so it stays a snapshot of
    * the original built-in ownership: re-registering a built-in plugin after `unregisterAll` still counts as built-in.
@@ -138,50 +137,6 @@ export class FunctionRegistry {
     return this._builtinFunctionOwners.get(canonicalId) === plugin
   }
 
-  /**
-   * Returns whether `canonicalId` is a built-in function id, regardless of which plugin currently provides it. Use
-   * this to decide whether the static metadata API describes an id at all, and {@link isBuiltinFunction} to decide
-   * whether it may wear the built-in's catalogue doc: a user plugin registered over a built-in id still occupies a
-   * built-in id, so it is described (as a custom function) rather than dropped from the API altogether.
-   *
-   * Answered from `FUNCTION_DOCS`, not from {@link _builtinFunctionOwners}: the catalogue is a plain module constant,
-   * so the built-in id set is intrinsic and cannot depend on whether some initialization step ran. Deliberately NOT
-   * derived from the plugin barrel, which the built-in ids would otherwise have to come from — importing it here
-   * creates a module-load-order cycle that breaks the bundled build. The catalogue holds an entry per built-in
-   * `implementedFunctions` key plus the protected ids (which are never registered, so they cannot reach this method
-   * from `this.plugins`), and a test enforces that coverage.
-   *
-   * The catalogue keys **canonical ids only** — it carries no entry per alias — so callers must resolve an alias to
-   * its target before asking (see {@link getListableFunctionIds}). That covers every built-in alias, because the
-   * built-in plugin owning the alias declares it in its `aliases` map. It does not cover a *user* plugin registered
-   * directly under a built-in alias id: such a plugin declares no `aliases`, so the id resolves to itself, matches no
-   * catalogue entry, and is reported as not being a built-in id. The function stays callable and the instance
-   * metadata methods still list it (as a custom function), but the static ones omit it. Widening this would mean
-   * snapshotting the built-in alias keys alongside {@link _builtinFunctionOwners}.
-   *
-   * @internal
-   * @param {string} canonicalId - the language-independent function id (the alias target, never an alias)
-   */
-  public static isBuiltinFunctionId(canonicalId: string): boolean {
-    return FUNCTION_DOCS[canonicalId] !== undefined
-  }
-
-  /**
-   * Returns whether the static metadata API describes `functionId` at all, resolving an alias to its target before
-   * asking {@link isBuiltinFunctionId}. This is the single listability gate: {@link getListableFunctionIds} applies it
-   * to build the list and `HyperFormula.getFunctionDetails` applies it to the one id it was asked about, so the two
-   * tiers cannot disagree about which ids exist. Widening the rule (see {@link isBuiltinFunctionId} on user plugins
-   * registered under a built-in *alias* id) means editing this method only.
-   *
-   * @internal
-   * @param {string} functionId - the language-independent function id (canonical id or alias)
-   * @param {FunctionPluginDefinition} plugin - the plugin currently registered for the id
-   */
-  public static isListableFunctionId(functionId: string, plugin: FunctionPluginDefinition): boolean {
-    const canonicalId = plugin.aliases?.[functionId] ?? functionId
-    return this.isBuiltinFunctionId(canonicalId)
-  }
-
   public static registerFunction(functionId: string, plugin: FunctionPluginDefinition, translations?: FunctionTranslationsPackage): void {
     this.loadPluginFunction(plugin, functionId, this.plugins)
     if (translations !== undefined) {
@@ -226,27 +181,22 @@ export class FunctionRegistry {
 
   /**
    * Returns the ids of all functions the function-metadata API (`getAvailableFunctions`/`getFunctionDetails`)
-   * should describe: every registered function that occupies a built-in id (canonical ids plus their aliases) even
-   * when a user plugin currently provides it, plus the protected ids (e.g. `VERSION`, `OFFSET`). Functions
-   * registered under a brand-new id via registerFunctionPlugin are excluded; they appear only in the instance
-   * method variant. A user plugin registered over a built-in id stays listed (as a custom function, since
-   * {@link isBuiltinFunction} denies it the catalogue doc) because it remains callable in every instance — dropping
-   * it would hide a working function from the list. Protected ids are excluded from registration
-   * (`this.plugins`) so they can never be unregistered or shadowed, but a user can still call them from a formula,
-   * so the metadata API surfaces them too (HF-249). Safe to include here: this method is consumed only by the
-   * metadata API, never by anything that would let a caller register/unregister against a protected id.
+   * should describe: everything globally registered — built-ins, their aliases, and custom functions registered
+   * under a brand-new id alike — plus the protected ids (e.g. `VERSION`, `OFFSET`), which are kept out of
+   * `this.plugins` so they can never be unregistered or shadowed but remain callable from a formula (HF-249).
+   *
+   * Callability is the whole rule: `registerFunctionPlugin` registers globally, so every id in this set can be
+   * used in a formula by any instance, and omitting one would hide a working function from a function picker.
+   * Whether a listed id is *described as* a built-in is a separate question, answered by {@link isBuiltinFunction}
+   * — a custom plugin registered over a built-in id is listed under that id but reported as a custom function,
+   * never wearing the built-in's catalogue doc.
+   *
+   * That set is exactly the one {@link getRegisteredFunctionIds} already answers, so it is delegated rather than
+   * recomputed: letting the two drift would make `getAvailableFunctions` and `getRegisteredFunctionNames` disagree
+   * about which functions exist.
    */
   public static getListableFunctionIds(): string[] {
-    const ids: string[] = []
-    for (const [functionId, plugin] of this.plugins.entries()) {
-      if (this.isListableFunctionId(functionId, plugin)) {
-        ids.push(functionId)
-      }
-    }
-    // Surface protected ids (e.g. VERSION, OFFSET): excluded from `this.plugins` so they can't be
-    // unregistered or shadowed, but callable from a formula, so the metadata API lists them too (HF-249).
-    ids.push(...this._protectedPlugins.keys())
-    return ids
+    return this.getRegisteredFunctionIds()
   }
 
   public static getFunctionPlugin(functionId: string): Maybe<FunctionPluginDefinition> {

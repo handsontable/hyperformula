@@ -658,12 +658,13 @@ export class HyperFormula implements TypedEmitter {
    * picker. Each entry contains the translated name, the language-independent canonical name, the category, and a
    * short description. Entries are sorted alphabetically by their localized name.
    *
-   * The static method describes built-in ids only. A custom (user-registered) function under its own new id is
-   * omitted here by design — not because it is unavailable: [[registerFunctionPlugin]] registers globally, so such a
-   * function is callable in every instance, and the instance method [[getAvailableFunctions]] lists it. A custom
-   * plugin registered *over* a built-in id stays listed here, but as a custom function (`category: 'Custom'`, empty
-   * `shortDescription`). An alias is listed under its own id, borrowing its target's category and description, with
-   * the target id exposed as `aliasOf`.
+   * The list reflects the global registry: the built-in functions and every custom function registered with
+   * [[registerFunctionPlugin]] or [[registerFunction]], plus their aliases. An alias is listed under its own id,
+   * borrowing its target's category and description, with the target id exposed as `aliasOf`. Custom functions
+   * ship no catalogue entry, so they are listed with `category: 'Custom'` and an empty `shortDescription` — as is
+   * a custom plugin registered *over* a built-in id, which keeps that id but never wears the built-in's
+   * description. Use the instance method [[getAvailableFunctions]] for one engine's own registry, which differs
+   * from the global one when the instance was built with the `functionPlugins` configuration option.
    *
    * A function with no translation entry for `code` is omitted: the interpreter refuses to evaluate an untranslated
    * id, so listing it would advertise a function that cannot be called. A translation set to an empty string is not
@@ -700,11 +701,14 @@ export class HyperFormula implements TypedEmitter {
    * for `code` (an untranslated id cannot be evaluated, so it is not described either, which keeps this method
    * consistent with [[getAvailableFunctions]]).
    *
-   * The static method resolves the globally-registered built-in functions and their aliases. An alias reports
-   * its target's metadata (including examples, which spell the target's name) under the alias id, with the
-   * target id exposed as `aliasOf`. For custom (user-registered) functions under their own new id, use the instance
-   * method [[getFunctionDetails]]; a custom plugin registered over a built-in id is still resolved here, but as a
-   * custom function (`category: 'Custom'`, empty `shortDescription`) so the result describes what actually runs.
+   * The static method resolves everything in the global registry: the built-in functions, their aliases, and the
+   * custom (user-registered) ones. An alias reports its target's metadata (including examples, which spell the
+   * target's name) under the alias id, with the target id exposed as `aliasOf`. A custom function has no catalogue
+   * entry, so it reports `category: 'Custom'`, an empty `shortDescription` and `documentationUrl`, no `examples`,
+   * and positional parameter names (`Arg1`, `Arg2`, ...) — as does a custom plugin registered over a built-in id,
+   * so the result describes what actually runs rather than the built-in it replaced. Use the instance method
+   * [[getFunctionDetails]] for one engine's own registry, which differs from the global one when the instance was
+   * built with the `functionPlugins` configuration option.
    *
    * `canonicalName` is matched exactly, in two ways worth knowing:
    * - It is **case-sensitive**, unlike formula syntax. `'SUMIF'` resolves; `'sumif'` and `'SumIf'` return
@@ -734,26 +738,18 @@ export class HyperFormula implements TypedEmitter {
     // only for the ids that reach a later exit path (an unknown or custom id used to return `undefined` instead).
     const language = this.getLanguage(code)
     const plugin = FunctionRegistry.getFunctionPlugin(canonicalName)
-    if (plugin === undefined) {
-      // Protected ids (VERSION, OFFSET) have no registered plugin by design (`getFunctionPlugin` always returns
-      // `undefined` for them), but the metadata API still describes them — resolved from the authored catalogue
-      // doc, so getFunctionDetails agrees with getAvailableFunctions. Anything else with no plugin is genuinely
-      // unknown. `buildFunctionDetailsFor` returns `undefined` for a protected id without a catalogue doc, so the
-      // list and the details stay consistent for those too.
-      if (!FunctionRegistry.functionIsProtected(canonicalName)) {
-        return undefined
-      }
-      return HyperFormula.buildFunctionDetailsFor(canonicalName, undefined, language)
-    }
-    // The static method describes the built-in ids only; a function registered under a brand-new id is omitted here
-    // by design and reachable through the instance method. An id that IS a built-in one stays described even when a
-    // user plugin has been registered over it — it remains callable in every instance, so hiding it would be a
-    // lie. `resolveFunctionMetadata` withholds the built-in catalogue doc in that case, so it is reported as a
-    // custom function rather than with metadata its implementation does not honour. The same gate builds the list,
-    // so the two tiers agree on which ids exist.
-    if (!FunctionRegistry.isListableFunctionId(canonicalName, plugin)) {
+    // Protected ids (VERSION, OFFSET) have no registered plugin by design (`getFunctionPlugin` always returns
+    // `undefined` for them), but the metadata API still describes them — resolved from the authored catalogue doc,
+    // so getFunctionDetails agrees with getAvailableFunctions. Anything else with no plugin is genuinely unknown.
+    // `buildFunctionDetailsFor` returns `undefined` for a protected id without a catalogue doc, so the list and the
+    // details stay consistent for those too.
+    if (plugin === undefined && !FunctionRegistry.functionIsProtected(canonicalName)) {
       return undefined
     }
+    // Every registered id is described, exactly as `FunctionRegistry.getListableFunctionIds` lists it, so the two
+    // tiers cannot disagree about which functions exist. `resolveFunctionMetadata` decides separately whether the
+    // id may wear a built-in's catalogue doc, so a custom function — including one registered over a built-in id —
+    // is described as custom rather than with metadata its implementation does not honour.
     return HyperFormula.buildFunctionDetailsFor(canonicalName, plugin, language)
   }
 
