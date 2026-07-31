@@ -142,10 +142,6 @@ method:
 HyperFormula.registerFunctionPlugin(MyCustomPlugin, MyCustomPluginTranslations);
 ```
 
-::: tip
-Custom functions registered with `registerFunctionPlugin()` are available in all HyperFormula instances, and both the static metadata API methods (`HyperFormula.getAvailableFunctions()` and `HyperFormula.getFunctionDetails()`) and their instance counterparts (`hfInstance.getAvailableFunctions()` and `hfInstance.getFunctionDetails()`) describe them. Custom functions ship no metadata catalogue entry, so they are reported with `category: 'Custom'`, an empty `shortDescription` and `documentationUrl`, no `examples`, and positional parameter names (`Arg1`, `Arg2`, ...). A plugin passed to a single engine through the [`functionPlugins`](../api/interfaces/configparams.md#functionplugins) configuration option is not registered globally, so only that instance's methods describe it. See [`getAvailableFunctions`](../api/classes/hyperformula.md#getavailablefunctions) and [`getFunctionDetails`](../api/classes/hyperformula.md#getfunctiondetails) in the API reference for more details.
-:::
-
 ### 6. Use your custom function in a formula
 
 Now, you're ready to use your GREET function in a formula.
