@@ -656,7 +656,8 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns metadata of all functions available for a given language, as a short list suitable for a function
    * picker. Each entry contains the translated name, the language-independent canonical name, the category, and a
-   * short description. Entries are sorted alphabetically by their localized name.
+   * short description. Entries are sorted alphabetically by their localized name, using the collation rules of the
+   * host environment, so the exact order of names that differ only by case or diacritics may vary between hosts.
    *
    * The list reflects the global registry: the built-in functions and every custom function registered with
    * [[registerFunctionPlugin]] or [[registerFunction]], plus their aliases. An alias is listed under its own id,
@@ -690,7 +691,6 @@ export class HyperFormula implements TypedEmitter {
       FunctionRegistry.getListableFunctionIds(),
       (id) => FunctionRegistry.getFunctionPlugin(id),
       HyperFormula.getLanguage(code),
-      code,
     )
   }
 
@@ -802,59 +802,22 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Converts a HyperFormula language code (e.g. `'enGB'`, `'plPL'`) to a BCP-47 locale (e.g. `'en-GB'`, `'pl-PL'`)
-   * so the function list collator is deterministic across hosts. Codes in the canonical `<ll><RR>` shape get a
-   * hyphen inserted; any other shape is passed through unchanged. A structurally valid but unknown tag is accepted
-   * by `Intl.Collator`, but a structurally invalid tag (e.g. an underscore-style `'pt_BR'`) makes `Intl.Collator`
-   * throw a `RangeError`; that case is handled by [[createLocaleCollator]], not here.
-   *
-   * @param {string} languageCode - the HyperFormula language code
-   */
-  private static toBcp47Locale(languageCode: string): string {
-    const match = /^([a-z]{2})([A-Z]{2})$/.exec(languageCode)
-    return match !== null ? `${match[1]}-${match[2]}` : languageCode
-  }
-
-  /**
-   * Builds a collator for the given HyperFormula language code, using the BCP-47 form of the code so ordering is
-   * deterministic across hosts. `registerLanguage` does not constrain the shape of a language code, so a caller may
-   * register a structurally invalid one (e.g. an underscore-style `'pt_BR'`); such a tag makes `Intl.Collator`
-   * throw a `RangeError`, so we fall back to the environment default collator to keep the function list from
-   * crashing on a caller-registered, non-BCP-47 code. That fallback reintroduces the host-dependent ordering the
-   * explicit collator exists to avoid, so it warns rather than degrading silently.
-   *
-   * @param {string} languageCode - the HyperFormula language code
-   */
-  private static createLocaleCollator(languageCode: string): Intl.Collator {
-    try {
-      return new Intl.Collator(HyperFormula.toBcp47Locale(languageCode))
-    } catch (e) {
-      console.warn(`Language code '${languageCode}' is not a valid BCP-47 locale tag (${(e as Error).message}); falling back to the environment default collator, so the function list order depends on the host.`)
-      return new Intl.Collator()
-    }
-  }
-
-  /**
    * Builds the function list for a set of registered ids. Documented functions use their catalogue entry; custom
-   * functions are listed with their name only. Sorted by localized name under an explicit, language-derived collator
-   * (so the order does not depend on the host locale), with the language-independent canonical name as a stable
-   * tiebreaker for entries that share a localized name.
+   * functions are listed with their name only. Sorted by localized name with `localeCompare`, so the order follows
+   * the host's collation rules, with the language-independent canonical name as a stable tiebreaker for entries
+   * that share a localized name.
    *
-   * Takes the [[TranslationPackage]] alongside the code it came from, rather than deriving it from the code: an
-   * instance must describe its functions under the package its own evaluator uses (`Config.translationPackage`),
-   * which is a snapshot taken when the instance was built and can differ from whatever is registered globally for
-   * the same code today. Deriving it here instead would let this method report a localized name the instance
-   * refuses to evaluate. Both callers pass a matching pair, so names are never translated under one language and
-   * ordered under another.
+   * Takes the [[TranslationPackage]] rather than deriving it from a language code: an instance must describe its
+   * functions under the package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
+   * when the instance was built and can differ from whatever is registered globally for the same code today.
+   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate.
    *
    * @param {string[]} functionIds - the registered ids to describe
    * @param {(id: string) => FunctionPluginDefinition | undefined} getPlugin - resolves the plugin registered for an id
    * @param {TranslationPackage} language - the translation package to translate the names under
-   * @param {string} languageCode - the HyperFormula language code `language` came from, used to order the names
    */
-  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage, languageCode: string): FunctionListEntry[] {
+  private static buildAvailableFunctions(functionIds: string[], getPlugin: (id: string) => FunctionPluginDefinition | undefined, language: TranslationPackage): FunctionListEntry[] {
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
-    const collator = HyperFormula.createLocaleCollator(languageCode)
     return functionIds
       // The interpreter refuses to evaluate ids the active language has no translation entry for
       // (FunctionRegistry.getFunction), so an untranslated function would be advertised but uncallable.
@@ -872,7 +835,7 @@ export class HyperFormula implements TypedEmitter {
           : buildCustomFunctionListEntry(id, translate, resolved.aliasOf)
       })
       .filter((entry): entry is FunctionListEntry => entry !== undefined)
-      .sort((a, b) => collator.compare(a.localizedName, b.localizedName) || collator.compare(a.canonicalName, b.canonicalName))
+      .sort((a, b) => a.localizedName.localeCompare(b.localizedName) || a.canonicalName.localeCompare(b.canonicalName))
   }
 
   /**
@@ -4633,7 +4596,8 @@ export class HyperFormula implements TypedEmitter {
    * Returns metadata of all functions available in this instance for a function picker, with names translated
    * according to the language set in this instance's configuration. Each entry contains the translated name, the
    * language-independent canonical name, the category, and a short description. Entries are sorted alphabetically by
-   * their localized name.
+   * their localized name, using the collation rules of the host environment, so the exact order of names that differ
+   * only by case or diacritics may vary between hosts.
    *
    * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
    * functions, plus their aliases. An alias is listed under its own id, borrowing its target's category and
@@ -4662,7 +4626,6 @@ export class HyperFormula implements TypedEmitter {
       // The instance's own package, the one its evaluator uses — not a fresh global lookup, which could describe
       // the functions under a package this instance never adopted.
       this._config.translationPackage,
-      this._config.language,
     )
   }
 

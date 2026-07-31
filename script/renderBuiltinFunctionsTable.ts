@@ -44,13 +44,6 @@ const FUNCTIONS_TABLE_MARKERS: RegionMarkers = {
  */
 const slugifyHeading = vuepressSlugify as (heading: string) => string
 
-/**
- * Deterministic, environment-independent ordering for function names (never ambient locale). Intentionally
- * pinned to English: the generated table is English-only, so ordering must not depend on the host locale. (The
- * public API's list ordering is language-derived; this renderer's is deliberately English-only.)
- */
-const COLLATOR = new Intl.Collator('en', {sensitivity: 'variant', caseFirst: 'upper'})
-
 /** The generated regions of the built-in functions guide page, both produced by one pass over the categories. */
 export interface BuiltinFunctionsMarkdown {
   /** The page's table of contents: a bullet linking to each rendered section, in page order. */
@@ -82,10 +75,10 @@ function escapeCell(text: string): string {
  * (Function ID | Description | Syntax), plus the table of contents that links to those sections. Both regions come
  * out of the same pass, so a bullet exists if and only if the section it points at was rendered: a category the
  * catalogue leaves empty gets neither, and the contents list can never link to an anchor no heading emits. Rows are
- * sorted by a pinned collator for deterministic, byte-idempotent output, with the canonical name as a stable
- * tiebreaker for entries that share a localized name (mirrors `HyperFormula.buildAvailableFunctions`). Reads only the
- * passed entries + details provider, so it is independent of how the catalogue is stored (forward-compatible with a
- * per-function file split).
+ * sorted by localized name with `localeCompare`, with the canonical name as a stable tiebreaker for entries that
+ * share a localized name (mirrors `HyperFormula.buildAvailableFunctions`); the order therefore follows the collation
+ * rules of the host that generates the page. Reads only the passed entries + details provider, so it is independent
+ * of how the catalogue is stored (forward-compatible with a per-function file split).
  *
  * Only the documented categories get a section, so every entry passed in must declare one: the page is generated from
  * the built-in catalogue, where `category` is a [[DocumentedFunctionCategory]] by type. A `'Custom'` entry is rejected
@@ -128,7 +121,7 @@ export function renderBuiltinFunctionsMarkdown(
     }
     categoryBySlug.set(slug, category)
     bullets.push(`- [${category}](#${slug})`)
-    bucket.sort((a, b) => COLLATOR.compare(a.localizedName, b.localizedName) || COLLATOR.compare(a.canonicalName, b.canonicalName))
+    bucket.sort((a, b) => a.localizedName.localeCompare(b.localizedName) || a.canonicalName.localeCompare(b.canonicalName))
     const rows = bucket.map(entry => {
       const details = detailsFor(entry.canonicalName)
       if (details === undefined) {
