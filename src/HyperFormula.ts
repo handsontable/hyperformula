@@ -755,12 +755,17 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Resolves the structural metadata and catalogue doc for a registered function id, following aliases to their
-   * target. Returns `undefined` when the id is not registered or its built-in catalogue doc disagrees with the
-   * implementation arity (catalogue drift). The catalogue doc is attached only when the id is genuinely provided by
-   * its built-in plugin; a user-registered plugin that shadows a built-in id is treated as a custom function (`doc`
-   * is `undefined`), so the API reflects what actually runs rather than stale built-in metadata. When the id has no
-   * applicable doc, `doc` is `undefined` and only the structural metadata is available. Shared by the list and the
-   * details builders so they always agree. The `getPlugin` callback abstracts over the static and the instance registry.
+   * target. Returns `undefined` only when the id is not registered. The catalogue doc is attached only when the id is
+   * genuinely provided by its built-in plugin; a user-registered plugin that shadows a built-in id is treated as a
+   * custom function (`doc` is `undefined`), so the API reflects what actually runs rather than stale built-in
+   * metadata. When the id has no applicable doc, `doc` is `undefined` and only the structural metadata is available.
+   * Shared by the list and the details builders so they always agree. The `getPlugin` callback abstracts over the
+   * static and the instance registry.
+   *
+   * A catalogue doc whose parameter count disagrees with the implementation is still returned, not withheld:
+   * [[buildFunctionDetails]] resolves the disagreement in the implementation's favour, reporting its arguments
+   * positionally and warning. Every function a user can call is therefore described, and catalogue drift costs the
+   * parameter prose rather than the whole entry.
    *
    * The returned `aliasOf` is the target's id when `functionId` is an alias, else `undefined`. It is derived here
    * rather than at each call site so the list and the details report the alias relation identically.
@@ -774,16 +779,11 @@ export class HyperFormula implements TypedEmitter {
     // below and disappear from the metadata API. They must still be described, because a user can call them from a
     // formula: resolve them here from the authored catalogue doc and structural metadata instead of from a plugin.
     // A protected id stays unlisted unless BOTH are authored — requiring the structural metadata keeps
-    // `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined` if the two maps ever drift
-    // (fail-safe: the function is omitted rather than crashing the metadata API).
+    // `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined` if a protected id is ever
+    // added to one map only (fail-safe: the function is omitted rather than crashing the metadata API).
     if (FunctionRegistry.functionIsProtected(functionId) && FUNCTION_DOCS[functionId] !== undefined && PROTECTED_FUNCTION_METADATA[functionId] !== undefined) {
-      const protectedDoc = FUNCTION_DOCS[functionId]
-      const protectedMetadata = PROTECTED_FUNCTION_METADATA[functionId]
-      if (!HyperFormula.isCatalogueArityConsistent(protectedDoc, protectedMetadata)) {
-        return undefined
-      }
       // A protected id is never an alias, so it resolves to itself.
-      return {doc: protectedDoc, metadata: protectedMetadata, aliasOf: undefined}
+      return {doc: FUNCTION_DOCS[functionId], metadata: PROTECTED_FUNCTION_METADATA[functionId], aliasOf: undefined}
     }
     if (plugin === undefined) {
       return undefined
@@ -797,23 +797,7 @@ export class HyperFormula implements TypedEmitter {
     // Use the catalogue doc only when the built-in plugin that owns this id is the one actually registered for it.
     // A custom plugin overriding a built-in id is reported as a custom function, never with the built-in's doc.
     const doc = FunctionRegistry.isBuiltinFunction(metadataKey, plugin) ? FUNCTION_DOCS[metadataKey] : undefined
-    if (!HyperFormula.isCatalogueArityConsistent(doc, metadata)) {
-      return undefined
-    }
     return {doc, metadata, aliasOf: metadataKey !== functionId ? metadataKey : undefined}
-  }
-
-  /**
-   * Returns whether a catalogue doc agrees with the implementation on the number of parameters. `true` when there is
-   * no doc to disagree with. Applied to every resolution path — plugin-backed ids and the protected ids resolved from
-   * `PROTECTED_FUNCTION_METADATA` alike — so catalogue drift makes a function fail safe by being omitted from both the
-   * list and the details, rather than reaching [[buildFunctionDetails]], which throws on the mismatch.
-   *
-   * @param {FunctionDoc | undefined} doc - the function's authored catalogue entry, or `undefined` when it has none
-   * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions` or the protected map
-   */
-  private static isCatalogueArityConsistent(doc: FunctionDoc | undefined, metadata: StructuralMetadata): boolean {
-    return doc === undefined || doc.parameters.length === (metadata.parameters ?? []).length
   }
 
   /**

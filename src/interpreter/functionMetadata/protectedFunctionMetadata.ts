@@ -17,11 +17,11 @@ import {StructuralMetadata} from './buildFunctionDescriptions'
  *   never be unregistered; reusing its `implementedFunctions` entry would require importing the protected plugin
  *   into the metadata builders, which this module avoids.
  *
- * Each entry's `parameters.length` MUST equal the corresponding `FunctionDoc.parameters.length` in `FUNCTION_DOCS`.
- * `HyperFormula.resolveFunctionMetadata` cross-checks the two for protected ids exactly as it does for plugin-backed
- * ones, and a mismatch fails safe rather than loudly: the function is silently dropped from both
- * `getAvailableFunctions` and `getFunctionDetails`, with nothing thrown and nothing logged. So keep the invariant
- * true by hand when editing either map — the only symptom of breaking it is a function that quietly disappears.
+ * Each entry's `parameters.length` SHOULD equal the corresponding `FunctionDoc.parameters.length` in `FUNCTION_DOCS`.
+ * A protected id degrades exactly as a plugin-backed one does when the two disagree: this map wins, and
+ * `getFunctionDetails` reports these parameters under positional names (`Arg1`, `Arg2`, ...) with a console warning,
+ * losing the catalogue's authored names and descriptions. The function itself stays available in both tiers, so keep
+ * the invariant true by hand when editing either map to keep the descriptions.
  *
  * Deliberately prototype-less, exactly like `FUNCTION_DOCS`. `HyperFormula.resolveFunctionMetadata` indexes this map
  * with a caller-supplied function id, and with `Object.prototype` in the chain

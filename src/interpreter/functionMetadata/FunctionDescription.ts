@@ -67,7 +67,11 @@ export interface FunctionDoc {
    * May contain inline markdown links (absolute URLs only) and `<br>` line breaks; no other markup.
    */
   shortDescription: string,
-  /** Ordered; length MUST equal the function's `implementedFunctions.parameters` length (implementation arity). */
+  /**
+   * Ordered; the length SHOULD equal the function's `implementedFunctions.parameters` length (implementation arity).
+   * The implementation wins where they disagree: the details API reports one parameter per implemented argument and
+   * discards these authored names, so drift costs the parameter prose, never the function itself.
+   */
   parameters: ParameterDoc[],
   /**
    * Link to the function's documentation. Required, and authored per entry rather than inherited from a shared

@@ -51,6 +51,51 @@ export function clampRepeatLastArgs(repeatLastArgs: number | undefined, paramete
 }
 
 /**
+ * Describes an argument list from the implementation alone, naming each parameter by its position (`Arg1`, `Arg2`,
+ * ...) and leaving its description empty. Used wherever no authored names apply: for a custom function, which ships
+ * no catalogue entry at all, and as the drift fallback for a built-in whose entry no longer matches its signature.
+ *
+ * @param {FunctionArgument[]} args - the implementation's parameters, in declaration order
+ */
+function buildPositionalParameters(args: FunctionArgument[]): FunctionParameterDescription[] {
+  return args.map((arg, index) => ({
+    name: `Arg${index + 1}`,
+    description: '',
+    optional: isParameterOptional(arg),
+  }))
+}
+
+/**
+ * Describes a documented function's argument list, joining the implementation's parameters with the authored names
+ * and descriptions of the catalogue entry.
+ *
+ * The implementation is the authority on how many arguments there are, so a catalogue entry that has drifted out of
+ * step with the signature loses its parameter prose rather than the function losing its entry: the arguments are
+ * reported positionally, as for a custom function. The authored names are dropped wholesale rather than paired with
+ * the arguments they still line up with: once the two lists differ in length, any pairing is a guess, and a
+ * plausible but wrong name misinforms more than an unnamed `Arg2` does.
+ *
+ * The mismatch is warned about on every call rather than recorded once: this is a catalogue bug to fix in the
+ * source, and the alternative to noise is a degradation nobody notices. The list tier never lands here, so a
+ * function picker rebuilding its list does not warn — only a consumer actually reading the degraded parameters.
+ *
+ * @param {string} canonicalName - the language-independent function id, named in the drift warning
+ * @param {FunctionDoc} doc - the function's authored catalogue entry
+ * @param {FunctionArgument[]} args - the implementation's parameters, in declaration order
+ */
+function buildDocumentedParameters(canonicalName: string, doc: FunctionDoc, args: FunctionArgument[]): FunctionParameterDescription[] {
+  if (doc.parameters.length !== args.length) {
+    console.warn(`Function metadata mismatch for ${canonicalName}: the catalogue describes ${doc.parameters.length} parameter(s) but the implementation declares ${args.length}. Reporting the implemented parameters under positional names; update the catalogue entry to restore the authored ones.`)
+    return buildPositionalParameters(args)
+  }
+  return doc.parameters.map((param, index) => ({
+    name: param.name,
+    description: param.description,
+    optional: isParameterOptional(args[index]),
+  }))
+}
+
+/**
  * Resolves the display name for a function: the translated name, or the canonical id when there is no usable
  * translation. Some bundled language packs leave a function untranslated as an empty string (e.g. `SWITCH` in
  * several locales), so an empty translation falls back to the canonical id just like a missing one.
@@ -94,24 +139,18 @@ export function buildFunctionListEntry(canonicalName: string, doc: FunctionDoc, 
  * `documentationUrl` and `examples` come from the catalogue doc, which authors both for every entry.
  * Built-in parameters carry authored descriptions; custom functions surface empty values.
  *
+ * The parameter list always has one entry per implemented argument, so it describes what the evaluator actually
+ * accepts even when the catalogue entry has drifted out of step with the signature; see
+ * [[buildDocumentedParameters]] for what such an entry still contributes.
+ *
  * @param {string} canonicalName - the language-independent function id
  * @param {FunctionDoc} doc - the function's authored catalogue entry
  * @param {StructuralMetadata} metadata - structural metadata from `implementedFunctions`
  * @param {TranslateName} translate - per-id translation lookup
  * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
- * @throws {Error} when `doc.parameters.length` does not equal `(metadata.parameters ?? []).length`
  */
 export function buildFunctionDetails(canonicalName: string, doc: FunctionDoc, metadata: StructuralMetadata, translate: TranslateName, aliasOf?: string): FunctionDetails {
-  const implParamCount = (metadata.parameters ?? []).length
-  if (doc.parameters.length !== implParamCount) {
-    throw new Error(`Function metadata mismatch for ${canonicalName}: catalogue has ${doc.parameters.length} parameters, implementation has ${implParamCount}`)
-  }
-  const args = metadata.parameters ?? []
-  const parameters: FunctionParameterDescription[] = doc.parameters.map((param, index) => ({
-    name: param.name,
-    description: param.description,
-    optional: isParameterOptional(args[index]),
-  }))
+  const parameters = buildDocumentedParameters(canonicalName, doc, metadata.parameters ?? [])
   return {
     localizedName: resolveName(canonicalName, translate),
     canonicalName,
@@ -161,12 +200,7 @@ export function buildCustomFunctionListEntry(canonicalName: string, translate: T
  * @param {string | undefined} aliasOf - the alias target's id when `canonicalName` is an alias, else `undefined`
  */
 export function buildCustomFunctionDetails(canonicalName: string, metadata: StructuralMetadata, translate: TranslateName, aliasOf?: string): FunctionDetails {
-  const args = metadata.parameters ?? []
-  const parameters: FunctionParameterDescription[] = args.map((arg, index) => ({
-    name: `Arg${index + 1}`,
-    description: '',
-    optional: isParameterOptional(arg),
-  }))
+  const parameters = buildPositionalParameters(metadata.parameters ?? [])
   // `aliasOf` is emitted only when there is one — see buildCustomFunctionListEntry for why an absent key beats an
   // `undefined`-valued one.
   return {
