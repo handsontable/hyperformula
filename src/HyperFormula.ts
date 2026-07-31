@@ -661,10 +661,11 @@ export class HyperFormula implements TypedEmitter {
    * The list reflects the global registry: the built-in functions and every custom function registered with
    * [[registerFunctionPlugin]] or [[registerFunction]], plus their aliases. An alias is listed under its own id,
    * borrowing its target's category and description, with the target id exposed as `aliasOf`. Custom functions
-   * ship no catalogue entry, so they are listed with `category: 'Custom'` and no `shortDescription` — as is
-   * a custom plugin registered *over* a built-in id, which keeps that id but never wears the built-in's
-   * description. Use the instance method [[getAvailableFunctions]] for one engine's own registry, which differs
-   * from the global one when the instance was built with the `functionPlugins` configuration option.
+   * ship no catalogue entry, so they are listed with `category: 'Custom'` and no `shortDescription` — with one
+   * exception: the catalogue is keyed by function id, so a custom plugin registered *over* a built-in id inherits
+   * that id's entry and is listed with the built-in's category and description. Use the instance method
+   * [[getAvailableFunctions]] for one engine's own registry, which differs from the global one when the instance
+   * was built with the `functionPlugins` configuration option.
    *
    * A function with no translation entry for `code` is omitted: the interpreter refuses to evaluate an untranslated
    * id, so listing it would advertise a function that cannot be called. A translation set to an empty string is not
@@ -704,9 +705,10 @@ export class HyperFormula implements TypedEmitter {
    * The static method resolves everything in the global registry: the built-in functions, their aliases, and the
    * custom (user-registered) ones. An alias reports its target's metadata (including examples, which spell the
    * target's name) under the alias id, with the target id exposed as `aliasOf`. A custom function has no catalogue
-   * entry, so it reports `category: 'Custom'`, no `shortDescription`, `documentationUrl` or `examples`,
-   * and positional parameter names (`Arg1`, `Arg2`, ...) — as does a custom plugin registered over a built-in id,
-   * so the result describes what actually runs rather than the built-in it replaced. Use the instance method
+   * entry, so it reports `category: 'Custom'`, no `shortDescription`, `documentationUrl` or `examples`, and
+   * positional parameter names (`Arg1`, `Arg2`, ...). A custom plugin registered over a built-in id is the
+   * exception: the catalogue is keyed by function id, so it reports that built-in's authored metadata alongside
+   * the parameter list of the implementation actually registered. Use the instance method
    * [[getFunctionDetails]] for one engine's own registry, which differs from the global one when the instance was
    * built with the `functionPlugins` configuration option.
    *
@@ -747,20 +749,20 @@ export class HyperFormula implements TypedEmitter {
       return undefined
     }
     // Every registered id is described, exactly as `FunctionRegistry.getListableFunctionIds` lists it, so the two
-    // tiers cannot disagree about which functions exist. `resolveFunctionMetadata` decides separately whether the
-    // id may wear a built-in's catalogue doc, so a custom function — including one registered over a built-in id —
-    // is described as custom rather than with metadata its implementation does not honour.
+    // tiers cannot disagree about which functions exist. `resolveFunctionMetadata` decides separately what the id
+    // is described with: the catalogue entry authored for it, or — for an id the catalogue does not cover — the
+    // implementation alone, reported as a custom function.
     return HyperFormula.buildFunctionDetailsFor(canonicalName, plugin, language)
   }
 
   /**
    * Resolves the structural metadata and catalogue doc for a registered function id, following aliases to their
-   * target. Returns `undefined` only when the id is not registered. The catalogue doc is attached only when the id is
-   * genuinely provided by its built-in plugin; a user-registered plugin that shadows a built-in id is treated as a
-   * custom function (`doc` is `undefined`), so the API reflects what actually runs rather than stale built-in
-   * metadata. When the id has no applicable doc, `doc` is `undefined` and only the structural metadata is available.
-   * Shared by the list and the details builders so they always agree. The `getPlugin` callback abstracts over the
-   * static and the instance registry.
+   * target. Returns `undefined` only when the id is not registered. The catalogue doc is attached whenever the
+   * catalogue holds an entry for the resolved id, whichever plugin currently provides it: the catalogue is keyed by
+   * id, not by implementation, so a user-registered plugin that shadows a built-in id inherits that built-in's
+   * authored metadata. When the catalogue has no entry for the id, `doc` is `undefined`, only the structural
+   * metadata is available, and the function is described as custom. Shared by the list and the details builders so
+   * they always agree. The `getPlugin` callback abstracts over the static and the instance registry.
    *
    * A catalogue doc whose parameter count disagrees with the implementation is still returned, not withheld:
    * [[buildFunctionDetails]] resolves the disagreement in the implementation's favour, reporting its arguments
