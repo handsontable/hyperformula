@@ -3,6 +3,26 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+/**
+ * Builders for the objects the metadata API returns: [[FunctionListEntry]] from `getAvailableFunctions` and
+ * [[FunctionDetails]] from `getFunctionDetails`.
+ *
+ * No single place holds those objects ready to be returned, which is what these builders are for. The catalogue
+ * ([[FUNCTION_DOCS]]) stores only the authored English prose — category, description, parameter names and
+ * descriptions, documentation link, examples — and knows nothing about the language a caller asks for, about how
+ * many arguments the plugin actually implements, or about functions with no entry at all. So each returned object
+ * is assembled from three sources:
+ *
+ * - the **catalogue entry** ([[FunctionDoc]]), for everything an author wrote;
+ * - the **implementation** (`implementedFunctions`), for the argument count, per-argument optionality and
+ *   `repeatLastArgs` — the implementation is the authority where the two disagree;
+ * - the **active translation package**, for the localized name.
+ *
+ * The custom-function builders cover the third case: a user-registered function has no catalogue entry, so it is
+ * described from its implementation alone, and every authored field is omitted rather than filled with a
+ * placeholder.
+ */
+
 import {FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
 import {CUSTOM_FUNCTION_CATEGORY, FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescription} from './FunctionDescription'
 
