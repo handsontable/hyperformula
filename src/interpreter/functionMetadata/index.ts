@@ -26,16 +26,14 @@ export * from './FunctionDescription'
  * edit a category file to change what either reports. Coverage of the whole canonical set is enforced by test.
  *
  * The key set decides which ids carry an authored description, not which ids the metadata API lists: that API
- * describes every registered function, and applies an entry only once `FunctionRegistry.isBuiltinFunction` confirms
- * the built-in plugin owning the id is the one currently registered for it. Nothing checks a catalogue key against a
- * registered function, so an entry left behind after a rename, or a typo'd one, describes nothing and merely ships in
- * the bundle. Removing or renaming a built-in means removing or renaming its entry in the same change.
+ * describes every registered function, and applies an entry only if one exists in this catalogue. Nothing checks a
+ * catalogue key against a registered function, so an entry left behind after a rename, or a typo'd one, describes
+ * nothing and merely ships in the bundle. Removing or renaming a built-in means removing or renaming its entry in the
+ * same change.
  *
  * Deliberately prototype-less, because ids are looked up here directly: with `Object.prototype` in the chain,
  * `FUNCTION_DOCS['toString']` resolves to a function rather than `undefined`, so an id colliding with a prototype
- * member (`toString`, `valueOf`, `__proto__`) would pull that member in as if it were a catalogue entry. The
- * ownership check above already keeps a user plugin registered under such an id away from any doc, so the null
- * prototype is a second line of defence rather than the only one.
+ * member (`toString`, `valueOf`, `__proto__`) would pull that member in as if it were a catalogue entry.
  */
 export const FUNCTION_DOCS: Record<string, FunctionDoc> = Object.assign(Object.create(null) as Record<string, FunctionDoc>, {
   ...ARRAY_MANIPULATION_DOCS,

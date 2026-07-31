@@ -794,9 +794,8 @@ export class HyperFormula implements TypedEmitter {
     if (metadata === undefined) {
       return undefined
     }
-    // Use the catalogue doc only when the built-in plugin that owns this id is the one actually registered for it.
-    // A custom plugin overriding a built-in id is reported as a custom function, never with the built-in's doc.
-    const doc = FunctionRegistry.isBuiltinFunction(metadataKey, plugin) ? FUNCTION_DOCS[metadataKey] : undefined
+    // Use the catalogue doc only if one exists for this function id.
+    const doc = FUNCTION_DOCS[metadataKey]
     return {doc, metadata, aliasOf: metadataKey !== functionId ? metadataKey : undefined}
   }
 
