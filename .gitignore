@@ -24,5 +24,14 @@ dev*.html
 .DS_Store
 
 /test/hyperformula-tests/
+
+# Doc snippets are regenerated from the docs before every test run
+# (the `test:*` scripts run `snippets:extract` first), so they are never committed.
+/test-utils/snippets/*.generated.ts
+
+# Generated at docs:build from built-in-functions.tmpl.md (HF-249 single-source); do not commit.
+docs/guide/built-in-functions.md
+
+# Wrangler (Cloudflare Workers) local state
 .wrangler
 .dev.vars*

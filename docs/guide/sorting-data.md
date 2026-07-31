@@ -6,30 +6,39 @@ In HyperFormula, you can sort data by reordering rows and columns.
 
 To sort data in HyperFormula, you reorder rows (or columns), by providing your preferred permutation of row (or column) indexes.
 
-You can implement any sorting algorithm that returns an array of row or column indexes.
+The permutation array has the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`. The value at index `i` is the new position for the row that is currently at index `i`.
+
+You can implement any sorting algorithm that returns such an array of row or column indexes.
 
 ## Sorting rows
 
 To sort rows, use the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibletosetroworder) and [`setRowOrder`](../api/classes/hyperformula.md#setroworder) methods.
 
 ### Step 1: Choose a new row order
-Choose your required permutation of row indexes. 
+Choose your required permutation of row indexes.
 
-For example, if you want to swap the first row with the third row, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
+For example, if you want to move the bottom row to the top of a 3-row sheet, set the order to `[1, 2, 0]` instead of `[0, 1, 2]`. This moves the row at index 0 to position 1, the row at index 1 to position 2, and the row at index 2 to position 0:
 
 ```js
 // a HyperFormula instance with example data
 const hfInstance = HyperFormula.buildFromArray([
- [1],
- [2],
- [4, 5],
+ ['A'],
+ ['B'],
+ ['C'],
 ]);
 
-// we'll set the row order to [2, 1, 0] in the next steps
+// we'll set the row order to [1, 2, 0] in the next steps
+// the resulting sheet will be: [['C'], ['A'], ['B']]
 ```
 
 ::: tip
 The [`setRowOrder`](../api/classes/hyperformula.md#setroworder) method accepts an array of numbers, so you can implement any function that returns an array with your required row order.
+:::
+
+::: warning
+The permutation array maps **current positions** to **new positions**, not the other way around. The value at index `i` tells HyperFormula where to move the row currently at index `i`, *not* which row should end up at index `i`.
+
+For example, `[1, 2, 0]` means "move row 0 to position 1, row 1 to position 2, row 2 to position 0". It does **not** mean "the new row 0 comes from position 1, the new row 1 comes from position 2, ...".
 :::
 
 ### Step 2: Check if the new row order can be applied
@@ -42,16 +51,16 @@ Use the [`isItPossibleToSetRowOrder`](../api/classes/hyperformula.md#isitpossibl
 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
- [1],
- [2],
- [4, 5],
+ ['A'],
+ ['B'],
+ ['C'],
 ]);
 
 // a variable to carry the user message
 let messageUsedInUI;
 
 // check if your permutation can be applied
-const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
+const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
 
 // display an error message
 if (!isRowOrderOk) {
@@ -65,39 +74,35 @@ If your specified row number permutation is valid, change the row order:
 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
- [1],
- [2],
- [4, 5],
+ ['A'],
+ ['B'],
+ ['C'],
 ]);
 
 let messageUsedInUI;
 
-const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
+const isRowOrderOk = hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
 
 if (!isRowOrderOk) {
   messageUsedInUI = 'Sorry, you cannot sort rows in this way.'
 } else {
   // set the new row order
-  setRowOrder(0, [2, 1, 0]);
+  hfInstance.setRowOrder(0, [1, 2, 0]);
 }
-// rows 0 and 2 swap places
+// the resulting sheet is: [['C'], ['A'], ['B']]
 
-// returns:
+// the method returns an array of cells whose values changed:
 // [{
-//   address: { sheet: 0, col: 0, row: 2 },
-//   newValue: 1,
+//   address: { sheet: 0, col: 0, row: 1 },
+//   newValue: 'A',
 // },
 // {
-//   address: { sheet: 0, col: 1, row: 2 },
-//   newValue: null,
+//   address: { sheet: 0, col: 0, row: 2 },
+//   newValue: 'B',
 // },
 // {
 //   address: { sheet: 0, col: 0, row: 0 },
-//   newValue: 4,
-// },
-// {
-//   address: { sheet: 0, col: 1, row: 0 },
-//   newValue: 5,
+//   newValue: 'C',
 // }]
 ```
 
@@ -105,23 +110,29 @@ if (!isRowOrderOk) {
 
 To sort columns, use the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitpossibletosetcolumnorder) and [`setColumnOrder`](../api/classes/hyperformula.md#setcolumnorder) methods.
 
+The permutation array has the same shape as for rows: `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`. The value at index `i` is the new position for the column that is currently at index `i`.
+
 ### Step 1: Choose a new column order
 Choose your required permutation of column indexes.
 
-For example, if you want to swap the first column with the third column, set the order to `[2, 1, 0]` instead of `[0, 1, 2]`:
+For example, if you want to move the last column to the front of a 3-column sheet, set the order to `[1, 2, 0]` instead of `[0, 1, 2]`. This moves the column at index 0 to position 1, the column at index 1 to position 2, and the column at index 2 to position 0:
 
 ```js
 // a HyperFormula instance with example data
 const hfInstance = HyperFormula.buildFromArray([
- [1, 2, 4],
- [5]
+ ['A', 'B', 'C']
 ]);
 
-// we'll set the column order to [2, 1, 0] in the next steps
+// we'll set the column order to [1, 2, 0] in the next steps
+// the resulting sheet will be: [['C', 'A', 'B']]
 ```
 
 ::: tip
 The [`setColumnOrder`](../api/classes/hyperformula.md#setcolumnorder) method accepts an array of numbers, so you can implement any function that returns an array with your required column order.
+:::
+
+::: warning
+The permutation array maps **current positions** to **new positions**, not the other way around. The value at index `i` tells HyperFormula where to move the column currently at index `i`, *not* which column should end up at index `i`.
 :::
 
 ### Step 2: Check if the new column order can be applied
@@ -134,15 +145,14 @@ Use the [`isItPossibleToSetColumnOrder`](../api/classes/hyperformula.md#isitposs
 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
- [1, 2, 4],
- [5]
+ ['A', 'B', 'C']
 ]);
 
 // a variable to carry the user message
 let messageUsedInUI;
 
 // check if your permutation can be applied
-const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
+const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
 
 // display an error message
 if (!isColumnOrderOk) {
@@ -156,38 +166,33 @@ If your specified column number permutation is valid, change the column order:
 
 ```js
 const hfInstance = HyperFormula.buildFromArray([
- [1, 2, 4],
- [5]
+ ['A', 'B', 'C']
 ]);
 
 let messageUsedInUI;
 
-const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
+const isColumnOrderOk = hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
 
 if (!isColumnOrderOk) {
   messageUsedInUI = 'Sorry, you cannot sort columns in this way.'
 } else {
   // set the new column order
-  setColumnOrder(0, [2, 1, 0]);
+  hfInstance.setColumnOrder(0, [1, 2, 0]);
 }
-// columns 0 and 2 swap places
+// the resulting sheet is: [['C', 'A', 'B']]
 
-//returns:
+// the method returns an array of cells whose values changed:
 // [{
-//   address: { sheet: 0, col: 2, row: 0 },
-//   newValue: 1,
+//   address: { sheet: 0, col: 1, row: 0 },
+//   newValue: 'A',
 // },
 // {
-//   address: { sheet: 0, col: 2, row: 1 },
-//   newValue: 5,
+//   address: { sheet: 0, col: 2, row: 0 },
+//   newValue: 'B',
 // },
 // {
 //   address: { sheet: 0, col: 0, row: 0 },
-//   newValue: 4,
-// },
-// {
-//   address: { sheet: 0, col: 0, row: 1 },
-//   newValue: null,
+//   newValue: 'C',
 // }]
 ```
 

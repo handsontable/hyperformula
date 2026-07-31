@@ -16,7 +16,11 @@ export class NumberLiteralHelper {
     const thousandSeparator = this.config.thousandSeparator === '.' ? `\\${this.config.thousandSeparator}` : this.config.thousandSeparator
     const decimalSeparator = this.config.decimalSeparator === '.' ? `\\${this.config.decimalSeparator}` : this.config.decimalSeparator
 
-    this.numberPattern = new RegExp(`^([+-]?((${decimalSeparator}\\d+)|(\\d+(${thousandSeparator}\\d{3,})*(${decimalSeparator}\\d*)?)))([eE][+-]?\\d+)?$`)
+    // When thousandSeparator is empty (the default), the group `(sep\d{3,})*` degenerates to
+    // `(\d{3,})*` adjacent to `\d+`, which causes catastrophic backtracking (ReDoS) on a long
+    // run of digits that ultimately fails to match. Omit the group entirely in that case. (DEV-2120)
+    const thousandSeparatorGroup = this.config.thousandSeparator === '' ? '' : `(${thousandSeparator}\\d{3,})*`
+    this.numberPattern = new RegExp(`^([+-]?((${decimalSeparator}\\d+)|(\\d+${thousandSeparatorGroup}(${decimalSeparator}\\d*)?)))([eE][+-]?\\d+)?$`)
     this.allThousandSeparatorsRegex = new RegExp(`${thousandSeparator}`, 'g')
   }
 
