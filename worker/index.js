@@ -12,8 +12,12 @@
  *   - extensionless URLs (`/docs/guide/basic-usage`) serve the matching `.html` file,
  *   - a directory URL without the trailing slash (`/docs`) redirects to the
  *     canonical URL with the trailing slash,
- *   - anything else falls through to the asset router, which returns the nearest
- *     `404.html`.
+ *   - anything else is answered with the nearest `404.html`.
+ *
+ * The 404 page is served here rather than through the `not_found_handling` asset
+ * option on purpose: any value other than `"none"` makes the asset router answer
+ * browser navigations (requests with `Sec-Fetch-Mode: navigate`) on its own, which
+ * bypasses this script and turns every directory and extensionless URL into a 404.
  */
 
 /**
@@ -40,6 +44,41 @@ const requestForPathname = (request, url, pathname) => {
  */
 const hasExtension = (pathname) => pathname.split('/').pop().includes('.')
 
+/**
+ * Lists the `404.html` pathnames to look up for a request, from the closest directory upwards.
+ *
+ * @param {string} pathname Requested pathname.
+ * @returns {string[]} Pathnames of the candidate 404 pages.
+ */
+const notFoundPagePathnames = (pathname) => {
+  const segments = pathname.split('/').slice(1, -1)
+
+  return segments
+    .map((_, index) => `/${segments.slice(0, segments.length - index).join('/')}/404.html`)
+    .concat('/404.html')
+}
+
+/**
+ * Builds the response for a request that matches no document: the nearest `404.html`,
+ * or a plain `404` when the build contains no 404 page at all.
+ *
+ * @param {Request} request Original request.
+ * @param {URL} url Original request URL.
+ * @param {{ ASSETS: { fetch: (request: Request) => Promise<Response> } }} env Worker bindings.
+ * @returns {Promise<Response>} Response with the 404 status.
+ */
+const notFoundResponse = async (request, url, env) => {
+  for (const pathname of notFoundPagePathnames(url.pathname)) {
+    const response = await env.ASSETS.fetch(requestForPathname(request, url, pathname))
+
+    if (response.status !== 404) {
+      return new Response(response.body, { status: 404, headers: response.headers })
+    }
+  }
+
+  return new Response('Not found', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
+}
+
 export default {
   /**
    * Serves a documentation request.
@@ -53,7 +92,9 @@ export default {
     const { pathname } = url
 
     if (pathname.endsWith('/')) {
-      return env.ASSETS.fetch(requestForPathname(request, url, `${pathname}index.html`))
+      const indexResponse = await env.ASSETS.fetch(requestForPathname(request, url, `${pathname}index.html`))
+
+      return indexResponse.status === 404 ? notFoundResponse(request, url, env) : indexResponse
     }
 
     if (!hasExtension(pathname)) {
@@ -74,6 +115,6 @@ export default {
       }
     }
 
-    return env.ASSETS.fetch(request)
+    return notFoundResponse(request, url, env)
   },
 }

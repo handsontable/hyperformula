@@ -20,8 +20,14 @@
   "assets": {
     "directory": "./docs/.vuepress/dist",
     "binding": "ASSETS",
-    "not_found_handling": "404-page",
-    "html_handling": "none"
+    // Both left at their defaults on purpose:
+    // - `html_handling: "none"` keeps `.html` URLs from being redirected to extensionless ones,
+    // - `not_found_handling: "none"` lets requests that match no asset reach `worker/index.js`.
+    //   Any other value makes the asset router answer browser navigations itself (requests with
+    //   `Sec-Fetch-Mode: navigate`), which would bypass the Worker and 404 every directory and
+    //   extensionless URL. The Worker serves the 404 page instead.
+    "html_handling": "none",
+    "not_found_handling": "none"
   },
   "observability": {
     "enabled": true
