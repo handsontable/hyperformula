@@ -49,7 +49,6 @@ import {HyperFormula} from './HyperFormula'
 import {RawTranslationPackage} from './i18n'
 import enGB from './i18n/languages/enGB'
 import {FunctionArgument, FunctionPlugin, FunctionPluginDefinition, FunctionArgumentType, ImplementedFunctions, FunctionMetadata, EmptyValue} from './interpreter'
-import {FunctionRegistry} from './interpreter/FunctionRegistry'
 import {FunctionCategory, FunctionDetails, FunctionListEntry, FunctionParameterDescription} from './interpreter/functionMetadata/FunctionDescription'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import * as plugins from './interpreter/plugin'
@@ -111,14 +110,11 @@ const defaultLanguage = Config.defaultConfig.language
 HyperFormula.registerLanguage(defaultLanguage, enGB)
 HyperFormula.languages[enGB.langCode] = enGB
 
-const builtinPlugins: FunctionPluginDefinition[] = []
 for (const pluginName of Object.getOwnPropertyNames(plugins)) {
   if (!pluginName.startsWith('_')) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const plugin = plugins[pluginName] as FunctionPluginDefinition
-    HyperFormula.registerFunctionPlugin(plugin)
-    builtinPlugins.push(plugin)
+    HyperFormula.registerFunctionPlugin(plugins[pluginName])
   }
 }
 
