@@ -147,7 +147,6 @@ if   [[ "$nM" != "$cM" ]]; then RELEASE_TYPE=major
 elif [[ "$nm" != "$cm" ]]; then RELEASE_TYPE=minor
 else RELEASE_TYPE=patch; fi
 VERSION_BRANCH="${nM}.${nm}.x"
-PREV_VERSION_BRANCH="${cM}.${cm}.x"
 
 # default repo locations (run from the hyperformula repo root):
 #   demos: sibling ../hyperformula-demos      tests: ./test/hyperformula-tests
@@ -298,26 +297,77 @@ else
         git checkout -b $VERSION_BRANCH && git push -u origin $VERSION_BRANCH
 MANUAL
   fi
-  # CodeSandbox demo URLs in this repo's docs/: prev branch -> new branch
+  # CodeSandbox demo URLs in this repo's docs/: point every one at the new
+  # branch, whatever branch it names now (old releases left several behind)
   if [[ -d docs ]]; then
-    DEMO_URL="hyperformula-demos/tree"
-    files="$(grep -rl "$DEMO_URL/$PREV_VERSION_BRANCH" docs 2>/dev/null || true)"
-    if [[ -z "$files" ]]; then
-      echo "    no CodeSandbox URLs with $PREV_VERSION_BRANCH in docs/"
-    elif $DRY_RUN; then
-      echo "    (replace tree/$PREV_VERSION_BRANCH -> tree/$VERSION_BRANCH in $(wc -l <<<"$files"|tr -d ' ') file(s):)"
-      # every matching line, as it is now (-) and as it would be rewritten (+)
-      preview "$(grep -rn "$DEMO_URL/$PREV_VERSION_BRANCH" docs |
-        CF_URL="$DEMO_URL" CF_PREV="$PREV_VERSION_BRANCH" CF_NEW="$VERSION_BRANCH" perl -ne '
-          my ($file, $no, $before) = /^([^:]+):(\d+):(.*)$/;
-          (my $after = $before) =~ s{\Q$ENV{CF_URL}/$ENV{CF_PREV}\E}{$ENV{CF_URL}/$ENV{CF_NEW}}g;
-          print "$file:$no\n-$before\n+$after\n";')"
-    else
-      while IFS= read -r f; do
-        perl -pi -e "s{\Q$DEMO_URL/$PREV_VERSION_BRANCH\E}{$DEMO_URL/$VERSION_BRANCH}g" "$f"
-      done <<<"$files"
-      echo "    updated CodeSandbox URLs -> $VERSION_BRANCH in $(wc -l <<<"$files"|tr -d ' ') file(s)"
-    fi
+    CF_NEW="$VERSION_BRANCH" CF_FENCE="$PREVIEW_FENCE" \
+    CF_DRY="$($DRY_RUN && echo 1 || echo '')" perl - docs <<'PERL'
+use strict;
+use warnings;
+use File::Find;
+
+my $treeUrl = 'handsontable/hyperformula-demos/tree';
+my $branch  = $ENV{CF_NEW};
+my $dryRun  = ($ENV{CF_DRY} // '') eq '1';
+
+# One path segment of a demo URL: up to the next '/' or to whatever ends the
+# URL in markdown, HTML, a query string or code. A demo URL is 'tree/' plus the
+# branch, optionally followed by the demo folder.
+my $segment = qr{[^/\s"'`<>()\[\]?#]+};
+my $demoUrl = qr{(\Q$treeUrl\E)/($segment)((?:/$segment)?)};
+
+# Demos that no longer exist on the current branch, so their URLs have to keep
+# naming the last branch that has them: vue-demo is the Vue 2 example, replaced
+# by vue-3-demo after 2.5.x.
+my %pinnedDemos = map { $_ => 1 } qw(vue-demo);
+
+my @docFiles;
+find(sub { push @docFiles, $File::Find::name if -f && -T }, @ARGV);
+
+my (@previewLines, @rewrittenFiles);
+for my $file (sort @docFiles) {
+  open my $in, '<', $file or next;
+  my @lines = <$in>;
+  close $in;
+
+  my $lineNo = 0;
+  my $rewritten = 0;
+  for my $line (@lines) {
+    $lineNo++;
+    my $before = $line;
+    $line =~ s{$demoUrl}{
+      my ($url, $namedBranch, $demoPath) = ($1, $2, $3);
+      my ($demo) = $demoPath =~ m{^/(.+)$};
+      my $keepPinned = defined $demo && $pinnedDemos{$demo};
+      $url . '/' . ($keepPinned ? $namedBranch : $branch) . $demoPath;
+    }ge;
+    next if $line eq $before;
+    $rewritten = 1;
+    my ($from, $to) = ($before, $line);
+    chomp $from;
+    chomp $to;
+    push @previewLines, "$file:$lineNo\n-$from\n+$to";
+  }
+  next unless $rewritten;
+
+  push @rewrittenFiles, $file;
+  next if $dryRun;
+  open my $out, '>', $file or die "cannot write $file: $!";
+  print {$out} @lines;
+  close $out;
+}
+
+my $count = scalar @rewrittenFiles;
+if (!$count) {
+  print "    no CodeSandbox URLs to update - all point at tree/$branch already\n";
+} elsif ($dryRun) {
+  print "    (point every CodeSandbox URL at tree/$branch, in $count file(s):)\n";
+  # every matching line, as it is now (-) and as it would be rewritten (+)
+  print join("\n", $ENV{CF_FENCE}, @previewLines, $ENV{CF_FENCE}), "\n";
+} else {
+  print "    updated CodeSandbox URLs -> tree/$branch in $count file(s)\n";
+}
+PERL
   fi
 fi
 
