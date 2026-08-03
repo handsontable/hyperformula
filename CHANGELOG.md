@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-08-10
+
 ### Added
 
 - Added the `getAvailableFunctions()` and `getFunctionDetails()` methods (both static and instance) for retrieving function metadata. [#1692](https://github.com/handsontable/hyperformula/pull/1692)
