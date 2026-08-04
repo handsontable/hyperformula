@@ -121,6 +121,29 @@ merge_release_into() { # merge_release_into <target branch> <release ref, for me
   fi
 }
 
+# The point of no return. Prints what is about to happen and requires the
+# operator to type the version back, so a stray Enter cannot publish.
+confirm_publish() { # confirm_publish <version> <npm user>
+  local version="$1" npm_user="$2" answer
+  printf '\n%s%s\n  ABOUT TO PUBLISH %s TO npm - THIS CANNOT BE UNDONE\n%s\n' \
+    "$HIGHLIGHT" "$CHECKLIST_RULE" "$version" "$CHECKLIST_RULE"
+  printf '  registry: %s\n  npm user: %s\n%s\n' \
+    "$(npm config get registry)" "$npm_user" "$RESET"
+  read -r -p "  Type the version to publish (anything else aborts): " answer
+  [[ "$answer" == "$version" ]] || die "aborted at the publish confirmation (got '$answer')."
+}
+
+# Waits until the registry serves the new version, so the steps after publish
+# (which install it) do not race npm's propagation.
+wait_for_npm() { # wait_for_npm <version>
+  local version="$1" waited=0
+  until on_npm "$version"; do
+    [[ $waited -ge 60 ]] && die "hyperformula@$version is not visible on npm after ${waited}s."
+    sleep 5; waited=$((waited + 5))
+    printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
+  done
+}
+
 usage_top() {
 cat <<'USAGE'
 release - HyperFormula release automation.
@@ -721,6 +744,20 @@ step "6. Merge $TESTS_REF back in hyperformula-tests"
   merge_release_into master  "$TESTS_REF" "$TESTS_TIP"
   merge_release_into develop "$TESTS_REF" "$TESTS_TIP"
   run git push --atomic origin master develop )
+
+# 7. The only irreversible step, behind a typed confirmation. Both the pause
+#    and the publish are skipped when the version is already on the registry,
+#    which is what makes a re-run after a mid-publish failure safe.
+step "7. Publish hyperformula@$VERSION to npm"
+if on_npm "$VERSION"; then
+  skip "hyperformula@$VERSION is already on npm - not publishing again"
+elif $DRY_RUN; then
+  echo "    (would ask for confirmation, then run: npm publish)"
+else
+  confirm_publish "$VERSION" "$NPM_USER"
+  run npm publish
+  wait_for_npm "$VERSION"
+fi
 }
 
 # ============================================================================
