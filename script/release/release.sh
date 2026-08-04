@@ -51,6 +51,58 @@ changelog_section_body() {
   ' CHANGELOG.md
 }
 
+# Prints a step that needed no work. The '=' marker mirrors 'run's '$' marker,
+# so a log line says at a glance whether a step acted or was already satisfied.
+skip() { printf '    = %s\n' "$*"; }
+
+# ---- state checks (idempotency) -------------------------------------------
+# These answer "is this already done?" so every step can be re-run safely.
+# They only read state, so they are also correct during a dry run. Each takes
+# an optional repository path, so the same check works on a sibling clone.
+branch_exists()        { git -C "${2:-.}" show-ref --verify --quiet "refs/heads/$1"; }
+# Asks for the full ref, so a name cannot match another branch that merely ends
+# with it ('release/3.4.0' would otherwise also match 'old/release/3.4.0').
+remote_branch_exists() { git -C "${2:-.}" ls-remote --heads origin "refs/heads/$1" 2>/dev/null | grep -q .; }
+is_ancestor()          { git merge-base --is-ancestor "$1" "$2" 2>/dev/null; }
+tag_exists()           { git rev-parse -q --verify "refs/tags/$1" >/dev/null; }
+has_upstream()         { git rev-parse --abbrev-ref "$1@{upstream}" >/dev/null 2>&1; }
+# A false answer means "not visible from here", which a registry outage produces
+# too - so callers must not treat it as proof the version is unpublished. npm
+# itself rejects a duplicate publish, and that rejection is the authority.
+on_npm()               { npm view "hyperformula@$1" version >/dev/null 2>&1; }
+
+# Verifies a sibling clone is usable before a release starts: present, a git
+# work tree, clean, carrying the branches this run will move, with a reachable
+# origin. Failing here costs nothing; failing half-way through leaves one of
+# three repositories in a state someone has to untangle by hand.
+require_repo() { # require_repo <label> <path> <flag> <required branch...>
+  local label="$1" dir="$2" flag="$3" branch; shift 3
+  [[ -n "$dir" && -d "$dir" ]] \
+    || die "$label clone not found at '${dir:-<unset>}' - pass $flag PATH."
+  git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+    || die "$dir is not a git repository ($label)."
+  [[ -z "$(git -C "$dir" status --porcelain)" ]] \
+    || die "Working tree in $dir ($label) is dirty - commit or stash there first."
+  git -C "$dir" ls-remote --heads origin >/dev/null 2>&1 \
+    || die "Cannot reach origin of $dir ($label)."
+  for branch in "$@"; do
+    branch_exists "$branch" "$dir" || remote_branch_exists "$branch" "$dir" \
+      || die "$label has no '$branch' branch ($dir)."
+  done
+}
+
+# Checks out a branch and fast-forwards it when it tracks a remote branch.
+# Refuses to create a merge: a release must never invent history on develop or
+# master, so a diverged branch is an error the operator has to look at.
+# Precondition: the calling cmd_* function must have declared DRY_RUN - 'run'
+# reads it through dynamic scoping, and without it the script dies under set -u
+# before the ERR trap can name the failing step.
+sync_branch() {
+  run git checkout "$1"
+  if has_upstream "$1"; then run git pull --ff-only
+  else skip "$1 has no upstream - nothing to pull"; fi
+}
+
 usage_top() {
 cat <<'USAGE'
 release - HyperFormula release automation.
