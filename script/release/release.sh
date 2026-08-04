@@ -536,7 +536,7 @@ exit 0
 }
 
 # ============================================================================
-# Command: publish  (placeholder - implement later)
+# Command: publish
 # ============================================================================
 cmd_publish() {
 local DRY_RUN=true SKIP_BUILD=false DEMOS_DIR="" TESTS_DIR="" VERSION=""
