@@ -267,9 +267,9 @@ if [[ -z "$PRE_FREEZE_VERSION" ]]; then
 fi
 IFS='.' read -r nM nm _ <<<"$VERSION"
 IFS='.' read -r cM cm _ <<<"${PRE_FREEZE_VERSION:-0.0.0}"
-if   [[ "$nM" != "$cM" ]]; then RELEASE_TYPE=major
-elif [[ "$nm" != "$cm" ]]; then RELEASE_TYPE=minor
-else RELEASE_TYPE=patch; fi
+if   [[ "$nM" != "$cM" ]]; then RELEASE_TYPE='major'
+elif [[ "$nm" != "$cm" ]]; then RELEASE_TYPE='minor'
+else RELEASE_TYPE='patch'; fi
 VERSION_BRANCH="${nM}.${nm}.x"
 
 # default repo locations (run from the hyperformula repo root):
