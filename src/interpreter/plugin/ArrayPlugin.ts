@@ -180,12 +180,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   /**
    * Corresponds to TAKE(array, rows, [columns]).
    *
-   * Returns the requested number of rows and columns from the beginning or end
-   * of the source array. Syntactically empty dimensions keep the corresponding
-   * source dimension, while evaluated zero counts produce an empty-range error.
+   * Returns rows and columns from the beginning or end of the source array.
+   * Empty dimensions keep all rows or columns.
    *
-   * @param {ProcedureAst} ast - The parsed function-call AST node.
-   * @param {InterpreterState} state - The current interpreter state.
+   * @param ast
+   * @param state
    */
   public take(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     const rowsArg = ast.args[1]
@@ -218,13 +217,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   }
 
   /**
-   * Predicts TAKE's maximum result size from the source array.
+   * Calculates the spilled array size of TAKE using the source dimensions as
+   * the upper bound.
    *
-   * The requested dimensions can depend on evaluated expressions, so the source
-   * dimensions are used as a safe upper bound for the spill area.
-   *
-   * @param {ProcedureAst} ast - The parsed function-call AST node.
-   * @param {InterpreterState} state - The current interpreter state.
+   * @param ast
+   * @param state
    */
   public takeArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length < 2 || ast.args.length > 3) {
