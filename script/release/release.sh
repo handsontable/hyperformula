@@ -7,7 +7,7 @@
 #
 # Commands:
 #   code-freeze <version> <release-date> [--real-run]   Start a code freeze.
-#   publish <version>                                   Publish a release. (not implemented yet)
+#   publish <version> [--real-run]                      Publish a finished release.
 #
 # More commands will be added over time.
 # Run 'release.sh <command> --help' for command-specific options.
@@ -113,7 +113,7 @@ Usage: release.sh <command> [options]
 
 Commands:
   code-freeze <version> <release-date> [--real-run]   Start a code freeze.
-  publish <version>                                   Publish a release. (not implemented yet)
+  publish <version> [--real-run]                      Publish a finished release.
 
 Run 'release.sh <command> --help' for command-specific options.
 USAGE
@@ -141,8 +141,27 @@ usage_publish() {
 cat <<'USAGE'
 Usage: release.sh publish <version> [options]
 
-Publish a finished release - the "Release steps" section of the doc
-(npm publish, tags, GitHub release, post-release). NOT IMPLEMENTED YET.
+Publishes a finished release: merges release/<version> into master and develop,
+tags it, pushes, publishes to npm (after an interactive confirmation), and
+updates hyperformula-tests and hyperformula-demos. Previews by default (prints
+commands, changes nothing); add --real-run to make changes.
+
+Requires release/<version> to exist in this repo AND in hyperformula-tests -
+run 'release.sh code-freeze' first. Every step checks whether it is already
+done, so a failed run is recovered by running the same command again.
+
+Options:
+  --real-run         Actually run the commands (default is a dry-run preview).
+  --skip-build       Skip 'npm ci' + 'npm run bundle-all' (the on-disk build is
+                     assumed to match the release commit). The package check
+                     still runs. Meant for a fast resume after a late failure.
+  --demos-dir PATH   hyperformula-demos clone (default: ../hyperformula-demos).
+  --tests-dir PATH   hyperformula-tests clone (default: test/hyperformula-tests).
+
+Examples:
+  release.sh publish 2.1.0                          # preview (dry run)
+  release.sh publish 2.1.0 --real-run               # do it for real
+  release.sh publish 2.1.0 --real-run --skip-build  # resume without rebuilding
 USAGE
 }
 
@@ -520,10 +539,107 @@ exit 0
 # Command: publish  (placeholder - implement later)
 # ============================================================================
 cmd_publish() {
-  case "${1:-}" in -h|--help) usage_publish; exit 0 ;; esac
-  echo "release.sh publish is not implemented yet - placeholder for a future step."
-  echo "See the 'Release steps' section of the doc; for now, publish manually."
-  exit 1
+local DRY_RUN=true SKIP_BUILD=false DEMOS_DIR="" TESTS_DIR="" VERSION=""
+
+# ---- args ----
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --real-run)     DRY_RUN=false ;;
+    --dry-run)      DRY_RUN=true ;;
+    --skip-build)   SKIP_BUILD=true ;;
+    --demos-dir)    DEMOS_DIR="${2:-}"; shift ;;
+    --tests-dir)    TESTS_DIR="${2:-}"; shift ;;
+    -h|--help)      usage_publish; exit 0 ;;
+    -*)             die "Unknown option: $1" ;;
+    *) if [[ -z "$VERSION" ]]; then VERSION="$1"
+       else die "Unexpected arg: $1"; fi ;;
+  esac
+  shift
+done
+
+[[ -n "$VERSION" ]] || read -r -p "Version to publish (e.g. 2.1.0): " VERSION
+[[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || die "Bad version: $VERSION"
+
+# ---- sanity checks ----
+git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "Not inside a git repo."
+[[ -f package.json ]] || die "No package.json here - run from the hyperformula repo root."
+command -v npm >/dev/null || die "npm not found."
+branch_exists master  || die "No 'master' branch."
+branch_exists develop || die "No 'develop' branch."
+[[ -z "$(git status --porcelain)" ]] || die "Working tree is dirty - commit or stash first."
+
+# default repo locations, as in code-freeze
+PARENT="$(dirname "$PWD")"
+[[ -z "$DEMOS_DIR" && -d "$PARENT/hyperformula-demos"   ]] && DEMOS_DIR="$PARENT/hyperformula-demos"
+[[ -z "$TESTS_DIR" && -d "$PWD/test/hyperformula-tests" ]] && TESTS_DIR="$PWD/test/hyperformula-tests"
+
+# Both sibling repositories are written to during a publish, so both are
+# required - same rule as code-freeze. The tests repo also needs master, which
+# step 6 merges into.
+require_repo hyperformula-tests "$TESTS_DIR" --tests-dir master develop
+require_repo hyperformula-demos "$DEMOS_DIR" --demos-dir develop
+
+step "Preflight"
+# Fetching only updates remote-tracking refs, so it is safe in a dry run too -
+# and every "is this already done?" check below needs the fresh state.
+printf '    $ git fetch origin --tags\n'
+git fetch origin --tags >/dev/null 2>&1 || die "git fetch origin failed."
+
+# Both release branches are prerequisites: 'publish' finishes a freeze, it never
+# improvises one. A missing branch means the freeze did not run for this version,
+# so it is an error rather than a step to skip. Prefer the local branch and fall
+# back to origin's, so publishing works from a fresh clone too.
+if branch_exists "release/$VERSION"; then
+  RELEASE_REF="release/$VERSION"
+elif remote_branch_exists "release/$VERSION"; then
+  RELEASE_REF="origin/release/$VERSION"
+else
+  die "No release/$VERSION branch (local or on origin) - run 'release.sh code-freeze $VERSION <date>' first."
+fi
+RELEASE_TIP="$(git rev-parse "$RELEASE_REF")"
+# Tolerant read, then explicit checks: under 'pipefail' an unreadable file or a
+# throwing JSON.parse would fail this assignment and trip the ERR trap, which
+# reports far less than the two messages below.
+REF_VERSION="$(git show "$RELEASE_REF:package.json" 2>/dev/null \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).version||"")}catch(e){}})' 2>/dev/null || true)"
+[[ -n "$REF_VERSION" ]] \
+  || die "Could not read a version from package.json on $RELEASE_REF."
+[[ "$REF_VERSION" == "$VERSION" ]] \
+  || die "package.json on $RELEASE_REF says $REF_VERSION, not $VERSION."
+
+# Same requirement in the tests repo, checked here so the run fails before it
+# touches master, rather than half-way through step 6.
+printf '    $ git -C %s fetch origin\n' "$TESTS_DIR"
+git -C "$TESTS_DIR" fetch origin >/dev/null 2>&1 || die "git fetch failed in $TESTS_DIR."
+if git -C "$TESTS_DIR" show-ref --verify --quiet "refs/heads/release/$VERSION"; then
+  TESTS_REF="release/$VERSION"
+elif git -C "$TESTS_DIR" ls-remote --heads origin "release/$VERSION" 2>/dev/null | grep -q .; then
+  TESTS_REF="origin/release/$VERSION"
+else
+  die "No release/$VERSION branch in the tests repo ($TESTS_DIR) - the freeze did not create it."
+fi
+
+NPM_USER="$(npm whoami 2>/dev/null || true)"
+if [[ -z "$NPM_USER" ]]; then
+  $DRY_RUN || die "npm whoami failed - run 'npm login' first."
+  NPM_USER="<not logged in>"
+fi
+
+IFS='.' read -r nM nm _ <<<"$VERSION"
+VERSION_BRANCH="${nM}.${nm}.x"
+
+step "Plan"
+cat <<INFO
+  version:      $VERSION
+  release ref:  $RELEASE_REF
+  npm user:     $NPM_USER
+  demos repo:   $DEMOS_DIR  (branch $VERSION_BRANCH)
+  tests repo:   $TESTS_DIR  ($TESTS_REF)
+  build:        $($SKIP_BUILD && echo 'SKIPPED (--skip-build; package check still runs)' || echo 'npm ci + bundle-all + package check')
+  mode:         $($DRY_RUN && echo 'DRY RUN (preview; pass --real-run to make changes)' || echo 'REAL RUN (making changes)')
+INFO
+
+exit 0
 }
 
 # ============================================================================
