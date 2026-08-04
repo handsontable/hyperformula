@@ -209,6 +209,13 @@ PARENT="$(dirname "$PWD")"
 [[ -z "$DEMOS_DIR" && -d "$PARENT/hyperformula-demos"   ]] && DEMOS_DIR="$PARENT/hyperformula-demos"
 [[ -z "$TESTS_DIR" && -d "$PWD/test/hyperformula-tests" ]] && TESTS_DIR="$PWD/test/hyperformula-tests"
 
+# Both sibling repositories are part of a freeze, so verify them before doing
+# anything: a freeze that half-runs across three repositories is worse than one
+# that refuses to start. The demos clone is required even for a patch release
+# (where step 8 is skipped) - the check is about the environment being complete.
+require_repo hyperformula-tests "$TESTS_DIR" --tests-dir develop
+require_repo hyperformula-demos "$DEMOS_DIR" --demos-dir develop
+
 step "Plan"
 cat <<INFO
   version:      $VERSION   (was ${PRE_FREEZE_VERSION:-unknown}, $RELEASE_TYPE release)
@@ -369,35 +376,26 @@ step "8. Demos + docs URLs (major/minor only)"
 if [[ "$RELEASE_TYPE" == patch ]]; then
   echo "    skipped (patch release)"
 else
-  if [[ -n "$DEMOS_DIR" && -d "$DEMOS_DIR" ]]; then
-    echo "    updating $DEMOS_DIR -> $VERSION, branch $VERSION_BRANCH"
-    ( trap - ERR; cd "$DEMOS_DIR"
-      run git checkout develop
-      run git pull
-      run sh set-hyperformula-version.sh "$VERSION"
-      run git add .
-      if $DRY_RUN || [[ -n "$(git status --porcelain)" ]]; then
-        run git commit -m "Set hyperformula version for all demos"
-      else
-        skip "demos already at $VERSION - no commit needed"
-      fi
-      run git push
-      if git show-ref --verify --quiet "refs/heads/$VERSION_BRANCH"; then
-        run git checkout "$VERSION_BRANCH"
-      else
-        run git checkout -b "$VERSION_BRANCH"
-      fi
-      run git push -u origin "$VERSION_BRANCH" )
-    [[ "$RELEASE_TYPE" == major ]] && echo "    ! major: manually test demos against the rc build."
-  else
-    cat <<MANUAL
-    ! demos repo not found - run in your hyperformula-demos clone:
-        git checkout develop && git pull
-        sh set-hyperformula-version.sh $VERSION
-        git add . && git commit -m "Set hyperformula version for all demos" && git push
-        git checkout -b $VERSION_BRANCH && git push -u origin $VERSION_BRANCH
-MANUAL
-  fi
+  # The sanity checks have already proved the demos clone is usable.
+  echo "    updating $DEMOS_DIR -> $VERSION, branch $VERSION_BRANCH"
+  ( trap - ERR; cd "$DEMOS_DIR"
+    run git checkout develop
+    run git pull
+    run sh set-hyperformula-version.sh "$VERSION"
+    run git add .
+    if $DRY_RUN || [[ -n "$(git status --porcelain)" ]]; then
+      run git commit -m "Set hyperformula version for all demos"
+    else
+      skip "demos already at $VERSION - no commit needed"
+    fi
+    run git push
+    if git show-ref --verify --quiet "refs/heads/$VERSION_BRANCH"; then
+      run git checkout "$VERSION_BRANCH"
+    else
+      run git checkout -b "$VERSION_BRANCH"
+    fi
+    run git push -u origin "$VERSION_BRANCH" )
+  [[ "$RELEASE_TYPE" == major ]] && echo "    ! major: manually test demos against the rc build."
   # CodeSandbox demo URLs in this repo's docs/: point every one at the new
   # branch, whatever branch it names now (old releases left several behind)
   if [[ -d docs ]]; then
@@ -482,17 +480,27 @@ else
 fi
 run git push -u origin "release/$VERSION"
 
-# 10. hyperformula-tests repo
-step "10. Update hyperformula-tests"
-if [[ -n "$TESTS_DIR" && -d "$TESTS_DIR" ]]; then
-  ( trap - ERR; cd "$TESTS_DIR"; run git checkout master; run git pull origin develop )
-else
-  cat <<MANUAL
-    ! tests repo not found - run in your hyperformula-tests clone:
-        git checkout master
-        git pull origin develop
-MANUAL
-fi
+# 10. hyperformula-tests: give the freeze its own branch there and publish it,
+#     so CI and other developers can add tests during the freeze. 'publish'
+#     merges it back. (The process doc still describes the older
+#     'checkout master && pull origin develop' - see release-README.md.)
+#     The sanity checks have already proved the clone is usable, so there is no
+#     "repo not found" path here.
+step "10. Create + push release/$VERSION in hyperformula-tests"
+( trap - ERR; cd "$TESTS_DIR"
+  run git fetch origin
+  if branch_exists "release/$VERSION"; then
+    skip "release/$VERSION already exists in the tests repo"
+    run git checkout "release/$VERSION"
+  elif remote_branch_exists "release/$VERSION"; then
+    skip "release/$VERSION exists on the tests repo's origin"
+    run git checkout -b "release/$VERSION" "origin/release/$VERSION"
+  else
+    run git checkout develop
+    run git pull --ff-only
+    run git checkout -b "release/$VERSION"
+  fi
+  run git push -u origin "release/$VERSION" )
 
 step "Done - release/$VERSION is ready for the freeze"
 if $DRY_RUN; then echo "  (dry run - nothing changed; re-run with --real-run to do it for real)"; fi
