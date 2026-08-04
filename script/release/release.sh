@@ -191,8 +191,11 @@ DATE_LONG="$(CF="$DATE_ISO" node -e 'console.log(new Date(process.env.CF+"T00:00
 # tree if develop cannot be read, so an unusual checkout still gets an answer.
 PRE_FREEZE_VERSION="$(git show develop:package.json 2>/dev/null \
   | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).version||"")}catch(e){}})' 2>/dev/null || true)"
-[[ -n "$PRE_FREEZE_VERSION" ]] \
-  || PRE_FREEZE_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
+if [[ -z "$PRE_FREEZE_VERSION" ]]; then
+  PRE_FREEZE_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
+  echo "    ! could not read develop's package.json - classifying the release against the checked-out"
+  echo "      version (${PRE_FREEZE_VERSION:-unknown}), which on a resumed freeze can read a minor release as a patch."
+fi
 IFS='.' read -r nM nm _ <<<"$VERSION"
 IFS='.' read -r cM cm _ <<<"${PRE_FREEZE_VERSION:-0.0.0}"
 if   [[ "$nM" != "$cM" ]]; then RELEASE_TYPE=major
@@ -373,7 +376,11 @@ else
       run git pull
       run sh set-hyperformula-version.sh "$VERSION"
       run git add .
-      run git commit -m "Set hyperformula version for all demos"
+      if $DRY_RUN || [[ -n "$(git status --porcelain)" ]]; then
+        run git commit -m "Set hyperformula version for all demos"
+      else
+        skip "demos already at $VERSION - no commit needed"
+      fi
       run git push
       if git show-ref --verify --quiet "refs/heads/$VERSION_BRANCH"; then
         run git checkout "$VERSION_BRANCH"
