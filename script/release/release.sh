@@ -420,11 +420,15 @@ cmd_publish() {
 # ============================================================================
 # Dispatch
 # ============================================================================
-if [[ $# -eq 0 ]]; then usage_top; exit 0; fi
-COMMAND="$1"; shift
-case "$COMMAND" in
-  code-freeze)    cmd_code_freeze "$@" ;;
-  publish)        cmd_publish "$@" ;;
-  -h|--help|help) usage_top ;;
-  *) printf 'Unknown command: %s\n\n' "$COMMAND" >&2; usage_top >&2; exit 1 ;;
-esac
+# Only dispatch when executed. Sourcing the script (the test harness does this)
+# just defines the helpers, so they can be exercised on their own.
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  if [[ $# -eq 0 ]]; then usage_top; exit 0; fi
+  COMMAND="$1"; shift
+  case "$COMMAND" in
+    code-freeze)    cmd_code_freeze "$@" ;;
+    publish)        cmd_publish "$@" ;;
+    -h|--help|help) usage_top ;;
+    *) printf 'Unknown command: %s\n\n' "$COMMAND" >&2; usage_top >&2; exit 1 ;;
+  esac
+fi
