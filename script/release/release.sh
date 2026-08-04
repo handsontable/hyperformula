@@ -184,9 +184,9 @@ command -v npm >/dev/null || die "npm not found."
 DATE_HT="$(CF="$DATE_ISO"   node -e 'const[y,m,d]=process.env.CF.split("-");console.log(`${d}/${m}/${y}`)')"
 DATE_LONG="$(CF="$DATE_ISO" node -e 'console.log(new Date(process.env.CF+"T00:00:00").toLocaleString("en-US",{month:"long",day:"numeric",year:"numeric"}))')"
 
-CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
+PRE_FREEZE_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 IFS='.' read -r nM nm _ <<<"$VERSION"
-IFS='.' read -r cM cm _ <<<"${CURRENT_VERSION:-0.0.0}"
+IFS='.' read -r cM cm _ <<<"${PRE_FREEZE_VERSION:-0.0.0}"
 if   [[ "$nM" != "$cM" ]]; then RELEASE_TYPE=major
 elif [[ "$nm" != "$cm" ]]; then RELEASE_TYPE=minor
 else RELEASE_TYPE=patch; fi
@@ -200,7 +200,7 @@ PARENT="$(dirname "$PWD")"
 
 step "Plan"
 cat <<INFO
-  version:      $VERSION   (was ${CURRENT_VERSION:-unknown}, $RELEASE_TYPE release)
+  version:      $VERSION   (was ${PRE_FREEZE_VERSION:-unknown}, $RELEASE_TYPE release)
   release date: $DATE_ISO  (ht.config.js: $DATE_HT | release notes: $DATE_LONG)
   demos repo:   ${DEMOS_DIR:-<none, will print manual steps>}$( [[ $RELEASE_TYPE == patch ]] && echo '  (skipped: patch)')
   tests repo:   ${TESTS_DIR:-<none, will print manual steps>}
@@ -252,7 +252,9 @@ fi
 if [[ ! -f ht.config.js ]] || ! grep -q HT_RELEASE_DATE ht.config.js; then
   echo "    ! HT_RELEASE_DATE not found in ht.config.js - set it to $DATE_HT manually."
 else
-  CURRENT_HT_DATE="$(sed -n "s/.*HT_RELEASE_DATE[[:space:]]*:[[:space:]]*'\([^']*\)'.*/\1/p" ht.config.js | head -1 || true)"
+  # Accept either quote style, matching the write below: a double-quoted value
+  # the read could not see would defeat the skip this step exists to add.
+  CURRENT_HT_DATE="$(sed -n "s/.*HT_RELEASE_DATE[[:space:]]*:[[:space:]]*['\"]\([^'\"]*\)['\"].*/\1/p" ht.config.js | head -1 || true)"
   if [[ "$CURRENT_HT_DATE" == "$DATE_HT" ]]; then
     skip "ht.config.js HT_RELEASE_DATE already $DATE_HT"
   elif $DRY_RUN; then
@@ -263,11 +265,15 @@ else
   fi
 fi
 
-# 4. Regenerate the lock file. A lock file already naming the new version is
-#    proof it was regenerated after the bump, so a re-run leaves it alone.
+# 4. Regenerate the lock file. A lock file naming the new version alongside an
+#    installed node_modules is a reasonable signal that the reinstall already
+#    ran; it does not prove the dependency tree is still current. Both are
+#    required, because an interrupted 'npm i' can leave the lock file written
+#    while node_modules is missing - and skipping then would take a broken
+#    install straight into the build.
 step "4. Reinstall dependencies"
 LOCK_VERSION="$(node -e 'try{process.stdout.write(require("./package-lock.json").version||"")}catch(e){}' 2>/dev/null || true)"
-if [[ "$LOCK_VERSION" == "$VERSION" ]]; then
+if [[ "$LOCK_VERSION" == "$VERSION" && -d node_modules ]]; then
   skip "package-lock.json already regenerated for $VERSION"
 else
   run rm -rf ./node_modules
