@@ -176,8 +176,8 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --real-run)     DRY_RUN=false ;;
     --dry-run)      DRY_RUN=true ;;
-    --demos-dir)    DEMOS_DIR="${2:-}"; shift ;;
-    --tests-dir)    TESTS_DIR="${2:-}"; shift ;;
+    --demos-dir)    [[ $# -ge 2 ]] || die "Missing value for $1"; DEMOS_DIR="$2"; shift ;;
+    --tests-dir)    [[ $# -ge 2 ]] || die "Missing value for $1"; TESTS_DIR="$2"; shift ;;
     -h|--help)      usage_code_freeze; exit 0 ;;
     -*)             die "Unknown option: $1" ;;
     *) if   [[ -z "$VERSION"  ]]; then VERSION="$1"
@@ -547,8 +547,8 @@ while [[ $# -gt 0 ]]; do
     --real-run)     DRY_RUN=false ;;
     --dry-run)      DRY_RUN=true ;;
     --skip-build)   SKIP_BUILD=true ;;
-    --demos-dir)    DEMOS_DIR="${2:-}"; shift ;;
-    --tests-dir)    TESTS_DIR="${2:-}"; shift ;;
+    --demos-dir)    [[ $# -ge 2 ]] || die "Missing value for $1"; DEMOS_DIR="$2"; shift ;;
+    --tests-dir)    [[ $# -ge 2 ]] || die "Missing value for $1"; TESTS_DIR="$2"; shift ;;
     -h|--help)      usage_publish; exit 0 ;;
     -*)             die "Unknown option: $1" ;;
     *) if [[ -z "$VERSION" ]]; then VERSION="$1"
@@ -580,9 +580,11 @@ require_repo hyperformula-tests "$TESTS_DIR" --tests-dir master develop
 require_repo hyperformula-demos "$DEMOS_DIR" --demos-dir develop
 
 step "Preflight"
-# Fetching only updates remote-tracking refs, so it is safe in a dry run too -
-# and every "is this already done?" check below needs the fresh state.
-printf '    $ git fetch origin --tags\n'
+# Fetching writes only refs the release reads (remote-tracking branches, and
+# local tags via --tags), never the working tree - so it is safe in a dry run,
+# and every "is this already done?" check below needs the fresh state. Marked
+# "(always runs)" because elsewhere a '$' line means "only with --real-run".
+printf '    $ git fetch origin --tags   (always runs)\n'
 git fetch origin --tags >/dev/null 2>&1 || die "git fetch origin failed."
 
 # Both release branches are prerequisites: 'publish' finishes a freeze, it never
@@ -608,12 +610,15 @@ REF_VERSION="$(git show "$RELEASE_REF:package.json" 2>/dev/null \
   || die "package.json on $RELEASE_REF says $REF_VERSION, not $VERSION."
 
 # Same requirement in the tests repo, checked here so the run fails before it
-# touches master, rather than half-way through step 6.
-printf '    $ git -C %s fetch origin\n' "$TESTS_DIR"
+# touches master, rather than half-way through the merge-back. Use the shared
+# predicates with their repo-path argument: a raw 'ls-remote --heads origin
+# release/X' matches by path component, so an unrelated 'old/release/X' would
+# satisfy it - the collision remote_branch_exists exists to prevent.
+printf '    $ git -C %s fetch origin   (always runs)\n' "$TESTS_DIR"
 git -C "$TESTS_DIR" fetch origin >/dev/null 2>&1 || die "git fetch failed in $TESTS_DIR."
-if git -C "$TESTS_DIR" show-ref --verify --quiet "refs/heads/release/$VERSION"; then
+if branch_exists "release/$VERSION" "$TESTS_DIR"; then
   TESTS_REF="release/$VERSION"
-elif git -C "$TESTS_DIR" ls-remote --heads origin "release/$VERSION" 2>/dev/null | grep -q .; then
+elif remote_branch_exists "release/$VERSION" "$TESTS_DIR"; then
   TESTS_REF="origin/release/$VERSION"
 else
   die "No release/$VERSION branch in the tests repo ($TESTS_DIR) - the freeze did not create it."
