@@ -176,6 +176,9 @@ Usage: release.sh code-freeze <version> <release-date> [options]
 Starts a HyperFormula code freeze. Previews by default (prints commands,
 changes nothing); add --real-run to make changes.
 
+Requires usable hyperformula-tests and hyperformula-demos clones (present,
+clean, with a reachable origin) - it exits early otherwise.
+
 Options:
   --real-run         Actually run the commands (default is a dry-run preview).
   --demos-dir PATH   hyperformula-demos clone (default: ../hyperformula-demos).
