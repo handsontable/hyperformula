@@ -105,6 +105,19 @@ sync_branch() {
   else skip "$1 has no upstream - nothing to pull"; fi
 }
 
+# Merges a release ref into a target branch, unless it is already in there.
+# Uses --no-ff so the release stays visible as a merge commit, matching what
+# 'git flow release finish' produces.
+merge_release_into() { # merge_release_into <target branch> <release ref> <release tip sha>
+  local target="$1" release_ref="$2" release_tip="$3"
+  sync_branch "$target"
+  if is_ancestor "$release_tip" "$target"; then
+    skip "$release_ref already merged into $target"
+  else
+    run git merge --no-ff -m "Merge branch '$release_ref' into $target" "$release_ref"
+  fi
+}
+
 usage_top() {
 cat <<'USAGE'
 release - HyperFormula release automation.
@@ -644,7 +657,41 @@ cat <<INFO
   mode:         $($DRY_RUN && echo 'DRY RUN (preview; pass --real-run to make changes)' || echo 'REAL RUN (making changes)')
 INFO
 
-exit 0
+# 1-2. master gets the release
+step "1. Merge $RELEASE_REF into master"
+merge_release_into master "$RELEASE_REF" "$RELEASE_TIP"
+
+# 3. Tag the release on master (git flow release finish tags here)
+step "2. Tag $VERSION"
+if tag_exists "$VERSION"; then
+  if is_ancestor "refs/tags/$VERSION" master; then
+    skip "tag $VERSION already exists on master's history"
+  else
+    die "tag $VERSION exists but is not in master's history - check it before continuing."
+  fi
+else
+  run git tag -a "$VERSION" -m "$VERSION"
+fi
+
+# 4. develop gets the release too
+step "3. Merge $RELEASE_REF into develop"
+merge_release_into develop "$RELEASE_REF" "$RELEASE_TIP"
+
+# 5. Build what is about to be published, from master
+step "4. Build + verify the package"
+run git checkout master
+if $SKIP_BUILD; then
+  skip "--skip-build: reusing the build on disk (npm ci + bundle-all not run)"
+else
+  run npm ci
+  run npm run bundle-all
+fi
+run npm run verify:publish-package
+
+# 6. Publish the branches and the tag before the package, so the commit that
+#    npm publish ships is already on origin.
+step "5. Push master, develop and tags"
+run git push origin master develop --tags
 }
 
 # ============================================================================
