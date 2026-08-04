@@ -220,8 +220,8 @@ step "Plan"
 cat <<INFO
   version:      $VERSION   (was ${PRE_FREEZE_VERSION:-unknown}, $RELEASE_TYPE release)
   release date: $DATE_ISO  (ht.config.js: $DATE_HT | release notes: $DATE_LONG)
-  demos repo:   ${DEMOS_DIR:-<none, will print manual steps>}$( [[ $RELEASE_TYPE == patch ]] && echo '  (skipped: patch)')
-  tests repo:   ${TESTS_DIR:-<none, will print manual steps>}
+  demos repo:   $DEMOS_DIR$( [[ $RELEASE_TYPE == patch ]] && echo '  (skipped: patch)')
+  tests repo:   $TESTS_DIR
   mode:         $($DRY_RUN && echo 'DRY RUN (preview; pass --real-run to make changes)' || echo 'REAL RUN (making changes)')
 INFO
 
@@ -378,7 +378,7 @@ if [[ "$RELEASE_TYPE" == patch ]]; then
 else
   # The sanity checks have already proved the demos clone is usable.
   echo "    updating $DEMOS_DIR -> $VERSION, branch $VERSION_BRANCH"
-  ( trap - ERR; cd "$DEMOS_DIR"
+  ( cd "$DEMOS_DIR"
     run git checkout develop
     run git pull
     run sh set-hyperformula-version.sh "$VERSION"
@@ -487,11 +487,11 @@ run git push -u origin "release/$VERSION"
 #     The sanity checks have already proved the clone is usable, so there is no
 #     "repo not found" path here.
 step "10. Create + push release/$VERSION in hyperformula-tests"
-( trap - ERR; cd "$TESTS_DIR"
+( cd "$TESTS_DIR"
   run git fetch origin
   if branch_exists "release/$VERSION"; then
     skip "release/$VERSION already exists in the tests repo"
-    run git checkout "release/$VERSION"
+    sync_branch "release/$VERSION"
   elif remote_branch_exists "release/$VERSION"; then
     skip "release/$VERSION exists on the tests repo's origin"
     run git checkout -b "release/$VERSION" "origin/release/$VERSION"
