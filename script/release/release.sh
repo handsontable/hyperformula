@@ -184,7 +184,15 @@ command -v npm >/dev/null || die "npm not found."
 DATE_HT="$(CF="$DATE_ISO"   node -e 'const[y,m,d]=process.env.CF.split("-");console.log(`${d}/${m}/${y}`)')"
 DATE_LONG="$(CF="$DATE_ISO" node -e 'console.log(new Date(process.env.CF+"T00:00:00").toLocaleString("en-US",{month:"long",day:"numeric",year:"numeric"}))')"
 
-PRE_FREEZE_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
+# Read the pre-release version from develop rather than the working tree: on a
+# resumed freeze the tree already carries the bump, which would read as a patch
+# release and silently skip step 8's demos and CodeSandbox work. develop holds
+# the old version until 'publish' merges the release back. Falls back to the
+# tree if develop cannot be read, so an unusual checkout still gets an answer.
+PRE_FREEZE_VERSION="$(git show develop:package.json 2>/dev/null \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{process.stdout.write(JSON.parse(s).version||"")}catch(e){}})' 2>/dev/null || true)"
+[[ -n "$PRE_FREEZE_VERSION" ]] \
+  || PRE_FREEZE_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 IFS='.' read -r nM nm _ <<<"$VERSION"
 IFS='.' read -r cM cm _ <<<"${PRE_FREEZE_VERSION:-0.0.0}"
 if   [[ "$nM" != "$cM" ]]; then RELEASE_TYPE=major
