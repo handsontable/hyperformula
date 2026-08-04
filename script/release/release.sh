@@ -179,16 +179,6 @@ git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "Not inside a git rep
 git show-ref --verify --quiet refs/heads/develop || die "No 'develop' branch."
 command -v npm >/dev/null || die "npm not found."
 
-# stop if the release branch already exists (locally or on origin) - do nothing
-if git show-ref --verify --quiet "refs/heads/release/$VERSION" \
-   || git ls-remote --heads origin "release/$VERSION" 2>/dev/null | grep -q .; then
-  echo "release/$VERSION already exists (local or on origin) - nothing to do."
-  echo "If you want to redo the freeze, delete it first:"
-  echo "    git branch -D release/$VERSION"
-  echo "    git push origin --delete release/$VERSION"
-  exit 0
-fi
-
 # ---- derive dates + release type ----
 # ht.config.js wants DD/MM/YYYY; release notes want "Month D, YYYY".
 DATE_HT="$(CF="$DATE_ISO"   node -e 'const[y,m,d]=process.env.CF.split("-");console.log(`${d}/${m}/${y}`)')"
@@ -217,15 +207,25 @@ cat <<INFO
   mode:         $($DRY_RUN && echo 'DRY RUN (preview; pass --real-run to make changes)' || echo 'REAL RUN (making changes)')
 INFO
 
-# 1. Update develop
-step "1. Update develop + the private test suite"
-run git checkout develop
-run git pull
-run npm run test:setup-private
+# 1. Get onto release/$VERSION - creating it off develop the first time, and
+#    resuming an existing one (local or on origin) on a re-run.
+step "1. Get onto release/$VERSION"
+if branch_exists "release/$VERSION"; then
+  skip "release/$VERSION exists locally - resuming the freeze"
+  run git checkout "release/$VERSION"
+  if has_upstream "release/$VERSION"; then run git pull --ff-only; fi
+elif remote_branch_exists "release/$VERSION"; then
+  skip "release/$VERSION exists on origin - resuming the freeze"
+  run git checkout -b "release/$VERSION" "origin/release/$VERSION"
+else
+  run git checkout develop
+  run git pull
+  run git checkout -b "release/$VERSION" develop
+fi
 
-# 2. Start release branch  (git flow release start = branch off develop)
-step "2. Create release/$VERSION"
-run git checkout -b "release/$VERSION" develop
+# 2. Private test suite (fetch-tests.sh follows the current branch name)
+step "2. Sync the private test suite"
+run npm run test:setup-private
 
 # 3. Bump version + release date
 step "3. Bump version + HT_RELEASE_DATE"
