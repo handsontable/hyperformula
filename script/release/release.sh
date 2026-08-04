@@ -461,8 +461,10 @@ else
       skip "demos already at $VERSION - no commit needed"
     fi
     run git push
-    if git show-ref --verify --quiet "refs/heads/$VERSION_BRANCH"; then
+    if branch_exists "$VERSION_BRANCH"; then
       run git checkout "$VERSION_BRANCH"
+    elif remote_branch_exists "$VERSION_BRANCH"; then
+      run git checkout -b "$VERSION_BRANCH" "origin/$VERSION_BRANCH"
     else
       run git checkout -b "$VERSION_BRANCH"
     fi
@@ -685,6 +687,14 @@ elif remote_branch_exists "release/$VERSION" "$TESTS_DIR"; then
   TESTS_REF="origin/release/$VERSION"
 else
   die "No release/$VERSION branch in the tests repo ($TESTS_DIR) - the freeze did not create it."
+fi
+# Same divergence guard as the public repo above: a stale local branch here
+# would silently drop a test pushed to the freeze branch by someone else.
+if [[ "$TESTS_REF" == "release/$VERSION" ]] && remote_branch_exists "release/$VERSION" "$TESTS_DIR"; then
+  LOCAL_TESTS_TIP="$(git -C "$TESTS_DIR" rev-parse "release/$VERSION")"
+  ORIGIN_TESTS_TIP="$(git -C "$TESTS_DIR" rev-parse "origin/release/$VERSION" 2>/dev/null || true)"
+  [[ -n "$ORIGIN_TESTS_TIP" && "$LOCAL_TESTS_TIP" == "$ORIGIN_TESTS_TIP" ]] \
+    || die "Local release/$VERSION in the tests repo ($LOCAL_TESTS_TIP) differs from origin ($ORIGIN_TESTS_TIP) - reconcile them first: git -C $TESTS_DIR checkout release/$VERSION && git -C $TESTS_DIR pull --ff-only"
 fi
 # Pinned here, like RELEASE_TIP: the merge below must use the commit this
 # preflight verified, not whatever the ref names once sync_branch has pulled.
