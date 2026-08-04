@@ -27,7 +27,7 @@ if [[ -t 1 ]]; then HIGHLIGHT=$'\033[1;33m'; RESET=$'\033[0m'; else HIGHLIGHT=''
 
 step() { CURRENT_STEP="$*"; printf '\n==> %s\n' "$*"; }
 die()  { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
-run()  { printf '    $ %s\n' "$*"; $DRY_RUN || "$@"; }
+run()  { printf '    $ %s\n' "$(printf '%q ' "$@" | sed 's/ $//')"; $DRY_RUN || "$@"; }
 
 # Shows generated file content verbatim (unindented, so a dry run displays
 # exactly what would be written), fenced to mark where it starts and ends.
@@ -77,19 +77,22 @@ on_npm()               { npm view "hyperformula@$1" version >/dev/null 2>&1; }
 # work tree, clean, carrying the branches this run will move, with a reachable
 # origin. Failing here costs nothing; failing half-way through leaves one of
 # three repositories in a state someone has to untangle by hand.
+# Reports the first problem it finds and returns 1 - it does not die itself, so
+# a caller checking both sibling clones can report both in one run rather than
+# stopping at whichever is checked first.
 require_repo() { # require_repo <label> <path> <flag> <required branch...>
   local label="$1" dir="$2" flag="$3" branch; shift 3
   [[ -n "$dir" && -d "$dir" ]] \
-    || die "$label clone not found at '${dir:-<unset>}' - pass $flag PATH."
+    || { printf 'ERROR: %s\n' "$label clone not found at '${dir:-<unset>}' - pass $flag PATH." >&2; return 1; }
   git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 \
-    || die "$dir is not a git repository ($label)."
+    || { printf 'ERROR: %s\n' "$dir is not a git repository ($label)." >&2; return 1; }
   [[ -z "$(git -C "$dir" status --porcelain)" ]] \
-    || die "Working tree in $dir ($label) is dirty - commit or stash there first."
+    || { printf 'ERROR: %s\n' "Working tree in $dir ($label) is dirty - commit or stash there first." >&2; return 1; }
   git -C "$dir" ls-remote --heads origin >/dev/null 2>&1 \
-    || die "Cannot reach origin of $dir ($label)."
+    || { printf 'ERROR: %s\n' "Cannot reach origin of $dir ($label)." >&2; return 1; }
   for branch in "$@"; do
     branch_exists "$branch" "$dir" || remote_branch_exists "$branch" "$dir" \
-      || die "$label has no '$branch' branch ($dir)."
+      || { printf 'ERROR: %s\n' "$label has no '$branch' branch ($dir)." >&2; return 1; }
   done
 }
 
@@ -248,7 +251,7 @@ done
 # ---- sanity checks ----
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "Not inside a git repo."
 [[ -f package.json ]] || die "No package.json here - run from the hyperformula repo root."
-git show-ref --verify --quiet refs/heads/develop || die "No 'develop' branch."
+branch_exists develop || die "No 'develop' branch."
 command -v npm >/dev/null || die "npm not found."
 
 # ---- derive dates + release type ----
@@ -285,8 +288,12 @@ PARENT="$(dirname "$PWD")"
 # anything: a freeze that half-runs across three repositories is worse than one
 # that refuses to start. The demos clone is required even for a patch release
 # (where step 8 is skipped) - the check is about the environment being complete.
-require_repo hyperformula-tests "$TESTS_DIR" --tests-dir develop
-require_repo hyperformula-demos "$DEMOS_DIR" --demos-dir develop
+# Both run unconditionally so a run missing both clones reports both, instead
+# of stopping at whichever is checked first and hiding the second problem.
+SIBLINGS_OK=true
+require_repo hyperformula-tests "$TESTS_DIR" --tests-dir develop || SIBLINGS_OK=false
+require_repo hyperformula-demos "$DEMOS_DIR" --demos-dir develop || SIBLINGS_OK=false
+$SIBLINGS_OK || die "Fix the sibling clone problem(s) reported above before continuing."
 
 step "Plan"
 cat <<INFO
@@ -383,7 +390,7 @@ step "6. Update CHANGELOG.md"
 if [[ ! -f CHANGELOG.md ]] || ! grep -q '^## \[Unreleased\]' CHANGELOG.md; then
   echo "    ! Couldn't find '## [Unreleased]' - add the $VERSION entry manually."
 elif grep -q "^## \[$VERSION\]" CHANGELOG.md; then
-  echo "    = already has an entry for $VERSION"
+  skip "already has an entry for $VERSION"
 elif $DRY_RUN; then
   echo "    (insert '## [$VERSION] - $DATE_ISO' under [Unreleased] - the new section will read:)"
   preview "$(printf '## [%s] - %s\n\n%s' "$VERSION" "$DATE_ISO" "$(changelog_section_body '## [Unreleased]')")"
@@ -550,7 +557,7 @@ run git add .
 if $DRY_RUN || [[ -n "$(git status --porcelain)" ]]; then
   run git commit -m "$VERSION"
 else
-  echo "    nothing to commit"
+  skip "nothing to commit"
 fi
 run git push -u origin "release/$VERSION"
 
@@ -630,9 +637,11 @@ PARENT="$(dirname "$PWD")"
 
 # Both sibling repositories are written to during a publish, so both are
 # required - same rule as code-freeze. The tests repo also needs master, which
-# step 6 merges into.
-require_repo hyperformula-tests "$TESTS_DIR" --tests-dir master develop
-require_repo hyperformula-demos "$DEMOS_DIR" --demos-dir develop
+# step 6 merges into. Both run unconditionally, same reason as code-freeze.
+SIBLINGS_OK=true
+require_repo hyperformula-tests "$TESTS_DIR" --tests-dir master develop || SIBLINGS_OK=false
+require_repo hyperformula-demos "$DEMOS_DIR" --demos-dir develop || SIBLINGS_OK=false
+$SIBLINGS_OK || die "Fix the sibling clone problem(s) reported above before continuing."
 
 step "Preflight"
 # Fetching writes only refs the release reads (remote-tracking branches, and

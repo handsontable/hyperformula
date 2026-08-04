@@ -104,9 +104,9 @@ are hard to miss in the output:
   [ ] Post a heads-up about the code freeze in #hyperformula and #release
 
   During the freeze:
-  [ ] Review the documentation changes (GitHub compare)
+  [ ] Review the docs changes (GitHub compare)
   [ ] Test the code examples on staging
-  [ ] Work with marketing team on the release blog post and social media announcements
+  [ ] Work with marketing on the blog post and social media content
 ```
 
 ## Command: `publish`
