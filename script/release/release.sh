@@ -649,6 +649,9 @@ elif remote_branch_exists "release/$VERSION" "$TESTS_DIR"; then
 else
   die "No release/$VERSION branch in the tests repo ($TESTS_DIR) - the freeze did not create it."
 fi
+# Pinned here, like RELEASE_TIP: the merge below must use the commit this
+# preflight verified, not whatever the ref names once sync_branch has pulled.
+TESTS_TIP="$(git -C "$TESTS_DIR" rev-parse "$TESTS_REF")"
 
 NPM_USER="$(npm whoami 2>/dev/null || true)"
 if [[ -z "$NPM_USER" ]]; then
@@ -706,6 +709,18 @@ run npm run verify:publish-package
 #    cannot leave the tag and develop published on their own.
 step "5. Push master, develop and tags"
 run git push --atomic origin master develop --tags
+
+# 6. hyperformula-tests: the freeze branch created by 'code-freeze' goes back
+#    into master and develop. No tag - that repo is not versioned. (The process
+#    doc predates this; see release-README.md.)
+step "6. Merge $TESTS_REF back in hyperformula-tests"
+# Preflight proved the clone, the branch and a clean tree, already fetched, and
+# pinned TESTS_TIP - so this is a straight merge of a fixed commit. No
+# 'trap - ERR' here: a failure inside this subshell must still name the step.
+( cd "$TESTS_DIR"
+  merge_release_into master  "$TESTS_REF" "$TESTS_TIP"
+  merge_release_into develop "$TESTS_REF" "$TESTS_TIP"
+  run git push --atomic origin master develop )
 }
 
 # ============================================================================
