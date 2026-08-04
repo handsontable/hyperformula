@@ -57,8 +57,10 @@ skip() { printf '    = %s\n' "$*"; }
 
 # ---- state checks (idempotency) -------------------------------------------
 # These answer "is this already done?" so every step can be re-run safely.
-# They only read state, so they are also correct during a dry run. Each takes
-# an optional repository path, so the same check works on a sibling clone.
+# They only read state, so they are also correct during a dry run.
+# The two branch predicates - and only those two - take an optional repository
+# path, so the same check works on a sibling clone; an empty string counts as
+# omitted and means the current repository.
 branch_exists()        { git -C "${2:-.}" show-ref --verify --quiet "refs/heads/$1"; }
 # Asks for the full ref, so a name cannot match another branch that merely ends
 # with it ('release/3.4.0' would otherwise also match 'old/release/3.4.0').
