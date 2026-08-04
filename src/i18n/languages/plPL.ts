@@ -225,6 +225,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: 'PRZEŁĄCZ',
     SYD: 'SYD',
     T: 'T',
+    TAKE: 'TAKE',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'RENT.EKW.BS',

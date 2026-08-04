@@ -51,6 +51,10 @@ a circular reference.
 
 * Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
 
+### TAKE function
+
+* When a non-empty `rows` or `columns` argument evaluates to 0, or when the source has no effective rows or columns, `TAKE` returns `#N/A` with the "Empty range not allowed" message. Microsoft Excel returns `#CALC!` for a zero-count empty-array result, but HyperFormula does not support the `#CALC!` error type.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.

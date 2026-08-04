@@ -43,6 +43,17 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       ],
       repeatLastArgs: 1,
     },
+    'TAKE': {
+      method: 'take',
+      sizeOfResultArrayMethod: 'takeArraySize',
+      enableArrayArithmeticForArguments: true,
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NUMBER},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
+      ],
+      vectorizationForbidden: true,
+    },
     'VSTACK': {
       method: 'vstack',
       sizeOfResultArrayMethod: 'vstackArraySize',
@@ -164,6 +175,69 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const width = Math.max(...(subChecks).map(val => val.width))
     const height = Math.max(...(subChecks).map(val => val.height))
     return new ArraySize(width, height)
+  }
+
+  /**
+   * Corresponds to TAKE(array, rows, [columns]).
+   *
+   * Returns the requested number of rows and columns from the beginning or end
+   * of the source array. Syntactically empty dimensions keep the corresponding
+   * source dimension, while evaluated zero counts produce an empty-range error.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter state.
+   */
+  public take(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const rowsArg = ast.args[1]
+    const columnsArg = ast.args[2]
+    const rowsIsEmpty = rowsArg?.type === AstNodeType.EMPTY
+    const columnsIsMissingOrEmpty = columnsArg === undefined || columnsArg.type === AstNodeType.EMPTY
+
+    return this.runFunction(ast.args, state, this.metadata('TAKE'),
+      (range: SimpleRangeValue, rows: number, columns: number | undefined) => {
+        const sourceHeight = range.height()
+        const sourceWidth = range.width()
+        const requestedRows = rowsIsEmpty ? sourceHeight : Math.trunc(rows)
+        const requestedColumns = columnsIsMissingOrEmpty || columns === undefined ? sourceWidth : Math.trunc(columns)
+
+        if (requestedRows === 0 || requestedColumns === 0 || sourceHeight === 0 || sourceWidth === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        }
+
+        const rowsToTake = Math.min(Math.abs(requestedRows), sourceHeight)
+        const columnsToTake = Math.min(Math.abs(requestedColumns), sourceWidth)
+        const startRow = requestedRows > 0 ? 0 : sourceHeight - rowsToTake
+        const startColumn = requestedColumns > 0 ? 0 : sourceWidth - columnsToTake
+        const result = range.data
+          .slice(startRow, startRow + rowsToTake)
+          .map(row => row.slice(startColumn, startColumn + columnsToTake))
+
+        return SimpleRangeValue.onlyValues(result)
+      }
+    )
+  }
+
+  /**
+   * Predicts TAKE's maximum result size from the source array.
+   *
+   * The requested dimensions can depend on evaluated expressions, so the source
+   * dimensions are used as a safe upper bound for the spill area.
+   *
+   * @param {ProcedureAst} ast - The parsed function-call AST node.
+   * @param {InterpreterState} state - The current interpreter state.
+   */
+  public takeArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const metadata = this.metadata('TAKE')
+    const sourceSize = this.arraySizeForAst(
+      ast.args[0],
+      new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
+    )
+
+    return new ArraySize(sourceSize.width, sourceSize.height)
   }
 
   /**
