@@ -245,16 +245,22 @@ else
   echo "    package.json version -> $VERSION"
 fi
 
-CURRENT_HT_DATE="$(sed -n "s/.*HT_RELEASE_DATE[[:space:]]*:[[:space:]]*'\([^']*\)'.*/\1/p" ht.config.js 2>/dev/null | head -1)"
+# Read the current date only once the file is known to exist and carry the key:
+# under 'set -Eeuo pipefail' a sed against a missing file fails the assignment
+# and trips the ERR trap, which would kill the run before the guard below could
+# report the problem in its own words.
 if [[ ! -f ht.config.js ]] || ! grep -q HT_RELEASE_DATE ht.config.js; then
   echo "    ! HT_RELEASE_DATE not found in ht.config.js - set it to $DATE_HT manually."
-elif [[ "$CURRENT_HT_DATE" == "$DATE_HT" ]]; then
-  skip "ht.config.js HT_RELEASE_DATE already $DATE_HT"
-elif $DRY_RUN; then
-  echo "    (set ht.config.js HT_RELEASE_DATE='$DATE_HT')"
 else
-  CF_D="$DATE_HT" node -e 'const f="ht.config.js",fs=require("fs");let s=fs.readFileSync(f,"utf8");s=s.replace(/(HT_RELEASE_DATE\s*:\s*)([\x27"])[^\x27"]*\2/,`$1$2${process.env.CF_D}$2`);fs.writeFileSync(f,s)'
-  echo "    ht.config.js HT_RELEASE_DATE -> $DATE_HT"
+  CURRENT_HT_DATE="$(sed -n "s/.*HT_RELEASE_DATE[[:space:]]*:[[:space:]]*'\([^']*\)'.*/\1/p" ht.config.js | head -1 || true)"
+  if [[ "$CURRENT_HT_DATE" == "$DATE_HT" ]]; then
+    skip "ht.config.js HT_RELEASE_DATE already $DATE_HT"
+  elif $DRY_RUN; then
+    echo "    (set ht.config.js HT_RELEASE_DATE='$DATE_HT')"
+  else
+    CF_D="$DATE_HT" node -e 'const f="ht.config.js",fs=require("fs");let s=fs.readFileSync(f,"utf8");s=s.replace(/(HT_RELEASE_DATE\s*:\s*)([\x27"])[^\x27"]*\2/,`$1$2${process.env.CF_D}$2`);fs.writeFileSync(f,s)'
+    echo "    ht.config.js HT_RELEASE_DATE -> $DATE_HT"
+  fi
 fi
 
 # 4. Regenerate the lock file. A lock file already naming the new version is
