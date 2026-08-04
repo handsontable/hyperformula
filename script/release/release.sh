@@ -212,10 +212,14 @@ INFO
 step "1. Get onto release/$VERSION"
 if branch_exists "release/$VERSION"; then
   skip "release/$VERSION exists locally - resuming the freeze"
-  run git checkout "release/$VERSION"
-  if has_upstream "release/$VERSION"; then run git pull --ff-only; fi
+  sync_branch "release/$VERSION"
 elif remote_branch_exists "release/$VERSION"; then
   skip "release/$VERSION exists on origin - resuming the freeze"
+  # remote_branch_exists asks the remote directly, so the local tracking ref may
+  # not exist yet. Fetch the branch before creating a local one from it, or
+  # resuming in a clone that never saw it - another machine, a fresh clone -
+  # fails on 'origin/release/<version>' not being a commit.
+  run git fetch origin "release/$VERSION"
   run git checkout -b "release/$VERSION" "origin/release/$VERSION"
 else
   run git checkout develop
@@ -248,11 +252,10 @@ run rm -rf ./node_modules
 run rm -f package-lock.json
 run npm i
 
-# 5. Build / private test suite / lint / test
-step "5. Build, fetch the private test suite, lint + test"
+# 5. Build / lint / test  (the private test suite was already pointed at this
+#    branch in step 2, and nothing since has changed the branch it follows)
+step "5. Build, lint + test"
 run npm run bundle-all
-# points test/hyperformula-tests at a branch matching release/$VERSION
-run npm run test:setup-private
 run npm run lint
 run npm run test:jest
 
