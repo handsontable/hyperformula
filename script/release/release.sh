@@ -769,6 +769,56 @@ else
   run npm publish
   wait_for_npm "$VERSION"
 fi
+
+# 8. Demos consume the published version, so they come after the publish.
+#    Preflight has already proved the clone is usable. No 'trap - ERR' here: a
+#    failure inside this subshell must still name the step.
+step "8. Update hyperformula-demos"
+( cd "$DEMOS_DIR"
+  run git fetch origin
+  sync_branch develop
+  run sh update-hyperformula-in-lock-files.sh
+  if $DRY_RUN || [[ -n "$(git status --porcelain)" ]]; then
+    run git add .
+    run git commit -m "Update hyperformula version in all lock files"
+  else
+    skip "lock files already up to date - nothing to commit"
+  fi
+  run git push origin develop
+
+  # sync_branch, not a raw checkout: the version branch is shared, and pushing
+  # to it without fast-forwarding first is what broke the tests-repo step once.
+  if branch_exists "$VERSION_BRANCH"; then
+    sync_branch "$VERSION_BRANCH"
+  elif remote_branch_exists "$VERSION_BRANCH"; then
+    run git checkout -b "$VERSION_BRANCH" "origin/$VERSION_BRANCH"
+  else
+    run git checkout -b "$VERSION_BRANCH"
+  fi
+  if is_ancestor develop "$VERSION_BRANCH"; then
+    skip "develop already merged into $VERSION_BRANCH"
+  else
+    run git merge --no-ff -m "Merge branch 'develop' into $VERSION_BRANCH" develop
+  fi
+  run git push -u origin "$VERSION_BRANCH" )
+
+# 9. Leave the operator where the next cycle starts.
+step "9. Back to develop"
+run git checkout develop
+
+step "Done - $VERSION is released"
+if $DRY_RUN; then echo "  (dry run - nothing changed; re-run with --real-run to do it for real)"; fi
+
+manual_checklist <<NEXT
+  [ ] Create the GitHub release for $VERSION (body = the $VERSION section of CHANGELOG.md):
+        https://github.com/handsontable/hyperformula/releases/new?tag=$VERSION&title=$VERSION
+  [ ] Check that the docs workflow deployed the documentation to gh-pages
+  [ ] Announce the release in #hyperformula and #release
+  [ ] Close the GitHub and ClickUp tasks in this release, announcing $VERSION,
+      notify everyone involved in the discussions, and check linked issues
+  [ ] Review the deployed docs and test the demos
+NEXT
+exit 0
 }
 
 # ============================================================================
