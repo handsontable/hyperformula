@@ -124,11 +124,17 @@ merge_release_into() { # merge_release_into <target branch> <release ref, for me
 # The point of no return. Prints what is about to happen and requires the
 # operator to type the version back, so a stray Enter cannot publish.
 confirm_publish() { # confirm_publish <version> <npm user>
-  local version="$1" npm_user="$2" answer
+  local version="$1" npm_user="$2" answer registry
+  # Read the registry into a variable first, tolerating failure: substituting the
+  # command inline would blank the line and print npm's stderr into the middle of
+  # the box, breaking the one banner in this script that must not be missed.
+  # Note this shows npm's configured registry; a publishConfig.registry in
+  # package.json would override it for the actual publish - there is none today.
+  registry="$(npm config get registry 2>/dev/null || true)"
   printf '\n%s%s\n  ABOUT TO PUBLISH %s TO npm - THIS CANNOT BE UNDONE\n%s\n' \
     "$HIGHLIGHT" "$CHECKLIST_RULE" "$version" "$CHECKLIST_RULE"
   printf '  registry: %s\n  npm user: %s\n%s\n' \
-    "$(npm config get registry)" "$npm_user" "$RESET"
+    "${registry:-<unknown - could not read npm config>}" "$npm_user" "$RESET"
   # A failed read means EOF or no terminal at all - a cron or CI invocation, say.
   # Name that case rather than letting the ERR trap report a generic step failure.
   read -r -p "  Type the version to publish (anything else aborts): " answer \
@@ -141,7 +147,9 @@ confirm_publish() { # confirm_publish <version> <npm user>
 wait_for_npm() { # wait_for_npm <version>
   local version="$1" waited=0
   until on_npm "$version"; do
-    [[ $waited -ge 60 ]] && die "hyperformula@$version is not visible on npm after ${waited}s."
+    # Say that the publish itself succeeded: by this point it has, and a bare
+    # "not visible" reads like the publish failed, which would invite a retry.
+    [[ $waited -ge 60 ]] && die "npm publish reported success, but hyperformula@$version is still not visible on npm after ${waited}s - check the registry before retrying."
     sleep 5; waited=$((waited + 5))
     printf '    waiting for hyperformula@%s on npm (%ss)\n' "$version" "$waited"
   done
