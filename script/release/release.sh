@@ -216,9 +216,10 @@ if branch_exists "release/$VERSION"; then
 elif remote_branch_exists "release/$VERSION"; then
   skip "release/$VERSION exists on origin - resuming the freeze"
   # remote_branch_exists asks the remote directly, so the local tracking ref may
-  # not exist yet. Fetch the branch before creating a local one from it, or
-  # resuming in a clone that never saw it - another machine, a fresh clone -
-  # fails on 'origin/release/<version>' not being a commit.
+  # not exist yet. Fetch the branch before creating a local one from it. Without
+  # this, resuming in a clone that has not fetched since the branch was pushed -
+  # a colleague's machine, a single-branch or shallow checkout - fails on
+  # 'origin/release/<version>' not being a commit.
   run git fetch origin "release/$VERSION"
   run git checkout -b "release/$VERSION" "origin/release/$VERSION"
 else
