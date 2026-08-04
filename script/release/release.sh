@@ -107,14 +107,17 @@ sync_branch() {
 
 # Merges a release ref into a target branch, unless it is already in there.
 # Uses --no-ff so the release stays visible as a merge commit, matching what
-# 'git flow release finish' produces.
-merge_release_into() { # merge_release_into <target branch> <release ref> <release tip sha>
+# 'git flow release finish' produces. Merges the pinned TIP, never the ref:
+# sync_branch's pull refreshes every remote-tracking ref, so a ref could name a
+# newer commit than the one the preflight checked and reported. The ref is used
+# only in messages.
+merge_release_into() { # merge_release_into <target branch> <release ref, for messages> <release tip sha, merged>
   local target="$1" release_ref="$2" release_tip="$3"
   sync_branch "$target"
   if is_ancestor "$release_tip" "$target"; then
     skip "$release_ref already merged into $target"
   else
-    run git merge --no-ff -m "Merge branch '$release_ref' into $target" "$release_ref"
+    run git merge --no-ff -m "Merge branch '$release_ref' into $target" "$release_tip"
   fi
 }
 
@@ -611,6 +614,16 @@ elif remote_branch_exists "release/$VERSION"; then
 else
   die "No release/$VERSION branch (local or on origin) - run 'release.sh code-freeze $VERSION <date>' first."
 fi
+
+# A local release branch can be stale - someone may have pushed a late fix to
+# the freeze branch. Publishing the local tip would silently drop it, so require
+# the two to agree rather than guessing which is wanted.
+if [[ "$RELEASE_REF" == "release/$VERSION" ]] && remote_branch_exists "release/$VERSION"; then
+  LOCAL_TIP="$(git rev-parse "release/$VERSION")"
+  ORIGIN_TIP="$(git rev-parse "origin/release/$VERSION" 2>/dev/null || true)"
+  [[ -n "$ORIGIN_TIP" && "$LOCAL_TIP" == "$ORIGIN_TIP" ]] \
+    || die "Local release/$VERSION ($LOCAL_TIP) differs from origin ($ORIGIN_TIP) - reconcile them first: git checkout release/$VERSION && git pull --ff-only"
+fi
 RELEASE_TIP="$(git rev-parse "$RELEASE_REF")"
 # Tolerant read, then explicit checks: under 'pipefail' an unreadable file or a
 # throwing JSON.parse would fail this assignment and trip the ERR trap, which
@@ -657,11 +670,11 @@ cat <<INFO
   mode:         $($DRY_RUN && echo 'DRY RUN (preview; pass --real-run to make changes)' || echo 'REAL RUN (making changes)')
 INFO
 
-# 1-2. master gets the release
+# 1. master gets the release
 step "1. Merge $RELEASE_REF into master"
 merge_release_into master "$RELEASE_REF" "$RELEASE_TIP"
 
-# 3. Tag the release on master (git flow release finish tags here)
+# 2. Tag the release on master (git flow release finish tags here)
 step "2. Tag $VERSION"
 if tag_exists "$VERSION"; then
   if is_ancestor "refs/tags/$VERSION" master; then
@@ -673,11 +686,11 @@ else
   run git tag -a "$VERSION" -m "$VERSION"
 fi
 
-# 4. develop gets the release too
+# 3. develop gets the release too
 step "3. Merge $RELEASE_REF into develop"
 merge_release_into develop "$RELEASE_REF" "$RELEASE_TIP"
 
-# 5. Build what is about to be published, from master
+# 4. Build what is about to be published, from master
 step "4. Build + verify the package"
 run git checkout master
 if $SKIP_BUILD; then
@@ -688,10 +701,11 @@ else
 fi
 run npm run verify:publish-package
 
-# 6. Publish the branches and the tag before the package, so the commit that
-#    npm publish ships is already on origin.
+# 5. Publish the branches and the tag before the package, so the commit that
+#    npm publish ships is already on origin. --atomic so a rejected master
+#    cannot leave the tag and develop published on their own.
 step "5. Push master, develop and tags"
-run git push origin master develop --tags
+run git push --atomic origin master develop --tags
 }
 
 # ============================================================================
