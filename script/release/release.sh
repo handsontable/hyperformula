@@ -129,7 +129,10 @@ confirm_publish() { # confirm_publish <version> <npm user>
     "$HIGHLIGHT" "$CHECKLIST_RULE" "$version" "$CHECKLIST_RULE"
   printf '  registry: %s\n  npm user: %s\n%s\n' \
     "$(npm config get registry)" "$npm_user" "$RESET"
-  read -r -p "  Type the version to publish (anything else aborts): " answer
+  # A failed read means EOF or no terminal at all - a cron or CI invocation, say.
+  # Name that case rather than letting the ERR trap report a generic step failure.
+  read -r -p "  Type the version to publish (anything else aborts): " answer \
+    || die "no answer at the publish confirmation (no terminal?) - nothing was published."
   [[ "$answer" == "$version" ]] || die "aborted at the publish confirmation (got '$answer')."
 }
 
