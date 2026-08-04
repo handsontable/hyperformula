@@ -232,26 +232,42 @@ fi
 step "2. Sync the private test suite"
 run npm run test:setup-private
 
-# 3. Bump version + release date
+# 3. Bump version + release date (each half skipped when already correct, so a
+#    re-run after a later failure does not rewrite files it already wrote)
 step "3. Bump version + HT_RELEASE_DATE"
-if $DRY_RUN; then
-  echo "    (set package.json version=$VERSION, ht.config.js HT_RELEASE_DATE='$DATE_HT')"
+CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
+if [[ "$CURRENT_VERSION" == "$VERSION" ]]; then
+  skip "package.json already at $VERSION"
+elif $DRY_RUN; then
+  echo "    (set package.json version=$VERSION)"
 else
   CF_V="$VERSION" node -e 'const f="package.json",j=require("./"+f);j.version=process.env.CF_V;require("fs").writeFileSync(f,JSON.stringify(j,null,2)+"\n")'
   echo "    package.json version -> $VERSION"
-  if [[ -f ht.config.js ]] && grep -q HT_RELEASE_DATE ht.config.js; then
-    CF_D="$DATE_HT" node -e 'const f="ht.config.js",fs=require("fs");let s=fs.readFileSync(f,"utf8");s=s.replace(/(HT_RELEASE_DATE\s*:\s*)([\x27"])[^\x27"]*\2/,`$1$2${process.env.CF_D}$2`);fs.writeFileSync(f,s)'
-    echo "    ht.config.js HT_RELEASE_DATE -> $DATE_HT"
-  else
-    echo "    ! HT_RELEASE_DATE not found in ht.config.js - set it to $DATE_HT manually."
-  fi
 fi
 
-# 4. Regenerate lock file
+CURRENT_HT_DATE="$(sed -n "s/.*HT_RELEASE_DATE[[:space:]]*:[[:space:]]*'\([^']*\)'.*/\1/p" ht.config.js 2>/dev/null | head -1)"
+if [[ ! -f ht.config.js ]] || ! grep -q HT_RELEASE_DATE ht.config.js; then
+  echo "    ! HT_RELEASE_DATE not found in ht.config.js - set it to $DATE_HT manually."
+elif [[ "$CURRENT_HT_DATE" == "$DATE_HT" ]]; then
+  skip "ht.config.js HT_RELEASE_DATE already $DATE_HT"
+elif $DRY_RUN; then
+  echo "    (set ht.config.js HT_RELEASE_DATE='$DATE_HT')"
+else
+  CF_D="$DATE_HT" node -e 'const f="ht.config.js",fs=require("fs");let s=fs.readFileSync(f,"utf8");s=s.replace(/(HT_RELEASE_DATE\s*:\s*)([\x27"])[^\x27"]*\2/,`$1$2${process.env.CF_D}$2`);fs.writeFileSync(f,s)'
+  echo "    ht.config.js HT_RELEASE_DATE -> $DATE_HT"
+fi
+
+# 4. Regenerate the lock file. A lock file already naming the new version is
+#    proof it was regenerated after the bump, so a re-run leaves it alone.
 step "4. Reinstall dependencies"
-run rm -rf ./node_modules
-run rm -f package-lock.json
-run npm i
+LOCK_VERSION="$(node -e 'try{process.stdout.write(require("./package-lock.json").version||"")}catch(e){}' 2>/dev/null || true)"
+if [[ "$LOCK_VERSION" == "$VERSION" ]]; then
+  skip "package-lock.json already regenerated for $VERSION"
+else
+  run rm -rf ./node_modules
+  run rm -f package-lock.json
+  run npm i
+fi
 
 # 5. Build / lint / test  (the private test suite was already pointed at this
 #    branch in step 2, and nothing since has changed the branch it follows)
