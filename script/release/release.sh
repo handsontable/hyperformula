@@ -553,8 +553,20 @@ fi
 
 # 9. Commit the release branch and publish it (git flow release publish = push)
 step "9. Commit + push release/$VERSION"
-run git add .
-if $DRY_RUN || [[ -n "$(git status --porcelain)" ]]; then
+# Named pathspecs, not '.': an unrelated uncommitted change elsewhere in the
+# working tree (something the operator was working on, unrelated to the
+# freeze) must not ride along into the release commit. package-lock.json,
+# ht.config.js and docs/ are each conditional on existing - step 4 deletes and
+# regenerates the lock file, so between an 'npm i' and its write it is briefly
+# gone, and both files can be legitimately absent altogether (see step 3, and
+# t05b for the missing ht.config.js case) - a bare pathspec for any of them
+# would die under 'set -e' when it is not there.
+ADD_PATHS=(package.json CHANGELOG.md)
+[[ -f package-lock.json ]] && ADD_PATHS+=(package-lock.json)
+[[ -f ht.config.js ]] && ADD_PATHS+=(ht.config.js)
+[[ -d docs ]] && ADD_PATHS+=(docs)
+run git add "${ADD_PATHS[@]}"
+if $DRY_RUN || [[ -n "$(git status --porcelain -- "${ADD_PATHS[@]}")" ]]; then
   run git commit -m "$VERSION"
 else
   skip "nothing to commit"
@@ -593,6 +605,9 @@ manual_checklist <<NEXT
   [ ] Review the docs changes (GitHub compare)
   [ ] Test the code examples on staging
   [ ] Work with marketing on the blog post and social media content
+
+  [ ] Check that CI is green on release/$VERSION before publishing (the freeze runs
+      the unit tests locally; the browser suite runs in CI on the pushed branch)
 NEXT
 exit 0
 }
@@ -822,7 +837,11 @@ step "8. Update hyperformula-demos"
   else
     run git merge --no-ff -m "Merge branch 'develop' into $VERSION_BRANCH" develop
   fi
-  run git push -u origin "$VERSION_BRANCH" )
+  run git push -u origin "$VERSION_BRANCH"
+  # All three clones end on develop - see step 9 below for this repo. Unlike
+  # code-freeze, there is no reason to leave the operator on the version branch
+  # here: the freeze just created it, but publish only ever revisits it.
+  run git checkout develop )
 
 # 9. Leave the operator where the next cycle starts.
 step "9. Back to develop"

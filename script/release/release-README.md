@@ -107,6 +107,9 @@ are hard to miss in the output:
   [ ] Review the docs changes (GitHub compare)
   [ ] Test the code examples on staging
   [ ] Work with marketing on the blog post and social media content
+
+  [ ] Check that CI is green on release/<version> before publishing (the freeze runs
+      the unit tests locally; the browser suite runs in CI on the pushed branch)
 ```
 
 ## Command: `publish`
