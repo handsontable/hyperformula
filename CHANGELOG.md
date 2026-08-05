@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added the `TAKE` dynamic-array function.
+- Added the `TAKE` dynamic-array function and the `CALC` error type used for empty-array results.
 
 ## [3.4.0] - 2026-08-10
 
