@@ -181,7 +181,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * Corresponds to TAKE(array, rows, [columns]).
    *
    * Returns rows and columns from the beginning or end of the source array.
-   * Empty dimensions keep all rows or columns.
+   * Syntactically empty dimensions keep all rows or columns. Counts that
+   * evaluate to zero return a #CALC! error.
    *
    * @param ast
    * @param state
@@ -200,7 +201,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const requestedColumns = columnsIsMissingOrEmpty || columns === undefined ? sourceWidth : Math.trunc(columns)
 
         if (requestedRows === 0 || requestedColumns === 0 || sourceHeight === 0 || sourceWidth === 0) {
-          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+          return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
         }
 
         const rowsToTake = Math.min(Math.abs(requestedRows), sourceHeight)

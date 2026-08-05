@@ -7,6 +7,7 @@ import {RawTranslationPackage} from '..'
 
 const dictionary: RawTranslationPackage = {
   errors: {
+    CALC: '#CALC!',
     CYCLE: '#CYCLE!',
     DIV_BY_ZERO: '#DELING.DOOR.0!',
     ERROR: '#ERROR!',
