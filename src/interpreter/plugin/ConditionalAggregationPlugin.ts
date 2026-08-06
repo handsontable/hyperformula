@@ -99,6 +99,15 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
         {argumentType: FunctionArgumentType.RANGE, optionalArg: true},
       ],
     },
+    AVERAGEIFS: {
+      method: 'averageifs',
+      parameters: [
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.RANGE},
+        {argumentType: FunctionArgumentType.NOERROR},
+      ],
+      repeatLastArgs: 2,
+    },
     SUMIFS: {
       method: 'sumifs',
       parameters: [
@@ -201,6 +210,56 @@ export class ConditionalAggregationPlugin extends FunctionPlugin implements Func
         return averageResult
       } else {
         return averageResult.averageValue() || new CellError(ErrorType.DIV_BY_ZERO)
+      }
+    }
+
+    return this.runFunction(ast.args, state, this.metadata(functionName), computeFn)
+  }
+
+  /**
+   * Corresponds to AVERAGEIFS(AverageRange, CriterionRange1, Criterion1, ...)
+   *
+   * AverageRange is the range whose matching numeric values are averaged.
+   * Every CriterionRange and Criterion pair adds a condition that must be satisfied.
+   *
+   * @param ast
+   * @param state
+   */
+  public averageifs(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    const functionName = 'AVERAGEIFS'
+
+    const composeFunction = (left: AverageResult | CellError, right: AverageResult | CellError): AverageResult | CellError => {
+      if (left instanceof CellError) {
+        return left
+      } else if (right instanceof CellError) {
+        return right
+      } else {
+        return left.compose(right)
+      }
+    }
+
+    const computeFn = (values: SimpleRangeValue, ...args: unknown[]) => {
+      const averageResult = this.computeConditionalAggregationFunction<AverageResult | CellError>(
+        values,
+        args as RawInterpreterValue[],
+        functionName,
+        AverageResult.empty,
+        composeFunction,
+        (arg) => {
+          if (arg instanceof CellError) {
+            return arg
+          } else if (isExtendedNumber(arg)) {
+            return AverageResult.single(getRawValue(arg))
+          } else {
+            return AverageResult.empty
+          }
+        },
+      )
+
+      if (averageResult instanceof CellError) {
+        return averageResult
+      } else {
+        return averageResult.averageValue() ?? new CellError(ErrorType.DIV_BY_ZERO)
       }
     }
 
