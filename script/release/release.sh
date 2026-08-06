@@ -389,10 +389,11 @@ usage_publish() {
 cat <<'USAGE'
 Usage: release.sh publish <version> [options]
 
-Publishes a finished release: merges release/<version> into master and develop,
-tags it, pushes, publishes to npm (after an interactive confirmation), and
-updates hyperformula-tests and hyperformula-demos. Previews by default (prints
-commands, changes nothing); add --real-run to make changes.
+Publishes a finished release: builds, tests and verifies the package, merges
+release/<version> into master and develop, tags it, pushes, publishes to npm
+(after an interactive confirmation), and updates hyperformula-tests and
+hyperformula-demos. Previews by default (prints commands, changes nothing);
+add --real-run to make changes.
 
 Requires release/<version> to exist in this repo AND in hyperformula-tests -
 run 'release.sh code-freeze' first. Every step checks whether it is already
@@ -401,9 +402,10 @@ done, so a failed run is recovered by running the same command again.
 Options:
   --real-run         Actually run the commands (default is a dry-run preview).
   --dry-run          Preview only. The default; useful to override an alias.
-  --skip-build       Skip 'npm ci' + 'npm run bundle-all' (the on-disk build is
-                     assumed to match the release commit). The package check
-                     still runs. Meant for a fast resume after a late failure.
+  --skip-build       Skip 'npm ci', 'npm run test' and 'npm run bundle-all' (the
+                     on-disk build is assumed to match the release commit). The
+                     package check still runs. Meant for a fast resume after a
+                     late failure.
   --demos-dir PATH   hyperformula-demos clone (default: ../hyperformula-demos).
 
 Examples:
@@ -591,9 +593,9 @@ step "2. Create release/$VERSION in hyperformula-tests, then sync the suite"
 run npm run test:setup-private
 
 # 3. Bump version + release date (each half skipped when already correct, so a
+CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 #    re-run after a later failure does not rewrite files it already wrote)
 step "3. Bump version + HT_RELEASE_DATE"
-CURRENT_VERSION="$(node -e 'process.stdout.write(require("./package.json").version||"")' 2>/dev/null || true)"
 if [[ "$CURRENT_VERSION" == "$VERSION" ]]; then
   skip "package.json already at $VERSION"
 elif $DRY_RUN; then
@@ -647,11 +649,13 @@ else
 fi
 
 # 5. Build / lint / test  (the private test suite was already pointed at this
-#    branch in step 2, and nothing since has changed the branch it follows)
+#    branch in step 2, and nothing since has changed the branch it follows).
+#    'npm run test' is lint, the unit tests and the browser suite, so it needs
+#    headless Chrome and Firefox on this machine - there is no separate lint
+#    call here because that script runs it first.
 step "5. Build, lint + test"
 run npm run bundle-all
-run npm run lint
-run npm run test:jest
+run npm run test
 
 # 6. CHANGELOG.md - add version heading under [Unreleased]
 step "6. Update CHANGELOG.md"
@@ -901,7 +905,7 @@ manual_checklist <<NEXT
   [ ] Work with marketing on the blog post and social media content
 $( [[ "$RELEASE_TYPE" == major ]] && printf '  [ ] Major release: test the demos by hand against the rc build\n' )
   [ ] Check that CI is green on release/$VERSION before publishing (the freeze runs
-      the unit tests locally; the browser suite runs in CI on the pushed branch)
+      lint and the whole test suite locally; CI re-runs them on the pushed branch)
 NEXT
 exit 0
 }
@@ -1042,19 +1046,56 @@ cat <<INFO
   npm dist-tag: $NPM_TAG$($IS_PRERELEASE && echo '   (prerelease - not tagged latest; GitHub release flagged pre-release)')
   demos repo:   $DEMOS_DIR  (branch $VERSION_BRANCH)
   tests repo:   $TESTS_DIR  ($TESTS_REF)
-  build:        $($SKIP_BUILD && echo 'SKIPPED (--skip-build; package check still runs)' || echo 'npm ci + bundle-all + package check')
+  build:        $($SKIP_BUILD && echo 'SKIPPED (--skip-build; package check still runs)' || echo 'npm ci + lint + tests + bundle-all + package check')
   mode:         $($DRY_RUN && echo 'DRY RUN (preview; pass --real-run to make changes)' || echo 'REAL RUN (making changes)')
 INFO
 
-# 1. master gets the release
-step "1. Merge $RELEASE_REF into master"
-merge_release_into master "$RELEASE_REF" "$RELEASE_TIP"
+# 1. Prove the release before anything moves. This is the last moment at which
+#    the run has changed nothing, so a broken build or a failing test costs only
+#    the time it took: no merge to unpick, no tag to delete, nothing pushed.
+#    Built from the release ref, not from master, because master does not carry
+#    the release yet - step 2 then proves that merging it changed nothing, so
+#    what is verified here is what step 7 publishes.
+step "1. Test, build + verify the package from $RELEASE_REF"
+run git checkout "$RELEASE_REF"
+if $SKIP_BUILD; then
+  skip "--skip-build: reusing the build on disk (npm ci, the tests and bundle-all not run)"
+else
+  run npm ci
+  # The suites collect test/**, private suite included, so the tests are the
+  # release's own only while that clone sits on the release branch - and nothing
+  # keeps it there between the freeze and the publish. The same pinned commit
+  # step 6 merges back, so both steps see one release of the suite.
+  run git -C "$TESTS_DIR" checkout "$TESTS_REF"
+  # As in the freeze: lint, the unit tests and the browser suite in one script.
+  run npm run test
+  run npm run bundle-all
+fi
+run npm run verify:publish-package
 
-# 2. Tag the release on master (git flow release finish tags here)
-step "2. Tag $VERSION"
+# 2. master gets the release
+step "2. Merge $RELEASE_REF into master"
+merge_release_into master "$RELEASE_REF" "$RELEASE_TIP"
+# npm packs the working tree, so what step 7 publishes is master's tracked files
+# plus the artifacts step 1 built from the release ref. That only holds together
+# while the merge is content-neutral - the normal case, master being behind the
+# release branch and contributing nothing of its own. When master does carry
+# something the release branch does not (a hotfix landed during the freeze, say)
+# it now holds code that was never built or tested here, so stop while nothing
+# has been pushed or published.
+if $DRY_RUN; then
+  skip "dry run - master has not moved, so its content cannot be compared with $RELEASE_REF yet"
+elif [[ "$(git rev-parse 'master^{tree}')" == "$(git rev-parse "$RELEASE_TIP^{tree}")" ]]; then
+  skip "master's content matches $RELEASE_REF - the verified build is what gets published"
+else
+  die "master now holds content that is not in $RELEASE_REF, so the package verified in step 1 is not what master would publish - see 'git diff $RELEASE_TIP master'. Nothing has been pushed or published: merge master into release/$VERSION, let CI run on it, then publish again."
+fi
+
+# 3. Tag the release on master (git flow release finish tags here)
+step "3. Tag $VERSION"
 if tag_exists "$VERSION"; then
   # Accept the tag when it sits on master's history OR origin/master's. In a real
-  # run step 1 has already fast-forwarded local master, so the two agree; in a dry
+  # run step 2 has already fast-forwarded local master, so the two agree; in a dry
   # run nothing has moved master, so a local copy left behind by anyone who has
   # not pulled since the release would otherwise fail this check on a tag that is
   # perfectly fine on origin. The preflight's 'git fetch origin --tags' already
@@ -1068,20 +1109,9 @@ else
   run git tag -a "$VERSION" -m "$VERSION"
 fi
 
-# 3. develop gets the release too
-step "3. Merge $RELEASE_REF into develop"
+# 4. develop gets the release too
+step "4. Merge $RELEASE_REF into develop"
 merge_release_into develop "$RELEASE_REF" "$RELEASE_TIP"
-
-# 4. Build what is about to be published, from master
-step "4. Build + verify the package"
-run git checkout master
-if $SKIP_BUILD; then
-  skip "--skip-build: reusing the build on disk (npm ci + bundle-all not run)"
-else
-  run npm ci
-  run npm run bundle-all
-fi
-run npm run verify:publish-package
 
 # 5. Publish the branches and the tag before the package, so the commit that
 #    npm publish ships is already on origin. --atomic so a rejected master
@@ -1105,6 +1135,10 @@ step "6. Merge $TESTS_REF back in hyperformula-tests"
 #    and the publish are skipped when the version is already on the registry,
 #    which is what makes a re-run after a mid-publish failure safe.
 step "7. Publish hyperformula@$VERSION to npm"
+# npm packs the working tree, so the tarball is the checked-out branch's files
+# plus the build on disk. Step 4 left HEAD on develop, whose commits from during
+# the freeze are not part of this release - publish the tagged commit instead.
+run git checkout master
 if on_npm "$VERSION"; then
   skip "hyperformula@$VERSION is already on npm - not publishing again"
 elif $DRY_RUN; then

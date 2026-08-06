@@ -132,8 +132,9 @@ describe decisions made from stale refs. The script marks these fetches
    Both are required: an interrupted install can leave the lock file written and
    `node_modules` missing, and skipping then would carry a broken install
    straight into the build.
-5. **Builds, lints and runs the unit tests.** These always run, even when
-   resuming a freeze that got this far before. The browser suite is left to CI.
+5. **Builds, then lints and runs the whole test suite** — the unit tests and the
+   browser suite, which needs headless Chrome and Firefox on this machine.
+   These always run, even when resuming a freeze that got this far before.
 6. **Adds the version section to `CHANGELOG.md`**, directly under
    `## [Unreleased]` so that the bullets accumulated during development become
    the new section — unless that section already exists.
@@ -176,7 +177,7 @@ are hard to miss in the output:
   [ ] Work with marketing on the blog post and social media content
 
   [ ] Check that CI is green on release/<version> before publishing (the freeze runs
-      the unit tests locally; the browser suite runs in CI on the pushed branch)
+      lint and the whole test suite locally; CI re-runs them on the pushed branch)
 ```
 
 A major release adds an item about testing the demos against the rc build.
@@ -185,9 +186,9 @@ Anything the run could not do is listed in the same box, above these — see
 
 ## Command: `publish`
 
-Publishes a finished release: merges `release/<version>` into `master` and
-`develop`, tags it, builds and verifies the package, publishes it to npm, and
-updates `hyperformula-tests` and `hyperformula-demos`. **Previews by
+Publishes a finished release: builds, tests and verifies the package, merges
+`release/<version>` into `master` and `develop`, tags it, publishes it to npm,
+and updates `hyperformula-tests` and `hyperformula-demos`. **Previews by
 default** — prints every command and changes nothing. Add `--real-run` to
 actually do it.
 
@@ -212,7 +213,7 @@ AND in `hyperformula-tests`; run `code-freeze` first if it doesn't.
 |------|--------|
 | `--real-run` | Actually run the commands. Without it, the script only previews (dry run). |
 | `--dry-run` | Preview only. This is the default; the flag exists to override a shell alias. |
-| `--skip-build` | Skip the reinstall and rebuild (assumes the on-disk build already matches the release commit). The package check still runs. Meant for a fast resume after a late failure. |
+| `--skip-build` | Skip the reinstall, the test suite and the rebuild (assumes the on-disk build already matches the release commit). The package check still runs. Meant for a fast resume after a late failure. |
 | `--demos-dir PATH` | Path to your `hyperformula-demos` clone. |
 | `-h`, `--help` | Show help for this command. |
 
@@ -254,29 +255,49 @@ refreshes the refs.
 
 ### What it does
 
-1. **Merges `release/<version>` into `master`** as a merge commit, unless it is
-   already merged.
-2. **Tags `<version>` on `master`** — an annotated tag, message = the version —
+1. **Tests, builds and verifies the package** from `release/<version>`:
+   reinstall, point the private test suite at the release branch, lint and run
+   the whole test suite (unit and browser, as in the freeze), rebuild (all
+   skipped by `--skip-build`), then always the publish-package check. It comes
+   first because this is the last moment at which the run has changed nothing,
+   so a failing test or a broken build costs only the time it took — no merge to
+   unpick, no tag to delete, nothing pushed. It builds from the release branch
+   rather than from `master`, which does not carry the release yet; step 2 is
+   what proves the two hold the same content.
+   The private suite is moved onto the release branch first because nothing
+   keeps it there between the freeze and the publish, and the tests are only
+   this release's tests while it is.
+2. **Merges `release/<version>` into `master`** as a merge commit, unless it is
+   already merged — then checks that `master`'s content now matches the release
+   branch's. `npm publish` packs the working tree, so what ships is `master`'s
+   files plus the artifacts step 1 built, and that only holds together while the
+   merge brings nothing of `master`'s own. When it does — a hotfix committed
+   straight to `master` during the freeze, say — `master` carries code that was
+   never built or tested here, so the run stops with nothing pushed and nothing
+   published: merge `master` into the release branch, let CI run on it, and
+   publish again. A dry run cannot check this, having moved no branch.
+3. **Tags `<version>` on `master`** — an annotated tag, message = the version —
    unless that tag already exists and is already in `master`'s (or
    `origin/master`'s) history — the latter so a dry run against a stale local
    `master` still recognises a tag that is fine on origin. If it exists anywhere
    else, the run stops so you can check it.
-3. **Merges `release/<version>` into `develop`**, unless already merged.
-4. **Builds and verifies the package** from `master`: reinstall and rebuild
-   (both skipped by `--skip-build`), then always the publish-package check.
+4. **Merges `release/<version>` into `develop`**, unless already merged.
 5. **Pushes `master`, `develop` and the tags** in one atomic push, so a rejected
    `master` cannot leave the tag and `develop` published on their own. This
    happens before the npm publish, so the commit npm ships is already on origin.
 6. **Merges the release branch back in `hyperformula-tests`**, into both `master`
    and `develop` there, and pushes both atomically. No tag — that repo is not
    versioned.
-7. **The pause — the only step that cannot be undone.** Unless
-   `hyperformula@<version>` is already on npm, prints the registry and the
-   `npm whoami` user and asks you to type the version back (anything else
-   aborts), then publishes and waits up to 60s for the new version to become
-   visible on the registry. A plain `x.y.z` publishes under npm's `latest` tag;
-   a version carrying a prerelease suffix (an rc, e.g. `3.5.0-rc.1`) publishes
-   under `next` instead, so `npm install hyperformula` never resolves to it.
+7. **The pause — the only step that cannot be undone.** Gets back onto `master`
+   first: `npm publish` packs the working tree, and step 4 left you on
+   `develop`, whose commits from during the freeze are not part of this release.
+   Then, unless `hyperformula@<version>` is already on npm, prints the registry
+   and the `npm whoami` user and asks you to type the version back (anything
+   else aborts), then publishes and waits up to 60s for the new version to
+   become visible on the registry. A plain `x.y.z` publishes under npm's
+   `latest` tag; a version carrying a prerelease suffix (an rc, e.g.
+   `3.5.0-rc.1`) publishes under `next` instead, so `npm install hyperformula`
+   never resolves to it.
 8. **Updates `hyperformula-demos`.** Syncs `develop`, refreshes the lock files,
    commits if anything changed, and pushes; then gets onto the `M.m.x` branch
    (fast-forwarding it first) and merges `develop` into it unless already merged,
@@ -351,8 +372,9 @@ highlighted box under its own error block.
   always re-run, even on a resumed freeze or a resumed publish — nothing on
   disk proves the build artifacts still match the release commit, and these
   are usually the steps a re-run is retrying anyway. `publish`'s
-  `--skip-build` is the explicit, deliberate override for the slow part; the
-  package check still runs even then.
+  `--skip-build` is the explicit, deliberate override for the slow part (the
+  reinstall, the test suite and the rebuild); the package check still runs
+  even then.
 - Release notes come straight from the changelog, so keep the `[Unreleased]`
   section tidy during development — that's exactly what becomes the notes.
 - The git-flow steps are translated to plain git: `release start` becomes a
