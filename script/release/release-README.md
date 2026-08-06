@@ -9,6 +9,14 @@ Usage:
 npm run release -- <command> [options]     # or: bash script/release/release.sh
 ```
 
+This file describes what each step *does*. It deliberately does not transcribe
+the commands the script runs — as it goes, the script prints each command that
+changes something (as a `$` line, and in a dry run prints it without running it)
+and previews the content it would write, so the script is the authority and this
+file cannot drift out of step with it. Not everything is echoed verbatim, though:
+read-only state checks run silently, and the in-place `node`/`perl` file edits
+are shown as preview blocks or `(set …)` lines rather than as literal commands.
+
 ## Before you start
 
 Both commands work across three repositories: this one, `hyperformula-tests`,
@@ -16,19 +24,26 @@ and `hyperformula-demos`. Before making any change — including during a dry
 run — each command checks that all three are usable, and refuses to start if
 they are not.
 
-- `hyperformula-tests` (default `test/hyperformula-tests`, override with
-  `--tests-dir PATH`) and `hyperformula-demos` (default `../hyperformula-demos`,
-  override with `--demos-dir PATH`) must each be a clone that has:
-  - a clean working tree,
-  - the branches this release will move (`develop` in both repos, plus
-    `master` in `hyperformula-tests` while running `publish`),
-  - a reachable `origin`.
-- If you have never had a private test clone, run `npm run test:setup-private`
-  first — it creates `test/hyperformula-tests` for you. `code-freeze` and
-  `publish` deliberately do not clone it for you mid-run.
-- A missing or dirty clone is an **error**, not a warning. This applies to dry
-  runs too: a preview that cannot see the repositories it would touch is not a
-  faithful preview.
+- **This repository** must be a git work tree with `package.json` present, the
+  branches the command will move, and a clean working tree. `code-freeze` relaxes
+  the last one for a dry run and for a resume: see [its preflight](#preflight).
+- **`hyperformula-tests`** always lives at `test/hyperformula-tests`. This is not
+  configurable, because `test/fetch-tests.sh` and the CI workflows all hardcode
+  it — if the script let you point it elsewhere, a freeze would validate one
+  clone and mutate another. If you have never had a private test clone, run
+  `npm run test:setup-private` first; it creates the clone for you. `code-freeze`
+  and `publish` deliberately do not clone it for you mid-run.
+- **`hyperformula-demos`** defaults to `../hyperformula-demos`, override with
+  `--demos-dir PATH`.
+- Each sibling clone must have a clean working tree, a reachable `origin`, the
+  branches the command will move (`develop` in both, plus `master` in
+  `hyperformula-tests` while running `publish`), and the script that command runs
+  inside it. The last one matters most for `publish`, whose demos script runs
+  *after* the npm publish that cannot be undone — so a wrong `--demos-dir` has to
+  be caught in the preflight or not at all.
+- A missing, dirty, or wrong clone is an **error**, not a warning. This applies
+  to dry runs too: a preview that cannot see the repositories it would touch is
+  not a faithful preview.
 
 ## Command: `code-freeze`
 
@@ -53,47 +68,99 @@ Arguments are `<version>` (e.g. `2.1.0`) and `<release-date>` in `YYYY-MM-DD`.
 | Flag | Effect |
 |------|--------|
 | `--real-run` | Actually run the commands. Without it, the script only previews (dry run). |
+| `--dry-run` | Preview only. This is the default; the flag exists to override a shell alias. |
 | `--demos-dir PATH` | Path to your `hyperformula-demos` clone. |
-| `--tests-dir PATH` | Path to your `hyperformula-tests` clone. |
 | `-h`, `--help` | Show help for this command. |
 
-`--tests-dir` should normally stay at its default. `test/fetch-tests.sh`
-(invoked by the freeze through `npm run test:setup-private`) and the CI
-workflows all hardcode `test/hyperformula-tests`, so pointing `--tests-dir`
-elsewhere splits the freeze across two clones — and you must pass the same
-`--tests-dir` to `publish` later, or it will look in `test/hyperformula-tests`
-and fail to find the release branch.
+### Preflight
+
+Before changing anything, and in a dry run too, `code-freeze` fetches `origin`
+(see below — the checks depend on it) and then checks that:
+
+1. This is a git work tree with `package.json` and a `develop` branch, and that
+   `npm`, `node` and `perl` are all on `PATH` — `node` makes the version, date
+   and release-notes edits, `perl` rewrites the demo URLs.
+2. `<version>` is not already tagged. A tag means the version is released, so
+   freezing it again is a typo rather than an intention. This is why the fetch
+   comes first: a tag a colleague pushed is invisible until it is fetched, which
+   is exactly the case worth catching.
+3. `<release-date>` is a date that exists. The `YYYY-MM-DD` shape is not enough:
+   `2026-02-30` would otherwise reach `ht.config.js` verbatim while the release
+   notes silently said March 2 and the changelog said February 30.
+4. Both sibling clones are usable (see [Before you start](#before-you-start)).
+5. The working tree is clean. Two cases stop short of refusing: a dry run
+   changes nothing, so it previews from a dirty tree and just says a real run
+   would refuse; and a resume — meaning `release/<version>` already exists **in
+   this clone** — is exempt, because there the dirty tree is the freeze's own
+   unfinished work and refusing would break the resume. Both are noted under
+   "worth checking" rather than treated as failures. A branch that exists only on
+   origin is *not* a resume: another clone ran that freeze, so anything dirty here
+   is your own and the run refuses.
+
+That fetch runs for real even in a dry run, so that every "does origin already
+have this?" answer is fresh, check 2 can see a tag someone else pushed, and the
+release type is classified against origin's `develop` rather than a possibly
+stale local copy. Only this repository is fetched with `--tags` — the tag checks
+above are what need them. The sibling clones are fetched the same way as each
+command reaches them, but plainly: neither `hyperformula-tests` nor
+`hyperformula-demos` is tag-gated, so a bare `git fetch origin` is enough there.
+
+So a dry run is not quite a no-op on disk: it updates remote-tracking refs and
+creates local tags. It never touches a working tree, a local branch, or a remote,
+which is what "changes nothing" means here — and without it the preview would
+describe decisions made from stale refs. The script marks these fetches
+`(always runs)` to distinguish them from the `$` lines that only execute with
+`--real-run`.
 
 ### What it does
 
-1. Gets onto `release/<version>`: creates it off `develop` the first time; on
-   a re-run, resumes an existing one — checking out the local branch, or
-   fetching it from origin first when only the remote has it (a cold local
-   tracking ref).
-2. Syncs the private test suite: `npm run test:setup-private` points
-   `test/hyperformula-tests` at a branch matching the current branch name,
-   creating that branch from `develop` the first time.
-3. Sets `version` in `package.json` and `HT_RELEASE_DATE` in `ht.config.js` —
-   each skipped when it already matches the target, so a re-run does not
-   rewrite files it already wrote.
-4. Reinstalls dependencies (wipes `node_modules`, deletes `package-lock.json`,
-   runs `npm i`) — skipped when `package-lock.json` already names the new
-   version and `node_modules` exists.
-5. `npm run bundle-all`, then `npm run lint` and `npm run test:jest`. These
-   always run, even when resuming a freeze that got this far before.
-6. Inserts `## [<version>] - <date>` under `## [Unreleased]` in
-   `CHANGELOG.md`, unless that entry already exists.
-7. **Generates the release notes**: turns that changelog entry into a
-   `docs/guide/release-notes.md` entry (`## <version>` +
-   `**Release date: Month D, YYYY**` + the same bullets), unless it's already there.
-8. **Major/minor only:** in `hyperformula-demos` runs `set-hyperformula-version.sh`,
-   commits, pushes, and creates the `M.m.x` branch; then find-replaces the
-   CodeSandbox demo URLs in `docs/`. Skipped entirely for a patch release.
-9. `git add . && git commit -m <version> && git push -u origin release/<version>`
-   — commits only if there is something to commit.
-10. Creates `release/<version>` in `hyperformula-tests` too (the same resume
-    logic as step 1), then `git push -u origin release/<version>` — so the
-    branch is ready for CI and for other developers for the rest of the freeze.
+1. **Gets onto `release/<version>`.** Creates it off `develop` the first time;
+   on a re-run, resumes the existing branch — fast-forwarding a local one, or
+   creating it from origin's when only the remote has it.
+2. **Gives the freeze a branch in `hyperformula-tests` and syncs the suite.**
+   Creates and pushes `release/<version>` there, then points the private test
+   suite at it via `npm run test:setup-private`. The push comes first on purpose:
+   `test/fetch-tests.sh` pulls the matching branch *from origin*, so a branch
+   that existed only locally used to make every resume fail here. Pushing it now
+   also publishes it for CI and for the other developers who add tests during
+   the freeze.
+3. **Sets the version and the release date** — `version` in `package.json` and
+   `HT_RELEASE_DATE` in `ht.config.js`. Each is skipped when it already matches,
+   so a re-run does not rewrite files it already wrote.
+4. **Reinstalls dependencies** and regenerates the lock file — skipped when
+   `package-lock.json` already names the new version *and* `node_modules` exists.
+   Both are required: an interrupted install can leave the lock file written and
+   `node_modules` missing, and skipping then would carry a broken install
+   straight into the build.
+5. **Builds, lints and runs the unit tests.** These always run, even when
+   resuming a freeze that got this far before. The browser suite is left to CI.
+6. **Adds the version section to `CHANGELOG.md`**, directly under
+   `## [Unreleased]` so that the bullets accumulated during development become
+   the new section — unless that section already exists.
+7. **Generates the release notes** from that changelog section: a `## <version>`
+   entry in `docs/guide/release-notes.md` with the release date and the same
+   bullets, unless it is already there. Only the two seams the insert creates are
+   reformatted, so the rest of the file is left exactly as it was.
+8. **Major/minor only — updates the demos and the docs URLs.** In
+   `hyperformula-demos`: sets the HyperFormula version across the demos on
+   `develop`, commits and pushes, then gets onto the `M.m.x` branch (creating it
+   if needed, fast-forwarding it first if it already exists) and makes sure the
+   version bump is on it. Then, in this repository, repoints every CodeSandbox
+   and StackBlitz demo URL in `docs/guide/` and `docs/index.md` — the tracked
+   files that carry them, so the rewrite never descends into generated output
+   like `docs/api/` — at `tree/<M.m.x>`, whatever branch it names today; old
+   releases left several behind. URLs for demos that no longer exist on the
+   current branch stay pinned to the last branch that has them (`vue-demo`, the
+   Vue 2 example replaced by `vue-3-demo` after 2.5.x); if you retire a demo, add
+   it to that list in the script. Skipped entirely for a patch release, where
+   `M.m.x` already names the right branch.
+9. **Commits and pushes the release branch.** Commits only if there is something
+   to commit. Stages **named paths, not `git add .`** — `package.json`,
+   `CHANGELOG.md`, and whichever of `package-lock.json`, `ht.config.js` and
+   `docs/` exist — so unrelated work elsewhere in your tree cannot ride along.
+   These are whole paths, though, not a list of files the run wrote, which is why
+   the preflight refuses to start a fresh freeze on a dirty tree. If you add a
+   step that writes somewhere new, add its path to that list too.
 
 ### What stays manual
 
@@ -111,6 +178,10 @@ are hard to miss in the output:
   [ ] Check that CI is green on release/<version> before publishing (the freeze runs
       the unit tests locally; the browser suite runs in CI on the pushed branch)
 ```
+
+A major release adds an item about testing the demos against the rc build.
+Anything the run could not do is listed in the same box, above these — see
+[Recorded failures](#recorded-failures).
 
 ## Command: `publish`
 
@@ -140,9 +211,9 @@ AND in `hyperformula-tests`; run `code-freeze` first if it doesn't.
 | Flag | Effect |
 |------|--------|
 | `--real-run` | Actually run the commands. Without it, the script only previews (dry run). |
-| `--skip-build` | Skip `npm ci` + `npm run bundle-all` (assumes the on-disk build already matches the release commit). `npm run verify:publish-package` still runs. Meant for a fast resume after a late failure. |
+| `--dry-run` | Preview only. This is the default; the flag exists to override a shell alias. |
+| `--skip-build` | Skip the reinstall and rebuild (assumes the on-disk build already matches the release commit). The package check still runs. Meant for a fast resume after a late failure. |
 | `--demos-dir PATH` | Path to your `hyperformula-demos` clone. |
-| `--tests-dir PATH` | Path to your `hyperformula-tests` clone. |
 | `-h`, `--help` | Show help for this command. |
 
 ### Preflight
@@ -151,45 +222,66 @@ Before changing anything, `publish` checks every hard requirement and exits
 with an error — in a dry run too — if one is not met:
 
 1. This repo is a usable git work tree: `package.json` present, both `master`
-   and `develop` branches exist, and the working tree is clean.
-2. Both sibling clones are usable (see [Before you start](#before-you-start)).
+   and `develop` branches exist, and the working tree is clean — unconditionally
+   here, unlike `code-freeze`, because `publish` never leaves work uncommitted.
+   `npm` and `node` must both be on `PATH`; `node` reads `package.json` off the
+   release ref in check 5.
+2. Both sibling clones are usable, including the demos script this run will
+   execute (see [Before you start](#before-you-start)).
 3. `release/<version>` exists — locally or on origin — in this repo AND in
    `hyperformula-tests`. `publish` finishes a freeze; it never improvises one,
    so a missing branch is an error rather than a step it works around.
-4. If both a local `release/<version>` and `origin/release/<version>` exist in
-   this repo, they must point at the same commit — reconcile them first with
-   `git checkout release/<version> && git pull --ff-only`.
+4. Where both a local `release/<version>` and `origin/release/<version>` exist,
+   they must point at the same commit — otherwise a late fix pushed to the freeze
+   branch would be silently dropped. The error names the commits and how to
+   reconcile them. Checked in both repositories, by the same code, so the two
+   guards cannot drift apart.
 5. `package.json` on `release/<version>` has `version` equal to the version
    you passed.
 6. `npm whoami` succeeds. In a dry run, a failure here doesn't stop the
    preview — it just shows `<not logged in>` in the plan.
+7. `hyperformula-demos` has the `M.m.x` branch. A missing one is noted rather
+   than fatal: step 8 can create it, and by then the release is already out, so
+   refusing there would leave a published package and a dead script. Reporting it
+   in the preflight is what gives you the chance to act. For a major or minor
+   release a missing `M.m.x` means the freeze's demos step never finished, so the
+   CodeSandbox URLs in `docs/` are probably wrong too; for the first patch on a
+   new minor line there may simply be nothing there yet.
+
+The commit `publish` merges is pinned during the preflight, so the later steps
+merge exactly the commit these checks verified, even though pulling along the way
+refreshes the refs.
 
 ### What it does
 
-1. Merges `release/<version>` into `master` (`--no-ff`), unless it is already
-   merged.
-2. Tags `<version>` on `master` — an annotated tag, message = the version —
-   unless that tag already exists and is already in `master`'s history (if it
-   exists anywhere else, the run stops so you can check it).
-3. Merges `release/<version>` into `develop` (`--no-ff`), unless it is already
-   merged.
-4. Checks out `master` and builds: `npm ci` + `npm run bundle-all` (both
-   skipped by `--skip-build`), then always `npm run verify:publish-package`.
-5. Pushes `master`, `develop` and every tag in one atomic push:
-   `git push --atomic origin master develop --tags`.
-6. In `hyperformula-tests`: merges `release/<version>` into `master` and into
-   `develop` there too (no tag — that repo isn't versioned), then
-   `git push --atomic origin master develop`.
-7. **The pause — the only irreversible step.** Unless `hyperformula@<version>`
-   is already on npm, prints the registry and the `npm whoami` user and asks
-   you to type the version back (anything else aborts), then runs
-   `npm publish` and waits up to 60s for the new version to become visible on
-   the registry.
-8. Updates `hyperformula-demos`: fetches, syncs `develop`, runs
-   `update-hyperformula-in-lock-files.sh`, commits if anything changed, and
-   pushes; then gets onto the `M.m.x` branch (creating it if needed) and
-   merges `develop` into it (unless already merged), pushing that too.
-9. Leaves you on `develop` in this repo.
+1. **Merges `release/<version>` into `master`** as a merge commit, unless it is
+   already merged.
+2. **Tags `<version>` on `master`** — an annotated tag, message = the version —
+   unless that tag already exists and is already in `master`'s (or
+   `origin/master`'s) history — the latter so a dry run against a stale local
+   `master` still recognises a tag that is fine on origin. If it exists anywhere
+   else, the run stops so you can check it.
+3. **Merges `release/<version>` into `develop`**, unless already merged.
+4. **Builds and verifies the package** from `master`: reinstall and rebuild
+   (both skipped by `--skip-build`), then always the publish-package check.
+5. **Pushes `master`, `develop` and the tags** in one atomic push, so a rejected
+   `master` cannot leave the tag and `develop` published on their own. This
+   happens before the npm publish, so the commit npm ships is already on origin.
+6. **Merges the release branch back in `hyperformula-tests`**, into both `master`
+   and `develop` there, and pushes both atomically. No tag — that repo is not
+   versioned.
+7. **The pause — the only step that cannot be undone.** Unless
+   `hyperformula@<version>` is already on npm, prints the registry and the
+   `npm whoami` user and asks you to type the version back (anything else
+   aborts), then publishes and waits up to 60s for the new version to become
+   visible on the registry. A plain `x.y.z` publishes under npm's `latest` tag;
+   a version carrying a prerelease suffix (an rc, e.g. `3.5.0-rc.1`) publishes
+   under `next` instead, so `npm install hyperformula` never resolves to it.
+8. **Updates `hyperformula-demos`.** Syncs `develop`, refreshes the lock files,
+   commits if anything changed, and pushes; then gets onto the `M.m.x` branch
+   (fast-forwarding it first) and merges `develop` into it unless already merged,
+   pushing that too. Ends on `develop` there.
+9. **Leaves you on `develop`** in this repo, where the next cycle starts.
 
 ### What stays manual
 
@@ -206,6 +298,36 @@ they are hard to miss in the output:
   [ ] Review the deployed docs and test the demos
 ```
 
+For a prerelease version (an rc — anything not a plain `x.y.z`) the GitHub link
+carries `&prerelease=1` and the checklist reminds you to leave *Set as the latest
+release* unchecked, so the prerelease is not marked latest on GitHub either —
+matching the `next` npm tag from step 7.
+
+## Recorded failures
+
+Both commands record anything you need to act on and re-print it as a `[ ]` item
+at the top of the closing checklist. A single marker line mid-run cannot carry
+that weight — it scrolls past in an output that also holds a full install, build
+and test log. There are two kinds, and only one of them means the run fell short:
+
+- **`!` — the script could not do it.** A step's target file has been
+  restructured, or the `[Unreleased]` section is empty, so the step cannot do its
+  job but the run is still worth finishing. These change the closing banner.
+- **`i` — worth checking.** The run did its job, but something deserves a look:
+  a resume that started from a dirty tree, or a demos version branch `publish`
+  had to create itself. These are listed without changing the banner, so an
+  ordinary resume does not announce itself as a failure.
+
+So `Done - release/<version> is ready for the freeze` (or `Done - <version> is
+released`) means the run did everything it set out to do, whatever is in the
+"worth checking" list. `Finished, but N thing(s) could not be done` means the box
+lists work that is still yours, and for a freeze the release branch needs those
+fixes committed before the freeze is really under way.
+
+The exit status stays 0 either way: these are interactive commands whose output
+*is* the report, and a non-zero exit would make `npm run release` bury the
+highlighted box under its own error block.
+
 ## Notes
 
 - Both commands are re-runnable. Every step checks whether it is already done
@@ -220,25 +342,33 @@ they are hard to miss in the output:
   CodeSandbox URL line it would rewrite (`-` current, `+` replacement).
 - If any step fails, the script stops right there, prints which step failed, and
   runs nothing further.
+- Getting onto a branch is one shared operation, wherever it happens: fetch
+  first, prefer the local branch and fast-forward it, else create it from
+  origin's, else create it from a named base. It never merges to get there, so a
+  branch that has genuinely diverged is an error you get to look at rather than a
+  merge commit invented on `develop` or on a shared version branch.
 - Verification steps (build, lint, tests, and `publish`'s package check)
   always re-run, even on a resumed freeze or a resumed publish — nothing on
   disk proves the build artifacts still match the release commit, and these
   are usually the steps a re-run is retrying anyway. `publish`'s
-  `--skip-build` is the explicit, deliberate override for the slow part
-  (`npm ci` + `npm run bundle-all`); the package check still runs even then.
+  `--skip-build` is the explicit, deliberate override for the slow part; the
+  package check still runs even then.
 - Release notes come straight from the changelog, so keep the `[Unreleased]`
   section tidy during development — that's exactly what becomes the notes.
-- The git-flow steps are translated to plain git: `release start` →
-  `git checkout -b release/<v> develop`; `release publish` →
-  `git push -u origin release/<v>`. `publish` (this script's command) covers
-  the rest of `release finish` — the merges into `master` and `develop`, and
-  the tag — except that it never deletes `release/<v>`; the branch is kept in
-  both repositories.
+- The git-flow steps are translated to plain git: `release start` becomes a
+  branch off `develop`, `release publish` becomes a push. `publish` (this
+  script's command) covers the rest of `release finish` — the merges into
+  `master` and `develop`, and the tag — except that it never deletes
+  `release/<v>`; the branch is kept in both repositories.
 - The way both commands handle `hyperformula-tests` deliberately differs from
   the [ClickUp process doc](https://app.clickup.com/9015210959/v/dc/8cnjcyf-9495/8cnjcyf-12135)
-  linked at the top of this file. See
-  `test/hyperformula-tests/dev_docs/2026-08-03-release-script-publish-command.md`
-  for why the two disagree. The ClickUp doc still needs updating to match.
+  linked at the top of this file: the freeze gives that repo its own
+  `release/<version>` branch and `publish` merges it back, where the doc still
+  describes pointing its `master` at `develop` by hand. The ClickUp doc still
+  needs updating to match.
+- Not automated, and not on either checklist: the ClickUp doc's step of deploying
+  the documentation to staging during the freeze. The checklist item about
+  testing the code examples on staging assumes you have done it.
 
 ## Adding a command later
 
@@ -246,4 +376,5 @@ Each command is a `cmd_<name>` function plus a line in the `case` at the bottom 
 the script, and a `usage_<name>` help function. To add, say, `post-release`: write
 `cmd_post_release()`, add `post-release) cmd_post_release "$@" ;;` to the dispatch,
 and list it in `usage_top`. (`cmd_code_freeze` and `cmd_publish` already follow
-this shape — use either as a reference.)
+this shape — use either as a reference.) Call `start_warning_register` first if
+the command has any step that can fail softly.
