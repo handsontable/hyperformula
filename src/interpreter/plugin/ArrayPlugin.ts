@@ -3,6 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {AbsoluteCellRange} from '../../AbsoluteCellRange'
 import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType} from '../../Cell'
 import {ErrorMessage} from '../../error-message'
@@ -228,6 +229,18 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const columnsToTake = Math.min(Math.abs(requestedColumns), sourceWidth)
         const startRow = requestedRows > 0 ? 0 : sourceHeight - rowsToTake
         const startColumn = requestedColumns > 0 ? 0 : sourceWidth - columnsToTake
+        const sourceRange = range.range
+
+        // Keep address-backed ranges lazy to avoid materializing cells outside the TAKE result.
+        if (sourceRange !== undefined) {
+          const resultRange = AbsoluteCellRange.spanFrom(
+            sourceRange.getAddress(startColumn, startRow),
+            columnsToTake,
+            rowsToTake,
+          )
+          return SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph)
+        }
+
         const result = range.data
           .slice(startRow, startRow + rowsToTake)
           .map(row => row.slice(startColumn, startColumn + columnsToTake))
