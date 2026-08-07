@@ -66,6 +66,7 @@ export class ErrorMessage {
   public static IncorrectDateTime = 'String does not represent correct DateTime.'
   public static CharacterCodeBounds = 'Character code out of bounds.'
   public static NonZero = 'Argument cannot be 0.'
+  public static ZeroRowOrColumnCount = 'Row or column count cannot be zero.'
   public static LessThanOne = 'Argument cannot be less than 1.'
   public static WeekendString = 'Incorrect weekend bitmask string.'
   public static InvalidRoman = 'Invalid roman numeral.'

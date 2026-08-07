@@ -23,7 +23,7 @@
  * placeholder.
  */
 
-import {FunctionMetadata, FunctionArgument} from '../plugin/FunctionPlugin'
+import {FunctionMetadata, FunctionArgument, isFunctionArgumentOptional} from '../plugin/FunctionPlugin'
 import {CUSTOM_FUNCTION_CATEGORY, FunctionDoc, FunctionListEntry, FunctionDetails, FunctionParameterDescription} from './FunctionDescription'
 
 /** Resolves a function's display name: the translation for the active language, or the canonical id as fallback. */
@@ -33,12 +33,14 @@ type TranslateName = (canonicalName: string) => string | undefined
 export type StructuralMetadata = Pick<FunctionMetadata, 'parameters' | 'repeatLastArgs'>
 
 /**
- * Returns whether a parameter may be omitted: it declares `optionalArg`, or it has a `defaultValue`.
+ * Returns whether a parameter may be omitted. An explicit `optionalArg`
+ * declaration takes precedence; otherwise, a `defaultValue` makes the
+ * parameter optional.
  *
  * @param {FunctionArgument | undefined} arg - the structural argument metadata, or `undefined`
  */
 export function isParameterOptional(arg: FunctionArgument | undefined): boolean {
-  return arg?.optionalArg === true || arg?.defaultValue !== undefined
+  return isFunctionArgumentOptional(arg)
 }
 
 /**

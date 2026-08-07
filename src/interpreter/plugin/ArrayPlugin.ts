@@ -49,8 +49,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: false, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
       ],
       vectorizationForbidden: true,
     },
@@ -188,19 +188,18 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @param state
    */
   public take(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    const rowsArg = ast.args[1]
-    const columnsArg = ast.args[2]
-    const rowsIsEmpty = rowsArg?.type === AstNodeType.EMPTY
-    const columnsIsMissingOrEmpty = columnsArg === undefined || columnsArg.type === AstNodeType.EMPTY
-
     return this.runFunction(ast.args, state, this.metadata('TAKE'),
-      (range: SimpleRangeValue, rows: number, columns: number | undefined) => {
+      (range: SimpleRangeValue, rows: number, columns: number) => {
         const sourceHeight = range.height()
         const sourceWidth = range.width()
-        const requestedRows = rowsIsEmpty ? sourceHeight : Math.trunc(rows)
-        const requestedColumns = columnsIsMissingOrEmpty || columns === undefined ? sourceWidth : Math.trunc(columns)
+        const requestedRows = Math.trunc(rows)
+        const requestedColumns = Math.trunc(columns)
 
-        if (requestedRows === 0 || requestedColumns === 0 || sourceHeight === 0 || sourceWidth === 0) {
+        if (requestedRows === 0 || requestedColumns === 0) {
+          return new CellError(ErrorType.CALC, ErrorMessage.ZeroRowOrColumnCount)
+        }
+
+        if (sourceHeight === 0 || sourceWidth === 0) {
           return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
         }
 
