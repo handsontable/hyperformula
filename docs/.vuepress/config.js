@@ -8,6 +8,11 @@ const includeCodeSnippet = require('./plugins/markdown-it-include-code-snippet')
 const mdCompanions = require('./plugins/md-companions');
 
 const searchPattern = new RegExp('^/api', 'i');
+// Pages generated at build time have no editable source file in the repository, so the "edit this page" link would
+// point at a path that does not exist. The built-in functions page is spliced together from
+// built-in-functions.tmpl.md and the function metadata catalogue (see docs/README.md).
+// Anchored, so a hand-written sibling page (e.g. /guide/built-in-functions-faq) keeps its edit link.
+const generatedPagePattern = new RegExp('^/guide/built-in-functions(\\.html)?$', 'i');
 
 // Build configuration (override via env vars or docs/.vuepress/build.config.js)
 const buildConfigOverrides = (() => {
@@ -30,6 +35,10 @@ const DOCS_DEST = process.env.DOCS_DEST || buildConfigOverrides.dest || 'docs/.v
 const DOCS_HOSTNAME = process.env.DOCS_HOSTNAME || buildConfigOverrides.hostname || 'https://hyperformula.handsontable.com';
 
 module.exports = {
+  // Default page globs, minus the built-in-functions template: it is the INPUT of docs:generate-function-docs,
+  // not a page, and without this exclusion VuePress would publish it as a duplicate, table-less
+  // /guide/built-in-functions.tmpl.html (also polluting the sitemap, search index, and llms.txt corpus).
+  patterns: ['**/*.md', '**/*.vue', '!guide/built-in-functions.tmpl.md'],
   title: 'HyperFormula (v' + HyperFormula.version + ')',
   description: 'HyperFormula is an open-source, high-performance calculation engine for spreadsheets and web applications.',
   head: [
@@ -103,9 +112,13 @@ module.exports = {
         // inject current HF releaseDate as {{ $page.releaseDate }} variable
         $page.releaseDate = HyperFormula.releaseDate
         // inject current HF function count as {{ $page.functionsCount }} variable
+        // This total and the rows of the built-in functions page come from two different sources: the count below,
+        // and getAvailableFunctions via script/renderBuiltinFunctionsTable.ts. They agree today (423 each) and must
+        // be kept in step by hand, or the page prints a total that contradicts the number of rows under it. The
+        // renderer throws on the one divergence it can see from its side; this side cannot detect any.
         $page.functionsCount = HyperFormula.getRegisteredFunctionNames('enGB').length
 
-        if (searchPattern.test($page.path)) {
+        if (searchPattern.test($page.path) || generatedPagePattern.test($page.path)) {
           $page.frontmatter.editLink = false
         }
       },
