@@ -226,7 +226,7 @@ const dictionary: RawTranslationPackage = {
     SWITCH: '',
     SYD: 'ÅRSAVSKR',
     T: 'T',
-    TAKE: 'TAKE',
+    TAKE: 'TA',
     TAN: 'TAN',
     TANH: 'TANH',
     TBILLEQ: 'SSVXEKV',
