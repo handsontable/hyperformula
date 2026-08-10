@@ -24,16 +24,23 @@ const TEMPLATE_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.tmpl.m
 const DOC_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
 /**
- * The GPLv3 key, which grants the complete function set. The metadata API is instance-scoped, so this page is
- * generated against an engine rather than against the package, and the engine's entitlement therefore decides which
- * functions reach the page. Naming the fully-entitled key here — instead of leaving it to whatever key the build
- * environment happens to supply — is what keeps the published reference documenting every built-in rather than
- * narrowing to one tier (HF-349).
+ * The GPLv3 key. Two reasons to name a key here, one current and one not yet:
+ *
+ * - Today it only keeps the build quiet. Function availability is **not** license-gated: every key, and no key at
+ *   all, yields the same function set. But the metadata API is instance-scoped, so this page is now generated from
+ *   an engine, and constructing one without a key logs "The license key for HyperFormula is missing." — noise the
+ *   static path never produced, because it built no engine.
+ * - Once entitlement lands (HF-307), the engine's key *will* decide which functions the metadata API reports.
+ *   Naming the fully-entitled key now means that change cannot silently narrow the published reference to one tier;
+ *   the page must always document the complete function set (HF-349).
  */
 const LICENSE_KEY = 'gpl-v3'
 
 /** Reads the committed template and returns the page with both generated regions spliced in. */
 function buildUpdatedFile(): string {
+  // Deliberately a default-config engine: its registry must stay the global one, because the function total printed
+  // on the page is computed separately, from the global registry, in docs/.vuepress/config.js. Restricting this
+  // engine with `functionPlugins` would give the table a different function set from the total above it.
   const engine = HyperFormula.buildEmpty({language: LANGUAGE, licenseKey: LICENSE_KEY})
   const entries = engine.getAvailableFunctions()
   const detailsFor = (canonicalName: string) => engine.getFunctionDetails(canonicalName)

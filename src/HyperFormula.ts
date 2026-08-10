@@ -4508,6 +4508,10 @@ export class HyperFormula implements TypedEmitter {
    * function id, so a custom plugin registered *over* a built-in id inherits that id's entry and is listed with the
    * built-in's category and description.
    *
+   * That registry is a snapshot taken when the instance was built, not a live view of the global one: a function
+   * registered with [[registerFunctionPlugin]] or [[registerFunction]] afterwards reaches only the engines built
+   * later, so an engine kept across a late registration keeps reporting the set it was built with.
+   *
    * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
    * an untranslated id, so listing it would advertise a function that cannot be called — in practice, a custom
    * plugin registered without translations for that language. A translation set to an empty string is not a missing
