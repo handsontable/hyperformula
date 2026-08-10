@@ -81,6 +81,10 @@ The built-in functions guide page `docs/guide/built-in-functions.md` is a **buil
   HyperFormula's API (`getAvailableFunctions`/`getFunctionDetails`), i.e. from the catalogue in
   `src/interpreter/functionMetadata/`, in a single pass &mdash; so the list links to exactly the sections the page has.
 
+That API is instance-scoped, so the generator builds an engine to read it. It builds that engine with the `gpl-v3`
+license key, which grants the complete function set: the published reference must document every built-in rather than
+narrow to the tier of whichever key the build environment happens to supply.
+
 `npm run docs:generate-function-docs` splices both regions into the template and writes the gitignored page; it runs
 automatically as the first step of `npm run docs:build` and `npm run docs:dev`. To change the wording, edit the
 template; to change a function's row, edit its catalogue metadata.

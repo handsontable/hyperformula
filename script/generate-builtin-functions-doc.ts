@@ -23,11 +23,20 @@ const REPO_ROOT = path.resolve(__dirname, '..')
 const TEMPLATE_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.tmpl.md')
 const DOC_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
+/**
+ * The GPLv3 key, which grants the complete function set. The metadata API is instance-scoped, so this page is
+ * generated against an engine rather than against the package, and the engine's entitlement therefore decides which
+ * functions reach the page. Naming the fully-entitled key here — instead of leaving it to whatever key the build
+ * environment happens to supply — is what keeps the published reference documenting every built-in rather than
+ * narrowing to one tier (HF-349).
+ */
+const LICENSE_KEY = 'gpl-v3'
 
 /** Reads the committed template and returns the page with both generated regions spliced in. */
 function buildUpdatedFile(): string {
-  const entries = HyperFormula.getAvailableFunctions(LANGUAGE)
-  const detailsFor = (canonicalName: string) => HyperFormula.getFunctionDetails(canonicalName, LANGUAGE)
+  const engine = HyperFormula.buildEmpty({language: LANGUAGE, licenseKey: LICENSE_KEY})
+  const entries = engine.getAvailableFunctions()
+  const detailsFor = (canonicalName: string) => engine.getFunctionDetails(canonicalName)
   const generated = renderBuiltinFunctionsMarkdown(entries, detailsFor)
   const template = fs.readFileSync(TEMPLATE_PATH, 'utf8')
   return spliceBuiltinFunctionsMarkdown(template, generated)
