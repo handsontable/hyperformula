@@ -4334,6 +4334,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} formulaString - A formula in a proper format, starting with `=`.
    * @param {number} sheetId - The ID of a sheet in context of which the formula gets evaluated.
+   * @param {number} col - The column of cell where the formula gets evaluated
+   * @param {number} row - The row of cell where the formula gets evaluated
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type arguments is of wrong type.
    * @throws [[NotAFormulaError]] when the provided string is not a valid formula (i.e., doesn't start with `=`).
@@ -4356,11 +4358,11 @@ export class HyperFormula implements TypedEmitter {
    *
    * @category Helpers
    */
-  public calculateFormula(formulaString: string, sheetId: number): CellValue | CellValue[][] {
+  public calculateFormula(formulaString: string, sheetId: number, col?: number, row?: number): CellValue | CellValue[][] {
     validateArgToType(formulaString, 'string', 'formulaString')
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.ensureScopeIdIsValid(sheetId)
-    const {ast, address, dependencies} = this.extractTemporaryFormula(formulaString, sheetId)
+    const {ast, address, dependencies} = this.extractTemporaryFormula(formulaString, sheetId, col, row)
     if (ast === undefined) {
       throw new NotAFormulaError()
     }
@@ -4772,9 +4774,9 @@ export class HyperFormula implements TypedEmitter {
    *
    * @internal
    */
-  private extractTemporaryFormula(formulaString: string, sheetId: number = 1): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
+  private extractTemporaryFormula(formulaString: string, sheetId: number = 1, col?: number, row?: number): { ast?: Ast, address: SimpleCellAddress, dependencies: RelativeDependency[] } {
     const parsedCellContent = this._cellContentParser.parse(formulaString)
-    const address = {sheet: sheetId, col: 0, row: 0}
+    const address = {sheet: sheetId, col: col ?? 0, row: row ?? 0}
     if (!(parsedCellContent instanceof CellContent.Formula)) {
       return {address, dependencies: []}
     }
