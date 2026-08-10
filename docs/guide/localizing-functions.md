@@ -1,0 +1,127 @@
+# Localizing functions
+
+You can localize a function's ID and error
+messages. Currently, HyperFormula supports 18 languages, with British English
+as the default.
+
+To change the language all you need to do is import and
+register the language like so:
+
+```javascript
+// import the French language pack
+import frFR from 'hyperformula/i18n/languages/frFR';
+
+// register the language
+HyperFormula.registerLanguage('frFR', frFR);
+```
+
+> To import the language packs, use the module-system-specific dedicated bundles at:
+> * **ES**: `hyperformula/i18n/languages/`
+> * **CommonJS**: `hyperformula/i18n/languages/`
+> * **UMD**: `hyperformula/dist/languages/`
+>
+> For the UMD build, the languages are accessible through `HyperFormula.languages`, e.g., `HyperFormula.languages.frFR`.
+
+Then set it inside it the [configuration options](configuration-options.md):
+
+```javascript
+// configure the instance
+const options = {
+  language: 'frFR'
+};
+```
+
+Language pack names should be passed as strings. They follow a
+naming convention that incorporates two standards: ISO-639 and
+ISO-3166-1. The pattern is `languageCOUNTRY`, for
+example `enUS`, `enGB`, `frFR`,  etc.
+
+You can freely use the localized names: `SUM` can be written as
+`SOMME` and the functionality of the function will remain the same.
+
+Here are some example functions and their translations in French:
+
+```javascript
+// localized functions
+functions: {
+  MATCH: 'EQUIV',
+  CORREL: 'COEFFICIENT.CORRELATION',
+  AVERAGE: 'MOYENNE'
+},
+```
+
+Same goes for the [errors](types-of-errors.md) displayed inside
+cells when something goes wrong:
+
+```javascript
+// localized errors
+errors: {
+  CYCLE: '#CYCLE!',
+  DIV_BY_ZERO: '#DIV/0!',
+  ERROR: '#ERROR!',
+  NA: '#N/A',
+  NAME: '#NOM?',
+  NUM: '#NOMBRE!',
+  REF: '#REF!',
+  VALUE: '#VALEUR!',
+}
+```
+
+## Creating a custom language pack
+
+If your desired language is not in the list of supported languages, you can create a custom language pack:
+
+```javascript
+// Create a language pack object
+const spanish = {
+  errors: {
+    NAME: '#¿NOMBRE?',
+    // ...
+  },
+  functions: {
+    SUM: 'SUMA',
+    IF: 'SI',
+    // ...
+  },
+  langCode: 'es', // Your custom language code
+  ui: {
+    NEW_SHEET_PREFIX: 'Sheet',
+  },
+};
+
+// Register your language
+HyperFormula.registerLanguage('es', spanish);
+
+// Use it in your configuration
+const hf = HyperFormula.buildEmpty({
+  language: 'es'
+});
+```
+
+> You can use an existing language pack as a template. Check the [language files in the repository](https://github.com/handsontable/hyperformula/tree/master/src/i18n/languages) to see complete examples with all available functions.
+
+## Localizing custom functions
+
+You can localize your custom functions as well. For details, see the [Custom functions](custom-functions.md#function-name-translations) guide.
+
+### List of supported languages
+| Language name    | Language code |
+|:-----------------|:--------------|
+| British English  | enGB          |
+| American English | enUS          |
+| Czech            | csCZ          |
+| Danish           | daDK          |
+| Dutch            | nlNL          |
+| Finnish          | fiFI          |
+| French           | frFR          |
+| German           | deDE          |
+| Hungarian        | huHU          |
+| Italian          | itIT          |
+| Norwegian        | nbNO          |
+| Polish           | plPL          |
+| Portuguese       | ptPT          |
+| Russian          | ruRU          |
+| Spanish          | esES          |
+| Swedish          | svSE          |
+| Turkish          | trTR          |
+| Indonesian       | idID          |
