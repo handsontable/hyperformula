@@ -81,13 +81,6 @@ The built-in functions guide page `docs/guide/built-in-functions.md` is a **buil
   HyperFormula's API (`getAvailableFunctions`/`getFunctionDetails`), i.e. from the catalogue in
   `src/interpreter/functionMetadata/`, in a single pass &mdash; so the list links to exactly the sections the page has.
 
-That API is instance-scoped, so the generator builds an engine to read it &mdash; a default-config one, because the
-function total printed on the page is computed separately, from the global registry, in `docs/.vuepress/config.js`.
-The engine is built with the `gpl-v3` license key. Today that only keeps the build quiet (an engine built without a
-key logs a missing-license warning); function availability is not license-gated. Once entitlement lands, the key will
-decide which functions the metadata API reports, and naming the fully-entitled one here is what keeps the published
-reference documenting every built-in instead of narrowing to a tier.
-
 `npm run docs:generate-function-docs` splices both regions into the template and writes the gitignored page; it runs
 automatically as the first step of `npm run docs:build` and `npm run docs:dev`. To change the wording, edit the
 template; to change a function's row, edit its catalogue metadata.
