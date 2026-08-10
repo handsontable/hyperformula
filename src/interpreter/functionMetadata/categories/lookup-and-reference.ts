@@ -39,6 +39,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=COLUMNS(A1:C5)', '=COLUMNS(A1:F1)'],
   },
+  FILTER: {
+    category: 'Lookup and reference',
+    shortDescription: 'Filters an array, based on multiple conditions (boolean arrays).',
+    parameters: [{name: 'source_array', description: 'The range of values to filter; it must be a single row or a single column (a two-dimensional range is not supported).'}, {name: 'bool_array1', description: 'A range of boolean values, with the same dimensions as source_array, marking which rows or columns to keep; only entries where every boolean array is TRUE are returned. Further boolean arrays can be passed as additional arguments, and all of them must evaluate to TRUE for an entry to be kept.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=FILTER(A1:C1, A2:C2)', '=FILTER(A1:A5, A1:A5>10)', '=FILTER(A1:C1, A2:C2, A3:C3)'],
+  },
   FORMULATEXT: {
     category: 'Lookup and reference',
     shortDescription: 'Returns a formula in a given cell as a string.',
@@ -52,6 +59,13 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     parameters: [{name: 'search_criterion', description: 'The value to search for in the first row of array.'}, {name: 'array', description: 'The range to search, with values compared against its first row.'}, {name: 'index', description: 'The row number within array (counting from 1) whose value in the matching column is returned.'}, {name: 'sort_order', description: 'TRUE (default) performs an approximate match against ascending-sorted data, FALSE performs an exact match.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=HLOOKUP("apple", A1:D5, 3, FALSE())', '=HLOOKUP(5, A1:F2, 2)'],
+  },
+  HSTACK: {
+    category: 'Lookup and reference',
+    shortDescription: 'Stacks arrays horizontally into a single array.',
+    parameters: [{name: 'array1', description: 'A range or array to stack. Further ranges or arrays can be passed as additional arguments; they are stacked left to right into one array.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=HSTACK(A1:A3, B1:B3)', '=HSTACK(A1:B2, C1:D2)'],
   },
   HYPERLINK: {
     category: 'Lookup and reference',
@@ -100,12 +114,40 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=ROWS(A1:C5)', '=ROWS(A1:A9)'],
   },
+  SORT: {
+    category: 'Lookup and reference',
+    shortDescription: 'Sorts the rows or columns of an array.',
+    parameters: [{name: 'array', description: 'The range or array whose rows (or columns) are sorted.'}, {name: 'sort_index', description: 'The 1-based row or column index within array to sort by. Defaults to 1 (the first row or column).'}, {name: 'sort_order', description: '1 (default) sorts in ascending order; -1 sorts in descending order.'}, {name: 'by_col', description: 'FALSE (default) sorts the rows of array; TRUE sorts its columns.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=SORT(A1:A10)', '=SORT(A1:B10, 2, -1)'],
+  },
+  TRANSPOSE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Transposes the rows and columns of an array.',
+    parameters: [{name: 'array', description: 'The range of cells whose rows and columns are swapped in the returned array.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=TRANSPOSE(A1:C2)', '=TRANSPOSE(A1:A5)'],
+  },
+  UNIQUE: {
+    category: 'Lookup and reference',
+    shortDescription: 'Returns the unique rows or columns of an array.',
+    parameters: [{name: 'array', description: 'The range or array to return distinct entries from.'}, {name: 'by_col', description: 'FALSE (default) compares and returns rows; TRUE compares and returns columns.'}, {name: 'exactly_once', description: 'FALSE (default) returns every distinct entry once; TRUE returns only the entries that appear exactly once in array.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=UNIQUE(A1:A10)', '=UNIQUE(A1:B10)'],
+  },
   VLOOKUP: {
     category: 'Lookup and reference',
     shortDescription: 'Searches vertically with reference to adjacent cells to the right.',
     parameters: [{name: 'search_criterion', description: 'The value to search for in the first column of array.'}, {name: 'array', description: 'The range to search, with values compared against its first column.'}, {name: 'index', description: 'The column number within array (counting from 1) whose value in the matching row is returned.'}, {name: 'sort_order', description: 'TRUE (default) performs an approximate match against ascending-sorted data, FALSE performs an exact match.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=VLOOKUP("apple", A1:B10, 2, FALSE())', '=VLOOKUP(5, A1:C10, 3)'],
+  },
+  VSTACK: {
+    category: 'Lookup and reference',
+    shortDescription: 'Stacks arrays vertically into a single array.',
+    parameters: [{name: 'array1', description: 'A range or array to stack. Further ranges or arrays can be passed as additional arguments; they are stacked top to bottom into one array.'}],
+    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
+    examples: ['=VSTACK(A1:B2, A3:B4)', '=VSTACK(A1:C1, A2:C2)'],
   },
   XLOOKUP: {
     category: 'Lookup and reference',

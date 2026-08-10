@@ -108,7 +108,6 @@ If your callback throws, HyperFormula propagates the exception. Wrap your format
 
 This adapter handles a representative subset of popular currency format strings using native [`Intl.NumberFormat`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat). Extend the `LCID_TO_LOCALE` map to cover more locales — see the [MS-LCID](https://learn.microsoft.com/openspecs/windows_protocols/ms-lcid) specification for canonical identifiers.
 
-<!-- snippet:currency-adapter -->
 ```javascript
 // Extend the LCID_TO_LOCALE map and CURRENCY_RULES list to cover more formats.
 
@@ -188,7 +187,6 @@ export const customStringifyCurrency = (value, currencyFormat) => {
   return undefined
 }
 ```
-<!-- /snippet:currency-adapter -->
 
 #### Limitations of the reference adapter
 
