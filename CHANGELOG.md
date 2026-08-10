@@ -7,6 +7,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-08-10
+
+### Added
+
+- Added the `getAvailableFunctions()` and `getFunctionDetails()` instance methods for retrieving function metadata. [#1692](https://github.com/handsontable/hyperformula/pull/1692)
+- Added new functions: VSTACK, HSTACK. [#1698](https://github.com/handsontable/hyperformula/pull/1698)
+- Added a new function: `XIRR`. [#1701](https://github.com/handsontable/hyperformula/pull/1701)
+- Added the UNIQUE function. [#1708](https://github.com/handsontable/hyperformula/pull/1708)
+- Added the SORT function. [#1707](https://github.com/handsontable/hyperformula/pull/1707)
+- Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
+- Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
+
+### Fixed
+
+- Fixed the behavior of `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions when the search range contained empty cells. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
+- Fixed the `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions to return `0` instead of an empty value when the matched cell in the result range is empty. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
+- Fixed the page freezing when entering a long string of digits containing a non-digit character near the end (e.g. `012...789a` or `012...789 123`) into a cell. [#1520](https://github.com/handsontable/hyperformula/issues/1520)
+
 ## [3.3.0] - 2026-05-20
 
 ### Added

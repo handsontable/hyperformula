@@ -45,6 +45,10 @@ import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
+import {FUNCTION_DOCS} from './interpreter/functionMetadata'
+import {buildCustomFunctionDetails, buildCustomFunctionListEntry, buildFunctionDetails, buildFunctionListEntry, StructuralMetadata} from './interpreter/functionMetadata/buildFunctionDescriptions'
+import {FunctionDetails, FunctionDoc, FunctionListEntry} from './interpreter/functionMetadata/FunctionDescription'
+import {PROTECTED_FUNCTION_METADATA} from './interpreter/functionMetadata/protectedFunctionMetadata'
 import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/FunctionRegistry'
 import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
@@ -650,6 +654,115 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Resolves the structural metadata and catalogue doc for a registered function id, following aliases to their
+   * target. Returns `undefined` only when the id is not registered. The catalogue doc is attached whenever the
+   * catalogue holds an entry for the resolved id, whichever plugin currently provides it: the catalogue is keyed by
+   * id, not by implementation, so a user-registered plugin that shadows a built-in id inherits that built-in's
+   * authored metadata. When the catalogue has no entry for the id, `doc` is `undefined`, only the structural
+   * metadata is available, and the function is described as custom. Shared by the list and the details builders so
+   * they always agree.
+   *
+   * A catalogue doc whose parameter count disagrees with the implementation is still returned, not withheld:
+   * [[buildFunctionDetails]] resolves the disagreement in the implementation's favour, reporting its arguments
+   * positionally and warning. Every function a user can call is therefore described, and catalogue drift costs the
+   * parameter prose rather than the whole entry.
+   *
+   * The returned `aliasOf` is the target's id when `functionId` is an alias, else `undefined`. It is derived here
+   * rather than at each call site so the list and the details report the alias relation identically.
+   *
+   * @param {string} functionId - the language-independent function id (canonical id or alias)
+   * @param {FunctionPluginDefinition | undefined} plugin - the plugin registered for `functionId`, or `undefined`
+   */
+  private static resolveFunctionMetadata(functionId: string, plugin: FunctionPluginDefinition | undefined): { doc: FunctionDoc | undefined, metadata: StructuralMetadata, aliasOf: string | undefined } | undefined {
+    // Protected ids (VERSION, OFFSET) are excluded from the plugin registry by design (`getFunctionPlugin` always
+    // returns `undefined` for them), so they would otherwise fall straight into the `plugin === undefined` case
+    // below and disappear from the metadata API. They must still be described, because a user can call them from a
+    // formula: resolve them here from the authored catalogue doc and structural metadata instead of from a plugin.
+    // A protected id stays unlisted unless BOTH are authored — requiring the structural metadata keeps
+    // `buildFunctionDetails` from reading `repeatLastArgs`/`parameters` off `undefined` if a protected id is ever
+    // added to one map only (fail-safe: the function is omitted rather than crashing the metadata API).
+    if (FunctionRegistry.functionIsProtected(functionId) && FUNCTION_DOCS[functionId] !== undefined && PROTECTED_FUNCTION_METADATA[functionId] !== undefined) {
+      // A protected id is never an alias, so it resolves to itself.
+      return {doc: FUNCTION_DOCS[functionId], metadata: PROTECTED_FUNCTION_METADATA[functionId], aliasOf: undefined}
+    }
+    if (plugin === undefined) {
+      return undefined
+    }
+    // An alias shares its target's implementation metadata and catalogue doc, but keeps its own (alias) name.
+    const metadataKey = plugin.aliases?.[functionId] ?? functionId
+    const metadata = plugin.implementedFunctions[metadataKey]
+    if (metadata === undefined) {
+      return undefined
+    }
+    // Use the catalogue doc only if one exists for this function id.
+    const doc = FUNCTION_DOCS[metadataKey]
+    return {doc, metadata, aliasOf: metadataKey !== functionId ? metadataKey : undefined}
+  }
+
+  /**
+   * Builds the function list for every id registered in an engine's own registry. Documented functions use their
+   * catalogue entry; custom functions are listed with their name only. Sorted by localized name with
+   * `localeCompare`, so the order follows the host's collation rules, with the language-independent canonical name
+   * as a stable tiebreaker for entries that share a localized name.
+   *
+   * Takes the [[TranslationPackage]] rather than deriving it from a language code: an instance must describe its
+   * functions under the package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
+   * when the instance was built and can differ from whatever is registered globally for the same code today.
+   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate.
+   *
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, the source of both the ids and their plugins
+   * @param {TranslationPackage} language - the translation package to translate the names under
+   */
+  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionListEntry[] {
+    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    return functionRegistry.getListableFunctionIds()
+      // The interpreter refuses to evaluate ids the active language has no translation entry for
+      // (FunctionRegistry.getFunction), so an untranslated function would be advertised but uncallable.
+      .filter(id => language.isFunctionTranslated(id))
+      .map(id => {
+        const resolved = HyperFormula.resolveFunctionMetadata(id, functionRegistry.getFunctionPlugin(id))
+        if (resolved === undefined) {
+          return undefined
+        }
+        // An alias borrows its target's category and description, so the alias->target relation is surfaced as
+        // `aliasOf` here too — a picker can group or annotate the aliases straight from the list, without one
+        // getFunctionDetails call per entry.
+        return resolved.doc !== undefined
+          ? buildFunctionListEntry(id, resolved.doc, translate, resolved.aliasOf)
+          : buildCustomFunctionListEntry(id, translate, resolved.aliasOf)
+      })
+      .filter((entry): entry is FunctionListEntry => entry !== undefined)
+      .sort((a, b) => a.localizedName.localeCompare(b.localizedName) || a.canonicalName.localeCompare(b.canonicalName))
+  }
+
+  /**
+   * Builds the full details for a single id registered in an engine's own registry, or `undefined` when it is
+   * unknown/not registered. Documented functions use their catalogue entry; custom functions report their
+   * structural metadata only.
+   *
+   * @param {string} functionId - the language-independent function id (canonical id or alias)
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the id to its plugin
+   * @param {TranslationPackage} language - the translation package to translate the names under
+   */
+  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionDetails | undefined {
+    // Mirrors the filter in buildAvailableFunctions: an id the active language cannot evaluate
+    // (no translation entry) gets no details either, so the list and the details always agree.
+    if (!language.isFunctionTranslated(functionId)) {
+      return undefined
+    }
+    const resolved = HyperFormula.resolveFunctionMetadata(functionId, functionRegistry.getFunctionPlugin(functionId))
+    if (resolved === undefined) {
+      return undefined
+    }
+    const translate = (id: string) => language.getMaybeFunctionTranslation(id)
+    // An alias borrows the target's metadata (including examples, which spell the target's name), so the
+    // alias->target relation is surfaced as `aliasOf` for consumers to detect and explain the difference.
+    return resolved.doc !== undefined
+      ? buildFunctionDetails(functionId, resolved.doc, resolved.metadata, translate, resolved.aliasOf)
+      : buildCustomFunctionDetails(functionId, resolved.metadata, translate, resolved.aliasOf)
+  }
+
+  /**
    * @internal
    */
   private static buildFromEngineState(engine: EngineState): HyperFormula {
@@ -995,15 +1108,19 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns formulas or values of all sheets in a form of an object which property keys are strings and values are 2D arrays of [[RawCellContent]].
    *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type.
+   * For example, a cell set with the string `'1'` is serialized as the string `'1'`, while a cell set with the number `1` is serialized as the number `1`.
+   *
    * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
    *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['1', '2', '=A1+10'],
+   *  ['1', 2, '=A1+10'],
    * ]);
    *
-   * // should return all sheets serialized content: { Sheet1: [ [ 1, 2, '=A1+10' ] ] }
+   * // should return all sheets serialized content: { Sheet1: [ [ '1', 2, '=A1+10' ] ] }
+   * // note: the string '1' stays a string and the number 2 stays a number
    * const allSheetsSerialized = hfInstance.getAllSheetsSerialized();
    * ```
    *
@@ -1385,7 +1502,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders rows of a sheet according to a permutation of 0-based indexes.
-   * Parameter `newRowOrder` should have a form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`.
+   *
+   * Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`.
+   * In other words, the value at index `i` is the new position for the row that is currently at index `i`.
+   * Note that this is the opposite of `[ previousPositionForRow0, previousPositionForRow1, ... ]`.
+   *
    * This method might be used to [sort the rows of a sheet](../../guide/sorting-data.md).
    *
    * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
@@ -1407,15 +1528,15 @@ export class HyperFormula implements TypedEmitter {
    * const hfInstance = HyperFormula.buildFromArray([
    *  ['A'],
    *  ['B'],
-   *  ['C'],
-   *  ['D']
+   *  ['C']
    * ]);
    *
-   * const newRowOrder = [0, 3, 2, 1]; // [ newPosForA, newPosForB, newPosForC, newPosForD ]
+   * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
+   * const newRowOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
    *
    * const changes = hfInstance.setRowOrder(0, newRowOrder);
    *
-   * // Sheet after this operation: [['A'], ['D'], ['C'], ['B']]
+   * // Sheet after this operation: [['C'], ['A'], ['B']]
    * ```
    *
    * @category Rows
@@ -1429,6 +1550,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Checks if it is possible to reorder rows of a sheet according to a permutation.
    *
+   * Parameter `newRowOrder` should have the form `[ newPositionForRow0, newPositionForRow1, newPositionForRow2, ... ]`,
+   * i.e. the value at index `i` is the new position for the row that is currently at index `i`.
+   * See [[setRowOrder]] for details.
+   *
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {number[]} newRowOrder - permutation of rows
    *
@@ -1437,15 +1562,15 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  [1],
-   *  [2],
-   *  [4, 5],
+   *  ['A'],
+   *  ['B'],
+   *  ['C']
    * ]);
    *
    * // returns true
-   * hfInstance.isItPossibleToSetRowOrder(0, [2, 1, 0]);
+   * hfInstance.isItPossibleToSetRowOrder(0, [1, 2, 0]);
    *
-   * // returns false
+   * // returns false (array length must match the number of rows)
    * hfInstance.isItPossibleToSetRowOrder(0, [2]);
    * ```
    *
@@ -1550,7 +1675,11 @@ export class HyperFormula implements TypedEmitter {
 
   /**
    * Reorders columns of a sheet according to a permutation of 0-based indexes.
-   * Parameter `newColumnOrder` should have a form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`.
+   *
+   * Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`.
+   * In other words, the value at index `i` is the new position for the column that is currently at index `i`.
+   * Note that this is the opposite of `[ previousPositionForColumn0, previousPositionForColumn1, ... ]`.
+   *
    * This method might be used to [sort the columns of a sheet](../../guide/sorting-data.md).
    *
    * Returns [an array of cells whose values changed as a result of this operation](/guide/basic-operations.md#changes-array).
@@ -1570,14 +1699,15 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *   ['A', 'B', 'C', 'D']
+   *   ['A', 'B', 'C']
    * ]);
    *
-   * const newColumnOrder = [0, 3, 2, 1]; // [ newPosForA, newPosForB, newPosForC, newPosForD ]
+   * // Move 'A' to index 1, 'B' to index 2, and 'C' to index 0.
+   * const newColumnOrder = [1, 2, 0]; // [ newPosForA, newPosForB, newPosForC ]
    *
    * const changes = hfInstance.setColumnOrder(0, newColumnOrder);
    *
-   * // Sheet after this operation: [['A', 'D', 'C', 'B']]
+   * // Sheet after this operation: [['C', 'A', 'B']]
    * ```
    *
    * @category Columns
@@ -1591,6 +1721,10 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Checks if it is possible to reorder columns of a sheet according to a permutation.
    *
+   * Parameter `newColumnOrder` should have the form `[ newPositionForColumn0, newPositionForColumn1, newPositionForColumn2, ... ]`,
+   * i.e. the value at index `i` is the new position for the column that is currently at index `i`.
+   * See [[setColumnOrder]] for details.
+   *
    * @param {number} sheetId - ID of a sheet to operate on
    * @param {number[]} newColumnOrder - permutation of columns
    *
@@ -1599,14 +1733,13 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  [1, 2, 4],
-   *  [5]
+   *  ['A', 'B', 'C']
    * ]);
    *
    * // returns true
-   * hfInstance.isItPossibleToSetColumnOrder(0, [2, 1, 0]);
+   * hfInstance.isItPossibleToSetColumnOrder(0, [1, 2, 0]);
    *
-   * // returns false
+   * // returns false (array length must match the number of columns)
    * hfInstance.isItPossibleToSetColumnOrder(0, [1]);
    * ```
    *
@@ -2494,6 +2627,9 @@ export class HyperFormula implements TypedEmitter {
   /**
    * Returns serialized cells in given range.
    *
+   * Each non-formula cell is serialized to the exact value it was set with, preserving its type
+   * (e.g., a cell set with the string `'2'` is serialized as the string `'2'`, while a cell set with the number `2` is serialized as the number `2`).
+   *
    * @param {SimpleCellRange} source - rectangular range
    *
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
@@ -2503,9 +2639,9 @@ export class HyperFormula implements TypedEmitter {
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromArray([
-   *  ['=SUM(1, 2)', '2', '10'],
-   *  ['5', '6', '7'],
-   *  ['40', '30', '20'],
+   *  ['=SUM(1, 2)', 2, 10],
+   *  [5, 6, 7],
+   *  [40, 30, 20],
    * ]);
    *
    * // should return serialized cell content for the given range:
@@ -4356,6 +4492,90 @@ export class HyperFormula implements TypedEmitter {
    */
   public getAllFunctionPlugins(): FunctionPluginDefinition[] {
     return this._functionRegistry.getPlugins()
+  }
+
+  /**
+   * Returns metadata of all functions available in this instance for a function picker, with names translated
+   * according to the language set in this instance's configuration. Each entry contains the translated name, the
+   * language-independent canonical name, the category, and a short description. Entries are sorted alphabetically by
+   * their localized name, using the collation rules of the host environment, so the exact order of names that differ
+   * only by case or diacritics may vary between hosts.
+   *
+   * The list reflects this instance's own registry: the built-in functions and any custom (user-registered)
+   * functions, plus their aliases. An alias is listed under its own id, borrowing its target's category and
+   * description, with the target id exposed as `aliasOf`. Custom functions ship no catalogue entry, so their
+   * `category` is `'Custom'` and they carry no `shortDescription` — with one exception: the catalogue is keyed by
+   * function id, so a custom plugin registered *over* a built-in id inherits that id's entry and is listed with the
+   * built-in's category and description.
+   *
+   * That registry is a snapshot taken when the instance was built, not a live view of the global one: a function
+   * registered with [[registerFunctionPlugin]] or [[registerFunction]] afterwards reaches only the engines built
+   * later, so an engine kept across a late registration keeps reporting the set it was built with.
+   *
+   * A function with no translation entry for the configured language is omitted: the interpreter refuses to evaluate
+   * an untranslated id, so listing it would advertise a function that cannot be called — in practice, a custom
+   * plugin registered without translations for that language. A translation set to an empty string is not a missing
+   * entry: it falls back to the canonical id, so the function stays listed under its canonical name.
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // get the list of available functions, translated for the configured language
+   * const functions = hfInstance.getAvailableFunctions();
+   * ```
+   *
+   * @category Helpers
+   */
+  public getAvailableFunctions(): FunctionListEntry[] {
+    return HyperFormula.buildAvailableFunctions(
+      this._functionRegistry,
+      // The instance's own package, the one its evaluator uses — not a fresh global lookup, which could describe
+      // the functions under a package this instance never adopted.
+      this._config.translationPackage,
+    )
+  }
+
+  /**
+   * Returns the full metadata of a single function registered in this instance, with names translated according to
+   * the language set in this instance's configuration: the parameter list (with per-parameter optionality), the
+   * number of trailing parameters that repeat (`repeatLastArgs`), the category, a short description, and the
+   * documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in authors both.
+   * Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
+   * target's metadata (including examples, which spell the target's name) under the alias id, with the target id
+   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
+   * has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
+   * described either, which keeps this method consistent with [[getAvailableFunctions]]).
+   * For a custom function, `category` is `'Custom'`, there is no `shortDescription`, `documentationUrl` or
+   * `examples`, and parameters are reported positionally (`Arg1`, `Arg2`, ...). A custom plugin registered over a
+   * built-in id is the exception: the catalogue is keyed by function id, so it reports that built-in's authored
+   * metadata alongside the parameter list of the implementation actually registered.
+   *
+   * `canonicalName` is matched exactly, in two ways worth knowing:
+   * - It is **case-sensitive**, unlike formula syntax. `'SUMIF'` resolves; `'sumif'` and `'SumIf'` return
+   *   `undefined`, even though `=sumif(...)` evaluates.
+   * - It must be the **canonical (English) id, never a localized name**. `localizedName` is output only: under
+   *   `plPL` this method reports `localizedName: 'SUMA.JEŻELI'` for `'SUMIF'`, but passing `'SUMA.JEŻELI'` back in
+   *   returns `undefined`. To look up an entry from [[getAvailableFunctions]], pass its `canonicalName`.
+   *
+   * @param {string} canonicalName - the language-independent function id, e.g. `'SUMIF'`
+   *
+   * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildEmpty();
+   *
+   * // get the details of the SUMIF function, translated for the configured language
+   * const details = hfInstance.getFunctionDetails('SUMIF');
+   * ```
+   *
+   * @category Helpers
+   */
+  public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
+    validateArgToType(canonicalName, 'string', 'canonicalName')
+    // The instance's own package, the one its evaluator uses — see getAvailableFunctions.
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config.translationPackage)
   }
 
   /**
