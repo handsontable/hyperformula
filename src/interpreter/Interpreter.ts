@@ -13,6 +13,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
+import {allowsFunction} from '../license/CapabilityRegistry'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -59,6 +60,17 @@ export class Interpreter {
   ) {
     this.functionRegistry.initializePlugins(this)
     this.criterionBuilder = new CriterionBuilder(config)
+  }
+
+  /**
+   * Resolves a function id to the name it is covered by in the capability table. A function
+   * registered purely as an alias of another one (`plugin.aliases`) must gate identically to
+   * its canonical name — otherwise calling a gated function through its alias would silently
+   * bypass the entitlement check.
+   */
+  private canonicalFunctionId(functionId: string): string {
+    const plugin = this.functionRegistry.getFunctionPlugin(functionId)
+    return plugin?.aliases?.[functionId] ?? functionId
   }
 
   public evaluateAst(ast: Ast, state: InterpreterState): InterpreterValue {
@@ -177,8 +189,17 @@ export class Interpreter {
         return this.unaryRangeWrapper(this.percentOp, result, state)
       }
       case AstNodeType.FUNCTION_CALL: {
-        if (this.config.licenseKeyValidityState !== LicenseKeyValidityState.VALID && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
-          return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(this.config.licenseKeyValidityState))
+        if (this.config.isLicenseGateActive && !FunctionRegistry.functionIsProtected(ast.procedureName)) {
+          const validityState = this.config.licenseKeyValidityState
+          if (validityState !== LicenseKeyValidityState.VALID) {
+            return new CellError(ErrorType.LIC, ErrorMessage.LicenseKey(validityState))
+          }
+
+          const canonicalId = this.canonicalFunctionId(ast.procedureName)
+          if (this.config.capabilityRegistry.capabilityOf(canonicalId) !== undefined
+              && !allowsFunction(this.config.licenseCapabilities, canonicalId)) {
+            return new CellError(ErrorType.LIC, ErrorMessage.LicenseCapability(ast.procedureName))
+          }
         }
         const pluginFunction = this.functionRegistry.getFunction(ast.procedureName)
         if (pluginFunction !== undefined) {
