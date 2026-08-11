@@ -1465,6 +1465,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1548,6 +1549,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
     return this.swapRowIndexes(sheetId, mapping)
@@ -1641,6 +1643,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1719,6 +1722,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
     return this.swapColumnIndexes(sheetId, mapping)
@@ -4800,6 +4804,22 @@ export class HyperFormula implements TypedEmitter {
    * unrestricted, i.e. for every key this library fully understands today (HF-307 PR 1); the
    * check only does work once a real license-key payload adapter (a later HF-307 PR) can
    * produce a restricted entitlement.
+   *
+   * Where the line is drawn, so a later change does not move it by accident:
+   * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
+   *   history, or the named-expression set.
+   * - **Not gated:** reads (`getCellValue`, `listNamedExpressions`,
+   *   `getAllNamedExpressionsSerialized`, the `isItPossibleTo*` predicates) and teardown or
+   *   cleanup that only ever removes state (`clearClipboard`, `clearUndoStack`,
+   *   `clearRedoStack`, `destroy`). Gating cleanup would let a restricted entitlement strand
+   *   an integration mid-teardown while giving a licensee nothing, and mirrors gate B, which
+   *   blocks *calling* a function rather than *reading* an already-computed value.
+   *
+   * Note this checks gate B (entitlement) only, never gate A (key validity). That asymmetry
+   * with the interpreter's gate B - which checks key validity first - is deliberate: it keeps
+   * today's behaviour for a missing or invalid key, where formulas yield `#LIC!` but the CRUD
+   * API keeps working. A later PR that resolves an invalid key to a *restricted* entitlement
+   * rather than an unrestricted one would silently turn that into a breaking API change.
    *
    * @internal
    */
