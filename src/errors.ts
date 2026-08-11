@@ -4,6 +4,7 @@
  */
 
 import {SimpleCellAddress} from './Cell'
+import {FeatureId} from './license/LicenseEntitlement'
 
 /**
  * Error thrown when the sheet of a given ID does not exist.
@@ -390,5 +391,29 @@ export class NoRelativeAddressesAllowedError extends Error {
 export class AliasAlreadyExisting extends Error {
   constructor(name: string, pluginName: string) {
     super(`Alias id ${name} in plugin ${pluginName} already defined as a function or alias.`)
+  }
+}
+
+/**
+ * Error thrown when a public API method is called for a {@link FeatureId} that the current
+ * license entitlement does not grant. Mirrors gate B's `ErrorMessage.LicenseCapability`, but
+ * this one guards the API surface itself (HF-307 PR 2) rather than a formula evaluation, so it
+ * is thrown synchronously instead of surfacing as a cell error.
+ *
+ * @see [[addNamedExpression]]
+ * @see [[changeNamedExpression]]
+ * @see [[removeNamedExpression]]
+ * @see [[copy]]
+ * @see [[cut]]
+ * @see [[paste]]
+ * @see [[undo]]
+ * @see [[redo]]
+ * @see [[batch]]
+ * @see [[suspendEvaluation]]
+ * @see [[resumeEvaluation]]
+ */
+export class LicenseCapabilityMissingError extends Error {
+  constructor(feature: FeatureId) {
+    super(`Feature ${feature} is not included in your license.`)
   }
 }

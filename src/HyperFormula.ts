@@ -38,11 +38,14 @@ import {
   ExpectedValueOfTypeError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
+  LicenseCapabilityMissingError,
   NotAFormulaError,
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {allowsFeature} from './license/CapabilityRegistry'
+import {FeatureId} from './license/LicenseEntitlement'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
@@ -1237,6 +1240,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public undo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.undo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1275,6 +1279,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public redo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.redo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1407,6 +1412,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1824,6 +1830,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1896,6 +1903,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1972,6 +1980,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2047,6 +2056,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2140,6 +2150,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
@@ -2226,6 +2237,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startRow, 'number', 'startRow')
     validateArgToType(numberOfRows, 'number', 'numberOfRows')
@@ -2314,6 +2326,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startColumn, 'number', 'startColumn')
     validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
@@ -2352,6 +2365,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public copy(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2392,6 +2406,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public cut(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2443,6 +2458,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
@@ -2769,6 +2785,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public addSheet(sheetName?: string): string {
+    this.ensureCapability(FeatureId.Crud)
     if (sheetName !== undefined) {
       validateArgToType(sheetName, 'string', 'sheetName')
     }
@@ -2844,6 +2861,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public removeSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const displayName = this.sheetMapping.getSheetName(sheetId) as string
     this._crudOperations.removeSheet(sheetId)
@@ -2917,6 +2935,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public clearSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.clearSheet(sheetId)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2984,6 +3003,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public setSheetContent(sheetId: number, values: RawCellContent[][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setSheetContent(sheetId, values)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -3671,6 +3691,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public renameSheet(sheetId: number, newName: string): void {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(newName, 'string', 'newName')
     const oldName = this._crudOperations.renameSheet(sheetId, newName)
@@ -3712,6 +3733,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public batch(batchOperations: () => void): ExportedChange[] {
+    this.ensureCapability(FeatureId.Batching)
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
@@ -3759,6 +3781,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public suspendEvaluation(): void {
+    this.ensureCapability(FeatureId.Batching)
     this._evaluationSuspended = true
     this._emitter.emit(Events.EvaluationSuspended)
   }
@@ -3795,6 +3818,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
+    this.ensureCapability(FeatureId.Batching)
     this._evaluationSuspended = false
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.EvaluationResumed, changes)
@@ -3902,6 +3926,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4124,6 +4149,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4205,6 +4231,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4764,6 +4791,24 @@ export class HyperFormula implements TypedEmitter {
   private ensureEvaluationIsNotSuspended() {
     if (this._evaluationSuspended) {
       throw new EvaluationSuspendedError()
+    }
+  }
+
+  /**
+   * Throws an error if the current license entitlement does not grant the given feature.
+   * A no-op read (`isLicenseGateActive === false`) whenever this instance's entitlement is
+   * unrestricted, i.e. for every key this library fully understands today (HF-307 PR 1); the
+   * check only does work once a real license-key payload adapter (a later HF-307 PR) can
+   * produce a restricted entitlement.
+   *
+   * @internal
+   */
+  private ensureCapability(feature: FeatureId): void {
+    if (!this._config.isLicenseGateActive) {
+      return
+    }
+    if (!allowsFeature(this._config.licenseCapabilities, feature)) {
+      throw new LicenseCapabilityMissingError(feature)
     }
   }
 
