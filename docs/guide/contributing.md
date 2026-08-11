@@ -55,9 +55,9 @@ GitHub account, not against a repository, and covers both
 already signed for either one, you are done.
 
 **Sign here:
-[cla-gate.handsontable-sandbox.workers.dev/sign](https://cla-gate.handsontable-sandbox.workers.dev/sign)**
+[cla.handsontable.com/sign](https://cla.handsontable.com/sign)**
 — the [process is explained in
-full](https://cla-gate.handsontable-sandbox.workers.dev/) on the same site.
+full](https://cla.handsontable.com/) on the same site.
 
 How it works on your pull request:
 
