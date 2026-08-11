@@ -110,7 +110,7 @@ console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCel
 
 ## Contributing
 
-Contributions are welcome, but before you make them, please read the [Contributing Guide](guide/contributing.md) and accept the [Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2).
+Contributions are welcome, but before you make them, please read the [Contributing Guide](guide/contributing.md) and accept the [Contributor License Agreement](https://cla.handsontable.com/sign).
 
 ## License
 

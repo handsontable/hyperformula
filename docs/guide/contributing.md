@@ -30,8 +30,7 @@ are a good starting point.
 
 ## How to get started
 
-1. First, sign this
-[Contributor License Agreement](https://goo.gl/forms/yuutGuN0RjsikVpM2)
+1. First, sign the [Contributor License Agreement](#contributor-license-agreement)
 to allow us to use and publish your changes.
 2. Always make your changes on a separate branch. This will speed up
 the merging process.
@@ -40,6 +39,47 @@ not `master`.
 4. For any change you make, add test specs to the `test` folder.
 5. Please lint the code. See the section about using linter.
 6. Add a comprehensive description of all the changes.
+
+## Contributor License Agreement
+
+Handsoncode publishes the code it merges — in open-source releases and in
+commercial products. Doing that requires the right to use, relicense, and
+distribute your contribution, and the Contributor License Agreement (CLA) is the
+record of that permission. You keep the copyright to your work; the CLA grants
+Handsoncode a licence to it.
+
+**Sign it once, for every project.** The signature is recorded against your
+GitHub account, not against a repository, and covers both
+[HyperFormula](https://github.com/handsontable/hyperformula) and
+[Handsontable](https://github.com/handsontable/handsontable). If you have
+already signed for either one, you are done.
+
+**Sign here:
+[cla.handsontable.com/sign](https://cla.handsontable.com/sign)**
+— the [process is explained in
+full](https://cla.handsontable.com/) on the same site.
+
+How it works on your pull request:
+
+1. You open a PR. A GitHub App looks up your GitHub login and sets the
+`cla/signed` status check.
+2. If you have not signed, the check fails and a bot comments with your signing
+link.
+3. Open the link, authenticate with GitHub, read the agreement, and submit the
+form.
+4. The check turns green — on this PR and on any other open PR of yours, in
+either repository.
+
+`cla/signed` is a **required check**, so an unsigned PR cannot be merged.
+Members of the `handsontable` GitHub organization and known bots are exempt.
+
+Signature records are stored in Cloudflare D1 in the EU. For a correction to
+your record or an erasure request, email
+[support@handsontable.com](mailto:support@handsontable.com).
+
+Reviewers: there is nothing to verify by hand — the required check is the
+verification. Never merge a PR whose `cla/signed` check is red, and do not work
+around it.
 
 ## Code of conduct
 
