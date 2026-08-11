@@ -23,9 +23,6 @@ import {AddressWithSheet} from './parser/Address'
  * Possible errors returned by our interpreter.
  */
 export enum ErrorType {
-  /** Calculation error. */
-  CALC = 'CALC',
-
   /** Division by zero. */
   DIV_BY_ZERO = 'DIV_BY_ZERO',
 

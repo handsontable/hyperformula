@@ -204,7 +204,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    *
    * Returns rows and columns from the beginning or end of the source array.
    * Syntactically empty dimensions keep all rows or columns. Counts that
-   * evaluate to zero return a #CALC! error.
+   * evaluate to zero return a #N/A error.
    *
    * @param ast
    * @param state
@@ -218,11 +218,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         const requestedColumns = Math.trunc(columns)
 
         if (requestedRows === 0 || requestedColumns === 0) {
-          return new CellError(ErrorType.CALC, ErrorMessage.ZeroRowOrColumnCount)
+          return new CellError(ErrorType.NA, ErrorMessage.ZeroRowOrColumnCount)
         }
 
         if (sourceHeight === 0 || sourceWidth === 0) {
-          return new CellError(ErrorType.CALC, ErrorMessage.EmptyRange)
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
         }
 
         const rowsToTake = Math.min(Math.abs(requestedRows), sourceHeight)
