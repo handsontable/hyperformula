@@ -3822,7 +3822,15 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
-    this.ensureCapability(FeatureId.Batching)
+    // Deliberately NOT gated, unlike suspendEvaluation and batch. This is the only exit from
+    // a suspended engine, and _evaluationSuspended survives rebuildWithConfig: an instance
+    // suspended while Batching was granted, whose entitlement then loses Batching via
+    // updateConfig, would be stuck suspended forever - every read throws
+    // EvaluationSuspendedError and the sole recovery path would throw
+    // LicenseCapabilityMissingError. Gating the two entry points is what makes the feature
+    // licensable; gating the release valve only strands the caller, which is the same reason
+    // teardown (clearClipboard, clearUndoStack, clearRedoStack) is ungated. See the note on
+    // ensureCapability.
     this._evaluationSuspended = false
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.EvaluationResumed, changes)
@@ -4814,6 +4822,11 @@ export class HyperFormula implements TypedEmitter {
    *   `clearRedoStack`, `destroy`). Gating cleanup would let a restricted entitlement strand
    *   an integration mid-teardown while giving a licensee nothing, and mirrors gate B, which
    *   blocks *calling* a function rather than *reading* an already-computed value.
+   * - **Not gated, for the same reason:** `resumeEvaluation`, the sole exit from a suspended
+   *   engine. Gate the entry points (`suspendEvaluation`, `batch`) and the feature is
+   *   licensable; gate the release valve too and an entitlement change mid-suspension leaves
+   *   the instance permanently unusable. A capability check must never be reachable only on
+   *   the way out of a state it let the caller into.
    *
    * Note this checks gate B (entitlement) only, never gate A (key validity). That asymmetry
    * with the interpreter's gate B - which checks key validity first - is deliberate: it keeps
