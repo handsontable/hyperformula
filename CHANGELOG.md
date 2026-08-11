@@ -7,9 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-08-10
+
 ### Added
 
-- Added the `getAvailableFunctions()` and `getFunctionDetails()` methods (both static and instance) for retrieving function metadata. [#1692](https://github.com/handsontable/hyperformula/pull/1692)
+- Added the `getAvailableFunctions()` and `getFunctionDetails()` instance methods for retrieving function metadata. [#1692](https://github.com/handsontable/hyperformula/pull/1692)
 - Added new functions: VSTACK, HSTACK. [#1698](https://github.com/handsontable/hyperformula/pull/1698)
 - Added a new function: `XIRR`. [#1701](https://github.com/handsontable/hyperformula/pull/1701)
 - Added the UNIQUE function. [#1708](https://github.com/handsontable/hyperformula/pull/1708)

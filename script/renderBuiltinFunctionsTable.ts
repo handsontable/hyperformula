@@ -85,7 +85,7 @@ function escapeCell(text: string): string {
  * rather than skipped — silently dropping it would leave the page short of a row while the printed function total,
  * which is computed independently in `docs/.vuepress/config.js`, still claimed it.
  *
- * @param {FunctionListEntry[]} entries - the function set to document (e.g. `HyperFormula.getAvailableFunctions`)
+ * @param {FunctionListEntry[]} entries - the function set to document (e.g. an engine's `getAvailableFunctions`)
  * @param {(canonicalName: string) => FunctionDetails | undefined} detailsFor - resolves a function's details
  * @returns {BuiltinFunctionsMarkdown} the markdown of both regions (no surrounding markers, LF, trailing newline)
  * @throws {Error} when a listed entry has no resolvable details

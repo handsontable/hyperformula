@@ -37,6 +37,39 @@ From the `hyperformula` directory, you can run the following npm scripts:
 * `npm run docs:build` - Builds the docs output into `/docs/.vuepress/dist`.
 * `npm run docs:generate-function-docs` - Regenerates the built-in functions guide page from the function metadata API. Runs automatically as the first step of `docs:dev` and `docs:build`.
 
+## Deployment
+
+The documentation site is deployed to Cloudflare Workers as the `hyperformula-docs` Worker in the Handsontable account (`15111272c53ed0aaf84a908f0c9c7f8b`). Deployments are driven by [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/), the Git integration configured on the Cloudflare side &mdash; the repository holds no deployment workflow, API token, or account secret.
+
+| Trigger | Command run by Workers Builds | Result |
+| --- | --- | --- |
+| push to `master` | `npx wrangler deploy` | production deployment |
+| push to any other branch, and every pull request | `npx wrangler versions upload` | preview deployment at `https://<branch>-hyperformula-docs.handsoncode.workers.dev`, posted as a pull request comment |
+
+Configuration in the repository:
+
+- `wrangler.jsonc` &mdash; Worker name, asset directory, and asset routing.
+- `worker/index.js` &mdash; resolves directory and extensionless URLs and serves the 404 page, so that the URL behaviour matches the previous hosting.
+- `docs/.vuepress/cf/_headers`, `docs/.vuepress/cf/_redirects` &mdash; asset headers and redirects, copied into the root of the build output by `script/prepare-cf-assets.js`.
+- `.nvmrc` &mdash; Node.js version used by the build.
+
+The asset directory is `docs/.vuepress/dist`, while VuePress writes to `docs/.vuepress/dist/docs` (see `docs/.vuepress/build.config.js`). This keeps the `/docs/` prefix that every document is built with, so the site is served under `https://hyperformula.handsontable.com/docs/`.
+
+Production traffic reaches this Worker through the `hyperformula-website` Worker, which proxies `/docs*` to `https://hyperformula-docs.handsoncode.workers.dev` (the `DOCS_ORIGIN` constant in that project).
+
+Build settings in the Cloudflare dashboard, under **Workers & Pages > hyperformula-docs > Settings > Build**: build command `npm run docs:build:cf`, deploy command `npx wrangler deploy`, non-production branch deploy command `npx wrangler versions upload`, production branch `master`, non-production branch builds enabled.
+
+Deploying by hand is only needed for debugging; regular deployments go through Workers Builds.
+
+```bash
+npm run docs:build:cf     # build the documentation and prepare the asset directory
+npx wrangler dev          # serve the built site locally at http://localhost:8787
+npm run docs:preview:cf   # upload a preview version (does not touch production)
+npm run docs:deploy:cf    # deploy to production
+```
+
+When changing the asset routing, verify it with browser navigation headers, not plain requests: `curl -H "Sec-Fetch-Mode: navigate" -H "Sec-Fetch-Dest: document"`. The asset router treats navigation requests differently from other requests, so a plain `curl` check can pass while browsers get a 404.
+
 ## Built-in functions guide page
 
 The built-in functions guide page `docs/guide/built-in-functions.md` is a **build product** and is

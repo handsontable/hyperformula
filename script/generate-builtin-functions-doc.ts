@@ -23,11 +23,27 @@ const REPO_ROOT = path.resolve(__dirname, '..')
 const TEMPLATE_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.tmpl.md')
 const DOC_PATH = path.join(REPO_ROOT, 'docs/guide/built-in-functions.md')
 const LANGUAGE = 'enGB'
+/**
+ * The GPLv3 key. Two reasons to name a key here, one current and one not yet:
+ *
+ * - Today it only keeps the build quiet. Function availability is **not** license-gated: every key, and no key at
+ *   all, yields the same function set. But the metadata API is instance-scoped, so this page is now generated from
+ *   an engine, and constructing one without a key logs "The license key for HyperFormula is missing." — noise the
+ *   static path never produced, because it built no engine.
+ * - Once entitlement lands (HF-307), the engine's key *will* decide which functions the metadata API reports.
+ *   Naming the fully-entitled key now means that change cannot silently narrow the published reference to one tier;
+ *   the page must always document the complete function set (HF-349).
+ */
+const LICENSE_KEY = 'gpl-v3'
 
 /** Reads the committed template and returns the page with both generated regions spliced in. */
 function buildUpdatedFile(): string {
-  const entries = HyperFormula.getAvailableFunctions(LANGUAGE)
-  const detailsFor = (canonicalName: string) => HyperFormula.getFunctionDetails(canonicalName, LANGUAGE)
+  // Deliberately a default-config engine: its registry must stay the global one, because the function total printed
+  // on the page is computed separately, from the global registry, in docs/.vuepress/config.js. Restricting this
+  // engine with `functionPlugins` would give the table a different function set from the total above it.
+  const engine = HyperFormula.buildEmpty({language: LANGUAGE, licenseKey: LICENSE_KEY})
+  const entries = engine.getAvailableFunctions()
+  const detailsFor = (canonicalName: string) => engine.getFunctionDetails(canonicalName)
   const generated = renderBuiltinFunctionsMarkdown(entries, detailsFor)
   const template = fs.readFileSync(TEMPLATE_PATH, 'utf8')
   return spliceBuiltinFunctionsMarkdown(template, generated)
