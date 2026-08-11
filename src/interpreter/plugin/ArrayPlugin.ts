@@ -244,7 +244,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
             columnsToTake,
             rowsToTake,
           )
-          return SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph)
+          const result = SimpleRangeValue.onlyRange(resultRange, this.dependencyGraph).data
+          return SimpleRangeValue.onlyValues(result)
         }
 
         const result = range.data
