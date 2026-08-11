@@ -159,46 +159,12 @@ Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of th
 
 HyperFormula supports internationalization and provides localized function names for all built-in languages. Translation files live in `src/i18n/languages/`. New functions must include translations for all built-in languages.
 
-### Policy: only ship a name you can source
-
-Add a localized function name **only when you have confirmed that Microsoft Excel ships that exact name in the product**. If you cannot confirm it, keep the English name.
-
-An unverified translation is worse than the English fallback. The English name at least matches what Excel uses in the locales Microsoft leaves untranslated, and users can look it up; an invented one matches nothing, is what users will type first because it reads plausibly, and silently produces `#NAME?`. It is also hard to spot in review — a made-up name looks exactly like a real one to anyone who does not speak the language.
-
-Two things this rules out:
-
-- Translating the English word yourself, or having a tool do it. A dictionary rendering is not what Excel ships: `TAKE` is `WYCINEK` in Polish (not "WEŹ"), `INCLUDI` in Italian, and `ÁTHELYEZ` in Hungarian — none of which a translator would produce from the word "take".
-- Guessing from a sibling function. Names within one release batch are not translated consistently: Swedish localizes `TAKE` as `TA` but keeps `VSTACK`/`HSTACK` in English.
-
-Keeping the English name is a legitimate, complete answer, and it is what Microsoft itself does in several locales. Prefer it over a guess.
-
 When looking for the valid translations for new functions, try these sources:
 
 - https://support.microsoft.com/en-us/office/excel-functions-translator-f262d0c0-991c-485b-89b6-32cc8d326889
 - http://dolf.trieschnigg.nl/excel/index.php
 
-### Reading the translations off Microsoft's localized function list
-
-The two sources above are a manual add-in and a third-party table that only covers older functions, so neither answers "what is `TAKE` called in Czech?". The **alphabetical function list** does, for every locale at once:
-
-```
-https://support.microsoft.com/<locale>/office/excel-functions-alphabetical-b3944572-255d-4efb-bb96-c6d90033e188
-```
-
-Each row links to the function's own page using the **English slug** in the `href` while the link text is the **localized name**, which makes the lookup exact rather than a guess:
-
-```html
-<a href="functions/take-function">WYCINEK</a> <br/> (2024)
-```
-
-So `grep`ping the page for `functions/<english-name>-function` and reading the anchor text gives the authoritative name. Do this per locale (`pl-pl`, `cs-cz`, `fi-fi`, …) rather than trusting a single translated page.
-
-Two traps this avoids:
-
-- **A function's own localized page is not a reliable source.** For several locales the syntax block is still the English one even though the surrounding prose and the argument names are translated — the French page shows `=TAKE(tableau, lignes,[colonnes])` and the Hungarian one `=TAKE(tömb, sorok,[oszlopok])`, while the product actually uses `PRENDRE` and `ÁTHELYEZ`. Reading the function page alone concludes "not translated" and is wrong.
-- **Do not translate the name yourself.** A dictionary rendering of the English word is not what Excel ships: `TAKE` is `WYCINEK` in Polish (not "WEŹ"), `INCLUDI` in Italian, `ÁTHELYEZ` in Hungarian, and `TA` in both Swedish and Norwegian. Where the list genuinely keeps the English name — `VSTACK`/`HSTACK` in Swedish and Indonesian, `TAKE` in Indonesian — keep it too.
-
-For languages not officially supported by Microsoft Excel, none of the sources above apply. For these languages, use Google Sheets as the reference. Switch the `hl` query parameter to the target locale, for example:
+For languages not officially supported by Microsoft Excel, the two sources above do not apply. For these languages, use Google Sheets as the reference. Switch the `hl` query parameter to the target locale, for example:
 
 - https://support.google.com/docs/table/25273?hl=id (Indonesian)
 
