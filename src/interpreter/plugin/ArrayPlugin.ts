@@ -259,7 +259,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
 
   /**
    * Calculates the spilled array size of TAKE using the source dimensions as
-   * the upper bound.
+   * the upper bound. Unbounded results are rejected so the dependency graph
+   * never reserves an infinite spill range.
    *
    * @param ast
    * @param state
@@ -280,7 +281,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     const height = literalRows === undefined ? sourceSize.height : Math.min(sourceSize.height, literalRows)
     const width = literalColumns === undefined ? sourceSize.width : Math.min(sourceSize.width, literalColumns)
 
-    if (height < 1 || width < 1) {
+    if (!Number.isFinite(height) || !Number.isFinite(width) || height < 1 || width < 1) {
       return ArraySize.error()
     }
 
