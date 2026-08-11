@@ -27,7 +27,7 @@ type ConsoleMessages = {
 
 type MessageDescriptor = {
   template: LicenseKeyValidityState,
-  vars: TemplateVars,
+  expiryDate?: Date,
 }
 
 /**
@@ -43,6 +43,29 @@ const consoleMessages: ConsoleMessages = {
 let _notified = false
 
 /**
+ * Prints the console message for a non-valid license key state, at most once per page load.
+ *
+ * Extracted so the typed-key path in `src/license/licenseResolution.ts` reports the same states
+ * with the same wording and the same once-only behaviour, without duplicating the message table
+ * or getting a second `_notified` flag of its own — two flags would let a page print two
+ * warnings for one key.
+ *
+ * @param {LicenseKeyValidityState} state - the state to report; `VALID` prints nothing
+ * @param {Date} [keyValidityDate] - the day the key stopped being valid, used by the `expired`
+ * message
+ */
+export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidityDate?: Date): void {
+  if (_notified || state === LicenseKeyValidityState.VALID) {
+    return
+  }
+
+  const vars: TemplateVars = keyValidityDate === undefined ? {} : {keyValidityDate: formatDate(keyValidityDate)}
+
+  console.warn(consoleMessages[state](vars))
+  _notified = true
+}
+
+/**
  * Checks if the provided license key is grammatically valid or not expired.
  *
  * @param {string} licenseKey The license key to check.
@@ -51,7 +74,6 @@ let _notified = false
 export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityState {
   const messageDescriptor: MessageDescriptor = {
     template: LicenseKeyValidityState.MISSING,
-    vars: {},
   }
 
   if (licenseKey === 'gpl-v3' || licenseKey === 'internal-use-in-handsontable' || licenseKey === 'hftrial-0168e-1f2b7-47158-70b05-0842f') {
@@ -62,7 +84,7 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
     const releaseDays = Math.floor(new Date(`${month}/${day}/${year}`).getTime() / 8.64e7)
     const keyValidityDays = extractTime(licenseKey)
 
-    messageDescriptor.vars.keyValidityDate = formatDate(new Date((keyValidityDays + 1) * 8.64e7))
+    messageDescriptor.expiryDate = new Date((keyValidityDays + 1) * 8.64e7)
 
     if (releaseDays > keyValidityDays) {
       messageDescriptor.template = LicenseKeyValidityState.EXPIRED
@@ -74,10 +96,7 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
     messageDescriptor.template = LicenseKeyValidityState.INVALID
   }
 
-  if (!_notified && messageDescriptor.template !== LicenseKeyValidityState.VALID) {
-    console.warn(consoleMessages[messageDescriptor.template](messageDescriptor.vars))
-    _notified = true
-  }
+  notifyLicenseKeyState(messageDescriptor.template, messageDescriptor.expiryDate)
 
   return messageDescriptor.template
 }
