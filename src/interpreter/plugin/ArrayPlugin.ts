@@ -71,7 +71,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       enableArrayArithmeticForArguments: true,
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: false, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: Number.POSITIVE_INFINITY, emptyAsDefault: true},
       ],
       vectorizationForbidden: true,
@@ -210,6 +210,12 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    * @param state
    */
   public take(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
+    // The default supports TAKE(array, , columns), but the rows argument
+    // position must still be present.
+    if (ast.args.length < 2) {
+      return new CellError(ErrorType.NA, ErrorMessage.WrongArgNumber)
+    }
+
     return this.runFunction(ast.args, state, this.metadata('TAKE'),
       (range: SimpleRangeValue, rows: number, columns: number) => {
         const sourceHeight = range.height()

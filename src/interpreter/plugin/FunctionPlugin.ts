@@ -256,17 +256,13 @@ export interface FunctionArgument {
 /**
  * Returns whether a function argument may be omitted.
  *
- * An explicit `optionalArg` declaration takes precedence. Otherwise, the
- * presence of a default value preserves the existing implicit-optional
- * behavior.
+ * Arguments explicitly marked as optional and arguments with default values
+ * may be omitted.
  *
  * @param {FunctionArgument | undefined} argument - The argument metadata to inspect.
  */
 export function isFunctionArgumentOptional(argument: FunctionArgument | undefined): boolean {
-  if (argument?.optionalArg !== undefined) {
-    return argument.optionalArg
-  }
-  return argument?.defaultValue !== undefined
+  return argument?.optionalArg || argument?.defaultValue !== undefined
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
