@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the `AVERAGEIF` function returning a division-by-zero error when the calculated average was `0`.
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
