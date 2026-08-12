@@ -104,16 +104,21 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
 /**
  * Formats a Date instance to hard-coded format MMMM DD, YYYY.
  *
- * @param {Date} date The date to format.
- * @returns {string}
+ * Read in UTC, not local time. Every date reaching this function is built at UTC midnight — the
+ * legacy path from a whole number of days since the epoch, the typed-key path from a calendar
+ * date in the payload — so local getters shifted the day backwards for anyone west of UTC and
+ * printed an expiry one day earlier than the one the key actually carries.
+ *
+ * @param {Date} date The date to format, at UTC midnight.
+ * @returns {string} The date as `MMMM DD, YYYY`.
  */
 function formatDate(date: Date): string {
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ]
-  const month = monthNames[date.getMonth()]
-  const day = date.getDate()
-  const year = date.getFullYear()
+  const month = monthNames[date.getUTCMonth()]
+  const day = date.getUTCDate()
+  const year = date.getUTCFullYear()
 
   return `${month} ${day}, ${year}`
 }
