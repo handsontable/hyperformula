@@ -43,10 +43,39 @@ two dates:
 
 This process doesn't require any connection to the server.
 
+## Feature packages and add-ons
+
+A proprietary license key may grant the whole library, or only part of it. If your key covers
+everything you buy nothing new to think about, and neither does the GPLv3 key `gpl-v3`, which
+always grants everything.
+
+If your key grants only part of the library, then:
+
+* A function your key doesn't include evaluates to a `#LIC!` error, in the same way as any other
+  [error value](types-of-errors.md). Everything else in the sheet keeps calculating.
+* An API method your key doesn't include throws a `LicenseCapabilityMissingError` when you call
+  it. Methods that only read data never throw.
+* [`getAvailableFunctions()`](../api/classes/hyperformula.md#getavailablefunctions) and
+  [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails) describe only the
+  functions your key includes, so a function picker built from them never offers a function that
+  then fails.
+
+Custom functions you register yourself are always available, whatever your key grants.
+
+::: tip
+To find out which package your key includes, check your order confirmation or
+[contact our team](contact.md). HyperFormula deliberately reports nothing about the contents of
+your key at runtime.
+:::
+
 ## License key notifications
 
 If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
+
+In that case every function evaluates to a `#LIC!` error — but no API method starts throwing, and
+`getAvailableFunctions()` still describes the full set of functions. A key problem never narrows
+what the library reports it can do; it stops formulas from calculating until you fix the key.
 
 ## License key support
 

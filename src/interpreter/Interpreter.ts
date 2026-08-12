@@ -13,7 +13,7 @@ import {DependencyGraph} from '../DependencyGraph'
 import {FormulaVertex} from '../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../error-message'
 import {LicenseKeyValidityState} from '../helpers/licenseKeyValidator'
-import {allowsFunction} from '../license/CapabilityRegistry'
+import {licenseAllowsFunction} from '../license/CapabilityRegistry'
 import {ColumnSearchStrategy} from '../Lookup/SearchStrategy'
 import {Maybe} from '../Maybe'
 import {NamedExpressions} from '../NamedExpressions'
@@ -196,8 +196,7 @@ export class Interpreter {
           }
 
           const canonicalId = this.canonicalFunctionId(ast.procedureName)
-          if (this.config.capabilityRegistry.capabilityOf(canonicalId) !== undefined
-              && !allowsFunction(this.config.licenseCapabilities, canonicalId)) {
+          if (!licenseAllowsFunction(this.config.capabilityRegistry, this.config.licenseCapabilities, canonicalId)) {
             return new CellError(ErrorType.LIC, ErrorMessage.LicenseCapability(ast.procedureName))
           }
         }
