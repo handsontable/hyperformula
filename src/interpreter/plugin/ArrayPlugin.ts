@@ -14,34 +14,39 @@ import {getRawValue, InternalScalarValue, InterpreterValue} from '../Interpreter
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
+type TakeLiteralDimension =
+  | {kind: 'value', value: number}
+  | {kind: 'invalid'}
+  | {kind: 'unresolved'}
+
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   /**
-   * Converts a numeric or numeric-text TAKE count literal into its predicted result dimension.
+   * Classifies a TAKE count for static result-size prediction.
    *
    * @param {Ast | undefined} argument - The count argument to inspect before evaluation.
-   * @returns {number | undefined} The truncated absolute count, or `undefined` when it is not a supported literal.
+   * @returns {TakeLiteralDimension} The literal value, an invalid-literal marker, or an unresolved marker.
    */
-  private parseTakeLiteralDimension(argument: Ast | undefined): number | undefined {
+  private parseTakeLiteralDimension(argument: Ast | undefined): TakeLiteralDimension {
     if (argument?.type === AstNodeType.NUMBER) {
-      return Math.abs(Math.trunc(argument.value))
+      return {kind: 'value', value: Math.abs(Math.trunc(argument.value))}
     }
 
     if (argument?.type === AstNodeType.STRING) {
       const coercedValue = this.arithmeticHelper.coerceToMaybeNumber(argument.value)
       if (coercedValue === undefined) {
-        return undefined
+        return {kind: 'invalid'}
       }
-      return Math.abs(Math.trunc(getRawValue(coercedValue)))
+      return {kind: 'value', value: Math.abs(Math.trunc(getRawValue(coercedValue)))}
     }
 
     if (
       (argument?.type === AstNodeType.PLUS_UNARY_OP || argument?.type === AstNodeType.MINUS_UNARY_OP)
       && argument.value.type === AstNodeType.NUMBER
     ) {
-      return Math.abs(Math.trunc(argument.value.value))
+      return {kind: 'value', value: Math.abs(Math.trunc(argument.value.value))}
     }
 
-    return undefined
+    return {kind: 'unresolved'}
   }
 
   public static implementedFunctions: ImplementedFunctions = {
@@ -284,10 +289,15 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
     )
 
-    const literalRows = this.parseTakeLiteralDimension(ast.args[1])
-    const literalColumns = this.parseTakeLiteralDimension(ast.args[2])
-    const height = literalRows === undefined ? sourceSize.height : Math.min(sourceSize.height, literalRows)
-    const width = literalColumns === undefined ? sourceSize.width : Math.min(sourceSize.width, literalColumns)
+    const rowDimension = this.parseTakeLiteralDimension(ast.args[1])
+    const columnDimension = this.parseTakeLiteralDimension(ast.args[2])
+
+    if (rowDimension.kind === 'invalid' || columnDimension.kind === 'invalid') {
+      return ArraySize.error()
+    }
+
+    const height = rowDimension.kind === 'value' ? Math.min(sourceSize.height, rowDimension.value) : sourceSize.height
+    const width = columnDimension.kind === 'value' ? Math.min(sourceSize.width, columnDimension.value) : sourceSize.width
 
     if (!Number.isFinite(height) || !Number.isFinite(width) || height < 1 || width < 1) {
       return ArraySize.error()
