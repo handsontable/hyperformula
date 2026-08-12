@@ -3,7 +3,6 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
-import {FunctionRegistry} from '../interpreter/FunctionRegistry'
 import {FeatureId} from './LicenseEntitlement'
 
 /**
@@ -102,6 +101,45 @@ const SPREADSHEET_FUNCTIONS = [
   'VLOOKUP', 'WEEKDAY', 'WEEKNUM', 'WORKDAY', 'WORKDAY.INTL', 'XLOOKUP', 'YEARFRAC',
 ]
 
+/**
+ * Added by the excel-simulator package, on top of {@link SPREADSHEET_FUNCTIONS} — the rest of the
+ * implemented catalog.
+ *
+ * Enumerated rather than taken from the function registry at run time, even though "all
+ * functions" would be the shorter way to say it. Reading the registry would sweep in functions
+ * registered through `HyperFormula.registerFunctionPlugin`, putting a user's OWN custom function
+ * into a paid package and returning `#LIC!` for it on a smaller licence — the opposite of HF-307
+ * decision D1, which drops custom-function gating entirely. A function this table does not list
+ * is not gated at all, which is exactly the treatment a custom function should get.
+ */
+const EXCEL_SIMULATOR_FUNCTIONS = [
+  'ACOS', 'ACOSH', 'ACOT', 'ACOTH', 'ARABIC', 'ARRAYFORMULA', 'ARRAY_CONSTRAIN', 'ASIN', 'ASINH', 'ATAN',
+  'ATAN2', 'ATANH', 'AVEDEV', 'AVERAGEA', 'BASE', 'BESSELI', 'BESSELJ', 'BESSELK', 'BESSELY', 'BETA.DIST',
+  'BETA.INV', 'BIN2DEC', 'BIN2HEX', 'BIN2OCT', 'BINOM.DIST', 'BINOM.INV', 'BITAND', 'BITLSHIFT', 'BITOR',
+  'BITRSHIFT', 'BITXOR', 'CEILING.MATH', 'CEILING.PRECISE', 'CHAR', 'CHISQ.DIST', 'CHISQ.DIST.RT',
+  'CHISQ.INV', 'CHISQ.INV.RT', 'CHISQ.TEST', 'CLEAN', 'CODE', 'COMBIN', 'COMBINA', 'COMPLEX',
+  'CONFIDENCE.NORM', 'CONFIDENCE.T', 'CORREL', 'COS', 'COSH', 'COT', 'COTH', 'COUNTA', 'COUNTBLANK',
+  'COUNTUNIQUE', 'COVARIANCE.P', 'COVARIANCE.S', 'CSC', 'CSCH', 'CUMIPMT', 'CUMPRINC', 'DAVERAGE', 'DB',
+  'DCOUNT', 'DCOUNTA', 'DDB', 'DEC2BIN', 'DEC2HEX', 'DEC2OCT', 'DECIMAL', 'DEGREES', 'DELTA', 'DEVSQ',
+  'DGET', 'DMAX', 'DMIN', 'DOLLARDE', 'DOLLARFR', 'DPRODUCT', 'DSTDEV', 'DSTDEVP', 'DSUM', 'DVAR', 'DVARP',
+  'EFFECT', 'ERF', 'ERFC', 'EVEN', 'EXACT', 'EXPON.DIST', 'F.DIST', 'F.DIST.RT', 'F.INV', 'F.INV.RT',
+  'F.TEST', 'FACT', 'FACTDOUBLE', 'FISHER', 'FISHERINV', 'FLOOR.MATH', 'FLOOR.PRECISE', 'FVSCHEDULE',
+  'GAMMA', 'GAMMA.DIST', 'GAMMA.INV', 'GAMMALN', 'GAUSS', 'GCD', 'GEOMEAN', 'HARMEAN', 'HEX2BIN',
+  'HEX2DEC', 'HEX2OCT', 'HSTACK', 'HYPGEOM.DIST', 'IFS', 'IMABS', 'IMAGINARY', 'IMARGUMENT', 'IMCONJUGATE',
+  'IMCOS', 'IMCOSH', 'IMCOT', 'IMCSC', 'IMCSCH', 'IMDIV', 'IMEXP', 'IMLN', 'IMLOG10', 'IMLOG2', 'IMPOWER',
+  'IMPRODUCT', 'IMREAL', 'IMSEC', 'IMSECH', 'IMSIN', 'IMSINH', 'IMSQRT', 'IMSUB', 'IMSUM', 'IMTAN', 'INT',
+  'ISPMT', 'LARGE', 'LCM', 'LOGNORM.DIST', 'LOGNORM.INV', 'MAXA', 'MAXPOOL', 'MEDIAN', 'MEDIANPOOL',
+  'MINA', 'MIRR', 'MMULT', 'MROUND', 'MULTINOMIAL', 'N', 'NEGBINOM.DIST', 'NOMINAL', 'NORM.DIST',
+  'NORM.INV', 'NORM.S.DIST', 'NORM.S.INV', 'OCT2BIN', 'OCT2DEC', 'OCT2HEX', 'ODD', 'PDURATION', 'PHI',
+  'PI', 'POISSON.DIST', 'PROPER', 'QUARTILE.EXC', 'QUARTILE.INC', 'QUOTIENT', 'RADIANS', 'REPLACE', 'REPT',
+  'ROMAN', 'RRI', 'RSQ', 'SEC', 'SECH', 'SEQUENCE', 'SERIESSUM', 'SHEET', 'SHEETS', 'SIGN', 'SIN', 'SINH',
+  'SKEW', 'SKEW.P', 'SLN', 'SLOPE', 'SMALL', 'SPLIT', 'SQRTPI', 'STANDARDIZE', 'STEYX', 'SUBSTITUTE',
+  'SUBTOTAL', 'SUMPRODUCT', 'SUMSQ', 'SUMX2MY2', 'SUMX2PY2', 'SUMXMY2', 'SWITCH', 'SYD', 'T', 'T.DIST',
+  'T.DIST.2T', 'T.DIST.RT', 'T.INV', 'T.INV.2T', 'T.TEST', 'TAN', 'TANH', 'TBILLEQ', 'TBILLPRICE',
+  'TBILLYIELD', 'TDIST', 'TRANSPOSE', 'UNICHAR', 'UNICODE', 'VSTACK', 'WEIBULL.DIST', 'XIRR', 'XNPV',
+  'Z.TEST',
+]
+
 const coreGrant: CapabilityGrant = {functions: [...OPERATOR_FUNCTIONS], features: [...CORE_FEATURES]}
 const functions1Grant: CapabilityGrant = {functions: [...MATH_ENGINE_FUNCTIONS], features: []}
 const functions2Grant: CapabilityGrant = {
@@ -110,7 +148,13 @@ const functions2Grant: CapabilityGrant = {
 const functions3Grant: CapabilityGrant = {
   functions: [...MATH_ENGINE_FUNCTIONS, ...CALCULATED_FIELDS_FUNCTIONS, ...SPREADSHEET_FUNCTIONS], features: [],
 }
-const functions4Grant: CapabilityGrant = {functions: [], features: []}
+const functions4Grant: CapabilityGrant = {
+  functions: [
+    ...MATH_ENGINE_FUNCTIONS, ...CALCULATED_FIELDS_FUNCTIONS, ...SPREADSHEET_FUNCTIONS,
+    ...EXCEL_SIMULATOR_FUNCTIONS,
+  ],
+  features: [],
+}
 
 /**
  * The production capability table.
@@ -120,8 +164,11 @@ const functions4Grant: CapabilityGrant = {functions: [], features: []}
  * commercial nesting is expressed by a bigger licence simply listing more functions. The
  * cumulative spreads above keep the source DRY without putting that hierarchy into the runtime.
  *
- * `functions_4` (the entire catalog) is filled by {@link refreshDynamicGrants} instead of being
- * listed, so it keeps covering functions added after this file was written.
+ * Every grant is STATIC. Nothing here is derived from the function registry at run time, so a
+ * function registered by a user through `HyperFormula.registerFunctionPlugin` can never appear in
+ * a package and can never be gated — see {@link EXCEL_SIMULATOR_FUNCTIONS}. The cost is that a
+ * newly implemented built-in is ungated until it is added here, which the completeness invariant
+ * in `unit/license/capability-registry.spec.ts` fails on.
  *
  * The two add-on tokens are RESERVED: recognized, so an issued key carrying one is not reported
  * as unrecognized, but granting nothing. `spreadsheet` has no agreed content yet — the packaging
@@ -139,21 +186,3 @@ export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [IMPORT_EXPORT_ADDON_TOKEN, {functions: [], features: []}],
 ])
 
-/**
- * Refreshes the grants that depend on what is currently registered — today only
- * `functions_4`, the entire implemented catalog.
- *
- * Called from `CapabilityRegistry`'s constructor every time it is constructed without an explicit
- * table, not just the first time: the static registry can change after the first engine is built
- * (`HyperFormula.registerFunctionPlugin`/`unregisterFunctionPlugin` are public, documented APIs),
- * and a one-time snapshot would silently go stale for every engine built afterwards. Cheap (a
- * single array copy from an existing map's keys) and only ever runs once per `Config`/engine
- * construction, never on the per-formula hot path.
- *
- * Reading the registry at module-load time instead would capture an empty one: `src/index.ts`
- * registers the built-in plugins as a side effect of being imported, AFTER `Config` and
- * `Interpreter` — and so this module — have been fully evaluated.
- */
-export function refreshDynamicGrants(): void {
-  functions4Grant.functions = FunctionRegistry.getRegisteredFunctionIds()
-}

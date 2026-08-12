@@ -4,7 +4,7 @@
  */
 
 import {FeatureId, LicenseEntitlement} from './LicenseEntitlement'
-import {CAPABILITY_TABLE, CapabilityGrant, refreshDynamicGrants} from './capabilities'
+import {CAPABILITY_TABLE, CapabilityGrant} from './capabilities'
 
 /**
  * The capabilities a resolved {@link LicenseEntitlement} grants, ready for gate B (the
@@ -33,9 +33,6 @@ export class CapabilityRegistry {
    * suite does not depend on its placeholder content.
    */
   constructor(table?: ReadonlyMap<string, CapabilityGrant>) {
-    if (table === undefined) {
-      refreshDynamicGrants()
-    }
     this.table = table ?? CAPABILITY_TABLE
     this.reverseIndex = CapabilityRegistry.buildReverseIndex(this.table)
   }

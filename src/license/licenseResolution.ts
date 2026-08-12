@@ -19,6 +19,7 @@ import {
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
 import {HYPERFORMULA_PRODUCT_NAME} from './vendor/defaultSchema'
 import {extractTypedKeyData, TypedKeyData, TypedKeyProductGrant} from './vendor/extractKeyData'
+import {parseIsoDate} from './vendor/utils'
 
 /** Milliseconds in a day, used to turn a grace period in days into a deadline. */
 const MILLISECONDS_PER_DAY = 86400000
@@ -30,6 +31,9 @@ const MILLISECONDS_PER_DAY = 86400000
  */
 const SECONDS_MILLISECONDS_THRESHOLD = 1e11
 
+/** The largest value `Date` can represent; beyond it `toISOString()` throws. */
+const MAX_TIMESTAMP = 8640000000000000
+
 /**
  * Commercial tier names (the shipped key format) mapped to the capability tokens the library
  * actually resolves. A tier this map does not know is passed through unchanged, so it surfaces
@@ -40,6 +44,15 @@ const TIER_TO_CAPABILITY_TOKEN: Record<string, string> = {
   crm: FUNCTIONS_2_TOKEN,
   data_grid: FUNCTIONS_3_TOKEN,
   excel_simulator: FUNCTIONS_4_TOKEN,
+}
+
+/** The rev-5 fields, which the shipped payload shape does not have. */
+interface Rev5ProductGrant {
+  capabilities?: unknown,
+  usage_until?: unknown,
+  release_until?: unknown,
+  notice?: unknown,
+  flags?: unknown,
 }
 
 /**
@@ -61,9 +74,10 @@ export interface ResolvedLicense {
  * The engine reads TWO payload shapes on purpose:
  *
  * - the **shipped** shape of `handsontable/license-key` — `tier`, `addons`, `exp`, `grace`, with
- *   the contract type carried by the key's `[TRIAL]`/`[FREE]`/`[SUB]`/`[PERP]` tag;
+ *   the contract type carried by the key's `[TRIAL]`/`[FREE]`/`[SUB]`/`[PERP]` tag, and with the
+ *   expiry living on the LICENSED product entry (the first schema product present);
  * - the shape of key spec **rev 5** — `capabilities`, `usage_until` / `release_until`, `notice`,
- *   `grace`, `flags`, with no commercial vocabulary in the payload at all.
+ *   `grace`, `flags`, where every product entry carries its own terms.
  *
  * The two disagree about nearly every field, rev 5 is still for review, and only the first can
  * be minted today. Reading both means an already-issued key keeps working whichever way that
@@ -98,28 +112,34 @@ function releaseDateTimestamp(): number | null {
 
 /**
  * Reads a date that may arrive either as a `YYYY-MM-DD` string or as a numeric timestamp, and
- * returns it as epoch milliseconds at UTC midnight; `null` when it is neither.
+ * returns it as epoch milliseconds at UTC midnight. Returns `null` when the value is present but
+ * cannot be read — the caller rejects the whole key in that case rather than treating it as
+ * "no expiry", which would silently turn a subscription into a perpetual licence.
  *
  * Both forms are accepted because key spec rev 5 contradicts itself about them: §1.2 mandates
  * "bare `YYYY-MM-DD` everywhere, no time component", while §2.1 types the same fields as
- * `timestamp` and its example payload carries integers. Accepting both costs a few lines and
- * removes the need to have guessed right.
+ * `timestamp` and its example payload carries integers.
  *
- * @param {unknown} value - the raw payload value
+ * The string form goes through the vendored {@link parseIsoDate}, so it gets the same calendar
+ * round-trip check the shipped shape's `exp` gets: `2027-02-30` is rejected rather than rolling
+ * over into March and quietly granting two extra days.
+ *
+ * @param {unknown} value - the raw payload value, known not to be `undefined`
  */
 function readDate(value: unknown): number | null {
   if (typeof value === 'string') {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
-
-    if (match === null) {
+    try {
+      return parseIsoDate(value, 'expiration').timestamp
+    } catch (error) {
       return null
     }
-    const timestamp = Date.UTC(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10))
-
-    return isNaN(timestamp) ? null : timestamp
   }
   if (typeof value === 'number' && isFinite(value)) {
     const milliseconds = Math.abs(value) < SECONDS_MILLISECONDS_THRESHOLD ? value * 1000 : value
+
+    if (Math.abs(milliseconds) > MAX_TIMESTAMP) {
+      return null
+    }
 
     // Normalize to UTC midnight so an inclusive last-licensed-DAY stays a day, not an instant.
     return Math.floor(milliseconds / MILLISECONDS_PER_DAY) * MILLISECONDS_PER_DAY
@@ -150,27 +170,35 @@ function readStrings(value: unknown): string[] {
   return (value as unknown[]).filter((item): item is string => typeof item === 'string' && item.length > 0)
 }
 
+/** Whether a payload product entry is a usable object rather than `null`, an array or a scalar. */
+function isProductGrant(value: unknown): value is TypedKeyProductGrant & Rev5ProductGrant {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
 /**
- * Reconciles the two payload shapes into one set of terms.
- *
- * `hyperformulaGrant` may be `undefined` — a key that licenses Handsontable alone still parses,
- * and HyperFormula simply gets nothing beyond {@link CORE_TOKEN} from it.
+ * Reconciles the two payload shapes into one set of terms, or `null` when the payload carries a
+ * term it cannot read — a date that is present but malformed, for instance. Returning `null`
+ * makes the key INVALID, which is what the shipped shape already does for a malformed `exp`;
+ * the alternative, treating an unreadable expiry as "never expires", would turn a minting typo
+ * into a permanent licence.
  *
  * @param {TypedKeyData} data - the extracted key data
  */
-function licenseTermsOf(data: TypedKeyData): LicenseTerms {
-  const hyperformulaGrant: TypedKeyProductGrant | undefined = data.payload.products[HYPERFORMULA_PRODUCT_NAME]
-  const licensedGrant: TypedKeyProductGrant = data.payload.products[data.licensedProductName]
-  const isRev5 = Array.isArray((hyperformulaGrant as {capabilities?: unknown} | undefined)?.capabilities)
+function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
+  const hyperformulaEntry: unknown = data.payload.products[HYPERFORMULA_PRODUCT_NAME]
+  const hyperformulaGrant = isProductGrant(hyperformulaEntry) ? hyperformulaEntry : undefined
+  const isRev5 = hyperformulaGrant !== undefined && Array.isArray(hyperformulaGrant.capabilities)
 
-  // CORE_TOKEN is always granted. Without it a key whose tier this version does not recognize
-  // would block every built-in function, whereas HF-307 decision D3 says such a key falls back
-  // to core and protected functions - not to nothing at all.
+  // CORE_TOKEN is always granted, but note what it actually grants: the calculation operators,
+  // and the whole gated public API surface - NOT a usable set of functions. A key whose only
+  // tokens this build does not recognize therefore evaluates operators and protected built-ins
+  // and returns #LIC! for every function call, silently, per HF-307 decision D3. That cliff is
+  // deliberate but severe, and is flagged for review rather than softened here.
   const capabilityTokens = [CORE_TOKEN]
 
   if (hyperformulaGrant !== undefined) {
     if (isRev5) {
-      capabilityTokens.push(...readStrings((hyperformulaGrant as {capabilities?: unknown}).capabilities))
+      capabilityTokens.push(...readStrings(hyperformulaGrant.capabilities))
     } else {
       if (typeof hyperformulaGrant.tier === 'string' && hyperformulaGrant.tier.length > 0) {
         capabilityTokens.push(TIER_TO_CAPABILITY_TOKEN[hyperformulaGrant.tier] ?? hyperformulaGrant.tier)
@@ -179,17 +207,42 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms {
     }
   }
 
-  // Expiry, grace and notice belong to the LICENSED product - for a key granting both products
-  // that is Handsontable, and HyperFormula's own entry carries none of them.
-  const rev5Terms = licensedGrant as {usage_until?: unknown, release_until?: unknown, notice?: unknown} | undefined
-  const usageUntil = readDate(rev5Terms?.usage_until)
-  const releaseUntil = readDate(rev5Terms?.release_until)
-  const comparedAgainstReleaseDate = releaseUntil !== null || (usageUntil === null && data.keyType === 'perpetual')
+  // WHERE the terms live differs by shape. Under rev 5 every product entry carries its own
+  // dates, notice, grace and flags, so HyperFormula reads its own. Under the shipped shape only
+  // the LICENSED product may carry `exp` and `grace`, so for a key granting both products those
+  // live on the Handsontable entry and HyperFormula's own entry has neither.
+  const licensedEntry: unknown = data.payload.products[data.licensedProductName]
+  const termsSource = isRev5 ? hyperformulaGrant : (isProductGrant(licensedEntry) ? licensedEntry : undefined)
+
+  let usageUntil: number | null = null
+  let releaseUntil: number | null = null
+
+  if (isRev5 && termsSource !== undefined) {
+    if (termsSource.usage_until !== undefined) {
+      usageUntil = readDate(termsSource.usage_until)
+      if (usageUntil === null) {
+        return null
+      }
+    }
+    if (termsSource.release_until !== undefined) {
+      releaseUntil = readDate(termsSource.release_until)
+      if (releaseUntil === null) {
+        return null
+      }
+    }
+  }
+
+  // The two rev-5 date fields are specified as mutually exclusive, but a hand-built payload can
+  // carry both, and the date used and the axis it is compared against MUST come from the same
+  // field - otherwise a usage deadline would be checked against the build date, which either
+  // never expires or expires on the wrong axis. `usage_until` wins, and the axis follows it.
+  const comparedAgainstReleaseDate = usageUntil === null
+    && (releaseUntil !== null || data.keyType === 'perpetual')
   const expiryTimestamp = usageUntil ?? releaseUntil ?? data.expiryTimestamp
-  const flags = readStrings((hyperformulaGrant as {flags?: unknown} | undefined)?.flags)
-  // A perpetual licence has no grace period: its date is compared against a static build date,
-  // so there is no window to be inside of.
-  const graceDays = comparedAgainstReleaseDate ? 0 : readDays(licensedGrant?.grace)
+  const flags = readStrings(termsSource?.flags)
+  // A release-date comparison has no grace period: it is static, so there is no window to be
+  // inside of.
+  const graceDays = comparedAgainstReleaseDate ? 0 : readDays(termsSource?.grace)
 
   return {
     capabilityTokens,
@@ -199,7 +252,7 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms {
         kind: comparedAgainstReleaseDate ? 'release' : 'usage',
         // UTC midnight by construction, so this round-trips a payload's own `YYYY-MM-DD` exactly.
         date: new Date(expiryTimestamp).toISOString().slice(0, 10),
-        noticeDays: readDays(rev5Terms?.notice),
+        noticeDays: readDays(termsSource?.notice),
         graceDays,
       },
     expiryTimestamp,
@@ -241,7 +294,9 @@ function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expir
 
   return now < deadline
     ? {state: LicenseKeyValidityState.VALID}
-    : {state: LicenseKeyValidityState.EXPIRED, expiredOn: new Date(terms.expiryTimestamp)}
+    // The reported day is the first day NOT covered, which is the convention the legacy validator
+    // already uses for the same message (it reports `keyValidityDays + 1`).
+    : {state: LicenseKeyValidityState.EXPIRED, expiredOn: new Date(terms.expiryTimestamp + MILLISECONDS_PER_DAY)}
 }
 
 /**
@@ -284,6 +339,9 @@ function entitlementOf(terms: LicenseTerms): LicenseEntitlement {
  * otherwise valid key; it is not a rule about invalid keys, and conflating the two is exactly
  * the mistake this comment is here to prevent.
  *
+ * A checksum-valid key whose terms cannot be read is INVALID, not a crash and not a free pass:
+ * every payload field is untrusted, so nothing here may assume a shape.
+ *
  * @param {string} licenseKey - the raw `licenseKey` config value
  */
 export function resolveLicense(licenseKey: string): ResolvedLicense {
@@ -297,6 +355,13 @@ export function resolveLicense(licenseKey: string): ResolvedLicense {
   }
 
   const terms = licenseTermsOf(typedKeyData)
+
+  if (terms === null) {
+    notifyLicenseKeyState(LicenseKeyValidityState.INVALID)
+
+    return {validityState: LicenseKeyValidityState.INVALID, entitlement: unrestrictedEntitlement()}
+  }
+
   const {state, expiredOn} = validityOf(terms)
 
   if (!terms.silent) {
