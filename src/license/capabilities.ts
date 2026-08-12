@@ -8,10 +8,33 @@ import {FeatureId} from './LicenseEntitlement'
 /**
  * The always-granted token. Every entitlement built from a license key includes it.
  *
- * It grants the calculation operators and the whole gated public API surface — see
- * {@link CORE_FEATURES} for why the features live here rather than on a package.
+ * It grants the calculation operators — and nothing else. In particular it grants NO features:
+ * per Kuba's decision (task comment, 12.08) feature gating is real, and the gated API areas come
+ * from the `feat:*` tokens below. The always-on functionality the packaging design assigns to
+ * core (reads, serialization, teardown) is not behind `ensureCapability` at all.
  */
 export const CORE_TOKEN = 'core'
+
+/** Grants {@link FeatureId.Crud} — the mutating CRUD surface of the public API. */
+export const CRUD_FEATURE_TOKEN = 'feat:crud'
+/** Grants {@link FeatureId.UndoRedo}. */
+export const UNDO_REDO_FEATURE_TOKEN = 'feat:undo_redo'
+/** Grants {@link FeatureId.Clipboard}. */
+export const CLIPBOARD_FEATURE_TOKEN = 'feat:clipboard'
+/** Grants {@link FeatureId.NamedExpressions}. */
+export const NAMED_EXPRESSIONS_FEATURE_TOKEN = 'feat:named_expressions'
+/** Grants {@link FeatureId.Batching}. */
+export const BATCHING_FEATURE_TOKEN = 'feat:batching'
+
+/**
+ * Every feature token, in one list, for the shipped-shape adapter: the shipped key vocabulary
+ * predates feature tokens entirely, so a commercial tier is translated into its functions token
+ * PLUS all of these — see `licenseTermsOf` for the reasoning.
+ */
+export const ALL_FEATURE_TOKENS = [
+  CRUD_FEATURE_TOKEN, UNDO_REDO_FEATURE_TOKEN, CLIPBOARD_FEATURE_TOKEN,
+  NAMED_EXPRESSIONS_FEATURE_TOKEN, BATCHING_FEATURE_TOKEN,
+]
 
 /** Math engine package — the free tier's function set. */
 export const FUNCTIONS_1_TOKEN = 'functions_1'
@@ -47,18 +70,11 @@ const OPERATOR_FUNCTIONS = [
   'HF.MULTIPLY', 'HF.NE', 'HF.POW', 'HF.UMINUS', 'HF.UNARY_PERCENT', 'HF.UPLUS',
 ]
 
-/**
- * The features {@link CORE_TOKEN} grants — which is all of them.
- *
- * No package restricts the public API surface in this draft, deliberately. The packaging
- * evidence covers FUNCTIONS only; nothing has decided whether, say, undo/redo or the clipboard
- * belongs to a paid tier. Restricting one here would both invent a product decision and make
- * PR 2's `ensureCapability` start throwing from the CRUD API for real keys, so the conservative
- * choice is to grant them all until that decision exists.
- */
-const CORE_FEATURES = [
-  FeatureId.NamedExpressions, FeatureId.Clipboard, FeatureId.Crud, FeatureId.UndoRedo, FeatureId.Batching,
-]
+// An earlier revision granted all five features from CORE_TOKEN, which made feature gating inert
+// by construction: no typed key could ever lose an API area. Kuba's call (task comment, 12.08):
+// "Feature gating should work, but the legacy keys should grant all feat:* capabilities" — legacy
+// keys already resolve to the unrestricted entitlement, so the carve-out costs nothing, and the
+// five features moved onto their own `feat:*` tokens below.
 
 /**
  * Package membership, as the LOWEST package that includes each function.
@@ -140,7 +156,7 @@ const EXCEL_SIMULATOR_FUNCTIONS = [
   'Z.TEST',
 ]
 
-const coreGrant: CapabilityGrant = {functions: [...OPERATOR_FUNCTIONS], features: [...CORE_FEATURES]}
+const coreGrant: CapabilityGrant = {functions: [...OPERATOR_FUNCTIONS], features: []}
 const functions1Grant: CapabilityGrant = {functions: [...MATH_ENGINE_FUNCTIONS], features: []}
 const functions2Grant: CapabilityGrant = {
   functions: [...MATH_ENGINE_FUNCTIONS, ...CALCULATED_FIELDS_FUNCTIONS], features: [],
@@ -170,6 +186,11 @@ const functions4Grant: CapabilityGrant = {
  * newly implemented built-in is ungated until it is added here, which the completeness invariant
  * in `unit/license/capability-registry.spec.ts` fails on.
  *
+ * The five `feat:*` tokens carry the gated API areas, one feature each, spelled after the draft
+ * vocabulary in the task. A rev-5 key states them explicitly; the shipped-shape adapter grants
+ * all five alongside the tier (that vocabulary predates feature tokens); legacy keys resolve to
+ * the unrestricted entitlement and never consult this table.
+ *
  * The two add-on tokens are RESERVED: recognized, so an issued key carrying one is not reported
  * as unrecognized, but granting nothing. `spreadsheet` has no agreed content yet — the packaging
  * proposal names a *package* "Spreadsheet" and the pricing task names a "Spreadsheet Bundle"
@@ -182,6 +203,11 @@ export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [FUNCTIONS_2_TOKEN, functions2Grant],
   [FUNCTIONS_3_TOKEN, functions3Grant],
   [FUNCTIONS_4_TOKEN, functions4Grant],
+  [CRUD_FEATURE_TOKEN, {functions: [], features: [FeatureId.Crud]}],
+  [UNDO_REDO_FEATURE_TOKEN, {functions: [], features: [FeatureId.UndoRedo]}],
+  [CLIPBOARD_FEATURE_TOKEN, {functions: [], features: [FeatureId.Clipboard]}],
+  [NAMED_EXPRESSIONS_FEATURE_TOKEN, {functions: [], features: [FeatureId.NamedExpressions]}],
+  [BATCHING_FEATURE_TOKEN, {functions: [], features: [FeatureId.Batching]}],
   [SPREADSHEET_ADDON_TOKEN, {functions: [], features: []}],
   [IMPORT_EXPORT_ADDON_TOKEN, {functions: [], features: []}],
 ])

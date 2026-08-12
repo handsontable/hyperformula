@@ -9,6 +9,7 @@ import {
   notifyLicenseKeyState,
 } from '../helpers/licenseKeyValidator'
 import {
+  ALL_FEATURE_TOKENS,
   CAPABILITY_TABLE,
   CORE_TOKEN,
   FUNCTIONS_1_TOKEN,
@@ -189,21 +190,30 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
   const hyperformulaGrant = isProductGrant(hyperformulaEntry) ? hyperformulaEntry : undefined
   const isRev5 = hyperformulaGrant !== undefined && Array.isArray(hyperformulaGrant.capabilities)
 
-  // CORE_TOKEN is always granted, but note what it actually grants: the calculation operators,
-  // and the whole gated public API surface - NOT a usable set of functions. A key whose only
-  // tokens this build does not recognize therefore evaluates operators and protected built-ins
-  // and returns #LIC! for every function call, silently, per HF-307 decision D3. That cliff is
-  // deliberate but severe, and is flagged for review rather than softened here.
+  // CORE_TOKEN is always granted, but note what it actually grants: the calculation operators -
+  // NOT a usable set of functions, and NO features. A key whose only tokens this build does not
+  // recognize therefore evaluates operators and protected built-ins, returns #LIC! for every
+  // function call, and throws from the gated API, silently, per HF-307 decision D3. Kuba
+  // ratified that cliff as-is on 12.08 (D6-A): "this situation should never happen. There is no
+  // point in issuing a key if empty capabilities."
   const capabilityTokens = [CORE_TOKEN]
 
   if (hyperformulaGrant !== undefined) {
     if (isRev5) {
+      // The rev-5 shape states its grants explicitly, feature tokens included - a key that
+      // carries no `feat:*` token gets no gated API area, which is what makes feature gating
+      // real (Kuba, 12.08: "Feature gating should work").
       capabilityTokens.push(...readStrings(hyperformulaGrant.capabilities))
     } else {
       if (typeof hyperformulaGrant.tier === 'string' && hyperformulaGrant.tier.length > 0) {
         capabilityTokens.push(TIER_TO_CAPABILITY_TOKEN[hyperformulaGrant.tier] ?? hyperformulaGrant.tier)
       }
       capabilityTokens.push(...readStrings(hyperformulaGrant.addons))
+      // The shipped vocabulary predates feature tokens entirely, so a shipped-shape key CANNOT
+      // carry one - and its tiers are commercial products sold with the full API. Granting all
+      // five keeps every shipped-shape key's API behaviour identical to what it was before
+      // feature gating went live: the additive-safety rule, applied to features.
+      capabilityTokens.push(...ALL_FEATURE_TOKENS)
     }
   }
 
@@ -259,8 +269,10 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
     comparedAgainstReleaseDate,
     graceDays,
     isTrial: data.keyType === 'trial' || flags.indexOf('trial') !== -1,
-    // rev 5's `silent` flag, plus the §4.3 spelling of it. HF-307 decision D3 additionally makes
-    // a key carrying tokens this version does not know silent, further down.
+    // rev 5's `silent` flag, plus the §4.3 spelling of it. This is the ONLY source of silence:
+    // an earlier revision also silenced any key carrying an unrecognized token, which suppressed
+    // strictly more than D3 asks for (it would have swallowed expiry notices too). Kuba confirmed
+    // it was an implementation error (12.08).
     silent: flags.indexOf('silent') !== -1 || flags.indexOf('silent-console') !== -1,
   }
 }
@@ -304,7 +316,10 @@ function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expir
  *
  * Per HF-307 decision D3 this is fail-closed and silent: a token this version does not recognize
  * is recorded in `unrecognizedCapabilities` and grants nothing, without a warning, a message, or
- * anything public to read it back from.
+ * anything public to read it back from. "Silent" there means the *grant* is silent — whether the
+ * key's console messages are suppressed is decided solely by its `flags` (`terms.silent`), never
+ * by the presence of an unrecognized token; coupling the two suppressed expiry notices as a side
+ * effect of a vocabulary mismatch, and was confirmed an implementation error (Kuba, 12.08).
  *
  * @param {LicenseTerms} terms - the reconciled terms of the key
  */
@@ -316,7 +331,7 @@ function entitlementOf(terms: LicenseTerms): LicenseEntitlement {
     capabilities: new Set(terms.capabilityTokens),
     unrecognizedCapabilities,
     expiry: terms.expiry,
-    silent: terms.silent || unrecognizedCapabilities.length > 0,
+    silent: terms.silent,
     isTrial: terms.isTrial,
   }
 }
