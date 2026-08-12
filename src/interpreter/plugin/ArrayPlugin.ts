@@ -10,20 +10,28 @@ import {ErrorMessage} from '../../error-message'
 import {Ast, AstNodeType, ProcedureAst} from '../../parser'
 import {coerceScalarToBoolean} from '../ArithmeticHelper'
 import {InterpreterState} from '../InterpreterState'
-import {InternalScalarValue, InterpreterValue} from '../InterpreterValue'
+import {getRawValue, InternalScalarValue, InterpreterValue} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
 
 export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypecheck<ArrayPlugin> {
   /**
-   * Converts a numeric TAKE count literal into its predicted result dimension.
+   * Converts a numeric or numeric-text TAKE count literal into its predicted result dimension.
    *
    * @param {Ast | undefined} argument - The count argument to inspect before evaluation.
-   * @returns {number | undefined} The truncated absolute count, or `undefined` when it is not a numeric literal.
+   * @returns {number | undefined} The truncated absolute count, or `undefined` when it is not a supported literal.
    */
-  private static parseTakeLiteralDimension(argument: Ast | undefined): number | undefined {
+  private parseTakeLiteralDimension(argument: Ast | undefined): number | undefined {
     if (argument?.type === AstNodeType.NUMBER) {
       return Math.abs(Math.trunc(argument.value))
+    }
+
+    if (argument?.type === AstNodeType.STRING) {
+      const coercedValue = this.arithmeticHelper.coerceToMaybeNumber(argument.value)
+      if (coercedValue === undefined) {
+        return undefined
+      }
+      return Math.abs(Math.trunc(getRawValue(coercedValue)))
     }
 
     if (
@@ -276,8 +284,8 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
     )
 
-    const literalRows = ArrayPlugin.parseTakeLiteralDimension(ast.args[1])
-    const literalColumns = ArrayPlugin.parseTakeLiteralDimension(ast.args[2])
+    const literalRows = this.parseTakeLiteralDimension(ast.args[1])
+    const literalColumns = this.parseTakeLiteralDimension(ast.args[2])
     const height = literalRows === undefined ? sourceSize.height : Math.min(sourceSize.height, literalRows)
     const width = literalColumns === undefined ? sourceSize.width : Math.min(sourceSize.width, literalColumns)
 
