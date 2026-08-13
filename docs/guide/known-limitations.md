@@ -51,6 +51,14 @@ a circular reference.
 
 * Ordering (including mixed types, empty cells, and text collation) follows HyperFormula's own comparison rules, which honor the `caseSensitive` and `accentSensitive` configuration options. Numbers sort before text, and text before logical values.
 
+### CHOOSECOLS function
+
+* Column indexes must be supplied as separate scalar arguments. Passing multiple indexes through an array or range argument is not supported.
+
+* A whole-column source produces an unbounded-height result, which HyperFormula cannot allocate as a direct spill. Such a formula returns `#VALUE!`; finite-height sources are supported.
+
+* HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. Errors in literal column indexes are detected before spill allocation.
+
 ### OFFSET function
 
 HyperFormula resolves the OFFSET function at parse time rather than during evaluation. The parser inspects the arguments and rewrites the expression into a plain cell reference or range. This keeps the dependency graph accurate but imposes several restrictions.

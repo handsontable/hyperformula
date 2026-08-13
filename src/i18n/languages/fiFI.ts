@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ARVO!',
   },
   functions: {
+    CHOOSECOLS: 'VALITSESARAKKEET',
     FILTER: 'FILTER',
     VSTACK: 'VSTACK',
     HSTACK: 'HSTACK',

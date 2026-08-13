@@ -18,6 +18,7 @@ const dictionary: RawTranslationPackage = {
     VALUE: '#ÉRTÉK!',
   },
   functions: {
+    CHOOSECOLS: 'OSZLOPVÁLASZTÁS',
     FILTER: 'FILTER',
     VSTACK: 'VSTACK',
     HSTACK: 'HSTACK',
