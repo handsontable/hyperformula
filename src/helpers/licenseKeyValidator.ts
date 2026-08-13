@@ -43,9 +43,22 @@ const consoleMessages: ConsoleMessages = {
 let _notified = false
 
 /**
- * Clears the once-per-page-load flag {@link notifyLicenseKeyState} keeps.
+ * License key strings that have already printed their expiry-approaching notice.
  *
- * Exists for tests only. The flag is module-level and never otherwise reset, so without this the
+ * Deliberately keyed by the raw key string rather than a single boolean like {@link _notified}
+ * above: that flag reports one of a handful of states that mean the same thing regardless of
+ * which key triggered them ("a key is invalid", "a key is missing"), so once-per-page-load is the
+ * right behaviour for it. Two different keys approaching their OWN expiry are two different
+ * events, and a page that swaps keys (or a test suite that builds one engine per key) must still
+ * warn for the second one even though the first already consumed a shared flag.
+ */
+const _noticedKeys = new Set<string>()
+
+/**
+ * Clears the once-per-page-load flag {@link notifyLicenseKeyState} keeps, and the per-key set
+ * {@link notifyLicenseKeyNotice} keeps.
+ *
+ * Exists for tests only. Both are module-level and never otherwise reset, so without this the
  * whole console-message path is unobservable: the first spec to build any engine consumes the single
  * warning and every later assertion sees silence regardless of what the code does. Making the reset
  * explicit beats the alternatives — depending on spec-file order is flaky, and under Karma every
@@ -55,6 +68,7 @@ let _notified = false
  */
 export function resetLicenseKeyNotificationForTests(): void {
   _notified = false
+  _noticedKeys.clear()
 }
 
 /**
@@ -78,6 +92,26 @@ export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidit
 
   console.warn(consoleMessages[state](vars))
   _notified = true
+}
+
+/**
+ * Prints a one-time notice that a VALID typed key's usage-until expiry is approaching, at most
+ * once per distinct license key string.
+ *
+ * Called from `src/license/licenseResolution.ts`'s `resolveLicense`, alongside
+ * {@link notifyLicenseKeyState} — see that function's doc for why the two share this module
+ * instead of each keeping a message table and a flag of their own.
+ *
+ * @param {string} licenseKey - the raw key string, used only as the warn-once identity
+ * @param {Date} expiryDate - the day the key's usage-until expiry falls on, at UTC midnight
+ */
+export function notifyLicenseKeyNotice(licenseKey: string, expiryDate: Date): void {
+  if (_noticedKeys.has(licenseKey)) {
+    return
+  }
+
+  console.warn(`The license key for HyperFormula will expire on ${formatDate(expiryDate)} (UTC).`)
+  _noticedKeys.add(licenseKey)
 }
 
 /**

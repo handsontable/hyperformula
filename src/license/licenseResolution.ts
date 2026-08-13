@@ -6,6 +6,7 @@
 import {
   checkLicenseKeyValidity,
   LicenseKeyValidityState,
+  notifyLicenseKeyNotice,
   notifyLicenseKeyState,
 } from '../helpers/licenseKeyValidator'
 import {
@@ -378,6 +379,38 @@ function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expir
 }
 
 /**
+ * The day a VALID key's usage-until expiry falls on, if the current UTC instant is within its
+ * notice window — `null` otherwise, which covers "no notice window configured" (`noticeDays` is
+ * `0`, true of every key the shipped shape can mint, since that shape has no `notice` field) just
+ * as much as "not close enough yet" or "already past its usage-until day".
+ *
+ * Deliberately blind to `graceDays`: notice is about the usage_until axis itself, not about the
+ * grace extension past it. Key spec rev 5 §4.1 sequences notice, then a soft-stop window, then the
+ * hard-stop this build already enforces; only the hard stop and this notice are built for 3.5.0
+ * (Kuba's decision D5-A), so the window checked here ends exactly where the soft-stop phase would
+ * begin, rather than reaching into grace and printing a notice for a key already past its expiry.
+ *
+ * `release_until`-axis keys never reach here with a non-`null` result — `kind` is `'usage'` only
+ * when the date came from `usage_until` (see {@link licenseTermsOf}) — matching rev 5's rule that
+ * notice and grace have no effect on that axis.
+ *
+ * @param {LicenseTerms} terms - the reconciled terms of the key
+ */
+function expiryWithinNoticeWindow(terms: LicenseTerms): Date | null {
+  if (terms.expiry.kind !== 'usage' || terms.expiry.noticeDays <= 0 || terms.expiryTimestamp === null) {
+    return null
+  }
+
+  // The first instant no longer on the usage_until day — the same boundary `validityOf` uses
+  // before adding its grace term.
+  const usageAxisDeadline = terms.expiryTimestamp + MILLISECONDS_PER_DAY
+  const noticeWindowStart = usageAxisDeadline - (terms.expiry.noticeDays * MILLISECONDS_PER_DAY)
+  const now = Date.now()
+
+  return now >= noticeWindowStart && now < usageAxisDeadline ? new Date(terms.expiryTimestamp) : null
+}
+
+/**
  * Turns the reconciled terms of an intact, unexpired typed key into the entitlement it grants.
  *
  * Per HF-307 decision D3 this is fail-closed and silent: a token this version does not recognize
@@ -447,6 +480,14 @@ export function resolveLicense(licenseKey: string): ResolvedLicense {
 
   if (!terms.silent) {
     notifyLicenseKeyState(state, expiredOn)
+
+    if (state === LicenseKeyValidityState.VALID) {
+      const noticeExpiryDate = expiryWithinNoticeWindow(terms)
+
+      if (noticeExpiryDate !== null) {
+        notifyLicenseKeyNotice(licenseKey, noticeExpiryDate)
+      }
+    }
   }
 
   return {
