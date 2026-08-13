@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added the `AVERAGEIFS` function.
+- Added the `AVERAGEIFS` function. [#1732](https://github.com/handsontable/hyperformula/pull/1732)
 
 ## [3.4.0] - 2026-08-10
 
