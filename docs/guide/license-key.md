@@ -65,6 +65,18 @@ an id of their own. The licence covers built-in ids, so a plugin registered unde
 key does not include is treated as that built-in and stays unavailable — it will not be described and
 it evaluates to `#LIC!`. Pick an id the built-in catalogue does not use and this cannot happen.
 
+Two commercial add-ons build on top of a package:
+
+* **Spreadsheet Bundle** grants the CRUD API (adding, removing, and moving rows, columns, sheets,
+  and cell contents), undo/redo, clipboard operations, and batching (`suspendEvaluation()` /
+  `resumeEvaluation()`).
+* **Import/export** is reserved for a future release. HyperFormula doesn't have an import/export
+  feature yet, so this add-on doesn't grant or restrict anything today.
+
+In this release, not having either add-on doesn't restrict anything either: every key already
+grants the CRUD API, undo/redo, clipboard, and batching regardless of whether it names these
+add-ons.
+
 ::: tip
 To find out which package your key includes, check your order confirmation or
 [contact our team](contact.md). HyperFormula deliberately reports nothing about the contents of

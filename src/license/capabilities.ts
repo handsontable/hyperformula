@@ -44,9 +44,17 @@ export const FUNCTIONS_2_TOKEN = 'functions_2'
 export const FUNCTIONS_3_TOKEN = 'functions_3'
 /** Excel simulator package — the entire implemented catalog. */
 export const FUNCTIONS_4_TOKEN = 'functions_4'
-/** Spreadsheet add-on. Reserved: recognized, grants nothing yet — see {@link CAPABILITY_TABLE}. */
+/**
+ * Spreadsheet Bundle add-on (2026-08-12 packages meeting). Grants {@link FeatureId.Crud},
+ * {@link FeatureId.UndoRedo}, {@link FeatureId.Clipboard} and {@link FeatureId.Batching} — see
+ * {@link CAPABILITY_TABLE}.
+ */
 export const SPREADSHEET_ADDON_TOKEN = 'spreadsheet'
-/** Import/export add-on. Reserved until HF-107 ships the feature it would gate. */
+/**
+ * Import/export add-on (2026-08-12 packages meeting). Grants {@link FeatureId.ImportExport}, a
+ * RESERVED grant: nothing in the public API is gated on it yet, because HF-107 hasn't shipped the
+ * import/export feature it would gate.
+ */
 export const IMPORT_EXPORT_ADDON_TOKEN = 'import_export'
 
 /**
@@ -197,11 +205,13 @@ const functions4Grant: CapabilityGrant = {
  * all five alongside the tier (that vocabulary predates feature tokens); legacy keys resolve to
  * the unrestricted entitlement and never consult this table.
  *
- * The two add-on tokens are RESERVED: recognized, so an issued key carrying one is not reported
- * as unrecognized, but granting nothing. `spreadsheet` has no agreed content yet — the packaging
- * proposal names a *package* "Spreadsheet" and the pricing task names a "Spreadsheet Bundle"
- * add-on, and it is not settled whether those are the same set; guessing would silently sell an
- * empty add-on or duplicate a whole tier. `import_export` has nothing to grant until HF-107.
+ * The two add-on tokens, wired per the 2026-08-12 packages meeting: `spreadsheet` backs the
+ * 'Spreadsheet Bundle' add-on and grants {@link FeatureId.Crud}, {@link FeatureId.UndoRedo},
+ * {@link FeatureId.Clipboard} and {@link FeatureId.Batching} (Kuba: batching too, 12.08).
+ * `import_export` backs the import-export add-on and grants {@link FeatureId.ImportExport} — a
+ * RESERVED grant, since nothing in the public API is gated on it yet: HF-107 hasn't shipped the
+ * feature it would gate. Both tokens stay recognized either way, so an issued key carrying one is
+ * never reported as unrecognized.
  */
 export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [CORE_TOKEN, coreGrant],
@@ -214,7 +224,10 @@ export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [CLIPBOARD_FEATURE_TOKEN, {functions: [], features: [FeatureId.Clipboard]}],
   [NAMED_EXPRESSIONS_FEATURE_TOKEN, {functions: [], features: [FeatureId.NamedExpressions]}],
   [BATCHING_FEATURE_TOKEN, {functions: [], features: [FeatureId.Batching]}],
-  [SPREADSHEET_ADDON_TOKEN, {functions: [], features: []}],
-  [IMPORT_EXPORT_ADDON_TOKEN, {functions: [], features: []}],
+  [SPREADSHEET_ADDON_TOKEN, {
+    functions: [],
+    features: [FeatureId.Crud, FeatureId.UndoRedo, FeatureId.Clipboard, FeatureId.Batching],
+  }],
+  [IMPORT_EXPORT_ADDON_TOKEN, {functions: [], features: [FeatureId.ImportExport]}],
 ])
 
