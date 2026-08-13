@@ -43,6 +43,21 @@ const consoleMessages: ConsoleMessages = {
 let _notified = false
 
 /**
+ * Clears the once-per-page-load flag {@link notifyLicenseKeyState} keeps.
+ *
+ * Exists for tests only. The flag is module-level and never otherwise reset, so without this the
+ * whole console-message path is unobservable: the first spec to build any engine consumes the single
+ * warning and every later assertion sees silence regardless of what the code does. Making the reset
+ * explicit beats the alternatives — depending on spec-file order is flaky, and under Karma every
+ * spec shares one browser context, so order tricks do not work there at all.
+ *
+ * @internal
+ */
+export function resetLicenseKeyNotificationForTests(): void {
+  _notified = false
+}
+
+/**
  * Prints the console message for a non-valid license key state, at most once per page load.
  *
  * Extracted so the typed-key path in `src/license/licenseResolution.ts` reports the same states

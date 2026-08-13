@@ -47,6 +47,25 @@ const TIER_TO_CAPABILITY_TOKEN: Record<string, string> = {
   excel_simulator: FUNCTIONS_4_TOKEN,
 }
 
+/**
+ * The prefix marking a capability token as granting a public-API feature area.
+ *
+ * Used to tell "this key names its feature grants" from "this key's vocabulary cannot express
+ * one" — see the opt-in rule in {@link licenseTermsOf}.
+ */
+const FEATURE_TOKEN_PREFIX = 'feat:'
+
+/**
+ * Flag spellings that suppress console output.
+ *
+ * Three, because the key spec is not self-consistent: its normative flags table and its example
+ * payload (rev 5 §2.3 and §2) say `no-console-warns`, while the runtime-behaviour sections of the
+ * same revision (§4.3, §5.2) say `silent-console`, and earlier revisions said plain `silent`. A key
+ * minted against any of those readings must be honoured — a SaaS deployment that asked for silence
+ * and got console warnings is the failure this list exists to prevent.
+ */
+const SILENT_CONSOLE_FLAGS = ['silent', 'silent-console', 'no-console-warns']
+
 /** The rev-5 fields, which the shipped payload shape does not have. */
 interface Rev5ProductGrant {
   capabilities?: unknown,
@@ -188,33 +207,51 @@ function isProductGrant(value: unknown): value is TypedKeyProductGrant & Rev5Pro
 function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
   const hyperformulaEntry: unknown = data.payload.products[HYPERFORMULA_PRODUCT_NAME]
   const hyperformulaGrant = isProductGrant(hyperformulaEntry) ? hyperformulaEntry : undefined
+
+  // `capabilities` present but not an array is a term this code cannot read, so the whole key is
+  // rejected rather than quietly falling through to the shipped-shape branch. That fall-through was
+  // a free pass in both directions: the key gained every feature it never carried, and its rev-5
+  // dates were never read at all, so an expired subscription resolved as perpetual.
+  if (hyperformulaGrant !== undefined
+      && hyperformulaGrant.capabilities !== undefined
+      && !Array.isArray(hyperformulaGrant.capabilities)) {
+    return null
+  }
+
   const isRev5 = hyperformulaGrant !== undefined && Array.isArray(hyperformulaGrant.capabilities)
 
   // CORE_TOKEN is always granted, but note what it actually grants: the calculation operators -
-  // NOT a usable set of functions, and NO features. A key whose only tokens this build does not
-  // recognize therefore evaluates operators and protected built-ins, returns #LIC! for every
-  // function call, and throws from the gated API, silently, per HF-307 decision D3. Kuba
-  // ratified that cliff as-is on 12.08 (D6-A): "this situation should never happen. There is no
-  // point in issuing a key if empty capabilities."
+  // NOT a usable set of functions. A key whose only tokens this build does not recognize therefore
+  // evaluates operators and protected built-ins and returns #LIC! for every function call,
+  // silently, per HF-307 decision D3. Kuba ratified that cliff as-is on 12.08 (D6-A): "this
+  // situation should never happen. There is no point in issuing a key if empty capabilities."
   const capabilityTokens = [CORE_TOKEN]
 
   if (hyperformulaGrant !== undefined) {
     if (isRev5) {
-      // The rev-5 shape states its grants explicitly, feature tokens included - a key that
-      // carries no `feat:*` token gets no gated API area, which is what makes feature gating
-      // real (Kuba, 12.08: "Feature gating should work").
       capabilityTokens.push(...readStrings(hyperformulaGrant.capabilities))
     } else {
       if (typeof hyperformulaGrant.tier === 'string' && hyperformulaGrant.tier.length > 0) {
         capabilityTokens.push(TIER_TO_CAPABILITY_TOKEN[hyperformulaGrant.tier] ?? hyperformulaGrant.tier)
       }
       capabilityTokens.push(...readStrings(hyperformulaGrant.addons))
-      // The shipped vocabulary predates feature tokens entirely, so a shipped-shape key CANNOT
-      // carry one - and its tiers are commercial products sold with the full API. Granting all
-      // five keeps every shipped-shape key's API behaviour identical to what it was before
-      // feature gating went live: the additive-safety rule, applied to features.
-      capabilityTokens.push(...ALL_FEATURE_TOKENS)
     }
+  }
+
+  // Feature tokens are OPT-IN, never opt-out. A key carrying at least one `feat:*` token demonstrably
+  // speaks the feature vocabulary, so it gets exactly the areas it names - that is what makes feature
+  // gating real (Kuba, 12.08: "Feature gating should work"). A key carrying NONE cannot be saying
+  // "no features", because no vocabulary in circulation can express one: the shipped shape has no
+  // such field, and the key spec's current HyperFormula token list (rev 5 §2.2 - `functions_1..4`,
+  // `spreadsheet`, `import_export`) contains no `feat:*` entry at all. So absence means "this key
+  // does not talk about features", and the task's additive-safety rule - a grant may grow between
+  // versions, never shrink - makes the whole gated API the only safe reading.
+  //
+  // Reading absence as denial instead would hand a dead public API to every key myHOT can mint
+  // today, HyperFormula-only and Handsontable-only alike; both were verified doing exactly that
+  // before this rule existed.
+  if (!capabilityTokens.some((token) => token.indexOf(FEATURE_TOKEN_PREFIX) === 0)) {
+    capabilityTokens.push(...ALL_FEATURE_TOKENS)
   }
 
   // WHERE the terms live differs by shape. Under rev 5 every product entry carries its own
@@ -269,11 +306,11 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
     comparedAgainstReleaseDate,
     graceDays,
     isTrial: data.keyType === 'trial' || flags.indexOf('trial') !== -1,
-    // rev 5's `silent` flag, plus the §4.3 spelling of it. This is the ONLY source of silence:
-    // an earlier revision also silenced any key carrying an unrecognized token, which suppressed
-    // strictly more than D3 asks for (it would have swallowed expiry notices too). Kuba confirmed
-    // it was an implementation error (12.08).
-    silent: flags.indexOf('silent') !== -1 || flags.indexOf('silent-console') !== -1,
+    // Every spelling the key spec uses for "suppress console output" - see SILENT_CONSOLE_FLAGS.
+    // The key's flags are the ONLY source of silence: an earlier revision also silenced any key
+    // carrying an unrecognized token, which suppressed strictly more than D3 asks for (it would
+    // have swallowed expiry notices too). Kuba confirmed that was an implementation error (12.08).
+    silent: flags.some((flag) => SILENT_CONSOLE_FLAGS.indexOf(flag) !== -1),
   }
 }
 

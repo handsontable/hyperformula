@@ -66,9 +66,13 @@ export interface LicenseEntitlement {
   expiry: LicenseExpiry,
   /**
    * When `true`, resolving this entitlement must not print a console message of any kind.
-   * HF-307 decision D3 (fail-closed, silent): a typed key with no recognized token resolves
-   * like an explicit `capabilities: []` — core and protected functions only, without a message,
-   * a warning, or a diagnostics getter.
+   *
+   * Set from the key's own flags ONLY — the key spec spells that flag three different ways across
+   * revisions and even within one revision, and all are honoured. An unrecognized token does NOT
+   * set it: HF-307 decision D3 makes the *grant* silent (an unknown token grants nothing, with no
+   * message and no diagnostics getter), which is a different thing from muting the key's console
+   * output. Coupling them suppressed expiry notices as a side effect of a vocabulary mismatch, and
+   * was confirmed an implementation error (Kuba, 12.08).
    */
   silent: boolean,
   isTrial: boolean,
