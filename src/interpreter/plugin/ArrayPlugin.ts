@@ -233,6 +233,11 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       (range: SimpleRangeValue, ...columnNumbers: number[]) => {
         const sourceWidth = range.width()
         const sourceHeight = range.height()
+
+        if (sourceHeight === 0 || sourceWidth === 0) {
+          return new CellError(ErrorType.NA, ErrorMessage.EmptyRange)
+        }
+
         const columnIndexes = columnNumbers.map(columnNumber => Math.trunc(columnNumber))
 
         if (columnIndexes.some(columnIndex =>
