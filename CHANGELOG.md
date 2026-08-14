@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `Exporter` ignoring the `evaluateNullToZero` config option: with the flag on, `getCellValue`, `getSheetValues`, `getAllSheetsValues`, and `ExportedCellChange` now return `0` for empty cells instead of `null`, matching the interpreter's own empty-to-zero coercion. Code that relied on `null` from `getCellValue` to tell a truly empty cell apart from a computed zero under this flag must use `ISBLANK` instead.
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
