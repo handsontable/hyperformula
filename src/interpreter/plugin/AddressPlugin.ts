@@ -67,7 +67,7 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
       const colLetter = columnIndexToLabel(col - 1)
       let sheetPrefix = ''
 
-      if (sheetName !== undefined && sheetName !== null) {
+      if (sheetName !== undefined && sheetName !== null && sheetName !== '') {
         sheetPrefix = `${sheetName}!`
       }
 
