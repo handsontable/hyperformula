@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed approximate `MATCH`/`XLOOKUP` to ignore values whose type differs from the search key also on the linear search path (inline arrays, computed arrays, single-cell ranges, and linear search modes), consistently with the binary-search path over sorted cell ranges and with Excel/Google Sheets behavior.
+
 ## [3.4.0] - 2026-08-10
 
 ### Added

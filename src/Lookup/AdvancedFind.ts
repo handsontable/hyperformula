@@ -103,6 +103,15 @@ export abstract class AdvancedFind {
         continue
       }
 
+      // Skip values of a different type than the key, consistent with findLastOccurrenceInOrderedRange:
+      // compare() ranks every number below every string (and both below booleans) only to keep a
+      // total order for sorting mixed-type arrays, not because cross-type values are comparable.
+      // Without this guard a text key would treat every number as a valid "smaller" candidate (and
+      // vice versa), so a lower-bound search over {10, 20} for "a" would return the largest number.
+      if (typeof value !== typeof searchKey) {
+        continue
+      }
+
       if (compareFn(value, searchKey) > 0) {
         continue
       }
