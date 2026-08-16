@@ -39,13 +39,20 @@ const MAX_TIMESTAMP = 8640000000000000
  * Commercial tier names (the shipped key format) mapped to the capability tokens the library
  * actually resolves. A tier this map does not know is passed through unchanged, so it surfaces
  * as an unrecognized capability rather than being silently swallowed.
+ *
+ * A `Map`, not an object literal, and that matters for safety rather than style: the tier is an
+ * attacker-influenced string, and an object lookup also answers for every `Object.prototype` member,
+ * so `tier: "constructor"` would resolve to a FUNCTION and `tier: "__proto__"` to an object. Either
+ * put a non-string into the token list, which then crashed the scan that reads tokens as strings —
+ * a thrown `TypeError` escaping the `HyperFormula` constructor instead of an `invalid` verdict.
+ * A `Map` answers only for keys actually put in it, matching {@link CAPABILITY_TABLE}.
  */
-const TIER_TO_CAPABILITY_TOKEN: Record<string, string> = {
-  freemium: FUNCTIONS_1_TOKEN,
-  crm: FUNCTIONS_2_TOKEN,
-  data_grid: FUNCTIONS_3_TOKEN,
-  excel_simulator: FUNCTIONS_4_TOKEN,
-}
+const TIER_TO_CAPABILITY_TOKEN: ReadonlyMap<string, string> = new Map([
+  ['freemium', FUNCTIONS_1_TOKEN],
+  ['crm', FUNCTIONS_2_TOKEN],
+  ['data_grid', FUNCTIONS_3_TOKEN],
+  ['excel_simulator', FUNCTIONS_4_TOKEN],
+])
 
 /**
  * The prefix marking a capability token as granting a public-API feature area.
@@ -232,7 +239,7 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
       capabilityTokens.push(...readStrings(hyperformulaGrant.capabilities))
     } else {
       if (typeof hyperformulaGrant.tier === 'string' && hyperformulaGrant.tier.length > 0) {
-        capabilityTokens.push(TIER_TO_CAPABILITY_TOKEN[hyperformulaGrant.tier] ?? hyperformulaGrant.tier)
+        capabilityTokens.push(TIER_TO_CAPABILITY_TOKEN.get(hyperformulaGrant.tier) ?? hyperformulaGrant.tier)
       }
       capabilityTokens.push(...readStrings(hyperformulaGrant.addons))
     }
