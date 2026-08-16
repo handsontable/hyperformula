@@ -127,8 +127,30 @@ interface LicenseTerms {
  * The build's release date as epoch milliseconds (UTC midnight), or `null` when it is unknown or
  * malformed.
  *
- * Read from the same `HT_RELEASE_DATE` (`DD/MM/YYYY`) the legacy validator uses, so a perpetual
- * typed key and a legacy key agree on what "this build" means.
+ * Read from the same `HT_RELEASE_DATE` (`DD/MM/YYYY`) the legacy validator uses, but **parsed
+ * differently on purpose**, and the difference is observable — so do not "simplify" either one to
+ * match the other without reading this.
+ *
+ * This function uses `Date.UTC`. The legacy validator builds the same value with
+ * `new Date(month/day/year)`, which is parsed in the host's LOCAL zone. East of UTC the two land on
+ * different day numbers for one and the same release date:
+ *
+ * ```text
+ * HT_RELEASE_DATE=10/08/2026        legacy (local)   this function (UTC)
+ *   TZ=UTC, TZ=America/Los_Angeles      20675              20675     agree
+ *   TZ=Asia/Tokyo                       20674              20675     differ by a day
+ *   TZ=Pacific/Kiritimati               20674              20675     differ by a day
+ * ```
+ *
+ * UTC is the required reading for a typed key: key spec rev 5 §1.2 makes offline/online parity a
+ * hard rule — the offline check and a future online check must return the same verdict for the same
+ * key at the same instant — and any rule reading a local clock breaks it. The legacy path keeps its
+ * local parse because legacy behaviour is frozen for this release; switching it would move the
+ * expiry verdict of already-issued legacy keys by a day for every customer east of UTC.
+ *
+ * The consequence, flagged rather than hidden: two customers east of UTC, one on a legacy key and
+ * one on an equivalent typed key, can disagree by a day about whether this build is covered.
+ * Reconciling them is a product decision, not a refactor.
  */
 function releaseDateTimestamp(): number | null {
   const [day, month, year] = (process.env.HT_RELEASE_DATE ?? '').split('/')
