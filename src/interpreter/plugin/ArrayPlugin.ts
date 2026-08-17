@@ -251,6 +251,14 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         )
 
         const sourceRange = range.range
+        if (
+          sourceRange !== undefined
+          && !Number.isFinite(sourceRange.height())
+          && (sourceRange.sheet !== state.formulaAddress.sheet || state.formulaAddress.row !== 0)
+        ) {
+          return new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
+        }
+
         if (sourceRange !== undefined) {
           const selectedColumns = zeroBasedColumnIndexes.map(columnIndex => {
             const columnRange = AbsoluteCellRange.spanFrom(
@@ -277,8 +285,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   /**
    * Predicts the CHOOSECOLS spill size from the source height and index count.
    *
-   * Invalid literals and unbounded result heights are rejected before spill
-   * allocation so a neighboring cell cannot mask a statically known error.
+   * Invalid literals and unsupported unbounded result heights are rejected
+   * before spill allocation so a neighboring cell cannot mask a statically
+   * known error. Same-sheet whole-column results can retain their unbounded
+   * height when anchored in the first row.
    *
    * @param {ProcedureAst} ast - The parsed function-call AST node.
    * @param {InterpreterState} state - The current interpreter evaluation state.
@@ -294,7 +304,14 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
     )
 
-    if (!Number.isFinite(sourceSize.height) || sourceSize.height < 1) {
+    const sourceRange = ast.args[0].type === AstNodeType.COLUMN_RANGE
+      ? AbsoluteCellRange.fromAstOrUndef(ast.args[0], state.formulaAddress)
+      : undefined
+    const isSupportedWholeColumnResult = sourceSize.height === Number.POSITIVE_INFINITY
+      && sourceRange?.sheet === state.formulaAddress.sheet
+      && state.formulaAddress.row === 0
+
+    if ((!Number.isFinite(sourceSize.height) && !isSupportedWholeColumnResult) || sourceSize.height < 1) {
       return ArraySize.error()
     }
 

@@ -106,7 +106,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
-| CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      |        VALUE | Spills the whole column when space is available. | Spills the whole column when space is available. |
+| CHOOSECOLS    | =CHOOSECOLS(Data!A:A, 1)                                      |        SPILL | Spills the whole column when space is available. |           SPILL |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | MOD           | =MOD(-10, 3)                                                   |           -1 |             2 |               2 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
