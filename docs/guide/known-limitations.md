@@ -55,7 +55,7 @@ a circular reference.
 
 * Column indexes must be supplied as separate scalar arguments. Passing multiple indexes through an array or range argument is not supported.
 
-* A whole-column source produces an unbounded-height result, which HyperFormula cannot allocate as a direct spill. Such a formula returns `#VALUE!`; if the source sheet has no populated rows, it returns `#N/A` because the effective source range is empty. Finite-height sources are supported.
+* A whole-column source can spill when the formula is in the first row, regardless of whether the source is on the same sheet. A formula below the first row returns `#SPILL!` because its result would extend beyond the worksheet edge. An empty source returns `#N/A` because its effective range is empty. Finite-height sources are supported.
 
 * HyperFormula reserves a dynamic array's predicted spill range before evaluating the formula. If that range is blocked, a runtime error in a source or non-literal column-index expression can therefore be reported as `#SPILL!`. Errors in literal column indexes are detected before spill allocation.
 

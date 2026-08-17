@@ -227,6 +227,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
    *
    * @param {ProcedureAst} ast - The parsed function-call AST node.
    * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {InterpreterValue} The selected source columns or a spreadsheet error.
    */
   public choosecols(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
     return this.runFunction(ast.args, state, this.metadata('CHOOSECOLS'),
@@ -251,6 +252,14 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
         )
 
         const sourceRange = range.range
+        const startsBelowFirstRow = sourceRange !== undefined
+          && !Number.isFinite(sourceRange.height())
+          && state.formulaAddress.row !== 0
+
+        if (startsBelowFirstRow) {
+          return new CellError(ErrorType.SPILL, ErrorMessage.NoSpaceForArrayResult)
+        }
+
         if (sourceRange !== undefined) {
           const selectedColumns = zeroBasedColumnIndexes.map(columnIndex => {
             const columnRange = AbsoluteCellRange.spanFrom(
@@ -277,11 +286,13 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
   /**
    * Predicts the CHOOSECOLS spill size from the source height and index count.
    *
-   * Invalid literals and unbounded result heights are rejected before spill
-   * allocation so a neighboring cell cannot mask a statically known error.
+   * Invalid literals are rejected before spill allocation. A whole-column
+   * result is valid only in the first output row, then its source range
+   * supplies the materialized spill height.
    *
    * @param {ProcedureAst} ast - The parsed function-call AST node.
    * @param {InterpreterState} state - The current interpreter evaluation state.
+   * @returns {ArraySize} The predicted result dimensions or an invalid size.
    */
   public choosecolsArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
     if (ast.args.length < 2) {
@@ -294,7 +305,15 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       new InterpreterState(state.formulaAddress, state.arraysFlag || (metadata?.enableArrayArithmeticForArguments ?? false)),
     )
 
-    if (!Number.isFinite(sourceSize.height) || sourceSize.height < 1) {
+    const startsBelowFirstRow = !Number.isFinite(sourceSize.height) && state.formulaAddress.row !== 0
+    const sourceRange = ast.args[0].type === AstNodeType.COLUMN_RANGE
+      ? AbsoluteCellRange.fromAstOrUndef(ast.args[0], state.formulaAddress)
+      : undefined
+    const effectiveHeight = !Number.isFinite(sourceSize.height) && sourceRange !== undefined
+      ? sourceRange.effectiveHeight(this.dependencyGraph)
+      : sourceSize.height
+
+    if (startsBelowFirstRow || effectiveHeight < 1) {
       return ArraySize.error()
     }
 
@@ -312,7 +331,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       }
     }
 
-    return new ArraySize(ast.args.length - 1, sourceSize.height)
+    return new ArraySize(ast.args.length - 1, effectiveHeight)
   }
 
   /**
