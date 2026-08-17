@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Added the `TAKE` dynamic-array function. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
 
+### Changed
+
+- **Breaking change**: Replaced the placeholder English `VSTACK` and `HSTACK` names with their official localized names in 14 language packs. Formulas parsed with one of those language packs must use the localized function names. [#1722](https://github.com/handsontable/hyperformula/pull/1722)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
