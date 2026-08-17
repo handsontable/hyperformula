@@ -107,7 +107,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
 | TAKE          | =TAKE(A1:A3, 0)                                                |          N/A | No such function. |           CALC  |
-| TAKE          | =TAKE(Data!A:A, , 1)                                           | VALUE because HyperFormula cannot allocate an unbounded direct whole-column result. | No such function. | Spills the whole column from row 1; returns SPILL below row 1. |
+| TAKE          | =TAKE(Data!A:A, , 1)                                           | Spills the whole column from row 1; returns SPILL below row 1. | No such function. | Spills the whole column from row 1; returns SPILL below row 1. |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | MOD           | =MOD(-10, 3)                                                   |           -1 |             2 |               2 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
