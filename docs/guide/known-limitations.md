@@ -43,6 +43,13 @@ a circular reference.
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.
 
 * When `ExactlyOnce` is TRUE and no row or column occurs exactly once, `UNIQUE` returns a `#N/A` error (the result would otherwise be empty).
+
+### TAKE function
+
+* A whole-column result can spill only from the first row of the source sheet, and a whole-row result can spill only from its first column. Cross-sheet whole-column and whole-row results return `#SPILL!`, matching Excel.
+
+* When a row or column count depends on a cell or another non-constant expression, TAKE reserves the corresponding source dimension as an upper bound. The reserved footprint can therefore be larger than the values returned at runtime; an error result, including a count that evaluates to zero, fills that footprint.
+
 ### SORT function
 
 * The `SortIndex` argument accepts a single key only. Multi-key sorting through an array constant (for example `=SORT(A1:B9, {1,2})`) is not supported; sort by one column or row at a time.
