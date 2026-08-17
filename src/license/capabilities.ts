@@ -79,81 +79,87 @@ const OPERATOR_FUNCTIONS = [
 /**
  * Package membership, as the LOWEST package that includes each function.
  *
- * Transcribed from the packaging design's own per-function evidence file. The lists reproduce
- * that file's package counts exactly (17 / 51 / 127 / 355 cumulative, plus 15 operators), which
- * is how the transcript was checked; `capability-table.spec.ts` pins those counts so a later
- * edit cannot drift from them silently.
+ * Transcribed from Kuba's 12.08 packaging doc (CU doc `8cnjcyf-33175`, page `8cnjcyf-47835`, "HF
+ * function groups and packages"), which supersedes the earlier evidence file this table was first
+ * built from. The doc organizes the catalog into 21 group tokens (`fun:<family>.<A|B|C>`) and
+ * states each package as the cumulative union of specific groups: Math engine = the `.A` groups,
+ * Calculated fields = `.A` + `.B`, Spreadsheet = `.A` + `.B` + `.C`. Reproducing that union gives
+ * 17 / 64 / 161 cumulative functions before the two protected built-ins below are removed;
+ * `capability-table.spec.ts` pins the resulting counts so a later edit cannot drift from them
+ * silently.
  *
- * Two functions of the evidence file are deliberately absent: `OFFSET` and `VERSION` are
- * protected built-ins and sit OUTSIDE the token system — the interpreter never gate-checks a
- * protected function, so listing them would be dead weight that implies a restriction that does
- * not exist.
- *
- * **This membership is a DRAFT and is expected to change before release.** The packaging design
- * it follows is still under review, with the free tier's exact contents and the placement of
- * several function families among the points not yet settled.
+ * `OFFSET` and `VERSION` are named by the doc (as `fun:lookup.A` and `fun:info.A`) but are
+ * deliberately absent from every list below: both are protected built-ins that sit OUTSIDE the
+ * token system today — the interpreter never gate-checks a protected function, so listing them
+ * would be dead weight that implies a restriction that does not exist. The doc calls this a
+ * "technical limitation" on both; see `hf-306-token-vocabulary-final` for the root cause of each
+ * (registry protection for VERSION, parse-time resolution for OFFSET) and what closing it would
+ * take.
  */
 const MATH_ENGINE_FUNCTIONS = [
-  'ABS', 'CEILING', 'EXP', 'FLOOR', 'IF', 'LN', 'LOG', 'LOG10', 'MOD', 'POWER', 'PRODUCT', 'ROUND',
-  'ROUNDDOWN', 'ROUNDUP', 'SQRT', 'SUM',
+  'ABS', 'AVERAGE', 'COUNT', 'IF', 'LOG', 'MAX', 'MIN', 'MOD', 'POWER', 'PRODUCT', 'ROUND', 'ROUNDDOWN',
+  'ROUNDUP', 'SQRT', 'SUM',
 ]
 
 /** Added by the calculated-fields package, on top of {@link MATH_ENGINE_FUNCTIONS}. */
 const CALCULATED_FIELDS_FUNCTIONS = [
-  'AND', 'AVERAGE', 'CONCATENATE', 'COUNT', 'DATE', 'DATEDIF', 'DAY', 'DAYS', 'FALSE', 'FIND', 'HOUR',
-  'LEFT', 'LEN', 'LOWER', 'MAX', 'MID', 'MIN', 'MINUTE', 'MONTH', 'NOT', 'NOW', 'OR', 'RIGHT', 'SEARCH',
-  'SECOND', 'TEXT', 'TEXTJOIN', 'TODAY', 'TRIM', 'TRUE', 'UPPER', 'VALUE', 'XOR', 'YEAR',
+  'AND', 'AVERAGEIF', 'CONCATENATE', 'COUNTIF', 'DATE', 'DATEDIF', 'DATEVALUE', 'DAY', 'DAYS', 'EOMONTH',
+  'EXACT', 'FALSE', 'HOUR', 'IFS', 'ISOWEEKNUM', 'LEFT', 'LEN', 'LOWER', 'MID', 'MINUTE', 'MONTH',
+  'NETWORKDAYS', 'NOT', 'OR', 'RAND', 'RANDBETWEEN', 'REPLACE', 'REPT', 'RIGHT', 'SEARCH', 'SECOND',
+  'STDEV.S', 'SUBSTITUTE', 'SUMIF', 'SUMIFS', 'SWITCH', 'TEXT', 'TODAY', 'TRIM', 'TRUE', 'UPPER', 'VALUE',
+  'WEEKDAY', 'WEEKNUM', 'WORKDAY', 'XOR', 'YEAR',
 ]
 
 /** Added by the spreadsheet package, on top of {@link CALCULATED_FIELDS_FUNCTIONS}. */
 const SPREADSHEET_FUNCTIONS = [
-  'ADDRESS', 'AVERAGEIF', 'CHOOSE', 'COLUMN', 'COLUMNS', 'COUNTIF', 'COUNTIFS', 'DATEVALUE', 'DAYS360',
-  'EDATE', 'EOMONTH', 'FILTER', 'FORMULATEXT', 'FV', 'HLOOKUP', 'HYPERLINK', 'IFERROR', 'IFNA', 'INDEX',
-  'INTERVAL', 'IPMT', 'IRR', 'ISBINARY', 'ISBLANK', 'ISERR', 'ISERROR', 'ISEVEN', 'ISFORMULA', 'ISLOGICAL',
-  'ISNA', 'ISNONTEXT', 'ISNUMBER', 'ISODD', 'ISOWEEKNUM', 'ISREF', 'ISTEXT', 'MATCH', 'MAXIFS', 'MINIFS',
-  'NA', 'NETWORKDAYS', 'NETWORKDAYS.INTL', 'NPER', 'NPV', 'PERCENTILE.EXC', 'PERCENTILE.INC', 'PMT',
-  'PPMT', 'PV', 'RAND', 'RANDBETWEEN', 'RATE', 'ROW', 'ROWS', 'SORT', 'STDEV.P', 'STDEV.S', 'STDEVA',
-  'STDEVPA', 'SUMIF', 'SUMIFS', 'TIME', 'TIMEVALUE', 'UNIQUE', 'VAR.P', 'VAR.S', 'VARA', 'VARPA',
-  'VLOOKUP', 'WEEKDAY', 'WEEKNUM', 'WORKDAY', 'WORKDAY.INTL', 'XLOOKUP', 'YEARFRAC',
+  'ACOS', 'ADDRESS', 'ARRAYFORMULA', 'ARRAY_CONSTRAIN', 'ASIN', 'ATAN', 'ATAN2', 'AVERAGEA', 'CEILING',
+  'CHAR', 'CHOOSE', 'CLEAN', 'CODE', 'COLUMN', 'COLUMNS', 'COS', 'COUNTA', 'COUNTBLANK', 'COUNTIFS',
+  'DAYS360', 'DEC2HEX', 'EDATE', 'EVEN', 'EXP', 'FILTER', 'FIND', 'FLOOR', 'FV', 'HEX2DEC', 'HLOOKUP',
+  'HSTACK', 'HYPERLINK', 'IFERROR', 'IFNA', 'INDEX', 'INT', 'IPMT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR',
+  'ISEVEN', 'ISLOGICAL', 'ISNA', 'ISNUMBER', 'ISODD', 'ISTEXT', 'LARGE', 'LN', 'MATCH', 'MAXIFS', 'MEDIAN',
+  'MINIFS', 'MROUND', 'N', 'NA', 'NOW', 'NPV', 'ODD', 'PERCENTILE.INC', 'PI', 'PMT', 'PPMT', 'PROPER', 'PV',
+  'QUOTIENT', 'RATE', 'ROW', 'ROWS', 'SEQUENCE', 'SIGN', 'SIN', 'SLN', 'SMALL', 'SORT', 'STDEV.P', 'STDEVA',
+  'STDEVPA', 'SUBTOTAL', 'SUMPRODUCT', 'SUMSQ', 'SUMXMY2', 'T', 'TAN', 'TEXTJOIN', 'TIME', 'TRANSPOSE',
+  'UNICHAR', 'UNIQUE', 'VAR.P', 'VAR.S', 'VLOOKUP', 'VSTACK', 'XIRR', 'XLOOKUP', 'XNPV', 'YEARFRAC',
 ]
 
 /**
  * Added by the excel-simulator package, on top of {@link SPREADSHEET_FUNCTIONS} — the rest of the
  * implemented catalog.
  *
- * Enumerated rather than taken from the function registry at run time, even though "all
- * functions" would be the shorter way to say it. Reading the registry would sweep in functions
- * registered through `HyperFormula.registerFunctionPlugin`, putting a user's OWN custom function
- * into a paid package and returning `#LIC!` for it on a smaller licence — the opposite of HF-307
- * decision D1, which drops custom-function gating entirely. A function this table does not list
- * is not gated at all, which is exactly the treatment a custom function should get.
+ * Kuba's doc does not itemize this remainder into groups the way it does for the first three
+ * packages: the excel-simulator package is stated as `fun:all` — the whole catalog, granted as a
+ * single token rather than assembled from named groups. This list is that remainder, enumerated
+ * rather than taken from the function registry at run time, even though "all functions" would be
+ * the shorter way to say it. Reading the registry would sweep in functions registered through
+ * `HyperFormula.registerFunctionPlugin`, putting a user's OWN custom function into a paid package
+ * and returning `#LIC!` for it on a smaller licence — the opposite of HF-307 decision D1, which
+ * drops custom-function gating entirely. A function this table does not list is not gated at all,
+ * which is exactly the treatment a custom function should get.
  */
 const EXCEL_SIMULATOR_FUNCTIONS = [
-  'ACOS', 'ACOSH', 'ACOT', 'ACOTH', 'ARABIC', 'ARRAYFORMULA', 'ARRAY_CONSTRAIN', 'ASIN', 'ASINH', 'ATAN',
-  'ATAN2', 'ATANH', 'AVEDEV', 'AVERAGEA', 'BASE', 'BESSELI', 'BESSELJ', 'BESSELK', 'BESSELY', 'BETA.DIST',
-  'BETA.INV', 'BIN2DEC', 'BIN2HEX', 'BIN2OCT', 'BINOM.DIST', 'BINOM.INV', 'BITAND', 'BITLSHIFT', 'BITOR',
-  'BITRSHIFT', 'BITXOR', 'CEILING.MATH', 'CEILING.PRECISE', 'CHAR', 'CHISQ.DIST', 'CHISQ.DIST.RT',
-  'CHISQ.INV', 'CHISQ.INV.RT', 'CHISQ.TEST', 'CLEAN', 'CODE', 'COMBIN', 'COMBINA', 'COMPLEX',
-  'CONFIDENCE.NORM', 'CONFIDENCE.T', 'CORREL', 'COS', 'COSH', 'COT', 'COTH', 'COUNTA', 'COUNTBLANK',
-  'COUNTUNIQUE', 'COVARIANCE.P', 'COVARIANCE.S', 'CSC', 'CSCH', 'CUMIPMT', 'CUMPRINC', 'DAVERAGE', 'DB',
-  'DCOUNT', 'DCOUNTA', 'DDB', 'DEC2BIN', 'DEC2HEX', 'DEC2OCT', 'DECIMAL', 'DEGREES', 'DELTA', 'DEVSQ',
-  'DGET', 'DMAX', 'DMIN', 'DOLLARDE', 'DOLLARFR', 'DPRODUCT', 'DSTDEV', 'DSTDEVP', 'DSUM', 'DVAR', 'DVARP',
-  'EFFECT', 'ERF', 'ERFC', 'EVEN', 'EXACT', 'EXPON.DIST', 'F.DIST', 'F.DIST.RT', 'F.INV', 'F.INV.RT',
-  'F.TEST', 'FACT', 'FACTDOUBLE', 'FISHER', 'FISHERINV', 'FLOOR.MATH', 'FLOOR.PRECISE', 'FVSCHEDULE',
-  'GAMMA', 'GAMMA.DIST', 'GAMMA.INV', 'GAMMALN', 'GAUSS', 'GCD', 'GEOMEAN', 'HARMEAN', 'HEX2BIN',
-  'HEX2DEC', 'HEX2OCT', 'HSTACK', 'HYPGEOM.DIST', 'IFS', 'IMABS', 'IMAGINARY', 'IMARGUMENT', 'IMCONJUGATE',
-  'IMCOS', 'IMCOSH', 'IMCOT', 'IMCSC', 'IMCSCH', 'IMDIV', 'IMEXP', 'IMLN', 'IMLOG10', 'IMLOG2', 'IMPOWER',
-  'IMPRODUCT', 'IMREAL', 'IMSEC', 'IMSECH', 'IMSIN', 'IMSINH', 'IMSQRT', 'IMSUB', 'IMSUM', 'IMTAN', 'INT',
-  'ISPMT', 'LARGE', 'LCM', 'LOGNORM.DIST', 'LOGNORM.INV', 'MAXA', 'MAXPOOL', 'MEDIAN', 'MEDIANPOOL',
-  'MINA', 'MIRR', 'MMULT', 'MROUND', 'MULTINOMIAL', 'N', 'NEGBINOM.DIST', 'NOMINAL', 'NORM.DIST',
-  'NORM.INV', 'NORM.S.DIST', 'NORM.S.INV', 'OCT2BIN', 'OCT2DEC', 'OCT2HEX', 'ODD', 'PDURATION', 'PHI',
-  'PI', 'POISSON.DIST', 'PROPER', 'QUARTILE.EXC', 'QUARTILE.INC', 'QUOTIENT', 'RADIANS', 'REPLACE', 'REPT',
-  'ROMAN', 'RRI', 'RSQ', 'SEC', 'SECH', 'SEQUENCE', 'SERIESSUM', 'SHEET', 'SHEETS', 'SIGN', 'SIN', 'SINH',
-  'SKEW', 'SKEW.P', 'SLN', 'SLOPE', 'SMALL', 'SPLIT', 'SQRTPI', 'STANDARDIZE', 'STEYX', 'SUBSTITUTE',
-  'SUBTOTAL', 'SUMPRODUCT', 'SUMSQ', 'SUMX2MY2', 'SUMX2PY2', 'SUMXMY2', 'SWITCH', 'SYD', 'T', 'T.DIST',
-  'T.DIST.2T', 'T.DIST.RT', 'T.INV', 'T.INV.2T', 'T.TEST', 'TAN', 'TANH', 'TBILLEQ', 'TBILLPRICE',
-  'TBILLYIELD', 'TDIST', 'TRANSPOSE', 'UNICHAR', 'UNICODE', 'VSTACK', 'WEIBULL.DIST', 'XIRR', 'XNPV',
-  'Z.TEST',
+  'ACOSH', 'ACOT', 'ACOTH', 'ARABIC', 'ASINH', 'ATANH', 'AVEDEV', 'BASE', 'BESSELI', 'BESSELJ', 'BESSELK',
+  'BESSELY', 'BETA.DIST', 'BETA.INV', 'BIN2DEC', 'BIN2HEX', 'BIN2OCT', 'BINOM.DIST', 'BINOM.INV', 'BITAND',
+  'BITLSHIFT', 'BITOR', 'BITRSHIFT', 'BITXOR', 'CEILING.MATH', 'CEILING.PRECISE', 'CHISQ.DIST',
+  'CHISQ.DIST.RT', 'CHISQ.INV', 'CHISQ.INV.RT', 'CHISQ.TEST', 'COMBIN', 'COMBINA', 'COMPLEX',
+  'CONFIDENCE.NORM', 'CONFIDENCE.T', 'CORREL', 'COSH', 'COT', 'COTH', 'COUNTUNIQUE', 'COVARIANCE.P',
+  'COVARIANCE.S', 'CSC', 'CSCH', 'CUMIPMT', 'CUMPRINC', 'DAVERAGE', 'DB', 'DCOUNT', 'DCOUNTA', 'DDB',
+  'DEC2BIN', 'DEC2OCT', 'DECIMAL', 'DEGREES', 'DELTA', 'DEVSQ', 'DGET', 'DMAX', 'DMIN', 'DOLLARDE',
+  'DOLLARFR', 'DPRODUCT', 'DSTDEV', 'DSTDEVP', 'DSUM', 'DVAR', 'DVARP', 'EFFECT', 'ERF', 'ERFC',
+  'EXPON.DIST', 'F.DIST', 'F.DIST.RT', 'F.INV', 'F.INV.RT', 'F.TEST', 'FACT', 'FACTDOUBLE', 'FISHER',
+  'FISHERINV', 'FLOOR.MATH', 'FLOOR.PRECISE', 'FORMULATEXT', 'FVSCHEDULE', 'GAMMA', 'GAMMA.DIST',
+  'GAMMA.INV', 'GAMMALN', 'GAUSS', 'GCD', 'GEOMEAN', 'HARMEAN', 'HEX2BIN', 'HEX2OCT', 'HYPGEOM.DIST',
+  'IMABS', 'IMAGINARY', 'IMARGUMENT', 'IMCONJUGATE', 'IMCOS', 'IMCOSH', 'IMCOT', 'IMCSC', 'IMCSCH', 'IMDIV',
+  'IMEXP', 'IMLN', 'IMLOG10', 'IMLOG2', 'IMPOWER', 'IMPRODUCT', 'IMREAL', 'IMSEC', 'IMSECH', 'IMSIN',
+  'IMSINH', 'IMSQRT', 'IMSUB', 'IMSUM', 'IMTAN', 'INTERVAL', 'ISBINARY', 'ISFORMULA', 'ISNONTEXT', 'ISPMT',
+  'ISREF', 'LCM', 'LOG10', 'LOGNORM.DIST', 'LOGNORM.INV', 'MAXA', 'MAXPOOL', 'MEDIANPOOL', 'MINA', 'MIRR',
+  'MMULT', 'MULTINOMIAL', 'NEGBINOM.DIST', 'NETWORKDAYS.INTL', 'NOMINAL', 'NORM.DIST', 'NORM.INV',
+  'NORM.S.DIST', 'NORM.S.INV', 'NPER', 'OCT2BIN', 'OCT2DEC', 'OCT2HEX', 'PDURATION', 'PERCENTILE.EXC',
+  'PHI', 'POISSON.DIST', 'QUARTILE.EXC', 'QUARTILE.INC', 'RADIANS', 'ROMAN', 'RRI', 'RSQ', 'SEC', 'SECH',
+  'SERIESSUM', 'SHEET', 'SHEETS', 'SINH', 'SKEW', 'SKEW.P', 'SLOPE', 'SPLIT', 'SQRTPI', 'STANDARDIZE',
+  'STEYX', 'SUMX2MY2', 'SUMX2PY2', 'SYD', 'T.DIST', 'T.DIST.2T', 'T.DIST.RT', 'T.INV', 'T.INV.2T', 'T.TEST',
+  'TANH', 'TBILLEQ', 'TBILLPRICE', 'TBILLYIELD', 'TDIST', 'TIMEVALUE', 'UNICODE', 'VARA', 'VARPA',
+  'WEIBULL.DIST', 'WORKDAY.INTL', 'Z.TEST',
 ]
 
 const coreGrant: CapabilityGrant = {functions: [...OPERATOR_FUNCTIONS], features: []}
