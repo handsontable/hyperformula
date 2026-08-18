@@ -400,17 +400,41 @@ export class AliasAlreadyExisting extends Error {
  * this one guards the API surface itself (HF-307 PR 2) rather than a formula evaluation, so it
  * is thrown synchronously instead of surfacing as a cell error.
  *
+ * This list names every method that can throw it - `resumeEvaluation` is deliberately NOT among
+ * them: it is the sole exit from a suspended engine, so gating it could strand an instance
+ * permanently if the entitlement changes mid-suspension (see the note on `HyperFormula.
+ * ensureCapability`).
+ *
+ * @see [[HyperFormula.buildFromArray]]
+ * @see [[HyperFormula.buildFromSheets]]
+ * @see [[HyperFormula.buildEmpty]]
  * @see [[addNamedExpression]]
  * @see [[changeNamedExpression]]
  * @see [[removeNamedExpression]]
  * @see [[copy]]
  * @see [[cut]]
  * @see [[paste]]
+ * @see [[setCellContents]]
+ * @see [[addRows]]
+ * @see [[removeRows]]
+ * @see [[addColumns]]
+ * @see [[removeColumns]]
+ * @see [[moveCells]]
+ * @see [[moveRows]]
+ * @see [[moveColumns]]
+ * @see [[swapRowIndexes]]
+ * @see [[setRowOrder]]
+ * @see [[swapColumnIndexes]]
+ * @see [[setColumnOrder]]
+ * @see [[addSheet]]
+ * @see [[removeSheet]]
+ * @see [[clearSheet]]
+ * @see [[setSheetContent]]
+ * @see [[renameSheet]]
  * @see [[undo]]
  * @see [[redo]]
  * @see [[batch]]
  * @see [[suspendEvaluation]]
- * @see [[resumeEvaluation]]
  */
 export class LicenseCapabilityMissingError extends Error {
   constructor(feature: FeatureId) {

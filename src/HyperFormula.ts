@@ -256,6 +256,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -296,6 +297,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -337,6 +339,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Partial<ConfigParams>} configInput - engine configuration
    * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
+   *
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -1222,6 +1226,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToUndoError]] when there is no operation running that can be undone
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the UndoRedo feature
    *
    * @example
    * ```js
@@ -1257,6 +1262,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the UndoRedo feature
    *
    * @example
    * ```js
@@ -1394,6 +1400,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[ExpectedValueOfTypeError]] if topLeftCornerAddress argument is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1433,6 +1440,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1529,6 +1537,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1612,6 +1621,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1704,6 +1714,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1818,6 +1829,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1892,6 +1904,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1965,6 +1978,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2041,6 +2055,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2131,6 +2146,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2225,6 +2241,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2308,6 +2325,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2350,6 +2368,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
@@ -2391,6 +2410,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
@@ -2440,6 +2460,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NothingToPasteError]] when clipboard is empty
    * @throws [[TargetLocationHasArrayError]] when the selected target area has array inside
    * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature, or the Crud feature when pasting a cut
    *
    * @example
    * ```js
@@ -2463,6 +2484,15 @@ export class HyperFormula implements TypedEmitter {
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
     this.ensureCapability(FeatureId.Clipboard)
+    // Pasting a CUT moves cells across the sheet - the same mutation the public moveCells()
+    // requires Crud for - so a Clipboard-only entitlement must not reach it this way. Pasting a
+    // COPY only duplicates values/formulas and stays Clipboard-only, correctly. Checked before
+    // argument validation, same as every other ensureCapability call (HF-307 spec-to-ship review,
+    // 18.08: found as a hard-gating bypass - a Clipboard-only entitlement could cut() then
+    // paste() to relocate cells without Crud ever being granted).
+    if (this._crudOperations.isCutClipboard()) {
+      this.ensureCapability(FeatureId.Crud)
+    }
     if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
@@ -2770,6 +2800,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2845,6 +2876,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2919,6 +2951,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2991,6 +3024,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when values argument is not an array of arrays
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -3680,6 +3714,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -3717,6 +3752,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    * @fires [[evaluationSuspended]] always
    * @fires [[evaluationResumed]] after the recomputation of necessary values
+   *
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Batching feature
    *
    * @example
    * ```js
@@ -3759,6 +3796,8 @@ export class HyperFormula implements TypedEmitter {
    * To resume the evaluation use [[resumeEvaluation]].
    *
    * @fires [[evaluationSuspended]] always
+   *
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Batching feature
    *
    * @example
    * ```js
@@ -3918,6 +3957,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NamedExpressionNameIsInvalidError]] when the named-expression name is not valid
    * @throws [[NoRelativeAddressesAllowedError]] when the named-expression formula contains relative references
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -4144,6 +4184,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    * @throws [[ArrayFormulasNotSupportedError]] when the named expression formula is an array formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -4226,6 +4267,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
