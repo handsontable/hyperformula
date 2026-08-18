@@ -38,11 +38,14 @@ import {
   ExpectedValueOfTypeError,
   LanguageAlreadyRegisteredError,
   LanguageNotRegisteredError,
+  LicenseCapabilityMissingError,
   NotAFormulaError,
 } from './errors'
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {allowsFeature} from './license/CapabilityRegistry'
+import {FeatureId} from './license/LicenseEntitlement'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {FUNCTION_DOCS} from './interpreter/functionMetadata'
@@ -253,6 +256,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -293,6 +297,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SheetSizeLimitExceededError]] when sheet size exceeds the limits
    * @throws [[InvalidArgumentsError]] when any sheet is not an array of arrays
    * @throws [[FunctionPluginValidationError]] when plugin class definition is not consistent with metadata
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -334,6 +339,8 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {Partial<ConfigParams>} configInput - engine configuration
    * @param {SerializedNamedExpression[]} namedExpressions - starting named expressions
+   *
+   * @throws [[LicenseCapabilityMissingError]] if namedExpressions is non-empty and the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -1219,6 +1226,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToUndoError]] when there is no operation running that can be undone
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the UndoRedo feature
    *
    * @example
    * ```js
@@ -1237,6 +1245,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public undo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.undo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1253,6 +1262,7 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[valuesUpdated]] if recalculation was triggered by this change
    *
    * @throws [[NoOperationToRedoError]] when there is no operation running that can be re-done
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the UndoRedo feature
    *
    * @example
    * ```js
@@ -1275,6 +1285,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Undo and Redo
    */
   public redo(): ExportedChange[] {
+    this.ensureCapability(FeatureId.UndoRedo)
     this._crudOperations.redo()
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1389,6 +1400,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the value is not an array of arrays or a raw cell value
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
    * @throws [[ExpectedValueOfTypeError]] if topLeftCornerAddress argument is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1407,6 +1419,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public setCellContents(topLeftCornerAddress: SimpleCellAddress, cellContents: RawCellContent[][] | RawCellContent): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     this._crudOperations.setCellContents(topLeftCornerAddress, cellContents)
     return this.recomputeIfDependencyGraphNeedsIt()
   }
@@ -1427,6 +1440,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1459,6 +1473,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public swapRowIndexes(sheetId: number, rowMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setRowOrder(sheetId, rowMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1522,6 +1537,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when rowMapping does not define correct row permutation for some subset of rows of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1542,6 +1558,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public setRowOrder(sheetId: number, newRowOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newRowOrder, 'row')
     return this.swapRowIndexes(sheetId, mapping)
@@ -1604,6 +1621,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1635,6 +1653,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public swapColumnIndexes(sheetId: number, columnMapping: [number, number][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setColumnOrder(sheetId, columnMapping)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1695,6 +1714,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when columnMapping does not define correct column permutation for some subset of columns of the given sheet
    * @throws [[SourceLocationHasArrayError]] when the selected position has array inside
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1713,6 +1733,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public setColumnOrder(sheetId: number, newColumnOrder: number[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const mapping = this._crudOperations.mappingFromOrder(sheetId, newColumnOrder, 'column')
     return this.swapColumnIndexes(sheetId, mapping)
@@ -1808,6 +1829,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1824,6 +1846,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public addRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1881,6 +1904,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1896,6 +1920,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public removeRows(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeRows(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -1953,6 +1978,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SheetSizeLimitExceededError]] when performing this operation would result in sheet size limits exceeding
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -1972,6 +1998,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public addColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.addColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2028,6 +2055,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2047,6 +2075,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public removeColumns(sheetId: number, ...indexes: ColumnRowIndex[]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.removeColumns(sheetId, ...indexes)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2117,6 +2146,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2140,6 +2170,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Cells
    */
   public moveCells(source: SimpleCellRange, destinationLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     if (!isSimpleCellAddress(destinationLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'destinationLeftCorner')
     }
@@ -2210,6 +2241,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2226,6 +2258,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Rows
    */
   public moveRows(sheetId: number, startRow: number, numberOfRows: number, targetRow: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startRow, 'number', 'startRow')
     validateArgToType(numberOfRows, 'number', 'numberOfRows')
@@ -2292,6 +2325,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[InvalidArgumentsError]] when the given arguments are invalid
    * @throws [[SourceLocationHasArrayError]] when the source location has array inside - array cannot be moved
    * @throws [[TargetLocationHasArrayError]] when the target location has array inside - cells cannot be replaced by the array
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2314,6 +2348,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Columns
    */
   public moveColumns(sheetId: number, startColumn: number, numberOfColumns: number, targetColumn: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(startColumn, 'number', 'startColumn')
     validateArgToType(numberOfColumns, 'number', 'numberOfColumns')
@@ -2333,6 +2368,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
@@ -2352,6 +2388,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public copy(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2373,6 +2410,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if source is of wrong type
    * @throws [[SheetsNotEqual]] if range provided has distinct sheet numbers for start and end
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature
    *
    * @example
    * ```js
@@ -2392,6 +2430,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public cut(source: SimpleCellRange): CellValue[][] {
+    this.ensureCapability(FeatureId.Clipboard)
     if (!isSimpleCellRange(source)) {
       throw new ExpectedValueOfTypeError('SimpleCellRange', 'source')
     }
@@ -2421,6 +2460,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NothingToPasteError]] when clipboard is empty
    * @throws [[TargetLocationHasArrayError]] when the selected target area has array inside
    * @throws [[ExpectedValueOfTypeError]] if targetLeftCorner is of wrong type
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Clipboard feature, or the Crud feature when pasting a cut
    *
    * @example
    * ```js
@@ -2443,6 +2483,16 @@ export class HyperFormula implements TypedEmitter {
    * @category Clipboard
    */
   public paste(targetLeftCorner: SimpleCellAddress): ExportedChange[] {
+    this.ensureCapability(FeatureId.Clipboard)
+    // Pasting a CUT moves cells across the sheet - the same mutation the public moveCells()
+    // requires Crud for - so a Clipboard-only entitlement must not reach it this way. Pasting a
+    // COPY only duplicates values/formulas and stays Clipboard-only, correctly. Checked before
+    // argument validation, same as every other ensureCapability call (HF-307 spec-to-ship review,
+    // 18.08: found as a hard-gating bypass - a Clipboard-only entitlement could cut() then
+    // paste() to relocate cells without Crud ever being granted).
+    if (this._crudOperations.isCutClipboard()) {
+      this.ensureCapability(FeatureId.Crud)
+    }
     if (!isSimpleCellAddress(targetLeftCorner)) {
       throw new ExpectedValueOfTypeError('SimpleCellAddress', 'targetLeftCorner')
     }
@@ -2750,6 +2800,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[SheetNameAlreadyTakenError]] when sheet with a given name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2769,6 +2820,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public addSheet(sheetName?: string): string {
+    this.ensureCapability(FeatureId.Crud)
     if (sheetName !== undefined) {
       validateArgToType(sheetName, 'string', 'sheetName')
     }
@@ -2824,6 +2876,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2844,6 +2897,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public removeSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     const displayName = this.sheetMapping.getSheetName(sheetId) as string
     this._crudOperations.removeSheet(sheetId)
@@ -2897,6 +2951,7 @@ export class HyperFormula implements TypedEmitter {
    *
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2917,6 +2972,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public clearSheet(sheetId: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.clearSheet(sheetId)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -2968,6 +3024,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[InvalidArgumentsError]] when values argument is not an array of arrays
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -2984,6 +3041,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public setSheetContent(sheetId: number, values: RawCellContent[][]): ExportedChange[] {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     this._crudOperations.setSheetContent(sheetId, values)
     return this.recomputeIfDependencyGraphNeedsIt()
@@ -3656,6 +3714,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NoSheetWithIdError]] when the given sheet ID does not exist
    * @throws [[SheetNameAlreadyTakenError]] when the provided sheet name already exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Crud feature
    *
    * @example
    * ```js
@@ -3671,6 +3730,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Sheets
    */
   public renameSheet(sheetId: number, newName: string): void {
+    this.ensureCapability(FeatureId.Crud)
     validateArgToType(sheetId, 'number', 'sheetId')
     validateArgToType(newName, 'string', 'newName')
     const oldName = this._crudOperations.renameSheet(sheetId, newName)
@@ -3693,6 +3753,8 @@ export class HyperFormula implements TypedEmitter {
    * @fires [[evaluationSuspended]] always
    * @fires [[evaluationResumed]] after the recomputation of necessary values
    *
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Batching feature
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildFromSheets({
@@ -3712,6 +3774,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public batch(batchOperations: () => void): ExportedChange[] {
+    this.ensureCapability(FeatureId.Batching)
     this.suspendEvaluation()
     this._crudOperations.beginUndoRedoBatchMode()
     try {
@@ -3733,6 +3796,8 @@ export class HyperFormula implements TypedEmitter {
    * To resume the evaluation use [[resumeEvaluation]].
    *
    * @fires [[evaluationSuspended]] always
+   *
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the Batching feature
    *
    * @example
    * ```js
@@ -3759,6 +3824,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public suspendEvaluation(): void {
+    this.ensureCapability(FeatureId.Batching)
     this._evaluationSuspended = true
     this._emitter.emit(Events.EvaluationSuspended)
   }
@@ -3795,6 +3861,15 @@ export class HyperFormula implements TypedEmitter {
    * @category Batch
    */
   public resumeEvaluation(): ExportedChange[] {
+    // Deliberately NOT gated, unlike suspendEvaluation and batch. This is the only exit from
+    // a suspended engine, and _evaluationSuspended survives rebuildWithConfig: an instance
+    // suspended while Batching was granted, whose entitlement then loses Batching via
+    // updateConfig, would be stuck suspended forever - every read throws
+    // EvaluationSuspendedError and the sole recovery path would throw
+    // LicenseCapabilityMissingError. Gating the two entry points is what makes the feature
+    // licensable; gating the release valve only strands the caller, which is the same reason
+    // teardown (clearClipboard, clearUndoStack, clearRedoStack) is ungated. See the note on
+    // ensureCapability.
     this._evaluationSuspended = false
     const changes = this.recomputeIfDependencyGraphNeedsIt()
     this._emitter.emit(Events.EvaluationResumed, changes)
@@ -3882,6 +3957,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NamedExpressionNameIsInvalidError]] when the named-expression name is not valid
    * @throws [[NoRelativeAddressesAllowedError]] when the named-expression formula contains relative references
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -3902,6 +3978,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public addNamedExpression(expressionName: string, expression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4107,6 +4184,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
    * @throws [[ArrayFormulasNotSupportedError]] when the named expression formula is an array formula
    * @throws [[NoRelativeAddressesAllowedError]] when the named expression formula contains relative references
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -4124,6 +4202,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public changeNamedExpression(expressionName: string, newExpression: RawCellContent, scope?: number, options?: NamedExpressionOptions): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4188,6 +4267,7 @@ export class HyperFormula implements TypedEmitter {
    * @throws [[ExpectedValueOfTypeError]] if any of its basic type argument is of wrong type
    * @throws [[NamedExpressionDoesNotExistError]] when the given expression does not exist.
    * @throws [[NoSheetWithIdError]] if no sheet with given sheetId exists
+   * @throws [[LicenseCapabilityMissingError]] if the current license entitlement does not grant the NamedExpressions feature
    *
    * @example
    * ```js
@@ -4205,6 +4285,7 @@ export class HyperFormula implements TypedEmitter {
    * @category Named Expressions
    */
   public removeNamedExpression(expressionName: string, scope?: number): ExportedChange[] {
+    this.ensureCapability(FeatureId.NamedExpressions)
     validateArgToType(expressionName, 'string', 'expressionName')
     if (scope !== undefined) {
       validateArgToType(scope, 'number', 'scope')
@@ -4764,6 +4845,45 @@ export class HyperFormula implements TypedEmitter {
   private ensureEvaluationIsNotSuspended() {
     if (this._evaluationSuspended) {
       throw new EvaluationSuspendedError()
+    }
+  }
+
+  /**
+   * Throws an error if the current license entitlement does not grant the given feature.
+   * A no-op read (`isLicenseGateActive === false`) whenever this instance's entitlement is
+   * unrestricted, i.e. for every key this library fully understands today (HF-307 PR 1); the
+   * check only does work once a real license-key payload adapter (a later HF-307 PR) can
+   * produce a restricted entitlement.
+   *
+   * Where the line is drawn, so a later change does not move it by accident:
+   * - **Gated:** methods that create value by mutating the sheet, the clipboard, the undo
+   *   history, or the named-expression set.
+   * - **Not gated:** reads (`getCellValue`, `listNamedExpressions`,
+   *   `getAllNamedExpressionsSerialized`, the `isItPossibleTo*` predicates) and teardown or
+   *   cleanup that only ever removes state (`clearClipboard`, `clearUndoStack`,
+   *   `clearRedoStack`, `destroy`). Gating cleanup would let a restricted entitlement strand
+   *   an integration mid-teardown while giving a licensee nothing, and mirrors gate B, which
+   *   blocks *calling* a function rather than *reading* an already-computed value.
+   * - **Not gated, for the same reason:** `resumeEvaluation`, the sole exit from a suspended
+   *   engine. Gate the entry points (`suspendEvaluation`, `batch`) and the feature is
+   *   licensable; gate the release valve too and an entitlement change mid-suspension leaves
+   *   the instance permanently unusable. A capability check must never be reachable only on
+   *   the way out of a state it let the caller into.
+   *
+   * Note this checks gate B (entitlement) only, never gate A (key validity). That asymmetry
+   * with the interpreter's gate B - which checks key validity first - is deliberate: it keeps
+   * today's behaviour for a missing or invalid key, where formulas yield `#LIC!` but the CRUD
+   * API keeps working. A later PR that resolves an invalid key to a *restricted* entitlement
+   * rather than an unrestricted one would silently turn that into a breaking API change.
+   *
+   * @internal
+   */
+  private ensureCapability(feature: FeatureId): void {
+    if (!this._config.isLicenseGateActive) {
+      return
+    }
+    if (!allowsFeature(this._config.licenseCapabilities, feature)) {
+      throw new LicenseCapabilityMissingError(feature)
     }
   }
 

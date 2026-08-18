@@ -4,6 +4,7 @@
  */
 
 import {SimpleCellAddress} from './Cell'
+import {FeatureId} from './license/LicenseEntitlement'
 
 /**
  * Error thrown when the sheet of a given ID does not exist.
@@ -390,5 +391,53 @@ export class NoRelativeAddressesAllowedError extends Error {
 export class AliasAlreadyExisting extends Error {
   constructor(name: string, pluginName: string) {
     super(`Alias id ${name} in plugin ${pluginName} already defined as a function or alias.`)
+  }
+}
+
+/**
+ * Error thrown when a public API method is called for a {@link FeatureId} that the current
+ * license entitlement does not grant. Mirrors gate B's `ErrorMessage.LicenseCapability`, but
+ * this one guards the API surface itself (HF-307 PR 2) rather than a formula evaluation, so it
+ * is thrown synchronously instead of surfacing as a cell error.
+ *
+ * This list names every method that can throw it - `resumeEvaluation` is deliberately NOT among
+ * them: it is the sole exit from a suspended engine, so gating it could strand an instance
+ * permanently if the entitlement changes mid-suspension (see the note on `HyperFormula.
+ * ensureCapability`).
+ *
+ * @see [[HyperFormula.buildFromArray]]
+ * @see [[HyperFormula.buildFromSheets]]
+ * @see [[HyperFormula.buildEmpty]]
+ * @see [[addNamedExpression]]
+ * @see [[changeNamedExpression]]
+ * @see [[removeNamedExpression]]
+ * @see [[copy]]
+ * @see [[cut]]
+ * @see [[paste]]
+ * @see [[setCellContents]]
+ * @see [[addRows]]
+ * @see [[removeRows]]
+ * @see [[addColumns]]
+ * @see [[removeColumns]]
+ * @see [[moveCells]]
+ * @see [[moveRows]]
+ * @see [[moveColumns]]
+ * @see [[swapRowIndexes]]
+ * @see [[setRowOrder]]
+ * @see [[swapColumnIndexes]]
+ * @see [[setColumnOrder]]
+ * @see [[addSheet]]
+ * @see [[removeSheet]]
+ * @see [[clearSheet]]
+ * @see [[setSheetContent]]
+ * @see [[renameSheet]]
+ * @see [[undo]]
+ * @see [[redo]]
+ * @see [[batch]]
+ * @see [[suspendEvaluation]]
+ */
+export class LicenseCapabilityMissingError extends Error {
+  constructor(feature: FeatureId) {
+    super(`Feature ${feature} is not included in your license.`)
   }
 }
