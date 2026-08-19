@@ -4,10 +4,10 @@ Use iterative calculation to resolve circular references in your spreadsheet for
 
 ## What is iterative calculation?
 
-A **circular reference** occurs when a formula refers back to its own cell. For example:
+A **circular reference** occurs when a formula refers back to its own cell, either directly or through a chain of other cells. For example:
 
-- `A1` contains `=A1+1`
-- `A1` contains `=B1+1` and `B1` contains `=A1+1`
+- Direct: `A1` contains `=A1+1`
+- Indirect: `A1` contains `=B1+1` and `B1` contains `=A1+1`
 
 By default, HyperFormula returns a [`#CYCLE!`](types-of-errors.md) error for circular references. However, some spreadsheet models intentionally use circular references for iterative calculations, such as:
 
@@ -30,8 +30,8 @@ When iterative calculation is enabled, HyperFormula repeatedly evaluates the cir
 
 A cell is considered **converged** when:
 
-- **(numeric values)** the change between iterations is below the configured threshold: `|new - old| < threshold` OR
-- **(strings, booleans)**: the value stop changing between iterations
+- **Numeric values**: the change between iterations is below the configured threshold: `|new - old| < threshold`
+- **Non-numeric values** (strings, booleans, errors): the value stops changing between iterations
 
 All cells in the cycle must converge for iteration to stop early.
 
