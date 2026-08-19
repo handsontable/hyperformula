@@ -18,7 +18,24 @@ const NOT_FOUND = -1
  * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range,
  * - ifNoMatch - must be set to 'returnLowerBound', 'returnUpperBound' or 'returnNotFound'
  *
- * If the search range contains duplicates, returns the last matching value. If no value found in the range satisfies the above, returns -1.
+ * If the search range contains duplicates, returns the last matching value, with one caveat: in the
+ * 'returnNotFound' mode, when the range contains both duplicates of the searchKey and interspersed
+ * empty cells, the search may report any of the duplicated positions (Excel's binary-search modes
+ * likewise leave this unspecified).
+ *
+ * If no value found in the range satisfies the above, returns -1.
+ *
+ * Empty cells (EmptyValue) are skipped: they are not treated as ordered values during the
+ * approximate search. This mirrors Google Sheets and Excel's linear approximate lookups, which
+ * ignore genuinely empty cells (but not empty strings) when looking for the lower/upper bound;
+ * for Excel's explicit binary search modes (XLOOKUP search_mode ±2) the result on a range with
+ * interspersed empty cells is unspecified — see docs/guide/list-of-differences.md.
+ * The returned offset is always relative to the original range, so empty cells keep their slots
+ * and the position of the matched non-empty cell is reported unchanged.
+ *
+ * Complexity: O(log n) as long as the binary-search descent probes no empty cell — in particular
+ * for ranges without empty cells. Only when the descent touches an empty cell does the search fall
+ * back to an O(n) scan that compacts the non-empty indices and re-runs the binary search over them.
  *
  * Note: this function does not normalize input strings.
  */
@@ -39,8 +56,66 @@ export function findLastOccurrenceInOrderedRange(
     ? (left: RawNoErrorScalarValue, right: RawInterpreterValue) => compare(left, right)
     : (left: RawNoErrorScalarValue, right: RawInterpreterValue) => -compare(left, right)
 
-  const foundIndex = findLastMatchingIndex(index => compareFn(searchKey, getValueFromIndexFn(index)) >= 0, start, end)
-  const foundValue = getValueFromIndexFn(foundIndex)
+  /*
+   * Returns the original index of the first non-empty cell at or after fromIndex, or undefined if
+   * all the remaining cells are empty. Costs O(gap length), which the search pays only when it
+   * actually needs to step over empty slots.
+   */
+  const findNextNonEmptyIndex = (fromIndex: number): number | undefined => {
+    for (let index = fromIndex; index <= end; index++) {
+      if (getValueFromIndexFn(index) !== EmptyValue) {
+        return index
+      }
+    }
+    return undefined
+  }
+
+  // Fast path: binary search directly over the original range, tracking whether the descent ever
+  // probed an empty cell. Within the sorted-input contract, empty cells are the only source of
+  // non-monotonicity in the search predicate: compare() ranks EmptyValue below every non-empty
+  // value, and genuinely empty cells surface as the EmptyValue sentinel — empty strings and 0 do
+  // not. (Error values also break the ordering, but a range containing errors is outside the
+  // contract, and the compaction fallback keeps them too.) In a descent that never probes an empty
+  // cell every probed pivot is a correctly-ordered non-empty value, so each discarded half is
+  // justified by the monotonicity of the non-empty values, and the landing index — which is always
+  // probed — is the same one the compacted search below would return: the result can be trusted
+  // as-is. This keeps the search O(log n) unless an empty cell actually interferes.
+  let probedEmptyCell = false
+  const directIndex = findLastMatchingIndex(index => {
+    const value = getValueFromIndexFn(index)
+    if (value === EmptyValue) {
+      probedEmptyCell = true
+    }
+    return compareFn(searchKey, value) >= 0
+  }, start, end)
+
+  let foundIndex: number
+
+  if (!probedEmptyCell) {
+    foundIndex = directIndex
+  } else if (ifNoMatch === 'returnNotFound' && directIndex !== NOT_FOUND && getValueFromIndexFn(directIndex) === searchKey) {
+    // Exact-match mode: a misdirected descent cannot produce a false positive, because the landing
+    // value is re-checked for equality here. Accept the hit and skip the O(n) fallback.
+    return directIndex - start
+  } else {
+    // The descent probed an empty cell, so its result cannot be trusted (HF-223): collect the
+    // original indices of the non-empty cells (O(n)) and re-run the binary search over the
+    // compacted, empty-free index list. The result maps back to the original index space, so empty
+    // cells keep their slots and the matched non-empty cell's original position is reported
+    // unchanged. On an all-empty range the compacted list has no elements and the search reports
+    // NOT_FOUND, which the ifNoMatch branches below preserve.
+    const nonEmptyIndices: number[] = []
+    for (let index = start; index <= end; index++) {
+      if (getValueFromIndexFn(index) !== EmptyValue) {
+        nonEmptyIndices.push(index)
+      }
+    }
+
+    const foundCompactedIndex = findLastMatchingIndex(compactedIndex => compareFn(searchKey, getValueFromIndexFn(nonEmptyIndices[compactedIndex])) >= 0, 0, nonEmptyIndices.length - 1)
+    foundIndex = foundCompactedIndex === NOT_FOUND ? NOT_FOUND : nonEmptyIndices[foundCompactedIndex]
+  }
+
+  const foundValue = foundIndex === NOT_FOUND ? EmptyValue : getValueFromIndexFn(foundIndex)
 
   if (foundValue === searchKey) {
     return foundIndex - start
@@ -48,7 +123,15 @@ export function findLastOccurrenceInOrderedRange(
 
   if (ifNoMatch === 'returnLowerBound') {
     if (foundIndex === NOT_FOUND) {
-      return orderingDirection === 'asc' ? NOT_FOUND : 0
+      if (orderingDirection === 'asc') {
+        return NOT_FOUND
+      }
+
+      // orderingDirection === 'desc': the key exceeds every value in the range, so the lower bound
+      // is the first (largest) non-empty value — never an empty leading cell, and NOT_FOUND on an
+      // all-empty range.
+      const firstNonEmptyIndex = findNextNonEmptyIndex(start)
+      return firstNonEmptyIndex !== undefined ? firstNonEmptyIndex - start : NOT_FOUND
     }
 
     if (typeof foundValue !== typeof searchKey) {
@@ -60,14 +143,23 @@ export function findLastOccurrenceInOrderedRange(
       return foundIndex - start
     }
 
-    // orderingDirection === 'desc'
-    const nextIndex = foundIndex+1
-    return nextIndex <= end ? nextIndex - start : NOT_FOUND
+    // orderingDirection === 'desc': step to the next non-empty cell, so skipped empty slots never
+    // shift the reported position.
+    const nextIndex = findNextNonEmptyIndex(foundIndex + 1)
+    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
   }
 
   if (ifNoMatch === 'returnUpperBound') {
     if (foundIndex === NOT_FOUND) {
-      return orderingDirection === 'asc' ? 0 : NOT_FOUND
+      if (orderingDirection === 'desc') {
+        return NOT_FOUND
+      }
+
+      // orderingDirection === 'asc': the key precedes every value in the range, so the upper bound
+      // is the first (smallest) non-empty value — never an empty leading cell, and NOT_FOUND on an
+      // all-empty range.
+      const firstNonEmptyIndex = findNextNonEmptyIndex(start)
+      return firstNonEmptyIndex !== undefined ? firstNonEmptyIndex - start : NOT_FOUND
     }
 
     if (typeof foundValue !== typeof searchKey) {
@@ -79,9 +171,10 @@ export function findLastOccurrenceInOrderedRange(
       return foundIndex - start
     }
 
-    // orderingDirection === 'asc'
-    const nextIndex = foundIndex+1
-    return nextIndex <= end ? nextIndex - start : NOT_FOUND
+    // orderingDirection === 'asc': step to the next non-empty cell, so skipped empty slots never
+    // shift the reported position.
+    const nextIndex = findNextNonEmptyIndex(foundIndex + 1)
+    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
   }
 
   // ifNoMatch === 'returnNotFound'

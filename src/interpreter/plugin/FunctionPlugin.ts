@@ -231,6 +231,22 @@ export interface FunctionArgument {
    * If set, numerical arguments need to be greater than `greaterThan`.
    */
   greaterThan?: number,
+
+  /**
+   * If set to `true`, an empty argument is treated as if the argument was not
+   * provided at all — that is, it falls back to `defaultValue`.
+   *
+   * By default (`false`), an empty argument is coerced to the zero-value for its
+   * type (`0` for numbers, `FALSE` for booleans, `""` for strings).
+   *
+   * | Formula          | `emptyAsDefault: false` (default) | `emptyAsDefault: true`        |
+   * |------------------|-----------------------------------|-------------------------------|
+   * | `ADDRESS(2,3)`   | uses `defaultValue` for 3rd arg   | uses `defaultValue` for 3rd arg |
+   * | `ADDRESS(2,3,)`  | uses `0` for 3rd arg              | uses `defaultValue` for 3rd arg |
+   *
+   * Requires `defaultValue` to be set.
+   */
+  emptyAsDefault?: boolean,
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
@@ -280,16 +296,17 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return this.arraySizePredictor.checkArraySizeForAst(ast, state)
   }
 
-  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean][] {
-    const ret: [InternalScalarValue, boolean][] = []
+  protected listOfScalarValues(asts: Ast[], state: InterpreterState): [InternalScalarValue, boolean, boolean][] {
+    const ret: [InternalScalarValue, boolean, boolean][] = []
     for (const argAst of asts) {
+      const isSyntacticallyEmpty = argAst.type === AstNodeType.EMPTY
       const value = this.evaluateAst(argAst, state)
       if (value instanceof SimpleRangeValue) {
         for (const scalarValue of value.valuesFromTopLeftCorner()) {
-          ret.push([scalarValue, true])
+          ret.push([scalarValue, true, isSyntacticallyEmpty])
         }
       } else {
-        ret.push([value, false])
+        ret.push([value, false, isSyntacticallyEmpty])
       }
     }
     return ret
@@ -389,10 +406,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     metadata: FunctionMetadata,
     functionImplementation: (...arg: any) => InterpreterValue,
   ): RawInterpreterValue => {
-    const evaluatedArguments: [InterpreterValue, boolean][] = this.evaluateArguments(args, state, metadata)
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    const argumentValues: InterpreterValue[] = evaluatedArguments.map(([value, _]: [InterpreterValue, boolean]) => value as InterpreterValue)
-    const argumentIgnorableFlags = evaluatedArguments.map(([_, ignorable]) => ignorable)
+    const evaluatedArguments = this.evaluateArguments(args, state, metadata)
+    const argumentValues: InterpreterValue[] = evaluatedArguments.map(([value]) => value)
+    const argumentIgnorableFlags = evaluatedArguments.map(([, ignorable]) => ignorable)
+    const syntacticallyEmptyFlags = evaluatedArguments.map(([, , empty]) => empty)
     const argumentMetadata = this.buildMetadataForEachArgumentValue(argumentValues.length, metadata)
     const isVectorizationOn = state.arraysFlag && !metadata.vectorizationForbidden
 
@@ -404,13 +421,13 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
     if (resultArrayHeight === 1 && resultArrayWidth === 1) {
       const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, 0, 0)
-      return this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
+      return this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, functionImplementation, metadata.returnNumberType)
     }
 
     const resultArray: InternalScalarValue[][] = [ ...Array(resultArrayHeight).keys() ].map(row =>
       [ ...Array(resultArrayWidth).keys() ].map(col => {
         const vectorizedArguments = this.vectorizeAndBroadcastArgumentsIfNecessary(isVectorizationOn, argumentValues, argumentMetadata, row, col)
-        const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, functionImplementation, metadata.returnNumberType)
+        const result = this.calculateSingleCellOfResultArray(state, vectorizedArguments, argumentMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags, functionImplementation, metadata.returnNumberType)
 
         if (result instanceof SimpleRangeValue) {
           throw new Error('Function returning array cannot be vectorized.')
@@ -428,10 +445,11 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     vectorizedArguments: Maybe<InterpreterValue>[],
     argumentsMetadata: FunctionArgument[],
     argumentIgnorableFlags: boolean[],
+    syntacticallyEmptyFlags: boolean[],
     functionImplementation: (...arg: any) => InterpreterValue,
     returnNumberType: NumberType | undefined,
   ): RawInterpreterValue {
-    const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags)
+    const coercedArguments = this.coerceArgumentsToRequiredTypes(state, vectorizedArguments, argumentsMetadata, argumentIgnorableFlags, syntacticallyEmptyFlags)
 
     if (coercedArguments instanceof CellError) {
       return coercedArguments
@@ -446,12 +464,18 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     vectorizedArguments: Maybe<InterpreterValue>[],
     argumentsMetadata: FunctionArgument[],
     argumentIgnorableFlags: boolean[],
+    syntacticallyEmptyFlags: boolean[],
   ):  CellError | Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] {
     const coercedArguments: Maybe<InterpreterValue | complex | RawNoErrorScalarValue>[] = []
 
     for (let i = 0; i < argumentsMetadata.length; i++) {
       const argumentMetadata = argumentsMetadata[i]
-      const argumentValue = vectorizedArguments[i] !== undefined ? vectorizedArguments[i] : argumentMetadata?.defaultValue
+      const rawArg = vectorizedArguments[i]
+      const argumentValue = rawArg === undefined
+        ? argumentMetadata?.defaultValue
+        : (syntacticallyEmptyFlags[i] && argumentMetadata?.emptyAsDefault && argumentMetadata?.defaultValue !== undefined)
+          ? argumentMetadata.defaultValue
+          : rawArg
 
       if (argumentValue === undefined) {
         coercedArguments.push(undefined)
@@ -489,8 +513,10 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
     return argumentValue.data[targetRowNum]?.[targetColNum]
   }
 
-  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean][] {
-    return metadata.expandRanges ? this.listOfScalarValues(args, state) : args.map((ast) => [this.evaluateAst(ast, state), false])
+  protected evaluateArguments(args: Ast[], state: InterpreterState, metadata: FunctionMetadata): [InterpreterValue, boolean, boolean][] {
+    return metadata.expandRanges
+      ? this.listOfScalarValues(args, state)
+      : args.map((ast) => [this.evaluateAst(ast, state), false, ast.type === AstNodeType.EMPTY])
   }
 
   protected buildMetadataForEachArgumentValue(numberOfArgumentValuesPassed: number, metadata: FunctionMetadata): FunctionArgument[] {

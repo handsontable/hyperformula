@@ -7,6 +7,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-08-10
+
+### Added
+
+- Added the `getAvailableFunctions()` and `getFunctionDetails()` instance methods for retrieving function metadata. [#1692](https://github.com/handsontable/hyperformula/pull/1692)
+- Added new functions: VSTACK, HSTACK. [#1698](https://github.com/handsontable/hyperformula/pull/1698)
+- Added a new function: `XIRR`. [#1701](https://github.com/handsontable/hyperformula/pull/1701)
+- Added the UNIQUE function. [#1708](https://github.com/handsontable/hyperformula/pull/1708)
+- Added the SORT function. [#1707](https://github.com/handsontable/hyperformula/pull/1707)
+- Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
+- Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
+
+### Fixed
+
+- Fixed the behavior of `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions when the search range contained empty cells. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
+- Fixed the `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions to return `0` instead of an empty value when the matched cell in the result range is empty. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
+- Fixed the page freezing when entering a long string of digits containing a non-digit character near the end (e.g. `012...789a` or `012...789 123`) into a cell. [#1520](https://github.com/handsontable/hyperformula/issues/1520)
+
+## [3.3.0] - 2026-05-20
+
+### Added
+
+- Added 12 database functions: DCOUNT, DSUM, DAVERAGE, DMAX, DMIN, DGET, DPRODUCT, DCOUNTA, DSTDEV, DSTDEVP, DVAR, DVARP. [#1652](https://github.com/handsontable/hyperformula/pull/1652)
+- Added new functions: PERCENTILE, PERCENTILE.INC, PERCENTILE.EXC, QUARTILE, QUARTILE.INC, QUARTILE.EXC. [#1650](https://github.com/handsontable/hyperformula/pull/1650)
+- Added `maxPendingLazyTransformations` configuration option to control memory usage by limiting accumulated transformations before cleanup. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
+- Added a new function: TEXTJOIN. [#1640](https://github.com/handsontable/hyperformula/pull/1640)
+- Added a new function: SEQUENCE. [#1645](https://github.com/handsontable/hyperformula/pull/1645)
+
+### Fixed
+
+- Fixed a memory leak in `LazilyTransformingAstService` where the transformations array grew unboundedly, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
+- Fixed a memory leak in `UndoRedo` where `oldData` entries for evicted undo stack entries were never cleaned up, causing increasing memory usage over time. [#1629](https://github.com/handsontable/hyperformula/issues/1629)
+- Fixed the IRR function returning `#NUM!` error when the initial investment significantly exceeds the sum of returns. [#1628](https://github.com/handsontable/hyperformula/issues/1628)
+- Fixed the ADDRESS function ignoring `defaultValue` when arguments are syntactically empty (e.g., `=ADDRESS(2,3,,FALSE())`). [#1632](https://github.com/handsontable/hyperformula/issues/1632)
+
+## [3.2.0] - 2026-02-19
+
 ### Added
 
 - Added iterative calculation support for circular references. [#1545](https://github.com/handsontable/hyperformula/issues/1545)

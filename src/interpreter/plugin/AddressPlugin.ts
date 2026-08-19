@@ -26,8 +26,8 @@ export class AddressPlugin extends FunctionPlugin implements FunctionPluginTypec
       parameters: [
         {argumentType: FunctionArgumentType.NUMBER},
         {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1, minValue: 1, maxValue: 4},
-        {argumentType: FunctionArgumentType.BOOLEAN, optionalArg: true, defaultValue: true},
+        {argumentType: FunctionArgumentType.NUMBER, optionalArg: true, defaultValue: 1, minValue: 1, maxValue: 4, emptyAsDefault: true},
+        {argumentType: FunctionArgumentType.BOOLEAN, optionalArg: true, defaultValue: true, emptyAsDefault: true},
         {argumentType: FunctionArgumentType.STRING, optionalArg: true},
       ]
     },

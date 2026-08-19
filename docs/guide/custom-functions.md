@@ -358,17 +358,11 @@ it('returns a VALUE error if the range argument contains a string', () => {
 
 ## Working demo
 
+Explore the full working example on <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/custom-functions?v=' + $page.buildDateURIEncoded">Stackblitz</a>.
+
 This demo contains the implementation of both the
 [`GREET`](#add-a-simple-custom-function) and
 [`DOUBLE_RANGE`](#advanced-custom-function-example) custom functions.
-
-<iframe
-  :src="`https://codesandbox.io/embed/github/handsontable/hyperformula-demos/tree/3.1.x/custom-functions?autoresize=1&fontsize=11&hidenavigation=1&theme=light&view=preview&v=${$page.buildDateURIEncoded}`"
-  style="width:100%; height:1070px; border:0; border-radius: 4px; overflow:hidden;"
-  title="handsontable/hyperformula-demos: react-demo"
-  allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-  sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
-</iframe>
 
 ## Function options
 
@@ -380,7 +374,7 @@ You can set the following options for your function:
 | `parameters`                        | Array   | Specification of the arguments accepted by the function and their [validation options](#argument-validation-options).                                                                                                                         |
 | `sizeOfResultArrayMethod`                   | String  | Name of the method that calculates the size of the result array. Not required for functions that never return an array.                                                                                                                       |
 | `returnNumberType`                  | String  | If the function returns a numeric value, this option indicates how to interpret the returned number.<br/>Possible values: `NUMBER_RAW, NUMBER_DATE, NUMBER_TIME, NUMBER_DATETIME, NUMBER_CURRENCY, NUMBER_PERCENT`.<br/>Default: `NUMBER_RAW` |
-| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely.<br/>Default: `0`                                                                                                                |
+| `repeatLastArgs`                    | Number  | For functions with a variable number of arguments: sets how many last arguments can be repeated indefinitely. Must be a positive integer no larger than the number of `parameters`. A value that is not a positive integer (`0`, a negative number, a fraction, `NaN`, or `Infinity`) is ignored, and the function keeps a fixed number of arguments. A value larger than the number of `parameters` is not supported and must not be used: the function then accepts an erratic set of argument counts instead of a repeating one (with one parameter and `repeatLastArgs: 5`, calls with 1, 2, 4, or 5 arguments are accepted, while 3 and 8 return `#N/A!`).<br/>Default: `0`                                                                                                                |
 | `expandRanges`                      | Boolean | `true`: ranges in the function's arguments are inlined to (possibly multiple) scalar arguments.<br/>Default: `false`                                                                                                                          |
 | `isVolatile`                        | Boolean | `true`: the function is [volatile](volatile-functions.md).<br/>Default: `false`                                                                                                                                                               |
 | `isDependentOnSheetStructureChange` | Boolean | `true`: the function gets recalculated with each sheet shape change (e.g., when adding/removing rows or columns).<br/>Default: `false`                                                                                                        |
@@ -429,6 +423,7 @@ You can set the following argument validation options:
 | `maxValue`                | Number                                    | If set: numerical arguments need to be less than or equal to `maxValue`.                                                                                                                                                                           |
 | `lessThan`                | Number                                    | If set: numerical argument needs to be less than `lessThan`.                                                                                                                                                                                       |
 | `greaterThan`             | Number                                    | If set: numerical argument needs to be greater than `greaterThan`.                                                                                                                                                                                 |
+| `emptyAsDefault`          | Boolean                                   | `true`: an empty argument (e.g., `=FUNC(1,,3)`) is treated as missing and falls back to `defaultValue`. By default (`false`), empty arguments are coerced to the zero-value for their type (`0`, `FALSE`, or `""`). Requires `defaultValue` to be set. |
 
 In your function plugin, in the static `implementedFunctions` property, add an
 array called `parameters`:

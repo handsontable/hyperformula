@@ -22,7 +22,6 @@
 
 ---
 
-> 🚀 **We're hiring!** Join HyperFormula team as a **Senior Software Engineer**. [See the role and apply](https://handsontable.traffit.com/public/an/4b09e1395bf8ea42ef86db4c4657992c2f48673d).
 
 HyperFormula is a headless spreadsheet built in TypeScript, serving as both a parser and evaluator of spreadsheet formulas. It can be integrated into your browser or utilized as a service with Node.js as your back-end technology.
 
@@ -103,7 +102,7 @@ hf.setCellContents({ sheet: sheetId, row: 0, col: 0 }, [['Monthly Payment', '=PM
 console.log(`${hf.getCellValue({ sheet: sheetId, row: 0, col: 0 })}: ${hf.getCellValue({ sheet: sheetId, row: 0, col: 1 })}`);
 ```
 
-[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.1.x/mortgage-calculator)
+[Run this code in StackBlitz](https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/mortgage-calculator)
 
 ## Contributing
 

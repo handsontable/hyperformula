@@ -15,7 +15,7 @@ module.exports = {
   },
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: './tsconfig.test.json',
+    project: './tsconfig.json',
     createDefaultProgram: true,
   },
   extends: [
@@ -148,6 +148,6 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-non-null-assertion': 'off',
       }
-    }
+    },
   ],
 }
