@@ -23,7 +23,7 @@ import {Statistics, StatType} from './statistics'
  * Responsible for computing cell values based on their formulas and dependencies.
  *
  * Uses topological sorting for acyclic portions and iterative calculation for cycles.
- * Maintains integration with column search index for VLOOKUP/MATCH optimization
+ * Maintains integration with column search index for VLOOKUP/MATCH optimization.
  *
  * ## Evaluation Workflow
  *
@@ -37,7 +37,7 @@ import {Statistics, StatType} from './statistics'
  *
  * 3. **Cycle Resolution** (if cycles exist)
  *    - If iterative calculation disabled: sets #CYCLE! error on all cycle members
- *    - If enabled: iteratates the cycle calculation until convergence or max iterations
+ *    - If enabled: iterates the cycle calculation until convergence or max iterations
  *
  * 4. **Post-cycle Evaluation**
  *    - Recomputes vertices that depend on cycle results
@@ -57,9 +57,9 @@ import {Statistics, StatType} from './statistics'
  *
  * ## Entry Points
  *
- * - `run()`: Full evaluation from scratch (initial load or major changes)
- * - `partialRun()`: Incremental evaluation starting from changed vertices
- * - `runAndForget()`: One-off formula evaluation without side effects
+ * - `recomputeWholeGraph()`: Full evaluation from scratch (initial load or major changes)
+ * - `recomputeSubgraph()`: Incremental evaluation starting from changed vertices
+ * - `evaluateSingleFormula()`: One-off formula evaluation without side effects
  */
 export class Evaluator {
   /**
