@@ -306,8 +306,12 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
     )
 
     const startsBelowFirstRow = !Number.isFinite(sourceSize.height) && state.formulaAddress.row !== 0
-    const sourceRange = ast.args[0].type === AstNodeType.COLUMN_RANGE
-      ? AbsoluteCellRange.fromAstOrUndef(ast.args[0], state.formulaAddress)
+    let sourceAst = ast.args[0]
+    while (sourceAst.type === AstNodeType.PARENTHESIS) {
+      sourceAst = sourceAst.expression
+    }
+    const sourceRange = sourceAst.type === AstNodeType.COLUMN_RANGE
+      ? AbsoluteCellRange.fromAstOrUndef(sourceAst, state.formulaAddress)
       : undefined
     const effectiveHeight = !Number.isFinite(sourceSize.height) && sourceRange !== undefined
       ? sourceRange.effectiveHeight(this.dependencyGraph)
