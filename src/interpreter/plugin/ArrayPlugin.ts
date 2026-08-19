@@ -40,12 +40,19 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return {kind: 'value', value: Math.trunc(getRawValue(coercedValue))}
     }
 
-    if (argument.type === AstNodeType.PLUS_UNARY_OP && argument.value.type === AstNodeType.NUMBER) {
-      return {kind: 'value', value: Math.trunc(argument.value.value)}
+    if (argument.type === AstNodeType.ERROR || argument.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+      return {kind: 'invalid'}
     }
 
-    if (argument.type === AstNodeType.MINUS_UNARY_OP && argument.value.type === AstNodeType.NUMBER) {
-      return {kind: 'value', value: Math.trunc(-argument.value.value)}
+    if (argument.type === AstNodeType.PLUS_UNARY_OP || argument.type === AstNodeType.MINUS_UNARY_OP) {
+      const index = this.parseChooseColsLiteralIndex(argument.value)
+      if (index.kind !== 'value') {
+        return index
+      }
+      return {
+        kind: 'value',
+        value: argument.type === AstNodeType.MINUS_UNARY_OP ? -index.value : index.value,
+      }
     }
 
     if (argument.type === AstNodeType.PARENTHESIS) {
