@@ -60,7 +60,10 @@ If your key grants only part of the library, then:
   functions your key includes, so a function picker built from them never offers a function that
   then fails.
 
-Custom functions you register yourself are always available, whatever your key grants.
+Custom functions you register yourself are available whatever your key grants, as long as they use
+an id of their own. The licence covers built-in ids, so a plugin registered under a built-in id your
+key does not include is treated as that built-in and stays unavailable — it will not be described and
+it evaluates to `#LIC!`. Pick an id the built-in catalogue does not use and this cannot happen.
 
 ::: tip
 To find out which package your key includes, check your order confirmation or
@@ -73,9 +76,13 @@ your key at runtime.
 If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
 
-In that case every function evaluates to a `#LIC!` error — but no API method starts throwing, and
-`getAvailableFunctions()` still describes the full set of functions. A key problem never narrows
-what the library reports it can do; it stops formulas from calculating until you fix the key.
+In that case every function call evaluates to a `#LIC!` error — but no API method starts throwing,
+and `getAvailableFunctions()` still describes the full set of functions. A key problem never
+narrows what the library reports it can do.
+
+Arithmetic keeps working: operators such as `=A1+B1` are not function calls and are unaffected, as
+are `VERSION()` and `OFFSET()`, which sit outside the licence system entirely. So a sheet with a
+key problem does not go blank — it keeps producing values wherever no function is called.
 
 ## License key support
 
