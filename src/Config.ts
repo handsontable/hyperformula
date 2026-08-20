@@ -180,7 +180,7 @@ export class Config implements ConfigParams, ParserConfig {
   /** @inheritDoc */
   public readonly matchWholeCell: boolean
 
-  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true) {
+  constructor(options: Partial<ConfigParams> = {}, showDeprecatedWarns: boolean = true, notifyLicenseMessages: boolean = true) {
     const {
       accentSensitive,
       caseSensitive,
@@ -279,7 +279,7 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.context = context
 
-    const {validityState: licenseKeyValidityState, entitlement} = resolveLicense(this.licenseKey)
+    const {validityState: licenseKeyValidityState, entitlement} = resolveLicense(this.licenseKey, notifyLicenseMessages)
     const capabilityRegistry = new CapabilityRegistry()
     const licenseCapabilities = capabilityRegistry.resolve(entitlement)
 
@@ -365,12 +365,12 @@ export class Config implements ConfigParams, ParserConfig {
     return getFullConfigFromPartial(this)
   }
 
-  public mergeConfig(init: Partial<ConfigParams>): Config {
+  public mergeConfig(init: Partial<ConfigParams>, notifyLicenseMessages: boolean = true): Config {
     const mergedConfig: ConfigParams = Object.assign({}, this.getConfig(), init)
 
     Config.warnDeprecatedOptions(init)
 
-    return new Config(mergedConfig, false)
+    return new Config(mergedConfig, false, notifyLicenseMessages)
   }
 
   private static warnDeprecatedOptions(options: Partial<ConfigParams>) {

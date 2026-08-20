@@ -43,9 +43,10 @@ const consoleMessages: ConsoleMessages = {
 let _notified = false
 
 /**
- * License key strings that have already printed their expiry-approaching notice.
+ * Identities (see {@link noticeIdentityOf}) of license keys that have already printed their
+ * expiry-approaching notice.
  *
- * Deliberately keyed by the raw key string rather than a single boolean like {@link _notified}
+ * Deliberately keyed per key rather than a single boolean like {@link _notified}
  * above: that flag reports one of a handful of states that mean the same thing regardless of
  * which key triggered them ("a key is invalid", "a key is missing"), so once-per-page-load is the
  * right behaviour for it. Two different keys approaching their OWN expiry are two different
@@ -96,22 +97,45 @@ export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidit
 
 /**
  * Prints a one-time notice that a VALID typed key's usage-until expiry is approaching, at most
- * once per distinct license key string.
+ * once per distinct license key.
  *
  * Called from `src/license/licenseResolution.ts`'s `resolveLicense`, alongside
  * {@link notifyLicenseKeyState} — see that function's doc for why the two share this module
  * instead of each keeping a message table and a flag of their own.
  *
- * @param {string} licenseKey - the raw key string, used only as the warn-once identity
- * @param {Date} expiryDate - the day the key's usage-until expiry falls on, at UTC midnight
+ * The wording is rev 5 §3.2's own subscription clause ("valid until {date} (UTC)"), naming the
+ * key's LAST covered day. It deliberately does not say "expires on": the pre-existing expired
+ * message reports the first day NOT covered (`validityOf`'s convention, +1 day), and two messages
+ * for the same key must not name two different days for the same boundary. "Valid until Aug 25"
+ * followed later by "expired on Aug 26" is consistent; "expires on Aug 25" followed by
+ * "expired on Aug 26" is a support ticket.
+ *
+ * @param {string} licenseKey - the raw key string; only its identity is retained, see below
+ * @param {Date} expiryDate - the last covered day of the key's usage-until axis, at UTC midnight
  */
 export function notifyLicenseKeyNotice(licenseKey: string, expiryDate: Date): void {
-  if (_noticedKeys.has(licenseKey)) {
+  const identity = noticeIdentityOf(licenseKey)
+
+  if (_noticedKeys.has(identity)) {
     return
   }
 
-  console.warn(`The license key for HyperFormula will expire on ${formatDate(expiryDate)} (UTC).`)
-  _noticedKeys.add(licenseKey)
+  console.warn(`The HyperFormula license key is valid until ${formatDate(expiryDate)} (UTC). To renew the license, contact sales@handsontable.com.`)
+  _noticedKeys.add(identity)
+}
+
+/**
+ * The warn-once identity of a key: its trailing 128 characters — for an intact typed key, the
+ * sha512 checksum, unique per distinct key content — after trimming.
+ *
+ * Trimmed because `extractTypedKeyData` trims before validating, so `'KEY'` and `'KEY\n'` are one
+ * license to the validator and must be one identity here too. Truncated because the set retains
+ * its entries for the life of the process: a multi-tenant server building one engine per
+ * customer-supplied key would otherwise accumulate every full key string it has ever warned
+ * about; 128 characters per entry bounds that to the checksum alone.
+ */
+function noticeIdentityOf(licenseKey: string): string {
+  return licenseKey.trim().slice(-128)
 }
 
 /**

@@ -4962,7 +4962,10 @@ export class HyperFormula implements TypedEmitter {
    */
   private rebuildWithConfig(newParams: Partial<ConfigParams>): void {
     const newConfig = this._config.mergeConfig(newParams)
-    const configNewLanguage = this._config.mergeConfig({language: newParams.language})
+    // The second argument silences license console messages for this transient Config: it is
+    // built from the OUTGOING config purely to reserialize sheets, and must not print an expiry
+    // notice for the key the caller may be replacing in this very call.
+    const configNewLanguage = this._config.mergeConfig({language: newParams.language}, false)
     const serializedSheets = this._serialization.withNewConfig(configNewLanguage, this._namedExpressions).getAllSheetsSerialized()
     const serializedNamedExpressions = this._serialization.getAllNamedExpressionsSerialized()
 
