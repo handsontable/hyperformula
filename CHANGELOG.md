@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the `ADDRESS` function to omit the sheet separator (`!`) when the `sheetName` argument is an empty string, consistently with Excel, in both A1 and R1C1 styles. [#1739](https://github.com/handsontable/hyperformula/pull/1739)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
