@@ -596,7 +596,21 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
-   * Returns translated names of all registered functions for a given language
+   * Returns translated names of all registered functions for a given language.
+   *
+   * Answers for the function REGISTRY, so it cannot take a license key into account: it has no
+   * engine, and therefore no key, in scope. A restricted key makes the answer wrong for every
+   * purpose a caller usually has — a function picker built from this list offers functions that
+   * then evaluate to a `#LIC!` error. Use the instance method
+   * [[getRegisteredFunctionNames]] instead, which answers for the engine you actually hold.
+   *
+   * The two are not interchangeable: this one translates into any registered language without
+   * building an engine, while the instance method answers only under its own instance's language
+   * and license. Migrating means building an engine:
+   * `HyperFormula.buildEmpty({ language: 'plPL' }).getRegisteredFunctionNames()`.
+   *
+   * @deprecated Use the instance method of the same name. This static method is deprecated and
+   * will be removed in one of the next major releases.
    *
    * @param {string} code - language code
    *
@@ -4549,6 +4563,17 @@ export class HyperFormula implements TypedEmitter {
    * Returns translated names of all functions registered in this instance of HyperFormula
    * according to the language set in the configuration
    *
+   * Lists exactly what this instance can evaluate: the instance's listable ids (the protected
+   * built-ins included, uniformly), under the translation package its own evaluator uses, minus any
+   * function the instance's license key does not include — so a function picker built from these
+   * names never offers a function that then evaluates to a `#LIC!` error. A missing, invalid, or
+   * expired key does not shorten the list.
+   *
+   * The ids and the license rule are [[getAvailableFunctions]]'s, but the NAMES are not: this
+   * method reports each function's translation as the language pack spells it, so a function
+   * translated to an empty string is listed as `''`, where [[getAvailableFunctions]] falls back to
+   * the canonical id. Use that method when you need a name to show a user.
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -4560,8 +4585,9 @@ export class HyperFormula implements TypedEmitter {
    * @category Custom Functions
    */
   public getRegisteredFunctionNames(): string[] {
-    const language = HyperFormula.getLanguage(this._config.language)
-    return language.getFunctionTranslations(this._functionRegistry.getRegisteredFunctionIds())
+    const listableFunctionIds = this._functionRegistry.getListableFunctionIds()
+      .filter((functionId) => HyperFormula.licenseListsFunction(functionId, this._functionRegistry, this._config))
+    return this._config.translationPackage.getFunctionTranslations(listableFunctionIds)
   }
 
   /**

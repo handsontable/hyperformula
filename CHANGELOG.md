@@ -18,6 +18,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Changed `getAvailableFunctions()` and `getFunctionDetails()` to describe only the functions the instance's license key includes, so they no longer advertise a function that would evaluate to a `#LIC!` error. A missing, invalid, or expired key does not shorten the list. [#1731](https://github.com/handsontable/hyperformula/pull/1731)
 - Changed the parser for the new proprietary license keys to the entitlement key format (a human-readable text ending with a machine-readable block in square brackets), following its upstream specification. This replaces the tagged key format, which was never issued to anyone. Classic 25-character license keys and `gpl-v3` are unaffected. [#1740](https://github.com/handsontable/hyperformula/pull/1740)
 - Changed the license capability tokens to be matched case-insensitively, and added support for the packaging group-token vocabulary (`fun:all`, `fun:<family>.<A|B|C>`, and per-function `fun:<FUNCTION_NAME>` tokens) alongside the existing package tokens (`functions_1`–`functions_4` and the add-ons). A key worded in either vocabulary grants the same functions. [#1741](https://github.com/handsontable/hyperformula/pull/1741)
+- Changed the `getRegisteredFunctionNames()` instance method to list exactly the functions the instance can evaluate, the same way `getAvailableFunctions()` does: the protected built-ins are now included, and a function the instance's license key does not include is no longer listed. A missing, invalid, or expired key does not shorten the list. [#1743](https://github.com/handsontable/hyperformula/pull/1743)
+
+### Deprecated
+
+- Deprecated the static `HyperFormula.getRegisteredFunctionNames()` method; it will be removed in one of the next major releases. Use the instance method of the same name instead — a static method has no engine, and therefore no license key or configuration, in scope, so it can only answer for the function registry as a whole. The two are not interchangeable: the static one translates into any registered language without an engine, so migrating means building one, for example `HyperFormula.buildEmpty({ language: 'plPL' }).getRegisteredFunctionNames()`. [#1743](https://github.com/handsontable/hyperformula/pull/1743)
 
 ## [3.4.0] - 2026-08-10
 
