@@ -3,6 +3,7 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {ENTITLEMENT_KEY_CHECKSUM_LENGTH} from '../license/vendor/constants'
 import {checkKeySchema, extractTime} from './licenseKeyHelper'
 
 /**
@@ -75,7 +76,7 @@ export function resetLicenseKeyNotificationForTests(): void {
 /**
  * Prints the console message for a non-valid license key state, at most once per page load.
  *
- * Extracted so the typed-key path in `src/license/licenseResolution.ts` reports the same states
+ * Extracted so the entitlement-key path in `src/license/licenseResolution.ts` reports the same states
  * with the same wording and the same once-only behaviour, without duplicating the message table
  * or getting a second `_notified` flag of its own — two flags would let a page print two
  * warnings for one key.
@@ -96,8 +97,8 @@ export function notifyLicenseKeyState(state: LicenseKeyValidityState, keyValidit
 }
 
 /**
- * Prints a one-time notice that a VALID typed key's usage-until expiry is approaching, at most
- * once per distinct license key.
+ * Prints a one-time notice that a VALID entitlement key's usage-until expiry is approaching, at
+ * most once per distinct license key.
  *
  * Called from `src/license/licenseResolution.ts`'s `resolveLicense`, alongside
  * {@link notifyLicenseKeyState} — see that function's doc for why the two share this module
@@ -125,17 +126,21 @@ export function notifyLicenseKeyNotice(licenseKey: string, expiryDate: Date): vo
 }
 
 /**
- * The warn-once identity of a key: its trailing 128 characters — for an intact typed key, the
- * sha512 checksum, unique per distinct key content — after trimming.
+ * The warn-once identity of a key: its trailing 129 characters, after trimming — for an intact
+ * entitlement key, the sha512 checksum plus the closing bracket that ends the machine-readable
+ * block, unique per distinct key content.
  *
- * Trimmed because `extractTypedKeyData` trims before validating, so `'KEY'` and `'KEY\n'` are one
- * license to the validator and must be one identity here too. Truncated because the set retains
- * its entries for the life of the process: a multi-tenant server building one engine per
- * customer-supplied key would otherwise accumulate every full key string it has ever warned
- * about; 128 characters per entry bounds that to the checksum alone.
+ * Trimmed because the reader ignores trailing whitespace (it looks for the block, not for the end
+ * of the string), so `'KEY'` and `'KEY\n'` are one license and must be one identity here too.
+ * Reading from the END rather than the start also makes the whole artifact and its bare `[...]`
+ * block — which the format says are equally valid spellings of the same license — one identity.
+ *
+ * Truncated because the set retains its entries for the life of the process: a multi-tenant server
+ * building one engine per customer-supplied key would otherwise accumulate every full key string
+ * it has ever warned about; 129 characters per entry bounds that to the checksum alone.
  */
 function noticeIdentityOf(licenseKey: string): string {
-  return licenseKey.trim().slice(-128)
+  return licenseKey.trim().slice(-(ENTITLEMENT_KEY_CHECKSUM_LENGTH + 1))
 }
 
 /**
@@ -178,7 +183,7 @@ export function checkLicenseKeyValidity(licenseKey: string): LicenseKeyValidityS
  * Formats a Date instance to hard-coded format MMMM DD, YYYY.
  *
  * Read in UTC, not local time. Every date reaching this function is built at UTC midnight — the
- * legacy path from a whole number of days since the epoch, the typed-key path from a calendar
+ * legacy path from a whole number of days since the epoch, the entitlement-key path from a calendar
  * date in the payload — so local getters shifted the day backwards for anyone west of UTC and
  * printed an expiry one day earlier than the one the key actually carries.
  *

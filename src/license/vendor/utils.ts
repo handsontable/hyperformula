@@ -4,7 +4,7 @@
  */
 
 /**
- * Vendored from `handsontable/license-key`, `src/typed-key/utils.js`.
+ * Vendored from `handsontable/license-key`, `src/entitlement-key/utils.js`.
  * See `src/license/vendor/PROVENANCE.md` before editing — this file is a port, not original code.
  *
  * The two generation-side helpers of the upstream file (`bytesToBase64`, `stringToBase64Url`) are

@@ -4,20 +4,25 @@
  */
 
 /**
- * Vendored from `handsontable/license-key`, `src/typed-key/constants.js`.
+ * Vendored from `handsontable/license-key`, `src/entitlement-key/constants.js`.
  * See `src/license/vendor/PROVENANCE.md` before editing — this file is a port, not original code.
  */
 
 /**
- * The typed license key format versions this library can read. The version is stamped into the
- * key payload (the `v` field) at generation and checked automatically at extraction — the format
- * version describes HOW the key is parsed (envelope, encoding, checksum), unlike the schema,
- * which describes WHAT the key grants. When a new format version ships, it is ADDED here (with
- * per-version handling where needed) so one build keeps reading all the already-issued keys.
+ * The length of the checksum (SHA-512 as hex) which postfixes the payload inside the
+ * machine-readable block of every entitlement license key.
  */
-export const TYPED_KEY_SUPPORTED_VERSIONS: number[] = [1]
+export const ENTITLEMENT_KEY_CHECKSUM_LENGTH = 128
 
 /**
- * The length of the checksum (SHA-512 as hex) which postfixes every typed license key.
+ * The two mutually exclusive date fields of a product entry. Exactly one of them has to be
+ * present:
+ *
+ * - `usage_until` — the last licensed day (inclusive, compared in UTC),
+ * - `release_until` — builds released on or before that day may be used forever (compared
+ *   against the build release date as text, no clock involved).
+ *
+ * The pair replaces the contract type — nothing in the payload says "subscription" or
+ * "perpetual".
  */
-export const TYPED_KEY_CHECKSUM_LENGTH = 128
+export const DATE_FIELDS: readonly string[] = ['usage_until', 'release_until']

@@ -341,7 +341,7 @@ export class Config implements ConfigParams, ParserConfig {
 
   /**
    * Whether gate B (the entitlement check in the interpreter) needs to run at all for this
-   * config. `false` — the common case, for `gpl-v3`, legacy keys, and an unrestricted typed
+   * config. `false` — the common case, for `gpl-v3`, legacy keys, and an unrestricted entitlement
    * key — is a single boolean read, cheaper than the string-enum comparison it replaces.
    *
    * @internal

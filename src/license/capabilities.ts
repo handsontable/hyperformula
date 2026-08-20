@@ -27,9 +27,9 @@ export const NAMED_EXPRESSIONS_FEATURE_TOKEN = 'feat:named_expressions'
 export const BATCHING_FEATURE_TOKEN = 'feat:batching'
 
 /**
- * Every feature token, in one list, for the shipped-shape adapter: the shipped key vocabulary
- * predates feature tokens entirely, so a commercial tier is translated into its functions token
- * PLUS all of these — see `licenseTermsOf` for the reasoning.
+ * Every feature token, in one list, for the opt-in rule in `licenseTermsOf`: a key naming no
+ * `feat:*` token at all is granted all of these, because no key vocabulary in circulation can
+ * express "no features" — see that function for the reasoning.
  */
 export const ALL_FEATURE_TOKENS = [
   CRUD_FEATURE_TOKEN, UNDO_REDO_FEATURE_TOKEN, CLIPBOARD_FEATURE_TOKEN,
@@ -79,7 +79,7 @@ const OPERATOR_FUNCTIONS = [
 ]
 
 // An earlier revision granted all five features from CORE_TOKEN, which made feature gating inert
-// by construction: no typed key could ever lose an API area. The ratified rule:
+// by construction: no restricted key could ever lose an API area. The ratified rule:
 // "Feature gating should work, but the legacy keys should grant all feat:* capabilities" — legacy
 // keys already resolve to the unrestricted entitlement, so the carve-out costs nothing, and the
 // five features moved onto their own `feat:*` tokens below.
@@ -201,9 +201,9 @@ const functions4Grant: CapabilityGrant = {
  * in `unit/license/capability-registry.spec.ts` fails on.
  *
  * The five `feat:*` tokens carry the gated API areas, one feature each, spelled after the draft
- * vocabulary in the task. A rev-5 key states them explicitly; the shipped-shape adapter grants
- * all five alongside the tier (that vocabulary predates feature tokens); legacy keys resolve to
- * the unrestricted entitlement and never consult this table.
+ * vocabulary in the task. A key may state them explicitly; a key naming none is granted all five
+ * (the opt-in rule in `licenseTermsOf`); legacy keys resolve to the unrestricted entitlement and
+ * never consult this table.
  *
  * The two add-on tokens, wired per the 2026-08-12 packages meeting: `spreadsheet` backs the
  * 'Spreadsheet Bundle' add-on and grants {@link FeatureId.Crud}, {@link FeatureId.UndoRedo},
