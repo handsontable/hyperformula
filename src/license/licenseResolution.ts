@@ -9,7 +9,7 @@ import {
   notifyLicenseKeyNotice,
   notifyLicenseKeyState,
 } from '../helpers/licenseKeyValidator'
-import {ALL_FEATURE_TOKENS, CAPABILITY_TABLE, CORE_TOKEN} from './capabilities'
+import {ALL_FEATURE_TOKENS, CAPABILITY_TABLE, CORE_TOKEN, normalizeCapabilityToken} from './capabilities'
 import {LicenseEntitlement, LicenseExpiry, unrestrictedEntitlement} from './LicenseEntitlement'
 import {detectLicenseKeyFormat} from './vendor/detectFormat'
 import {EntitlementKeyData, EntitlementProductGrant, extractEntitlementKeyData} from './vendor/extractKeyData'
@@ -170,9 +170,11 @@ function licenseTermsOf(data: EntitlementKeyData): LicenseTerms {
   // the same key without that token had all five. That is the additive-safety rule inverted - an
   // older build meeting a key minted by a newer generator, or a one-character typo at issuing time,
   // would revoke the whole gated API rather than ignore a word it does not know.
-  const namesAKnownFeature = capabilityTokens.some(
-    (token) => token.indexOf(FEATURE_TOKEN_PREFIX) === 0 && CAPABILITY_TABLE.has(token)
-  )
+  const namesAKnownFeature = capabilityTokens.some((token) => {
+    const normalized = normalizeCapabilityToken(token)
+
+    return normalized.indexOf(FEATURE_TOKEN_PREFIX) === 0 && CAPABILITY_TABLE.has(normalized)
+  })
 
   if (!namesAKnownFeature) {
     capabilityTokens.push(...ALL_FEATURE_TOKENS)
@@ -302,7 +304,9 @@ function expiryWithinNoticeWindow(terms: LicenseTerms): Date | null {
  * @param {LicenseTerms} terms - the terms of the key
  */
 function entitlementOf(terms: LicenseTerms): LicenseEntitlement {
-  const unrecognizedCapabilities = terms.capabilityTokens.filter((token) => !CAPABILITY_TABLE.has(token))
+  const unrecognizedCapabilities = terms.capabilityTokens.filter(
+    (token) => !CAPABILITY_TABLE.has(normalizeCapabilityToken(token)),
+  )
 
   return {
     unrestricted: false,
