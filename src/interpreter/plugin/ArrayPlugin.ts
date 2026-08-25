@@ -41,6 +41,10 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return {kind: 'value', value: getRawValue(coercedValue)}
     }
 
+    if (argument?.type === AstNodeType.ERROR || argument?.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+      return {kind: 'invalid'}
+    }
+
     if (argument?.type === AstNodeType.PLUS_UNARY_OP || argument?.type === AstNodeType.MINUS_UNARY_OP) {
       const dimension = this.parseTakeLiteralNumber(argument.value)
       if (dimension.kind !== 'value') {
@@ -53,6 +57,14 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return this.parseTakeLiteralNumber(argument.expression)
     }
 
+    if (argument?.type === AstNodeType.PERCENT_OP) {
+      const dimension = this.parseTakeLiteralNumber(argument.value)
+      if (dimension.kind !== 'value') {
+        return dimension
+      }
+      return {kind: 'value', value: getRawValue(this.arithmeticHelper.unaryPercent(dimension.value))}
+    }
+
     if (argument?.type === AstNodeType.FUNCTION_CALL && argument.args.length === 0) {
       if (argument.procedureName === 'TRUE') {
         return {kind: 'value', value: 1}
@@ -62,14 +74,43 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       }
     }
 
-    if (argument?.type === AstNodeType.PLUS_OP) {
+    if (
+      argument?.type === AstNodeType.PLUS_OP
+      || argument?.type === AstNodeType.MINUS_OP
+      || argument?.type === AstNodeType.TIMES_OP
+      || argument?.type === AstNodeType.DIV_OP
+      || argument?.type === AstNodeType.POWER_OP
+    ) {
       const left = this.parseTakeLiteralNumber(argument.left)
       const right = this.parseTakeLiteralNumber(argument.right)
       if (left.kind === 'invalid' || right.kind === 'invalid') {
         return {kind: 'invalid'}
       }
       if (left.kind === 'value' && right.kind === 'value') {
-        return {kind: 'value', value: left.value + right.value}
+        let value: number
+        switch (argument.type) {
+          case AstNodeType.PLUS_OP:
+            value = this.arithmeticHelper.addWithEpsilonRaw(left.value, right.value)
+            break
+          case AstNodeType.MINUS_OP:
+            value = getRawValue(this.arithmeticHelper.subtract(left.value, right.value))
+            break
+          case AstNodeType.TIMES_OP:
+            value = getRawValue(this.arithmeticHelper.multiply(left.value, right.value))
+            break
+          case AstNodeType.DIV_OP: {
+            const quotient = this.arithmeticHelper.divide(left.value, right.value)
+            if (quotient instanceof CellError) {
+              return {kind: 'invalid'}
+            }
+            value = getRawValue(quotient)
+            break
+          }
+          case AstNodeType.POWER_OP:
+            value = this.arithmeticHelper.pow(left.value, right.value)
+            break
+        }
+        return Number.isFinite(value) ? {kind: 'value', value} : {kind: 'invalid'}
       }
     }
 

@@ -6,12 +6,6 @@ This page lists HyperFormula release notes. The format is based on
 HyperFormula adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Changed
-
-- **Breaking change**: The Czech, Danish, German, Spanish, Finnish, French, Hungarian, Italian, Norwegian Bokmål, Dutch, Polish, Portuguese, Russian, and Turkish language packs now use the official localized names for `VSTACK` and `HSTACK`. If an existing formula uses the English `VSTACK` or `HSTACK` name while one of these language packs is active, update that formula to the localized function name exported by the language pack.
-
 ## 3.4.0
 
 **Release date: August 10, 2026**

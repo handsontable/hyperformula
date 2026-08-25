@@ -200,18 +200,15 @@ export interface FunctionArgument {
   passSubtype?: boolean,
 
   /**
-   * If an argument is missing and omission is allowed, its value defaults to
-   * `defaultValue`. Declaring a default makes the argument optional unless
-   * `optionalArg` is explicitly set to `false`.
+   * If an argument is missing, its value defaults to `defaultValue`.
    */
   defaultValue?: InternalScalarValue | RawScalarValue,
 
   /**
-   * Explicitly controls whether the argument may be omitted. When omitted,
-   * the presence of `defaultValue` makes the argument optional.
+   * If set to `true`:
+   * if an argument is missing, and no `defaultValue` is set, the argument is `undefined` (instead of throwing an error).
    *
-   * If set to `true` without a `defaultValue`, a missing argument is passed as
-   * `undefined` instead of producing an error.
+   * This is logically equivalent to setting `defaultValue` to `undefined`.
    */
   optionalArg?: boolean,
 
@@ -236,9 +233,8 @@ export interface FunctionArgument {
   greaterThan?: number,
 
   /**
-   * If set to `true`, a syntactically empty argument falls back to
-   * `defaultValue`. This does not make the argument optional; `optionalArg`
-   * controls whether the argument may be omitted.
+   * If set to `true`, an empty argument is treated as if the argument was not
+   * provided at all — that is, it falls back to `defaultValue`.
    *
    * By default (`false`), an empty argument is coerced to the zero-value for its
    * type (`0` for numbers, `FALSE` for booleans, `""` for strings).
@@ -251,18 +247,6 @@ export interface FunctionArgument {
    * Requires `defaultValue` to be set.
    */
   emptyAsDefault?: boolean,
-}
-
-/**
- * Returns whether a function argument may be omitted.
- *
- * Arguments explicitly marked as optional and arguments with default values
- * may be omitted.
- *
- * @param {FunctionArgument | undefined} argument - The argument metadata to inspect.
- */
-export function isFunctionArgumentOptional(argument: FunctionArgument | undefined): boolean {
-  return argument?.optionalArg || argument?.defaultValue !== undefined
 }
 
 export type PluginFunctionType = (ast: ProcedureAst, state: InterpreterState) => InterpreterValue
@@ -555,7 +539,7 @@ export abstract class FunctionPlugin implements FunctionPluginTypecheck<Function
 
     if (numberOfArgumentValuesPassed < argumentsMetadata.length) {
       const metadataForMissingArguments = argumentsMetadata.slice(numberOfArgumentValuesPassed)
-      const areMissingArgumentsOptional = metadataForMissingArguments.every(isFunctionArgumentOptional)
+      const areMissingArgumentsOptional = metadataForMissingArguments.every(argMetadata => argMetadata?.optionalArg || argMetadata?.defaultValue !== undefined)
       return areMissingArgumentsOptional
     }
 
