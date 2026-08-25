@@ -172,7 +172,7 @@ For recent Excel functions that are absent from those sources, use Microsoft's l
 https://support.microsoft.com/<locale>/office/excel-functions-alphabetical-b3944572-255d-4efb-bb96-c6d90033e188
 ```
 
-Find the link whose URL contains `functions/<english-name>-function` and use its localized link text. Check each locale independently because Excel keeps some function names in English.
+Find the link whose URL contains `functions/<english-name>-function`, then follow it and confirm that the individual function page uses the same localized name in its title and formula syntax. Check each locale independently because Excel keeps some function names in English. If the alphabetical list and the individual page disagree, do not copy the list entry without additional product verification.
 
 For languages not officially supported by Microsoft Excel, the two sources above do not apply. For these languages, use Google Sheets as the reference. Switch the `hl` query parameter to the target locale, for example:
 
