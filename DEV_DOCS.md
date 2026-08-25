@@ -159,10 +159,20 @@ Descriptions must describe **HyperFormula's** behaviour, not Excel's. Much of th
 
 HyperFormula supports internationalization and provides localized function names for all built-in languages. Translation files live in `src/i18n/languages/`. New functions must include translations for all built-in languages.
 
+Only add a localized function name after confirming that Microsoft Excel ships that exact name. If an authoritative source does not provide a localized name, keep the English name instead of translating or inferring one.
+
 When looking for the valid translations for new functions, try these sources:
 
 - https://support.microsoft.com/en-us/office/excel-functions-translator-f262d0c0-991c-485b-89b6-32cc8d326889
 - http://dolf.trieschnigg.nl/excel/index.php
+
+For recent Excel functions that are absent from those sources, use Microsoft's localized alphabetical function list:
+
+```text
+https://support.microsoft.com/<locale>/office/excel-functions-alphabetical-b3944572-255d-4efb-bb96-c6d90033e188
+```
+
+Find the link whose URL contains `functions/<english-name>-function` and use its localized link text. Check each locale independently because Excel keeps some function names in English.
 
 For languages not officially supported by Microsoft Excel, the two sources above do not apply. For these languages, use Google Sheets as the reference. Switch the `hl` query parameter to the target locale, for example:
 
