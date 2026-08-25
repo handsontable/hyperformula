@@ -40,7 +40,7 @@ export class ArrayPlugin extends FunctionPlugin implements FunctionPluginTypeche
       return {kind: 'value', value: Math.trunc(getRawValue(coercedValue))}
     }
 
-    if (argument.type === AstNodeType.ERROR || argument.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
+    if (argument.type === AstNodeType.EMPTY || argument.type === AstNodeType.ERROR || argument.type === AstNodeType.ERROR_WITH_RAW_INPUT) {
       return {kind: 'invalid'}
     }
 
