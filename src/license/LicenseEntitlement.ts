@@ -72,7 +72,7 @@ export interface LicenseEntitlement {
    * set it: HF-307 decision D3 makes the *grant* silent (an unknown token grants nothing, with no
    * message and no diagnostics getter), which is a different thing from muting the key's console
    * output. Coupling them suppressed expiry notices as a side effect of a vocabulary mismatch, and
-   * was confirmed an implementation error (Kuba, 12.08).
+   * was confirmed an implementation error.
    */
   silent: boolean,
   isTrial: boolean,

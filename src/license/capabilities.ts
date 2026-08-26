@@ -9,7 +9,7 @@ import {FeatureId} from './LicenseEntitlement'
  * The always-granted token. Every entitlement built from a license key includes it.
  *
  * It grants the calculation operators — and nothing else. In particular it grants NO features:
- * per Kuba's decision (task comment, 12.08) feature gating is real, and the gated API areas come
+ * per the ratified HF-307 decision feature gating is real, and the gated API areas come
  * from the `feat:*` tokens below. The always-on functionality the packaging design assigns to
  * core (reads, serialization, teardown) is not behind `ensureCapability` at all.
  */
@@ -71,7 +71,7 @@ const OPERATOR_FUNCTIONS = [
 ]
 
 // An earlier revision granted all five features from CORE_TOKEN, which made feature gating inert
-// by construction: no typed key could ever lose an API area. Kuba's call (task comment, 12.08):
+// by construction: no typed key could ever lose an API area. The ratified rule:
 // "Feature gating should work, but the legacy keys should grant all feat:* capabilities" — legacy
 // keys already resolve to the unrestricted entitlement, so the carve-out costs nothing, and the
 // five features moved onto their own `feat:*` tokens below.

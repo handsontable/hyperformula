@@ -252,7 +252,7 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
   // CORE_TOKEN is always granted, but note what it actually grants: the calculation operators -
   // NOT a usable set of functions. A key whose only tokens this build does not recognize therefore
   // evaluates operators and protected built-ins and returns #LIC! for every function call,
-  // silently, per HF-307 decision D3. Kuba ratified that cliff as-is on 12.08 (D6-A): "this
+  // silently, per HF-307 decision D3. That cliff is ratified as-is (D6-A): "this
   // situation should never happen. There is no point in issuing a key if empty capabilities."
   const capabilityTokens = [CORE_TOKEN]
 
@@ -269,7 +269,7 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
 
   // Feature tokens are OPT-IN, never opt-out. A key carrying at least one `feat:*` token demonstrably
   // speaks the feature vocabulary, so it gets exactly the areas it names - that is what makes feature
-  // gating real (Kuba, 12.08: "Feature gating should work"). A key carrying NONE cannot be saying
+  // gating real (the ratified decision: "Feature gating should work"). A key carrying NONE cannot be saying
   // "no features", because no vocabulary in circulation can express one: the shipped shape has no
   // such field, and the key spec's current HyperFormula token list (rev 5 §2.2 - `functions_1..4`,
   // `spreadsheet`, `import_export`) contains no `feat:*` entry at all. So absence means "this key
@@ -338,7 +338,7 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
     // Every spelling the key spec uses for "suppress console output" - see SILENT_CONSOLE_FLAGS.
     // The key's flags are the ONLY source of silence: an earlier revision also silenced any key
     // carrying an unrecognized token, which suppressed strictly more than D3 asks for (it would
-    // have swallowed expiry notices too). Kuba confirmed that was an implementation error (12.08).
+    // have swallowed expiry notices too). That was confirmed an implementation error.
     silent: flags.some((flag) => SILENT_CONSOLE_FLAGS.indexOf(flag) !== -1),
   }
 }
@@ -385,7 +385,7 @@ function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expir
  * anything public to read it back from. "Silent" there means the *grant* is silent — whether the
  * key's console messages are suppressed is decided solely by its `flags` (`terms.silent`), never
  * by the presence of an unrecognized token; coupling the two suppressed expiry notices as a side
- * effect of a vocabulary mismatch, and was confirmed an implementation error (Kuba, 12.08).
+ * effect of a vocabulary mismatch, and was confirmed an implementation error.
  *
  * @param {LicenseTerms} terms - the reconciled terms of the key
  */
