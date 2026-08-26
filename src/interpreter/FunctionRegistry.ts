@@ -285,10 +285,6 @@ export class FunctionRegistry {
     return Array.from(plugins)
   }
 
-  public getRegisteredFunctionIds(): string[] {
-    return Array.from(this.functions.keys())
-  }
-
   public doesFunctionNeedArgumentToBeComputed = (functionId: string): boolean => this.functionsWhichDoesNotNeedArgumentsToBeComputed.has(functionId)
 
   public isFunctionVolatile = (functionId: string): boolean => this.volatileFunctions.has(functionId)
