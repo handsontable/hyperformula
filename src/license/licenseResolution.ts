@@ -6,6 +6,7 @@
 import {
   checkLicenseKeyValidity,
   LicenseKeyValidityState,
+  notifyLicenseKeyNotice,
   notifyLicenseKeyState,
 } from '../helpers/licenseKeyValidator'
 import {
@@ -328,7 +329,11 @@ function licenseTermsOf(data: TypedKeyData): LicenseTerms | null {
         kind: comparedAgainstReleaseDate ? 'release' : 'usage',
         // UTC midnight by construction, so this round-trips a payload's own `YYYY-MM-DD` exactly.
         date: new Date(expiryTimestamp).toISOString().slice(0, 10),
-        noticeDays: readDays(termsSource?.notice),
+        // Gated on the shape, not just on the field's presence: `notice` is rev-5 vocabulary
+        // (§2.1), and the shipped shape reads its terms off the LICENSED product's entry — for a
+        // dual-product key that is the Handsontable entry, so an ungated read would let a field
+        // another product added for its own purposes switch HyperFormula's console output on.
+        noticeDays: isRev5 ? readDays(termsSource?.notice) : 0,
         graceDays,
       },
     expiryTimestamp,
@@ -378,6 +383,44 @@ function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expir
 }
 
 /**
+ * The day a VALID key's usage-until expiry falls on, if the current UTC instant is within its
+ * notice window — `null` otherwise, which covers "no notice window configured" (`noticeDays` is
+ * `0` for every non-rev-5 entry, enforced where the terms are read) just as much as "not close
+ * enough yet" or "already past its usage-until day".
+ *
+ * Deliberately blind to `graceDays`: notice is about the usage_until axis itself, not about the
+ * grace extension past it. Key spec rev 5 §4.1 sequences notice, then a soft-stop window, then the
+ * hard-stop this build already enforces; only the hard stop and this notice are built for 3.5.0
+ * (decision D5-A), so the window checked here ends exactly where the soft-stop phase would
+ * begin, rather than reaching into grace and printing a notice for a key already past its expiry.
+ *
+ * `release_until`-axis keys never reach here with a non-`null` result — `kind` is `'release'` for
+ * them (see {@link licenseTermsOf}) — matching rev 5's rule that notice and grace have no effect
+ * on that axis. The converse does NOT hold: `kind === 'usage'` also covers a rev-5 entry with no
+ * date of its own, whose `expiryTimestamp` fell through to the key envelope's `exp`, so such an
+ * entry carrying `notice` notices against that envelope date. Accepted for this PR standing
+ * alone — the entitlement-envelope re-port (#1740) removes the fallback entirely.
+ *
+ * @param {LicenseTerms} terms - the reconciled terms of the key
+ */
+function expiryWithinNoticeWindow(terms: LicenseTerms): Date | null {
+  if (terms.expiry.kind !== 'usage' || terms.expiry.noticeDays <= 0 || terms.expiryTimestamp === null) {
+    return null
+  }
+
+  // The window ends at the first instant no longer on the usage_until day — the same boundary
+  // `validityOf` uses before adding its grace term — and opens `notice` days before the licensed
+  // day ITSELF, not before that end. Counting back from the end would shorten the window by a day:
+  // the date-semantics fixtures pin 2027-06-13T00:00:00Z for usage_until 2027-08-12 with notice 60,
+  // and a trial whose notice equals its whole term must warn from the day it is issued.
+  const usageAxisDeadline = terms.expiryTimestamp + MILLISECONDS_PER_DAY
+  const noticeWindowStart = terms.expiryTimestamp - (terms.expiry.noticeDays * MILLISECONDS_PER_DAY)
+  const now = Date.now()
+
+  return now >= noticeWindowStart && now < usageAxisDeadline ? new Date(terms.expiryTimestamp) : null
+}
+
+/**
  * Turns the reconciled terms of an intact, unexpired typed key into the entitlement it grants.
  *
  * Per HF-307 decision D3 this is fail-closed and silent: a token this version does not recognize
@@ -424,8 +467,13 @@ function entitlementOf(terms: LicenseTerms): LicenseEntitlement {
  * every payload field is untrusted, so nothing here may assume a shape.
  *
  * @param {string} licenseKey - the raw `licenseKey` config value
+ * @param {boolean} notifyConsole - pass `false` for a resolution whose result exists only to be
+ * thrown away (e.g. the transient serialization-only `Config` that `rebuildWithConfig` builds
+ * from the OUTGOING config) — such a resolution must not print notices for a key the caller is
+ * in the middle of replacing. Legacy keys notify inside {@link checkLicenseKeyValidity} behind a
+ * once-per-page-load flag, so they cannot double-print regardless of this parameter.
  */
-export function resolveLicense(licenseKey: string): ResolvedLicense {
+export function resolveLicense(licenseKey: string, notifyConsole: boolean = true): ResolvedLicense {
   const typedKeyData = extractTypedKeyData(licenseKey)
 
   if (typedKeyData === null) {
@@ -438,15 +486,25 @@ export function resolveLicense(licenseKey: string): ResolvedLicense {
   const terms = licenseTermsOf(typedKeyData)
 
   if (terms === null) {
-    notifyLicenseKeyState(LicenseKeyValidityState.INVALID)
+    if (notifyConsole) {
+      notifyLicenseKeyState(LicenseKeyValidityState.INVALID)
+    }
 
     return {validityState: LicenseKeyValidityState.INVALID, entitlement: unrestrictedEntitlement()}
   }
 
   const {state, expiredOn} = validityOf(terms)
 
-  if (!terms.silent) {
+  if (notifyConsole && !terms.silent) {
     notifyLicenseKeyState(state, expiredOn)
+
+    if (state === LicenseKeyValidityState.VALID) {
+      const noticeExpiryDate = expiryWithinNoticeWindow(terms)
+
+      if (noticeExpiryDate !== null) {
+        notifyLicenseKeyNotice(licenseKey, noticeExpiryDate)
+      }
+    }
   }
 
   return {
