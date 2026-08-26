@@ -374,7 +374,7 @@ function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expir
     ? {state: LicenseKeyValidityState.VALID}
     // The reported day is the first day NOT covered, which is the convention the legacy validator
     // already uses for the same message (it reports `keyValidityDays + 1`).
-    : {state: LicenseKeyValidityState.EXPIRED, expiredOn: new Date(terms.expiryTimestamp + MILLISECONDS_PER_DAY)}
+    : {state: LicenseKeyValidityState.EXPIRED, expiredOn: new Date(deadline)}
 }
 
 /**
