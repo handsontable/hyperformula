@@ -54,7 +54,7 @@ If your key grants only part of the library, then:
 * A function your key doesn't include evaluates to a `#LIC!` error, in the same way as any other
   [error value](types-of-errors.md). Everything else in the sheet keeps calculating.
 * An API method your key doesn't include throws a `LicenseCapabilityMissingError` when you call
-  it. Methods that only read data never throw.
+  it. Getters never throw; `copy()` and `cut()` do, because they belong to the clipboard feature.
 * [`getAvailableFunctions()`](../api/classes/hyperformula.md#getavailablefunctions) and
   [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails) describe only the
   functions your key includes, so a function picker built from them never offers a function that
@@ -76,13 +76,14 @@ your key at runtime.
 If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
 
-In that case every function call evaluates to a `#LIC!` error — but no API method starts throwing,
-and `getAvailableFunctions()` still describes the full set of functions. A key problem never
-narrows what the library reports it can do.
+In that case every licence-gated function call evaluates to a `#LIC!` error — but no API method
+starts throwing, and `getAvailableFunctions()` still describes the full set of functions. A key
+problem never narrows what the library reports it can do.
 
-Arithmetic keeps working: operators such as `=A1+B1` are not function calls and are unaffected, as
-are `VERSION()` and `OFFSET()`, which sit outside the licence system entirely. So a sheet with a
-key problem does not go blank — it keeps producing values wherever no function is called.
+Arithmetic keeps working: operators such as `=A1+B1` are not function calls, so nothing gates them.
+`VERSION()` and `OFFSET()` are function calls, but they are protected built-ins that sit outside the
+licence system entirely, so they keep evaluating too. A sheet with a key problem therefore does not
+go blank.
 
 ## License key support
 

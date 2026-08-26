@@ -4638,8 +4638,9 @@ export class HyperFormula implements TypedEmitter {
    * `#LIC!` error. The list therefore answers "what can this engine compute", not "what does this package contain".
    * Two consequences worth knowing:
    * - A missing, invalid or expired license key does **not** shorten the list. Such a key restricts nothing by
-   *   entitlement — it is reported on the console, and every function call evaluates to `#LIC!` — so the full catalogue
-   *   is still described. Use it to build a function picker before a key is configured.
+   *   entitlement — it is reported on the console, and every licence-gated function call evaluates to `#LIC!` — so
+   *   the full catalogue is still described. `VERSION()` and `OFFSET()` are protected built-ins outside the licence
+   *   system, so they keep evaluating. Use it to build a function picker before a key is configured.
    * - A custom (user-registered) function is omitted only if it took a built-in id the key excludes. The rule is
    *   "not covered by the capability table", not "not user-registered", so a plugin registered under an id the
    *   built-in catalogue already uses is treated as that built-in. Registered under an id of its own, a custom
