@@ -4,7 +4,7 @@
  */
 
 import {FeatureId, LicenseEntitlement} from './LicenseEntitlement'
-import {CAPABILITY_TABLE, CapabilityGrant} from './capabilities'
+import {CAPABILITY_TABLE, CapabilityGrant, normalizeCapabilityToken} from './capabilities'
 
 /**
  * The capabilities a resolved {@link LicenseEntitlement} grants, ready for gate B (the
@@ -59,12 +59,13 @@ export class CapabilityRegistry {
   /**
    * Expands an entitlement's capability tokens into the concrete functions and features they
    * grant. An `unrestricted` entitlement short-circuits to an unrestricted result without
-   * consulting the table at all. Expansion through `implies` is transitive and cycle-safe (a
-   * visited set guards against a token implying itself, directly or through others); an
-   * unrecognized token is skipped without an error.
+   * consulting the table at all. Tokens are matched case-insensitively (the table is keyed by
+   * the normalized spelling — see {@link normalizeCapabilityToken}). Expansion through `implies`
+   * is transitive and cycle-safe (a visited set guards against a token implying itself, directly
+   * or through others); an unrecognized token is skipped without an error.
    *
    * @param {LicenseEntitlement} entitlement - the entitlement to resolve, e.g. one built by
-   * hand in a test or produced by PR 3's license-key payload adapter
+   * hand in a test or produced by the license-key payload adapter
    */
   public resolve(entitlement: LicenseEntitlement): ResolvedCapabilities {
     if (entitlement.unrestricted) {
@@ -74,10 +75,17 @@ export class CapabilityRegistry {
     const functions = new Set<string>()
     const features = new Set<FeatureId>()
     const visited = new Set<string>()
+    // Walked with a read cursor rather than `queue.shift()`: `shift` is O(n) in most engines, which
+    // made expansion O(n^2) in the number of tokens a key carries - measured at 1.4 s inside the
+    // constructor for a key with 100 000 tokens, which the format's missing size limit allows.
+    // `implies` still appends, so the queue has to stay a growable array.
     const queue = [...entitlement.capabilities]
+    let cursor = 0
 
-    while (queue.length > 0) {
-      const token = queue.shift() as string
+    while (cursor < queue.length) {
+      const token = normalizeCapabilityToken(queue[cursor])
+
+      cursor += 1
       if (visited.has(token)) {
         continue
       }

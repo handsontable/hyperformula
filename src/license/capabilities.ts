@@ -45,6 +45,11 @@ export const FUNCTIONS_3_TOKEN = 'functions_3'
 /** Excel simulator package — the entire implemented catalog. */
 export const FUNCTIONS_4_TOKEN = 'functions_4'
 /**
+ * The packaging doc's whole-catalog token — the excel-simulator package as that doc's own
+ * vocabulary spells it. Grants exactly what {@link FUNCTIONS_4_TOKEN} grants.
+ */
+export const FUN_ALL_TOKEN = 'fun:all'
+/**
  * Spreadsheet Bundle add-on (2026-08-12 packages meeting). Grants {@link FeatureId.Crud},
  * {@link FeatureId.UndoRedo}, {@link FeatureId.Clipboard} and {@link FeatureId.Batching} — see
  * {@link CAPABILITY_TABLE}.
@@ -56,6 +61,26 @@ export const SPREADSHEET_ADDON_TOKEN = 'spreadsheet'
  * import/export feature it would gate.
  */
 export const IMPORT_EXPORT_ADDON_TOKEN = 'import_export'
+
+/**
+ * The canonical spelling of a capability token for table lookups.
+ *
+ * Token names are case-insensitive — the packaging doc states it outright for its `fun:*`
+ * vocabulary, and tolerating case on the other tokens costs nothing since none of them collide
+ * under lowercasing. Surrounding whitespace is trimmed for a sharper reason than tidiness: every
+ * rule that reads a token has to read the SAME token, and a padded one used to be read two
+ * different ways at once — `' feat:crud'` failed the `feat:` prefix test that decides whether a key
+ * speaks the feature vocabulary, so the key was granted all five feature areas instead of the one
+ * it named, while `'feat:crud '` passed that test and then missed the table, granting none.
+ *
+ * Normalization happens at LOOKUP, never at storage: an entitlement carries the key's own
+ * spellings (they are diagnostics), and {@link CAPABILITY_TABLE} is keyed by the normalized form.
+ *
+ * @param {string} token - a capability token as the key spells it
+ */
+export function normalizeCapabilityToken(token: string): string {
+  return token.trim().toLowerCase()
+}
 
 /**
  * Describes what a capability token grants: a set of function ids, a set of {@link FeatureId}
@@ -78,6 +103,15 @@ const OPERATOR_FUNCTIONS = [
   'HF.MULTIPLY', 'HF.NE', 'HF.POW', 'HF.UMINUS', 'HF.UNARY_PERCENT', 'HF.UPLUS',
 ]
 
+/**
+ * The two protected built-ins. Both are named by the packaging doc (`fun:lookup.A`, `fun:info.A`)
+ * but sit OUTSIDE the token system today — the interpreter never gate-checks a protected
+ * function, so granting them would be dead weight that implies a restriction that does not exist.
+ * The doc calls this a "technical limitation" on both; their tokens below are recognized but
+ * grant nothing.
+ */
+const PROTECTED_BUILT_INS = ['OFFSET', 'VERSION']
+
 // An earlier revision granted all five features from CORE_TOKEN, which made feature gating inert
 // by construction: no restricted key could ever lose an API area. The ratified rule:
 // "Feature gating should work, but the legacy keys should grant all feat:* capabilities" — legacy
@@ -85,51 +119,104 @@ const OPERATOR_FUNCTIONS = [
 // five features moved onto their own `feat:*` tokens below.
 
 /**
- * Package membership, as the LOWEST package that includes each function.
+ * The 21 function groups of the packaging doc, keyed by their group tokens in normalized
+ * (lowercase) spelling — the doc writes them `fun:<family>.<A|B|C>` and declares all token names
+ * case-insensitive.
  *
- * Transcribed from section 6 of the internal packaging design document ("HF
- * function groups and packages"), which supersedes the earlier evidence file this table was first
- * built from. The doc organizes the catalog into 21 group tokens (`fun:<family>.<A|B|C>`) and
- * states each package as the cumulative union of specific groups: Math engine = the `.A` groups,
- * Calculated fields = `.A` + `.B`, Spreadsheet = `.A` + `.B` + `.C`. Reproducing that union gives
- * 17 / 64 / 161 cumulative functions before the two protected built-ins below are removed;
- * `capability-table.spec.ts` pins the resulting counts so a later edit cannot drift from them
- * silently.
+ * Transcribed 1:1 from section 6 of the internal packaging design document ("HF function groups
+ * and packages"), INCLUDING the members that resolve to no grant here: the operators (granted by
+ * {@link CORE_TOKEN} instead) and the protected built-ins
+ * (outside the token system, see {@link PROTECTED_BUILT_INS}). Keeping the doc's own membership
+ * verbatim is what makes this map the SINGLE SOURCE OF TRUTH both token dialects read from — the
+ * package slices below are DERIVED from these groups, so moving a function between groups moves
+ * it in both dialects at once, and `capability-table.spec.ts` pins each group's size against the
+ * doc's published counts so a re-transcription is a reviewable diff.
  *
- * `OFFSET` and `VERSION` are named by the doc (as `fun:lookup.A` and `fun:info.A`) but are
- * deliberately absent from every list below: both are protected built-ins that sit OUTSIDE the
- * token system today — the interpreter never gate-checks a protected function, so listing them
- * would be dead weight that implies a restriction that does not exist. The doc calls this a
- * "technical limitation" on both; see `hf-306-token-vocabulary-final` for the root cause of each
- * (registry protection for VERSION, parse-time resolution for OFFSET) and what closing it would
- * take.
+ * The doc freezes group names as API surface: once shipped inside license keys, a rename is a
+ * breaking change.
  */
-const MATH_ENGINE_FUNCTIONS = [
-  'ABS', 'AVERAGE', 'COUNT', 'IF', 'LOG', 'MAX', 'MIN', 'MOD', 'POWER', 'PRODUCT', 'ROUND', 'ROUNDDOWN',
-  'ROUNDUP', 'SQRT', 'SUM',
+export const FUNCTION_GROUPS: ReadonlyMap<string, readonly string[]> = new Map([
+  ['fun:math.a', ['ABS', 'LOG', 'MOD', 'POWER', 'PRODUCT', 'ROUND', 'ROUNDDOWN', 'ROUNDUP', 'SQRT', 'SUM']],
+  ['fun:stat.a', ['AVERAGE', 'COUNT', 'MAX', 'MIN']],
+  ['fun:logic.a', ['IF']],
+  ['fun:operator.a', [...OPERATOR_FUNCTIONS]],
+  ['fun:info.a', ['VERSION']],
+  ['fun:lookup.a', ['OFFSET']],
+  ['fun:time.b', [
+    'DATE', 'DATEDIF', 'DATEVALUE', 'DAY', 'DAYS', 'EOMONTH', 'HOUR', 'ISOWEEKNUM', 'MINUTE', 'MONTH',
+    'NETWORKDAYS', 'SECOND', 'TODAY', 'WEEKDAY', 'WEEKNUM', 'WORKDAY', 'YEAR',
+  ]],
+  ['fun:text.b', [
+    'CONCATENATE', 'EXACT', 'LEFT', 'LEN', 'LOWER', 'MID', 'REPLACE', 'REPT', 'RIGHT', 'SEARCH',
+    'SUBSTITUTE', 'TEXT', 'TRIM', 'UPPER', 'VALUE',
+  ]],
+  ['fun:logic.b', ['AND', 'FALSE', 'IFS', 'NOT', 'OR', 'SWITCH', 'TRUE', 'XOR']],
+  ['fun:math.b', ['RAND', 'RANDBETWEEN', 'SUMIF', 'SUMIFS']],
+  ['fun:stat.b', ['AVERAGEIF', 'COUNTIF', 'STDEV.S']],
+  ['fun:lookup.c', [
+    'ADDRESS', 'CHOOSE', 'COLUMN', 'COLUMNS', 'FILTER', 'HLOOKUP', 'HSTACK', 'HYPERLINK', 'INDEX', 'MATCH',
+    'ROW', 'ROWS', 'SORT', 'TRANSPOSE', 'UNIQUE', 'VLOOKUP', 'VSTACK', 'XLOOKUP',
+  ]],
+  ['fun:math.c', [
+    'ACOS', 'ASIN', 'ATAN', 'ATAN2', 'CEILING', 'COS', 'EVEN', 'EXP', 'FLOOR', 'INT', 'LN', 'MROUND', 'ODD',
+    'PI', 'QUOTIENT', 'SEQUENCE', 'SIGN', 'SIN', 'SUBTOTAL', 'SUMPRODUCT', 'SUMSQ', 'SUMXMY2', 'TAN',
+  ]],
+  ['fun:stat.c', [
+    'AVERAGEA', 'COUNTA', 'COUNTBLANK', 'COUNTIFS', 'LARGE', 'MAXIFS', 'MEDIAN', 'MINIFS', 'PERCENTILE.INC',
+    'SMALL', 'STDEV.P', 'STDEVA', 'STDEVPA', 'VAR.P', 'VAR.S',
+  ]],
+  ['fun:time.c', ['DAYS360', 'EDATE', 'NOW', 'TIME', 'YEARFRAC']],
+  ['fun:text.c', ['CHAR', 'CLEAN', 'CODE', 'FIND', 'PROPER', 'T', 'TEXTJOIN', 'UNICHAR']],
+  ['fun:info.c', [
+    'ISBLANK', 'ISERR', 'ISERROR', 'ISEVEN', 'ISLOGICAL', 'ISNA', 'ISNUMBER', 'ISODD', 'ISTEXT', 'N', 'NA',
+  ]],
+  ['fun:logic.c', ['IFERROR', 'IFNA']],
+  ['fun:finance.c', ['FV', 'IPMT', 'IRR', 'NPV', 'PMT', 'PPMT', 'PV', 'RATE', 'SLN', 'XIRR', 'XNPV']],
+  ['fun:engineer.c', ['DEC2HEX', 'HEX2DEC']],
+  ['fun:array.c', ['ARRAYFORMULA', 'ARRAY_CONSTRAIN']],
+])
+
+/** The group tokens each package adds, exactly as the packaging doc's §4 table states them. */
+const MATH_ENGINE_GROUPS = ['fun:math.a', 'fun:stat.a', 'fun:logic.a', 'fun:operator.a', 'fun:info.a', 'fun:lookup.a']
+const CALCULATED_FIELDS_GROUPS = ['fun:time.b', 'fun:text.b', 'fun:logic.b', 'fun:math.b', 'fun:stat.b']
+const SPREADSHEET_GROUPS = [
+  'fun:lookup.c', 'fun:math.c', 'fun:stat.c', 'fun:time.c', 'fun:text.c', 'fun:info.c', 'fun:logic.c',
+  'fun:finance.c', 'fun:engineer.c', 'fun:array.c',
 ]
+
+/** The members of the given groups, concatenated. The groups are disjoint, so this is a union. */
+function membersOfGroups(groupTokens: string[]): string[] {
+  return groupTokens.reduce<string[]>(
+    (members, groupToken) => members.concat(FUNCTION_GROUPS.get(groupToken) ?? []),
+    [],
+  )
+}
+
+/**
+ * The members a group contributes to a package GRANT: the group verbatim, minus the operators
+ * (granted by {@link CORE_TOKEN} in every package) and the protected built-ins (outside the token
+ * system entirely).
+ */
+function gatableMembersOfGroups(groupTokens: string[]): string[] {
+  return membersOfGroups(groupTokens).filter(
+    (name) => OPERATOR_FUNCTIONS.indexOf(name) === -1 && PROTECTED_BUILT_INS.indexOf(name) === -1,
+  )
+}
+
+/**
+ * Package membership, DERIVED from {@link FUNCTION_GROUPS} as the cumulative group unions the
+ * packaging doc's §4 table states: Math engine = the `.A` groups, Calculated fields = `.A` + `.B`,
+ * Spreadsheet = `.A` + `.B` + `.C`. Reproducing that union gives 17 / 64 / 161 cumulative
+ * functions before the two protected built-ins are removed; `capability-table.spec.ts` pins the
+ * resulting full memberships by name so a re-derivation is a reviewable diff.
+ */
+const MATH_ENGINE_FUNCTIONS = gatableMembersOfGroups(MATH_ENGINE_GROUPS)
 
 /** Added by the calculated-fields package, on top of {@link MATH_ENGINE_FUNCTIONS}. */
-const CALCULATED_FIELDS_FUNCTIONS = [
-  'AND', 'AVERAGEIF', 'CONCATENATE', 'COUNTIF', 'DATE', 'DATEDIF', 'DATEVALUE', 'DAY', 'DAYS', 'EOMONTH',
-  'EXACT', 'FALSE', 'HOUR', 'IFS', 'ISOWEEKNUM', 'LEFT', 'LEN', 'LOWER', 'MID', 'MINUTE', 'MONTH',
-  'NETWORKDAYS', 'NOT', 'OR', 'RAND', 'RANDBETWEEN', 'REPLACE', 'REPT', 'RIGHT', 'SEARCH', 'SECOND',
-  'STDEV.S', 'SUBSTITUTE', 'SUMIF', 'SUMIFS', 'SWITCH', 'TEXT', 'TODAY', 'TRIM', 'TRUE', 'UPPER', 'VALUE',
-  'WEEKDAY', 'WEEKNUM', 'WORKDAY', 'XOR', 'YEAR',
-]
+const CALCULATED_FIELDS_FUNCTIONS = gatableMembersOfGroups(CALCULATED_FIELDS_GROUPS)
 
 /** Added by the spreadsheet package, on top of {@link CALCULATED_FIELDS_FUNCTIONS}. */
-const SPREADSHEET_FUNCTIONS = [
-  'ACOS', 'ADDRESS', 'ARRAYFORMULA', 'ARRAY_CONSTRAIN', 'ASIN', 'ATAN', 'ATAN2', 'AVERAGEA', 'CEILING',
-  'CHAR', 'CHOOSE', 'CLEAN', 'CODE', 'COLUMN', 'COLUMNS', 'COS', 'COUNTA', 'COUNTBLANK', 'COUNTIFS',
-  'DAYS360', 'DEC2HEX', 'EDATE', 'EVEN', 'EXP', 'FILTER', 'FIND', 'FLOOR', 'FV', 'HEX2DEC', 'HLOOKUP',
-  'HSTACK', 'HYPERLINK', 'IFERROR', 'IFNA', 'INDEX', 'INT', 'IPMT', 'IRR', 'ISBLANK', 'ISERR', 'ISERROR',
-  'ISEVEN', 'ISLOGICAL', 'ISNA', 'ISNUMBER', 'ISODD', 'ISTEXT', 'LARGE', 'LN', 'MATCH', 'MAXIFS', 'MEDIAN',
-  'MINIFS', 'MROUND', 'N', 'NA', 'NOW', 'NPV', 'ODD', 'PERCENTILE.INC', 'PI', 'PMT', 'PPMT', 'PROPER', 'PV',
-  'QUOTIENT', 'RATE', 'ROW', 'ROWS', 'SEQUENCE', 'SIGN', 'SIN', 'SLN', 'SMALL', 'SORT', 'STDEV.P', 'STDEVA',
-  'STDEVPA', 'SUBTOTAL', 'SUMPRODUCT', 'SUMSQ', 'SUMXMY2', 'T', 'TAN', 'TEXTJOIN', 'TIME', 'TRANSPOSE',
-  'UNICHAR', 'UNIQUE', 'VAR.P', 'VAR.S', 'VLOOKUP', 'VSTACK', 'XIRR', 'XLOOKUP', 'XNPV', 'YEARFRAC',
-]
+const SPREADSHEET_FUNCTIONS = gatableMembersOfGroups(SPREADSHEET_GROUPS)
 
 /**
  * Added by the excel-simulator package, on top of {@link SPREADSHEET_FUNCTIONS} — the rest of the
@@ -187,7 +274,50 @@ const functions4Grant: CapabilityGrant = {
 }
 
 /**
- * The production capability table.
+ * One table entry per group token: the group's gatable members, so a key may assemble a package
+ * from groups instead of naming a `functions_N` slice. `fun:info.a` and `fun:lookup.a` resolve to
+ * EMPTY grants on purpose — their members are the protected built-ins, which are always available
+ * and must never become table-covered (a covered function is gated for every key not granting
+ * it). The tokens stay recognized either way, so a key carrying them is never reported as
+ * unrecognized: they are the doc's bookkeeping identifiers for functionality every key gets.
+ */
+const groupEntries: [string, CapabilityGrant][] = Array.from(FUNCTION_GROUPS.keys()).map((groupToken) => [
+  groupToken,
+  {functions: gatableMembersOfGroups([groupToken]), features: []},
+])
+
+/**
+ * One table entry per canonical function name: the packaging doc's single-function tokens
+ * (`fun:<CANONICAL_FUNCTION_NAME>`), "for surgical grants: custom deals, previews, per-function
+ * exceptions". One exists for EVERY canonical name — including the operators (harmless: core
+ * grants them anyway) and the protected built-ins (empty grants, as above). Alias names get no
+ * token of their own: tokens reference canonical names, and an alias travels with its canonical
+ * function because the gates canonicalize before consulting the table.
+ */
+const singleFunctionEntries: [string, CapabilityGrant][] = functions4Grant.functions
+  .concat(OPERATOR_FUNCTIONS, PROTECTED_BUILT_INS)
+  .map((name) => [
+    `fun:${normalizeCapabilityToken(name)}`,
+    {functions: PROTECTED_BUILT_INS.indexOf(name) === -1 ? [name] : [], features: []},
+  ])
+
+/**
+ * The production capability table, keyed by NORMALIZED token spelling — look up through
+ * {@link normalizeCapabilityToken}, never with a raw key string.
+ *
+ * The engine understands BOTH token dialects in circulation, resolved from the one group registry
+ * above so they cannot drift apart:
+ *
+ * - the key spec's package slices (`functions_1..4`) plus the two add-on tokens — the vocabulary
+ *   the upstream generator's own schema mints today;
+ * - the packaging doc's group vocabulary (`fun:all`, `fun:<family>.<A|B|C>`,
+ *   `fun:<CANONICAL_FUNCTION_NAME>`) — §6 of the 12.08 packaging doc.
+ *
+ * Accepting the superset is deliberate and spec-clean: an unrecognized token is defined as "a
+ * grant this version does not implement" (strict-shape/lenient-vocabulary, T7), so implementing
+ * more tokens than the generator currently mints breaks nothing — and it makes the engine robust
+ * to the still-open business decision about which dialect keys will finally be worded in
+ * (owner's call, 20.08). A key's function set is the UNION of everything recognized.
  *
  * The grants are stored FULLY EXPANDED rather than chained through `implies`: the packaging
  * design states the enforcement layer must not assume a hierarchy between tokens, and that the
@@ -212,6 +342,11 @@ const functions4Grant: CapabilityGrant = {
  * RESERVED grant, since nothing in the public API is gated on it yet: HF-107 hasn't shipped the
  * feature it would gate. Both tokens stay recognized either way, so an issued key carrying one is
  * never reported as unrecognized.
+ *
+ * Entry ORDER is load-bearing at one spot: `CapabilityRegistry`'s reverse index maps each
+ * function id to the FIRST token that lists it, so the package slices stay ahead of the group and
+ * single-function tokens, keeping `capabilityOf`'s answers what they were before the second
+ * dialect existed.
  */
 export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [CORE_TOKEN, coreGrant],
@@ -233,5 +368,7 @@ export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
     features: [FeatureId.Crud, FeatureId.UndoRedo, FeatureId.Clipboard, FeatureId.Batching],
   }],
   [IMPORT_EXPORT_ADDON_TOKEN, {functions: [], features: [FeatureId.ImportExport]}],
+  [FUN_ALL_TOKEN, {functions: [...functions4Grant.functions], features: []}],
+  ...groupEntries,
+  ...singleFunctionEntries,
 ])
-
