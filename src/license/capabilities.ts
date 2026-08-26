@@ -207,7 +207,7 @@ const functions4Grant: CapabilityGrant = {
  *
  * The two add-on tokens, wired per the 2026-08-12 packages meeting: `spreadsheet` backs the
  * 'Spreadsheet Bundle' add-on and grants {@link FeatureId.Crud}, {@link FeatureId.UndoRedo},
- * {@link FeatureId.Clipboard} and {@link FeatureId.Batching} (Kuba: batching too, 12.08).
+ * {@link FeatureId.Clipboard} and {@link FeatureId.Batching} (batching included, per the packaging decision).
  * `import_export` backs the import-export add-on and grants {@link FeatureId.ImportExport} — a
  * RESERVED grant, since nothing in the public API is gated on it yet: HF-107 hasn't shipped the
  * feature it would gate. Both tokens stay recognized either way, so an issued key carrying one is
