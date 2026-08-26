@@ -224,6 +224,10 @@ export const CAPABILITY_TABLE: ReadonlyMap<string, CapabilityGrant> = new Map([
   [CLIPBOARD_FEATURE_TOKEN, {functions: [], features: [FeatureId.Clipboard]}],
   [NAMED_EXPRESSIONS_FEATURE_TOKEN, {functions: [], features: [FeatureId.NamedExpressions]}],
   [BATCHING_FEATURE_TOKEN, {functions: [], features: [FeatureId.Batching]}],
+  // NamedExpressions is absent on purpose: the Spreadsheet Bundle was scoped at the 12.08 packages
+  // meeting to the four areas below, and named expressions was not among them. It is recorded here
+  // so the omission reads as the decision it is rather than as a transcription slip, and so that
+  // moving it into the bundle stays a product call rather than a silent edit.
   [SPREADSHEET_ADDON_TOKEN, {
     functions: [],
     features: [FeatureId.Crud, FeatureId.UndoRedo, FeatureId.Clipboard, FeatureId.Batching],
