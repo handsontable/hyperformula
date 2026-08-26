@@ -43,10 +43,47 @@ two dates:
 
 This process doesn't require any connection to the server.
 
+## Feature packages and add-ons
+
+A proprietary license key may grant the whole library, or only part of it. If your key covers
+everything you buy nothing new to think about, and neither does the GPLv3 key `gpl-v3`, which
+always grants everything.
+
+If your key grants only part of the library, then:
+
+* A function your key doesn't include evaluates to a `#LIC!` error, in the same way as any other
+  [error value](types-of-errors.md). Everything else in the sheet keeps calculating.
+* An API method your key doesn't include throws a `LicenseCapabilityMissingError` when you call
+  it. Getters never throw; `copy()` and `cut()` do, because they belong to the clipboard feature.
+* [`getAvailableFunctions()`](../api/classes/hyperformula.md#getavailablefunctions) and
+  [`getFunctionDetails()`](../api/classes/hyperformula.md#getfunctiondetails) describe only the
+  functions your key includes, so a function picker built from them never offers a function that
+  then fails.
+
+Custom functions you register yourself are available whatever your key grants, as long as they use
+an id of their own. The licence covers built-in ids, so a plugin registered under a built-in id your
+key does not include is treated as that built-in and stays unavailable — it will not be described and
+it evaluates to `#LIC!`. Pick an id the built-in catalogue does not use and this cannot happen.
+
+::: tip
+To find out which package your key includes, check your order confirmation or
+[contact our team](contact.md). HyperFormula deliberately reports nothing about the contents of
+your key at runtime.
+:::
+
 ## License key notifications
 
 If your license key is missing, invalid, or expired, you see a
 corresponding notification in the console.
+
+In that case every licence-gated function call evaluates to a `#LIC!` error — but no API method
+starts throwing, and `getAvailableFunctions()` still describes the full set of functions. A key
+problem never narrows what the library reports it can do.
+
+Arithmetic keeps working: operators such as `=A1+B1` are not function calls, so nothing gates them.
+`VERSION()` and `OFFSET()` are function calls, but they are protected built-ins that sit outside the
+licence system entirely, so they keep evaluating too. A sheet with a key problem therefore does not
+go blank.
 
 ## License key support
 

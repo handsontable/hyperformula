@@ -121,3 +121,34 @@ export function allowsFunction(resolved: ResolvedCapabilities, functionId: strin
 export function allowsFeature(resolved: ResolvedCapabilities, feature: FeatureId): boolean {
   return resolved.unrestricted || resolved.features.has(feature)
 }
+
+/**
+ * Whether the license lets an instance evaluate — and therefore describe — the given function.
+ *
+ * The rule both gate-B function call sites share: a function the capability table does not cover
+ * at all is allowed. {@link CapabilityRegistry.capabilityOf} returns `undefined` only for an id no
+ * token lists, which the completeness invariant in `unit/license/capability-registry.spec.ts`
+ * guarantees is not an unlisted built-in but a custom, instance-registered function — exempt from
+ * gate B by decision D1. Everything the table does cover has to be granted by the entitlement.
+ *
+ * Extracted so the interpreter and the function metadata API cannot drift apart. The metadata API
+ * exists to describe the functions an instance can actually evaluate, so a second spelling of this
+ * rule would eventually let it advertise a function that then returns `#LIC!` — the exact failure
+ * removing the static metadata methods (HF-349) was meant to prevent.
+ *
+ * Note this is gate B only: it says nothing about {@link LicenseKeyValidityState}. Callers that
+ * also need gate A check it separately, because the two gates have different answers for the same
+ * key — see the comment on `resolveLicense`.
+ *
+ * @param {CapabilityRegistry} registry - the registry the capabilities were resolved against
+ * @param {ResolvedCapabilities} resolved - the instance's resolved capabilities
+ * @param {string} canonicalFunctionId - the function id, already resolved through the alias map
+ */
+export function licenseAllowsFunction(
+  registry: CapabilityRegistry,
+  resolved: ResolvedCapabilities,
+  canonicalFunctionId: string,
+): boolean {
+  return registry.capabilityOf(canonicalFunctionId) === undefined
+    || allowsFunction(resolved, canonicalFunctionId)
+}

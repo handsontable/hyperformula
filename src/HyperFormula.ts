@@ -44,7 +44,7 @@ import {
 import {Evaluator} from './Evaluator'
 import {ExportedChange, Exporter} from './Exporter'
 import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
-import {allowsFeature} from './license/CapabilityRegistry'
+import {allowsFeature, licenseAllowsFunction} from './license/CapabilityRegistry'
 import {FeatureId} from './license/LicenseEntitlement'
 import {buildTranslationPackage, RawTranslationPackage, TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
@@ -707,25 +707,56 @@ export class HyperFormula implements TypedEmitter {
   }
 
   /**
+   * Whether an instance's license lets it evaluate the given function id, and therefore whether the
+   * metadata API may describe it. Mirrors the gate-B branch the interpreter runs per function call
+   * (`Interpreter.evaluateAstWithoutPostprocessing`, the `FUNCTION_CALL` case), through the same
+   * [[licenseAllowsFunction]] rule and the same alias canonicalisation, so a listed function is
+   * always one that actually evaluates.
+   *
+   * Gate B only, deliberately — never the license key's validity state. A missing, invalid or expired
+   * key resolves to an unrestricted entitlement (the invariant `resolveLicense` documents), so it
+   * reaches this method with `licenseCapabilities.unrestricted` set and every function stays listed.
+   * That is the intended answer: a key problem is reported on the console and by `#LIC!` in cells,
+   * and narrowing the catalogue to the two protected built-ins would leave an integrator who has not
+   * wired up their key yet with an empty function picker and no clue why. The list narrows only for
+   * a *valid* key that genuinely does not include a function — the case where the answer is useful.
+   *
+   * @param {string} functionId - the id as registered, which may be an alias
+   * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the alias map
+   * @param {Config} config - the instance's config, holding its resolved entitlement
+   */
+  private static licenseListsFunction(functionId: string, functionRegistry: FunctionRegistry, config: Config): boolean {
+    if (!config.isLicenseGateActive || FunctionRegistry.functionIsProtected(functionId)) {
+      return true
+    }
+    const plugin = functionRegistry.getFunctionPlugin(functionId)
+    const canonicalId = plugin?.aliases?.[functionId] ?? functionId
+    return licenseAllowsFunction(config.capabilityRegistry, config.licenseCapabilities, canonicalId)
+  }
+
+  /**
    * Builds the function list for every id registered in an engine's own registry. Documented functions use their
    * catalogue entry; custom functions are listed with their name only. Sorted by localized name with
    * `localeCompare`, so the order follows the host's collation rules, with the language-independent canonical name
    * as a stable tiebreaker for entries that share a localized name.
    *
-   * Takes the [[TranslationPackage]] rather than deriving it from a language code: an instance must describe its
-   * functions under the package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
+   * Takes the instance's whole [[Config]] rather than a language code: an instance must describe its functions
+   * under the translation package its own evaluator uses (`Config.translationPackage`), which is a snapshot taken
    * when the instance was built and can differ from whatever is registered globally for the same code today.
-   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate.
+   * Deriving it here instead would let this method report a localized name the instance refuses to evaluate. The
+   * config also carries the resolved entitlement, for the same reason — see [[licenseListsFunction]].
    *
    * @param {FunctionRegistry} functionRegistry - the engine's registry, the source of both the ids and their plugins
-   * @param {TranslationPackage} language - the translation package to translate the names under
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
    */
-  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionListEntry[] {
+  private static buildAvailableFunctions(functionRegistry: FunctionRegistry, config: Config): FunctionListEntry[] {
+    const language = config.translationPackage
     const translate = (id: string) => language.getMaybeFunctionTranslation(id)
     return functionRegistry.getListableFunctionIds()
       // The interpreter refuses to evaluate ids the active language has no translation entry for
       // (FunctionRegistry.getFunction), so an untranslated function would be advertised but uncallable.
       .filter(id => language.isFunctionTranslated(id))
+      .filter(id => HyperFormula.licenseListsFunction(id, functionRegistry, config))
       .map(id => {
         const resolved = HyperFormula.resolveFunctionMetadata(id, functionRegistry.getFunctionPlugin(id))
         if (resolved === undefined) {
@@ -749,12 +780,17 @@ export class HyperFormula implements TypedEmitter {
    *
    * @param {string} functionId - the language-independent function id (canonical id or alias)
    * @param {FunctionRegistry} functionRegistry - the engine's registry, which resolves the id to its plugin
-   * @param {TranslationPackage} language - the translation package to translate the names under
+   * @param {Config} config - the instance's config: the translation package and the resolved license entitlement
    */
-  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, language: TranslationPackage): FunctionDetails | undefined {
-    // Mirrors the filter in buildAvailableFunctions: an id the active language cannot evaluate
-    // (no translation entry) gets no details either, so the list and the details always agree.
+  private static buildFunctionDetailsFor(functionId: string, functionRegistry: FunctionRegistry, config: Config): FunctionDetails | undefined {
+    const language = config.translationPackage
+    // Mirrors the filters in buildAvailableFunctions: an id the active language cannot evaluate
+    // (no translation entry), or one this instance's license does not grant, gets no details
+    // either, so the list and the details always agree.
     if (!language.isFunctionTranslated(functionId)) {
+      return undefined
+    }
+    if (!HyperFormula.licenseListsFunction(functionId, functionRegistry, config)) {
       return undefined
     }
     const resolved = HyperFormula.resolveFunctionMetadata(functionId, functionRegistry.getFunctionPlugin(functionId))
@@ -4598,6 +4634,18 @@ export class HyperFormula implements TypedEmitter {
    * plugin registered without translations for that language. A translation set to an empty string is not a missing
    * entry: it falls back to the canonical id, so the function stays listed under its canonical name.
    *
+   * A function the instance's license key does not include is omitted for the same reason: it would evaluate to a
+   * `#LIC!` error. The list therefore answers "what can this engine compute", not "what does this package contain".
+   * Two consequences worth knowing:
+   * - A missing, invalid or expired license key does **not** shorten the list. Such a key restricts nothing by
+   *   entitlement — it is reported on the console, and every licence-gated function call evaluates to `#LIC!` — so
+   *   the full catalogue is still described. `VERSION()` and `OFFSET()` are protected built-ins outside the licence
+   *   system, so they keep evaluating. Use it to build a function picker before a key is configured.
+   * - A custom (user-registered) function is omitted only if it took a built-in id the key excludes. The rule is
+   *   "not covered by the capability table", not "not user-registered", so a plugin registered under an id the
+   *   built-in catalogue already uses is treated as that built-in. Registered under an id of its own, a custom
+   *   function is never omitted. See {@link getFunctionDetails}, which states the same exception.
+   *
    * @example
    * ```js
    * const hfInstance = HyperFormula.buildEmpty();
@@ -4611,9 +4659,9 @@ export class HyperFormula implements TypedEmitter {
   public getAvailableFunctions(): FunctionListEntry[] {
     return HyperFormula.buildAvailableFunctions(
       this._functionRegistry,
-      // The instance's own package, the one its evaluator uses — not a fresh global lookup, which could describe
-      // the functions under a package this instance never adopted.
-      this._config.translationPackage,
+      // The instance's own config: its translation package (not a fresh global lookup, which could describe the
+      // functions under a package this instance never adopted) and its resolved license entitlement.
+      this._config,
     )
   }
 
@@ -4624,9 +4672,10 @@ export class HyperFormula implements TypedEmitter {
    * documentation link (`documentationUrl`) and usage examples (`examples`) — every built-in authors both.
    * Resolves both built-in and custom (user-registered) functions, as well as aliases. An alias reports its
    * target's metadata (including examples, which spell the target's name) under the alias id, with the target id
-   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, or
-   * has no translation entry for the configured language (an untranslated id cannot be evaluated, so it is not
-   * described either, which keeps this method consistent with [[getAvailableFunctions]]).
+   * exposed as `aliasOf`. Returns `undefined` when the function id is unknown, not registered in this instance, has
+   * no translation entry for the configured language, or is not included in this instance's license key (neither an
+   * untranslated nor an unlicensed id can be evaluated, so neither is described — which keeps this method consistent
+   * with [[getAvailableFunctions]], including its behaviour for a missing, invalid or expired key).
    * For a custom function, `category` is `'Custom'`, there is no `shortDescription`, `documentationUrl` or
    * `examples`, and parameters are reported positionally (`Arg1`, `Arg2`, ...). A custom plugin registered over a
    * built-in id is the exception: the catalogue is keyed by function id, so it reports that built-in's authored
@@ -4655,8 +4704,8 @@ export class HyperFormula implements TypedEmitter {
    */
   public getFunctionDetails(canonicalName: string): FunctionDetails | undefined {
     validateArgToType(canonicalName, 'string', 'canonicalName')
-    // The instance's own package, the one its evaluator uses — see getAvailableFunctions.
-    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config.translationPackage)
+    // The instance's own config, for the same reasons as getAvailableFunctions.
+    return HyperFormula.buildFunctionDetailsFor(canonicalName, this._functionRegistry, this._config)
   }
 
   /**

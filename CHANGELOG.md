@@ -7,6 +7,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added support for proprietary license keys that grant a subset of the library ("feature packages and add-ons"). A function your key does not include evaluates to a `#LIC!` error, and the corresponding parts of the API throw a `LicenseCapabilityMissingError`. Keys that grant everything, including `gpl-v3`, are unaffected. [#1728](https://github.com/handsontable/hyperformula/pull/1728) [#1729](https://github.com/handsontable/hyperformula/pull/1729) [#1730](https://github.com/handsontable/hyperformula/pull/1730)
+
+### Changed
+
+- Changed `getAvailableFunctions()` and `getFunctionDetails()` to describe only the functions the instance's license key includes, so they no longer advertise a function that would evaluate to a `#LIC!` error. A missing, invalid, or expired key does not shorten the list. [#1731](https://github.com/handsontable/hyperformula/pull/1731)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
