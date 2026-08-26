@@ -84,7 +84,7 @@ export interface LicenseEntitlement {
 /**
  * The unrestricted entitlement: legacy keys and `gpl-v3` resolve to this today.
  *
- * HF-307 decision D3 (fail-closed, silent) means a typed key whose tokens this library version
+ * HF-307 decision D3 (fail-closed, silent) means an entitlement key whose tokens this library version
  * does not recognize at all no longer maps here — it resolves to an entitlement with an empty,
  * silent capability set instead of falling back to unrestricted access. Do not reuse this
  * function for that case.

@@ -4,7 +4,7 @@
  */
 
 /**
- * Vendored from `handsontable/license-key`, `src/typed-key/sha512.js`.
+ * Vendored from `handsontable/license-key`, `src/entitlement-key/sha512.js`.
  * See `src/license/vendor/PROVENANCE.md` before editing — this file is a port, not original code.
  */
 

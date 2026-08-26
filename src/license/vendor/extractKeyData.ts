@@ -4,212 +4,281 @@
  */
 
 /**
- * Vendored from `handsontable/license-key`, `src/typed-key/extract-key-data.js`.
+ * Vendored from `handsontable/license-key`, `src/entitlement-key/extract-key-data.js`.
  * See `src/license/vendor/PROVENANCE.md` before editing — this file is a port, not original code.
  *
- * Two deliberate divergences from upstream, both recorded in the manifest: the custom-schema
- * parameter is dropped (HyperFormula always reads with {@link DEFAULT_TYPED_KEY_SCHEMA}, so
- * upstream's `validateTypedKeySchema` branch is unreachable here), and the result additionally
- * carries {@link TypedKeyData.licensedProductName} so a caller can find the grace period without
- * re-implementing the licensed-product rule.
+ * Unlike the typed-key reader this file replaces, the entitlement reader is deliberately
+ * SCHEMA-FREE upstream: unknown products, capabilities and flags are all tolerated, so nothing
+ * about reading a key depends on the vocabulary — which is what lets a product vendor this
+ * parser on its own.
  */
 
-import {TYPED_KEY_CHECKSUM_LENGTH, TYPED_KEY_SUPPORTED_VERSIONS} from './constants'
-import {DEFAULT_TYPED_KEY_SCHEMA} from './defaultSchema'
+import {DATE_FIELDS, ENTITLEMENT_KEY_CHECKSUM_LENGTH} from './constants'
 import {sha512} from './sha512'
 import {base64ToString, parseIsoDate, stringToUtf8Bytes} from './utils'
 
 /**
- * One product entry of a typed key payload.
+ * The alphabet of the encoded payload — URL-safe base64 without padding. The checksum (lowercase
+ * hex) is a subset of it, which is what lets the two be split by a fixed length from the right.
+ */
+const ENCODED_PAYLOAD = /^[A-Za-z0-9\-_]+$/
+const CHECKSUM = /^[0-9a-f]+$/
+
+/**
+ * One normalized product entry of an entitlement key payload.
  *
- * Every field is typed `unknown` on purpose. Field types are checked when a key is generated,
- * which constrains nothing about a payload that actually reaches this code, and the checksum
- * establishes only that the payload arrived intact. Every consumer must therefore narrow a
- * field before using it rather than trusting its declared shape.
+ * The named fields are guaranteed by {@link normalizeProductEntry}: `capabilities` and `flags`
+ * are arrays of strings (`flags` normalized to `[]` when absent), `notice` and `grace` are
+ * non-negative integers, and exactly one of `usage_until` / `release_until` is present and is a
+ * real `YYYY-MM-DD` calendar date. Any OTHER field the entry carries is preserved verbatim under
+ * its own name — a field added to the format later must reach an application running an older
+ * vendored parser — which is what the index signature is for.
  */
-export interface TypedKeyProductGrant {
-  readonly tier?: unknown,
-  readonly mode?: unknown,
-  readonly addons?: unknown,
-  readonly exp?: unknown,
-  readonly grace?: unknown,
+export interface EntitlementProductGrant {
+  readonly capabilities: readonly string[],
+  readonly usage_until?: string,
+  readonly release_until?: string,
+  readonly notice: number,
+  readonly grace: number,
+  readonly flags: readonly string[],
+  readonly [field: string]: unknown,
 }
 
 /**
- * A typed key payload. Only `v` is verified before this type is handed out (against
- * {@link TYPED_KEY_SUPPORTED_VERSIONS}); see {@link TypedKeyProductGrant} for why the rest is
- * `unknown`.
+ * The machine-readable content of an intact entitlement license key: the granted products, each
+ * with its capabilities, its single date (`usage_until` or `release_until`), its `notice` and
+ * `grace` windows in days, and its `flags`.
  */
-export interface TypedKeyPayload {
-  readonly v: number,
-  readonly products: Readonly<Record<string, TypedKeyProductGrant>>,
-  readonly ref?: unknown,
-  readonly holder?: unknown,
-  readonly iss?: unknown,
+export interface EntitlementKeyData {
+  readonly products: Readonly<Record<string, EntitlementProductGrant>>,
 }
 
 /**
- * The machine-readable content of an intact typed license key.
- */
-export interface TypedKeyData {
-  /** One of `'trial'`, `'freemium'`, `'subscription'`, `'perpetual'`. */
-  readonly keyType: string,
-  readonly payload: TypedKeyPayload,
-  /**
-   * The expiration time derived from the payload, as epoch milliseconds; `null` means the key
-   * never expires. `null` rather than a number is deliberate — a real timestamp of `0` (a key
-   * dated 1970-01-01) must stay distinguishable from "never".
-   */
-  readonly expiryTimestamp: number | null,
-  /**
-   * The name of the licensed product: the first schema product present in the payload. It is the
-   * only entry allowed to carry `exp` and `grace`, so a key granting both Handsontable and
-   * HyperFormula carries its expiry and grace period on the Handsontable entry.
-   */
-  readonly licensedProductName: string,
-}
-
-/**
- * The licensed product of a payload, together with the expiration time derived from it.
- */
-interface LicensedProduct {
-  readonly name: string,
-  readonly expiryTimestamp: number | null,
-}
-
-/**
- * Resolves the licensed product of the payload and derives its expiration time. The expiration
- * date (`exp`, in the `YYYY-MM-DD` format) is converted to epoch milliseconds (UTC midnight). A
- * payload without the expiration date (a freemium key) maps to `null`, which means the key never
- * expires. Returns `null` when the payload does not have the expected shape.
+ * Returns `true` when the value is a plain object.
  *
- * Upstream returns only the timestamp, using `undefined` as its "malformed" sentinel because
- * `null` already means "never expires"; folding the product name in lets this return one
- * unambiguous `null` instead.
- *
- * @param {TypedKeyPayload} payload - the key payload
+ * @param {unknown} value - the value to check
  */
-function resolveLicensedProduct(payload: TypedKeyPayload): LicensedProduct | null {
-  const {products} = payload
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
 
-  if (products === null || typeof products !== 'object' || Array.isArray(products)) {
-    return null
-  }
+/**
+ * Returns `true` when the value is a non-negative integer.
+ *
+ * @param {unknown} value - the value to check
+ */
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && Math.floor(value) === value && value >= 0
+}
 
-  const schemaProductNames = DEFAULT_TYPED_KEY_SCHEMA.products.map((schemaProduct) => schemaProduct.name)
+/**
+ * Returns `true` when the value is an array of strings.
+ *
+ * @param {unknown} value - the value to check
+ */
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+}
 
-  // A payload granting a product this schema does not know cannot be read reliably - the
-  // licensed product (and so the expiry) could be resolved wrongly. Reject it instead of
-  // guessing; product lists are append-only and the reading side has to know at least as much as
-  // the generating one.
-  if (Object.keys(products).some((name) => schemaProductNames.indexOf(name) === -1)) {
-    return null
-  }
-
-  // The licensed product is the first schema product present in the payload (the schema order
-  // defines the priority). Presence is read own-property only, so an inherited prototype-chain
-  // property cannot masquerade as a granted product.
-  const hasOwn = (name: string) => Object.prototype.hasOwnProperty.call(products, name)
-  const licensedProductName = schemaProductNames.find(hasOwn)
-  const licensedProduct = licensedProductName === undefined ? undefined : products[licensedProductName]
-
-  if (licensedProductName === undefined || licensedProduct === undefined || licensedProduct === null
-      || typeof licensedProduct !== 'object' || Array.isArray(licensedProduct)) {
-    return null
-  }
-  if (licensedProduct.exp === undefined) {
-    return {name: licensedProductName, expiryTimestamp: null}
+/**
+ * Returns `true` when the value is a real calendar date in the `YYYY-MM-DD` format. A time
+ * component, an offset, a numeric timestamp and a date that does not exist are all rejected —
+ * the format is the whole contract, and a validator that accepted two spellings would hide a
+ * timezone bug at generation instead of surfacing it.
+ *
+ * @param {unknown} value - the value to check
+ */
+function isIsoDate(value: unknown): boolean {
+  // `parseIsoDate` stringifies its argument before matching the `YYYY-MM-DD` shape, so a value
+  // that is not a string but spells a date once stringified — a single-element array is the
+  // realistic case — would pass a shape check the format makes fatal, and a malformed key would
+  // end up granting a RESTRICTED entitlement instead of taking the invalid-key path. The type is
+  // part of the shape, so it is rejected here rather than left to the stringifying matcher.
+  if (typeof value !== 'string') {
+    return false
   }
 
   try {
-    return {name: licensedProductName, expiryTimestamp: parseIsoDate(String(licensedProduct.exp), 'expiration').timestamp}
+    parseIsoDate(value, 'license')
+
+    return true
   } catch (error) {
-    // A malformed or impossible date - such a payload is not trustworthy.
-    return null
+    return false
   }
 }
 
 /**
- * Extracts the machine-readable data from a typed license key (`[TRIAL]`, `[FREE]`, `[SUB]` or
- * `[PERP]`). The function verifies the checksum first, so the returned data is guaranteed to
- * belong to an intact key. For a malformed or tampered key `null` is returned.
+ * Adds an own, ordinary property.
  *
- * The expiration time itself is not checked here — it is up to the caller to compare it against
- * the current time (trial, subscription) or the build release date (perpetual).
+ * Both the product names and the field names of a product entry come from JSON, so `__proto__`
+ * is a name an attacker can put in a key. A plain assignment would go through the
+ * `Object.prototype` setter: the value would vanish from `Object.keys` while still resolving
+ * through the chain.
+ *
+ * @param {object} target - the object to add the property to
+ * @param {string} key - the property name
+ * @param {unknown} value - the property value
+ */
+function defineOwn(target: object, key: string, value: unknown): void {
+  Object.defineProperty(target, key, {
+    value, enumerable: true, writable: true, configurable: true,
+  })
+}
+
+/**
+ * Verifies and normalizes one product entry.
+ *
+ * Strict about SHAPE: exactly one of the two dates, a real date, and the two window sizes. A key
+ * that gets this wrong is malformed, not merely unknown, and reading it would mean guessing what
+ * was licensed.
+ *
+ * Lenient about VOCABULARY: an unrecognised capability token, an unrecognised flag and an
+ * unrecognised extra field are all kept and ignored. Without that leniency every token added on
+ * the issuing side would break every library version already deployed in the field.
+ *
+ * Returns `null` when the entry is malformed.
+ *
+ * @param {unknown} entry - the product entry of the payload
+ */
+function normalizeProductEntry(entry: unknown): EntitlementProductGrant | null {
+  if (!isPlainObject(entry)) {
+    return null
+  }
+  if (!isStringArray(entry.capabilities)) {
+    return null
+  }
+
+  const presentDateFields = DATE_FIELDS.filter((field) => entry[field] !== undefined)
+
+  // Exactly one date per product. "Both" and "neither" are each a different commercial shape
+  // that the format cannot express, so neither may be silently resolved by whichever field the
+  // parser happens to read first.
+  if (presentDateFields.length !== 1) {
+    return null
+  }
+  if (!isIsoDate(entry[presentDateFields[0]])) {
+    return null
+  }
+  if (!isNonNegativeInteger(entry.notice) || !isNonNegativeInteger(entry.grace)) {
+    return null
+  }
+  if (entry.flags !== undefined && !isStringArray(entry.flags)) {
+    return null
+  }
+
+  // Start from everything the entry carries, so a field this version does not know survives
+  // into the result instead of being silently dropped. A field added to the format later is
+  // exactly the case an already-vendored parser has to survive, and a reader that quietly
+  // discards it makes the field invisible to the application on top.
+  const normalized = {}
+
+  Object.keys(entry).forEach((field) => defineOwn(normalized, field, entry[field]))
+
+  defineOwn(normalized, 'capabilities', entry.capabilities.slice())
+  defineOwn(normalized, 'notice', entry.notice)
+  defineOwn(normalized, 'grace', entry.grace)
+  // An absent array and an empty one mean the same thing. Normalizing here keeps
+  // `flags.indexOf('trial')` safe at every call site.
+  defineOwn(normalized, 'flags', entry.flags === undefined ? [] : entry.flags.slice())
+  defineOwn(normalized, presentDateFields[0], entry[presentDateFields[0]])
+
+  return normalized as EntitlementProductGrant
+}
+
+/**
+ * Extracts the machine-readable data from an entitlement license key.
+ *
+ * The checksum is verified first, so the returned data is guaranteed to belong to an intact
+ * block. For a malformed or tampered key `null` is returned — reporting an invalid key is the
+ * caller's job, not this function's.
+ *
+ * Only the bracketed block matters. The prose in front of it is neither parsed nor covered by
+ * the checksum, so the caller may pass the whole artifact or just the `[...]` block, and
+ * rewrapped or re-pasted text still validates.
+ *
+ * No schema is needed. Unknown products, capabilities and flags are all tolerated, so nothing
+ * about reading a key depends on the vocabulary — which is what lets a product vendor this
+ * parser on its own.
  *
  * @param {string} licenseKey - the license key to extract the data from
  */
-export function extractTypedKeyData(licenseKey: string): TypedKeyData | null {
-  // The key alphabet has no whitespace, so trimming is lossless - keys are commonly pasted with
-  // a trailing newline (email, terminal).
-  const key = `${licenseKey}`.trim()
-  const keyType = Object.keys(DEFAULT_TYPED_KEY_SCHEMA.keyTypes)
-    .find((type) => key.indexOf(`${DEFAULT_TYPED_KEY_SCHEMA.keyTypes[type].tag}_`) === 0)
-
-  if (keyType === undefined) {
-    return null
-  }
-  if (key.length <= TYPED_KEY_CHECKSUM_LENGTH) {
+export function extractEntitlementKeyData(licenseKey: string): EntitlementKeyData | null {
+  if (typeof licenseKey !== 'string') {
     return null
   }
 
-  const keyBody = key.slice(0, -TYPED_KEY_CHECKSUM_LENGTH)
-  const checksum = key.slice(-TYPED_KEY_CHECKSUM_LENGTH)
+  // The machine-readable block closes the key. Searching backwards means a bracket inside the
+  // prose cannot shadow it.
+  const blockStart = licenseKey.lastIndexOf('[')
 
-  if (!/^[0-9a-f]+$/.test(checksum)) {
-    return null
-  }
-  if (sha512(stringToUtf8Bytes(keyBody)) !== checksum) {
-    return null
-  }
-
-  // The quadruple underscore separates the human-readable part from the machine-readable one.
-  // The LAST occurrence is used - the payload (base64 of valid UTF-8) can never contain four
-  // consecutive underscores, while the human-readable part could (underscore runs are sanitized
-  // at generation, but a lenient search keeps the parser robust).
-  const separatorIndex = keyBody.lastIndexOf('____')
-
-  if (separatorIndex === -1) {
+  if (blockStart === -1) {
     return null
   }
 
-  // The machine-readable part is the payload encoded as URL-safe base64.
-  const payloadJson = base64ToString(keyBody.slice(separatorIndex + 4))
+  const blockEnd = licenseKey.indexOf(']', blockStart)
+
+  if (blockEnd === -1) {
+    return null
+  }
+
+  const content = licenseKey.slice(blockStart + 1, blockEnd)
+
+  if (content.length <= ENTITLEMENT_KEY_CHECKSUM_LENGTH) {
+    return null
+  }
+
+  const encodedPayload = content.slice(0, -ENTITLEMENT_KEY_CHECKSUM_LENGTH)
+  const checksum = content.slice(-ENTITLEMENT_KEY_CHECKSUM_LENGTH)
+
+  if (!ENCODED_PAYLOAD.test(encodedPayload) || !CHECKSUM.test(checksum)) {
+    return null
+  }
+  if (sha512(stringToUtf8Bytes(encodedPayload)) !== checksum) {
+    return null
+  }
+
+  const payloadJson = base64ToString(encodedPayload)
 
   if (payloadJson === null) {
     return null
   }
 
-  let parsed: unknown
+  let payload: unknown
 
   try {
-    parsed = JSON.parse(payloadJson)
+    payload = JSON.parse(payloadJson)
   } catch (error) {
     return null
   }
 
-  if (parsed === null || typeof parsed !== 'object') {
+  if (!isPlainObject(payload)) {
     return null
   }
 
-  const payload = parsed as TypedKeyPayload
+  const rawProducts = payload.products
 
-  // Keys stamped with a format version this library does not know are not readable - the format
-  // version describes HOW the key is parsed.
-  if (TYPED_KEY_SUPPORTED_VERSIONS.indexOf(payload.v) === -1) {
+  if (!isPlainObject(rawProducts)) {
     return null
   }
 
-  const licensedProduct = resolveLicensedProduct(payload)
+  const products = {}
+  let malformed = false
 
-  if (licensedProduct === null) {
+  Object.keys(rawProducts).forEach((name) => {
+    const entry = normalizeProductEntry(rawProducts[name])
+
+    if (entry === null) {
+      malformed = true
+
+      return
+    }
+
+    defineOwn(products, name, entry)
+  })
+
+  if (malformed) {
     return null
   }
 
-  return {
-    keyType,
-    payload,
-    expiryTimestamp: licensedProduct.expiryTimestamp,
-    licensedProductName: licensedProduct.name,
-  }
+  return {products}
 }

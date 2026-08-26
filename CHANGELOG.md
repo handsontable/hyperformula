@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Changed
 
 - Changed `getAvailableFunctions()` and `getFunctionDetails()` to describe only the functions the instance's license key includes, so they no longer advertise a function that would evaluate to a `#LIC!` error. A missing, invalid, or expired key does not shorten the list. [#1731](https://github.com/handsontable/hyperformula/pull/1731)
+- Changed the parser for the new proprietary license keys to the entitlement key format (a human-readable text ending with a machine-readable block in square brackets), following its upstream specification. This replaces the tagged key format, which was never issued to anyone. Classic 25-character license keys and `gpl-v3` are unaffected. [#1740](https://github.com/handsontable/hyperformula/pull/1740)
 
 ## [3.4.0] - 2026-08-10
 
