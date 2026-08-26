@@ -89,11 +89,17 @@ function isStringArray(value: unknown): value is string[] {
  * @param {unknown} value - the value to check
  */
 function isIsoDate(value: unknown): boolean {
+  // `parseIsoDate` stringifies its argument before matching the `YYYY-MM-DD` shape, so a value
+  // that is not a string but spells a date once stringified — a single-element array is the
+  // realistic case — would pass a shape check the format makes fatal, and a malformed key would
+  // end up granting a RESTRICTED entitlement instead of taking the invalid-key path. The type is
+  // part of the shape, so it is rejected here rather than left to the stringifying matcher.
+  if (typeof value !== 'string') {
+    return false
+  }
+
   try {
-    // The cast mirrors upstream, where the call is untyped: `parseIsoDate` stringifies its
-    // argument before matching it against the `YYYY-MM-DD` shape, so a non-string value is
-    // rejected by the shape check rather than by a type guard here.
-    parseIsoDate(value as string, 'license')
+    parseIsoDate(value, 'license')
 
     return true
   } catch (error) {
