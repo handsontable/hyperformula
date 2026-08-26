@@ -6,10 +6,13 @@
 /**
  * Identifies a feature area of the public API that a license entitlement can gate.
  *
- * `CustomFunctions` and `ImportExport` are reserved vocabulary: they exist so a license payload
- * is free to carry them, but no capability grant in this release maps to either of them yet.
- * HF-307 decision D1 drops function-registration gating (and the `CustomFunctions` grant) from
- * this release; `ImportExport` has no gated methods until HF-107 lands.
+ * `CustomFunctions` is reserved vocabulary: it exists so a license payload is free to carry it,
+ * but HF-307 decision D1 drops function-registration gating (and the `CustomFunctions` grant)
+ * from this release, so no capability grant maps to it.
+ *
+ * `ImportExport` IS granted, by the `import_export` add-on token (2026-08-12 packages meeting) —
+ * but it gates no public method yet, because HF-107 hasn't shipped the import/export feature it
+ * would gate. The grant exists; the gate does not, yet.
  */
 export const enum FeatureId {
   NamedExpressions = 'named_expressions',
