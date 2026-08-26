@@ -79,7 +79,7 @@ const OPERATOR_FUNCTIONS = [
 /**
  * Package membership, as the LOWEST package that includes each function.
  *
- * Transcribed from Kuba's 12.08 packaging doc (CU doc `8cnjcyf-33175`, page `8cnjcyf-47835`, "HF
+ * Transcribed from section 6 of the internal packaging design document ("HF
  * function groups and packages"), which supersedes the earlier evidence file this table was first
  * built from. The doc organizes the catalog into 21 group tokens (`fun:<family>.<A|B|C>`) and
  * states each package as the cumulative union of specific groups: Math engine = the `.A` groups,
@@ -127,7 +127,7 @@ const SPREADSHEET_FUNCTIONS = [
  * Added by the excel-simulator package, on top of {@link SPREADSHEET_FUNCTIONS} — the rest of the
  * implemented catalog.
  *
- * Kuba's doc does not itemize this remainder into groups the way it does for the first three
+ * The packaging document does not itemize this remainder into groups the way it does for the first three
  * packages: the excel-simulator package is stated as `fun:all` — the whole catalog, granted as a
  * single token rather than assembled from named groups. This list is that remainder, enumerated
  * rather than taken from the function registry at run time, even though "all functions" would be
