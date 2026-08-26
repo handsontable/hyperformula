@@ -391,7 +391,7 @@ function validityOf(terms: LicenseTerms): {state: LicenseKeyValidityState, expir
  * Deliberately blind to `graceDays`: notice is about the usage_until axis itself, not about the
  * grace extension past it. Key spec rev 5 §4.1 sequences notice, then a soft-stop window, then the
  * hard-stop this build already enforces; only the hard stop and this notice are built for 3.5.0
- * (Kuba's decision D5-A), so the window checked here ends exactly where the soft-stop phase would
+ * (decision D5-A), so the window checked here ends exactly where the soft-stop phase would
  * begin, rather than reaching into grace and printing a notice for a key already past its expiry.
  *
  * `release_until`-axis keys never reach here with a non-`null` result — `kind` is `'release'` for
