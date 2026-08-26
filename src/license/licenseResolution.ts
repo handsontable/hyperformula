@@ -408,10 +408,13 @@ function expiryWithinNoticeWindow(terms: LicenseTerms): Date | null {
     return null
   }
 
-  // The first instant no longer on the usage_until day — the same boundary `validityOf` uses
-  // before adding its grace term.
+  // The window ends at the first instant no longer on the usage_until day — the same boundary
+  // `validityOf` uses before adding its grace term — and opens `notice` days before the licensed
+  // day ITSELF, not before that end. Counting back from the end would shorten the window by a day:
+  // the date-semantics fixtures pin 2027-06-13T00:00:00Z for usage_until 2027-08-12 with notice 60,
+  // and a trial whose notice equals its whole term must warn from the day it is issued.
   const usageAxisDeadline = terms.expiryTimestamp + MILLISECONDS_PER_DAY
-  const noticeWindowStart = usageAxisDeadline - (terms.expiry.noticeDays * MILLISECONDS_PER_DAY)
+  const noticeWindowStart = terms.expiryTimestamp - (terms.expiry.noticeDays * MILLISECONDS_PER_DAY)
   const now = Date.now()
 
   return now >= noticeWindowStart && now < usageAxisDeadline ? new Date(terms.expiryTimestamp) : null
