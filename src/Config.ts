@@ -16,12 +16,12 @@ import {DateTime, instanceOfSimpleDate, SimpleDate, SimpleDateTime, SimpleTime} 
 import {AlwaysDense, ChooseAddressMapping} from './DependencyGraph/AddressMapping/ChooseAddressMappingPolicy'
 import {ConfigValueEmpty, ExpectedValueOfTypeError} from './errors'
 import {defaultStringifyCurrency, defaultStringifyDateTime, defaultStringifyDuration} from './format/format'
-import {checkLicenseKeyValidity, LicenseKeyValidityState} from './helpers/licenseKeyValidator'
+import {LicenseKeyValidityState} from './helpers/licenseKeyValidator'
 import {HyperFormula} from './HyperFormula'
 import {TranslationPackage} from './i18n'
 import {FunctionPluginDefinition} from './interpreter'
 import {CapabilityRegistry, ResolvedCapabilities} from './license/CapabilityRegistry'
-import {unrestrictedEntitlement} from './license/LicenseEntitlement'
+import {resolveLicense} from './license/licenseResolution'
 import {Maybe} from './Maybe'
 import {ParserConfig} from './parser/ParserConfig'
 import {ConfigParams, ConfigParamsList} from './ConfigParams'
@@ -279,13 +279,9 @@ export class Config implements ConfigParams, ParserConfig {
     validateNumberToBeAtLeast(this.maxColumns, 'maxColumns', 1)
     this.context = context
 
-    const licenseKeyValidityState = checkLicenseKeyValidity(this.licenseKey)
+    const {validityState: licenseKeyValidityState, entitlement} = resolveLicense(this.licenseKey)
     const capabilityRegistry = new CapabilityRegistry()
-    // PR 1 (HF-307) ships the gate infrastructure without a real license-key payload adapter —
-    // that lands in PR 3 as src/license/payloadAdapter.ts. Until then every entitlement resolves
-    // as unrestricted, so isLicenseGateActive below reduces to today's licenseKeyValidityState
-    // check and gate B in the interpreter never actually restricts a function.
-    const licenseCapabilities = capabilityRegistry.resolve(unrestrictedEntitlement())
+    const licenseCapabilities = capabilityRegistry.resolve(entitlement)
 
     privatePool.set(this, {
       licenseKeyValidityState,
