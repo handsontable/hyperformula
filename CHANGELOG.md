@@ -36,6 +36,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
 - Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 
+### Removed
+
+- **Breaking change**: Removed the static `HyperFormula.getAvailableFunctions()` and `HyperFormula.getFunctionDetails()` methods. Use the instance methods of the same names, added in this release: a static method has no engine, and therefore no configuration, in scope, so it can only answer for the package as a whole. This entry was missing from the 3.4.0 release notes and is added retroactively. [#1724](https://github.com/handsontable/hyperformula/pull/1724)
+
 ### Fixed
 
 - Fixed the behavior of `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions when the search range contained empty cells. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
