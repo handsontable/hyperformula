@@ -17,6 +17,14 @@ It makes the page wider to accommodate large tables
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+/* Allow table cells to wrap text for better responsiveness */
+.page:has(.widePage) td,
+.page:has(.widePage) th {
+  white-space: normal !important;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 100px;
+}
 </style>
 
 See a full list of differences between HyperFormula, Microsoft Excel, and Google Sheets.
