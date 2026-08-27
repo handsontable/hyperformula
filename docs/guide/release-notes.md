@@ -1,3 +1,12 @@
+---
+tags:
+  - changelog
+  - version history
+  - breaking changes
+  - bug fixes
+  - new features
+---
+
 # Release notes
 
 This page lists HyperFormula release notes. The format is based on

@@ -1,3 +1,17 @@
+---
+tags:
+  - "#REF!"
+  - "#VALUE!"
+  - "#DIV/0!"
+  - "#N/A"
+  - "#NAME?"
+  - "#NUM!"
+  - "#CYCLE!"
+  - "#ERROR!"
+  - "#LIC!"
+  - division by zero
+---
+
 # Types of errors
 
 HyperFormula returns an error when a formula cannot be processed

@@ -1,3 +1,15 @@
+---
+tags:
+  - maxRows
+  - maxColumns
+  - nested functions
+  - nesting levels
+  - precisionRounding
+  - significant digits
+  - iterative calculation
+  - floating point
+---
+
 # Specifications and limits
 
 The following table presents the limits of features. Many of them

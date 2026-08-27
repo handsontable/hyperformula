@@ -1,3 +1,15 @@
+---
+tags:
+  - defined names
+  - global scope
+  - variables
+  - named constants
+  - addNamedExpression
+  - changeNamedExpression
+  - removeNamedExpression
+  - listNamedExpressions
+---
+
 # Named expressions
 
 An expression can be assigned a human-friendly name. Thanks to this you can
