@@ -53,6 +53,9 @@ import {FunctionRegistry, FunctionTranslationsPackage} from './interpreter/Funct
 import {FormatInfo} from './interpreter/InterpreterValue'
 import {LazilyTransformingAstService} from './LazilyTransformingAstService'
 import {ColumnSearchStrategy} from './Lookup/SearchStrategy'
+import {sheetsToXlsx} from './io/xlsx/exporter'
+import {loadXlsxWorkbook} from './io/xlsx/loadWorkbook'
+import {workbookToSheets} from './io/xlsx/importer'
 import {NamedExpression, NamedExpressionOptions, NamedExpressions} from './NamedExpressions'
 import {normalizeAddedIndexes, normalizeRemovedIndexes} from './Operations'
 import {
@@ -325,6 +328,47 @@ export class HyperFormula implements TypedEmitter {
    */
   public static buildFromSheets(sheets: Sheets, configInput: Partial<ConfigParams> = {}, namedExpressions: SerializedNamedExpression[] = []): HyperFormula {
     return this.buildFromEngineState(BuildEngineFactory.buildFromSheets(sheets, configInput, namedExpressions))
+  }
+
+  /**
+   * Builds the engine from the raw bytes of an .xlsx file. The file is parsed and its
+   * worksheets are converted into sheets, keyed by worksheet name, exactly as if they had
+   * been passed to [[buildFromSheets]].
+   * Can be configured with the optional second parameter that represents a [[ConfigParams]].
+   * If not specified the engine will be built with the default configuration.
+   *
+   * v1 scope: no import options, no named expressions, no cell-format detection (see HF-107).
+   *
+   * @param {ArrayBuffer | Uint8Array} data - the raw bytes of an .xlsx file
+   * @param {Partial<ConfigParams>} configInput - engine configuration
+   *
+   * @returns {Promise<HyperFormula>} a promise that resolves to the built engine
+   *
+   * @throws [[UnsupportedFileError]] when `data` cannot be read as a valid .xlsx workbook
+   * (e.g. it is empty or not a well-formed .xlsx file)
+   * @throws [[SheetSizeLimitExceededError]] when a worksheet size exceeds the limits
+   *
+   * @example
+   * ```js
+   * // Node.js: read the file from disk first
+   * const fs = require('fs/promises');
+   * const buffer = await fs.readFile('example.xlsx');
+   * const hfInstance = await HyperFormula.buildFromFile(buffer, { licenseKey: 'gpl-v3' });
+   * ```
+   *
+   * @example
+   * ```js
+   * // Browser: read bytes from a File (e.g. an <input type="file"> element)
+   * const arrayBuffer = await file.arrayBuffer();
+   * const hfInstance = await HyperFormula.buildFromFile(arrayBuffer, { licenseKey: 'gpl-v3' });
+   * ```
+   *
+   * @category Factories
+   */
+  public static async buildFromFile(data: ArrayBuffer | Uint8Array, configInput: Partial<ConfigParams> = {}): Promise<HyperFormula> {
+    const workbook = await loadXlsxWorkbook(data)
+    const sheets = workbookToSheets(workbook)
+    return HyperFormula.buildFromSheets(sheets, configInput)
   }
 
   /**
@@ -1129,6 +1173,32 @@ export class HyperFormula implements TypedEmitter {
   public getAllSheetsSerialized(): Record<string, RawCellContent[][]> {
     this.ensureEvaluationIsNotSuspended()
     return this._serialization.getAllSheetsSerialized()
+  }
+
+  /**
+   * Exports the current engine state to `.xlsx` file bytes.
+   *
+   * v1 scope: values and formulas only, no styles/number-formats/merged cells
+   * (see HF-107). Formulas are serialized exactly as {@link getAllSheetsSerialized}
+   * would return them.
+   *
+   * @throws [[EvaluationSuspendedError]] when the evaluation is suspended
+   *
+   * @returns {Promise<Uint8Array>} a promise that resolves to the raw bytes of an .xlsx file
+   *
+   * @example
+   * ```js
+   * const hfInstance = HyperFormula.buildFromArray([
+   *  ['1', '2', '=A1+10'],
+   * ]);
+   *
+   * const bytes = await hfInstance.toFile();
+   * ```
+   *
+   * @category Sheets
+   */
+  public async toFile(): Promise<Uint8Array> {
+    return sheetsToXlsx(this.getAllSheetsSerialized())
   }
 
   /**

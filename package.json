@@ -107,6 +107,7 @@
   },
   "dependencies": {
     "chevrotain": "^6.5.0",
+    "exceljs": "^4.4.0",
     "tiny-emitter": "^2.1.0"
   },
   "devDependencies": {
@@ -124,7 +125,6 @@
     "@babel/preset-typescript": "^7.26.0",
     "@babel/register": "^7.25.9",
     "@babel/runtime": "^7.26.0",
-    "@types/exceljs": "^0.5.3",
     "@types/jasmine": "^5.1.4",
     "@types/jest": "^26.0.24",
     "@types/jsdom": "^21.1.7",
@@ -147,7 +147,6 @@
     "eslint-plugin-license-header": "^0.6.1",
     "eslint-plugin-prettier": "^5.2.1",
     "esm": "^3.2.25",
-    "exceljs": "^4.4.0",
     "full-icu": "^1.5.0",
     "jasmine": "^5.4.0",
     "jest": "^26.6.3",
