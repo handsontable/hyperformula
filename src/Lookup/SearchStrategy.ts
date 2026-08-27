@@ -14,9 +14,26 @@ import {Statistics} from '../statistics'
 import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 
+/**
+ * Controls whether approximate lookups require the lookup value's type or use the comparator's total ordering.
+ *
+ * @internal
+ */
+export type ApproximateMatchPolicy = 'sameType' | 'totalOrder'
+
+/**
+ * Defines the lookup semantics passed to a search strategy.
+ *
+ * @property {('asc'|'desc'|'none')} ordering - Ordering assumed by the selected search algorithm.
+ * @property {('returnLowerBound'|'returnUpperBound'|'returnNotFound')} ifNoMatch - Result requested when an exact value is absent.
+ * @property {ApproximateMatchPolicy} approximateMatchPolicy - Whether approximate bounds require the key type or use the comparator's total ordering.
+ * @property {('first'|'last')} [returnOccurrence] - Which exact duplicate to return.
+ * @internal
+ */
 export interface SearchOptions {
   ordering: 'asc' | 'desc' | 'none',
   ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound',
+  approximateMatchPolicy: ApproximateMatchPolicy,
   returnOccurrence?: 'first' | 'last',
 }
 

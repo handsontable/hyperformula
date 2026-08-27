@@ -6,6 +6,7 @@
 import {AbsoluteCellRange} from '../AbsoluteCellRange'
 import {CellError, simpleCellAddress} from '../Cell'
 import {DependencyGraph} from '../DependencyGraph'
+import {ApproximateMatchPolicy} from '../Lookup/SearchStrategy'
 import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} from './InterpreterValue'
 
 const NOT_FOUND = -1
@@ -16,7 +17,8 @@ const NOT_FOUND = -1
  * Options:
  * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search,
  * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range,
- * - ifNoMatch - must be set to 'returnLowerBound', 'returnUpperBound' or 'returnNotFound'
+ * - ifNoMatch - must be set to 'returnLowerBound', 'returnUpperBound' or 'returnNotFound',
+ * - approximateMatchPolicy - controls whether an approximate result must have the key's type
  *
  * If the search range contains duplicates, returns the last matching value, with one caveat: in the
  * 'returnNotFound' mode, when the range contains both duplicates of the searchKey and interspersed
@@ -42,7 +44,7 @@ const NOT_FOUND = -1
 export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
   range: AbsoluteCellRange,
-  { searchCoordinate, orderingDirection, ifNoMatch }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' },
+  { searchCoordinate, orderingDirection, ifNoMatch, approximateMatchPolicy }: { searchCoordinate: 'row' | 'col', orderingDirection: 'asc' | 'desc', ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound', approximateMatchPolicy: ApproximateMatchPolicy },
   dependencyGraph: DependencyGraph,
 ): number {
   const start = range.start[searchCoordinate]
@@ -117,6 +119,18 @@ export function findLastOccurrenceInOrderedRange(
 
   const foundValue = foundIndex === NOT_FOUND ? EmptyValue : getValueFromIndexFn(foundIndex)
 
+  const returnApproximateResult = (index: number | undefined): number => {
+    if (index === undefined || index === NOT_FOUND) {
+      return NOT_FOUND
+    }
+
+    if (approximateMatchPolicy === 'sameType' && typeof getValueFromIndexFn(index) !== typeof searchKey) {
+      return NOT_FOUND
+    }
+
+    return index - start
+  }
+
   if (foundValue === searchKey) {
     return foundIndex - start
   }
@@ -131,22 +145,18 @@ export function findLastOccurrenceInOrderedRange(
       // is the first (largest) non-empty value — never an empty leading cell, and NOT_FOUND on an
       // all-empty range.
       const firstNonEmptyIndex = findNextNonEmptyIndex(start)
-      return firstNonEmptyIndex !== undefined ? firstNonEmptyIndex - start : NOT_FOUND
-    }
-
-    if (typeof foundValue !== typeof searchKey) {
-      return NOT_FOUND
+      return returnApproximateResult(firstNonEmptyIndex)
     }
 
     // here: foundValue !== searchKey
     if (orderingDirection === 'asc') {
-      return foundIndex - start
+      return returnApproximateResult(foundIndex)
     }
 
     // orderingDirection === 'desc': step to the next non-empty cell, so skipped empty slots never
     // shift the reported position.
     const nextIndex = findNextNonEmptyIndex(foundIndex + 1)
-    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
+    return returnApproximateResult(nextIndex)
   }
 
   if (ifNoMatch === 'returnUpperBound') {
@@ -159,22 +169,18 @@ export function findLastOccurrenceInOrderedRange(
       // is the first (smallest) non-empty value — never an empty leading cell, and NOT_FOUND on an
       // all-empty range.
       const firstNonEmptyIndex = findNextNonEmptyIndex(start)
-      return firstNonEmptyIndex !== undefined ? firstNonEmptyIndex - start : NOT_FOUND
-    }
-
-    if (typeof foundValue !== typeof searchKey) {
-      return NOT_FOUND
+      return returnApproximateResult(firstNonEmptyIndex)
     }
 
     // here: foundValue !== searchKey
     if (orderingDirection === 'desc') {
-      return foundIndex - start
+      return returnApproximateResult(foundIndex)
     }
 
     // orderingDirection === 'asc': step to the next non-empty cell, so skipped empty slots never
     // shift the reported position.
     const nextIndex = findNextNonEmptyIndex(foundIndex + 1)
-    return nextIndex !== undefined ? nextIndex - start : NOT_FOUND
+    return returnApproximateResult(nextIndex)
   }
 
   // ifNoMatch === 'returnNotFound'

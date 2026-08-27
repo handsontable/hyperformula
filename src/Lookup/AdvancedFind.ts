@@ -42,22 +42,22 @@ export abstract class AdvancedFind {
     return NOT_FOUND
   }
 
-  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, returnOccurrence }: SearchOptions): number {
+  protected basicFind(searchKey: RawNoErrorScalarValue, rangeValue: SimpleRangeValue, searchCoordinate: 'col' | 'row', { ordering, ifNoMatch, approximateMatchPolicy, returnOccurrence }: SearchOptions): number {
     const normalizedSearchKey = typeof searchKey === 'string' ? forceNormalizeString(searchKey) : searchKey
     const range = rangeValue.range
 
     if (range === undefined) {
-      return this.findNormalizedValue(normalizedSearchKey, rangeValue.valuesFromTopLeftCorner(), ifNoMatch, returnOccurrence)
+      return this.findNormalizedValue(normalizedSearchKey, rangeValue.valuesFromTopLeftCorner(), ifNoMatch, approximateMatchPolicy, returnOccurrence)
     }
 
     if (ordering === 'none') {
-      return this.findNormalizedValue(normalizedSearchKey, this.dependencyGraph.computeListOfValuesInRange(range), ifNoMatch, returnOccurrence)
+      return this.findNormalizedValue(normalizedSearchKey, this.dependencyGraph.computeListOfValuesInRange(range), ifNoMatch, approximateMatchPolicy, returnOccurrence)
     }
 
     return findLastOccurrenceInOrderedRange(
       normalizedSearchKey,
       range,
-      { searchCoordinate, orderingDirection: ordering, ifNoMatch },
+      { searchCoordinate, orderingDirection: ordering, ifNoMatch, approximateMatchPolicy },
       this.dependencyGraph
     )
   }
@@ -67,9 +67,11 @@ export abstract class AdvancedFind {
    * is `returnLowerBound`/`returnUpperBound` — the closest non-exceeding/non-preceding value.
    * Genuinely empty cells (`EmptyValue`) are skipped, consistent with `findLastOccurrenceInOrderedRange`
    * and with Excel/Google Sheets, which ignore empty cells (but not empty strings) in approximate search.
+   * Other cross-type candidates are either ignored or compared using the total ordering, according to
+   * `approximateMatchPolicy`.
    * Returns the 0-based index into `searchArray`, or `NOT_FOUND` (-1) when nothing matches.
    */
-  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound' = 'returnNotFound', returnOccurrence: 'first' | 'last' = 'first'): number {
+  protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound', approximateMatchPolicy: SearchOptions['approximateMatchPolicy'], returnOccurrence: 'first' | 'last' = 'first'): number {
     const normalizedArray = searchArray
       .map(getRawValue)
       .map(val => typeof val === 'string' ? forceNormalizeString(val) : val)
@@ -82,7 +84,6 @@ export abstract class AdvancedFind {
       ? (left: RawNoErrorScalarValue, right: RawInterpreterValue) => compare(left, right)
       : (left: RawNoErrorScalarValue, right: RawInterpreterValue) => -compare(left, right)
 
-    let bestValue: RawNoErrorScalarValue = ifNoMatch === 'returnLowerBound' ? -Infinity : Infinity
     let bestIndex = NOT_FOUND
 
     const initialIterationIndex = returnOccurrence === 'first' ? 0 : normalizedArray.length-1
@@ -103,12 +104,15 @@ export abstract class AdvancedFind {
         continue
       }
 
+      if (approximateMatchPolicy === 'sameType' && typeof value !== typeof searchKey) {
+        continue
+      }
+
       if (compareFn(value, searchKey) > 0) {
         continue
       }
       
-      if (compareFn(bestValue, value) < 0) {
-        bestValue = value
+      if (bestIndex === NOT_FOUND || compareFn(normalizedArray[bestIndex] as RawNoErrorScalarValue, value) < 0) {
         bestIndex = i
       }
     }

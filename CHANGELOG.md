@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed approximate lookups to handle values of different types consistently across linear and binary search paths. `MATCH`, `VLOOKUP`, and `HLOOKUP` ignore cross-type candidates, while `XLOOKUP` follows Microsoft Excel's total ordering.
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
