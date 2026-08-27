@@ -2,27 +2,15 @@
 description: Install the official HyperFormula skill for Claude Code, or point any other AI coding agent at HyperFormula's machine-readable docs.
 tags:
   - skills
-  - SKILL.md
-  - HyperFormula skill
-  - Claude Code skill
   - plugin marketplace
-  - AI coding agent setup
-  - agentic coding
-  - Cursor
-  - GitHub Copilot
+  - AI agents
   - Codex
   - Windsurf
-  - MCP
-  - Model Context Protocol
   - GitMCP
   - Context7
   - llms.txt
-  - llms-full.txt
-  - Markdown docs
-  - machine-readable docs
   - AGENTS.md
-  - rules file
-  - LLM
+  - Markdown docs
 ---
 
 # Set up your coding agent

@@ -1,3 +1,13 @@
+---
+tags:
+  - Microsoft Excel
+  - Google Sheets
+  - compatibility
+  - OpenDocument
+  - negative numbers
+  - rounding
+---
+
 # List of differences with other spreadsheets
 
 <!--

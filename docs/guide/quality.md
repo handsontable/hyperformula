@@ -1,3 +1,13 @@
+---
+tags:
+  - audits
+  - OWASP
+  - penetration testing
+  - test coverage
+  - vulnerability scanning
+  - reliability
+---
+
 # Quality & Security
 
 HyperFormula is built with the highest standards of software quality, backed by rigorous research, comprehensive testing, and transparent development practices.

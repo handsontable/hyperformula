@@ -1,3 +1,12 @@
+---
+tags:
+  - GSheets
+  - Google Spreadsheets
+  - 1900 leap year
+  - OpenDocument
+  - interoperability
+---
+
 # Compatibility with Google Sheets
 
 Achieve nearly full compatibility wih Google Sheets, using the right HyperFormula configuration.

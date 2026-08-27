@@ -1,3 +1,11 @@
+---
+tags:
+  - Node.js version
+  - full-icu
+  - CommonJS
+  - backend
+---
+
 # Server-side installation
 
 ::: tip
