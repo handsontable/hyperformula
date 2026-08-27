@@ -83,3 +83,11 @@ You can download all resources as a ZIP archive directly from the
 [GitHub repository](https://github.com/handsontable/hyperformula).
 Then, you can use one of the above-mentioned methods to install the
 library.
+
+## Set up your coding agent
+
+HyperFormula ships an official Claude skill and machine-readable docs, so
+your AI coding agent can scaffold, configure, and debug HyperFormula
+correctly. To install the skill in Claude Code, or to point Cursor, GitHub
+Copilot, or another agent at the docs, see
+[Set up your coding agent](setup-coding-agent.md).
