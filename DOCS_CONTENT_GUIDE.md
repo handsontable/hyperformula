@@ -220,6 +220,10 @@ and hallucinate the parts you omit.
   description: Register and use your own functions in HyperFormula.
   ---
   ```
+- Add a `tags` frontmatter **list** to make a page findable by words it does not use in
+its title or its `##`/`###` headings — the search box matches those three things only,
+never the body text (see `docs/guide/setup-coding-agent.md`, tagged `skills`, `Cursor`,
+`MCP`). A plain string instead of a list breaks the search box site-wide.
 - Use containers for asides: `::: tip`, `::: warning`, `::: danger` … `:::`. Put
 essential steps in the body, not hidden inside a tip.
 - Use **relative links** between guide pages (`./named-expressions.md`) and link to
