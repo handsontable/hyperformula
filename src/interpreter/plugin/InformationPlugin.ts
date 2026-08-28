@@ -45,8 +45,8 @@ function resolveIndexArguments(rowArgument: number, columnArgument: number, colu
 /**
  * Returns the value of an INDEX index argument that can be derived from the formula alone, or
  * `undefined` when it is known only once the argument is evaluated. An absent argument counts as
- * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime. The value is
- * returned untruncated, so that a negative one stays recognizable as negative.
+ * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime. Truncation is
+ * left to {@link resolveIndexArguments}, the single place that applies it.
  */
 function staticIndexArgument(ast: ProcedureAst, argumentIndex: number): Maybe<number> {
   if (indexArgumentIsAbsent(ast, argumentIndex)) {
@@ -529,9 +529,10 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * The indices are resolved with the same {@link resolveIndexArguments} the evaluation uses, so
    * that the predicted shape cannot disagree with the shape of the value returned later.
    *
-   * An index that is negative or past the end of the range makes the formula fail, and a single cell
-   * is predicted for it so that the error is reported once instead of filling the area an array
-   * result would have occupied.
+   * An index past the end of the range makes the formula fail, and a single cell is predicted for it
+   * so that the error is reported once instead of filling the area an array result would have
+   * occupied. A negative index needs no such case: it is always written as a negated literal, which
+   * is not a literal number and so is not known here in the first place.
    *
    * @param ast
    * @param state
@@ -545,9 +546,6 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     const columnArgument = staticIndexArgument(ast, INDEX_COLUMN_ARGUMENT)
 
     if (rowArgument === undefined || columnArgument === undefined) {
-      return ArraySize.scalar()
-    }
-    if (rowArgument < WHOLE_DIMENSION_INDEX || columnArgument < WHOLE_DIMENSION_INDEX) {
       return ArraySize.scalar()
     }
 
