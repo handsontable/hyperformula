@@ -117,6 +117,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
 | INDEX         | =INDEX(A1:C3, 2, B1)<br>where B1 = 0                           |        VALUE |     whole row |       whole row |
+| INDEX         | =INDEX(A1:C3, {1,2}, 1)<br>with array arithmetic enabled       |            1 |          1, 4 |            1, 4 |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
@@ -128,4 +129,5 @@ A few of the rows above share a root cause worth stating once:
 - **Rounding toward zero, not down.** `INT` discards the fractional part rather than rounding toward negative infinity, so it differs from Excel and Google Sheets for negative input only. `ROUNDDOWN`/`ROUNDUP` are unaffected — they are defined in terms of zero in all three.
 - **`ISEVEN`/`ISODD` do not truncate.** They test the remainder of the value as given, so a value with a fractional part returns `FALSE` from *both*. Excel and Google Sheets truncate to an integer first, so exactly one of the two is always `TRUE`.
 - **`CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1.** Excel and Google Sheets switch the negative-number rounding direction for any non-zero `mode`.
+- **`INDEX` is not vectorized.** Excel and Google Sheets evaluate `=INDEX(A1:C3, {1,2}, 1)` once per element of the array and return `1, 4`. HyperFormula resolves the array to a single value instead, because a vectorized call cannot hold the array that a zero index returns. See [known limitations](known-limitations.md#index-function).
 - **`INDEX` spills a whole row or column only when its shape follows from the formula.** An index of `0` selects every row or every column, exactly as in Excel and Google Sheets, but the result is an array whose size HyperFormula has to know before evaluating the formula. That needs literal index arguments *and* a statically sized range. Otherwise the array can only be consumed by an enclosing function (`=SUM(INDEX(A1:C3, 2, B1))` works, `=INDEX(A1:C3, 2, B1)` does not). See [known limitations](known-limitations.md#index-function).

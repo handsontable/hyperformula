@@ -49,7 +49,7 @@ a circular reference.
 
 ### INDEX function
 
-* A `row` or `column` argument of 0 returns a whole row, a whole column or the whole range. Such a result is an array, and space for an array is reserved before the formula is evaluated, so the result spills into the sheet only when its shape follows from the formula alone. That needs two things: both index arguments written as literal numbers or omitted, and a range whose size is known statically. The second holds for a plain cell range and an array literal, but not for a named expression, an unbounded range such as `A:A`, or most function results.
+* A `row` or `column` argument of 0 returns a whole row, a whole column or the whole range. Such a result is an array, and space for an array is reserved before the formula is evaluated, so the result spills into the sheet only when its shape follows from the formula alone. That needs two things: both index arguments written as literal numbers, and a range whose size is known statically. The second holds for a plain cell range and an array literal, but not for a named expression, an unbounded range such as `A:A`, or most function results.
 
 * When the shape does not follow from the formula, the result is still computed and can be consumed by an enclosing function — `=SUM(INDEX(A1:C3, B1, 0))` sums the whole row — but on its own the formula returns a `#VALUE!` error, because no room was reserved for the array. This is why `=INDEX(A1:C3, B1, 0)`, `=INDEX(myNamedRange, 2)` and `=INDEX(A:A, 0, 1)` report `#VALUE!` where Excel spills.
 

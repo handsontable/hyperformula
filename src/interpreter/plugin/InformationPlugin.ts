@@ -27,19 +27,34 @@ const INDEX_ROW_ARGUMENT = 1
 const INDEX_COLUMN_ARGUMENT = 2
 
 /**
- * Applies Excel's rule for a single-row range, where the only index provided is read as the column
- * number, and truncates both indices toward zero the way Excel does.
+ * Reads the two index arguments the way Excel does, truncating both toward zero.
  *
- * Either of the returned indices can be {@link WHOLE_DIMENSION_INDEX}, meaning that the result
- * spans the whole dimension.
+ * When `column_num` is left out of the formula entirely, Excel requires the range to be a single row
+ * or a single column, and reads the only index provided as the position along it: `=INDEX(A1:C1, 3)`
+ * is `C1` and `=INDEX(A1:A3, 2)` is `A2`. Given a range with several rows and several columns there
+ * is nothing for that index to mean, and Excel answers `#REF!` — which is what `undefined` requests
+ * from the caller here.
+ *
+ * An argument left empty rather than left out, as in `=INDEX(A1:C1, 3, )`, is not the same thing: it
+ * is a `column_num` of zero, so the result is the whole third row, and a single-row range has none.
+ *
+ * Either of the returned indices can be {@link WHOLE_DIMENSION_INDEX}, meaning that the result spans
+ * the whole dimension.
  */
-function resolveIndexArguments(rowArgument: number, columnArgument: number, columnArgumentIsAbsent: boolean, rangeHeight: number): {row: number, column: number} {
+function resolveIndexArguments(rowArgument: number, columnArgument: number, columnArgumentIsOmitted: boolean, rangeHeight: number, rangeWidth: number): Maybe<{row: number, column: number}> {
   const row = Math.trunc(rowArgument)
-  const column = Math.trunc(columnArgument)
 
-  return columnArgumentIsAbsent && rangeHeight === 1
-    ? {row: 1, column: row}
-    : {row, column}
+  if (!columnArgumentIsOmitted) {
+    return {row, column: Math.trunc(columnArgument)}
+  }
+  if (rangeHeight === 1) {
+    return {row: 1, column: row}
+  }
+  if (rangeWidth === 1) {
+    return {row, column: 1}
+  }
+
+  return undefined
 }
 
 /**
@@ -56,29 +71,37 @@ function declaredHeightOf(rangeValue: SimpleRangeValue): number {
 }
 
 /**
+ * Returns the width a range is declared with, rather than the width the sheet currently uses. See
+ * {@link declaredHeightOf} for why the declared size is the one that may decide how an argument is
+ * read.
+ */
+function declaredWidthOf(rangeValue: SimpleRangeValue): number {
+  return rangeValue.range?.width() ?? rangeValue.width()
+}
+
+/**
  * Returns the value of an INDEX index argument that can be derived from the formula alone, or
  * `undefined` when it is known only once the argument is evaluated. An absent argument counts as
  * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime. Truncation is
  * left to {@link resolveIndexArguments}, the single place that applies it.
  */
 function staticIndexArgument(ast: ProcedureAst, argumentIndex: number): Maybe<number> {
-  if (indexArgumentIsAbsent(ast, argumentIndex)) {
+  const argument = ast.args[argumentIndex]
+
+  if (argument === undefined || argument.type === AstNodeType.EMPTY) {
     return WHOLE_DIMENSION_INDEX
   }
-
-  const argument = ast.args[argumentIndex]
 
   return argument.type === AstNodeType.NUMBER ? argument.value : undefined
 }
 
 /**
- * Returns `true` if and only if the given INDEX argument is missing from the formula or left empty,
- * as in `=INDEX(A1:C3, 2)` and `=INDEX(A1:C3, 2, )`.
+ * Returns `true` if and only if the `column_num` argument is missing from the formula, as in
+ * `=INDEX(A1:C3, 2)`. An argument that is present but empty, as in `=INDEX(A1:C3, 2, )`, is not
+ * missing: it is a zero. See {@link resolveIndexArguments}.
  */
-function indexArgumentIsAbsent(ast: ProcedureAst, argumentIndex: number): boolean {
-  const argument = ast.args[argumentIndex]
-
-  return argument === undefined || argument.type === AstNodeType.EMPTY
+function columnArgumentIsOmitted(ast: ProcedureAst): boolean {
+  return ast.args.length <= INDEX_COLUMN_ARGUMENT
 }
 
 /**
@@ -508,7 +531,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * @param state
    */
   public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    const columnArgumentIsAbsent = indexArgumentIsAbsent(ast, INDEX_COLUMN_ARGUMENT)
+    const columnIsOmitted = columnArgumentIsOmitted(ast)
 
     return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, rowArg: number, columnArg: number): InterpreterValue => {
       if (rowArg < WHOLE_DIMENSION_INDEX || columnArg < WHOLE_DIMENSION_INDEX) {
@@ -519,7 +542,13 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         return new CellError(ErrorType.REF, ErrorMessage.EmptyRange)
       }
 
-      const {row, column} = resolveIndexArguments(rowArg, columnArg, columnArgumentIsAbsent, declaredHeightOf(rangeValue))
+      const resolved = resolveIndexArguments(rowArg, columnArg, columnIsOmitted, declaredHeightOf(rangeValue), declaredWidthOf(rangeValue))
+
+      if (resolved === undefined) {
+        return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
+      }
+
+      const {row, column} = resolved
 
       if (row > rangeValue.height() || column > rangeValue.width()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
@@ -571,7 +600,13 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     }
 
     const rangeSize = this.arraySizeForAst(ast.args[0], state)
-    const {row, column} = resolveIndexArguments(rowArgument, columnArgument, indexArgumentIsAbsent(ast, INDEX_COLUMN_ARGUMENT), rangeSize.height)
+    const resolved = resolveIndexArguments(rowArgument, columnArgument, columnArgumentIsOmitted(ast), rangeSize.height, rangeSize.width)
+
+    if (resolved === undefined) {
+      return ArraySize.scalar()
+    }
+
+    const {row, column} = resolved
 
     if (row > rangeSize.height || column > rangeSize.width) {
       return ArraySize.scalar()
