@@ -15,7 +15,17 @@ import {ColumnBinarySearch} from './ColumnBinarySearch'
 import {ColumnIndex} from './ColumnIndex'
 
 /**
- * Controls whether approximate lookups require the lookup value's type or use the comparator's total ordering.
+ * Selects how approximate lower and upper bounds handle non-empty candidates whose scalar type
+ * differs from the lookup value's type.
+ *
+ * Mode semantics:
+ *
+ * - `'sameType'` accepts only candidates with the same JavaScript scalar type as the lookup value.
+ *   `MATCH`, `VLOOKUP`, and `HLOOKUP` use this policy.
+ * - `'totalOrder'` accepts cross-type candidates and orders them with the lookup comparator.
+ *   `XLOOKUP` uses this policy to match Microsoft Excel.
+ * - Exact matches are unaffected. The policy is required so every search strategy receives an
+ *   explicit choice and linear, indexed, and binary paths cannot silently diverge.
  *
  * @internal
  */
@@ -26,7 +36,7 @@ export type ApproximateMatchPolicy = 'sameType' | 'totalOrder'
  *
  * @property {('asc'|'desc'|'none')} ordering - Ordering assumed by the selected search algorithm.
  * @property {('returnLowerBound'|'returnUpperBound'|'returnNotFound')} ifNoMatch - Result requested when an exact value is absent.
- * @property {ApproximateMatchPolicy} approximateMatchPolicy - Whether approximate bounds require the key type or use the comparator's total ordering.
+ * @property {ApproximateMatchPolicy} approximateMatchPolicy - Cross-type candidate policy for approximate bounds; exact matches ignore it.
  * @property {('first'|'last')} [returnOccurrence] - Which exact duplicate to return.
  * @internal
  */

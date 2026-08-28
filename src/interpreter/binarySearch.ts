@@ -11,14 +11,8 @@ import {EmptyValue, getRawValue, RawInterpreterValue, RawNoErrorScalarValue} fro
 
 const NOT_FOUND = -1
 
-/*
+/**
  * Searches for the searchKey in a sorted 1-D range.
- *
- * Options:
- * - searchCoordinate - must be set to either 'row' or 'col' to indicate the dimension of the search,
- * - orderingDirection - must be set to either 'asc' or 'desc' to indicate the ordering direction for the search range,
- * - ifNoMatch - must be set to 'returnLowerBound', 'returnUpperBound' or 'returnNotFound',
- * - approximateMatchPolicy - controls whether an approximate result must have the key's type
  *
  * If the search range contains duplicates, returns the last matching value, with one caveat: in the
  * 'returnNotFound' mode, when the range contains both duplicates of the searchKey and interspersed
@@ -40,6 +34,24 @@ const NOT_FOUND = -1
  * back to an O(n) scan that compacts the non-empty indices and re-runs the binary search over them.
  *
  * Note: this function does not normalize input strings.
+ *
+ * @param {RawNoErrorScalarValue} searchKey - Lookup value.
+ * @param {AbsoluteCellRange} range - Sorted one-dimensional cell range.
+ * @param {object} options - Search direction, requested miss result, and approximate-match policy.
+ * @param {('row'|'col')} options.searchCoordinate - Dimension containing the one-dimensional lookup values.
+ * @param {('asc'|'desc')} options.orderingDirection - Ascending or descending ordering assumed by the binary search.
+ * @param {('returnLowerBound'|'returnUpperBound'|'returnNotFound')} options.ifNoMatch - Whether an absent exact value requests a lower bound, upper bound, or no result.
+ * @param {ApproximateMatchPolicy} options.approximateMatchPolicy - Cross-type candidate policy for approximate bounds.
+ * @param {DependencyGraph} dependencyGraph - Source of current cell values for the range.
+ * @returns {number} The range-relative index of the match, or `NOT_FOUND` when no valid result exists.
+ *
+ * Approximate result invariant:
+ *
+ * Exact equality is resolved before approximate policy validation. Every approximate exit path,
+ * including candidates reached by stepping over empty cells, is finalized through the same policy
+ * check so linear and binary lookup routes cannot assign different cross-type semantics.
+ *
+ * @internal
  */
 export function findLastOccurrenceInOrderedRange(
   searchKey: RawNoErrorScalarValue,
@@ -119,6 +131,14 @@ export function findLastOccurrenceInOrderedRange(
 
   const foundValue = foundIndex === NOT_FOUND ? EmptyValue : getValueFromIndexFn(foundIndex)
 
+  /**
+   * Validates and converts an absolute approximate candidate index into a range-relative result.
+   *
+   * @param {(number|undefined)} index - Absolute candidate index, or `undefined` when no non-empty candidate exists.
+   * @returns {number} The range-relative index, or `NOT_FOUND` when the candidate is absent or disallowed.
+   *
+   * @internal
+   */
   const returnApproximateResult = (index: number | undefined): number => {
     if (index === undefined || index === NOT_FOUND) {
       return NOT_FOUND

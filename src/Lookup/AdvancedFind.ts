@@ -29,7 +29,7 @@ export abstract class AdvancedFind {
     const values: InternalScalarValue[] = (range === undefined)
       ? rangeValue.valuesFromTopLeftCorner()
       : this.dependencyGraph.computeListOfValuesInRange(range)
-    
+
     const initialIterationIndex = returnOccurrence === 'first' ? 0 : values.length-1
     const iterationCondition = returnOccurrence === 'first' ? (i: number) => i < values.length : (i: number) => i >= 0
     const incrementIndex = returnOccurrence === 'first' ? (i: number) => i+1 : (i: number) => i-1
@@ -69,7 +69,23 @@ export abstract class AdvancedFind {
    * and with Excel/Google Sheets, which ignore empty cells (but not empty strings) in approximate search.
    * Other cross-type candidates are either ignored or compared using the total ordering, according to
    * `approximateMatchPolicy`.
-   * Returns the 0-based index into `searchArray`, or `NOT_FOUND` (-1) when nothing matches.
+   *
+   * @param {RawNoErrorScalarValue} searchKey - Normalized lookup value.
+   * @param {InternalScalarValue[]} searchArray - Values to search from the top-left corner of the lookup array.
+   * @param {('returnLowerBound'|'returnUpperBound'|'returnNotFound')} ifNoMatch - Whether an absent exact value requests a lower bound, upper bound, or no result.
+   * @param {SearchOptions['approximateMatchPolicy']} approximateMatchPolicy - Cross-type candidate policy for approximate bounds.
+   * @param {('first'|'last')} returnOccurrence - Which exact duplicate to return and the direction used to scan candidates.
+   * @returns {number} The zero-based index into `searchArray`, or `NOT_FOUND` (-1) when nothing matches.
+   *
+   * Candidate selection:
+   *
+   * Approximate candidate selection remains in the `NOT_FOUND` index state until the first eligible
+   * value seeds the result. A scalar sentinel such as positive or negative infinity would participate
+   * in `compare()` and is not type-neutral: numeric infinity is not a universal extremum under the
+   * number/string/boolean total ordering. Keeping absence in the index domain ensures that only actual
+   * lookup values are compared.
+   *
+   * @internal
    */
   protected findNormalizedValue(searchKey: RawNoErrorScalarValue, searchArray: InternalScalarValue[], ifNoMatch: 'returnLowerBound' | 'returnUpperBound' | 'returnNotFound', approximateMatchPolicy: SearchOptions['approximateMatchPolicy'], returnOccurrence: 'first' | 'last' = 'first'): number {
     const normalizedArray = searchArray
@@ -111,7 +127,7 @@ export abstract class AdvancedFind {
       if (compareFn(value, searchKey) > 0) {
         continue
       }
-      
+
       if (bestIndex === NOT_FOUND || compareFn(normalizedArray[bestIndex] as RawNoErrorScalarValue, value) < 0) {
         bestIndex = i
       }
