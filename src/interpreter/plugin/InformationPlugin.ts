@@ -529,6 +529,10 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * The indices are resolved with the same {@link resolveIndexArguments} the evaluation uses, so
    * that the predicted shape cannot disagree with the shape of the value returned later.
    *
+   * An index that is negative or past the end of the range makes the formula fail, and a single cell
+   * is predicted for it so that the error is reported once instead of filling the area an array
+   * result would have occupied.
+   *
    * @param ast
    * @param state
    */
@@ -549,6 +553,10 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
 
     const rangeSize = this.arraySizeForAst(ast.args[0], state)
     const {row, column} = resolveIndexArguments(rowArgument, columnArgument, indexArgumentIsAbsent(ast, INDEX_COLUMN_ARGUMENT), rangeSize.height)
+
+    if (row > rangeSize.height || column > rangeSize.width) {
+      return ArraySize.scalar()
+    }
 
     return new ArraySize(
       column === WHOLE_DIMENSION_INDEX ? rangeSize.width : 1,
