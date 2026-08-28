@@ -76,7 +76,7 @@ export const LOOKUP_AND_REFERENCE_DOCS: Record<string, FunctionDoc> = {
   },
   INDEX: {
     category: 'Lookup and reference',
-    shortDescription: 'Returns the contents of a cell specified by row and column number, or a whole row, a whole column or the whole range when the corresponding number is 0.',
+    shortDescription: 'Returns the contents of a cell specified by row and column number. A row of 0 returns the whole column, a column of 0 returns the whole row, and 0 for both returns the whole range.',
     parameters: [{name: 'range', description: 'The range from which a value is returned.'}, {name: 'row', description: 'The row number within range (counting from 1) of the value to return. 0 selects every row of range. For a single-row range with no column argument, this is read as the column number instead.'}, {name: 'column', description: 'The column number within range (counting from 1) of the value to return. 0, which is also the value used when the argument is omitted, selects every column of range.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=INDEX(A1:C10, 2, 3)', '=INDEX(A1:A10, 5)', '=INDEX(A1:C10, 2, 0)', '=INDEX(A1:C10, 0, 3)'],
