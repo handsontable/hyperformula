@@ -55,6 +55,8 @@ a circular reference.
 
 * Excel's reference form of the function, `INDEX(reference, row_num, column_num, area_num)`, is not supported. HyperFormula has no multi-area references, so `area_num` would have nothing to select from, and a fourth argument returns a `#N/A` error.
 
+* INDEX is not [vectorized](arrays.md#passing-arrays-to-scalar-functions-vectorization). An array passed as an index argument is resolved to a single value rather than producing one result per element, because a vectorized call cannot hold the array that a zero index returns.
+
 ### UNIQUE function
 
 * Comparison of values follows HyperFormula's own equality rules, which honor the `caseSensitive` and `accentSensitive` configuration options. By default comparison is case-insensitive.

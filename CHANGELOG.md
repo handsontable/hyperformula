@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - A **breaking change**: the `INDEX` function no longer defaults its third argument to `1`. An omitted third argument now means "every column", so `=INDEX(A1:C3, 2)` returns the whole second row instead of the value in its first column. For a single-row range the only index provided is read as the column number, so `=INDEX(A1:C1, 3)` returns the value of `C1` instead of a `#NUM!` error. Both behaviors match Excel. [#1754](https://github.com/handsontable/hyperformula/pull/1754)
 - A **breaking change**: the `INDEX` function returns a `#REF!` error instead of `#NUM!` when an index exceeds the size of the range, and a `#VALUE!` error with the "Value cannot be negative." message instead of "Argument cannot be less than 1." for a negative index. Both match Excel and the behavior already described in the [cell references guide](https://hyperformula.handsontable.com/docs/guide/cell-references.html). [#1754](https://github.com/handsontable/hyperformula/pull/1754)
+- A **breaking change**: the `INDEX` function is no longer [vectorized](https://hyperformula.handsontable.com/docs/guide/arrays.html#passing-arrays-to-scalar-functions-vectorization) in the array arithmetic mode. An array passed as an index argument is now resolved to a single value, as it already was outside that mode, instead of producing one result per element. Vectorization is incompatible with the array results that a zero index produces. [#1754](https://github.com/handsontable/hyperformula/pull/1754)
 
 ### Fixed
 

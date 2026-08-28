@@ -166,7 +166,10 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
         {argumentType: FunctionArgumentType.NUMBER, defaultValue: WHOLE_DIMENSION_INDEX},
-      ]
+      ],
+      // A vectorized call evaluates the function once per element and rejects an array result, which
+      // an index of WHOLE_DIMENSION_INDEX produces. Array-output functions are never vectorized.
+      vectorizationForbidden: true,
     },
     'NA': {
       method: 'na',
