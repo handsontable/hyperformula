@@ -12,14 +12,14 @@ import {FunctionDoc} from '../FunctionDescription'
 export const MATRIX_FUNCTIONS_DOCS: Record<string, FunctionDoc> = {
   MAXPOOL: {
     category: 'Matrix functions',
-    shortDescription: 'Calculates a smaller range which is a maximum of a window_size, in a given range, for every stride element.',
+    shortDescription: 'Calculates a smaller range which is a maximum of a window_size, in a given range, for every stride element.<br>window_size and stride must be positive integers, and the window must tile the range exactly: window_size cannot exceed either dimension of range, and both dimensions, reduced by window_size, must be whole multiples of stride. Otherwise the function returns the #VALUE! error.',
     parameters: [{name: 'range', description: 'The range of numeric values to pool; must contain only numbers, and its dimensions must fit a whole number of windows (see window_size and stride).'}, {name: 'window_size', description: 'The width and height, in cells, of the square window whose maximum is taken at each step; a positive integer that is not greater than either dimension of range.'}, {name: 'stride', description: 'The number of cells the window moves between steps; a positive integer that defaults to window_size when omitted. Both dimensions of range, reduced by window_size, must be whole multiples of it, otherwise the function returns the #VALUE! error.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MAXPOOL(A1:D4, 2)', '=MAXPOOL(A1:D4, 2, 1)'],
   },
   MEDIANPOOL: {
     category: 'Matrix functions',
-    shortDescription: 'Calculates a smaller range which is a median of a window_size, in a given range, for every stride element.',
+    shortDescription: 'Calculates a smaller range which is a median of a window_size, in a given range, for every stride element.<br>window_size and stride must be positive integers, and the window must tile the range exactly: window_size cannot exceed either dimension of range, and both dimensions, reduced by window_size, must be whole multiples of stride. Otherwise the function returns the #VALUE! error.',
     parameters: [{name: 'range', description: 'The range of numeric values to pool; must contain only numbers, and its dimensions must fit a whole number of windows (see window_size and stride).'}, {name: 'window_size', description: 'The width and height, in cells, of the square window whose median is taken at each step; a positive integer that is not greater than either dimension of range.'}, {name: 'stride', description: 'The number of cells the window moves between steps; a positive integer that defaults to window_size when omitted. Both dimensions of range, reduced by window_size, must be whole multiples of it, otherwise the function returns the #VALUE! error.'}],
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MEDIANPOOL(A1:D4, 2)', '=MEDIANPOOL(A1:D4, 2, 1)'],

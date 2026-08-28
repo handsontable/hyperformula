@@ -285,7 +285,7 @@ export class MatrixPlugin extends FunctionPlugin implements FunctionPluginTypech
       }
     }
 
-    if (stride > window || !isPoolWindowFittingInputArray(array, window, stride)) {
+    if (!isPoolWindowFittingInputArray(array, window, stride)) {
       return ArraySize.error()
     }
 
