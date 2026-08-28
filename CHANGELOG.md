@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- Fixed the `TEXT` function so that number-format masks with thousands grouping (`#,##0`) and positive/negative/zero sections (`0.00;(0.00)`) are formatted correctly instead of leaking the unparsed mask into the output. The built-in number formatter now also honors the configured `decimalSeparator` and `thousandSeparator` and ignores color tags such as `[Red]`, which are now removed from the format string before it reaches the `stringifyDateTime` and `stringifyDuration` callbacks. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
+- Fixed the `TEXT` function so that number-format masks with thousands grouping (`#,##0`) and positive/negative/zero sections (`0.00;(0.00)`) are formatted correctly instead of leaking the unparsed mask into the output. The built-in number formatter now also honors the configured `decimalSeparator` and `thousandSeparator` and ignores color tags such as `[Red]`, which are now removed from the format string before it reaches the `stringifyDateTime` and `stringifyDuration` callbacks. Matching Excel, a negative value whose rendered digits all round to zero is now displayed without the minus sign (`TEXT(-0.4, "0")` returns `0`), and magnitudes of `1e21` and above are expanded to their full digits instead of scientific notation. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 
 ## [3.4.0] - 2026-08-10
 

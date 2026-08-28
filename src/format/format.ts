@@ -144,7 +144,8 @@ function stripQuotes(section: string): string {
  * - `> 0` → positive section (section 0), formatted signed (non-negative).
  * - `< 0` → negative section (section 1) when present, formatted on `abs` (the
  *   section's own literals, e.g. `(0.00)`, carry the sign); when only one
- *   section exists the signed value is passed so the formatter re-adds `-`.
+ *   section exists the signed value is passed so the formatter re-adds `-`
+ *   (unless every rendered digit is zero — see `numberFormat`).
  * - `= 0` → zero section (section 2) when present, else the positive section.
  *
  * Excel-canonical fallbacks: 1 section → all values; 2 sections → `[pos+zero ;
@@ -263,9 +264,13 @@ function countChars(text: string, char: string) {
  *
  * The sign is extracted up front: the value is formatted on its magnitude
  * (`Math.abs`) and a leading `-` is prepended to the whole result iff the value
- * is negative. Callers pass `abs` for an explicit negative section (whose own
- * literals carry the sign) and the signed value for a single-section mask (so
- * the `-` is re-added here) — see `pickSection`.
+ * is negative AND some rendered digit is non-zero — Excel displays a magnitude
+ * that rounds to zero unsigned (`TEXT(-0.4,"0")` → `0`, not `-0`). Only this
+ * implicit sign is suppressed: an explicit `-` literal in the mask (`0;-0`)
+ * flows through the FREE_TEXT path and still prints. Callers pass `abs` for an
+ * explicit negative section (whose own literals carry the sign) and the signed
+ * value for a single-section mask (so the `-` is re-added here) — see
+ * `pickSection`.
  *
  * Per integer-format token:
  * - a *trailing* comma run (Excel's scaler, OUT of HF-287 scope) is peeled off
@@ -285,6 +290,7 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
   const negative = value < 0
   const absValue = Math.abs(value)
   let result = ''
+  let hasNonZeroDigit = false
 
   for (let i = 0; i < tokens.length; ++i) {
     const token = tokens[i]
@@ -307,10 +313,14 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
     const grouping = /[#0],[#0]/.test(coreIntegerFormat)
     const integerSkeleton = coreIntegerFormat.replace(/,/g, '')
 
-    /* get fixed-point number without trailing zeros */
-    const valueParts = Number(absValue.toFixed(decimalFormat.length)).toString().split('.')
-    let integerPart = valueParts[0] || ''
-    let decimalPart = valueParts[1] || ''
+    /* get fixed-point digits (huge magnitudes expanded — see stringifyMagnitude) */
+    let {integerPart, decimalPart} = stringifyMagnitude(absValue, decimalFormat.length)
+
+    /* the signed-zero check reads the ROUNDED digits before padding/grouping,
+     * which only ever add zeros and separator glyphs */
+    if (/[1-9]/.test(integerPart + decimalPart)) {
+      hasNonZeroDigit = true
+    }
 
     if (integerSkeleton.length > integerPart.length) {
       const padSizeInteger = countChars(integerSkeleton.substr(0, integerSkeleton.length - integerPart.length), '0')
@@ -318,7 +328,8 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
     }
 
     /* group only after padding, only with a configured glyph, only on pure digits
-     * (Number#toString emits scientific notation e.g. 1e+21 for huge magnitudes) */
+     * (defensive: huge magnitudes arrive pre-expanded from scientific notation by
+     * stringifyMagnitude, but a non-finite value still stringifies as `Infinity`) */
     if (grouping && config.thousandSeparator !== '' && /^\d+$/.test(integerPart)) {
       integerPart = insertGrouping(integerPart, config.thousandSeparator)
     }
@@ -329,7 +340,35 @@ function numberFormat(tokens: FormatToken[], value: number, config: Config): Raw
     result += integerPart + trailingScaler + separator + decimalPart
   }
 
-  return negative ? '-' + result : result
+  /* Excel drops the implicitly-prepended minus when every rendered digit is
+   * zero after rounding (`TEXT(-0.4,"0")` → `0`, not `-0`); an explicit `-`
+   * literal in the mask is FREE_TEXT and has already been emitted above. */
+  return negative && hasNonZeroDigit ? '-' + result : result
+}
+
+/**
+ * Stringifies the integer and fractional digits of a magnitude for rendering:
+ * the value is rounded to `decimalPlaces` and split on the dot, with the
+ * trailing zeros of the fraction dropped (the placeholder padding re-adds
+ * them).
+ *
+ * Doubles `>= 1e21` stringify in scientific notation (`1e+21`), which would
+ * defeat placeholder padding and grouping, so they are expanded to their exact
+ * decimal digits via `BigInt` instead — every such double is integer-valued.
+ * NOTE: beyond 15 significant digits Excel displays zeros while the double's
+ * exact expansion may carry non-zero tail digits; HyperFormula renders the
+ * double's exact value (measured equal to Excel for the round `1e21` case).
+ *
+ * @param absValue the non-negative magnitude to stringify
+ * @param decimalPlaces the number of decimal places requested by the format
+ * @returns the integer digits and the trailing-zero-free fractional digits
+ */
+function stringifyMagnitude(absValue: number, decimalPlaces: number): { integerPart: string, decimalPart: string } {
+  if (absValue >= 1e21 && Number.isFinite(absValue)) {
+    return {integerPart: BigInt(absValue).toString(), decimalPart: ''}
+  }
+  const valueParts = Number(absValue.toFixed(decimalPlaces)).toString().split('.')
+  return {integerPart: valueParts[0] || '', decimalPart: valueParts[1] || ''}
 }
 
 /**
