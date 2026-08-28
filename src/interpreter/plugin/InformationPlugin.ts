@@ -45,7 +45,8 @@ function resolveIndexArguments(rowArgument: number, columnArgument: number, colu
 /**
  * Returns the value of an INDEX index argument that can be derived from the formula alone, or
  * `undefined` when it is known only once the argument is evaluated. An absent argument counts as
- * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime.
+ * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime. The value is
+ * returned untruncated, so that a negative one stays recognizable as negative.
  */
 function staticIndexArgument(ast: ProcedureAst, argumentIndex: number): Maybe<number> {
   if (indexArgumentIsAbsent(ast, argumentIndex)) {
@@ -54,7 +55,7 @@ function staticIndexArgument(ast: ProcedureAst, argumentIndex: number): Maybe<nu
 
   const argument = ast.args[argumentIndex]
 
-  return argument.type === AstNodeType.NUMBER ? Math.trunc(argument.value) : undefined
+  return argument.type === AstNodeType.NUMBER ? argument.value : undefined
 }
 
 /**
@@ -497,11 +498,12 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     const columnArgumentIsAbsent = indexArgumentIsAbsent(ast, INDEX_COLUMN_ARGUMENT)
 
     return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, rowArg: number, columnArg: number): InterpreterValue => {
-      const {row, column} = resolveIndexArguments(rowArg, columnArg, columnArgumentIsAbsent, rangeValue.height())
-
-      if (row < WHOLE_DIMENSION_INDEX || column < WHOLE_DIMENSION_INDEX) {
+      if (rowArg < WHOLE_DIMENSION_INDEX || columnArg < WHOLE_DIMENSION_INDEX) {
         return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
       }
+
+      const {row, column} = resolveIndexArguments(rowArg, columnArg, columnArgumentIsAbsent, rangeValue.height())
+
       if (row > rangeValue.height() || column > rangeValue.width()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
       }
@@ -539,6 +541,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     const columnArgument = staticIndexArgument(ast, INDEX_COLUMN_ARGUMENT)
 
     if (rowArgument === undefined || columnArgument === undefined) {
+      return ArraySize.scalar()
+    }
+    if (rowArgument < WHOLE_DIMENSION_INDEX || columnArgument < WHOLE_DIMENSION_INDEX) {
       return ArraySize.scalar()
     }
 
