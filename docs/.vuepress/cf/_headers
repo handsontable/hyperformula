@@ -1,0 +1,8 @@
+# Cloudflare Workers static-asset headers.
+# Copied to the root of the asset directory by `script/prepare-cf-assets.js`.
+#
+# Every file under `/docs/assets/` has a content hash in its name, so it can be
+# cached indefinitely. HTML documents keep the default revalidate-on-request
+# behaviour so that a new deployment is picked up immediately.
+/docs/assets/*
+  Cache-Control: public, max-age=31536000, immutable

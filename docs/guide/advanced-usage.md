@@ -1,3 +1,11 @@
+---
+tags:
+  - buildEmpty
+  - simpleCellAddressFromString
+  - getSheetValues
+  - cross-sheet
+---
+
 # Advanced usage
 
 ::: tip

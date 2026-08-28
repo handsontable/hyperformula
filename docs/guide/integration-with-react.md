@@ -1,3 +1,15 @@
+---
+tags:
+  - SSR
+  - React hooks
+  - useEffect
+  - useRef
+  - useState
+  - dynamic import
+  - use client
+  - lifecycle
+---
+
 # Integration with React
 
 The HyperFormula API is identical in a React app and in plain JavaScript. This guide demonstrates how HyperFormula is integrated with the React component tree and how its lifecycle maps to React hooks.
@@ -116,4 +128,4 @@ In the Pages Router, the same `dynamic(..., { ssr: false })` call works directly
 
 ## Demo
 
-For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.3.x/react-demo?v=' + $page.buildDateURIEncoded">React demo on Stackblitz</a>.
+For a more advanced example, check out the <a :href="'https://stackblitz.com/github/handsontable/hyperformula-demos/tree/3.4.x/react-demo?v=' + $page.buildDateURIEncoded">React demo on Stackblitz</a>.

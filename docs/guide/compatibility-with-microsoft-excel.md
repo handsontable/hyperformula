@@ -1,3 +1,15 @@
+---
+tags:
+  - MS Excel
+  - missing Excel functions
+  - wildcards
+  - regex
+  - useRegularExpressions
+  - 1900 leap year
+  - OpenDocument
+  - interoperability
+---
+
 # Compatibility with Microsoft Excel
 
 Achieve nearly full compatibility with Microsoft Excel, using the right HyperFormula configuration.

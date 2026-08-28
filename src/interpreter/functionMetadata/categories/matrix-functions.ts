@@ -31,11 +31,4 @@ export const MATRIX_FUNCTIONS_DOCS: Record<string, FunctionDoc> = {
     documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
     examples: ['=MMULT(A1:B2, D1:E2)', '=MMULT(A1:C2, A4:B6)'],
   },
-  TRANSPOSE: {
-    category: 'Matrix functions',
-    shortDescription: 'Transposes the rows and columns of an array.',
-    parameters: [{name: 'array', description: 'The range of cells whose rows and columns are swapped in the returned array.'}],
-    documentationUrl: 'https://hyperformula.handsontable.com/docs/guide/built-in-functions.html',
-    examples: ['=TRANSPOSE(A1:C2)', '=TRANSPOSE(A1:A5)'],
-  },
 }
