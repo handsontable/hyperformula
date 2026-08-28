@@ -4,7 +4,6 @@ tags:
   - global scope
   - variables
   - named constants
-  - named columns
   - structured references
   - addNamedExpression
   - changeNamedExpression
