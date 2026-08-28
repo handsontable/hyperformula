@@ -118,13 +118,6 @@ When array arithmetic is enabled (`useArrayArithmetic: true`), named ranges stil
 
 ## Named columns
 
-HyperFormula does not support Excel-style structured references such as `Table[Column]`, and it does not treat column headers as formula addresses. A formula like `=SUM(Name1:Name5)` is not a reference to columns named Name1 and Name5.
-
-Two separate problems often get stacked in that example:
-
-1. **Illegal name.** `Name1` matches A1 notation (column NAME, row 1), so it cannot be registered as a named expression. Use `ColSales` or `Name_1` instead. See [Naming rules](#naming-rules).
-2. **Range operator.** `:` does not accept named expressions as endpoints. Even with legal names, `Name_1:Name_5` is a parse error. See [Range restraints](cell-references.md#range-restraints).
-
 To address a column by name, register a named expression that points at the column (or at the data range), then use that name in the formula:
 
 ```javascript
@@ -135,6 +128,15 @@ hfInstance.setCellContents({ sheet: 0, col: 2, row: 0 }, [['=SUM(ColSales)']]);
 - The address inside the named expression must be **absolute** (`$A:$A` or `Sheet1!$A:$A`). Relative `A:A` is not allowed.
 - If row 1 is a header, `$A:$A` includes it. For data only, use `$A$2:$A`.
 - Do not put header text in the formula. Map each header to a named expression in application code.
+
+### Why SUM(Name1:Name5) does not work
+
+HyperFormula does not support Excel-style structured references such as `Table[Column]`, and it does not treat column headers as formula addresses. A formula like `=SUM(Name1:Name5)` is not a reference to columns named Name1 and Name5.
+
+Two separate problems often get stacked in that example:
+
+1. **Illegal name.** `Name1` matches A1 notation (column NAME, row 1), so it cannot be registered as a named expression. Use `ColSales` or `Name_1` instead. See [Naming rules](#naming-rules).
+2. **Range operator.** `:` does not accept named expressions as endpoints. Even with legal names, `Name_1:Name_5` is a parse error. See [Range restraints](cell-references.md#range-restraints).
 
 ## Available methods
 
