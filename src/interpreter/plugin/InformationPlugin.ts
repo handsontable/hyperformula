@@ -43,6 +43,19 @@ function resolveIndexArguments(rowArgument: number, columnArgument: number, colu
 }
 
 /**
+ * Returns the height a range is declared with, rather than the height the sheet currently uses.
+ *
+ * The two differ for an unbounded range, whose declared height is infinite while its used height
+ * follows the data. Only the declared height may decide the single-row rule: keying that rule on the
+ * used height would let `=INDEX(A:C, 2)` mean "cell B1" on a sheet holding one row of data and "the
+ * whole second row" once a second row is filled in, and would also disagree with
+ * {@link InformationPlugin#indexArraySize}, which has nothing but the declared size to work from.
+ */
+function declaredHeightOf(rangeValue: SimpleRangeValue): number {
+  return rangeValue.range?.height() ?? rangeValue.height()
+}
+
+/**
  * Returns the value of an INDEX index argument that can be derived from the formula alone, or
  * `undefined` when it is known only once the argument is evaluated. An absent argument counts as
  * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime. Truncation is
@@ -506,7 +519,7 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         return new CellError(ErrorType.REF, ErrorMessage.EmptyRange)
       }
 
-      const {row, column} = resolveIndexArguments(rowArg, columnArg, columnArgumentIsAbsent, rangeValue.height())
+      const {row, column} = resolveIndexArguments(rowArg, columnArg, columnArgumentIsAbsent, declaredHeightOf(rangeValue))
 
       if (row > rangeValue.height() || column > rangeValue.width()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
