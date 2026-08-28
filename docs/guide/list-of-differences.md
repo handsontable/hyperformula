@@ -116,6 +116,7 @@ To remove the differences, create [custom implementations](custom-functions.md) 
 | NORMSDIST     | =NORMSDIST(0, TRUE())                                          |          0.5 |  Wrong number |    Wrong number |
 | ADDRESS       | =ADDRESS(1,1,4, TRUE(), "")                                    |          !A1 |         ''!A1 |             !A1 |
 | SEQUENCE      | =SEQUENCE(0)                                                   |        VALUE |           N/A |           CALC  |
+| INDEX         | =INDEX(A1:C3, 2, B1)<br>where B1 = 0                           |        VALUE |     whole row |       whole row |
 | INT           | =INT(-8.9)                                                     |           -8 |            -9 |              -9 |
 | ISEVEN        | =ISEVEN(2.5)                                                   |        FALSE |          TRUE |            TRUE |
 | ISODD         | =ISODD(3.5)                                                    |        FALSE |          TRUE |            TRUE |
@@ -127,3 +128,4 @@ A few of the rows above share a root cause worth stating once:
 - **Rounding toward zero, not down.** `INT` discards the fractional part rather than rounding toward negative infinity, so it differs from Excel and Google Sheets for negative input only. `ROUNDDOWN`/`ROUNDUP` are unaffected — they are defined in terms of zero in all three.
 - **`ISEVEN`/`ISODD` do not truncate.** They test the remainder of the value as given, so a value with a fractional part returns `FALSE` from *both*. Excel and Google Sheets truncate to an integer first, so exactly one of the two is always `TRUE`.
 - **`CEILING.MATH`/`FLOOR.MATH` honour only `mode` = 1.** Excel and Google Sheets switch the negative-number rounding direction for any non-zero `mode`.
+- **`INDEX` returns a whole row or column only for literal indices.** An index of `0` selects every row or every column, exactly as in Excel and Google Sheets, but the result is an array whose size HyperFormula has to know before evaluating the formula. With a literal `0` it does; with an index computed from a cell or a formula it does not, and the array can then only be consumed by an enclosing function (`=SUM(INDEX(A1:C3, 2, B1))` works, `=INDEX(A1:C3, 2, B1)` does not). See [known limitations](known-limitations.md#index-function).

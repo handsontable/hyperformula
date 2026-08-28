@@ -3,14 +3,69 @@
  * Copyright (c) 2025 Handsoncode. All rights reserved.
  */
 
+import {ArraySize} from '../../ArraySize'
 import {CellError, ErrorType, SimpleCellAddress} from '../../Cell'
 import {FormulaVertex} from '../../DependencyGraph/FormulaVertex'
 import {ErrorMessage} from '../../error-message'
+import {Maybe} from '../../Maybe'
 import {AstNodeType, ProcedureAst} from '../../parser'
 import {InterpreterState} from '../InterpreterState'
 import {EmptyValue, InternalScalarValue, InterpreterValue, isExtendedNumber} from '../InterpreterValue'
 import {SimpleRangeValue} from '../../SimpleRangeValue'
 import {FunctionArgumentType, FunctionPlugin, FunctionPluginTypecheck, ImplementedFunctions} from './FunctionPlugin'
+
+/**
+ * The value of an INDEX index argument that selects every row or every column of the range instead
+ * of a single one.
+ */
+const WHOLE_DIMENSION_INDEX = 0
+
+/** Position of the `row_num` argument in the argument list of INDEX. */
+const INDEX_ROW_ARGUMENT = 1
+
+/** Position of the `column_num` argument in the argument list of INDEX. */
+const INDEX_COLUMN_ARGUMENT = 2
+
+/**
+ * Applies Excel's rule for a single-row range, where the only index provided is read as the column
+ * number, and truncates both indices toward zero the way Excel does.
+ *
+ * Either of the returned indices can be {@link WHOLE_DIMENSION_INDEX}, meaning that the result
+ * spans the whole dimension.
+ */
+function resolveIndexArguments(rowArgument: number, columnArgument: number, columnArgumentIsAbsent: boolean, rangeHeight: number): {row: number, column: number} {
+  const row = Math.trunc(rowArgument)
+  const column = Math.trunc(columnArgument)
+
+  return columnArgumentIsAbsent && rangeHeight === 1
+    ? {row: 1, column: row}
+    : {row, column}
+}
+
+/**
+ * Returns the value of an INDEX index argument that can be derived from the formula alone, or
+ * `undefined` when it is known only once the argument is evaluated. An absent argument counts as
+ * {@link WHOLE_DIMENSION_INDEX}, matching how such an argument is coerced at runtime.
+ */
+function staticIndexArgument(ast: ProcedureAst, argumentIndex: number): Maybe<number> {
+  if (indexArgumentIsAbsent(ast, argumentIndex)) {
+    return WHOLE_DIMENSION_INDEX
+  }
+
+  const argument = ast.args[argumentIndex]
+
+  return argument.type === AstNodeType.NUMBER ? Math.trunc(argument.value) : undefined
+}
+
+/**
+ * Returns `true` if and only if the given INDEX argument is missing from the formula or left empty,
+ * as in `=INDEX(A1:C3, 2)` and `=INDEX(A1:C3, 2, )`.
+ */
+function indexArgumentIsAbsent(ast: ProcedureAst, argumentIndex: number): boolean {
+  const argument = ast.args[argumentIndex]
+
+  return argument === undefined || argument.type === AstNodeType.EMPTY
+}
 
 /**
  * Interpreter plugin containing information functions
@@ -106,10 +161,11 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
     },
     'INDEX': {
       method: 'index',
+      sizeOfResultArrayMethod: 'indexArraySize',
       parameters: [
         {argumentType: FunctionArgumentType.RANGE},
         {argumentType: FunctionArgumentType.NUMBER},
-        {argumentType: FunctionArgumentType.NUMBER, defaultValue: 1},
+        {argumentType: FunctionArgumentType.NUMBER, defaultValue: WHOLE_DIMENSION_INDEX},
       ]
     },
     'NA': {
@@ -413,23 +469,80 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
   }
 
   /**
-   * Corresponds to INDEX
+   * Corresponds to INDEX(range, row_num, column_num)
    *
-   * Returns specific position in 2d array.
+   * Returns the value of a single cell of the range, or a whole row, a whole column or the whole
+   * range when the corresponding index is {@link WHOLE_DIMENSION_INDEX}.
+   *
+   * A `column_num` that is omitted or empty is read as {@link WHOLE_DIMENSION_INDEX}, except for
+   * single-row ranges, where the only index provided is read as the column number. Both conventions
+   * come from Excel, where `=INDEX(A1:C3, 2)` returns the whole second row while
+   * `=INDEX(A1:C1, 2)` returns cell `B1`.
+   *
+   * A result spanning more than one cell is an array, so the sheet has to reserve space for it
+   * before the formula is evaluated. That space is reserved based on
+   * {@link InformationPlugin#indexArraySize}, which can only tell the shape of the result for
+   * indices written as literal numbers. When an index is computed by a subexpression, the result is
+   * predicted to be a single cell: such a formula still passes whole rows and columns to an
+   * enclosing function (for example `=SUM(INDEX(A1:C3, B1, 0))`), but it cannot spill into the
+   * sheet on its own.
    *
    * @param ast
    * @param state
    */
   public index(ast: ProcedureAst, state: InterpreterState): InterpreterValue {
-    return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, row: number, col: number) => {
-      if (col < 1 || row < 1) {
-        return new CellError(ErrorType.VALUE, ErrorMessage.LessThanOne)
+    const columnArgumentIsAbsent = indexArgumentIsAbsent(ast, INDEX_COLUMN_ARGUMENT)
+
+    return this.runFunction(ast.args, state, this.metadata('INDEX'), (rangeValue: SimpleRangeValue, rowArg: number, columnArg: number): InterpreterValue => {
+      const {row, column} = resolveIndexArguments(rowArg, columnArg, columnArgumentIsAbsent, rangeValue.height())
+
+      if (row < WHOLE_DIMENSION_INDEX || column < WHOLE_DIMENSION_INDEX) {
+        return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
       }
-      if (col > rangeValue.width() || row > rangeValue.height()) {
-        return new CellError(ErrorType.NUM, ErrorMessage.ValueLarge)
+      if (row > rangeValue.height() || column > rangeValue.width()) {
+        return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
       }
-      return rangeValue?.data?.[row - 1]?.[col - 1] ?? rangeValue?.data?.[0]?.[0] ?? new CellError(ErrorType.VALUE, ErrorMessage.CellRangeExpected)
+
+      const selectedRows = row === WHOLE_DIMENSION_INDEX ? rangeValue.data : [rangeValue.data[row - 1]]
+      const selectedData: InternalScalarValue[][] = column === WHOLE_DIMENSION_INDEX
+        ? selectedRows.map(rowData => rowData.slice())
+        : selectedRows.map(rowData => [rowData[column - 1]])
+
+      return selectedData.length === 1 && selectedData[0].length === 1
+        ? selectedData[0][0]
+        : SimpleRangeValue.onlyValues(selectedData)
     })
+  }
+
+  /**
+   * Returns the size of the array returned by INDEX, or a scalar size when the shape of the result
+   * cannot be derived from the formula alone. See {@link InformationPlugin#index}.
+   *
+   * The indices are resolved with the same {@link resolveIndexArguments} the evaluation uses, so
+   * that the predicted shape cannot disagree with the shape of the value returned later.
+   *
+   * @param ast
+   * @param state
+   */
+  public indexArraySize(ast: ProcedureAst, state: InterpreterState): ArraySize {
+    if (ast.args.length < 2 || ast.args.length > 3) {
+      return ArraySize.error()
+    }
+
+    const rowArgument = staticIndexArgument(ast, INDEX_ROW_ARGUMENT)
+    const columnArgument = staticIndexArgument(ast, INDEX_COLUMN_ARGUMENT)
+
+    if (rowArgument === undefined || columnArgument === undefined) {
+      return ArraySize.scalar()
+    }
+
+    const rangeSize = this.arraySizeForAst(ast.args[0], state)
+    const {row, column} = resolveIndexArguments(rowArgument, columnArgument, indexArgumentIsAbsent(ast, INDEX_COLUMN_ARGUMENT), rangeSize.height)
+
+    return new ArraySize(
+      column === WHOLE_DIMENSION_INDEX ? rangeSize.width : 1,
+      row === WHOLE_DIMENSION_INDEX ? rangeSize.height : 1,
+    )
   }
 
   /**

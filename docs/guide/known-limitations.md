@@ -43,10 +43,17 @@ a circular reference.
 * CHISQ.INV, CHISQ.INV.RT, CHISQ.DIST.RT, CHIDIST, CHIINV and CHISQ.DIST (CHISQ.DIST in CDF mode): Running time grows linearly with the value of the second parameter, degrees_of_freedom (slow for values>1e7).
 * GAMMA.DIST, GAMMA.INV, GAMMADIST, GAMMAINV (GAMMA.DIST and GAMMADIST in CDF mode): Running time grows linearly with the value of the second parameter, alpha (slow for values>1e7). 
 * For certain inputs, the RATE function might have no solutions, or have multiple solutions. Our implementation uses an iterative algorithm (Newton's method) to find an approximation for one of the solutions to within 1e-7. If the approximation is not found after 50 iterations, the RATE function returns the `#NUM!` error.
-* The INDEX function doesn't support returning whole rows or columns of the source range – it always returns the contents of a single cell.
 * The FILTER function accepts either single rows of equal width or single columns of equal height. In other words, all arrays passed to the FILTER function must have equal dimensions, and at least one of those dimensions must be 1.
-* Array-producing functions (e.g., SEQUENCE, FILTER) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
+* Array-producing functions (e.g., SEQUENCE, FILTER, INDEX) require their output dimensions to be determinable at parse time. Passing cell references or formulas as dimension arguments (e.g., `=SEQUENCE(A1)`) results in a `#VALUE!` error, because the output size cannot be resolved before evaluation.
 * The TEXT function does not accept embedded double-quote literals in the format string. In Excel, `""` inside a format string is an escape sequence for a literal `"` character — e.g. `=TEXT(1234.5, "#,##0.00 ""zł""")` returns `"1,234.50 zł"`. If your application requires this escape sequence, supply a custom [`stringifyCurrency`](currency-handling.md) callback.
+
+### INDEX function
+
+* A `row` or `column` argument of 0 returns a whole row, a whole column or the whole range. Such a result is an array, so its size has to be known at parse time. That is the case only when both index arguments are written as literal numbers, as in `=INDEX(A1:C3, 2, 0)`. When an index is a cell reference or a formula, the result is assumed to be a single cell: `=SUM(INDEX(A1:C3, B1, 0))` still sums the whole row, but `=INDEX(A1:C3, B1, 0)` on its own returns a `#VALUE!` error, because no room was reserved for the array.
+
+* INDEX returns values, not a reference, so it cannot be used as an endpoint of a range. Excel's `=SUM(A1:INDEX(A1:A10, 5))` is a parsing error in HyperFormula. Use [OFFSET](#offset-function) to build a range dynamically.
+
+* Excel's reference form of the function, `INDEX(reference, row_num, column_num, area_num)`, is not supported. HyperFormula has no multi-area references, so `area_num` would have nothing to select from, and a fourth argument returns a `#N/A` error.
 
 ### UNIQUE function
 
