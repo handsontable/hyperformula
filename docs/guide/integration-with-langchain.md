@@ -1,3 +1,12 @@
+---
+tags:
+  - AI agents
+  - LLM
+  - tool calling
+  - deterministic
+  - createSpreadsheetTools
+---
+
 # Integration with LangChain/LangGraph
 
 A [LangChain.js](https://js.langchain.com/) / [LangGraph](https://langchain-ai.github.io/langgraphjs/) tool that gives your agents deterministic spreadsheet and formula computation — backed by HyperFormula's Excel-compatible engine.

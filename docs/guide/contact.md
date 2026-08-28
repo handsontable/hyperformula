@@ -1,3 +1,14 @@
+---
+tags:
+  - pricing
+  - get a quote
+  - purchase
+  - email
+  - VAT
+  - invoice
+  - Handsoncode
+---
+
 # Contact
 
 HyperFormula is a product of Handsoncode, the company that stands behind
