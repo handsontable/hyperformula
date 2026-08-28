@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added the `arrayFunctionResultOverwritesData` configuration option (default `false`). When enabled, an array function whose result spills onto occupied cells overwrites them instead of returning a `#SPILL!` error. This is an opt-in, destructive behavior; a collision with another array still yields `#SPILL!`. [#1714](https://github.com/handsontable/hyperformula/pull/1714)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
@@ -16,7 +20,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Added a new function: `XIRR`. [#1701](https://github.com/handsontable/hyperformula/pull/1701)
 - Added the UNIQUE function. [#1708](https://github.com/handsontable/hyperformula/pull/1708)
 - Added the SORT function. [#1707](https://github.com/handsontable/hyperformula/pull/1707)
-- Added the `arrayFunctionResultOverwritesData` configuration option (default `false`). When enabled, an array function whose result spills onto occupied cells overwrites them instead of returning a `#SPILL!` error. This is an opt-in, destructive behavior; a collision with another array still yields `#SPILL!`.
 - Added an Indonesian (Bahasa Indonesia) language pack. [#1674](https://github.com/handsontable/hyperformula/pull/1674)
 - Added a `stringifyCurrency` config option that lets you plug in a custom currency formatter for the `TEXT` function. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 
