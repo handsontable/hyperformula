@@ -673,7 +673,7 @@ export class Operations {
    * nor is reported as an occupant.
    */
   private overwrittenOccupantAddresses(anchorAddress: SimpleCellAddress, size: ArraySize): SimpleCellAddress[] {
-    if (!this.dependencyGraph.config.arrayFunctionResultOverwritesData || size.width * size.height <= 1) {
+    if (!this.dependencyGraph.config.arrayFunctionResultOverwritesData || size.isScalar()) {
       return []
     }
 
