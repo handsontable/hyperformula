@@ -17,10 +17,7 @@ export async function loadXlsxWorkbook(data: ArrayBuffer | Uint8Array): Promise<
     throw new UnsupportedFileError('empty')
   }
 
-  // Copy to a fresh, zero-offset Uint8Array (works in Node and the browser
-  // without pulling in the Node `Buffer` polyfill). `.slice()` on a subarray
-  // view copies exactly the view's logical bytes, so byteOffset is honored.
-  const bytes = data instanceof Uint8Array ? data.slice() : new Uint8Array(data)
+  const bytes = toStandaloneBytes(data)
 
   try {
     const ExcelJS = await import(/* webpackMode: "eager" */ 'exceljs')
@@ -31,4 +28,34 @@ export async function loadXlsxWorkbook(data: ArrayBuffer | Uint8Array): Promise<
     const detail = e instanceof Error ? e.message : String(e)
     throw new UnsupportedFileError('unparseable', detail)
   }
+}
+
+/**
+ * Returns a zero-offset `Uint8Array` whose `ArrayBuffer` holds exactly the
+ * caller's logical bytes, so that `.buffer` can be handed to ExcelJS as-is.
+ *
+ * A `Uint8Array` argument may be a *view* into a larger buffer whose remaining
+ * bytes belong to someone else — in Node every small `Buffer` is carved out of a
+ * shared allocation pool — and passing that buffer on would let ExcelJS parse
+ * the neighbouring bytes instead. A `.xlsx` file is a ZIP, located by scanning
+ * backwards for its end-of-central-directory record, so a trailing foreign
+ * workbook wins silently: one import then resolves to another import's content.
+ *
+ * The view therefore has to be copied out. Neither `Buffer.prototype.slice` (an
+ * alias of `subarray`) nor `subarray` does that, and the Node `Buffer` API is
+ * avoided altogether because it pulls webpack's `Buffer` polyfill into the
+ * browser bundles; `set()` on a freshly allocated array works on both targets.
+ *
+ * An `ArrayBuffer` argument needs no copy: it is standalone by definition, and
+ * all of it is the file.
+ */
+function toStandaloneBytes(data: ArrayBuffer | Uint8Array): Uint8Array {
+  if (!(data instanceof Uint8Array)) {
+    return new Uint8Array(data)
+  }
+
+  const bytes = new Uint8Array(data.byteLength)
+  bytes.set(data)
+
+  return bytes
 }

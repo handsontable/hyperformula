@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added built-in `.xlsx` import/export: the `HyperFormula.buildFromFile()` static factory and the `toFile()` instance method, backed by ExcelJS. [#1702](https://github.com/handsontable/hyperformula/pull/1702)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
