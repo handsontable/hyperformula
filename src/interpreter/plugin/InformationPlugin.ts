@@ -502,6 +502,10 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
         return new CellError(ErrorType.VALUE, ErrorMessage.Negative)
       }
 
+      if (rangeValue.height() === 0 || rangeValue.width() === 0) {
+        return new CellError(ErrorType.REF, ErrorMessage.EmptyRange)
+      }
+
       const {row, column} = resolveIndexArguments(rowArg, columnArg, columnArgumentIsAbsent, rangeValue.height())
 
       if (row > rangeValue.height() || column > rangeValue.width()) {
@@ -534,6 +538,10 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * occupied. A negative index needs no such case: it is always written as a negated literal, which
    * is not a literal number and so is not known here in the first place.
    *
+   * An unbounded range (`A:C`, `1:2`) has an infinite dimension, and no area of that size can be
+   * reserved in a sheet. A single cell is predicted for it too, which makes the formula report that
+   * its result does not fit rather than silently spill only the part that does.
+   *
    * @param ast
    * @param state
    */
@@ -556,10 +564,14 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       return ArraySize.scalar()
     }
 
-    return new ArraySize(
-      column === WHOLE_DIMENSION_INDEX ? rangeSize.width : 1,
-      row === WHOLE_DIMENSION_INDEX ? rangeSize.height : 1,
-    )
+    const width = column === WHOLE_DIMENSION_INDEX ? rangeSize.width : 1
+    const height = row === WHOLE_DIMENSION_INDEX ? rangeSize.height : 1
+
+    if (!Number.isFinite(width) || !Number.isFinite(height)) {
+      return ArraySize.scalar()
+    }
+
+    return new ArraySize(width, height)
   }
 
   /**
