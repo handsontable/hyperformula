@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the `TEXT` function so that number-format masks with thousands grouping (`#,##0`) and positive/negative/zero sections (`0.00;(0.00)`) are formatted correctly instead of leaking the unparsed mask into the output. The built-in number formatter now also honors the configured `decimalSeparator` and `thousandSeparator` and ignores color tags such as `[Red]`, which are now removed from the format string before it reaches the `stringifyDateTime` and `stringifyDuration` callbacks. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
@@ -21,7 +25,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Fixed
 
-- Fixed the `TEXT` function so that number-format masks with thousands grouping (`#,##0`) and positive/negative/zero sections (`0.00;(0.00)`) are formatted correctly instead of leaking the unparsed mask into the output. The built-in number formatter now also honors the configured `decimalSeparator` and `thousandSeparator` and ignores color tags such as `[Red]`, which are now removed from the format string before it reaches the `stringifyDateTime` and `stringifyDuration` callbacks. [#1145](https://github.com/handsontable/hyperformula/issues/1145)
 - Fixed the behavior of `MATCH`, `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions when the search range contained empty cells. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
 - Fixed the `VLOOKUP`, `HLOOKUP`, and `XLOOKUP` functions to return `0` instead of an empty value when the matched cell in the result range is empty. [#1697](https://github.com/handsontable/hyperformula/pull/1697)
 - Fixed the page freezing when entering a long string of digits containing a non-digit character near the end (e.g. `012...789a` or `012...789 123`) into a cell. [#1520](https://github.com/handsontable/hyperformula/issues/1520)
