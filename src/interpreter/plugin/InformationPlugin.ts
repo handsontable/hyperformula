@@ -505,6 +505,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
       if (row > rangeValue.height() || column > rangeValue.width()) {
         return new CellError(ErrorType.REF, ErrorMessage.IndexBounds)
       }
+      if (row !== WHOLE_DIMENSION_INDEX && column !== WHOLE_DIMENSION_INDEX) {
+        return rangeValue.data[row - 1][column - 1]
+      }
 
       const selectedRows = row === WHOLE_DIMENSION_INDEX ? rangeValue.data : [rangeValue.data[row - 1]]
       const selectedData: InternalScalarValue[][] = column === WHOLE_DIMENSION_INDEX
