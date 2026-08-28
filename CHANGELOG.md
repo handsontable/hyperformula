@@ -9,16 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Added
 
-- Added support for whole-row, whole-column and whole-range results of the `INDEX` function. An index of `0` selects every row (`=INDEX(A1:C3, 0, 2)`) or every column (`=INDEX(A1:C3, 2, 0)`), matching Excel. The result is an array, so it needs free space in the sheet to spill into. HYPERFORMULA_PR_LINK
+- Added support for whole-row, whole-column and whole-range results of the `INDEX` function. An index of `0` selects every row (`=INDEX(A1:C3, 0, 2)`) or every column (`=INDEX(A1:C3, 2, 0)`), matching Excel. The result is an array, so it needs free space in the sheet to spill into. [#1754](https://github.com/handsontable/hyperformula/pull/1754)
 
 ### Changed
 
-- A **breaking change**: the `INDEX` function no longer defaults its third argument to `1`. An omitted third argument now means "every column", so `=INDEX(A1:C3, 2)` returns the whole second row instead of the value in its first column. For a single-row range the only index provided is read as the column number, so `=INDEX(A1:C1, 3)` returns the value of `C1` instead of a `#NUM!` error. Both behaviors match Excel. HYPERFORMULA_PR_LINK
-- A **breaking change**: the `INDEX` function returns a `#REF!` error instead of `#NUM!` when an index exceeds the size of the range, and a `#VALUE!` error with the "Value cannot be negative." message instead of "Argument cannot be less than 1." for a negative index. Both match Excel and the behavior already described in the [cell references guide](https://hyperformula.handsontable.com/docs/guide/cell-references.html). HYPERFORMULA_PR_LINK
+- A **breaking change**: the `INDEX` function no longer defaults its third argument to `1`. An omitted third argument now means "every column", so `=INDEX(A1:C3, 2)` returns the whole second row instead of the value in its first column. For a single-row range the only index provided is read as the column number, so `=INDEX(A1:C1, 3)` returns the value of `C1` instead of a `#NUM!` error. Both behaviors match Excel. [#1754](https://github.com/handsontable/hyperformula/pull/1754)
+- A **breaking change**: the `INDEX` function returns a `#REF!` error instead of `#NUM!` when an index exceeds the size of the range, and a `#VALUE!` error with the "Value cannot be negative." message instead of "Argument cannot be less than 1." for a negative index. Both match Excel and the behavior already described in the [cell references guide](https://hyperformula.handsontable.com/docs/guide/cell-references.html). [#1754](https://github.com/handsontable/hyperformula/pull/1754)
 
 ### Fixed
 
-- Fixed the `INDEX` function silently returning the top-left cell of the range for a fractional index. Indices are now truncated toward zero, as in Excel, so `=INDEX(A1:C3, 2.9, 1)` returns the value of `A2`. HYPERFORMULA_PR_LINK
+- Fixed the `INDEX` function silently returning the top-left cell of the range for a fractional index. Indices are now truncated toward zero, as in Excel, so `=INDEX(A1:C3, 2.9, 1)` returns the value of `A2`. [#1754](https://github.com/handsontable/hyperformula/pull/1754)
 - Fixed the `MOD` function returning a remainder with the sign of the dividend instead of the sign of the divisor, which made the results differ from Excel and Google Sheets for arguments with opposite signs (e.g. `=MOD(-3, 12)` now returns `9` instead of `-3`). [#1747](https://github.com/handsontable/hyperformula/issues/1747)
 
 ## [3.4.0] - 2026-08-10
