@@ -61,9 +61,9 @@ function resolveIndexArguments(rowArgument: number, columnArgument: number, colu
  * Returns the height a range is declared with, rather than the height the sheet currently uses.
  *
  * The two differ for an unbounded range, whose declared height is infinite while its used height
- * follows the data. Only the declared height may decide the single-row rule: keying that rule on the
- * used height would let `=INDEX(A:C, 2)` mean "cell B1" on a sheet holding one row of data and "the
- * whole second row" once a second row is filled in, and would also disagree with
+ * follows the data. Only the declared height may decide how an omitted `column_num` is read: keying
+ * that on the used height would let `=INDEX(A:C, 2)` mean "cell B1" on a sheet holding one row of
+ * data and something else entirely once a second row is filled in, and would also disagree with
  * {@link InformationPlugin#indexArraySize}, which has nothing but the declared size to work from.
  */
 function declaredHeightOf(rangeValue: SimpleRangeValue): number {
@@ -514,10 +514,9 @@ export class InformationPlugin extends FunctionPlugin implements FunctionPluginT
    * Returns the value of a single cell of the range, or a whole row, a whole column or the whole
    * range when the corresponding index is {@link WHOLE_DIMENSION_INDEX}.
    *
-   * A `column_num` that is omitted or empty is read as {@link WHOLE_DIMENSION_INDEX}, except for
-   * single-row ranges, where the only index provided is read as the column number. Both conventions
-   * come from Excel, where `=INDEX(A1:C3, 2)` returns the whole second row while
-   * `=INDEX(A1:C1, 2)` returns cell `B1`.
+   * A `column_num` left *empty* is read as {@link WHOLE_DIMENSION_INDEX}. A `column_num` left *out*
+   * is a different thing: see {@link resolveIndexArguments}. Both conventions come from Excel, where
+   * `=INDEX(A1:C3, 2, )` returns the whole second row while `=INDEX(A1:C3, 2)` is `#REF!`.
    *
    * A result spanning more than one cell is an array, so the sheet has to reserve space for it
    * before the formula is evaluated. That space is reserved based on
